@@ -220,6 +220,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
                 var id = working.BeatmapSetInfo.ID;
 
                 var stream = storage.GetStream($"custom/lyrics/beatmap-{id}.json", FileAccess.Read, FileMode.Create);
+
                 if (stream == null)
                 {
                     Logger.Log("未找到对应文件", LoggingTarget.Runtime, LogLevel.Important);

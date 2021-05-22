@@ -22,6 +22,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
+using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
@@ -93,6 +94,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private MusicController musicController { get; set; }
 
+        [Resolved]
+        private SpectatorClient spectatorClient { get; set; }
+
         private Sample sampleRestart;
 
         public BreakOverlay BreakOverlay;
@@ -154,6 +158,9 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
+            if (!LoadedBeatmapSuccessfully)
+                return;
+
             // replays should never be recorded or played back when autoplay is enabled
             if (!Mods.Value.Any(m => m is ModAutoplay))
                 PrepareReplay();
@@ -198,6 +205,7 @@ namespace osu.Game.Screens.Play
                 LocalUserPlaying.BindTo(osuGame.LocalUserPlaying);
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
+            dependencies.CacheAs(DrawableRuleset);
 
             ScoreProcessor = ruleset.CreateScoreProcessor();
             ScoreProcessor.ApplyBeatmap(playableBeatmap);
@@ -357,11 +365,6 @@ namespace osu.Game.Screens.Play
                         {
                             AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
                             IsCounting = false
-                        },
-                        RequestSeek = time =>
-                        {
-                            GameplayClockContainer.Seek(time);
-                            GameplayClockContainer.Start();
                         },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
@@ -566,6 +569,12 @@ namespace osu.Game.Screens.Play
             // return samplePlaybackDisabled.Value to what is defined by the beatmap's current state
             updateSampleDisabledState();
         }
+
+        /// <summary>
+        /// Seek to a specific time in gameplay.
+        /// </summary>
+        /// <param name="time">The destination time to seek to.</param>
+        public void Seek(double time) => GameplayClockContainer.Seek(time);
 
         /// <summary>
         /// Restart gameplay via a parent <see cref="PlayerLoader"/>.
@@ -878,6 +887,11 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
+            // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
+            // To resolve test failures, forcefully end playing synchronously when this screen exits.
+            // Todo: Replace this with a more permanent solution once osu-framework has a synchronous cleanup method.
+            spectatorClient.EndPlaying();
+
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.
             // as we are no longer the current screen, we cannot guarantee the track is still usable.
             (GameplayClockContainer as MasterGameplayClockContainer)?.StopUsingBeatmapClock();
@@ -926,11 +940,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="score">The <see cref="Score"/> to import.</param>
         /// <returns>The imported score.</returns>
-        protected virtual Task ImportScore(Score score)
+        protected virtual async Task ImportScore(Score score)
         {
             // Replays are already populated and present in the game's database, so should not be re-imported.
             if (DrawableRuleset.ReplayScore != null)
-                return Task.CompletedTask;
+                return;
 
             LegacyByteArrayReader replayReader;
 
@@ -940,7 +954,18 @@ namespace osu.Game.Screens.Play
                 replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
             }
 
-            return scoreManager.Import(score.ScoreInfo, replayReader);
+            // For the time being, online ID responses are not really useful for anything.
+            // In addition, the IDs provided via new (lazer) endpoints are based on a different autoincrement from legacy (stable) scores.
+            //
+            // Until we better define the server-side logic behind this, let's not store the online ID to avoid potential unique constraint
+            // conflicts across various systems (ie. solo and multiplayer).
+            long? onlineScoreId = score.ScoreInfo.OnlineScoreID;
+            score.ScoreInfo.OnlineScoreID = null;
+
+            await scoreManager.Import(score.ScoreInfo, replayReader).ConfigureAwait(false);
+
+            // ... And restore the online ID for other processes to handle correctly (e.g. de-duplication for the results screen).
+            score.ScoreInfo.OnlineScoreID = onlineScoreId;
         }
 
         /// <summary>

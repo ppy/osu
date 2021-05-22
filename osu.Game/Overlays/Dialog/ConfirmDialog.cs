@@ -28,12 +28,12 @@ namespace osu.Game.Overlays.Dialog
             {
                 new PopupDialogOkButton
                 {
-                    Text = @"确定",
+                    Text = @"是的，我确定",
                     Action = onConfirm
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = @"取消",
+                    Text = @"让我再想想><",
                     Action = onCancel
                 },
             };

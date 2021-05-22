@@ -1,15 +1,12 @@
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Mvis.Misc;
+using osu.Game.Online.Placeholders;
 using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.SideBar;
 using osuTK;
-using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Mvis.Plugins
@@ -33,6 +30,9 @@ namespace osu.Game.Screens.Mvis.Plugins
         public MvisPlugin Plugin { get; }
         protected IPluginConfigManager Config => Dependencies.Get<MvisPluginManager>().GetConfigManager(Plugin);
 
+        [Resolved]
+        private MvisPluginManager pluginManager { get; set; }
+
         protected PluginSidebarPage(MvisPlugin plugin, float resizeWidth)
         {
             ResizeWidth = resizeWidth;
@@ -50,48 +50,35 @@ namespace osu.Game.Screens.Mvis.Plugins
                 placeholder = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Depth = float.MinValue,
+                    RelativePositionAxes = Axes.Both,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
                     Children = new Drawable[]
                     {
-                        new BlockMouseBox
+                        bgBox = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black.Opacity(0.5f),
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre
                         },
-                        new FillFlowContainer
+                        new ClickablePlaceholder("请先启用该插件!", FontAwesome.Solid.Plug)
                         {
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Vertical,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Colour = Color4.White.Opacity(0.6f),
-                            Children = new Drawable[]
-                            {
-                                new SpriteIcon
-                                {
-                                    Icon = FontAwesome.Solid.Ban,
-                                    Size = new Vector2(60),
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                },
-                                new OsuSpriteText
-                                {
-                                    Text = "插件不可用",
-                                    Font = OsuFont.GetFont(size: 45, weight: FontWeight.Bold),
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                }
-                            }
-                        },
+                            Action = () => pluginManager?.ActivePlugin(Plugin),
+                            Scale = new Vector2(1.25f)
+                        }
                     }
                 }
             };
         }
 
         private DependencyContainer dependencies;
+        private readonly Box bgBox;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+        [Resolved]
+        private CustomColourProvider colourProvider { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -102,8 +89,16 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             Plugin.Disabled.BindValueChanged(v =>
             {
-                content.FadeTo(v.NewValue ? 0 : 1);
-                placeholder.FadeTo(v.NewValue ? 1 : 0, 200);
+                if (v.NewValue)
+                {
+                    content.FadeOut();
+                    placeholder.MoveToY(0, 500, Easing.OutQuint);
+                }
+                else
+                {
+                    content.FadeIn(200, Easing.OutQuint);
+                    placeholder.MoveToY(1, 500, Easing.OutQuint);
+                }
 
                 if (!v.NewValue && !contentInit)
                 {
@@ -111,6 +106,16 @@ namespace osu.Game.Screens.Mvis.Plugins
                     contentInit = true;
                 }
             }, true);
+        }
+
+        protected override void LoadComplete()
+        {
+            colourProvider.HueColour.BindValueChanged(_ =>
+            {
+                bgBox.Colour = colourProvider.Background7;
+            }, true);
+
+            base.LoadComplete();
         }
 
         public float ResizeWidth { get; }

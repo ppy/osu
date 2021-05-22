@@ -4,22 +4,23 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public abstract class ManiaSelectionBlueprint : OverlaySelectionBlueprint
+    public abstract class ManiaSelectionBlueprint<T> : HitObjectSelectionBlueprint<T>
+        where T : ManiaHitObject
     {
         public new DrawableManiaHitObject DrawableObject => (DrawableManiaHitObject)base.DrawableObject;
 
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
-        protected ManiaSelectionBlueprint(DrawableHitObject drawableObject)
-            : base(drawableObject)
+        protected ManiaSelectionBlueprint(T hitObject)
+            : base(hitObject)
         {
             RelativeSizeAxes = Axes.None;
         }

@@ -163,8 +163,8 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             Active.BindValueChanged(OnActiveChanged, true);
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                maskBox.Colour = colourProvider.Background3.Opacity(0.65f);
-                maskFillFlow.Colour = bgBox.Colour = colourProvider.Background4;
+                maskBox.Colour = colourProvider.Dark3.Opacity(0.65f);
+                maskFillFlow.Colour = bgBox.Colour = colourProvider.Dark4;
 
                 if (Active.Value)
                 {
@@ -173,8 +173,8 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                         : colourProvider.Light2;
                 }
                 else
-                    content.BorderColour = colourProvider.Background1;
-            });
+                    content.BorderColour = colourProvider.Dark1;
+            }, true);
         }
 
         private class Flash : BeatSyncedContainer

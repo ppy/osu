@@ -1,4 +1,5 @@
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Shapes;
@@ -27,7 +28,7 @@ namespace osu.Game.Tests.Visual.Mvis
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(Colour4.White, Colour4.LightGray)
+                    Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#333"), Color4Extensions.FromHex("#777"))
                 },
                 button = new BottomBarButton
                 {

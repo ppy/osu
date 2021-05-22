@@ -101,11 +101,11 @@ namespace osu.Game.Tests.Visual.Mvis
 
             protected override void LoadComplete()
             {
-                MvisScreen.OnBeatmapChanged += b =>
+                MvisScreen.OnBeatmapChanged(b =>
                 {
                     songTitle.Text = b.Metadata.TitleUnicode ?? b.Metadata.Title;
                     songArtist.Text = b.Metadata.ArtistUnicode ?? b.Metadata.Artist;
-                };
+                }, this);
 
                 base.LoadComplete();
             }

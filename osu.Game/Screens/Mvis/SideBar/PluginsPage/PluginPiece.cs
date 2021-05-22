@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
         private Box bgBox;
         private Color4 defaultIconColor => colourProvider.Light1.Opacity(0.5f);
         private Color4 indicatorActiveColor => colourProvider.Light1;
-        private Color4 indicatorInActiveColor => colourProvider.Background1;
+        private Color4 indicatorInActiveColor => colourProvider.Dark1;
 
         public PluginPiece(MvisPlugin pl)
         {
@@ -229,8 +229,8 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
             colourProvider.HueColour.BindValueChanged(_ =>
             {
                 disabled.TriggerChange();
-                maskBox.FadeColour(colourProvider.Background3.Opacity(0.65f));
-                bgBox.FadeColour(colourProvider.Background4);
+                maskBox.FadeColour(colourProvider.Dark3.Opacity(0.65f));
+                bgBox.FadeColour(colourProvider.Dark4);
                 unloadButton.Colour = defaultIconColor;
             }, true);
         }

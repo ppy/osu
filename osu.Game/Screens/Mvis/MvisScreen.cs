@@ -21,6 +21,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Mf;
 using osu.Game.Rulesets.Mods;
@@ -58,7 +60,7 @@ namespace osu.Game.Screens.Mvis
         private bool okForHide => IsHovered
                                   && isIdle.Value
                                   && !(bottomBar?.IsHovered ?? false)
-                                  && !(lockButton?.ToggleableValue.Value ?? false)
+                                  && !(lockButton?.Value.Value ?? false)
                                   && !lockChanges.Value
                                   && inputManager?.DraggedDrawable == null
                                   && inputManager?.FocusedDrawable == null;
@@ -102,7 +104,28 @@ namespace osu.Game.Screens.Mvis
         /// 谱面变更时调用<br/><br/>
         /// 传递: 当前谱面(WorkingBeatmap)<br/>
         /// </summary>
-        public Action<WorkingBeatmap> OnBeatmapChanged;
+        private Action<WorkingBeatmap> onBeatmapChangedAction;
+
+        public void OnBeatmapChanged(Action<WorkingBeatmap> action, Drawable sender, bool runOnce = false)
+        {
+            bool alreadyRegistered = onBeatmapChangedAction?.GetInvocationList().ToList().Contains(action) ?? false;
+
+            if (sender.GetType().IsSubclassOf(typeof(MvisPlugin))
+                && pluginManager.GetAllPlugins(false).Contains((MvisPlugin)sender)
+                && runOnce
+                && alreadyRegistered)
+            {
+                action.Invoke(Beatmap.Value);
+                return;
+            }
+
+            if (alreadyRegistered)
+                throw new InvalidOperationException($"{sender}已经注册过一个相同的{action}了。");
+
+            onBeatmapChangedAction += action;
+
+            if (runOnce) action.Invoke(Beatmap.Value);
+        }
 
         /// <summary>
         /// 拖动下方进度条时调用<br/><br/>
@@ -245,10 +268,9 @@ namespace osu.Game.Screens.Mvis
 
         private IProvideAudioControlPlugin audioControlProvider;
         private readonly OsuMusicControllerWrapper musicControllerWrapper = new OsuMusicControllerWrapper();
+        private SettingsButton songSelectButton;
 
         public float BottombarHeight => (bottomBar?.Height - bottomBar?.Y ?? 0) + 10 + 5;
-
-        public new string Name => "123";
 
         #endregion
 
@@ -296,13 +318,13 @@ namespace osu.Game.Screens.Mvis
                             {
                                 Padding = new MarginPadding(0)
                             },
-                            new SettingsButton
+                            songSelectButton = new SettingsButton
                             {
                                 Text = "歌曲选择",
                                 Action = () => this.Push(new MvisSongSelect())
                             }
                         }
-                    },
+                    }
                 },
                 pluginsPage = new SidebarPluginsPage()
             });
@@ -325,27 +347,20 @@ namespace osu.Game.Screens.Mvis
                 {
                     Alpha = 0
                 },
-                new Container
+                bgTriangles = new BgTrianglesContainer(),
+                background = new Container
                 {
-                    Name = "Contents",
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
-                    Children = new Drawable[]
-                    {
-                        bgTriangles = new BgTrianglesContainer(),
-                        background = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Name = "Background Layer",
-                        },
-                        foreground = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Name = "Foreground Layer",
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre
-                        }
-                    }
+                    Name = "Background Layer"
+                },
+                foreground = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
+                    Name = "Foreground Layer",
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
                 },
                 skinnableForeground = new FullScreenSkinnableComponent("MPlayer-foreground", confineMode: ConfineMode.ScaleToFill, defaultImplementation: _ => new PlaceHolder())
                 {
@@ -366,7 +381,7 @@ namespace osu.Game.Screens.Mvis
                     {
                         skinnableBbBackground = new FullScreenSkinnableComponent("MBottomBar-background",
                             confineMode: ConfineMode.ScaleToFill,
-                            masking: true,
+                            masking: false,
                             defaultImplementation: _ => new PlaceHolder())
                         {
                             Name = "底栏背景图",
@@ -453,14 +468,14 @@ namespace osu.Game.Screens.Mvis
 
                                         //防止手机端无法恢复界面
                                         lockChanges.Value = RuntimeInfo.IsDesktop;
-                                        lockButton.ToggleableValue.Value = !RuntimeInfo.IsDesktop;
+                                        lockButton.Value.Value = !RuntimeInfo.IsDesktop;
                                     },
                                     TooltipText = "锁定变更并隐藏界面"
                                 },
                                 loopToggleButton = new ToggleLoopButton
                                 {
                                     ButtonIcon = FontAwesome.Solid.Undo,
-                                    Action = () => CurrentTrack.Looping = loopToggleButton.ToggleableValue.Value,
+                                    Action = () => CurrentTrack.Looping = loopToggleButton.Value.Value,
                                     TooltipText = "单曲循环",
                                 },
                                 soloButton = new BottomBarButton
@@ -469,11 +484,13 @@ namespace osu.Game.Screens.Mvis
                                     Action = presentBeatmap,
                                     TooltipText = "在单人游戏选歌界面中查看",
                                 },
-                                sidebarToggleButton = new BottomBarButton
+                                sidebarToggleButton = new BottomBarSwitchButton
                                 {
-                                    ButtonIcon = FontAwesome.Solid.Cog,
+                                    ButtonIcon = FontAwesome.Solid.List,
                                     Action = () => updateSidebarState(settingsScroll),
-                                    TooltipText = "播放器设置",
+                                    TooltipText = "侧边栏(播放器设置)",
+                                    Value = { BindTarget = sidebar.IsVisible },
+                                    IsCoupled = false
                                 }
                             }
                         },
@@ -526,7 +543,7 @@ namespace osu.Game.Screens.Mvis
 
             inputManager = GetContainingInputManager();
 
-            songProgressButton.ToggleableValue.BindTo(trackRunning);
+            songProgressButton.Value.BindTo(trackRunning);
 
             allowProxy.BindValueChanged(v =>
             {
@@ -623,22 +640,28 @@ namespace osu.Game.Screens.Mvis
             {
                 //获取与新值匹配的控制插件
                 var pl = (IProvideAudioControlPlugin)pluginManager.GetAllPlugins(false).FirstOrDefault(p => v.NewValue == $"{p.GetType().Namespace}+{p.GetType().Name}");
-
-                //如果没找到(为null)，则解锁Beatmap.Disabled
-                Beatmap.Disabled = pl != null;
-
-                //设置当前控制插件IsCurrent为false
-                audioControlProvider.IsCurrent = false;
-
-                //切换并设置当前控制插件IsCurrent为true
-                audioControlProvider = pl ?? musicControllerWrapper;
-                audioControlProvider.IsCurrent = true;
+                changeAudioControlProvider(pl);
             }, true);
 
             bottomBar.MoveToY(bottomBar.Height + 10).FadeOut();
             progressBar.MoveToY(5);
 
             base.LoadComplete();
+        }
+
+        private void changeAudioControlProvider(IProvideAudioControlPlugin pacp)
+        {
+            //如果没找到(为null)，则解锁Beatmap.Disabled
+            Beatmap.Disabled = pacp != null;
+
+            //设置当前控制插件IsCurrent为false
+            audioControlProvider.IsCurrent = false;
+
+            //切换并设置当前控制插件IsCurrent为true
+            audioControlProvider = pacp ?? musicControllerWrapper;
+            audioControlProvider.IsCurrent = true;
+
+            songSelectButton.Enabled.Value = audioControlProvider == musicControllerWrapper;
         }
 
         private void setupKeyBindings()
@@ -654,7 +677,7 @@ namespace osu.Game.Screens.Mvis
             keyBindings[GlobalAction.MvisForceLockOverlayChanges] = () => lockChanges.Toggle();
             keyBindings[GlobalAction.Back] = () =>
             {
-                if (sidebar.IsPresent && !sidebar.Hiding)
+                if (sidebar.IsPresent && sidebar.IsVisible.Value)
                 {
                     sidebar.Hide();
                     return;
@@ -663,7 +686,7 @@ namespace osu.Game.Screens.Mvis
                 if (OverlaysHidden)
                 {
                     lockChanges.Value = false;
-                    lockButton.ToggleableValue.Value = false;
+                    lockButton.Value.Value = false;
                     showOverlays(true);
                 }
                 else
@@ -715,6 +738,28 @@ namespace osu.Game.Screens.Mvis
             return true;
         }
 
+        [Resolved]
+        private DialogOverlay dialog { get; set; }
+
+        public void RequestAudioControl(IProvideAudioControlPlugin pacp, string message, Action onDeny, Action onAllow)
+        {
+            if (!(pacp is MvisPlugin mpl)) return;
+
+            dialog.Push(new ConfirmDialog($"插件\"{mpl}\"\n请求接手音频控制。\n原因是: {message}",
+                () =>
+                {
+                    changeAudioControlProvider(pacp);
+                    onAllow?.Invoke();
+                },
+                onDeny));
+        }
+
+        public void ReleaseAudioControlFrom(IProvideAudioControlPlugin pacp)
+        {
+            if (audioControlProvider == pacp)
+                changeAudioControlProvider(null);
+        }
+
         private void onLoadListChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (sender is BindableList<MvisPlugin> list)
@@ -734,7 +779,7 @@ namespace osu.Game.Screens.Mvis
             var sc = (ISidebarContent)d;
 
             //如果sc是上一个显示(mvis)或sc是侧边栏的当前显示并且侧边栏未隐藏
-            if (sc == sidebar.CurrentDisplay.Value && !sidebar.Hiding)
+            if (sc == sidebar.CurrentDisplay.Value && sidebar.IsVisible.Value)
             {
                 sidebar.Hide();
                 return;
@@ -873,7 +918,7 @@ namespace osu.Game.Screens.Mvis
         //当有弹窗或游戏失去焦点时要进行的动作
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (lockButton.ToggleableValue.Value && OverlaysHidden)
+            if (lockButton.Value.Value && OverlaysHidden)
                 lockButton.Toggle();
 
             showOverlays(false);
@@ -906,7 +951,7 @@ namespace osu.Game.Screens.Mvis
         private void showOverlays(bool force)
         {
             //在有锁并且悬浮界面已隐藏或悬浮界面可见的情况下显示悬浮锁
-            if (!force && ((lockButton.ToggleableValue.Value && OverlaysHidden) || !OverlaysHidden || lockChanges.Value))
+            if (!force && ((lockButton.Value.Value && OverlaysHidden) || !OverlaysHidden || lockChanges.Value))
             {
                 showPluginEntriesTemporary();
                 return;
@@ -957,7 +1002,7 @@ namespace osu.Game.Screens.Mvis
         private void applyTrackAdjustments()
         {
             CurrentTrack.ResetSpeedAdjustments();
-            CurrentTrack.Looping = loopToggleButton.ToggleableValue.Value;
+            CurrentTrack.Looping = loopToggleButton.Value.Value;
             CurrentTrack.RestartPoint = 0;
             CurrentTrack.AddAdjustment(adjustFreq.Value ? AdjustableProperty.Frequency : AdjustableProperty.Tempo, musicSpeed);
 
@@ -1004,7 +1049,7 @@ namespace osu.Game.Screens.Mvis
             updateBackground(beatmap);
 
             activity.Value = new UserActivity.InMvis(beatmap.BeatmapInfo);
-            OnBeatmapChanged?.Invoke(beatmap);
+            onBeatmapChangedAction?.Invoke(beatmap);
         }
     }
 }

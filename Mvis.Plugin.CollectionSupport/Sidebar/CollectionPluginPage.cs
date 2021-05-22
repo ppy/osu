@@ -187,9 +187,17 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             searchForCurrentSelection();
         }
 
+        private bool requestedOnce;
+
         private void makeCurrentSelected()
         {
             collectionHelper.CurrentCollection.Value = selectedCollection.Value;
+
+            if (!requestedOnce)
+            {
+                requestedOnce = true;
+                mvisScreen?.RequestAudioControl((CollectionHelper)Plugin, "激活以确保插件可以发挥功能\n本提示在本次会话中不会出现第二次。", null, null);
+            }
         }
 
         protected override void Dispose(bool isDisposing)

@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Footer
         {
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                bgBox?.FadeColour(colourProvider.Background5);
+                bgBox?.FadeColour(colourProvider.Dark5);
                 highLightBox?.FadeColour(colourProvider.Highlight1);
             }, true);
 

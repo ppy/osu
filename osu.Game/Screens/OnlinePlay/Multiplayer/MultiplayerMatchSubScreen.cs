@@ -43,7 +43,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public override string ShortTitle => "screen.multi.multiplayer.multiplayer.screenTitle";
 
         [Resolved]
-        private StatefulMultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; }
 
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }

@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Mvis.SideBar
         [CanBeNull]
         private Box sidebarBg;
 
-        public bool Hiding;
+        public BindableBool IsVisible = new BindableBool();
         public Bindable<Drawable> CurrentDisplay = new Bindable<Drawable>();
 
         private readonly Container<Drawable> contentContainer;
@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 defaultImplementation: _ => sidebarBg = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background6,
+                    Colour = colourProvider.Dark5,
                     Depth = float.MaxValue
                 })
             {
@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Mvis.SideBar
 
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                sidebarBg?.FadeColour(colourProvider.Background6);
+                sidebarBg?.FadeColour(colourProvider.Dark5);
             }, true);
         }
 
@@ -260,7 +260,7 @@ namespace osu.Game.Screens.Mvis.SideBar
 
             contentContainer.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
 
-            Hiding = true;
+            IsVisible.Value = false;
         }
 
         protected override void PopIn()
@@ -272,7 +272,7 @@ namespace osu.Game.Screens.Mvis.SideBar
 
             contentContainer.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
 
-            Hiding = false;
+            IsVisible.Value = true;
         }
 
         private class ClickToCloseBox : Box
