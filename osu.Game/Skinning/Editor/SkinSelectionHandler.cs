@@ -20,16 +20,8 @@ namespace osu.Game.Skinning.Editor
 {
     public class SkinSelectionHandler : SelectionHandler<ISkinnableDrawable>
     {
-        private Vector2? referenceOrigin;
-
         [Resolved]
         private SkinEditor skinEditor { get; set; }
-
-        protected override void OnOperationEnded()
-        {
-            base.OnOperationEnded();
-            referenceOrigin = null;
-        }
 
         public override bool HandleRotation(float angle)
         {
@@ -42,13 +34,11 @@ namespace osu.Game.Skinning.Editor
             {
                 var selectionQuad = getSelectionQuad();
 
-                referenceOrigin ??= selectionQuad.Centre;
-
                 foreach (var b in SelectedBlueprints)
                 {
                     var drawableItem = (Drawable)b.Item;
 
-                    drawableItem.Position = drawableItem.Parent.ToLocalSpace(RotatePointAroundOrigin(b.ScreenSpaceSelectionPoint, referenceOrigin.Value, angle)) - drawableItem.AnchorPosition;
+                    drawableItem.Position = drawableItem.Parent.ToLocalSpace(RotatePointAroundOrigin(b.ScreenSpaceSelectionPoint, selectionQuad.Centre, angle)) - drawableItem.AnchorPosition;
                     drawableItem.Rotation += angle;
                 }
             }
