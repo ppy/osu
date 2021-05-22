@@ -14,4 +14,19 @@
     <data name="solo" xml:space="preserve">
         <value>ソロ</value>
     </data>
+    <data name="playlists" xml:space="preserve">
+        <value>プレイリスト</value>
+    </data>
+    <data name="play" xml:space="preserve">
+        <value>遊ぶ</value>
+    </data>
+    <data name="multi" xml:space="preserve">
+        <value>マルチ</value>
+    </data>
+    <data name="edit" xml:space="preserve">
+        <value>エディット</value>
+    </data>
+    <data name="browse" xml:space="preserve">
+        <value>ブラウズ</value>
+    </data>
 </root>
