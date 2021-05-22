@@ -653,10 +653,12 @@ namespace osu.Game.Database
             {
                 using (Stream s = reader.GetStream(file))
                 {
+                    var fileInfo = files.Add(s);
                     fileInfos.Add(new TFileModel
                     {
                         Filename = file.Substring(prefix.Length).ToStandardisedPath(),
-                        FileInfo = files.Add(s)
+                        FileInfo = fileInfo,
+                        FileInfoID = fileInfo.ID
                     });
                 }
             }
