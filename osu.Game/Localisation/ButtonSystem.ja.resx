@@ -29,4 +29,10 @@
     <data name="browse" xml:space="preserve">
         <value>ブラウズ</value>
     </data>
+    <data name="exit" xml:space="preserve">
+        <value>閉じる</value>
+    </data>
+    <data name="settings" xml:space="preserve">
+        <value>設定</value>
+    </data>
 </root>
