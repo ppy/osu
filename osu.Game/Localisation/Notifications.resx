@@ -58,22 +58,10 @@
   <resheader name="writer">
     <value>System.Resources.NetStandard.ResXResourceWriter, System.Resources.NetStandard, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
   </resheader>
-  <data name="solo" xml:space="preserve">
-    <value>solo</value>
+  <data name="header_title" xml:space="preserve">
+    <value>notifications</value>
   </data>
-  <data name="multi" xml:space="preserve">
-    <value>multi</value>
-  </data>
-  <data name="playlists" xml:space="preserve">
-    <value>playlists</value>
-  </data>
-  <data name="play" xml:space="preserve">
-    <value>play</value>
-  </data>
-  <data name="edit" xml:space="preserve">
-    <value>edit</value>
-  </data>
-  <data name="browse" xml:space="preserve">
-    <value>browse</value>
+  <data name="header_description" xml:space="preserve">
+    <value>waiting for 'ya</value>
   </data>
 </root>
