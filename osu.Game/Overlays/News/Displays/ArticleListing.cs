@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -9,12 +10,18 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
 namespace osu.Game.Overlays.News.Displays
 {
-    public class FrontPageDisplay : CompositeDrawable
+    /// <summary>
+    /// Lists articles in a vertical flow for a specified year.
+    /// </summary>
+    public class ArticleListing : CompositeDrawable
     {
+        public Action<APINewsSidebar> SidebarMetadataUpdated;
+
         [Resolved]
         private IAPIProvider api { get; set; }
 
@@ -23,6 +30,17 @@ namespace osu.Game.Overlays.News.Displays
 
         private GetNewsRequest request;
         private Cursor lastCursor;
+
+        private readonly int? year;
+
+        /// <summary>
+        /// Instantiate a listing for the specified year.
+        /// </summary>
+        /// <param name="year">The year to load articles from. If null, will show the most recent articles.</param>
+        public ArticleListing(int? year = null)
+        {
+            this.year = year;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -74,7 +92,7 @@ namespace osu.Game.Overlays.News.Displays
         {
             request?.Cancel();
 
-            request = new GetNewsRequest(lastCursor);
+            request = new GetNewsRequest(year, lastCursor);
             request.Success += response => Schedule(() => onSuccess(response));
             api.PerformAsync(request);
         }
@@ -85,22 +103,19 @@ namespace osu.Game.Overlays.News.Displays
         {
             cancellationToken?.Cancel();
 
+            // only needs to be updated on the initial load, as the content won't change during pagination.
+            if (lastCursor == null)
+                SidebarMetadataUpdated?.Invoke(response.SidebarMetadata);
+
+            // store cursor for next pagination request.
             lastCursor = response.Cursor;
 
-            var flow = new FillFlowContainer<NewsCard>
+            LoadComponentsAsync(response.NewsPosts.Select(p => new NewsCard(p)).ToList(), loaded =>
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 10),
-                Children = response.NewsPosts.Select(p => new NewsCard(p)).ToList()
-            };
+                content.AddRange(loaded);
 
-            LoadComponentAsync(flow, loaded =>
-            {
-                content.Add(loaded);
                 showMore.IsLoading = false;
-                showMore.Alpha = lastCursor == null ? 0 : 1;
+                showMore.Alpha = response.Cursor != null ? 1 : 0;
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 

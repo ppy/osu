@@ -9,6 +9,7 @@ using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
@@ -19,16 +20,8 @@ namespace osu.Game.Skinning.Editor
 {
     public class SkinSelectionHandler : SelectionHandler<ISkinnableDrawable>
     {
-        private Vector2? referenceOrigin;
-
         [Resolved]
         private SkinEditor skinEditor { get; set; }
-
-        protected override void OnOperationEnded()
-        {
-            base.OnOperationEnded();
-            referenceOrigin = null;
-        }
 
         public override bool HandleRotation(float angle)
         {
@@ -41,14 +34,13 @@ namespace osu.Game.Skinning.Editor
             {
                 var selectionQuad = getSelectionQuad();
 
-                referenceOrigin ??= selectionQuad.Centre;
-
                 foreach (var b in SelectedBlueprints)
                 {
                     var drawableItem = (Drawable)b.Item;
 
-                    var rotatedPosition = RotatePointAroundOrigin(b.ScreenSpaceSelectionPoint, referenceOrigin.Value, angle);
+                    var rotatedPosition = RotatePointAroundOrigin(b.ScreenSpaceSelectionPoint, selectionQuad.Centre, angle);
                     updateDrawablePosition(drawableItem, rotatedPosition);
+
                     drawableItem.Rotation += angle;
                 }
             }
@@ -64,39 +56,43 @@ namespace osu.Game.Skinning.Editor
 
             adjustScaleFromAnchor(ref scale, anchor);
 
-            var selectionQuad = getSelectionQuad();
+            // the selection quad is always upright, so use an AABB rect to make mutating the values easier.
+            var selectionRect = getSelectionQuad().AABBFloat;
 
-            // the selection quad is always upright, so use a rect to make mutating the values easier.
-            var adjustedRect = selectionQuad.AABBFloat;
+            // copy to mutate, as we will need to compare to the original later on.
+            var adjustedRect = selectionRect;
 
-            // for now aspect lock scale adjustments that occur at corners.
-            if (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
-                scale.Y = scale.X / selectionQuad.Width * selectionQuad.Height;
+            // first, remove any scale axis we are not interested in.
+            if (anchor.HasFlagFast(Anchor.x1)) scale.X = 0;
+            if (anchor.HasFlagFast(Anchor.y1)) scale.Y = 0;
 
-            if (anchor.HasFlagFast(Anchor.x0))
-            {
-                adjustedRect.X -= scale.X;
-                adjustedRect.Width += scale.X;
-            }
-            else if (anchor.HasFlagFast(Anchor.x2))
-            {
-                adjustedRect.Width += scale.X;
-            }
+            bool shouldAspectLock =
+                // for now aspect lock scale adjustments that occur at corners..
+                (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
+                // ..or if any of the selection have been rotated.
+                // this is to avoid requiring skew logic (which would likely not be the user's expected transform anyway).
+                || SelectedBlueprints.Any(b => !Precision.AlmostEquals(((Drawable)b.Item).Rotation, 0));
 
-            if (anchor.HasFlagFast(Anchor.y0))
+            if (shouldAspectLock)
             {
-                adjustedRect.Y -= scale.Y;
-                adjustedRect.Height += scale.Y;
-            }
-            else if (anchor.HasFlagFast(Anchor.y2))
-            {
-                adjustedRect.Height += scale.Y;
+                if (anchor.HasFlagFast(Anchor.x1))
+                    // if dragging from the horizontal centre, only a vertical component is available.
+                    scale.X = scale.Y / selectionRect.Height * selectionRect.Width;
+                else
+                    // in all other cases (arbitrarily) use the horizontal component for aspect lock.
+                    scale.Y = scale.X / selectionRect.Width * selectionRect.Height;
             }
 
-            // scale adjust should match that of the quad itself.
+            if (anchor.HasFlagFast(Anchor.x0)) adjustedRect.X -= scale.X;
+            if (anchor.HasFlagFast(Anchor.y0)) adjustedRect.Y -= scale.Y;
+
+            adjustedRect.Width += scale.X;
+            adjustedRect.Height += scale.Y;
+
+            // scale adjust applied to each individual item should match that of the quad itself.
             var scaledDelta = new Vector2(
-                adjustedRect.Width / selectionQuad.Width,
-                adjustedRect.Height / selectionQuad.Height
+                adjustedRect.Width / selectionRect.Width,
+                adjustedRect.Height / selectionRect.Height
             );
 
             foreach (var b in SelectedBlueprints)
@@ -108,8 +104,8 @@ namespace osu.Game.Skinning.Editor
 
                 var relativePositionInOriginal =
                     new Vector2(
-                        (screenPosition.X - selectionQuad.TopLeft.X) / selectionQuad.Width,
-                        (screenPosition.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height
+                        (screenPosition.X - selectionRect.TopLeft.X) / selectionRect.Width,
+                        (screenPosition.Y - selectionRect.TopLeft.Y) / selectionRect.Height
                     );
 
                 var newPositionInAdjusted = new Vector2(
@@ -184,7 +180,7 @@ namespace osu.Game.Skinning.Editor
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            IEnumerable<AnchorMenuItem> createAnchorItems(Func<Drawable, Anchor> checkFunction, Action<Anchor> applyFunction)
+            IEnumerable<TernaryStateMenuItem> createAnchorItems(Func<Drawable, Anchor> checkFunction, Action<Anchor> applyFunction)
             {
                 var displayableAnchors = new[]
                 {
@@ -201,7 +197,7 @@ namespace osu.Game.Skinning.Editor
 
                 return displayableAnchors.Select(a =>
                 {
-                    return new AnchorMenuItem(a, selection, _ => applyFunction(a))
+                    return new TernaryStateRadioMenuItem(a.ToString(), MenuItemType.Standard, _ => applyFunction(a))
                     {
                         State = { Value = GetStateFromSelection(selection, c => checkFunction((Drawable)c.Item) == a) }
                     };
@@ -255,16 +251,6 @@ namespace osu.Game.Skinning.Editor
             // reverse the scale direction if dragging from top or left.
             if ((reference & Anchor.x0) > 0) scale.X = -scale.X;
             if ((reference & Anchor.y0) > 0) scale.Y = -scale.Y;
-        }
-
-        public class AnchorMenuItem : TernaryStateMenuItem
-        {
-            public AnchorMenuItem(Anchor anchor, IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection, Action<TernaryState> action)
-                : base(anchor.ToString(), getNextState, MenuItemType.Standard, action)
-            {
-            }
-
-            private static TernaryState getNextState(TernaryState state) => TernaryState.True;
         }
     }
 }
