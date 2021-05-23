@@ -6,13 +6,23 @@ using osu.Framework.Graphics.Containers;
 using System.Linq;
 using HtmlAgilityPack;
 using osu.Framework.Allocation;
+using System.Collections.Generic;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays.Wiki.Markdown;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Wiki
 {
     public class WikiMainPage : FillFlowContainer
     {
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
+
         public string Markdown;
 
         public WikiMainPage()
@@ -31,6 +41,7 @@ namespace osu.Game.Overlays.Wiki
             {
                 createBlurb(html)
             };
+            AddRange(createPanels(html));
         }
 
         private Container createBlurb(HtmlDocument html)
@@ -53,6 +64,51 @@ namespace osu.Game.Overlays.Wiki
                     Origin = Anchor.TopCentre,
                 }
             };
+        }
+
+        private IEnumerable<Container> createPanels(HtmlDocument html)
+        {
+            var panelsNode = html.DocumentNode.SelectNodes("//div[contains(@class, 'wiki-main-page-panel')]");
+
+            foreach (var panel in panelsNode)
+            {
+                var isFullWidth = panel.HasClass("wiki-main-page-panel--full");
+
+                yield return new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Width = isFullWidth ? 1.0f : 0.5f,
+                    Padding = new MarginPadding(3),
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Masking = true,
+                            CornerRadius = 4,
+                            EdgeEffect = new EdgeEffectParameters
+                            {
+                                Type = EdgeEffectType.Shadow,
+                                Colour = Color4.Black.Opacity(25),
+                                Offset = new Vector2(0, 1),
+                                Radius = 3,
+                            },
+                            Child = new Box
+                            {
+                                Colour = colourProvider.Background4,
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                        },
+                        new WikiMarkdownContainer
+                        {
+                            Text = panel.InnerText,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                        }
+                    }
+                };
+            }
         }
     }
 }
