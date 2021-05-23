@@ -30,9 +30,13 @@ namespace osu.Game.Overlays.Wiki
 
             Children = new Drawable[]
             {
-                createBlurb(html)
+                createBlurb(html),
+                new GridContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                },
             };
-            AddRange(createPanels(html));
         }
 
         private Container createBlurb(HtmlDocument html)
