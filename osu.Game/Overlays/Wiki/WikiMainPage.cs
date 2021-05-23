@@ -28,6 +28,8 @@ namespace osu.Game.Overlays.Wiki
             var html = new HtmlDocument();
             html.LoadHtml(Markdown);
 
+            var panels = createPanels(html).ToArray();
+
             Children = new Drawable[]
             {
                 createBlurb(html),
@@ -35,6 +37,8 @@ namespace osu.Game.Overlays.Wiki
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    RowDimensions = Enumerable.Repeat(new Dimension(GridSizeMode.AutoSize), panels.Length).ToArray(),
+                    Content = panels,
                 },
             };
         }
