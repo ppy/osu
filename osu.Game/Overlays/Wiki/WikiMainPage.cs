@@ -61,22 +61,48 @@ namespace osu.Game.Overlays.Wiki
             };
         }
 
-        private IEnumerable<Container> createPanels(HtmlDocument html)
+        private IEnumerable<Drawable[]> createPanels(HtmlDocument html)
         {
-            var panelsNode = html.DocumentNode.SelectNodes("//div[contains(@class, 'wiki-main-page-panel')]");
+            var panelsNode = html.DocumentNode.SelectNodes("//div[contains(@class, 'wiki-main-page-panel')]").ToArray();
 
-            foreach (var panel in panelsNode)
+            for (var i = 0; i < panelsNode.Length; i++)
             {
-                var isFullWidth = panel.HasClass("wiki-main-page-panel--full");
+                var isFullWidth = panelsNode[i].HasClass("wiki-main-page-panel--full");
 
-                yield return new WikiPanelContainer
+                if (isFullWidth)
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Width = isFullWidth ? 1.0f : 0.5f,
-                    Text = panel.InnerText,
-                    IsFullWidth = isFullWidth,
-                };
+                    yield return new Drawable[]
+                    {
+                        new WikiPanelContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Text = panelsNode[i].InnerText,
+                            IsFullWidth = true,
+                            Width = 2,
+                        },
+                        null,
+                    };
+                }
+
+                if (i % 2 == 1)
+                {
+                    yield return new Drawable[]
+                    {
+                        new WikiPanelContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Text = panelsNode[i].InnerText,
+                        },
+                        new WikiPanelContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Text = panelsNode[i + 1].InnerText,
+                        },
+                    };
+                }
             }
         }
     }
