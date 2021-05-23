@@ -186,7 +186,8 @@ namespace osu.Game.Screens.Play
                     if (lowestTopScreenSpace == null || bottomRight.Y > lowestTopScreenSpace.Value.Y)
                         lowestTopScreenSpace = bottomRight;
                 }
-                else if (element.Anchor.HasFlagFast(Anchor.y2))
+                // and align bottom-right components with the top-edge of the highest bottom-anchored hud element.
+                else if (element.Anchor.HasFlagFast(Anchor.BottomRight) || (element.Anchor.HasFlagFast(Anchor.y2) && element.RelativeSizeAxes == Axes.X))
                 {
                     var topLeft = element.ScreenSpaceDrawQuad.TopLeft;
                     if (highestBottomScreenSpace == null || topLeft.Y < highestBottomScreenSpace.Value.Y)
