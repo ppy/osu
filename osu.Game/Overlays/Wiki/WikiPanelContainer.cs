@@ -1,12 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using Markdig.Syntax;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers.Markdown;
 using osu.Game.Overlays.Wiki.Markdown;
 using osuTK;
 using osuTK.Graphics;
@@ -66,6 +70,33 @@ namespace osu.Game.Overlays.Wiki
                 DocumentPadding = new MarginPadding(30);
                 DocumentMargin = new MarginPadding(0);
             }
+
+            protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock) => new WikiPanelHeading(headingBlock)
+            {
+                IsFullWidth = IsFullWidth,
+            };
+        }
+
+        private class WikiPanelHeading : OsuMarkdownHeading
+        {
+            public bool IsFullWidth;
+
+            public WikiPanelHeading(HeadingBlock headingBlock)
+                : base(headingBlock)
+            {
+                Margin = new MarginPadding { Bottom = 40 };
+            }
+
+            public override MarkdownTextFlowContainer CreateTextFlow() => base.CreateTextFlow().With(f =>
+            {
+                f.Anchor = Anchor.TopCentre;
+                f.Origin = Anchor.TopCentre;
+                f.TextAnchor = Anchor.TopCentre;
+            });
+
+            protected override FontWeight GetFontWeightByLevel(int level) => FontWeight.Regular;
+
+            protected override float GetFontSizeByLevel(int level) => base.GetFontSizeByLevel(IsFullWidth ? level : 3);
         }
     }
 }
