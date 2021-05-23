@@ -76,6 +76,9 @@ namespace osu.Game.Overlays.Wiki
 
             public override MarkdownTextFlowContainer CreateTextFlow() => base.CreateTextFlow().With(f => f.TextAnchor = Anchor.TopCentre);
 
+            protected override MarkdownParagraph CreateParagraph(ParagraphBlock paragraphBlock, int level)
+                => base.CreateParagraph(paragraphBlock, level).With(p => p.Margin = new MarginPadding { Bottom = 10 });
+
             protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock) => new WikiPanelHeading(headingBlock)
             {
                 IsFullWidth = IsFullWidth,
