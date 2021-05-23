@@ -176,10 +176,7 @@ namespace osu.Game.Screens.Play
             foreach (var element in mainComponents.Components.Cast<Drawable>())
             {
                 // for now align top-right components with the bottom-edge of the lowest top-anchored hud element.
-                if (!element.RelativeSizeAxes.HasFlagFast(Axes.X))
-                    continue;
-
-                if (element.Anchor.HasFlagFast(Anchor.TopRight))
+                if (element.Anchor.HasFlagFast(Anchor.TopRight) || (element.Anchor.HasFlagFast(Anchor.y0) && element.RelativeSizeAxes == Axes.X))
                 {
                     // health bars are excluded for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
                     if (element is LegacyHealthDisplay)
