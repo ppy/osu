@@ -27,10 +27,16 @@ namespace osu.Game.Overlays.Wiki
 
         public bool IsFullWidth;
 
+        public WikiPanelContainer()
+        {
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+            Padding = new MarginPadding(3);
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            Padding = new MarginPadding(3);
             Children = new Drawable[]
             {
                 new Container

@@ -79,8 +79,6 @@ namespace osu.Game.Overlays.Wiki
                     {
                         new WikiPanelContainer
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
                             Text = panelsNode[i].InnerText,
                             IsFullWidth = true,
                             Width = 2,
@@ -95,14 +93,10 @@ namespace osu.Game.Overlays.Wiki
                     {
                         new WikiPanelContainer
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
                             Text = panelsNode[i].InnerText,
                         },
                         new WikiPanelContainer
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
                             Text = panelsNode[i + 1].InnerText,
                         },
                     };
