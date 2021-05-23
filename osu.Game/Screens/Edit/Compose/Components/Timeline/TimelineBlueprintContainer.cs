@@ -276,7 +276,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 var timingPoint = EditorBeatmap.ControlPointInfo.TimingPointAt(selected.First().StartTime);
                 double adjustment = timingPoint.BeatLength / EditorBeatmap.BeatDivisor * amount;
 
-                EditorBeatmap.PerformOnSelection(h => h.StartTime += adjustment);
+                EditorBeatmap.PerformOnSelection(h =>
+                {
+                    h.StartTime += adjustment;
+                    EditorBeatmap.Update(h);
+                });
             }
         }
 
