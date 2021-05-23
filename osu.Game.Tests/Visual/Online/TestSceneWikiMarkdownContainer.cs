@@ -120,6 +120,29 @@ needs_cleanup: true
             });
         }
 
+        [Test]
+        public void TestBlockImage()
+        {
+            AddStep("Add paragraph with block image", () =>
+            {
+                markdownContainer.CurrentPath = "Interface/";
+                markdownContainer.Text = @"Line before image
+
+![play menu](img/play-menu.jpg ""Main Menu in osu!"")
+
+Line after image";
+            });
+        }
+
+        [Test]
+        public void TestInlineImage()
+        {
+            AddStep("Add inline image", () =>
+            {
+                markdownContainer.Text = "![osu! mode icon](/wiki/shared/mode/osu.png) osu!";
+            });
+        }
+
         private class TestMarkdownContainer : WikiMarkdownContainer
         {
             public LinkInline Link;
