@@ -101,6 +101,25 @@ needs_cleanup: true
             });
         }
 
+        [Test]
+        public void TestAbsoluteImage()
+        {
+            AddStep("Add absolute image", () =>
+            {
+                markdownContainer.Text = "![intro](/wiki/Interface/img/intro-screen.jpg)";
+            });
+        }
+
+        [Test]
+        public void TestRelativeImage()
+        {
+            AddStep("Add relative image", () =>
+            {
+                markdownContainer.CurrentPath = "Interface/";
+                markdownContainer.Text = "![intro](img/intro-screen.jpg)";
+            });
+        }
+
         private class TestMarkdownContainer : WikiMarkdownContainer
         {
             public LinkInline Link;
