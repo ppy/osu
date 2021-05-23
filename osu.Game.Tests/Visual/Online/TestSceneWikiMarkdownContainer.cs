@@ -67,6 +67,40 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("check url", () => markdownContainer.Link.Url == $"{api.WebsiteRootUrl}/wiki/Article_styling_criteria/Formatting");
         }
 
+        [Test]
+        public void TestOutdatedNoticeBox()
+        {
+            AddStep("Add outdated yaml header", () =>
+            {
+                markdownContainer.Text = @"---
+outdated: true
+---";
+            });
+        }
+
+        [Test]
+        public void TestNeedsCleanupNoticeBox()
+        {
+            AddStep("Add needs cleanup yaml header", () =>
+            {
+                markdownContainer.Text = @"---
+needs_cleanup: true
+---";
+            });
+        }
+
+        [Test]
+        public void TestOnlyShowOutdatedNoticeBox()
+        {
+            AddStep("Add outdated and needs cleanup yaml", () =>
+            {
+                markdownContainer.Text = @"---
+outdated: true
+needs_cleanup: true
+---";
+            });
+        }
+
         private class TestMarkdownContainer : WikiMarkdownContainer
         {
             public LinkInline Link;
