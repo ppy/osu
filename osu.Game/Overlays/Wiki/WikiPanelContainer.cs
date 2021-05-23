@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Wiki
                 f.TextAnchor = Anchor.TopCentre;
             });
 
-            protected override FontWeight GetFontWeightByLevel(int level) => FontWeight.Regular;
+            protected override FontWeight GetFontWeightByLevel(int level) => FontWeight.Light;
 
             protected override float GetFontSizeByLevel(int level) => base.GetFontSizeByLevel(IsFullWidth ? level : 3);
         }
