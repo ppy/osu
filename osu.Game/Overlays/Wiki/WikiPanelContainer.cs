@@ -44,13 +44,23 @@ namespace osu.Game.Overlays.Wiki
                         RelativeSizeAxes = Axes.Both,
                     },
                 },
-                new WikiMarkdownContainer
+                new WikiPanelMarkdownContainer
                 {
                     Text = Text,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 }
             };
+        }
+
+        private class WikiPanelMarkdownContainer : WikiMarkdownContainer
+        {
+            public WikiPanelMarkdownContainer()
+            {
+                LineSpacing = 0;
+                DocumentPadding = new MarginPadding(30);
+                DocumentMargin = new MarginPadding(0);
+            }
         }
     }
 }
