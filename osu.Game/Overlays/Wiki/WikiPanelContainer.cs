@@ -20,6 +20,8 @@ namespace osu.Game.Overlays.Wiki
 
         public string Text;
 
+        public bool IsFullWidth;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -49,12 +51,15 @@ namespace osu.Game.Overlays.Wiki
                     Text = Text,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    IsFullWidth = IsFullWidth,
                 }
             };
         }
 
         private class WikiPanelMarkdownContainer : WikiMarkdownContainer
         {
+            public bool IsFullWidth;
+
             public WikiPanelMarkdownContainer()
             {
                 LineSpacing = 0;

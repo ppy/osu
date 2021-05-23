@@ -71,6 +71,7 @@ namespace osu.Game.Overlays.Wiki
                     AutoSizeAxes = Axes.Y,
                     Width = isFullWidth ? 1.0f : 0.5f,
                     Text = panel.InnerText,
+                    IsFullWidth = isFullWidth,
                 };
             }
         }
