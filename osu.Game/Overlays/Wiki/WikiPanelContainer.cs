@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using Markdig.Syntax;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -23,6 +24,8 @@ namespace osu.Game.Overlays.Wiki
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
+        private WikiPanelMarkdownContainer panelContainer;
+
         public string Text;
 
         public bool IsFullWidth;
@@ -30,7 +33,6 @@ namespace osu.Game.Overlays.Wiki
         public WikiPanelContainer()
         {
             RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding(3);
         }
 
@@ -57,7 +59,7 @@ namespace osu.Game.Overlays.Wiki
                         RelativeSizeAxes = Axes.Both,
                     },
                 },
-                new WikiPanelMarkdownContainer
+                panelContainer = new WikiPanelMarkdownContainer
                 {
                     Text = Text,
                     RelativeSizeAxes = Axes.X,
@@ -65,6 +67,12 @@ namespace osu.Game.Overlays.Wiki
                     IsFullWidth = IsFullWidth,
                 }
             };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            Height = Math.Max(panelContainer.Height, Parent.DrawHeight);
         }
 
         private class WikiPanelMarkdownContainer : WikiMarkdownContainer
