@@ -62,7 +62,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public override double DifficultyValue()
         {
-            return fcTimeSkillLevel(calculateDifficultyValue());
+            // return .85 * calculateDifficultyValue();
+            return  fcTimeSkillLevel(calculateDifficultyValue());
         }
 
         /// <summary>
@@ -96,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double fcTimeSkillLevel(double totalDifficulty)
         {
             double lengthEstimate = 0.4 * (times[times.Count - 1] - times[0]);
-            target_fc_time += (times[times.Count - 1] - times[0]);
+            target_fc_time += (times[times.Count - 1] - times[0]) * Math.Pow((times[times.Count - 1] - times[0]) / 30000, .75);
             double fcProb = lengthEstimate / target_fc_time;
             double skill = skillLevel(fcProb, totalDifficulty);
             for (int i=0; i<5; ++i)

@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : OsuSkill
     {
-        protected override double StarsPerDouble => 1.075;
+        protected override double StarsPerDouble => 1.1;
         protected override int HistoryLength => 2;
 
         private int decayExcessThreshold = 500;
@@ -24,10 +24,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currStrain = 1;
 
         private double snapStrainMultiplier = 11.25;
-        private double flowStrainMultiplier = 16.75;
+        private double flowStrainMultiplier = 13.25;
         private double hybridStrainMultiplier = 11.5;
         private double sliderStrainMultiplier = 75;
-        private double totalStrainMultiplier = .1875;//.0875;
+        private double totalStrainMultiplier = .1725;//.0875;
 
         private int curr = 0;
 
@@ -72,22 +72,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                               * Math.Pow(Math.Sin(2 * (angle - Math.PI / 4)), 2)
                               * Math.Max(0, Math.Min(Math.Min(100 / osuCurrObj.StrainTime, minBoyDistance), prevDiffVector.Length - Math.Max(currVector.Length, prevVector.Length) / 2));
 
-
-            // // this garbage needs to be better coded. super bandaid.
-            // if (prevDiffVector.Length > Math.Max(currVector.Length, prevVector.Length) && nextDiffVector.Length > Math.Max(currVector.Length, nextVector.Length))
-            //     minDistance = 0;//Math.Min(1, Math.Max(0, (osuCurrObj.JumpDistance - 75)) / 50) * Math.Max(0, Math.Min(50 / osuCurrObj.StrainTime, prevDiffVector.Length - Math.Max(currVector.Length, prevVector.Length) / 2));
-            // else
-            //     minDistance = Math.Max(0, Math.Min(125 / osuCurrObj.StrainTime, prevDiffVector.Length - Math.Max(currVector.Length, prevVector.Length) / 2));
-
-
-
-
             double strain = prevVector.Length * osuPrevObj.FlowProbability
                           + currVector.Length * osuCurrObj.FlowProbability
                           + Math.Min(Math.Min(currVector.Length, prevVector.Length), Math.Abs(currVector.Length - prevVector.Length)) * osuCurrObj.FlowProbability * osuPrevObj.FlowProbability
                           + minDistance * osuCurrObj.FlowProbability * osuPrevObj.FlowProbability;// * (minDistance * osuPrevObj.FlowProbability +   prevDiffVectorSnap.Length * osuPrevObj.SnapProbability);
 
-            strain *= Math.Min(osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 10) , osuPrevObj.StrainTime / (osuPrevObj.StrainTime - 10));
+            strain *= Math.Min(osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 20) , osuPrevObj.StrainTime / (osuPrevObj.StrainTime - 20));
 
             return strain;
         }
@@ -119,13 +109,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             // Console.WriteLine(osuCurrObj.Angle);
 
-            if (angle < Math.PI / 6)
+            if (angle < Math.PI / 3)
             {
-                angleAdjustment -= .25 * Math.Abs(currDistance - angleDistance) * Math.Pow(Math.Sin(angle * 3), 2); //i can probably just make this linear imo
+                angleAdjustment -= .2 * Math.Abs(currDistance - angleDistance) * Math.Pow(Math.Sin(Math.PI / 2 + angle * 1.5), 2); //i can probably just make this linear imo
             }
             else if (angle > Math.PI / 3)
             {
-                angleAdjustment += angleDistance * (1 + .5 * Math.Pow(Math.Sin(angle), 2));//1.5 * (angle - Math.PI / 3)), 2));
+                angleAdjustment += angleDistance * (1 + .5 * Math.Pow(Math.Sin(angle - Math.PI / 4), 2));//1.5 * (angle - Math.PI / 3)), 2));
             }
 
             double strain = currDistance
