@@ -125,6 +125,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return;
 
                 h.Samples.Add(new HitSampleInfo(sampleName));
+                EditorBeatmap.Update(h);
             });
         }
 
@@ -134,7 +135,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void RemoveHitSample(string sampleName)
         {
-            EditorBeatmap.PerformOnSelection(h => h.SamplesBindable.RemoveAll(s => s.Name == sampleName));
+            EditorBeatmap.PerformOnSelection(h =>
+            {
+                h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
+                EditorBeatmap.Update(h);
+            });
         }
 
         /// <summary>
