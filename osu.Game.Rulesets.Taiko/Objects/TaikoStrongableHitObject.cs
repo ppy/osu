@@ -33,15 +33,25 @@ namespace osu.Game.Rulesets.Taiko.Objects
         public bool IsStrong
         {
             get => IsStrongBindable.Value;
-            set
-            {
-                IsStrongBindable.Value = value;
-                updateSamplesFromStrong();
-            }
+            set => IsStrongBindable.Value = value;
         }
 
-        private void updateSamplesFromStrong()
+        protected TaikoStrongableHitObject()
         {
+            IsStrongBindable.BindValueChanged(_ => UpdateSamplesFromType());
+        }
+
+        protected override void UpdateTypeFromSamples()
+        {
+            base.UpdateTypeFromSamples();
+
+            IsStrong = getStrongSamples().Any();
+        }
+
+        protected override void UpdateSamplesFromType()
+        {
+            base.UpdateSamplesFromType();
+
             var strongSamples = getStrongSamples();
 
             if (IsStrongBindable.Value != strongSamples.Any())
