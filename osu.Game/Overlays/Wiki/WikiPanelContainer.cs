@@ -71,6 +71,8 @@ namespace osu.Game.Overlays.Wiki
                 DocumentMargin = new MarginPadding(0);
             }
 
+            public override MarkdownTextFlowContainer CreateTextFlow() => base.CreateTextFlow().With(f => f.TextAnchor = Anchor.TopCentre);
+
             protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock) => new WikiPanelHeading(headingBlock)
             {
                 IsFullWidth = IsFullWidth,
