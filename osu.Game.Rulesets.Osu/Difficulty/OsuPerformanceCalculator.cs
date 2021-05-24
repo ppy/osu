@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
-                aimValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
+                aimValue *= Math.Pow((Math.Tan(Math.PI / 4 * (2 * (scoreMaxCombo / (double)Attributes.MaxCombo) - 1)) + 1) / 2, .8);
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (Attributes.ApproachRate < 8.0)
                 approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
 
-            aimValue *= 1.0 + Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
+            aimValue *= 1.0 + Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));//+ Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(h => h is OsuModHidden))
@@ -134,18 +134,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (Attributes.ApproachRate < 8.0)
                 approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
 
-            speedValue *= 1.0 + approachRateFactor;
+            speedValue *= 1.0 + approachRateFactor;// + Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
-                speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
+                speedValue *= Math.Pow((Math.Tan(Math.PI / 4 * (2 * (scoreMaxCombo / (double)Attributes.MaxCombo) - 1)) + 1) / 2, .8);
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (countMiss > 0)
                 speedValue *= 0.97 * Math.Pow(1 - Math.Pow((double)countMiss / totalHits, 0.775), countMiss);
 
             // Scale the speed value with accuracy and OD
-            speedValue *= (0.9 + Math.Pow(Attributes.OverallDifficulty, 2) / 750) * Math.Pow(accuracy, (14.5 - Math.Max(Attributes.OverallDifficulty, 8)) / 2);
+            speedValue *= (0.575 + Math.Pow(Attributes.OverallDifficulty, 2) / 250) * Math.Pow(accuracy, (14.5 - Math.Max(Attributes.OverallDifficulty, 8)) / 2);
             // Scale the speed value with # of 50s to punish doubletapping.
             speedValue *= Math.Pow(0.98, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);
 

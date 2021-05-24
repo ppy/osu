@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private int decayExcessThreshold = 500;
 
         private double currentStrain;
-        private double strainMultiplier = 2.7;//675;//1.5;//3125;
+        private double strainMultiplier = 2.65;//675;//1.5;//3125;
 
         private double hitWindowGreat;
 

@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private readonly List<double> strains = new List<double>();
         private readonly List<double> times = new List<double>();
         private double target_fc_precision = 0.01;
-        private double target_fc_time = 3600*1000;
+        private double target_fc_time = 30 * 60 * 1000;
 
         protected virtual double StarsPerDouble => 1.15;
 
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public override double DifficultyValue()
         {
             // return .85 * calculateDifficultyValue();
-            return  fcTimeSkillLevel(calculateDifficultyValue());
+            return fcTimeSkillLevel(calculateDifficultyValue());
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double fcTimeSkillLevel(double totalDifficulty)
         {
             double lengthEstimate = 0.4 * (times[times.Count - 1] - times[0]);
-            target_fc_time += (times[times.Count - 1] - times[0]) * Math.Pow((times[times.Count - 1] - times[0]) / 30000, .75);
+            target_fc_time += 300000 * (Math.Max(0, (times[times.Count - 1] - times[0]) - 180000) / 30000);
             double fcProb = lengthEstimate / target_fc_time;
             double skill = skillLevel(fcProb, totalDifficulty);
             for (int i=0; i<5; ++i)
