@@ -56,7 +56,10 @@ namespace osu.Game.Overlays
             Padding = new MarginPadding { Vertical = 1.5f };
             Alpha = 0f;
 
-            Action += () => { if (!current.Disabled) current.SetDefault(); };
+            Action += () =>
+            {
+                if (!current.Disabled) current.SetDefault();
+            };
         }
 
         protected override void LoadComplete()
