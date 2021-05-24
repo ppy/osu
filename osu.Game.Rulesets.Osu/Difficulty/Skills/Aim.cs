@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currStrain = 1;
 
-        private double snapStrainMultiplier = 9.125;
+        private double snapStrainMultiplier = 10;//9.725;
         private double flowStrainMultiplier = 16.25;
         private double hybridStrainMultiplier = 8.25;
         private double sliderStrainMultiplier = 75;
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (distance == 0)
                 return 0;
             else
-                return (5 * (Math.Log(distance / 5 + 1) / Math.Log(2))) / distance;
+                return (3.75 * (Math.Log(distance / 3.75 + 1) / Math.Log(2))) / distance;
         }
 
         private double snapStrainAt(OsuDifficultyHitObject osuPrevObj, OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuNextObj,
