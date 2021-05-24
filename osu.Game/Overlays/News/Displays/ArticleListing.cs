@@ -8,9 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
 namespace osu.Game.Overlays.News.Displays
@@ -20,26 +18,20 @@ namespace osu.Game.Overlays.News.Displays
     /// </summary>
     public class ArticleListing : CompositeDrawable
     {
-        public Action<APINewsSidebar> SidebarMetadataUpdated;
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
+        public Action RequestMorePosts;
 
         private FillFlowContainer content;
         private ShowMoreButton showMore;
 
-        private GetNewsRequest request;
-        private Cursor lastCursor;
-
-        private readonly int? year;
+        private readonly GetNewsResponse initialResponse;
 
         /// <summary>
         /// Instantiate a listing for the specified year.
         /// </summary>
-        /// <param name="year">The year to load articles from. If null, will show the most recent articles.</param>
-        public ArticleListing(int? year = null)
+        /// <param name="initialResponse">Initial response to create articles from.</param>
+        public ArticleListing(GetNewsResponse initialResponse)
         {
-            this.year = year;
+            this.initialResponse = initialResponse;
         }
 
         [BackgroundDependencyLoader]
@@ -69,7 +61,8 @@ namespace osu.Game.Overlays.News.Displays
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 10)
+                        Spacing = new Vector2(0, 10),
+                        Children = initialResponse.NewsPosts.Select(p => new NewsCard(p)).ToList()
                     },
                     showMore = new ShowMoreButton
                     {
@@ -79,36 +72,18 @@ namespace osu.Game.Overlays.News.Displays
                         {
                             Top = 15
                         },
-                        Action = performFetch,
-                        Alpha = 0
+                        Action = RequestMorePosts,
+                        Alpha = initialResponse.Cursor != null ? 1 : 0
                     }
                 }
             };
-
-            performFetch();
-        }
-
-        private void performFetch()
-        {
-            request?.Cancel();
-
-            request = new GetNewsRequest(year, lastCursor);
-            request.Success += response => Schedule(() => onSuccess(response));
-            api.PerformAsync(request);
         }
 
         private CancellationTokenSource cancellationToken;
 
-        private void onSuccess(GetNewsResponse response)
+        public void AddPosts(GetNewsResponse response)
         {
             cancellationToken?.Cancel();
-
-            // only needs to be updated on the initial load, as the content won't change during pagination.
-            if (lastCursor == null)
-                SidebarMetadataUpdated?.Invoke(response.SidebarMetadata);
-
-            // store cursor for next pagination request.
-            lastCursor = response.Cursor;
 
             LoadComponentsAsync(response.NewsPosts.Select(p => new NewsCard(p)).ToList(), loaded =>
             {
@@ -121,7 +96,6 @@ namespace osu.Game.Overlays.News.Displays
 
         protected override void Dispose(bool isDisposing)
         {
-            request?.Cancel();
             cancellationToken?.Cancel();
             base.Dispose(isDisposing);
         }
