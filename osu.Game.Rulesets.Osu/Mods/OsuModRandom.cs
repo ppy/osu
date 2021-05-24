@@ -83,36 +83,24 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 var distanceToPrev = Vector2.Distance(prevObjectInfo.EndPositionOriginal, currentObjectInfo.PositionOriginal);
 
+                if (hitObject is Spinner)
+                    continue;
+
+                applyRandomisation(
+                    rateOfChangeMultiplier,
+                    prevObjectInfo,
+                    distanceToPrev,
+                    ref currentObjectInfo
+                );
+
+                hitObject.Position = currentObjectInfo.PositionRandomised;
+
+                // update end position as it may have changed as a result of the position update.
+                currentObjectInfo.EndPositionRandomised = currentObjectInfo.PositionRandomised;
+
                 switch (hitObject)
                 {
-                    case HitCircle circle:
-                        applyRandomisation(
-                            rateOfChangeMultiplier,
-                            prevObjectInfo,
-                            distanceToPrev,
-                            ref currentObjectInfo
-                        );
-
-                        circle.Position = currentObjectInfo.PositionRandomised;
-                        currentObjectInfo.EndPositionRandomised = currentObjectInfo.PositionRandomised;
-
-                        break;
-
                     case Slider slider:
-                        currentObjectInfo.EndPositionOriginal = slider.EndPosition;
-
-                        currentObjectInfo.EndPositionOriginal = slider.TailCircle.Position;
-
-                        applyRandomisation(
-                            rateOfChangeMultiplier,
-                            prevObjectInfo,
-                            distanceToPrev,
-                            ref currentObjectInfo
-                        );
-
-                        slider.Position = currentObjectInfo.PositionRandomised;
-                        currentObjectInfo.EndPositionRandomised = slider.TailCircle.Position;
-
                         moveSliderIntoPlayfield(ref slider, ref currentObjectInfo);
 
                         var sliderShift = Vector2.Subtract(slider.Position, currentObjectInfo.PositionOriginal);
@@ -239,15 +227,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var diff = destAngleRad - initialAngleRad;
 
-            while (diff < -Math.PI)
-            {
-                diff += 2 * Math.PI;
-            }
+            while (diff < -Math.PI) diff += 2 * Math.PI;
 
-            while (diff > Math.PI)
-            {
-                diff -= 2 * Math.PI;
-            }
+            while (diff > Math.PI) diff -= 2 * Math.PI;
 
             var finalAngleRad = initialAngleRad + relativeDistance * diff;
 
