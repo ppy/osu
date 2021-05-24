@@ -58,35 +58,32 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var rng = new Random((int)Seed.Value);
 
-            var prevObjectInfo = new RandomObjectInfo
-            {
-                PositionOriginal = hitObjects[0].Position,
-                EndPositionOriginal = hitObjects[0].EndPosition,
-                PositionRandomised = hitObjects[0].Position,
-                EndPositionRandomised = hitObjects[0].EndPosition
-            };
+            RandomObjectInfo? prevObjectInfo = null;
 
             float rateOfChangeMultiplier = 0;
 
             for (int i = 0; i < hitObjects.Count; i++)
             {
+                var distanceToPrev = 0f;
+
                 var hitObject = hitObjects[i];
 
                 var currentObjectInfo = new RandomObjectInfo(hitObject);
 
-                if (i == 0)
-                    prevObjectInfo = currentObjectInfo;
+                if (i > 0 && hitObjects[i - 1] is Spinner)
+                    prevObjectInfo = null;
+                else if (prevObjectInfo != null)
+                    distanceToPrev = Vector2.Distance(((RandomObjectInfo)prevObjectInfo).EndPositionOriginal, currentObjectInfo.PositionOriginal);
 
                 // rateOfChangeMultiplier only changes every i iterations to prevent shaky-line-shaped streams
                 if (i % 3 == 0)
                     rateOfChangeMultiplier = (float)rng.NextDouble() * 2 - 1;
 
-                var distanceToPrev = Vector2.Distance(prevObjectInfo.EndPositionOriginal, currentObjectInfo.PositionOriginal);
-
                 if (hitObject is Spinner)
                     continue;
 
                 applyRandomisation(
+                    rng,
                     rateOfChangeMultiplier,
                     prevObjectInfo,
                     distanceToPrev,
@@ -119,8 +116,20 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// Returns the final position of the hit object
         /// </summary>
         /// <returns>Final position of the hit object</returns>
-        private void applyRandomisation(float rateOfChangeMultiplier, RandomObjectInfo prevObjectInfo, float distanceToPrev, ref RandomObjectInfo currentObjectInfo)
+        private void applyRandomisation(Random rng, float rateOfChangeMultiplier, RandomObjectInfo? prevObjectInfoNullable, float distanceToPrev, ref RandomObjectInfo currentObjectInfo)
         {
+            if (prevObjectInfoNullable == null)
+            {
+                var playfieldSize = OsuPlayfield.BASE_SIZE;
+
+                currentObjectInfo.AngleRad = (float)(rng.NextDouble() * 2 * Math.PI - Math.PI);
+                currentObjectInfo.PositionRandomised = new Vector2((float)rng.NextDouble() * playfieldSize.X, (float)rng.NextDouble() * playfieldSize.Y);
+
+                return;
+            }
+
+            var prevObjectInfo = (RandomObjectInfo)prevObjectInfoNullable;
+
             // The max. angle (relative to the angle of the vector pointing from the 2nd last to the last hit object)
             // is proportional to the distance between the last and the current hit object
             // to allow jumps and prevent too sharp turns during streams.
