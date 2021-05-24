@@ -1,48 +1,62 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using Markdig.Syntax.Inlines;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers.Markdown;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
+using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
     public class OsuMarkdownLinkText : MarkdownLinkText
     {
-        [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
+        [Resolved(canBeNull: true)]
+        private OsuGame game { get; set; }
 
-        private SpriteText spriteText;
+        protected string Text;
+        protected string Title;
 
         public OsuMarkdownLinkText(string text, LinkInline linkInline)
             : base(text, linkInline)
         {
+            Text = text;
+            Title = linkInline.Title;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
-            spriteText.Colour = colourProvider.Light2;
+            var text = CreateSpriteText().With(t => t.Text = Text);
+            InternalChildren = new Drawable[]
+            {
+                text,
+                new OsuMarkdownLinkCompiler(new[] { text })
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Action = OnLinkPressed,
+                    TooltipText = Title ?? Url,
+                }
+            };
         }
 
-        public override SpriteText CreateSpriteText()
-        {
-            return spriteText = base.CreateSpriteText();
-        }
+        protected override void OnLinkPressed() => game?.HandleLink(Url);
 
-        protected override bool OnHover(HoverEvent e)
+        private class OsuMarkdownLinkCompiler : DrawableLinkCompiler
         {
-            spriteText.Colour = colourProvider.Light1;
-            return base.OnHover(e);
-        }
+            public OsuMarkdownLinkCompiler(IEnumerable<Drawable> parts)
+                : base(parts)
+            {
+            }
 
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            spriteText.Colour = colourProvider.Light2;
-            base.OnHoverLost(e);
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                IdleColour = colourProvider.Light2;
+                HoverColour = colourProvider.Light1;
+            }
         }
     }
 }
