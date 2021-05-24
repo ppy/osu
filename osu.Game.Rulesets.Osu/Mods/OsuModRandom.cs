@@ -29,10 +29,16 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "It never gets boring!";
         public override bool Ranked => false;
 
-        // The distances from the hit objects to the borders of the playfield they start to "turn around" and curve towards the middle.
+        // The relative distance to the edge of the playfield before objects' positions should start to "turn around" and curve towards the middle.
         // The closer the hit objects draw to the border, the sharper the turn
-        private const byte border_distance_x = 192;
-        private const byte border_distance_y = 144;
+        private const float playfield_edge_ratio = 0.375f;
+
+        private static readonly float border_distance_x = OsuPlayfield.BASE_SIZE.X * playfield_edge_ratio;
+        private static readonly float border_distance_y = OsuPlayfield.BASE_SIZE.Y * playfield_edge_ratio;
+
+        private static readonly Vector2 playfield_middle = Vector2.Divide(OsuPlayfield.BASE_SIZE, 2);
+
+        private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
 
         [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(OsuModRandomSettingsControl))]
         public Bindable<int?> Seed { get; } = new Bindable<int?>
@@ -130,8 +136,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             // The max. angle (relative to the angle of the vector pointing from the 2nd last to the last hit object)
             // is proportional to the distance between the last and the current hit object
             // to allow jumps and prevent too sharp turns during streams.
-            var maxDistance = OsuPlayfield.BASE_SIZE.LengthFast;
-            var randomAngleRad = rateOfChangeMultiplier * 2 * Math.PI * distanceToPrev / maxDistance;
+            var randomAngleRad = rateOfChangeMultiplier * 2 * Math.PI * distanceToPrev / playfield_diagonal;
 
             currentObjectInfo.AngleRad = (float)randomAngleRad + prevObjectInfo.AngleRad;
             if (currentObjectInfo.AngleRad < 0)
@@ -145,6 +150,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             posRelativeToPrev = getRotatedVector(prevObjectInfo.EndPositionRandomised, posRelativeToPrev);
 
             currentObjectInfo.AngleRad = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
+
             var position = Vector2.Add(prevObjectInfo.EndPositionRandomised, posRelativeToPrev);
 
             // Move hit objects back into the playfield if they are outside of it,
@@ -192,9 +198,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         private Vector2 getRotatedVector(Vector2 prevPosChanged, Vector2 posRelativeToPrev)
         {
             var relativeRotationDistance = 0f;
-            var playfieldMiddle = Vector2.Divide(OsuPlayfield.BASE_SIZE, 2);
 
-            if (prevPosChanged.X < playfieldMiddle.X)
+            if (prevPosChanged.X < playfield_middle.X)
             {
                 relativeRotationDistance = Math.Max(
                     (border_distance_x - prevPosChanged.X) / border_distance_x,
@@ -209,7 +214,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 );
             }
 
-            if (prevPosChanged.Y < playfieldMiddle.Y)
+            if (prevPosChanged.Y < playfield_middle.Y)
             {
                 relativeRotationDistance = Math.Max(
                     (border_distance_y - prevPosChanged.Y) / border_distance_y,
@@ -224,11 +229,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 );
             }
 
-            return rotateVectorTowardsVector(
-                posRelativeToPrev,
-                Vector2.Subtract(playfieldMiddle, prevPosChanged),
-                relativeRotationDistance / 2
-            );
+            return rotateVectorTowardsVector(posRelativeToPrev, playfield_middle - prevPosChanged, relativeRotationDistance / 2);
         }
 
         /// <summary>
