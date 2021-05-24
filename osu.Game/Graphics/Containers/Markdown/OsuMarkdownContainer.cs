@@ -6,11 +6,13 @@ using Markdig.Extensions.AutoIdentifiers;
 using Markdig.Extensions.Tables;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
@@ -19,6 +21,12 @@ namespace osu.Game.Graphics.Containers.Markdown
         public OsuMarkdownContainer()
         {
             LineSpacing = 21;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(IAPIProvider api)
+        {
+            DocumentUrl = api.WebsiteRootUrl;
         }
 
         protected override void AddMarkdownComponent(IMarkdownObject markdownObject, FillFlowContainer container, int level)
