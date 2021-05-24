@@ -24,14 +24,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currStrain = 1;
 
         private double snapStrainMultiplier = 11.25;
-        private double flowStrainMultiplier = 16.75;
+        private double flowStrainMultiplier = 16.25;
         private double hybridStrainMultiplier = 8.25;
         private double sliderStrainMultiplier = 75;
-        private double totalStrainMultiplier = .1675;//.0875;
-
-        private int curr = 0;
-
-        // private double hybridScaler = 1.5;
+        private double totalStrainMultiplier = .1675;
 
         private Tap tapSkill;
 
@@ -68,14 +64,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             else if (angle > Math.PI / 2)
                 minDistance = Math.Max(0, Math.Min(100 / osuCurrObj.StrainTime, prevDiffVector.Length - Math.Max(currVector.Length, prevVector.Length) / 2));
             else
-                minDistance = Math.Min(1, Math.Max(0, osuCurrObj.JumpDistance - 75) / 50) // i dont really want to buff acute angles if you dont have to wiggle.
+                minDistance = Math.Min(1, Math.Max(0, osuCurrObj.JumpDistance - 75) / 50)
                               * Math.Pow(Math.Sin(2 * (angle - Math.PI / 4)), 2)
                               * Math.Max(0, Math.Min(Math.Min(100 / osuCurrObj.StrainTime, minBoyDistance), prevDiffVector.Length - Math.Max(currVector.Length, prevVector.Length) / 2));
 
             double strain = prevVector.Length * osuPrevObj.FlowProbability
                           + currVector.Length * osuCurrObj.FlowProbability
                           + Math.Min(Math.Min(currVector.Length, prevVector.Length), Math.Abs(currVector.Length - prevVector.Length)) * osuCurrObj.FlowProbability * osuPrevObj.FlowProbability
-                          + minDistance * osuCurrObj.FlowProbability * osuPrevObj.FlowProbability;// * (minDistance * osuPrevObj.FlowProbability +   prevDiffVectorSnap.Length * osuPrevObj.SnapProbability);
+                          + minDistance * osuCurrObj.FlowProbability * osuPrevObj.FlowProbability;
 
             strain *= Math.Min(osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 10) , osuPrevObj.StrainTime / (osuPrevObj.StrainTime - 10));
 
@@ -107,20 +103,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double angle = Math.Abs(osuCurrObj.Angle);
 
-            // Console.WriteLine(osuCurrObj.Angle);
-
             if (angle < Math.PI / 3)
             {
-                angleAdjustment -= .2 * Math.Abs(currDistance - angleDistance) * Math.Pow(Math.Sin(Math.PI / 2 - angle * 1.5), 2); //i can probably just make this linear imo
+                angleAdjustment -= .2 * Math.Abs(currDistance - angleDistance) * Math.Pow(Math.Sin(Math.PI / 2 - angle * 1.5), 2);
             }
             else
             {
-                angleAdjustment += angleDistance * (1 + .5 * Math.Pow(Math.Sin(angle - Math.PI / 4), 2));//1.5 * (angle - Math.PI / 3)), 2));
+                angleAdjustment += angleDistance * (1 + .5 * Math.Pow(Math.Sin(angle - Math.PI / 4), 2));
             }
 
-            double strain = currDistance
-                          // + Math.Abs(currVector.Length - prevVector.Length) * osuCurrObj.SnapProbability * osuPrevObj.SnapProbability
-                          + angleAdjustment * osuCurrObj.SnapProbability * osuPrevObj.SnapProbability;//, osuPrevObj.SnapProbability);
+            double strain = currDistance + angleAdjustment * osuCurrObj.SnapProbability * osuPrevObj.SnapProbability;
 
             strain *= Math.Min(osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 20) , osuPrevObj.StrainTime / (osuPrevObj.StrainTime - 20));
 
@@ -193,30 +185,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                                                      osuNextObj);
 
 
-                currStrain *= computeDecay(.75, Math.Max(50, osuCurrObj.StrainTime));// - osuCurrObj.TravelTime));
-                currStrain += snapStrain * snapStrainMultiplier;// * Math.Sqrt(1 + tapSkill.TapStrain / 400);
-                currStrain += flowStrain * flowStrainMultiplier;// * Math.Sqrt(1 + tapSkill.TapStrain / 150);
+                currStrain *= computeDecay(.75, Math.Max(50, osuCurrObj.StrainTime));
+                currStrain += snapStrain * snapStrainMultiplier;
+                currStrain += flowStrain * flowStrainMultiplier;
                 currStrain += hybridStrain * hybridStrainMultiplier;
                 currStrain += sliderStrain * sliderStrainMultiplier;
 
-                // currStrain += Math.Max(snapStrain, hybridStrain) + slider
-
-
-                // Console.WriteLine("C: " + curr);
-                // Console.WriteLine("Strain: " + currStrain);
-                // curr++;
-
-                strain = totalStrainMultiplier * currStrain;// * Math.Sqrt(1 + tapSkill.TapStrain / 100);;
-      // (Math.Max(currFlowStrain, currSnapStrain) + Math.Min(currFlowStrain, currSnapStrain));
-    // (currFlowStrain + currSnapStrain);
-    // Math.Pow(Math.Pow(currSnapStrain, hybridScaler) + Math.Pow(currFlowStrain, hybridScaler), 1.0 / hybridScaler);
+                strain = totalStrainMultiplier * currStrain;
             }
 
-
-  curr++;
-            // Console.WriteLine(tappingStrain);
-
-            return strain;// * Math.Sqrt(4 + tappingStrain) / 2;
+            return strain;
         }
 
         public void SetTapSkill(Tap tap) => tapSkill = tap;
