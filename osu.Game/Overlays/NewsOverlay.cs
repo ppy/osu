@@ -6,6 +6,8 @@ using System.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.News;
 using osu.Game.Overlays.News.Displays;
 using osu.Game.Overlays.News.Sidebar;
@@ -18,8 +20,11 @@ namespace osu.Game.Overlays
 
         private readonly Container sidebarContainer;
         private readonly NewsSidebar sidebar;
-
         private readonly Container content;
+
+        private APIRequest lastRequest;
+        private Cursor lastCursor;
+        private int? year;
 
         private CancellationTokenSource cancellationToken;
 
@@ -108,7 +113,11 @@ namespace osu.Game.Overlays
         protected void LoadDisplay(Drawable display)
         {
             ScrollFlow.ScrollToStart();
-            LoadComponentAsync(display, loaded => content.Child = loaded, (cancellationToken = new CancellationTokenSource()).Token);
+            LoadComponentAsync(display, loaded =>
+            {
+                content.Child = loaded;
+                Loading.Hide();
+            }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
         protected override void UpdateAfterChildren()
@@ -132,13 +141,41 @@ namespace osu.Game.Overlays
 
             Header.SetFrontPage();
 
-            var page = new ArticleListing(year);
-            page.SidebarMetadataUpdated += metadata => Schedule(() =>
+            this.year = year;
+            lastCursor = null;
+
+            performListingRequest(response =>
             {
-                sidebar.Metadata.Value = metadata;
-                Loading.Hide();
+                sidebar.Metadata.Value = response.SidebarMetadata;
+
+                var listing = new ArticleListing(response);
+                listing.RequestMorePosts += getMorePosts;
+
+                LoadDisplay(listing);
             });
-            LoadDisplay(page);
+        }
+
+        private void getMorePosts()
+        {
+            lastRequest?.Cancel();
+            performListingRequest(response =>
+            {
+                if (content.Child is ArticleListing listing)
+                    listing.AddPosts(response);
+            });
+        }
+
+        private void performListingRequest(Action<GetNewsResponse> onSuccess)
+        {
+            lastRequest = new GetNewsRequest(year, lastCursor);
+
+            ((GetNewsRequest)lastRequest).Success += response => Schedule(() =>
+            {
+                lastCursor = response.Cursor;
+                onSuccess?.Invoke(response);
+            });
+
+            API.PerformAsync(lastRequest);
         }
 
         private void loadArticle(string article)
@@ -149,17 +186,18 @@ namespace osu.Game.Overlays
 
             // Temporary, should be handled by ArticleDisplay later
             LoadDisplay(Empty());
-            Loading.Hide();
         }
 
         private void beginLoading()
         {
+            lastRequest?.Cancel();
             cancellationToken?.Cancel();
             Loading.Show();
         }
 
         protected override void Dispose(bool isDisposing)
         {
+            lastRequest?.Cancel();
             cancellationToken?.Cancel();
             base.Dispose(isDisposing);
         }
