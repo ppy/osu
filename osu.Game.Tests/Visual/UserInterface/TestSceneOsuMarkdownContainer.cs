@@ -87,6 +87,15 @@ _**italic with underscore, bold with asterisk**_";
         }
 
         [Test]
+        public void TestLinkWithTitle()
+        {
+            AddStep("Add Link with title", () =>
+            {
+                markdownContainer.Text = "[wikipedia](https://www.wikipedia.org \"The Free Encyclopedia\")";
+            });
+        }
+
+        [Test]
         public void TestInlineCode()
         {
             AddStep("Add inline code", () =>
