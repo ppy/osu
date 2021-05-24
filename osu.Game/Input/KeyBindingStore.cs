@@ -104,6 +104,10 @@ namespace osu.Game.Input
             using (ContextFactory.GetForWrite())
             {
                 var dbKeyBinding = (DatabasedKeyBinding)keyBinding;
+
+                if (dbKeyBinding.RulesetID != null && !CheckValidForGameplay(keyBinding.KeyCombination))
+                    return;
+
                 Refresh(ref dbKeyBinding);
 
                 if (dbKeyBinding.KeyCombination.Equals(keyBinding.KeyCombination))
