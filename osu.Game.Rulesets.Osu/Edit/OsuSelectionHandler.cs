@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -12,7 +11,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
-using Vector2 = osuTK.Vector2;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -173,12 +172,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             foreach (var h in hitObjects)
             {
-                h.Position = rotatePointAroundOrigin(h.Position, referenceOrigin.Value, delta);
+                h.Position = RotatePointAroundOrigin(h.Position, referenceOrigin.Value, delta);
 
                 if (h is IHasPath path)
                 {
                     foreach (var point in path.Path.ControlPoints)
-                        point.Position.Value = rotatePointAroundOrigin(point.Position.Value, Vector2.Zero, delta);
+                        point.Position.Value = RotatePointAroundOrigin(point.Position.Value, Vector2.Zero, delta);
                 }
             }
 
@@ -225,26 +224,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void scaleHitObjects(OsuHitObject[] hitObjects, Anchor reference, Vector2 scale)
         {
             scale = getClampedScale(hitObjects, reference, scale);
-
-            // move the selection before scaling if dragging from top or left anchors.
-            float xOffset = ((reference & Anchor.x0) > 0) ? -scale.X : 0;
-            float yOffset = ((reference & Anchor.y0) > 0) ? -scale.Y : 0;
-
             Quad selectionQuad = getSurroundingQuad(hitObjects);
 
             foreach (var h in hitObjects)
-            {
-                var newPosition = h.Position;
-
-                // guard against no-ops and NaN.
-                if (scale.X != 0 && selectionQuad.Width > 0)
-                    newPosition.X = selectionQuad.TopLeft.X + xOffset + (h.X - selectionQuad.TopLeft.X) / selectionQuad.Width * (selectionQuad.Width + scale.X);
-
-                if (scale.Y != 0 && selectionQuad.Height > 0)
-                    newPosition.Y = selectionQuad.TopLeft.Y + yOffset + (h.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height * (selectionQuad.Height + scale.Y);
-
-                h.Position = newPosition;
-            }
+                h.Position = GetScaledPosition(reference, scale, selectionQuad, h.Position);
         }
 
         private (bool X, bool Y) isQuadInBounds(Quad quad)
@@ -340,28 +323,5 @@ namespace osu.Game.Rulesets.Osu.Edit
         private OsuHitObject[] selectedMovableObjects => SelectedItems.OfType<OsuHitObject>()
                                                                       .Where(h => !(h is Spinner))
                                                                       .ToArray();
-
-        /// <summary>
-        /// Rotate a point around an arbitrary origin.
-        /// </summary>
-        /// <param name="point">The point.</param>
-        /// <param name="origin">The centre origin to rotate around.</param>
-        /// <param name="angle">The angle to rotate (in degrees).</param>
-        private static Vector2 rotatePointAroundOrigin(Vector2 point, Vector2 origin, float angle)
-        {
-            angle = -angle;
-
-            point.X -= origin.X;
-            point.Y -= origin.Y;
-
-            Vector2 ret;
-            ret.X = point.X * MathF.Cos(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Sin(MathUtils.DegreesToRadians(angle));
-            ret.Y = point.X * -MathF.Sin(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Cos(MathUtils.DegreesToRadians(angle));
-
-            ret.X += origin.X;
-            ret.Y += origin.Y;
-
-            return ret;
-        }
     }
 }

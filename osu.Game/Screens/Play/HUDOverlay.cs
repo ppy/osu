@@ -176,10 +176,7 @@ namespace osu.Game.Screens.Play
             foreach (var element in mainComponents.Components.Cast<Drawable>())
             {
                 // for now align top-right components with the bottom-edge of the lowest top-anchored hud element.
-                if (!element.RelativeSizeAxes.HasFlagFast(Axes.X))
-                    continue;
-
-                if (element.Anchor.HasFlagFast(Anchor.TopRight))
+                if (element.Anchor.HasFlagFast(Anchor.TopRight) || (element.Anchor.HasFlagFast(Anchor.y0) && element.RelativeSizeAxes == Axes.X))
                 {
                     // health bars are excluded for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
                     if (element is LegacyHealthDisplay)
@@ -189,7 +186,8 @@ namespace osu.Game.Screens.Play
                     if (lowestTopScreenSpace == null || bottomRight.Y > lowestTopScreenSpace.Value.Y)
                         lowestTopScreenSpace = bottomRight;
                 }
-                else if (element.Anchor.HasFlagFast(Anchor.y2))
+                // and align bottom-right components with the top-edge of the highest bottom-anchored hud element.
+                else if (element.Anchor.HasFlagFast(Anchor.BottomRight) || (element.Anchor.HasFlagFast(Anchor.y2) && element.RelativeSizeAxes == Axes.X))
                 {
                     var topLeft = element.ScreenSpaceDrawQuad.TopLeft;
                     if (highestBottomScreenSpace == null || topLeft.Y < highestBottomScreenSpace.Value.Y)
