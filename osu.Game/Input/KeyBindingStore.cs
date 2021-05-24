@@ -16,6 +16,17 @@ namespace osu.Game.Input
     {
         public event Action KeyBindingChanged;
 
+        /// <summary>
+        /// Keys which should not be allowed for gameplay input purposes.
+        /// </summary>
+        private static readonly IEnumerable<InputKey> banned_keys = new[]
+        {
+            InputKey.MouseWheelDown,
+            InputKey.MouseWheelLeft,
+            InputKey.MouseWheelUp,
+            InputKey.MouseWheelRight
+        };
+
         public KeyBindingStore(DatabaseContextFactory contextFactory, RulesetStore rulesets, Storage storage = null)
             : base(contextFactory, storage)
         {
@@ -102,6 +113,17 @@ namespace osu.Game.Input
             }
 
             KeyBindingChanged?.Invoke();
+        }
+
+        public static bool CheckValidForGameplay(KeyCombination combination)
+        {
+            foreach (var key in banned_keys)
+            {
+                if (combination.Keys.Contains(key))
+                    return false;
+            }
+
+            return true;
         }
     }
 }
