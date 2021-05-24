@@ -6,17 +6,16 @@ using osu.Framework.Bindables;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
 {
-    public class RestoreDefaultValueButton<T> : Container, IHasTooltip, IHasCurrentValue<T>
+    public class RestoreDefaultValueButton<T> : OsuButton, IHasTooltip, IHasCurrentValue<T>
     {
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
@@ -34,34 +33,30 @@ namespace osu.Game.Overlays
 
         public RestoreDefaultValueButton()
         {
+            Height = 1;
+
             RelativeSizeAxes = Axes.Y;
             Width = SettingsPanel.CONTENT_MARGINS;
-            Padding = new MarginPadding { Vertical = 1.5f };
-            Alpha = 0f;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
+            BackgroundColour = colour.Yellow;
             buttonColour = colour.Yellow;
-
-            Child = new Container
+            Content.Width = 0.33f;
+            Content.CornerRadius = 3;
+            Content.EdgeEffect = new EdgeEffectParameters
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                CornerRadius = 3,
-                Masking = true,
-                Colour = buttonColour,
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Colour = buttonColour.Opacity(0.1f),
-                    Type = EdgeEffectType.Glow,
-                    Radius = 2,
-                },
-                Width = 0.33f,
-                Child = new Box { RelativeSizeAxes = Axes.Both },
+                Colour = buttonColour.Opacity(0.1f),
+                Type = EdgeEffectType.Glow,
+                Radius = 2,
             };
+
+            Padding = new MarginPadding { Vertical = 1.5f };
+            Alpha = 0f;
+
+            Action += () => { if (!current.Disabled) current.SetDefault(); };
         }
 
         protected override void LoadComplete()
@@ -76,13 +71,6 @@ namespace osu.Game.Overlays
         }
 
         public string TooltipText => "revert to default";
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            if (!current.Disabled)
-                current.SetDefault();
-            return true;
-        }
 
         protected override bool OnHover(HoverEvent e)
         {

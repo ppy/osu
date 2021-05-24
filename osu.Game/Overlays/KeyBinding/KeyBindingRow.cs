@@ -131,9 +131,8 @@ namespace osu.Game.Overlays.KeyBinding
 
             IsDefault.BindValueChanged(isDefault =>
             {
-                if (isDefault.NewValue && !computeIsDefaultValue())
+                if (isDefault.NewValue)
                 {
-                    RestoreDefaults();
                     finalise();
                 }
             });
