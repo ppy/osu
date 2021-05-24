@@ -519,10 +519,13 @@ namespace osu.Game.Screens.Play
 
             // there is a chance that the exit was performed after the transition to results has started.
             // we want to give the user what they want, so forcefully return to this screen (to proceed with the upwards exit process).
-            if (!this.IsCurrentScreen() && this.GetChildScreen() != null)
+            if (!this.IsCurrentScreen())
             {
                 ValidForResume = false;
-                this.MakeCurrent();
+
+                // in the potential case that this instance has already been exited, this is required to avoid a crash.
+                if (this.GetChildScreen() != null)
+                    this.MakeCurrent();
                 return;
             }
 
