@@ -119,8 +119,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("join other user (ready)", () =>
             {
-                Client.AddUser(new User { Id = 55 });
-                Client.ChangeUserState(55, MultiplayerUserState.Ready);
+                Client.AddUser(new User { Id = PLAYER_1_ID });
+                Client.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready);
             });
 
             AddStep("click spectate button", () =>

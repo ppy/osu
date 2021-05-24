@@ -16,7 +16,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public abstract class MultiplayerTestScene : RoomTestScene
     {
-        [Cached(typeof(StatefulMultiplayerClient))]
+        public const int PLAYER_1_ID = 55;
+        public const int PLAYER_2_ID = 56;
+
+        [Cached(typeof(MultiplayerClient))]
         public TestMultiplayerClient Client { get; }
 
         [Cached(typeof(IRoomManager))]

@@ -8,13 +8,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class HoldNoteSelectionBlueprint : ManiaSelectionBlueprint
+    public class HoldNoteSelectionBlueprint : ManiaSelectionBlueprint<HoldNote>
     {
         public new DrawableHoldNote DrawableObject => (DrawableHoldNote)base.DrawableObject;
 
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public HoldNoteSelectionBlueprint(DrawableHoldNote hold)
+        public HoldNoteSelectionBlueprint(HoldNote hold)
             : base(hold)
         {
         }
@@ -32,16 +33,11 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         private void load(IScrollingInfo scrollingInfo)
         {
             direction.BindTo(scrollingInfo.Direction);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
 
             InternalChildren = new Drawable[]
             {
-                new HoldNoteNoteSelectionBlueprint(DrawableObject, HoldNotePosition.Start),
-                new HoldNoteNoteSelectionBlueprint(DrawableObject, HoldNotePosition.End),
+                new HoldNoteNoteOverlay(this, HoldNotePosition.Start),
+                new HoldNoteNoteOverlay(this, HoldNotePosition.End),
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
