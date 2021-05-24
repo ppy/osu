@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -25,8 +24,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             InternalChild = judgementsFlow = new JudgementFlow();
         }
 
-        //Taiko-specific: hitting a wrong colour note should result in a miss being pushed.
-        protected override void OnNewJudgement(JudgementResult judgement) => judgementsFlow.Push(judgement.Type == HitResult.Miss ? GetColourForHitResult(HitResult.Miss) : GetColourForHitResult(HitWindows.ResultFor(judgement.TimeOffset)));
+        protected override void OnNewJudgement(JudgementResult judgement) => judgementsFlow.Push(GetColourForHitResult(judgement.Type));
 
         private class JudgementFlow : FillFlowContainer<HitErrorCircle>
         {
