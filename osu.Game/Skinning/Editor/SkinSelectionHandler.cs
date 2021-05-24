@@ -59,6 +59,10 @@ namespace osu.Game.Skinning.Editor
             // the selection quad is always upright, so use an AABB rect to make mutating the values easier.
             var selectionRect = getSelectionQuad().AABBFloat;
 
+            // If the selection has no area we cannot scale it
+            if (selectionRect.Area == 0.0)
+                return false;
+
             // copy to mutate, as we will need to compare to the original later on.
             var adjustedRect = selectionRect;
 
