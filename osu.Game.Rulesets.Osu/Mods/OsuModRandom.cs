@@ -52,35 +52,32 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var rng = new Random((int)Seed.Value);
 
-            var prevObjectInfo = new HitObjectInfo
+            var prevObjectInfo = new RandomObjectInfo
             {
-                StartPosUnchanged = hitObjects[0].Position,
-                EndPosUnchanged = hitObjects[0].EndPosition,
-                StartPosChanged = hitObjects[0].Position,
-                EndPosChanged = hitObjects[0].EndPosition
+                PositionOriginal = hitObjects[0].Position,
+                EndPositionOriginal = hitObjects[0].EndPosition,
+                PositionRandomised = hitObjects[0].Position,
+                EndPositionRandomised = hitObjects[0].EndPosition
             };
 
             float rateOfChangeMultiplier = 0;
 
             for (int i = 0; i < hitObjects.Count; i++)
             {
-                var h = hitObjects[i];
+                var hitObject = hitObjects[i];
 
-                var currentObjectInfo = new HitObjectInfo
-                {
-                    StartPosUnchanged = h.Position,
-                    EndPosUnchanged = h.EndPosition,
-                    StartPosChanged = Vector2.Zero,
-                    EndPosChanged = Vector2.Zero
-                };
+                var currentObjectInfo = new RandomObjectInfo(hitObject);
+
+                if (i == 0)
+                    prevObjectInfo = currentObjectInfo;
 
                 // rateOfChangeMultiplier only changes every i iterations to prevent shaky-line-shaped streams
                 if (i % 3 == 0)
                     rateOfChangeMultiplier = (float)rng.NextDouble() * 2 - 1;
 
-                var distanceToPrev = Vector2.Distance(prevObjectInfo.EndPosUnchanged, currentObjectInfo.StartPosUnchanged);
+                var distanceToPrev = Vector2.Distance(prevObjectInfo.EndPositionOriginal, currentObjectInfo.PositionOriginal);
 
-                switch (h)
+                switch (hitObject)
                 {
                     case HitCircle circle:
                         getObjectInfo(
@@ -90,15 +87,15 @@ namespace osu.Game.Rulesets.Osu.Mods
                             ref currentObjectInfo
                         );
 
-                        circle.Position = currentObjectInfo.StartPosChanged;
-                        currentObjectInfo.EndPosChanged = currentObjectInfo.StartPosChanged;
+                        circle.Position = currentObjectInfo.PositionRandomised;
+                        currentObjectInfo.EndPositionRandomised = currentObjectInfo.PositionRandomised;
 
                         break;
 
                     case Slider slider:
-                        currentObjectInfo.EndPosUnchanged = slider.EndPosition;
+                        currentObjectInfo.EndPositionOriginal = slider.EndPosition;
 
-                        currentObjectInfo.EndPosUnchanged = slider.TailCircle.Position;
+                        currentObjectInfo.EndPositionOriginal = slider.TailCircle.Position;
 
                         getObjectInfo(
                             rateOfChangeMultiplier,
@@ -107,12 +104,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                             ref currentObjectInfo
                         );
 
-                        slider.Position = currentObjectInfo.StartPosChanged;
-                        currentObjectInfo.EndPosChanged = slider.TailCircle.Position;
+                        slider.Position = currentObjectInfo.PositionRandomised;
+                        currentObjectInfo.EndPositionRandomised = slider.TailCircle.Position;
 
                         moveSliderIntoPlayfield(ref slider, ref currentObjectInfo);
 
-                        var sliderShift = Vector2.Subtract(slider.Position, currentObjectInfo.StartPosUnchanged);
+                        var sliderShift = Vector2.Subtract(slider.Position, currentObjectInfo.PositionOriginal);
 
                         foreach (var tick in slider.NestedHitObjects.OfType<SliderTick>())
                             tick.Position = Vector2.Add(tick.Position, sliderShift);
@@ -128,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// Returns the final position of the hit object
         /// </summary>
         /// <returns>Final position of the hit object</returns>
-        private void getObjectInfo(float rateOfChangeMultiplier, HitObjectInfo prevObjectInfo, float distanceToPrev, ref HitObjectInfo currentObjectInfo)
+        private void getObjectInfo(float rateOfChangeMultiplier, RandomObjectInfo prevObjectInfo, float distanceToPrev, ref RandomObjectInfo currentObjectInfo)
         {
             // The max. angle (relative to the angle of the vector pointing from the 2nd last to the last hit object)
             // is proportional to the distance between the last and the current hit object
@@ -145,10 +142,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                 distanceToPrev * (float)Math.Sin(currentObjectInfo.AngleRad)
             );
 
-            posRelativeToPrev = getRotatedVector(prevObjectInfo.EndPosChanged, posRelativeToPrev);
+            posRelativeToPrev = getRotatedVector(prevObjectInfo.EndPositionRandomised, posRelativeToPrev);
 
             currentObjectInfo.AngleRad = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
-            var position = Vector2.Add(prevObjectInfo.EndPosChanged, posRelativeToPrev);
+            var position = Vector2.Add(prevObjectInfo.EndPositionRandomised, posRelativeToPrev);
 
             // Move hit objects back into the playfield if they are outside of it,
             // which would sometimes happen during big jumps otherwise.
@@ -162,10 +159,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             else if (position.Y > OsuPlayfield.BASE_SIZE.Y)
                 position.Y = OsuPlayfield.BASE_SIZE.Y;
 
-            currentObjectInfo.StartPosChanged = position;
+            currentObjectInfo.PositionRandomised = position;
         }
 
-        private void moveSliderIntoPlayfield(ref Slider slider, ref HitObjectInfo currentObjectInfo)
+        private void moveSliderIntoPlayfield(ref Slider slider, ref RandomObjectInfo currentObjectInfo)
         {
             foreach (var controlPoint in slider.Path.ControlPoints)
             {
@@ -185,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     slider.Position = new Vector2(slider.Position.X, playfieldSize.Y - pos.Y);
             }
 
-            currentObjectInfo.EndPosChanged = slider.TailCircle.Position;
+            currentObjectInfo.EndPositionRandomised = slider.TailCircle.Position;
         }
 
         /// <summary>
@@ -266,89 +263,98 @@ namespace osu.Game.Rulesets.Osu.Mods
             );
         }
 
-        private struct HitObjectInfo
+        private struct RandomObjectInfo
         {
             internal float AngleRad { get; set; }
-            internal Vector2 StartPosUnchanged { get; set; }
-            internal Vector2 EndPosUnchanged { get; set; }
-            internal Vector2 StartPosChanged { get; set; }
-            internal Vector2 EndPosChanged { get; set; }
-        }
-    }
 
-    public class OsuModRandomSettingsControl : SettingsItem<int?>
-    {
-        protected override Drawable CreateControl() => new SeedControl
-        {
-            RelativeSizeAxes = Axes.X,
-            Margin = new MarginPadding { Top = 5 }
-        };
+            internal Vector2 PositionOriginal { get; set; }
+            internal Vector2 PositionRandomised { get; set; }
 
-        private sealed class SeedControl : CompositeDrawable, IHasCurrentValue<int?>
-        {
-            private readonly BindableWithCurrent<int?> current = new BindableWithCurrent<int?>();
+            internal Vector2 EndPositionOriginal { get; set; }
+            internal Vector2 EndPositionRandomised { get; set; }
 
-            public Bindable<int?> Current
+            public RandomObjectInfo(OsuHitObject hitObject)
             {
-                get => current;
-                set
-                {
-                    current.Current = value;
-                    seedNumberBox.Text = value.Value.ToString();
-                }
+                PositionRandomised = PositionOriginal = hitObject.Position;
+                EndPositionRandomised = EndPositionOriginal = hitObject.EndPosition;
+                AngleRad = 0;
             }
+        }
 
-            private readonly OsuNumberBox seedNumberBox;
-
-            public SeedControl()
+        public class OsuModRandomSettingsControl : SettingsItem<int?>
+        {
+            protected override Drawable CreateControl() => new SeedControl
             {
-                AutoSizeAxes = Axes.Y;
+                RelativeSizeAxes = Axes.X,
+                Margin = new MarginPadding { Top = 5 }
+            };
 
-                InternalChildren = new[]
+            private sealed class SeedControl : CompositeDrawable, IHasCurrentValue<int?>
+            {
+                private readonly BindableWithCurrent<int?> current = new BindableWithCurrent<int?>();
+
+                public Bindable<int?> Current
                 {
-                    new GridContainer
+                    get => current;
+                    set
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        ColumnDimensions = new[]
+                        current.Current = value;
+                        seedNumberBox.Text = value.Value.ToString();
+                    }
+                }
+
+                private readonly OsuNumberBox seedNumberBox;
+
+                public SeedControl()
+                {
+                    AutoSizeAxes = Axes.Y;
+
+                    InternalChildren = new[]
+                    {
+                        new GridContainer
                         {
-                            new Dimension(),
-                            new Dimension(GridSizeMode.Absolute, 2),
-                            new Dimension(GridSizeMode.Relative, 0.25f)
-                        },
-                        RowDimensions = new[]
-                        {
-                            new Dimension(GridSizeMode.AutoSize)
-                        },
-                        Content = new[]
-                        {
-                            new Drawable[]
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            ColumnDimensions = new[]
                             {
-                                seedNumberBox = new OsuNumberBox
+                                new Dimension(),
+                                new Dimension(GridSizeMode.Absolute, 2),
+                                new Dimension(GridSizeMode.Relative, 0.25f)
+                            },
+                            RowDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.AutoSize)
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    CommitOnFocusLost = true
+                                    seedNumberBox = new OsuNumberBox
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        CommitOnFocusLost = true
+                                    }
                                 }
                             }
                         }
-                    }
-                };
+                    };
 
-                seedNumberBox.Current.BindValueChanged(e =>
+                    seedNumberBox.Current.BindValueChanged(e =>
+                    {
+                        int? value = null;
+
+                        if (int.TryParse(e.NewValue, out var intVal))
+                            value = intVal;
+
+                        current.Value = value;
+                    });
+                }
+
+                protected override void Update()
                 {
-                    int? value = null;
-
-                    if (int.TryParse(e.NewValue, out var intVal))
-                        value = intVal;
-
-                    current.Value = value;
-                });
-            }
-
-            protected override void Update()
-            {
-                if (current.Value == null)
-                    seedNumberBox.Text = current.Current.Value.ToString();
+                    if (current.Value == null)
+                        seedNumberBox.Text = current.Current.Value.ToString();
+                }
             }
         }
     }
