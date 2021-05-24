@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Edit
             }
         }
 
-        private void updateReplay() => drawableRuleset.RegenerateAutoplay();
+        private void updateReplay() => Scheduler.AddOnce(drawableRuleset.RegenerateAutoplay);
 
         private void addHitObject(HitObject hitObject)
         {
