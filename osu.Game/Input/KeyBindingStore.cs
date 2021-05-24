@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
@@ -105,8 +106,7 @@ namespace osu.Game.Input
             {
                 var dbKeyBinding = (DatabasedKeyBinding)keyBinding;
 
-                if (dbKeyBinding.RulesetID != null && !CheckValidForGameplay(keyBinding.KeyCombination))
-                    return;
+                Debug.Assert(dbKeyBinding.RulesetID == null || CheckValidForGameplay(keyBinding.KeyCombination));
 
                 Refresh(ref dbKeyBinding);
 
