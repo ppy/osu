@@ -9,6 +9,7 @@ using Moq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
 using FileInfo = osu.Game.IO.FileInfo;
@@ -53,25 +54,25 @@ namespace osu.Game.Tests.Editing.Checks
         {
             // While this is a problem, it is out of scope for this check and is caught by a different one.
             beatmap.Metadata.BackgroundFile = null;
-            var mock = getMockWorkingBeatmap(null, System.Array.Empty<byte>());
+            var context = getContext(null, System.Array.Empty<byte>());
 
-            Assert.That(check.Run(beatmap, mock.Object), Is.Empty);
+            Assert.That(check.Run(context), Is.Empty);
         }
 
         [Test]
         public void TestAcceptable()
         {
-            var mock = getMockWorkingBeatmap(new Texture(1920, 1080));
+            var context = getContext(new Texture(1920, 1080));
 
-            Assert.That(check.Run(beatmap, mock.Object), Is.Empty);
+            Assert.That(check.Run(context), Is.Empty);
         }
 
         [Test]
         public void TestTooHighResolution()
         {
-            var mock = getMockWorkingBeatmap(new Texture(3840, 2160));
+            var context = getContext(new Texture(3840, 2160));
 
-            var issues = check.Run(beatmap, mock.Object).ToList();
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckBackgroundQuality.IssueTemplateTooHighResolution);
@@ -80,9 +81,9 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestLowResolution()
         {
-            var mock = getMockWorkingBeatmap(new Texture(640, 480));
+            var context = getContext(new Texture(640, 480));
 
-            var issues = check.Run(beatmap, mock.Object).ToList();
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckBackgroundQuality.IssueTemplateLowResolution);
@@ -91,9 +92,9 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestTooLowResolution()
         {
-            var mock = getMockWorkingBeatmap(new Texture(100, 100));
+            var context = getContext(new Texture(100, 100));
 
-            var issues = check.Run(beatmap, mock.Object).ToList();
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckBackgroundQuality.IssueTemplateTooLowResolution);
@@ -102,12 +103,17 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestTooUncompressed()
         {
-            var mock = getMockWorkingBeatmap(new Texture(1920, 1080), new byte[1024 * 1024 * 3]);
+            var context = getContext(new Texture(1920, 1080), new byte[1024 * 1024 * 3]);
 
-            var issues = check.Run(beatmap, mock.Object).ToList();
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckBackgroundQuality.IssueTemplateTooUncompressed);
+        }
+
+        private BeatmapVerifierContext getContext(Texture background, [CanBeNull] byte[] fileBytes = null)
+        {
+            return new BeatmapVerifierContext(beatmap, getMockWorkingBeatmap(background, fileBytes).Object);
         }
 
         /// <summary>

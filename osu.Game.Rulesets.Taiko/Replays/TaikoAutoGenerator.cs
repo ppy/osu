@@ -2,10 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Replays;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Taiko.Beatmaps;
@@ -13,7 +11,7 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {
-    public class TaikoAutoGenerator : AutoGenerator
+    public class TaikoAutoGenerator : AutoGenerator<TaikoReplayFrame>
     {
         public new TaikoBeatmap Beatmap => (TaikoBeatmap)base.Beatmap;
 
@@ -22,16 +20,12 @@ namespace osu.Game.Rulesets.Taiko.Replays
         public TaikoAutoGenerator(IBeatmap beatmap)
             : base(beatmap)
         {
-            Replay = new Replay();
         }
 
-        protected Replay Replay;
-        protected List<ReplayFrame> Frames => Replay.Frames;
-
-        public override Replay Generate()
+        protected override void GenerateFrames()
         {
             if (Beatmap.HitObjects.Count == 0)
-                return Replay;
+                return;
 
             bool hitButton = true;
 
@@ -128,8 +122,6 @@ namespace osu.Game.Rulesets.Taiko.Replays
 
                 hitButton = !hitButton;
             }
-
-            return Replay;
         }
     }
 }
