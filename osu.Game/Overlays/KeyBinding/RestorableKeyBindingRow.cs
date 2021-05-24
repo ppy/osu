@@ -65,6 +65,7 @@ namespace osu.Game.Overlays.KeyBinding
                 },
             };
 
+            restoreDefaultButton.Action = () => { KeyBindingRow.RestoreDefaults(); };
             restoreDefaultButton.Current = KeyBindingRow.IsDefault;
         }
     }
