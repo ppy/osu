@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 switch (hitObject)
                 {
                     case HitCircle circle:
-                        getObjectInfo(
+                        applyRandomisation(
                             rateOfChangeMultiplier,
                             prevObjectInfo,
                             distanceToPrev,
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                         currentObjectInfo.EndPositionOriginal = slider.TailCircle.Position;
 
-                        getObjectInfo(
+                        applyRandomisation(
                             rateOfChangeMultiplier,
                             prevObjectInfo,
                             distanceToPrev,
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// Returns the final position of the hit object
         /// </summary>
         /// <returns>Final position of the hit object</returns>
-        private void getObjectInfo(float rateOfChangeMultiplier, RandomObjectInfo prevObjectInfo, float distanceToPrev, ref RandomObjectInfo currentObjectInfo)
+        private void applyRandomisation(float rateOfChangeMultiplier, RandomObjectInfo prevObjectInfo, float distanceToPrev, ref RandomObjectInfo currentObjectInfo)
         {
             // The max. angle (relative to the angle of the vector pointing from the 2nd last to the last hit object)
             // is proportional to the distance between the last and the current hit object
@@ -155,15 +155,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // Move hit objects back into the playfield if they are outside of it,
             // which would sometimes happen during big jumps otherwise.
-            if (position.X < 0)
-                position.X = 0;
-            else if (position.X > OsuPlayfield.BASE_SIZE.X)
-                position.X = OsuPlayfield.BASE_SIZE.X;
-
-            if (position.Y < 0)
-                position.Y = 0;
-            else if (position.Y > OsuPlayfield.BASE_SIZE.Y)
-                position.Y = OsuPlayfield.BASE_SIZE.Y;
+            position.X = MathHelper.Clamp(position.X, 0, OsuPlayfield.BASE_SIZE.X);
+            position.Y = MathHelper.Clamp(position.Y, 0, OsuPlayfield.BASE_SIZE.Y);
 
             currentObjectInfo.PositionRandomised = position;
         }
