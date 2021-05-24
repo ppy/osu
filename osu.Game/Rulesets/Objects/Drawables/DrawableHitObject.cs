@@ -174,7 +174,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             base.AddInternal(Samples = new PausableSkinnableSound());
 
             CurrentSkin = skinSource;
-            CurrentSkin.SourceChanged += onSkinSourceChanged;
+            CurrentSkin.SourceChanged += skinSourceChanged;
+        }
+
+        protected override void LoadAsyncComplete()
+        {
+            base.LoadAsyncComplete();
+            skinChanged();
         }
 
         protected override void LoadComplete()
@@ -497,7 +503,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected ISkinSource CurrentSkin { get; private set; }
 
-        private void onSkinSourceChanged() => Scheduler.AddOnce(() =>
+        private void skinSourceChanged() => Scheduler.AddOnce(skinChanged);
+
+        private void skinChanged()
         {
             UpdateComboColour();
 
@@ -505,7 +513,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (IsLoaded)
                 updateState(State.Value, true);
-        });
+        }
 
         protected void UpdateComboColour()
         {
@@ -749,7 +757,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (HitObject != null)
                 HitObject.DefaultsApplied -= onDefaultsApplied;
 
-            CurrentSkin.SourceChanged -= onSkinSourceChanged;
+            CurrentSkin.SourceChanged -= skinSourceChanged;
         }
     }
 

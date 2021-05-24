@@ -20,6 +20,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Music;
 using osuTK;
 using osuTK.Graphics;
@@ -29,8 +30,8 @@ namespace osu.Game.Overlays
     public class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
         public string IconTexture => "Icons/Hexacons/music";
-        public string Title => "音乐";
-        public string Description => "管理当前正在播放的音乐";
+        public LocalisableString Title => NowPlayingStrings.HeaderTitle;
+        public LocalisableString Description => NowPlayingStrings.HeaderDescription;
 
         private const float player_height = 130;
         private const float transition_length = 800;

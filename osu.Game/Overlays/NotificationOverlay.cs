@@ -11,16 +11,18 @@ using osu.Game.Graphics.Containers;
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays
 {
     public class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
         public string IconTexture => "Icons/Hexacons/notification";
-        public string Title => "通知";
-        public string Description => "等待着您~";
+        public LocalisableString Title => NotificationsStrings.HeaderTitle;
+        public LocalisableString Description => NotificationsStrings.HeaderDescription;
 
         private const float width = 320;
 
