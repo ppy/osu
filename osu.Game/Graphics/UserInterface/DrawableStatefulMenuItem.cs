@@ -46,10 +46,10 @@ namespace osu.Game.Graphics.UserInterface
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                updateState(state.Value);
+                updateState();
 
                 if (!closeMenuOnClick)
-                    state.BindValueChanged(updateState);
+                    state.BindValueChanged(_ => updateState());
             }
 
             protected override void Update()
@@ -60,14 +60,9 @@ namespace osu.Game.Graphics.UserInterface
                 stateIcon.X = BoldText.DrawWidth + 10;
             }
 
-            private void updateState(ValueChangedEvent<object> state)
+            private void updateState()
             {
-                updateState(state.NewValue);
-            }
-
-            private void updateState(object state)
-            {
-                var icon = menuItem.GetIconForState(state);
+                var icon = menuItem.GetIconForState(state.Value);
 
                 if (icon == null)
                     stateIcon.Alpha = 0;
