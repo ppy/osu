@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private readonly List<double> strains = new List<double>();
         private readonly List<double> times = new List<double>();
         private double target_fc_precision = 0.01;
-        private double target_fc_time = 30 * 60 * 1000;
+        private double target_fc_time = 30 * 60 * 1000; // estimated time it takes us to FC (30 minutes)
 
         protected virtual double StarsPerDouble => 1.15;
 
@@ -39,19 +39,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double difficultyExponent = 1.0 / Math.Log(StarsPerDouble, 2);
             double SR = 0;
 
-            // double avgStrain = 0;
-            // for (int i = 0; i < strains.Count; i++)
-            // {
-            //     avgStrain += strains[i];
-            // }
-            //
-            // avgStrain /= strains.Count;
-            //
-            // for (int i = 0; i < strains.Count; i++)
-            // {
-            //     strains[i] += avgStrain;
-            // }
-
             for (int i = 0; i < strains.Count; i++)
             {
                 SR += Math.Pow(strains[i], difficultyExponent);
@@ -62,7 +49,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public override double DifficultyValue()
         {
-            // return .85 * calculateDifficultyValue();
             return fcTimeSkillLevel(calculateDifficultyValue());
         }
 
@@ -97,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double fcTimeSkillLevel(double totalDifficulty)
         {
             double lengthEstimate = 0.4 * (times[times.Count - 1] - times[0]);
-            target_fc_time += 300000 * (Math.Max(0, (times[times.Count - 1] - times[0]) - 180000) / 30000);
+            target_fc_time += 300000 * (Math.Max(0, (times[times.Count - 1] - times[0]) - 180000) / 30000); // for every 30 seconds past 3 mins, add 5 mins to estimated time to FC.
             double fcProb = lengthEstimate / target_fc_time;
             double skill = skillLevel(fcProb, totalDifficulty);
             for (int i=0; i<5; ++i)

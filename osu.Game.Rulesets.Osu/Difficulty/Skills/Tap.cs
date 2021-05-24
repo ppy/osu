@@ -21,14 +21,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StarsPerDouble => 1.075;
         protected override int HistoryLength => 16;
         private int averageLength = 2;
-        private int globalCount;
 
         private int decayExcessThreshold = 500;
 
         private double currentStrain;
-        private double strainMultiplier = 2.65;//675;//1.5;//3125;
-
-        private double hitWindowGreat;
+        private double strainMultiplier = 2.65;
 
         public Tap(Mod[] mods)
             : base(mods)
@@ -57,7 +54,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double strainValue = .25;
 
-            // double deltaTimeDeltaCount = 0;
             double sumDeltaTime = 0;
 
             if (Previous.Count < 8)
@@ -142,15 +138,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             for (int i = 0; i < islandSizes.Length; i++)
             {
                 if (islandSizes[i] != 0)
-                    rhythmComplexitySum += islandTimes[i] / Math.Pow(islandSizes[i], .5);
+                    rhythmComplexitySum += islandTimes[i] / Math.Pow(islandSizes[i], .5); // sum the total amount of rhythm variance, penalizing for repeated island sizes.
             }
-
-            // rhythmComplexitySum += islandTimes[0] / Math.Pow(islandSizes[0], .75);
-            // rhythmComplexitySum += islandTimes[2] / Math.Pow(islandSizes[2], .75);
-            // rhythmComplexitySum += islandTimes[4] / Math.Pow(islandSizes[4], .75);
-            // rhythmComplexitySum += islandTimes[5] / Math.Pow(islandSizes[5], .75);
-            // rhythmComplexitySum += (islandSizes[1] + islandSizes[3]) / Math.Pow(islandSizes[1] + islandSizes[3], .75);
-            // rhythmComplexitySum += islandTimes[6] / Math.Pow(islandSizes[6], .75);
 
             int sliderCount = 1;
 
@@ -160,52 +149,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     sliderCount++;
             }
 
-            // rhythmComplexitySum /= Math.Sqrt(9 + sliderCount) / 3;
-
-
-            rhythmComplexitySum += specialTransitionCount;
+            rhythmComplexitySum += specialTransitionCount; // add in our 1.5 * transitions
             rhythmComplexitySum *= .75;
-            // Console.WriteLine("Delta: " + avgDeltaTime);
 
-            if (75 / avgDeltaTime > 1)
+            if (75 / avgDeltaTime > 1) // scale tap value for high BPM.
                 strainValue += Math.Pow(75 / avgDeltaTime, 2);
             else
                 strainValue += Math.Pow(75 / avgDeltaTime, 1);
 
-            // strainValue += 1.5 / Math.Sqrt(hitWindowGreat);
-
-//2.5 / Math.Sqrt(hitWindowGreat)
-
-            // Nerf by 12.5% for ultra stacks.
-            // strainValue *= 1 - Math.Min(1, (osuCurrent.JumpDistance) / 50) / 8;
-
             currentStrain *= computeDecay(.9, osuCurrent.StrainTime);
             currentStrain += strainValue * strainMultiplier;
 
-
-// Console.WriteLine("Count: " + globalCount);
-// Console.WriteLine("Buff: " + Math.Sqrt((Previous.Count / HistoryLength) * Math.Sqrt(4 + rhythmComplexitySum) / 2));
-// Console.WriteLine("Doubles: " + islandSizes[0] + " " + "Triples: " + islandSizes[1] + " " + "Quads: " +
-//  islandSizes[2] + " " + "Quints: " + islandSizes[3] + " " + "Six: " + islandSizes[4] + " " + "Sevens: " + islandSizes[5] + " " + "Plus: " + islandSizes[6]);
-
-            globalCount++;
-            // Console.WriteLine(hitWindowGreat);
-
-            // if (rhythmComplexitySum > 1)
-                return currentStrain * (Previous.Count / HistoryLength) * (Math.Sqrt(4 + rhythmComplexitySum) / 2);
-
-
-            // else
-            //     return currentStrain;// * (Previous.Count / HistoryLength) * Math.Max(1, Math.Sqrt(3 + rhythmComplexitySum) / 2);
-        }
-
-        public void SetHitWindow(double od, double clockRate)
-        {
-            HitWindows hitWindows = new OsuHitWindows();
-            hitWindows.SetDifficulty(od);
-
-                    // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-            hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate;
+            return currentStrain * (Previous.Count / HistoryLength) * (Math.Sqrt(4 + rhythmComplexitySum) / 2);
         }
     }
 }
