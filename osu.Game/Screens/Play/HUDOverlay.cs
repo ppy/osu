@@ -196,12 +196,12 @@ namespace osu.Game.Screens.Play
             }
 
             if (lowestTopScreenSpace.HasValue)
-                topRightElements.Y = TopScoringElementsHeight = Math.Max(0, ToLocalSpace(lowestTopScreenSpace.Value).Y);
+                topRightElements.Y = TopScoringElementsHeight = MathHelper.Clamp(ToLocalSpace(lowestTopScreenSpace.Value).Y, 0, DrawHeight - topRightElements.DrawHeight);
             else
                 topRightElements.Y = 0;
 
             if (highestBottomScreenSpace.HasValue)
-                bottomRightElements.Y = BottomScoringElementsHeight = -Math.Max(0, (DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y));
+                bottomRightElements.Y = BottomScoringElementsHeight = -MathHelper.Clamp(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y, 0, DrawHeight - bottomRightElements.DrawHeight);
             else
                 bottomRightElements.Y = 0;
         }
