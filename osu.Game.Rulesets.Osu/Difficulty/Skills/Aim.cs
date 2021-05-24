@@ -92,7 +92,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currVector = Vector2.Divide(Vector2.Multiply(osuCurrObj.DistanceVector, (float)snapScaling(osuCurrObj.JumpDistance / 104)), (float)osuCurrObj.StrainTime);
             prevVector = Vector2.Divide(Vector2.Multiply(osuPrevObj.DistanceVector, (float)snapScaling(osuPrevObj.JumpDistance / 104)), (float)osuPrevObj.StrainTime);
 
-            var nextDiffVector = Vector2.Add(currVector, nextVector);
             var prevDiffVector = Vector2.Add(prevVector, currVector);
 
             double angleDistance = Math.Max(0, prevDiffVector.Length - Math.Max(currVector.Length, prevVector.Length));
@@ -164,21 +163,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                                                  osuNextObj,
                                                  prevVector,
                                                  currVector,
-                                                 prevVector);
+                                                 nextVector);
 
                 double flowStrain = flowStrainAt(osuPrevObj,
                                                  osuCurrObj,
                                                  osuNextObj,
                                                  prevVector,
                                                  currVector,
-                                                 prevVector);
+                                                 nextVector);
 
                 double hybridStrain = hybridStrainAt(osuPrevObj,
                                                      osuCurrObj,
                                                      osuNextObj,
                                                      prevVector,
                                                      currVector,
-                                                     prevVector);
+                                                     nextVector);
 
                 double sliderStrain = sliderStrainAt(osuPrevObj,
                                                      osuCurrObj,
