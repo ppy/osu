@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using MathNet.Numerics;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -101,7 +100,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (Attributes.ApproachRate < 8.0)
                 approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
 
-            aimValue *= 1.0 + Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));//+ Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
+            // scale aim with AR, sensitive to object count
+            aimValue *= 1.0 + Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(h => h is OsuModHidden))
@@ -135,7 +135,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (Attributes.ApproachRate < 8.0)
                 approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
 
-            speedValue *= 1.0 + approachRateFactor;// + Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
+            // scale speed sensitive to AR, without respect to object count.
+            speedValue *= 1.0 + approachRateFactor;
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
@@ -170,17 +171,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accValue = Math.Pow(1.52163, Attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.83;
+            double accuracyValue = Math.Pow(1.52163, Attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.83;
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
-            accValue *= Math.Min(1.15, Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.3));
+            accuracyValue *= Math.Min(1.15, Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.3));
 
             if (mods.Any(m => m is OsuModHidden))
-                accValue *= 1.08;
+                accuracyValue *= 1.08;
             if (mods.Any(m => m is OsuModFlashlight))
-                accValue *= 1.02;
+                accuracyValue *= 1.02;
 
-            return accValue;
+            return accuracyValue;
         }
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;

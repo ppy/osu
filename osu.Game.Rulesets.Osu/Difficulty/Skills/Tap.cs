@@ -20,54 +20,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         protected override double StarsPerDouble => 1.075;
         protected override int HistoryLength => 16;
-        private int averageLength = 2;
+        protected override int decayExcessThreshold => 500;
+        protected override double baseDecay => 0.9;
 
-        private int decayExcessThreshold = 500;
+        private int strainTimeBuffRange = 75;
 
-        private double currentStrain;
+        private double currentStrain = 1;
+        // Global Tap Strain Multiplier.
         private double strainMultiplier = 2.65;
+        private double rhythmMultiplier = 0.75;
 
         public Tap(Mod[] mods)
             : base(mods)
         {
         }
 
-        public double TapStrain => currentStrain;
-
-        private double computeDecay(double baseDecay, double ms)
+        /// <summary>
+        /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
+        /// </summary>
+        private double calculateRhythmDifficulty()
         {
-            double decay = 0;
-            if (ms < decayExcessThreshold)
-                decay = baseDecay;
-            else
-                decay = Math.Pow(Math.Pow(baseDecay, 1000 / Math.Min(ms, decayExcessThreshold)), ms / 1000);
-
-            return decay;
-        }
-
-        protected override double strainValueAt(DifficultyHitObject current)
-        {
-            if (current.BaseObject is Spinner || Previous.Count == 0)
-                return 0;
-
-            var osuCurrent = (OsuDifficultyHitObject)current;
-
-            double strainValue = .25;
-
-            double sumDeltaTime = 0;
-
-            if (Previous.Count < 8)
-                return 0;
-
-            for (int i = 0; i < Previous.Count; i++)
-            {
-                if (i < averageLength)
-                    sumDeltaTime += ((OsuDifficultyHitObject)Previous[i]).StrainTime;
-            }
-
-            double avgDeltaTime = sumDeltaTime / Math.Min(Previous.Count, averageLength);
-
-// {doubles, triplets, quads, quints, 6-tuplets, 7 Tuplets, greater}
+            // {doubles, triplets, quads, quints, 6-tuplets, 7 Tuplets, greater}
             double[] islandSizes = {0, 0, 0, 0, 0, 0, 0};
             double[] islandTimes = {0, 0, 0, 0, 0, 0, 0};
             int islandSize = 0;
@@ -141,26 +114,33 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     rhythmComplexitySum += islandTimes[i] / Math.Pow(islandSizes[i], .5); // sum the total amount of rhythm variance, penalizing for repeated island sizes.
             }
 
-            int sliderCount = 1;
-
-            for (int i = 0; i < Previous.Count; i++)
-            {
-                if (Previous[i].BaseObject is Slider)
-                    sliderCount++;
-            }
-
             rhythmComplexitySum += specialTransitionCount; // add in our 1.5 * transitions
-            rhythmComplexitySum *= .75;
 
-            if (75 / avgDeltaTime > 1) // scale tap value for high BPM.
-                strainValue += Math.Pow(75 / avgDeltaTime, 2);
+            return Math.Sqrt(4 + rhythmComplexitySum * rhythmMultiplier) / 2;
+        }
+
+        protected override double strainValueAt(DifficultyHitObject current)
+        {
+            if (current.BaseObject is Spinner || Previous.Count == 0)
+                return 0;
+
+            var osuCurrent = (OsuDifficultyHitObject)current;
+
+            double strainValue = .25;
+
+            double avgDeltaTime = (osuCurrent.StrainTime + ((OsuDifficultyHitObject)Previous[0]).StrainTime) / 2;
+
+            double rhythmComplexity = calculateRhythmDifficulty(); // equals 1 with no rhythm difficulty, otherwise scales with a sqrt
+
+            if (strainTimeBuffRange / avgDeltaTime > 1) // scale tap value for high BPM (above 200).
+                strainValue += Math.Pow(strainTimeBuffRange / avgDeltaTime, 2);
             else
-                strainValue += Math.Pow(75 / avgDeltaTime, 1);
+                strainValue += Math.Pow(strainTimeBuffRange / avgDeltaTime, 1);
 
-            currentStrain *= computeDecay(.9, osuCurrent.StrainTime);
+            currentStrain *= computeDecay(baseDecay, osuCurrent.StrainTime);
             currentStrain += strainValue * strainMultiplier;
 
-            return currentStrain * (Previous.Count / HistoryLength) * (Math.Sqrt(4 + rhythmComplexitySum) / 2);
+            return currentStrain * (Previous.Count / HistoryLength) * rhythmComplexity;
         }
     }
 }

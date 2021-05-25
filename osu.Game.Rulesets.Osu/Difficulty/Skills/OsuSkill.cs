@@ -18,7 +18,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double target_fc_precision = 0.01;
         private double target_fc_time = 30 * 60 * 1000; // estimated time it takes us to FC (30 minutes)
 
-        protected virtual double StarsPerDouble => 1.15;
+        protected virtual int decayExcessThreshold => 500;
+        protected virtual double baseDecay => .75;
+
+        protected virtual double StarsPerDouble => 1.0;
 
         private double difficultyExponent => 1.0 / Math.Log(StarsPerDouble, 2);
 
@@ -26,7 +29,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
+        /// <summary>
+        /// The calculated strain value associated with this <see cref="DifficultyHitObject"/>.
+        /// </summary>
+        /// <param name="current">The current DifficultyHitObject being processed.</param>
         protected abstract double strainValueAt(DifficultyHitObject current);
+
+        /// <summary>
+        /// Utility to decay strain over a period of deltaTime.
+        /// </summary>
+        /// <param name="baseDecay">The rate of decay per object.</param>
+        /// <param name="deltaTime">The time between objects.</param>
+        protected double computeDecay(double baseDecay, double deltaTime)
+        {
+            double decay = 0;
+            if (deltaTime < decayExcessThreshold)
+                decay = baseDecay;
+            else // Beyond 500 MS (or whatever decayExcessThreshold is), we decay geometrically to avoid keeping strain going over long breaks.
+                decay = Math.Pow(Math.Pow(baseDecay, 1000 / Math.Min(deltaTime, decayExcessThreshold)), deltaTime / 1000);
+
+            return decay;
+        }
 
         protected override void Process(DifficultyHitObject current)
         {
@@ -34,10 +57,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             times.Add(current.StartTime);
         }
 
+        /// <summary>
+        /// The total summarized difficulty value of all strains for every <see cref="DifficultyHitObject"/> in the beatmap.
+        /// </summary>
         private double calculateDifficultyValue()
         {
             double difficultyExponent = 1.0 / Math.Log(StarsPerDouble, 2);
             double SR = 0;
+
+            // Math here preserves the property that two notes of equal difficulty x, we have their summed difficulty = x*StarsPerDouble
+            // This also applies to two sets of notes with equal difficulty.
 
             for (int i = 0; i < strains.Count; i++)
             {
@@ -80,10 +109,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return fcTime - (times[times.Count - 1] - times[0]);
         }
 
+        /// <summary>
+        /// The final estimated skill level necessary to full combo the entire beatmap.
+        /// </summary>
+        /// <param name="totalDifficulty">The total difficulty of all objects in the map.</param>
         private double fcTimeSkillLevel(double totalDifficulty)
         {
             double lengthEstimate = 0.4 * (times[times.Count - 1] - times[0]);
-            target_fc_time += 300000 * (Math.Max(0, (times[times.Count - 1] - times[0]) - 180000) / 30000); // for every 30 seconds past 3 mins, add 5 mins to estimated time to FC.
+            target_fc_time += 300000 * (Math.Max(0, (times[times.Count - 1] - times[0]) - 180000) / 30000);
+            // for every 30 seconds past 3 mins, add 5 mins to estimated time to FC. ^
             double fcProb = lengthEstimate / target_fc_time;
             double skill = skillLevel(fcProb, totalDifficulty);
             for (int i=0; i<5; ++i)
