@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.KeyBinding
 
             InternalChildren = new Drawable[]
             {
-                new RestoreDefaultValueButton<bool>()
+                new RestoreDefaultValueButton<bool>
                 {
                     Current = KeyBindingRow.IsDefault,
                     Action = () => { KeyBindingRow.RestoreDefaults(); }
