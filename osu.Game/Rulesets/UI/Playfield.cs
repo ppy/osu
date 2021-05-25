@@ -354,8 +354,11 @@ namespace osu.Game.Rulesets.UI
 
                     // If this is the first time this DHO is being used, then apply the DHO mods.
                     // This is done before Apply() so that the state is updated once when the hitobject is applied.
-                    foreach (var m in mods.OfType<IApplicableToDrawableHitObjects>())
-                        m.ApplyToDrawableHitObjects(dho.Yield());
+                    if (mods != null)
+                    {
+                        foreach (var m in mods.OfType<IApplicableToDrawableHitObjects>())
+                            m.ApplyToDrawableHitObjects(dho.Yield());
+                    }
                 }
 
                 if (!lifetimeEntryMap.TryGetValue(hitObject, out var entry))

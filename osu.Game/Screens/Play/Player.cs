@@ -22,6 +22,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
+using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
@@ -93,6 +94,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private MusicController musicController { get; set; }
 
+        [Resolved]
+        private SpectatorClient spectatorClient { get; set; }
+
         private Sample sampleRestart;
 
         public BreakOverlay BreakOverlay;
@@ -104,7 +108,8 @@ namespace osu.Game.Screens.Play
 
         private BreakTracker breakTracker;
 
-        private SkipOverlay skipOverlay;
+        private SkipOverlay skipIntroOverlay;
+        private SkipOverlay skipOutroOverlay;
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
 
@@ -153,6 +158,9 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
+            if (!LoadedBeatmapSuccessfully)
+                return;
+
             // replays should never be recorded or played back when autoplay is enabled
             if (!Mods.Value.Any(m => m is ModAutoplay))
                 PrepareReplay();
@@ -197,13 +205,18 @@ namespace osu.Game.Screens.Play
                 LocalUserPlaying.BindTo(osuGame.LocalUserPlaying);
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
+            dependencies.CacheAs(DrawableRuleset);
 
             ScoreProcessor = ruleset.CreateScoreProcessor();
             ScoreProcessor.ApplyBeatmap(playableBeatmap);
             ScoreProcessor.Mods.BindTo(Mods);
 
+            dependencies.CacheAs(ScoreProcessor);
+
             HealthProcessor = ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
             HealthProcessor.ApplyBeatmap(playableBeatmap);
+
+            dependencies.CacheAs(HealthProcessor);
 
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
@@ -244,7 +257,6 @@ namespace osu.Game.Screens.Play
                 HUDOverlay.ShowHud.Value = false;
                 HUDOverlay.ShowHud.Disabled = true;
                 BreakOverlay.Hide();
-                skipOverlay.Hide();
             }
 
             DrawableRuleset.FrameStableClock.WaitingOnFrames.BindValueChanged(waiting =>
@@ -281,8 +293,14 @@ namespace osu.Game.Screens.Play
                 ScoreProcessor.RevertResult(r);
             };
 
+            DimmableStoryboard.HasStoryboardEnded.ValueChanged += storyboardEnded =>
+            {
+                if (storyboardEnded.NewValue && completionProgressDelegate == null)
+                    updateCompletionState();
+            };
+
             // Bind the judgement processors to ourselves
-            ScoreProcessor.HasCompleted.ValueChanged += updateCompletionState;
+            ScoreProcessor.HasCompleted.BindValueChanged(_ => updateCompletionState());
             HealthProcessor.Failed += onFail;
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
@@ -335,7 +353,7 @@ namespace osu.Game.Screens.Play
                     // display the cursor above some HUD elements.
                     DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                     DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
-                    HUDOverlay = new HUDOverlay(ScoreProcessor, HealthProcessor, DrawableRuleset, Mods.Value)
+                    HUDOverlay = new HUDOverlay(DrawableRuleset, Mods.Value)
                     {
                         HoldToQuit =
                         {
@@ -347,17 +365,17 @@ namespace osu.Game.Screens.Play
                             AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
                             IsCounting = false
                         },
-                        RequestSeek = time =>
-                        {
-                            GameplayClockContainer.Seek(time);
-                            GameplayClockContainer.Start();
-                        },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     },
-                    skipOverlay = new SkipOverlay(DrawableRuleset.GameplayStartTime)
+                    skipIntroOverlay = new SkipOverlay(DrawableRuleset.GameplayStartTime)
                     {
                         RequestSkip = performUserRequestedSkip
+                    },
+                    skipOutroOverlay = new SkipOverlay(Beatmap.Value.Storyboard.LatestEventTime ?? 0)
+                    {
+                        RequestSkip = () => updateCompletionState(true),
+                        Alpha = 0
                     },
                     FailOverlay = new FailOverlay
                     {
@@ -385,11 +403,14 @@ namespace osu.Game.Screens.Play
                 }
             };
 
+            if (!Configuration.AllowSkipping || !DrawableRuleset.AllowGameplayOverlays)
+            {
+                skipIntroOverlay.Expire();
+                skipOutroOverlay.Expire();
+            }
+
             if (GameplayClockContainer is MasterGameplayClockContainer master)
                 HUDOverlay.PlayerSettingsOverlay.PlaybackSettings.UserPlaybackRate.BindTarget = master.UserPlaybackRate;
-
-            if (!Configuration.AllowSkippingIntro)
-                skipOverlay.Expire();
 
             if (Configuration.AllowRestart)
             {
@@ -525,6 +546,12 @@ namespace osu.Game.Screens.Play
                     Pause();
                     return;
                 }
+
+                // if the score is ready for display but results screen has not been pushed yet (e.g. storyboard is still playing beyond gameplay), then transition to results screen instead of exiting.
+                if (prepareScoreForDisplayTask != null && completionProgressDelegate == null)
+                {
+                    updateCompletionState(true);
+                }
             }
 
             this.Exit();
@@ -541,6 +568,12 @@ namespace osu.Game.Screens.Play
             // return samplePlaybackDisabled.Value to what is defined by the beatmap's current state
             updateSampleDisabledState();
         }
+
+        /// <summary>
+        /// Seek to a specific time in gameplay.
+        /// </summary>
+        /// <param name="time">The destination time to seek to.</param>
+        public void Seek(double time) => GameplayClockContainer.Seek(time);
 
         /// <summary>
         /// Restart gameplay via a parent <see cref="PlayerLoader"/>.
@@ -564,17 +597,23 @@ namespace osu.Game.Screens.Play
         private ScheduledDelegate completionProgressDelegate;
         private Task<ScoreInfo> prepareScoreForDisplayTask;
 
-        private void updateCompletionState(ValueChangedEvent<bool> completionState)
+        /// <summary>
+        /// Handles changes in player state which may progress the completion of gameplay / this screen's lifetime.
+        /// </summary>
+        /// <param name="skipStoryboardOutro">If in a state where a storyboard outro is to be played, offers the choice of skipping beyond it.</param>
+        /// <exception cref="InvalidOperationException">Thrown if this method is called more than once without changing state.</exception>
+        private void updateCompletionState(bool skipStoryboardOutro = false)
         {
             // screen may be in the exiting transition phase.
             if (!this.IsCurrentScreen())
                 return;
 
-            if (!completionState.NewValue)
+            if (!ScoreProcessor.HasCompleted.Value)
             {
                 completionProgressDelegate?.Cancel();
                 completionProgressDelegate = null;
                 ValidForResume = true;
+                skipOutroOverlay.Hide();
                 return;
             }
 
@@ -613,6 +652,20 @@ namespace osu.Game.Screens.Play
 
                 return score.ScoreInfo;
             });
+
+            if (skipStoryboardOutro)
+            {
+                scheduleCompletion();
+                return;
+            }
+
+            bool storyboardHasOutro = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
+
+            if (storyboardHasOutro)
+            {
+                skipOutroOverlay.Show();
+                return;
+            }
 
             using (BeginDelayedSequence(RESULTS_DISPLAY_DELAY))
                 scheduleCompletion();
@@ -833,6 +886,11 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
+            // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
+            // To resolve test failures, forcefully end playing synchronously when this screen exits.
+            // Todo: Replace this with a more permanent solution once osu-framework has a synchronous cleanup method.
+            spectatorClient.EndPlaying();
+
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.
             // as we are no longer the current screen, we cannot guarantee the track is still usable.
             (GameplayClockContainer as MasterGameplayClockContainer)?.StopUsingBeatmapClock();
@@ -880,11 +938,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="score">The <see cref="Score"/> to import.</param>
         /// <returns>The imported score.</returns>
-        protected virtual Task ImportScore(Score score)
+        protected virtual async Task ImportScore(Score score)
         {
             // Replays are already populated and present in the game's database, so should not be re-imported.
             if (DrawableRuleset.ReplayScore != null)
-                return Task.CompletedTask;
+                return;
 
             LegacyByteArrayReader replayReader;
 
@@ -894,7 +952,18 @@ namespace osu.Game.Screens.Play
                 replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
             }
 
-            return scoreManager.Import(score.ScoreInfo, replayReader);
+            // For the time being, online ID responses are not really useful for anything.
+            // In addition, the IDs provided via new (lazer) endpoints are based on a different autoincrement from legacy (stable) scores.
+            //
+            // Until we better define the server-side logic behind this, let's not store the online ID to avoid potential unique constraint
+            // conflicts across various systems (ie. solo and multiplayer).
+            long? onlineScoreId = score.ScoreInfo.OnlineScoreID;
+            score.ScoreInfo.OnlineScoreID = null;
+
+            await scoreManager.Import(score.ScoreInfo, replayReader).ConfigureAwait(false);
+
+            // ... And restore the online ID for other processes to handle correctly (e.g. de-duplication for the results screen).
+            score.ScoreInfo.OnlineScoreID = onlineScoreId;
         }
 
         /// <summary>
