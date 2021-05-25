@@ -41,6 +41,12 @@ namespace osu.Game.Overlays.KeyBinding
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding { Right = SettingsPanel.CONTENT_MARGINS };
 
+            KeyBindingRow = new KeyBindingRow(key, bindings.Where(b => ((int)b.Action).Equals((int)key)))
+            {
+                AllowMainMouseButtons = ruleset != null,
+                Defaults = defaults
+            };
+
             InternalChildren = new Drawable[]
             {
                 new RestoreDefaultValueButton<bool>
@@ -53,11 +59,7 @@ namespace osu.Game.Overlays.KeyBinding
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
-                    Child = KeyBindingRow = new KeyBindingRow(key, bindings.Where(b => ((int)b.Action).Equals((int)key)))
-                    {
-                        AllowMainMouseButtons = ruleset != null,
-                        Defaults = defaults
-                    }
+                    Child = KeyBindingRow
                 },
             };
         }
