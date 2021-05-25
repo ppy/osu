@@ -47,6 +47,7 @@ namespace osu.Game.Overlays
             Loading.Show();
 
             request.Success += response => Schedule(() => onSuccess(response));
+            request.Failure += _ => Schedule(() => LoadDisplay(Empty()));
 
             api.PerformAsync(request);
         }
