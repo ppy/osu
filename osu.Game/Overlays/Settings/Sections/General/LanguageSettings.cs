@@ -39,7 +39,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 locale = Language.en;
             languageSelection.Current.Value = locale;
 
-            languageSelection.Current.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToString());
+            //Workaround for culture codes like "zh-Hans" or "zh-CHS"
+            languageSelection.Current.BindValueChanged(val => frameworkLocale.Value = val.NewValue.ToString().Replace("_", "-"));
         }
     }
 }

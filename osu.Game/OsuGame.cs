@@ -565,7 +565,8 @@ namespace osu.Game
 
             foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
             {
-                var cultureCode = language.ToString();
+                //Workaround for culture codes like "zh-Hans" or "zh-CHS"
+                var cultureCode = language.ToString().Replace("_", "-");
                 Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
             }
 
