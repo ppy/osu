@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking, ITrackSnaking, IHasMainCirclePiece
+    public class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking, IHasMainCirclePiece
     {
         public new SliderTailCircle HitObject => (SliderTailCircle)base.HitObject;
 
