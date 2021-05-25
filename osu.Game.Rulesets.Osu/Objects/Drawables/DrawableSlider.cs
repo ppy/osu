@@ -34,7 +34,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override bool DisplayResult => !HitObject.OnlyJudgeNestedObjects;
 
-        private PlaySliderBody sliderBody => Body.Drawable as PlaySliderBody;
+        [CanBeNull]
+        public PlaySliderBody SliderBody => Body.Drawable as PlaySliderBody;
 
         public IBindable<int> PathVersion => pathVersion;
         private readonly Bindable<int> pathVersion = new Bindable<int>();
@@ -215,16 +216,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             double completionProgress = Math.Clamp((Time.Current - HitObject.StartTime) / HitObject.Duration, 0, 1);
 
             Ball.UpdateProgress(completionProgress);
-            sliderBody?.UpdateProgress(completionProgress);
+            SliderBody?.UpdateProgress(completionProgress);
 
             foreach (DrawableHitObject hitObject in NestedHitObjects)
             {
-                if (hitObject is ITrackSnaking s) s.UpdateSnakingPosition(HitObject.Path.PositionAt(sliderBody?.SnakedStart ?? 0), HitObject.Path.PositionAt(sliderBody?.SnakedEnd ?? 0));
+                if (hitObject is ITrackSnaking s) s.UpdateSnakingPosition(HitObject.Path.PositionAt(SliderBody?.SnakedStart ?? 0), HitObject.Path.PositionAt(SliderBody?.SnakedEnd ?? 0));
                 if (hitObject is IRequireTracking t) t.Tracking = Ball.Tracking;
             }
 
-            Size = sliderBody?.Size ?? Vector2.Zero;
-            OriginPosition = sliderBody?.PathOffset ?? Vector2.Zero;
+            Size = SliderBody?.Size ?? Vector2.Zero;
+            OriginPosition = SliderBody?.PathOffset ?? Vector2.Zero;
 
             if (DrawSize != Vector2.Zero)
             {
@@ -238,7 +239,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public override void OnKilled()
         {
             base.OnKilled();
-            sliderBody?.RecyclePath();
+            SliderBody?.RecyclePath();
         }
 
         protected override void ApplySkin(ISkinSource skin, bool allowFallback)
@@ -324,7 +325,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 case ArmedState.Hit:
                     Ball.ScaleTo(HitObject.Scale * 1.4f, fade_out_time, Easing.Out);
-                    if (sliderBody?.SnakingOut.Value == true)
+                    if (SliderBody?.SnakingOut.Value == true)
                         Body.FadeOut(40); // short fade to allow for any body colour to smoothly disappear.
                     break;
             }
@@ -332,7 +333,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
         }
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => sliderBody?.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => SliderBody?.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
 
         private class DefaultSliderBody : PlaySliderBody
         {

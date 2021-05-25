@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableHitCircle : DrawableOsuHitObject
+    public class DrawableHitCircle : DrawableOsuHitObject, IHasMainCirclePiece
     {
         public OsuAction? HitAction => HitArea.HitAction;
         protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;

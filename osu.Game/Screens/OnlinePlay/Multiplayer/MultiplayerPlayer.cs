@@ -26,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override bool CheckModsAllowFailure() => false;
 
         [Resolved]
-        private StatefulMultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; }
 
         private IBindable<bool> isConnected;
 
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 AllowPause = false,
                 AllowRestart = false,
-                AllowSkippingIntro = false,
+                AllowSkipping = false,
             })
         {
             this.userIds = userIds;

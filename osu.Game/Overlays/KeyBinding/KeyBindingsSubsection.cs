@@ -61,10 +61,10 @@ namespace osu.Game.Overlays.KeyBinding
         }
     }
 
-    public class ResetButton : TriangleButton
+    public class ResetButton : DangerousTriangleButton
     {
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             Text = "Reset all bindings in section";
             RelativeSizeAxes = Axes.X;
@@ -72,10 +72,6 @@ namespace osu.Game.Overlays.KeyBinding
             Height = 20;
 
             Content.CornerRadius = 5;
-
-            BackgroundColour = colours.PinkDark;
-            Triangles.ColourDark = colours.PinkDarker;
-            Triangles.ColourLight = colours.Pink;
         }
     }
 }

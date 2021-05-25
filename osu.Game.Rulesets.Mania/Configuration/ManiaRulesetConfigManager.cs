@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
 
             SetDefault(ManiaRulesetSetting.ScrollTime, 1500.0, DrawableManiaRuleset.MIN_TIME_RANGE, DrawableManiaRuleset.MAX_TIME_RANGE, 5);
             SetDefault(ManiaRulesetSetting.ScrollDirection, ManiaScrollingDirection.Down);
+            SetDefault(ManiaRulesetSetting.TimingBasedNoteColouring, false);
         }
 
         public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
@@ -34,6 +35,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
     public enum ManiaRulesetSetting
     {
         ScrollTime,
-        ScrollDirection
+        ScrollDirection,
+        TimingBasedNoteColouring
     }
 }

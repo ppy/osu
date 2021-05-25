@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class TimingScreen : RoundedContentEditorScreen
+    public class TimingScreen : EditorRoundedScreen
     {
         [Cached]
         private Bindable<ControlPointGroup> selectedGroup = new Bindable<ControlPointGroup>();
