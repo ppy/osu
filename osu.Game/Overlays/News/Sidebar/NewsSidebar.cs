@@ -155,10 +155,7 @@ namespace osu.Game.Overlays.News.Sidebar
                 }
 
                 if (ScrollContent.DrawHeight - Current < DrawHeight)
-                {
                     ScrollToEnd(false);
-                    return;
-                }
             }
         }
     }
