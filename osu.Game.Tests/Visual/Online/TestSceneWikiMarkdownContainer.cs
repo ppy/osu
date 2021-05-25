@@ -1,11 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using Markdig.Syntax.Inlines;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers.Markdown;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Wiki.Markdown;
 
@@ -13,7 +17,7 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneWikiMarkdownContainer : OsuTestScene
     {
-        private WikiMarkdownContainer markdownContainer;
+        private TestMarkdownContainer markdownContainer;
 
         [Cached]
         private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Orange);
@@ -32,7 +36,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding(20),
-                    Child = markdownContainer = new WikiMarkdownContainer()
+                    Child = markdownContainer = new TestMarkdownContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -53,6 +57,28 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set './Writing''", () => markdownContainer.Text = "[wiki writing guidline](./Writing)");
 
             AddStep("set 'Formatting''", () => markdownContainer.Text = "[wiki formatting guidline](Formatting)");
+        }
+
+        private class TestMarkdownContainer : WikiMarkdownContainer
+        {
+            public LinkInline Link;
+
+            public override MarkdownTextFlowContainer CreateTextFlow() => new TestMarkdownTextFlowContainer
+            {
+                UrlAdded = link => Link = link,
+            };
+
+            private class TestMarkdownTextFlowContainer : OsuMarkdownTextFlowContainer
+            {
+                public Action<LinkInline> UrlAdded;
+
+                protected override void AddLinkText(string text, LinkInline linkInline)
+                {
+                    base.AddLinkText(text, linkInline);
+
+                    UrlAdded?.Invoke(linkInline);
+                }
+            }
         }
     }
 }
