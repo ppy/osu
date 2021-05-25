@@ -161,9 +161,7 @@ namespace osu.Game.Screens.Play
             if (!LoadedBeatmapSuccessfully)
                 return;
 
-            // replays should never be recorded or played back when autoplay is enabled
-            if (!Mods.Value.Any(m => m is ModAutoplay))
-                PrepareReplay();
+            PrepareReplay();
 
             gameActive.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
         }
