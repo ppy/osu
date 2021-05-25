@@ -7,19 +7,19 @@ using osuTK;
 
 namespace osu.Game.Storyboards
 {
-    public class StoryboardLayerVideo : StoryboardLayer
+    public class StoryboardVideoLayer : StoryboardLayer
     {
-        public StoryboardLayerVideo(string name, int depth, bool masking)
+        public StoryboardVideoLayer(string name, int depth, bool masking)
             : base(name, depth, masking)
         {
         }
 
         public override DrawableStoryboardLayer CreateDrawable()
-            => new DrawableStoryboardLayerVideo(this) { Depth = Depth, Name = Name };
+            => new DrawableStoryboardVideoLayer(this) { Depth = Depth, Name = Name };
 
-        public class DrawableStoryboardLayerVideo : DrawableStoryboardLayer
+        public class DrawableStoryboardVideoLayer : DrawableStoryboardLayer
         {
-            public DrawableStoryboardLayerVideo(StoryboardLayerVideo layer)
+            public DrawableStoryboardVideoLayer(StoryboardVideoLayer layer)
                 : base(layer)
             {
                 // for videos we want to take on the full size of the storyboard container hierarchy
