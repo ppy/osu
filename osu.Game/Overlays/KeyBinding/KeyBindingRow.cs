@@ -17,6 +17,7 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
@@ -462,6 +463,9 @@ namespace osu.Game.Overlays.KeyBinding
 
             public void UpdateKeyCombination(KeyCombination newCombination)
             {
+                if (KeyBinding.RulesetID != null && !RealmKeyBindingStore.CheckValidForGameplay(newCombination))
+                    return;
+
                 KeyBinding.KeyCombination = newCombination;
                 Text.Text = KeyBinding.KeyCombination.ReadableString();
             }

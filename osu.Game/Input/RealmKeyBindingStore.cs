@@ -84,5 +84,27 @@ namespace osu.Game.Input
                 usage.Commit();
             }
         }
+
+        /// <summary>
+        /// Keys which should not be allowed for gameplay input purposes.
+        /// </summary>
+        private static readonly IEnumerable<InputKey> banned_keys = new[]
+        {
+            InputKey.MouseWheelDown,
+            InputKey.MouseWheelLeft,
+            InputKey.MouseWheelUp,
+            InputKey.MouseWheelRight
+        };
+
+        public static bool CheckValidForGameplay(KeyCombination combination)
+        {
+            foreach (var key in banned_keys)
+            {
+                if (combination.Keys.Contains(key))
+                    return false;
+            }
+
+            return true;
+        }
     }
 }
