@@ -3,6 +3,7 @@
 
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
+using Markdig.Syntax.Inlines;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Game.Graphics.Containers.Markdown;
@@ -35,5 +36,10 @@ namespace osu.Game.Overlays.Wiki.Markdown
         protected override MarkdownParagraph CreateParagraph(ParagraphBlock paragraphBlock, int level) => new WikiMarkdownParagraph(paragraphBlock);
 
         protected virtual FillFlowContainer CreateNotice(YamlFrontMatterBlock yamlFrontMatterBlock) => new WikiNoticeContainer(yamlFrontMatterBlock);
+
+        private class WikiMarkdownTextFlowContainer : OsuMarkdownTextFlowContainer
+        {
+            protected override void AddImage(LinkInline linkInline) => AddDrawable(new WikiMarkdownImage(linkInline));
+        }
     }
 }
