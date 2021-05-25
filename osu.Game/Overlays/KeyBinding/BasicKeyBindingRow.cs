@@ -37,10 +37,7 @@ namespace osu.Game.Overlays.KeyBinding
         private FillFlowContainer cancelAndClearButtons;
         private FillFlowContainer<KeyButton> buttons;
 
-        public Bindable<bool> IsDefault { get; } = new BindableBool(true)
-        {
-            Default = true
-        };
+        public Bindable<bool> IsDefault { get; } = new BindableBool(true);
 
         public BasicKeyBindingRow(object action, IEnumerable<Framework.Input.Bindings.KeyBinding> bindings)
         {

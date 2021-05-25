@@ -32,41 +32,33 @@ namespace osu.Game.Overlays.KeyBinding
 
         public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend(key.ToString());
 
-        public KeyBindingRow(
-            object key,
-            ICollection<Input.Bindings.DatabasedKeyBinding> bindings,
-            RulesetInfo ruleset,
-            IEnumerable<KeyCombination> defaults)
-        {
+        public KeyBindingRow(object key, ICollection<Input.Bindings.DatabasedKeyBinding> bindings, RulesetInfo ruleset, IEnumerable<KeyCombination> defaults) {
             this.key = key;
             this.bindings = bindings;
-
-            RestoreDefaultValueButton<bool> restoreDefaultButton;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding { Right = SettingsPanel.CONTENT_MARGINS };
 
-            BasicKeyBindingRow = new BasicKeyBindingRow(key, bindings.Where(b => ((int)b.Action).Equals((int)key)))
-            {
-                AllowMainMouseButtons = ruleset != null,
-                Defaults = defaults
-            };
-
             InternalChildren = new Drawable[]
             {
-                restoreDefaultButton = new RestoreDefaultValueButton<bool>(),
+                new RestoreDefaultValueButton<bool>()
+                {
+                    Current = BasicKeyBindingRow.IsDefault,
+                    Action = () => { BasicKeyBindingRow.RestoreDefaults(); }
+                },
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
-                    Child = BasicKeyBindingRow
+                    Child = BasicKeyBindingRow = new BasicKeyBindingRow(key, bindings.Where(b => ((int)b.Action).Equals((int)key)))
+                    {
+                        AllowMainMouseButtons = ruleset != null,
+                        Defaults = defaults
+                    }
                 },
             };
-
-            restoreDefaultButton.Action = () => { BasicKeyBindingRow.RestoreDefaults(); };
-            restoreDefaultButton.Current = BasicKeyBindingRow.IsDefault;
         }
     }
 }
