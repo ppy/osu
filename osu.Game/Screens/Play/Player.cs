@@ -145,7 +145,7 @@ namespace osu.Game.Screens.Play
             Configuration = configuration ?? new PlayerConfiguration();
         }
 
-        private GameplayBeatmap gameplayBeatmap;
+        protected GameplayBeatmap GameplayBeatmap { get; private set; }
 
         private ScreenSuspensionHandler screenSuspension;
 
@@ -221,10 +221,10 @@ namespace osu.Game.Screens.Play
 
             InternalChild = GameplayClockContainer = CreateGameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime);
 
-            AddInternal(gameplayBeatmap = new GameplayBeatmap(playableBeatmap));
+            AddInternal(GameplayBeatmap = new GameplayBeatmap(playableBeatmap));
             AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
 
-            dependencies.CacheAs(gameplayBeatmap);
+            dependencies.CacheAs(GameplayBeatmap);
 
             var beatmapSkinProvider = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
 
@@ -282,7 +282,7 @@ namespace osu.Game.Screens.Play
             {
                 HealthProcessor.ApplyResult(r);
                 ScoreProcessor.ApplyResult(r);
-                gameplayBeatmap.ApplyResult(r);
+                GameplayBeatmap.ApplyResult(r);
             };
 
             DrawableRuleset.RevertResult += r =>
@@ -946,7 +946,7 @@ namespace osu.Game.Screens.Play
 
             using (var stream = new MemoryStream())
             {
-                new LegacyScoreEncoder(score, gameplayBeatmap.PlayableBeatmap).Encode(stream);
+                new LegacyScoreEncoder(score, GameplayBeatmap.PlayableBeatmap).Encode(stream);
                 replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
             }
 
