@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.KeyBinding
     {
         private readonly object key;
         private readonly ICollection<Input.Bindings.DatabasedKeyBinding> bindings;
-        public readonly KeyBindingRow BasicKeyBindingRow;
+        public readonly KeyBindingRow KeyBindingRow;
 
         private bool matchingFilter;
 
@@ -32,7 +32,8 @@ namespace osu.Game.Overlays.KeyBinding
 
         public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend(key.ToString());
 
-        public RestorableKeyBindingRow(object key, ICollection<Input.Bindings.DatabasedKeyBinding> bindings, RulesetInfo ruleset, IEnumerable<KeyCombination> defaults) {
+        public RestorableKeyBindingRow(object key, ICollection<Input.Bindings.DatabasedKeyBinding> bindings, RulesetInfo ruleset, IEnumerable<KeyCombination> defaults)
+        {
             this.key = key;
             this.bindings = bindings;
 
@@ -44,15 +45,15 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 new RestoreDefaultValueButton<bool>()
                 {
-                    Current = BasicKeyBindingRow.IsDefault,
-                    Action = () => { BasicKeyBindingRow.RestoreDefaults(); }
+                    Current = KeyBindingRow.IsDefault,
+                    Action = () => { KeyBindingRow.RestoreDefaults(); }
                 },
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
-                    Child = BasicKeyBindingRow = new KeyBindingRow(key, bindings.Where(b => ((int)b.Action).Equals((int)key)))
+                    Child = KeyBindingRow = new KeyBindingRow(key, bindings.Where(b => ((int)b.Action).Equals((int)key)))
                     {
                         AllowMainMouseButtons = ruleset != null,
                         Defaults = defaults
