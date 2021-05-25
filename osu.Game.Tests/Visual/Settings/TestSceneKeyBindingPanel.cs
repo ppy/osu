@@ -31,11 +31,11 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestClickTwiceOnClearButton()
         {
-            BasicKeyBindingRow firstRow = null;
+            KeyBindingRow firstRow = null;
 
             AddStep("click first row", () =>
             {
-                firstRow = panel.ChildrenOfType<BasicKeyBindingRow>().First();
+                firstRow = panel.ChildrenOfType<KeyBindingRow>().First();
 
                 InputManager.MoveMouseTo(firstRow);
                 InputManager.Click(MouseButton.Left);
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddStep("schedule button clicks", () =>
             {
-                var clearButton = firstRow.ChildrenOfType<BasicKeyBindingRow.ClearButton>().Single();
+                var clearButton = firstRow.ChildrenOfType<KeyBindingRow.ClearButton>().Single();
 
                 InputManager.MoveMouseTo(clearButton);
 
@@ -68,22 +68,22 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestClearButtonOnBindings()
         {
-            BasicKeyBindingRow multiBindingRow = null;
+            KeyBindingRow multiBindingRow = null;
 
             AddStep("click first row with two bindings", () =>
             {
-                multiBindingRow = panel.ChildrenOfType<BasicKeyBindingRow>().First(row => row.Defaults.Count() > 1);
+                multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().First(row => row.Defaults.Count() > 1);
                 InputManager.MoveMouseTo(multiBindingRow);
                 InputManager.Click(MouseButton.Left);
             });
 
             clickClearButton();
 
-            AddAssert("first binding cleared", () => string.IsNullOrEmpty(multiBindingRow.ChildrenOfType<BasicKeyBindingRow.KeyButton>().First().Text.Text.ToString()));
+            AddAssert("first binding cleared", () => string.IsNullOrEmpty(multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First().Text.Text.ToString()));
 
             AddStep("click second binding", () =>
             {
-                var target = multiBindingRow.ChildrenOfType<BasicKeyBindingRow.KeyButton>().ElementAt(1);
+                var target = multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1);
 
                 InputManager.MoveMouseTo(target);
                 InputManager.Click(MouseButton.Left);
@@ -91,13 +91,13 @@ namespace osu.Game.Tests.Visual.Settings
 
             clickClearButton();
 
-            AddAssert("second binding cleared", () => string.IsNullOrEmpty(multiBindingRow.ChildrenOfType<BasicKeyBindingRow.KeyButton>().ElementAt(1).Text.Text.ToString()));
+            AddAssert("second binding cleared", () => string.IsNullOrEmpty(multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1).Text.Text.ToString()));
 
             void clickClearButton()
             {
                 AddStep("click clear button", () =>
                 {
-                    var clearButton = multiBindingRow.ChildrenOfType<BasicKeyBindingRow.ClearButton>().Single();
+                    var clearButton = multiBindingRow.ChildrenOfType<KeyBindingRow.ClearButton>().Single();
 
                     InputManager.MoveMouseTo(clearButton);
                     InputManager.Click(MouseButton.Left);
@@ -108,11 +108,11 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestSingleBindingResetButton()
         {
-            KeyBindingRow settingsKeyBindingRow = null;
+            RestorableKeyBindingRow settingsKeyBindingRow = null;
 
             AddStep("click first row", () =>
             {
-                settingsKeyBindingRow = panel.ChildrenOfType<KeyBindingRow>().First();
+                settingsKeyBindingRow = panel.ChildrenOfType<RestorableKeyBindingRow>().First();
 
                 InputManager.MoveMouseTo(settingsKeyBindingRow);
                 InputManager.Click(MouseButton.Left);
@@ -131,17 +131,17 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
 
-            AddAssert("binding cleared", () => settingsKeyBindingRow.ChildrenOfType<BasicKeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.BasicKeyBindingRow.Defaults.ElementAt(0)));
+            AddAssert("binding cleared", () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.BasicKeyBindingRow.Defaults.ElementAt(0)));
         }
 
         [Test]
         public void TestResetAllBindingsButton()
         {
-            KeyBindingRow settingsKeyBindingRow = null;
+            RestorableKeyBindingRow settingsKeyBindingRow = null;
 
             AddStep("click first row", () =>
             {
-                settingsKeyBindingRow = panel.ChildrenOfType<KeyBindingRow>().First();
+                settingsKeyBindingRow = panel.ChildrenOfType<RestorableKeyBindingRow>().First();
 
                 InputManager.MoveMouseTo(settingsKeyBindingRow);
                 InputManager.Click(MouseButton.Left);
@@ -160,26 +160,26 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
 
-            AddAssert("binding cleared", () => settingsKeyBindingRow.ChildrenOfType<BasicKeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.BasicKeyBindingRow.Defaults.ElementAt(0)));
+            AddAssert("binding cleared", () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.BasicKeyBindingRow.Defaults.ElementAt(0)));
         }
 
         [Test]
         public void TestClickRowSelectsFirstBinding()
         {
-            BasicKeyBindingRow multiBindingRow = null;
+            KeyBindingRow multiBindingRow = null;
 
             AddStep("click first row with two bindings", () =>
             {
-                multiBindingRow = panel.ChildrenOfType<BasicKeyBindingRow>().First(row => row.Defaults.Count() > 1);
+                multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().First(row => row.Defaults.Count() > 1);
                 InputManager.MoveMouseTo(multiBindingRow);
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("first binding selected", () => multiBindingRow.ChildrenOfType<BasicKeyBindingRow.KeyButton>().First().IsBinding);
+            AddAssert("first binding selected", () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First().IsBinding);
 
             AddStep("click second binding", () =>
             {
-                var target = multiBindingRow.ChildrenOfType<BasicKeyBindingRow.KeyButton>().ElementAt(1);
+                var target = multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1);
 
                 InputManager.MoveMouseTo(target);
                 InputManager.Click(MouseButton.Left);
@@ -187,12 +187,12 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddStep("click back binding row", () =>
             {
-                multiBindingRow = panel.ChildrenOfType<BasicKeyBindingRow>().ElementAt(10);
+                multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().ElementAt(10);
                 InputManager.MoveMouseTo(multiBindingRow);
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("first binding selected", () => multiBindingRow.ChildrenOfType<BasicKeyBindingRow.KeyButton>().First().IsBinding);
+            AddAssert("first binding selected", () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First().IsBinding);
         }
     }
 }
