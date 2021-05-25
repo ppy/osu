@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             var oldPos = new Vector2(slider.Position.X, slider.Position.Y);
 
             // Min. distances from the slider's position to the playfield border
-            var minMargin = new MarginPadding(0);
+            var minMargin = new MarginPadding();
 
             foreach (var hitObject in slider.NestedHitObjects.Where(o => o is SliderTick || o is SliderEndCircle))
             {
@@ -282,10 +282,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             internal float AngleRad { get; set; }
 
-            internal Vector2 PositionOriginal { get; set; }
+            internal Vector2 PositionOriginal { get; }
             internal Vector2 PositionRandomised { get; set; }
 
-            internal Vector2 EndPositionOriginal { get; set; }
+            internal Vector2 EndPositionOriginal { get; }
             internal Vector2 EndPositionRandomised { get; set; }
 
             public RandomObjectInfo(OsuHitObject hitObject)
