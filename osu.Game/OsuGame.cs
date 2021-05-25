@@ -634,7 +634,7 @@ namespace osu.Game
 
             foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
             {
-                var cultureCode = language.ToString();
+                var cultureCode = language.ToString().Replace("_", "-");
                 Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
             }
 

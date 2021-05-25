@@ -11,6 +11,9 @@ namespace osu.Game.Localisation
         en,
 
         [Description("日本語")]
-        ja
+        ja,
+
+        [Description("简体中文")]
+        zh_Hans
     }
 }
