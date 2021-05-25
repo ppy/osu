@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -20,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-        private const double difficulty_multiplier = 0.0675;
+        private const double difficulty_multiplier = 0.18;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -32,16 +34,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods, Skills = skills };
 
-            double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
-            double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
-            double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
-
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
             double hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate;
             double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+
+            double aimRating = Math.Pow(skills[0].DifficultyValue(), .75) * difficulty_multiplier;
+            double speedRating = Math.Pow(skills[1].DifficultyValue(), .75) * difficulty_multiplier;
+            double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
 
             int maxCombo = beatmap.HitObjects.Count;
             // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
@@ -79,12 +81,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods) => new Skill[]
-        {
-            new Aim(mods),
-            new Speed(mods)
-        };
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods) {
 
+            Skill[] skills = new Skill[]
+            {
+                new Aim(mods),
+                new Tap(mods)
+            };
+
+            var track = new TrackVirtual(10000);
+            mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
+
+            return skills;
+        }
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
             new OsuModDoubleTime(),

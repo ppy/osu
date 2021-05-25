@@ -12,10 +12,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
     public class OsuDifficultyHitObject : DifficultyHitObject
     {
-        private const int normalized_radius = 52;
+        private const int normalized_radius = 50;
 
         protected new OsuHitObject BaseObject => (OsuHitObject)base.BaseObject;
 
+        public double FlowProbability { get; private set; }
+        public double SnapProbability => 1.0 - FlowProbability;
+
+        public Vector2 DistanceVector { get; private set; }
         /// <summary>
         /// Normalized distance from the end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
@@ -30,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
         /// Calculated as the angle between the circles (current-2, current-1, current).
         /// </summary>
-        public double? Angle { get; private set; }
+        public double Angle { get; private set; }
 
         /// <summary>
         /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 50ms.
@@ -47,9 +51,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             this.lastObject = (OsuHitObject)lastObject;
 
             setDistances();
+            calculateFlowProbability();
 
             // Every strain interval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure
             StrainTime = Math.Max(50, DeltaTime);
+        }
+        private void calculateFlowProbability()
+        {
+            double deltaTime = DeltaTime;
+            double distance = JumpDistance;
+            double angle = Angle;
+
+            angle = Math.Clamp(angle, Math.PI / 6, Math.PI / 2);
+            double angleOffset = 10.0 * Math.Sin(1.5 * (Math.PI / 2 - angle));
+
+            double distanceOffset = Math.Pow(distance, 1.7) / 325;
+            FlowProbability = 1.0 / (1.0 + Math.Pow(Math.E, deltaTime - 126.0 + distanceOffset + angleOffset));
         }
 
         private void setDistances()
@@ -57,9 +74,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             float scalingFactor = normalized_radius / (float)BaseObject.Radius;
 
-            if (BaseObject.Radius < 30)
+            if (BaseObject.Radius < 32)
             {
-                float smallCircleBonus = Math.Min(30 - (float)BaseObject.Radius, 5) / 50;
+                float smallCircleBonus = Math.Min(32 - (float)BaseObject.Radius, 5) / 50;
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
@@ -73,7 +90,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Don't need to jump to reach spinners
             if (!(BaseObject is Spinner))
-                JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+            {
+                DistanceVector = BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor;
+                JumpDistance = DistanceVector.Length;
+            }
 
             if (lastLastObject != null)
             {
@@ -85,7 +105,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 float dot = Vector2.Dot(v1, v2);
                 float det = v1.X * v2.Y - v1.Y * v2.X;
 
-                Angle = Math.Abs(Math.Atan2(det, dot));
+                double? angle = Math.Abs(Math.Atan2(det, dot));
+
+                if (angle == null)
+                    Angle = 0;
+                else
+                    Angle = (double) angle;
             }
         }
 
