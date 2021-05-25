@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osuTK;
 using System.Linq;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
@@ -45,7 +46,7 @@ namespace osu.Game.Overlays.News.Sidebar
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Right = -3 }, // Compensate for scrollbar margin
-                    Child = new OsuScrollContainer
+                    Child = new SidebarScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = new Container
@@ -123,6 +124,41 @@ namespace osu.Game.Overlays.News.Sidebar
                 {
                     Expanded = { Value = i == 0 }
                 });
+            }
+        }
+
+        private class SidebarScrollContainer : OsuScrollContainer
+        {
+            protected override bool OnScroll(ScrollEvent e)
+            {
+                if (e.ScrollDelta.Y > 0 && Current <= 0)
+                {
+                    return false;
+                }
+
+                if (e.ScrollDelta.Y < 0 && ScrollContent.DrawHeight - Current <= DrawHeight)
+                {
+                    return false;
+                }
+
+                return base.OnScroll(e);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (Current < 0)
+                {
+                    ScrollToStart(false);
+                    return;
+                }
+
+                if (ScrollContent.DrawHeight - Current < DrawHeight)
+                {
+                    ScrollToEnd(false);
+                    return;
+                }
             }
         }
     }
