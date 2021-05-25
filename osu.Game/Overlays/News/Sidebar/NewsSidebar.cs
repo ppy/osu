@@ -132,14 +132,10 @@ namespace osu.Game.Overlays.News.Sidebar
             protected override bool OnScroll(ScrollEvent e)
             {
                 if (e.ScrollDelta.Y > 0 && Current <= 0)
-                {
                     return false;
-                }
 
                 if (e.ScrollDelta.Y < 0 && ScrollContent.DrawHeight - Current <= DrawHeight)
-                {
                     return false;
-                }
 
                 return base.OnScroll(e);
             }
