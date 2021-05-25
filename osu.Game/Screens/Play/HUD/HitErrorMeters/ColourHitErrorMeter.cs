@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             InternalChild = judgementsFlow = new JudgementFlow();
         }
 
-        protected override void OnNewJudgement(JudgementResult judgement) => judgementsFlow.Push(GetColourForHitResult(HitWindows.ResultFor(judgement.TimeOffset)));
+        protected override void OnNewJudgement(JudgementResult judgement) => judgementsFlow.Push(GetColourForHitResult(judgement.Type));
 
         private class JudgementFlow : FillFlowContainer<HitErrorCircle>
         {
