@@ -98,12 +98,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 switch (hitObject)
                 {
                     case Slider slider:
+                        shiftNestedObjects(slider, Vector2.Subtract(slider.Position, currentObjectInfo.PositionOriginal));
                         moveSliderIntoPlayfield(ref slider, ref currentObjectInfo);
-
-                        var sliderShift = Vector2.Subtract(slider.Position, currentObjectInfo.PositionOriginal);
-
-                        foreach (var tick in slider.NestedHitObjects.OfType<SliderTick>())
-                            tick.Position = Vector2.Add(tick.Position, sliderShift);
 
                         break;
                 }
@@ -158,27 +154,61 @@ namespace osu.Game.Rulesets.Osu.Mods
             currentObjectInfo.PositionRandomised = position;
         }
 
+        /// <summary>
+        /// Moves the <see cref="Slider"/> and all necessary nested <see cref="OsuHitObject"/>s into the <see cref="OsuPlayfield"/> if they aren't already.
+        /// </summary>
         private void moveSliderIntoPlayfield(ref Slider slider, ref RandomObjectInfo currentObjectInfo)
         {
-            foreach (var controlPoint in slider.Path.ControlPoints)
+            var oldPos = new Vector2(slider.Position.X, slider.Position.Y);
+
+            // Min. distances from the slider's position to the playfield border
+            var minMargin = new MarginPadding(0);
+
+            foreach (var hitObject in slider.NestedHitObjects.Where(o => o is SliderTick || o is SliderEndCircle))
             {
-                // Position of controlPoint relative to slider.Position
-                var pos = controlPoint.Position.Value;
+                if (!(hitObject is OsuHitObject osuHitObject))
+                    continue;
 
-                var playfieldSize = OsuPlayfield.BASE_SIZE;
+                var relativePos = Vector2.Subtract(osuHitObject.Position, slider.Position);
 
-                if (pos.X + slider.Position.X < 0)
-                    slider.Position = new Vector2(-pos.X, slider.Position.Y);
-                else if (pos.X + slider.Position.X > playfieldSize.X)
-                    slider.Position = new Vector2(playfieldSize.X - pos.X, slider.Position.Y);
-
-                if (pos.Y + slider.Position.Y < 0)
-                    slider.Position = new Vector2(slider.Position.X, -pos.Y);
-                else if (pos.Y + slider.Position.Y > playfieldSize.Y)
-                    slider.Position = new Vector2(slider.Position.X, playfieldSize.Y - pos.Y);
+                minMargin.Left = Math.Max(minMargin.Left, -relativePos.X);
+                minMargin.Right = Math.Max(minMargin.Right, relativePos.X);
+                minMargin.Top = Math.Max(minMargin.Top, -relativePos.Y);
+                minMargin.Bottom = Math.Max(minMargin.Bottom, relativePos.Y);
             }
 
-            currentObjectInfo.EndPositionRandomised = slider.TailCircle.Position;
+            if (slider.Position.X < minMargin.Left)
+                slider.Position = new Vector2(minMargin.Left, slider.Position.Y);
+            else if (slider.Position.X + minMargin.Right > OsuPlayfield.BASE_SIZE.X)
+                slider.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - minMargin.Right, slider.Position.Y);
+
+            if (slider.Position.Y < minMargin.Top)
+                slider.Position = new Vector2(slider.Position.X, minMargin.Top);
+            else if (slider.Position.Y + minMargin.Bottom > OsuPlayfield.BASE_SIZE.Y)
+                slider.Position = new Vector2(slider.Position.X, OsuPlayfield.BASE_SIZE.Y - minMargin.Bottom);
+
+            currentObjectInfo.PositionRandomised = slider.Position;
+            currentObjectInfo.EndPositionRandomised = slider.EndPosition;
+
+            var shift = Vector2.Subtract(slider.Position, oldPos);
+
+            shiftNestedObjects(slider, shift);
+        }
+
+        /// <summary>
+        /// Shifts all nested <see cref="SliderTick"/>s and <see cref="SliderRepeat"/>s by the specified shift.
+        /// </summary>
+        /// <param name="slider"><see cref="Slider"/> whose nested <see cref="SliderTick"/>s and <see cref="SliderRepeat"/>s should be shifted</param>
+        /// <param name="shift">The <see cref="Vector2"/> the <see cref="Slider"/>'s nested <see cref="SliderTick"/>s and <see cref="SliderRepeat"/>s should be shifted by</param>
+        private void shiftNestedObjects(Slider slider, Vector2 shift)
+        {
+            foreach (var hitObject in slider.NestedHitObjects.Where(o => o is SliderTick || o is SliderRepeat))
+            {
+                if (!(hitObject is OsuHitObject osuHitObject))
+                    continue;
+
+                osuHitObject.Position = Vector2.Add(osuHitObject.Position, shift);
+            }
         }
 
         /// <summary>
