@@ -54,13 +54,24 @@ namespace osu.Game.Overlays
         private void onSuccess(APIWikiPage response)
         {
             wikiData.Value = response;
-            LoadDisplay(new WikiMarkdownContainer
+
+            if (response.Layout == "main_page")
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                CurrentPath = $"{path.Value}/",
-                Text = response.Markdown,
-            });
+                LoadDisplay(new WikiMainPage
+                {
+                    Markdown = response.Markdown
+                });
+            }
+            else
+            {
+                LoadDisplay(new WikiMarkdownContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    CurrentPath = $"{path.Value}/",
+                    Text = response.Markdown,
+                });
+            }
         }
 
         private void showParentPage()
