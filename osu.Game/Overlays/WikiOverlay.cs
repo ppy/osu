@@ -59,7 +59,12 @@ namespace osu.Game.Overlays
             {
                 LoadDisplay(new WikiMainPage
                 {
-                    Markdown = response.Markdown
+                    Markdown = response.Markdown,
+                    Padding = new MarginPadding
+                    {
+                        Vertical = 20,
+                        Horizontal = 50,
+                    },
                 });
             }
             else
@@ -70,6 +75,13 @@ namespace osu.Game.Overlays
                     AutoSizeAxes = Axes.Y,
                     CurrentPath = $"{path.Value}/",
                     Text = response.Markdown,
+                    DocumentMargin = new MarginPadding(0),
+                    DocumentPadding = new MarginPadding
+                    {
+                        Vertical = 20,
+                        Left = 30,
+                        Right = 50,
+                    },
                 });
             }
         }
