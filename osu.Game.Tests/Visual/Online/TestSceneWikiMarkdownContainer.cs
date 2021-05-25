@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers.Markdown;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Wiki.Markdown;
 
@@ -21,6 +22,9 @@ namespace osu.Game.Tests.Visual.Online
 
         [Cached]
         private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Orange);
+
+        [Cached]
+        private readonly IAPIProvider api = new DummyAPIAccess();
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -51,12 +55,16 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set current path", () => markdownContainer.CurrentPath = "Article_styling_criteria/");
 
             AddStep("set '/wiki/Main_Page''", () => markdownContainer.Text = "[wiki main page](/wiki/Main_Page)");
+            AddAssert("check url", () => markdownContainer.Link.Url == $"{api.WebsiteRootUrl}/wiki/Main_Page");
 
             AddStep("set '../FAQ''", () => markdownContainer.Text = "[FAQ](../FAQ)");
+            AddAssert("check url", () => markdownContainer.Link.Url == $"{api.WebsiteRootUrl}/wiki/FAQ");
 
             AddStep("set './Writing''", () => markdownContainer.Text = "[wiki writing guidline](./Writing)");
+            AddAssert("check url", () => markdownContainer.Link.Url == $"{api.WebsiteRootUrl}/wiki/Article_styling_criteria/Writing");
 
             AddStep("set 'Formatting''", () => markdownContainer.Text = "[wiki formatting guidline](Formatting)");
+            AddAssert("check url", () => markdownContainer.Link.Url == $"{api.WebsiteRootUrl}/wiki/Article_styling_criteria/Formatting");
         }
 
         private class TestMarkdownContainer : WikiMarkdownContainer
