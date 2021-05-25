@@ -85,12 +85,8 @@ namespace osu.Game.Storyboards
             }
         }
 
-        public DrawableStoryboard CreateDrawable(WorkingBeatmap working = null)
-        {
-            var drawable = new DrawableStoryboard(this);
-            drawable.Width = drawable.Height * (BeatmapInfo.WidescreenStoryboard ? 16 / 9f : 4 / 3f);
-            return drawable;
-        }
+        public DrawableStoryboard CreateDrawable(WorkingBeatmap working = null) =>
+            new DrawableStoryboard(this);
 
         public Drawable CreateSpriteFromResourcePath(string path, TextureStore textureStore)
         {

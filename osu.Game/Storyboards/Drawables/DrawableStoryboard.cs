@@ -58,6 +58,9 @@ namespace osu.Game.Storyboards.Drawables
         {
             Storyboard = storyboard;
             Size = new Vector2(640, 480);
+
+            Width = Height * (storyboard.BeatmapInfo.WidescreenStoryboard ? 16 / 9f : 4 / 3f);
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
