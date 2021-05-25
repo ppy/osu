@@ -60,7 +60,7 @@ namespace osu.Game.Storyboards.Drawables
 
             Size = new Vector2(640, 480);
 
-            bool onlyHasVideoElements = !Storyboard.Layers.Any(l => l.Elements.Any(e => !(e is StoryboardVideo)));
+            bool onlyHasVideoElements = Storyboard.Layers.SelectMany(l => l.Elements).Any(e => !(e is StoryboardVideo));
 
             Width = Height * (storyboard.BeatmapInfo.WidescreenStoryboard || onlyHasVideoElements ? 16 / 9f : 4 / 3f);
 
