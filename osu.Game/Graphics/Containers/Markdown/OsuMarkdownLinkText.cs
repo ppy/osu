@@ -16,28 +16,29 @@ namespace osu.Game.Graphics.Containers.Markdown
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
 
-        protected string Text;
-        protected string Title;
+        private readonly string text;
+        private readonly string title;
 
         public OsuMarkdownLinkText(string text, LinkInline linkInline)
             : base(text, linkInline)
         {
-            Text = text;
-            Title = linkInline.Title;
+            this.text = text;
+            title = linkInline.Title;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
-            var text = CreateSpriteText().With(t => t.Text = Text);
+            var textDrawable = CreateSpriteText().With(t => t.Text = text);
+
             InternalChildren = new Drawable[]
             {
-                text,
-                new OsuMarkdownLinkCompiler(new[] { text })
+                textDrawable,
+                new OsuMarkdownLinkCompiler(new[] { textDrawable })
                 {
                     RelativeSizeAxes = Axes.Both,
                     Action = OnLinkPressed,
-                    TooltipText = Title ?? Url,
+                    TooltipText = title ?? Url,
                 }
             };
         }
