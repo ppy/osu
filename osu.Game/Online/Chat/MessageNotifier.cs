@@ -142,12 +142,10 @@ namespace osu.Game.Online.Chat
         /// <returns>If the <paramref name="message"/> mentions the <paramref name="username"/></returns>
         private static bool isMentioning(string message, string username) => message.IndexOf(username, StringComparison.OrdinalIgnoreCase) != -1 || message.IndexOf(username.Replace(' ', '_'), StringComparison.OrdinalIgnoreCase) != -1;
 
-        public class PrivateMessageNotification : SimpleNotification
+        public class OpenChannelNotification : SimpleNotification
         {
-            public PrivateMessageNotification(string username, Channel channel)
+            public OpenChannelNotification(Channel channel)
             {
-                Icon = FontAwesome.Solid.Envelope;
-                Text = $"You received a private message from '{username}'. Click to read it!";
                 this.channel = channel;
             }
 
@@ -171,32 +169,21 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        public class MentionNotification : SimpleNotification
+        public class PrivateMessageNotification : OpenChannelNotification
         {
-            public MentionNotification(string username, Channel channel)
+            public PrivateMessageNotification(string username, Channel channel) : base(channel)
+            {
+                Icon = FontAwesome.Solid.Envelope;
+                Text = $"You received a private message from '{username}'. Click to read it!";
+            }
+        }
+
+        public class MentionNotification : OpenChannelNotification
+        {
+            public MentionNotification(string username, Channel channel) : base(channel)
             {
                 Icon = FontAwesome.Solid.At;
                 Text = $"Your name was mentioned in chat by '{username}'. Click to find out why!";
-                this.channel = channel;
-            }
-
-            private readonly Channel channel;
-
-            public override bool IsImportant => false;
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours, ChatOverlay chatOverlay, NotificationOverlay notificationOverlay, ChannelManager channelManager)
-            {
-                IconBackgound.Colour = colours.PurpleDark;
-
-                Activated = delegate
-                {
-                    notificationOverlay.Hide();
-                    chatOverlay.Show();
-                    channelManager.CurrentChannel.Value = channel;
-
-                    return true;
-                };
             }
         }
     }
