@@ -1,83 +1,167 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.News;
+using osu.Game.Overlays.News.Displays;
+using osu.Game.Overlays.News.Sidebar;
 
 namespace osu.Game.Overlays
 {
-    public class NewsOverlay : FullscreenOverlay
+    public class NewsOverlay : OnlineOverlay<NewsHeader>
     {
-        private NewsHeader header;
+        private readonly Bindable<string> article = new Bindable<string>(null);
 
-        private Container<NewsContent> content;
+        private readonly Container sidebarContainer;
+        private readonly NewsSidebar sidebar;
 
-        public readonly Bindable<string> Current = new Bindable<string>(null);
+        private readonly Container content;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private CancellationTokenSource cancellationToken;
+
+        private bool displayUpdateRequired = true;
+
+        public NewsOverlay()
+            : base(OverlayColourScheme.Purple, false)
         {
-            Children = new Drawable[]
+            Child = new GridContainer
             {
-                new Box
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                RowDimensions = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colours.PurpleDarkAlternative
+                    new Dimension(GridSizeMode.AutoSize)
                 },
-                new OsuScrollContainer
+                ColumnDimensions = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = new FillFlowContainer
+                    new Dimension(GridSizeMode.AutoSize),
+                    new Dimension()
+                },
+                Content = new[]
+                {
+                    new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                        sidebarContainer = new Container
                         {
-                            header = new NewsHeader
-                            {
-                                ShowFrontPage = ShowFrontPage
-                            },
-                            content = new Container<NewsContent>
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                            }
+                            AutoSizeAxes = Axes.X,
+                            Child = sidebar = new NewsSidebar()
                         },
-                    },
-                },
+                        content = new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        }
+                    }
+                }
             };
-
-            header.Current.BindTo(Current);
-            Current.TriggerChange();
         }
 
-        private CancellationTokenSource loadContentCancellation;
-
-        protected void LoadAndShowContent(NewsContent newContent)
+        protected override void LoadComplete()
         {
-            content.FadeTo(0.2f, 300, Easing.OutQuint);
+            base.LoadComplete();
 
-            loadContentCancellation?.Cancel();
+            // should not be run until first pop-in to avoid requesting data before user views.
+            article.BindValueChanged(onArticleChanged);
+        }
 
-            LoadComponentAsync(newContent, c =>
+        protected override NewsHeader CreateHeader() => new NewsHeader { ShowFrontPage = ShowFrontPage };
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+
+            if (displayUpdateRequired)
             {
-                content.Child = c;
-                content.FadeIn(300, Easing.OutQuint);
-            }, (loadContentCancellation = new CancellationTokenSource()).Token);
+                article.TriggerChange();
+                displayUpdateRequired = false;
+            }
+        }
+
+        protected override void PopOutComplete()
+        {
+            base.PopOutComplete();
+            displayUpdateRequired = true;
         }
 
         public void ShowFrontPage()
         {
-            Current.Value = null;
+            article.Value = null;
             Show();
+        }
+
+        public void ShowYear(int year)
+        {
+            loadFrontPage(year);
+            Show();
+        }
+
+        public void ShowArticle(string slug)
+        {
+            article.Value = slug;
+            Show();
+        }
+
+        protected void LoadDisplay(Drawable display)
+        {
+            ScrollFlow.ScrollToStart();
+            LoadComponentAsync(display, loaded => content.Child = loaded, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+            sidebarContainer.Height = DrawHeight;
+            sidebarContainer.Y = Math.Clamp(ScrollFlow.Current - Header.DrawHeight, 0, Math.Max(ScrollFlow.ScrollContent.DrawHeight - DrawHeight - Header.DrawHeight, 0));
+        }
+
+        private void onArticleChanged(ValueChangedEvent<string> article)
+        {
+            if (article.NewValue == null)
+                loadFrontPage();
+            else
+                loadArticle(article.NewValue);
+        }
+
+        private void loadFrontPage(int? year = null)
+        {
+            beginLoading();
+
+            Header.SetFrontPage();
+
+            var page = new ArticleListing(year);
+            page.SidebarMetadataUpdated += metadata => Schedule(() =>
+            {
+                sidebar.Metadata.Value = metadata;
+                Loading.Hide();
+            });
+            LoadDisplay(page);
+        }
+
+        private void loadArticle(string article)
+        {
+            beginLoading();
+
+            Header.SetArticle(article);
+
+            // Temporary, should be handled by ArticleDisplay later
+            LoadDisplay(Empty());
+            Loading.Hide();
+        }
+
+        private void beginLoading()
+        {
+            cancellationToken?.Cancel();
+            Loading.Show();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            cancellationToken?.Cancel();
+            base.Dispose(isDisposing);
         }
     }
 }

@@ -21,6 +21,27 @@ namespace osu.Game.Tests.Chat
             Assert.AreEqual(36, result.Links[0].Length);
         }
 
+        [TestCase(LinkAction.OpenBeatmap, "456", "https://dev.ppy.sh/beatmapsets/123#osu/456")]
+        [TestCase(LinkAction.OpenBeatmap, "456", "https://dev.ppy.sh/beatmapsets/123#osu/456?whatever")]
+        [TestCase(LinkAction.OpenBeatmap, "456", "https://dev.ppy.sh/beatmapsets/123/456")]
+        [TestCase(LinkAction.External, null, "https://dev.ppy.sh/beatmapsets/abc/def")]
+        [TestCase(LinkAction.OpenBeatmapSet, "123", "https://dev.ppy.sh/beatmapsets/123")]
+        [TestCase(LinkAction.OpenBeatmapSet, "123", "https://dev.ppy.sh/beatmapsets/123/whatever")]
+        [TestCase(LinkAction.External, null, "https://dev.ppy.sh/beatmapsets/abc")]
+        public void TestBeatmapLinks(LinkAction expectedAction, string expectedArg, string link)
+        {
+            MessageFormatter.WebsiteRootUrl = "dev.ppy.sh";
+
+            Message result = MessageFormatter.FormatMessage(new Message { Content = link });
+
+            Assert.AreEqual(result.Content, result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual(expectedAction, result.Links[0].Action);
+            Assert.AreEqual(expectedArg, result.Links[0].Argument);
+            if (expectedAction == LinkAction.External)
+                Assert.AreEqual(link, result.Links[0].Url);
+        }
+
         [Test]
         public void TestMultipleComplexLinks()
         {
@@ -428,22 +449,27 @@ namespace osu.Game.Tests.Chat
             Assert.AreEqual(5, result.Links.Count);
 
             Link f = result.Links.Find(l => l.Url == "https://osu.ppy.sh/wiki/wiki links");
+            Assert.That(f, Is.Not.Null);
             Assert.AreEqual(44, f.Index);
             Assert.AreEqual(10, f.Length);
 
             f = result.Links.Find(l => l.Url == "http://www.simple-test.com");
+            Assert.That(f, Is.Not.Null);
             Assert.AreEqual(10, f.Index);
             Assert.AreEqual(11, f.Length);
 
             f = result.Links.Find(l => l.Url == "http://google.com");
+            Assert.That(f, Is.Not.Null);
             Assert.AreEqual(97, f.Index);
             Assert.AreEqual(4, f.Length);
 
             f = result.Links.Find(l => l.Url == "https://osu.ppy.sh");
+            Assert.That(f, Is.Not.Null);
             Assert.AreEqual(78, f.Index);
             Assert.AreEqual(18, f.Length);
 
             f = result.Links.Find(l => l.Url == "\uD83D\uDE12");
+            Assert.That(f, Is.Not.Null);
             Assert.AreEqual(101, f.Index);
             Assert.AreEqual(3, f.Length);
         }

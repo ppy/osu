@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 
@@ -21,9 +22,9 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class OsuButton : Button
     {
-        public string Text
+        public LocalisableString Text
         {
-            get => SpriteText?.Text;
+            get => SpriteText?.Text ?? default;
             set
             {
                 if (SpriteText != null)
@@ -129,10 +130,10 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             Content.ScaleTo(1, 1000, Easing.OutElastic);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected virtual SpriteText CreateText() => new OsuSpriteText

@@ -12,6 +12,7 @@ namespace osu.Game.Rulesets.Difficulty
         public Skill[] Skills;
 
         public double StarRating;
+        public int MaxCombo;
 
         public DifficultyAttributes()
         {

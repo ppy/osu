@@ -141,16 +141,13 @@ namespace osu.Game.Overlays.Chat.Tabs
             updateState();
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             switch (e.Button)
             {
                 case MouseButton.Middle:
                     CloseButton.Click();
-                    return true;
-
-                default:
-                    return false;
+                    break;
             }
         }
 
@@ -214,7 +211,7 @@ namespace osu.Game.Overlays.Chat.Tabs
 
             TweenEdgeEffectTo(deactivateEdgeEffect, TRANSITION_LENGTH);
 
-            box.FadeColour(BackgroundInactive, TRANSITION_LENGTH, Easing.OutQuint);
+            box.FadeColour(IsHovered ? backgroundHover : BackgroundInactive, TRANSITION_LENGTH, Easing.OutQuint);
             highlightBox.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
 
             Text.Font = Text.Font.With(weight: FontWeight.Medium);

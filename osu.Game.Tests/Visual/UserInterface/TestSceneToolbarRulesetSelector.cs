@@ -3,8 +3,6 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Toolbar;
-using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using System.Linq;
 using NUnit.Framework;
@@ -16,12 +14,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneToolbarRulesetSelector : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ToolbarRulesetSelector),
-            typeof(ToolbarRulesetTabButton),
-        };
-
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
@@ -44,7 +36,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("Select random", () =>
             {
-                selector.Current.Value = selector.Items.ElementAt(RNG.Next(selector.Items.Count()));
+                selector.Current.Value = selector.Items.ElementAt(RNG.Next(selector.Items.Count));
             });
             AddStep("Toggle disabled state", () => selector.Current.Disabled = !selector.Current.Disabled);
         }

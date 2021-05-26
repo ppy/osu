@@ -4,10 +4,11 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Caching;
 using osu.Framework.Graphics;
+using osu.Framework.Layout;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osuTK;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
@@ -16,14 +17,27 @@ namespace osu.Game.Rulesets.UI.Scrolling
         private readonly IBindable<double> timeRange = new BindableDouble();
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
+        /// <summary>
+        /// Hit objects which require lifetime computation in the next update call.
+        /// </summary>
+        private readonly HashSet<DrawableHitObject> toComputeLifetime = new HashSet<DrawableHitObject>();
+
+        /// <summary>
+        /// A set containing all <see cref="HitObjectContainer.AliveObjects"/> which have an up-to-date layout.
+        /// </summary>
+        private readonly HashSet<DrawableHitObject> layoutComputed = new HashSet<DrawableHitObject>();
+
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
-        private readonly Cached initialStateCache = new Cached();
+        // Responds to changes in the layout. When the layout changes, all hit object states must be recomputed.
+        private readonly LayoutValue layoutCache = new LayoutValue(Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo);
 
         public ScrollingHitObjectContainer()
         {
             RelativeSizeAxes = Axes.Both;
+
+            AddLayout(layoutCache);
         }
 
         [BackgroundDependencyLoader]
@@ -32,35 +46,144 @@ namespace osu.Game.Rulesets.UI.Scrolling
             direction.BindTo(scrollingInfo.Direction);
             timeRange.BindTo(scrollingInfo.TimeRange);
 
-            direction.ValueChanged += _ => initialStateCache.Invalidate();
-            timeRange.ValueChanged += _ => initialStateCache.Invalidate();
+            direction.ValueChanged += _ => layoutCache.Invalidate();
+            timeRange.ValueChanged += _ => layoutCache.Invalidate();
         }
 
-        public override void Add(DrawableHitObject hitObject)
+        public override void Clear()
         {
-            initialStateCache.Invalidate();
-            base.Add(hitObject);
+            base.Clear();
+
+            toComputeLifetime.Clear();
+            layoutComputed.Clear();
         }
 
-        public override bool Remove(DrawableHitObject hitObject)
+        /// <summary>
+        /// Given a position in screen space, return the time within this column.
+        /// </summary>
+        public double TimeAtScreenSpacePosition(Vector2 screenSpacePosition)
         {
-            var result = base.Remove(hitObject);
+            // convert to local space of column so we can snap and fetch correct location.
+            Vector2 localPosition = ToLocalSpace(screenSpacePosition);
 
-            if (result)
+            float position = 0;
+
+            switch (scrollingInfo.Direction.Value)
             {
-                initialStateCache.Invalidate();
-                hitObjectInitialStateCache.Remove(hitObject);
+                case ScrollingDirection.Up:
+                case ScrollingDirection.Down:
+                    position = localPosition.Y;
+                    break;
+
+                case ScrollingDirection.Right:
+                case ScrollingDirection.Left:
+                    position = localPosition.X;
+                    break;
             }
 
-            return result;
+            flipPositionIfRequired(ref position);
+
+            return scrollingInfo.Algorithm.TimeAt(position, Time.Current, scrollingInfo.TimeRange.Value, getLength());
         }
 
-        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
+        /// <summary>
+        /// Given a time, return the screen space position within this column.
+        /// </summary>
+        public Vector2 ScreenSpacePositionAtTime(double time)
         {
-            if ((invalidation & (Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo)) > 0)
-                initialStateCache.Invalidate();
+            var pos = scrollingInfo.Algorithm.PositionAt(time, Time.Current, scrollingInfo.TimeRange.Value, getLength());
 
-            return base.Invalidate(invalidation, source, shallPropagate);
+            flipPositionIfRequired(ref pos);
+
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Up:
+                case ScrollingDirection.Down:
+                    return ToScreenSpace(new Vector2(getBreadth() / 2, pos));
+
+                default:
+                    return ToScreenSpace(new Vector2(pos, getBreadth() / 2));
+            }
+        }
+
+        private float getLength()
+        {
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Left:
+                case ScrollingDirection.Right:
+                    return DrawWidth;
+
+                default:
+                    return DrawHeight;
+            }
+        }
+
+        private float getBreadth()
+        {
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Up:
+                case ScrollingDirection.Down:
+                    return DrawWidth;
+
+                default:
+                    return DrawHeight;
+            }
+        }
+
+        private void flipPositionIfRequired(ref float position)
+        {
+            // We're dealing with screen coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
+            // The scrolling algorithm instead assumes a top anchor meaning an increase in time corresponds to an increase in position,
+            // so when scrolling downwards the coordinates need to be flipped.
+
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Down:
+                    position = DrawHeight - position;
+                    break;
+
+                case ScrollingDirection.Right:
+                    position = DrawWidth - position;
+                    break;
+            }
+        }
+
+        protected override void OnAdd(DrawableHitObject drawableHitObject) => onAddRecursive(drawableHitObject);
+
+        protected override void OnRemove(DrawableHitObject drawableHitObject) => onRemoveRecursive(drawableHitObject);
+
+        private void onAddRecursive(DrawableHitObject hitObject)
+        {
+            invalidateHitObject(hitObject);
+
+            hitObject.DefaultsApplied += invalidateHitObject;
+
+            foreach (var nested in hitObject.NestedHitObjects)
+                onAddRecursive(nested);
+        }
+
+        private void onRemoveRecursive(DrawableHitObject hitObject)
+        {
+            toComputeLifetime.Remove(hitObject);
+            layoutComputed.Remove(hitObject);
+
+            hitObject.DefaultsApplied -= invalidateHitObject;
+
+            foreach (var nested in hitObject.NestedHitObjects)
+                onRemoveRecursive(nested);
+        }
+
+        /// <summary>
+        /// Make this <see cref="DrawableHitObject"/> lifetime and layout computed in next update.
+        /// </summary>
+        private void invalidateHitObject(DrawableHitObject hitObject)
+        {
+            // Lifetime computation is delayed until next update because
+            // when the hit object is not pooled this container is not loaded here and `scrollLength` cannot be computed.
+            toComputeLifetime.Add(hitObject);
+            layoutComputed.Remove(hitObject);
         }
 
         private float scrollLength;
@@ -69,10 +192,19 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             base.Update();
 
-            if (!initialStateCache.IsValid)
+            if (!layoutCache.IsValid)
             {
-                foreach (var cached in hitObjectInitialStateCache.Values)
-                    cached.Invalidate();
+                toComputeLifetime.Clear();
+
+                foreach (var hitObject in Objects)
+                {
+                    if (hitObject.HitObject != null)
+                        toComputeLifetime.Add(hitObject);
+                }
+
+                layoutComputed.Clear();
+
+                scrollingInfo.Algorithm.Reset();
 
                 switch (direction.Value)
                 {
@@ -86,27 +218,34 @@ namespace osu.Game.Rulesets.UI.Scrolling
                         break;
                 }
 
-                scrollingInfo.Algorithm.Reset();
+                layoutCache.Validate();
+            }
 
-                foreach (var obj in Objects)
-                {
-                    computeLifetimeStartRecursive(obj);
-                    computeInitialStateRecursive(obj);
-                }
+            foreach (var hitObject in toComputeLifetime)
+                hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
 
-                initialStateCache.Validate();
+            toComputeLifetime.Clear();
+        }
+
+        protected override void UpdateAfterChildrenLife()
+        {
+            base.UpdateAfterChildrenLife();
+
+            // We need to calculate hit object positions (including nested hit objects) as soon as possible after lifetimes
+            // to prevent hit objects displayed in a wrong position for one frame.
+            // Only AliveObjects need to be considered for layout (reduces overhead in the case of scroll speed changes).
+            foreach (var obj in AliveObjects)
+            {
+                updatePosition(obj, Time.Current);
+
+                if (layoutComputed.Contains(obj))
+                    continue;
+
+                updateLayoutRecursive(obj);
+
+                layoutComputed.Add(obj);
             }
         }
-
-        private void computeLifetimeStartRecursive(DrawableHitObject hitObject)
-        {
-            hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
-
-            foreach (var obj in hitObject.NestedHitObjects)
-                computeLifetimeStartRecursive(obj);
-        }
-
-        private readonly Dictionary<DrawableHitObject, Cached> hitObjectInitialStateCache = new Dictionary<DrawableHitObject, Cached>();
 
         private double computeOriginAdjustedLifetimeStart(DrawableHitObject hitObject)
         {
@@ -133,20 +272,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     break;
             }
 
-            var adjustedStartTime = scrollingInfo.Algorithm.TimeAt(-originAdjustment, hitObject.HitObject.StartTime, timeRange.Value, scrollLength);
-            return scrollingInfo.Algorithm.GetDisplayStartTime(adjustedStartTime, timeRange.Value);
+            return scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, originAdjustment, timeRange.Value, scrollLength);
         }
 
-        // Cant use AddOnce() since the delegate is re-constructed every invocation
-        private void computeInitialStateRecursive(DrawableHitObject hitObject) => hitObject.Schedule(() =>
+        private void updateLayoutRecursive(DrawableHitObject hitObject)
         {
-            if (!hitObjectInitialStateCache.TryGetValue(hitObject, out var cached))
-                cached = hitObjectInitialStateCache[hitObject] = new Cached();
-
-            if (cached.IsValid)
-                return;
-
-            if (hitObject.HitObject is IHasEndTime e)
+            if (hitObject.HitObject is IHasDuration e)
             {
                 switch (direction.Value)
                 {
@@ -164,22 +295,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             foreach (var obj in hitObject.NestedHitObjects)
             {
-                computeInitialStateRecursive(obj);
+                updateLayoutRecursive(obj);
 
                 // Nested hitobjects don't need to scroll, but they do need accurate positions
                 updatePosition(obj, hitObject.HitObject.StartTime);
             }
-
-            cached.Validate();
-        });
-
-        protected override void UpdateAfterChildrenLife()
-        {
-            base.UpdateAfterChildrenLife();
-
-            // We need to calculate hitobject positions as soon as possible after lifetimes so that hitobjects get the final say in their positions
-            foreach (var obj in AliveObjects)
-                updatePosition(obj, Time.Current);
         }
 
         private void updatePosition(DrawableHitObject hitObject, double currentTime)

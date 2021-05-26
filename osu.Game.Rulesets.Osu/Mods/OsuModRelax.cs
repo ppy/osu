@@ -9,85 +9,131 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
     {
         public override string Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
 
-        public void Update(Playfield playfield)
-        {
-            bool requiresHold = false;
-            bool requiresHit = false;
+        /// <summary>
+        /// How early before a hitobject's start time to trigger a hit.
+        /// </summary>
+        private const float relax_leniency = 3;
 
-            const float relax_leniency = 3;
-
-            foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
-            {
-                if (!(drawable is DrawableOsuHitObject osuHit))
-                    continue;
-
-                double time = osuHit.Clock.CurrentTime;
-                double relativetime = time - osuHit.HitObject.StartTime;
-
-                if (time < osuHit.HitObject.StartTime - relax_leniency) continue;
-
-                if ((osuHit.HitObject is IHasEndTime hasEnd && time > hasEnd.EndTime) || osuHit.IsHit)
-                    continue;
-
-                if (osuHit is DrawableHitCircle && osuHit.IsHovered)
-                {
-                    Debug.Assert(osuHit.HitObject.HitWindows != null);
-                    requiresHit |= osuHit.HitObject.HitWindows.CanBeHit(relativetime);
-                }
-
-                requiresHold |= (osuHit is DrawableSlider slider && (slider.Ball.IsHovered || osuHit.IsHovered)) || osuHit is DrawableSpinner;
-            }
-
-            if (requiresHit)
-            {
-                addAction(false);
-                addAction(true);
-            }
-
-            addAction(requiresHold);
-        }
-
-        private bool wasHit;
+        private bool isDownState;
         private bool wasLeft;
 
         private OsuInputManager osuInputManager;
 
-        private void addAction(bool hitting)
-        {
-            if (wasHit == hitting)
-                return;
+        private ReplayState<OsuAction> state;
+        private double lastStateChangeTime;
 
-            wasHit = hitting;
-
-            var state = new ReplayState<OsuAction>
-            {
-                PressedActions = new List<OsuAction>()
-            };
-
-            if (hitting)
-            {
-                state.PressedActions.Add(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
-                wasLeft = !wasLeft;
-            }
-
-            state.Apply(osuInputManager.CurrentState, osuInputManager);
-        }
+        private bool hasReplay;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // grab the input manager for future use.
             osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
+        }
+
+        public void ApplyToPlayer(Player player)
+        {
+            if (osuInputManager.ReplayInputHandler != null)
+            {
+                hasReplay = true;
+                return;
+            }
+
             osuInputManager.AllowUserPresses = false;
+        }
+
+        public void Update(Playfield playfield)
+        {
+            if (hasReplay)
+                return;
+
+            bool requiresHold = false;
+            bool requiresHit = false;
+
+            double time = playfield.Clock.CurrentTime;
+
+            foreach (var h in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
+            {
+                // we are not yet close enough to the object.
+                if (time < h.HitObject.StartTime - relax_leniency)
+                    break;
+
+                // already hit or beyond the hittable end time.
+                if (h.IsHit || (h.HitObject is IHasDuration hasEnd && time > hasEnd.EndTime))
+                    continue;
+
+                switch (h)
+                {
+                    case DrawableHitCircle circle:
+                        handleHitCircle(circle);
+                        break;
+
+                    case DrawableSlider slider:
+                        // Handles cases like "2B" beatmaps, where sliders may be overlapping and simply holding is not enough.
+                        if (!slider.HeadCircle.IsHit)
+                            handleHitCircle(slider.HeadCircle);
+
+                        requiresHold |= slider.Ball.IsHovered || h.IsHovered;
+                        break;
+
+                    case DrawableSpinner _:
+                        requiresHold = true;
+                        break;
+                }
+            }
+
+            if (requiresHit)
+            {
+                changeState(false);
+                changeState(true);
+            }
+
+            if (requiresHold)
+                changeState(true);
+            else if (isDownState && time - lastStateChangeTime > AutoGenerator.KEY_UP_DELAY)
+                changeState(false);
+
+            void handleHitCircle(DrawableHitCircle circle)
+            {
+                if (!circle.HitArea.IsHovered)
+                    return;
+
+                Debug.Assert(circle.HitObject.HitWindows != null);
+                requiresHit |= circle.HitObject.HitWindows.CanBeHit(time - circle.HitObject.StartTime);
+            }
+
+            void changeState(bool down)
+            {
+                if (isDownState == down)
+                    return;
+
+                isDownState = down;
+                lastStateChangeTime = time;
+
+                state = new ReplayState<OsuAction>
+                {
+                    PressedActions = new List<OsuAction>()
+                };
+
+                if (down)
+                {
+                    state.PressedActions.Add(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
+                    wasLeft = !wasLeft;
+                }
+
+                state?.Apply(osuInputManager.CurrentState, osuInputManager);
+            }
         }
     }
 }

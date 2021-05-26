@@ -28,7 +28,5 @@ namespace osu.Game.IO.Archives
         }
 
         public override IEnumerable<string> Filenames => Directory.GetFiles(path, "*", SearchOption.AllDirectories).Select(f => f.Replace(path, string.Empty).Trim(Path.DirectorySeparatorChar)).ToArray();
-
-        public override Stream GetUnderlyingStream() => null;
     }
 }

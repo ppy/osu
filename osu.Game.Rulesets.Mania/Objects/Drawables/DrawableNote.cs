@@ -2,14 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Configuration;
+using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Edit;
+using osu.Game.Skinning;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -18,30 +23,47 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
-        private readonly NotePiece headPiece;
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private IBeatmap beatmap { get; set; }
+
+        private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
+
+        protected virtual ManiaSkinComponents Component => ManiaSkinComponents.Note;
+
+        private Drawable headPiece;
+
+        public DrawableNote()
+            : this(null)
+        {
+        }
 
         public DrawableNote(Note hitObject)
             : base(hitObject)
         {
-            RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+        }
 
-            CornerRadius = 5;
-            Masking = true;
+        [BackgroundDependencyLoader(true)]
+        private void load(ManiaRulesetConfigManager rulesetConfig)
+        {
+            rulesetConfig?.BindWith(ManiaRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
 
-            AddInternal(headPiece = new NotePiece());
-
-            AccentColour.BindValueChanged(colour =>
+            AddInternal(headPiece = new SkinnableDrawable(new ManiaSkinComponent(Component), _ => new DefaultNotePiece())
             {
-                headPiece.AccentColour = colour.NewValue;
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y
+            });
+        }
 
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Glow,
-                    Colour = colour.NewValue.Lighten(1f).Opacity(0.2f),
-                    Radius = 10,
-                };
-            }, true);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
+            StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
         }
 
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
@@ -58,7 +80,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = HitResult.Miss);
+                    ApplyResult(r => r.Type = r.Judgement.MinResult);
                 return;
             }
 
@@ -74,9 +96,23 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (action != Action.Value)
                 return false;
 
+            if (CheckHittable?.Invoke(this, Time.Current) == false)
+                return false;
+
             return UpdateResult(true);
         }
 
-        public virtual bool OnReleased(ManiaAction action) => false;
+        public virtual void OnReleased(ManiaAction action)
+        {
+        }
+
+        private void updateSnapColour()
+        {
+            if (beatmap == null || HitObject == null) return;
+
+            int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
+
+            Colour = configTimingBasedNoteColouring.Value ? BindableBeatDivisor.GetColourFor(snapDivisor, colours) : Color4.White;
+        }
     }
 }

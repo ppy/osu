@@ -6,27 +6,26 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Overlays.BeatmapSet.Scores;
+using osu.Game.Overlays.Comments;
 using osu.Game.Rulesets;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapSetOverlay : FullscreenOverlay
+    public class BeatmapSetOverlay : OnlineOverlay<BeatmapSetHeader>
     {
         public const float X_PADDING = 40;
-        public const float TOP_PADDING = 25;
+        public const float Y_PADDING = 25;
         public const float RIGHT_WIDTH = 275;
-        protected readonly Header Header;
 
-        private RulesetStore rulesets;
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         private readonly Bindable<BeatmapSetInfo> beatmapSet = new Bindable<BeatmapSetInfo>();
 
@@ -34,55 +33,42 @@ namespace osu.Game.Overlays
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public BeatmapSetOverlay()
+            : base(OverlayColourScheme.Blue)
         {
-            OsuScrollContainer scroll;
             Info info;
+            CommentsSection comments;
 
-            Children = new Drawable[]
+            Child = new FillFlowContainer
             {
-                new Box
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 20),
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.2f)
-                },
-                scroll = new OsuScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
-                    Child = new ReverseChildIDFillFlowContainer<Drawable>
+                    info = new Info(),
+                    new ScoresContainer
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
-                        {
-                            Header = new Header(),
-                            info = new Info(),
-                            new ScoresContainer
-                            {
-                                Beatmap = { BindTarget = Header.Picker.Beatmap }
-                            }
-                        },
+                        Beatmap = { BindTarget = Header.HeaderContent.Picker.Beatmap }
                     },
-                },
+                    comments = new CommentsSection()
+                }
             };
 
             Header.BeatmapSet.BindTo(beatmapSet);
             info.BeatmapSet.BindTo(beatmapSet);
+            comments.BeatmapSet.BindTo(beatmapSet);
 
-            Header.Picker.Beatmap.ValueChanged += b =>
+            Header.HeaderContent.Picker.Beatmap.ValueChanged += b =>
             {
                 info.Beatmap = b.NewValue;
-
-                scroll.ScrollToStart();
+                ScrollFlow.ScrollToStart();
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
-        {
-            this.rulesets = rulesets;
-        }
+        protected override BeatmapSetHeader CreateHeader() => new BeatmapSetHeader();
+
+        protected override Color4 BackgroundColour => ColourProvider.Background6;
 
         protected override void PopOutComplete()
         {
@@ -104,7 +90,7 @@ namespace osu.Game.Overlays
             req.Success += res =>
             {
                 beatmapSet.Value = res.ToBeatmapSet(rulesets);
-                Header.Picker.Beatmap.Value = Header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
+                Header.HeaderContent.Picker.Beatmap.Value = Header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
             };
             API.Queue(req);
 
@@ -130,6 +116,31 @@ namespace osu.Game.Overlays
         {
             beatmapSet.Value = set;
             Show();
+        }
+
+        private class CommentsSection : BeatmapSetLayoutSection
+        {
+            public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
+
+            public CommentsSection()
+            {
+                CommentsContainer comments;
+
+                Add(comments = new CommentsContainer());
+
+                BeatmapSet.BindValueChanged(beatmapSet =>
+                {
+                    if (beatmapSet.NewValue?.OnlineBeatmapSetID is int onlineBeatmapSetID)
+                    {
+                        Show();
+                        comments.ShowComments(CommentableType.Beatmapset, onlineBeatmapSetID);
+                    }
+                    else
+                    {
+                        Hide();
+                    }
+                }, true);
+            }
         }
     }
 }

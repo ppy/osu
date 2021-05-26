@@ -7,12 +7,15 @@ using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
@@ -102,27 +105,27 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void testBeatmapLabels(Ruleset ruleset)
         {
-            AddAssert("check version", () => infoWedge.Info.VersionLabel.Text == $"{ruleset.ShortName}Version");
-            AddAssert("check title", () => infoWedge.Info.TitleLabel.Text == $"{ruleset.ShortName}Source — {ruleset.ShortName}Title");
-            AddAssert("check artist", () => infoWedge.Info.ArtistLabel.Text == $"{ruleset.ShortName}Artist");
-            AddAssert("check author", () => infoWedge.Info.MapperContainer.Children.OfType<OsuSpriteText>().Any(s => s.Text == $"{ruleset.ShortName}Author"));
+            AddAssert("check version", () => infoWedge.Info.VersionLabel.Current.Value == $"{ruleset.ShortName}Version");
+            AddAssert("check title", () => infoWedge.Info.TitleLabel.Current.Value == $"{ruleset.ShortName}Source — {ruleset.ShortName}Title");
+            AddAssert("check artist", () => infoWedge.Info.ArtistLabel.Current.Value == $"{ruleset.ShortName}Artist");
+            AddAssert("check author", () => infoWedge.Info.MapperContainer.ChildrenOfType<OsuSpriteText>().Any(s => s.Current.Value == $"{ruleset.ShortName}Author"));
         }
 
         private void testInfoLabels(int expectedCount)
         {
-            AddAssert("check info labels exists", () => infoWedge.Info.InfoLabelContainer.Children.Any());
-            AddAssert("check info labels count", () => infoWedge.Info.InfoLabelContainer.Children.Count == expectedCount);
+            AddAssert("check info labels exists", () => infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Any());
+            AddAssert("check info labels count", () => infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Count() == expectedCount);
         }
 
         [Test]
         public void TestNullBeatmap()
         {
             selectBeatmap(null);
-            AddAssert("check empty version", () => string.IsNullOrEmpty(infoWedge.Info.VersionLabel.Text));
-            AddAssert("check default title", () => infoWedge.Info.TitleLabel.Text == Beatmap.Default.BeatmapInfo.Metadata.Title);
-            AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Text == Beatmap.Default.BeatmapInfo.Metadata.Artist);
-            AddAssert("check empty author", () => !infoWedge.Info.MapperContainer.Children.Any());
-            AddAssert("check no info labels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
+            AddAssert("check empty version", () => string.IsNullOrEmpty(infoWedge.Info.VersionLabel.Current.Value));
+            AddAssert("check default title", () => infoWedge.Info.TitleLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Title);
+            AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Artist);
+            AddAssert("check empty author", () => !infoWedge.Info.MapperContainer.ChildrenOfType<OsuSpriteText>().Any());
+            AddAssert("check no info labels", () => !infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Any());
         }
 
         [Test]
@@ -133,15 +136,15 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void selectBeatmap([CanBeNull] IBeatmap b)
         {
-            BeatmapInfoWedge.BufferedWedgeInfo infoBefore = null;
+            Container containerBefore = null;
 
             AddStep($"select {b?.Metadata.Title ?? "null"} beatmap", () =>
             {
-                infoBefore = infoWedge.Info;
+                containerBefore = infoWedge.DisplayedContent;
                 infoWedge.Beatmap = Beatmap.Value = b == null ? Beatmap.Default : CreateWorkingBeatmap(b);
             });
 
-            AddUntilStep("wait for async load", () => infoWedge.Info != infoBefore);
+            AddUntilStep("wait for async load", () => infoWedge.DisplayedContent != containerBefore);
         }
 
         private IBeatmap createTestBeatmap(RulesetInfo ruleset)
@@ -191,13 +194,15 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private class TestBeatmapInfoWedge : BeatmapInfoWedge
         {
-            public new BufferedWedgeInfo Info => base.Info;
+            public new Container DisplayedContent => base.DisplayedContent;
+
+            public new WedgeInfoText Info => base.Info;
         }
 
-        private class TestHitObject : HitObject, IHasPosition
+        private class TestHitObject : ConvertHitObject, IHasPosition
         {
-            public float X { get; } = 0;
-            public float Y { get; } = 0;
+            public float X => 0;
+            public float Y => 0;
             public Vector2 Position { get; } = Vector2.Zero;
         }
     }

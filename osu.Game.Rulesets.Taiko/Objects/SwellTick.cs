@@ -3,13 +3,12 @@
 
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class SwellTick : TaikoHitObject
     {
-        public override Judgement CreateJudgement() => new TaikoSwellTickJudgement();
+        public override Judgement CreateJudgement() => new IgnoreJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }

@@ -2,17 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Users
 {
-    public class User
+    public class User : IEquatable<User>
     {
         [JsonProperty(@"id")]
-        public long Id = 1;
+        public int Id = 1;
 
         [JsonProperty(@"join_date")]
         public DateTimeOffset JoinDate;
@@ -108,12 +111,6 @@ namespace osu.Game.Users
         [JsonProperty(@"twitter")]
         public string Twitter;
 
-        [JsonProperty(@"lastfm")]
-        public string Lastfm;
-
-        [JsonProperty(@"skype")]
-        public string Skype;
-
         [JsonProperty(@"discord")]
         public string Discord;
 
@@ -123,8 +120,14 @@ namespace osu.Game.Users
         [JsonProperty(@"post_count")]
         public int PostCount;
 
+        [JsonProperty(@"comments_count")]
+        public int CommentsCount;
+
         [JsonProperty(@"follower_count")]
         public int FollowerCount;
+
+        [JsonProperty(@"mapping_follower_count")]
+        public int MappingFollowerCount;
 
         [JsonProperty(@"favourite_beatmapset_count")]
         public int FavouriteBeatmapsetCount;
@@ -141,8 +144,17 @@ namespace osu.Game.Users
         [JsonProperty(@"unranked_beatmapset_count")]
         public int UnrankedBeatmapsetCount;
 
+        [JsonProperty(@"scores_best_count")]
+        public int ScoresBestCount;
+
         [JsonProperty(@"scores_first_count")]
         public int ScoresFirstCount;
+
+        [JsonProperty(@"scores_recent_count")]
+        public int ScoresRecentCount;
+
+        [JsonProperty(@"beatmap_playcounts_count")]
+        public int BeatmapPlaycountsCount;
 
         [JsonProperty]
         private string[] playstyle
@@ -170,8 +182,31 @@ namespace osu.Game.Users
             public int Available;
         }
 
+        private UserStatistics statistics;
+
+        /// <summary>
+        /// User statistics for the requested ruleset (in the case of a <see cref="GetUserRequest"/> or <see cref="GetFriendsRequest"/> response).
+        /// Otherwise empty.
+        /// </summary>
         [JsonProperty(@"statistics")]
-        public UserStatistics Statistics;
+        public UserStatistics Statistics
+        {
+            get => statistics ??= new UserStatistics();
+            set
+            {
+                if (statistics != null)
+                    // we may already have rank history populated
+                    value.RankHistory = statistics.RankHistory;
+
+                statistics = value;
+            }
+        }
+
+        [JsonProperty(@"rank_history")]
+        private RankHistoryData rankHistory
+        {
+            set => statistics.RankHistory = value;
+        }
 
         public class RankHistoryData
         {
@@ -180,12 +215,6 @@ namespace osu.Game.Users
 
             [JsonProperty(@"data")]
             public int[] Data;
-        }
-
-        [JsonProperty(@"rankHistory")]
-        private RankHistoryData rankHistory
-        {
-            set => Statistics.RankHistory = value;
         }
 
         [JsonProperty("badges")]
@@ -203,6 +232,21 @@ namespace osu.Game.Users
             public int ID;
         }
 
+        [JsonProperty("monthly_playcounts")]
+        public UserHistoryCount[] MonthlyPlaycounts;
+
+        [JsonProperty("replays_watched_counts")]
+        public UserHistoryCount[] ReplaysWatchedCounts;
+
+        /// <summary>
+        /// All user statistics per ruleset's short name (in the case of a <see cref="GetUsersRequest"/> response).
+        /// Otherwise empty. Can be altered for testing purposes.
+        /// </summary>
+        // todo: this should likely be moved to a separate UserCompact class at some point.
+        [JsonProperty("statistics_rulesets")]
+        [CanBeNull]
+        public Dictionary<string, UserStatistics> RulesetsStatistics { get; set; }
+
         public override string ToString() => Username;
 
         /// <summary>
@@ -214,6 +258,14 @@ namespace osu.Game.Users
             Colour = @"9c0101",
             Id = 0
         };
+
+        public bool Equals(User other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return Id == other.Id;
+        }
 
         public enum PlayStyle
         {
@@ -228,6 +280,15 @@ namespace osu.Game.Users
 
             [Description("Touch Screen")]
             Touch,
+        }
+
+        public class UserHistoryCount
+        {
+            [JsonProperty("start_date")]
+            public DateTime Date;
+
+            [JsonProperty("count")]
+            public long Count;
         }
     }
 }

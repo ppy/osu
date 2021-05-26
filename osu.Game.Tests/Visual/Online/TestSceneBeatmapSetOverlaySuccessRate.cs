@@ -1,15 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Screens.Select.Details;
 using osuTK;
@@ -19,12 +21,10 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneBeatmapSetOverlaySuccessRate : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(Details)
-        };
-
         private GraphExposingSuccessRate successRate;
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -72,6 +72,32 @@ namespace osu.Game.Tests.Visual.Online
                     Retries = Enumerable.Range(-2, 100).Select(_ => RNG.Next(10)).ToArray(),
                 }
             };
+        }
+
+        [Test]
+        public void TestOnlyFailMetrics()
+        {
+            AddStep("set beatmap", () => successRate.Beatmap = new BeatmapInfo
+            {
+                Metrics = new BeatmapMetrics
+                {
+                    Fails = Enumerable.Range(1, 100).ToArray(),
+                }
+            });
+            AddAssert("graph max values correct",
+                () => successRate.ChildrenOfType<BarGraph>().All(graph => graph.MaxValue == 100));
+        }
+
+        [Test]
+        public void TestEmptyMetrics()
+        {
+            AddStep("set beatmap", () => successRate.Beatmap = new BeatmapInfo
+            {
+                Metrics = new BeatmapMetrics()
+            });
+
+            AddAssert("graph max values correct",
+                () => successRate.ChildrenOfType<BarGraph>().All(graph => graph.MaxValue == 0));
         }
 
         private class GraphExposingSuccessRate : SuccessRate

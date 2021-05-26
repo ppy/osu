@@ -135,7 +135,7 @@ csharp_preferred_modifier_order = public,private,protected,internal,new,abstract
 csharp_style_expression_bodied_accessors = true:warning
 csharp_style_expression_bodied_constructors = false:none
 csharp_style_expression_bodied_indexers = true:warning
-csharp_style_expression_bodied_methods = true:silent
+csharp_style_expression_bodied_methods = false:silent
 csharp_style_expression_bodied_operators = true:warning
 csharp_style_expression_bodied_properties = true:warning
 csharp_style_expression_bodied_local_functions = true:silent
@@ -192,3 +192,9 @@ dotnet_diagnostic.IDE0052.severity = silent
 dotnet_diagnostic.IDE0067.severity = none
 dotnet_diagnostic.IDE0068.severity = none
 dotnet_diagnostic.IDE0069.severity = none
+
+#Disable operator overloads requiring alternate named methods
+dotnet_diagnostic.CA2225.severity = none
+
+# Banned APIs
+dotnet_diagnostic.RS0030.severity = error

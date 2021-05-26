@@ -4,11 +4,13 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 
@@ -21,8 +23,8 @@ namespace osu.Game.Graphics.UserInterface
         private const int text_size = 17;
         private const int transition_length = 80;
 
-        private SampleChannel sampleClick;
-        private SampleChannel sampleHover;
+        private Sample sampleClick;
+        private Sample sampleHover;
 
         private TextContainer text;
 
@@ -38,9 +40,11 @@ namespace osu.Game.Graphics.UserInterface
             sampleClick = audio.Samples.Get(@"UI/generic-select");
 
             BackgroundColour = Color4.Transparent;
-            BackgroundColourHover = OsuColour.FromHex(@"172023");
+            BackgroundColourHover = Color4Extensions.FromHex(@"172023");
 
             updateTextColour();
+
+            Item.Action.BindDisabledChanged(_ => updateState(), true);
         }
 
         private void updateTextColour()
@@ -57,24 +61,38 @@ namespace osu.Game.Graphics.UserInterface
                     break;
 
                 case MenuItemType.Highlighted:
-                    text.Colour = OsuColour.FromHex(@"ffcc22");
+                    text.Colour = Color4Extensions.FromHex(@"ffcc22");
                     break;
             }
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            sampleHover.Play();
-            text.BoldText.FadeIn(transition_length, Easing.OutQuint);
-            text.NormalText.FadeOut(transition_length, Easing.OutQuint);
+            updateState();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            text.BoldText.FadeOut(transition_length, Easing.OutQuint);
-            text.NormalText.FadeIn(transition_length, Easing.OutQuint);
+            updateState();
             base.OnHoverLost(e);
+        }
+
+        private void updateState()
+        {
+            Alpha = Item.Action.Disabled ? 0.2f : 1;
+
+            if (IsHovered && !Item.Action.Disabled)
+            {
+                sampleHover.Play();
+                text.BoldText.FadeIn(transition_length, Easing.OutQuint);
+                text.NormalText.FadeOut(transition_length, Easing.OutQuint);
+            }
+            else
+            {
+                text.BoldText.FadeOut(transition_length, Easing.OutQuint);
+                text.NormalText.FadeIn(transition_length, Easing.OutQuint);
+            }
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -88,7 +106,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected class TextContainer : Container, IHasText
         {
-            public string Text
+            public LocalisableString Text
             {
                 get => NormalText.Text;
                 set

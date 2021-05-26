@@ -16,21 +16,24 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     /// </summary>
     public class PathControlPointConnectionPiece : CompositeDrawable
     {
-        public PathControlPoint ControlPoint;
+        public readonly PathControlPoint ControlPoint;
 
         private readonly Path path;
         private readonly Slider slider;
+        public int ControlPointIndex { get; set; }
 
         private IBindable<Vector2> sliderPosition;
         private IBindable<int> pathVersion;
 
-        public PathControlPointConnectionPiece(Slider slider, PathControlPoint controlPoint)
+        public PathControlPointConnectionPiece(Slider slider, int controlPointIndex)
         {
             this.slider = slider;
-            ControlPoint = controlPoint;
+            ControlPointIndex = controlPointIndex;
 
             Origin = Anchor.Centre;
             AutoSizeAxes = Axes.Both;
+
+            ControlPoint = slider.Path.ControlPoints[controlPointIndex];
 
             InternalChild = path = new SmoothPath
             {
@@ -61,13 +64,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             path.ClearVertices();
 
-            int index = slider.Path.ControlPoints.IndexOf(ControlPoint) + 1;
-
-            if (index == 0 || index == slider.Path.ControlPoints.Count)
+            int nextIndex = ControlPointIndex + 1;
+            if (nextIndex == 0 || nextIndex >= slider.Path.ControlPoints.Count)
                 return;
 
             path.AddVertex(Vector2.Zero);
-            path.AddVertex(slider.Path.ControlPoints[index].Position.Value - ControlPoint.Position.Value);
+            path.AddVertex(slider.Path.ControlPoints[nextIndex].Position.Value - ControlPoint.Position.Value);
 
             path.OriginPosition = path.PositionInBoundingBox(Vector2.Zero);
         }

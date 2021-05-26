@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.Containers
         private TimingControlPoint lastTimingPoint;
 
         /// <summary>
-        /// The amount of time before a beat we should fire <see cref="OnNewBeat(int, TimingControlPoint, EffectControlPoint, TrackAmplitudes)"/>.
+        /// The amount of time before a beat we should fire <see cref="OnNewBeat(int, TimingControlPoint, EffectControlPoint, ChannelAmplitudes)"/>.
         /// This allows for adding easing to animations that may be synchronised to the beat.
         /// </summary>
         protected double EarlyActivationMilliseconds;
@@ -43,25 +43,16 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public double MinimumBeatLength { get; set; }
 
-        /// <summary>
-        /// Default length of a beat in milliseconds. Used whenever there is no beatmap or track playing.
-        /// </summary>
-        private const double default_beat_length = 60000.0 / 60.0;
-
-        private TimingControlPoint defaultTiming;
-        private EffectControlPoint defaultEffect;
-        private TrackAmplitudes defaultAmplitudes;
-
         protected bool IsBeatSyncedWithTrack { get; private set; }
 
         protected override void Update()
         {
-            Track track = null;
+            ITrack track = null;
             IBeatmap beatmap = null;
 
-            double currentTrackTime;
-            TimingControlPoint timingPoint;
-            EffectControlPoint effectPoint;
+            double currentTrackTime = 0;
+            TimingControlPoint timingPoint = null;
+            EffectControlPoint effectPoint = null;
 
             if (Beatmap.Value.TrackLoaded && Beatmap.Value.BeatmapLoaded)
             {
@@ -69,27 +60,21 @@ namespace osu.Game.Graphics.Containers
                 beatmap = Beatmap.Value.Beatmap;
             }
 
-            if (track != null && beatmap != null && track.IsRunning)
+            if (track != null && beatmap != null && track.IsRunning && track.Length > 0)
             {
-                currentTrackTime = track.Length > 0 ? track.CurrentTime + EarlyActivationMilliseconds : Clock.CurrentTime;
+                currentTrackTime = track.CurrentTime + EarlyActivationMilliseconds;
 
                 timingPoint = beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
                 effectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
-
-                if (timingPoint.BeatLength == 0)
-                {
-                    IsBeatSyncedWithTrack = false;
-                    return;
-                }
-
-                IsBeatSyncedWithTrack = true;
             }
-            else
+
+            IsBeatSyncedWithTrack = timingPoint?.BeatLength > 0;
+
+            if (timingPoint == null || !IsBeatSyncedWithTrack)
             {
-                IsBeatSyncedWithTrack = false;
                 currentTrackTime = Clock.CurrentTime;
-                timingPoint = defaultTiming;
-                effectPoint = defaultEffect;
+                timingPoint = TimingControlPoint.DEFAULT;
+                effectPoint = EffectControlPoint.DEFAULT;
             }
 
             double beatLength = timingPoint.BeatLength / Divisor;
@@ -109,11 +94,11 @@ namespace osu.Game.Graphics.Containers
 
             TimeSinceLastBeat = beatLength - TimeUntilNextBeat;
 
-            if (timingPoint.Equals(lastTimingPoint) && beatIndex == lastBeat)
+            if (timingPoint == lastTimingPoint && beatIndex == lastBeat)
                 return;
 
             using (BeginDelayedSequence(-TimeSinceLastBeat, true))
-                OnNewBeat(beatIndex, timingPoint, effectPoint, track?.CurrentAmplitudes ?? defaultAmplitudes);
+                OnNewBeat(beatIndex, timingPoint, effectPoint, track?.CurrentAmplitudes ?? ChannelAmplitudes.Empty);
 
             lastBeat = beatIndex;
             lastTimingPoint = timingPoint;
@@ -123,27 +108,9 @@ namespace osu.Game.Graphics.Containers
         private void load(IBindable<WorkingBeatmap> beatmap)
         {
             Beatmap.BindTo(beatmap);
-
-            defaultTiming = new TimingControlPoint
-            {
-                BeatLength = default_beat_length,
-            };
-
-            defaultEffect = new EffectControlPoint
-            {
-                KiaiMode = false,
-                OmitFirstBarLine = false
-            };
-
-            defaultAmplitudes = new TrackAmplitudes
-            {
-                FrequencyAmplitudes = new float[256],
-                LeftChannel = 0,
-                RightChannel = 0
-            };
         }
 
-        protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+        protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
         }
     }

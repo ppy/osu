@@ -6,49 +6,55 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Database;
+using osu.Game.Extensions;
+using osu.Game.IO;
 using osu.Game.IO.Archives;
 
 namespace osu.Game.Skinning
 {
-    public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>, ISkinSource
+    [ExcludeFromDynamicCompile]
+    public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>, ISkinSource, IStorageResourceProvider
     {
         private readonly AudioManager audio;
 
+        private readonly GameHost host;
+
         private readonly IResourceStore<byte[]> legacyDefaultResources;
 
-        public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>(new DefaultSkin());
+        public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>(new DefaultSkin(null));
         public readonly Bindable<SkinInfo> CurrentSkinInfo = new Bindable<SkinInfo>(SkinInfo.Default) { Default = SkinInfo.Default };
 
-        public override string[] HandledExtensions => new[] { ".osk" };
+        public override IEnumerable<string> HandledExtensions => new[] { ".osk" };
 
         protected override string[] HashableFileTypes => new[] { ".ini" };
 
         protected override string ImportFromStablePath => "Skins";
 
-        public SkinManager(Storage storage, DatabaseContextFactory contextFactory, IIpcHost importHost, AudioManager audio, IResourceStore<byte[]> legacyDefaultResources)
-            : base(storage, contextFactory, new SkinStore(contextFactory, storage), importHost)
+        public SkinManager(Storage storage, DatabaseContextFactory contextFactory, GameHost host, AudioManager audio, IResourceStore<byte[]> legacyDefaultResources)
+            : base(storage, contextFactory, new SkinStore(contextFactory, storage), host)
         {
             this.audio = audio;
-            this.legacyDefaultResources = legacyDefaultResources;
+            this.host = host;
 
-            ItemRemoved += removedInfo =>
-            {
-                // check the removed skin is not the current user choice. if it is, switch back to default.
-                if (removedInfo.ID == CurrentSkinInfo.Value.ID)
-                    CurrentSkinInfo.Value = SkinInfo.Default;
-            };
+            this.legacyDefaultResources = legacyDefaultResources;
 
             CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = GetSkin(skin.NewValue);
             CurrentSkin.ValueChanged += skin =>
@@ -65,7 +71,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Returns a list of all usable <see cref="SkinInfo"/>s. Includes the special default skin plus all skins from <see cref="GetAllUserSkins"/>.
         /// </summary>
-        /// <returns>A list of available <see cref="SkinInfo"/>.</returns>
+        /// <returns>A newly allocated list of available <see cref="SkinInfo"/>.</returns>
         public List<SkinInfo> GetAllUsableSkins()
         {
             var userSkins = GetAllUserSkins();
@@ -77,26 +83,67 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Returns a list of all usable <see cref="SkinInfo"/>s that have been loaded by the user.
         /// </summary>
-        /// <returns>A list of available <see cref="SkinInfo"/>.</returns>
+        /// <returns>A newly allocated list of available <see cref="SkinInfo"/>.</returns>
         public List<SkinInfo> GetAllUserSkins() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
+
+        public void SelectRandomSkin()
+        {
+            // choose from only user skins, removing the current selection to ensure a new one is chosen.
+            var randomChoices = GetAllUsableSkins().Where(s => s.ID != CurrentSkinInfo.Value.ID).ToArray();
+
+            if (randomChoices.Length == 0)
+            {
+                CurrentSkinInfo.Value = SkinInfo.Default;
+                return;
+            }
+
+            CurrentSkinInfo.Value = randomChoices.ElementAt(RNG.Next(0, randomChoices.Length));
+        }
 
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name };
 
+        private const string unknown_creator_string = "Unknown";
+
+        protected override string ComputeHash(SkinInfo item, ArchiveReader reader = null)
+        {
+            // we need to populate early to create a hash based off skin.ini contents
+            if (item.Name?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true)
+                populateMetadata(item, GetSkin(item));
+
+            if (item.Creator != null && item.Creator != unknown_creator_string)
+            {
+                // this is the optimal way to hash legacy skins, but will need to be reconsidered when we move forward with skin implementation.
+                // likely, the skin should expose a real version (ie. the version of the skin, not the skin.ini version it's targeting).
+                return item.ToString().ComputeSHA2Hash();
+            }
+
+            // if there was no creator, the ToString above would give the filename, which alone isn't really enough to base any decisions on.
+            return base.ComputeHash(item, reader);
+        }
+
         protected override async Task Populate(SkinInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
-            await base.Populate(model, archive, cancellationToken);
+            await base.Populate(model, archive, cancellationToken).ConfigureAwait(false);
 
-            Skin reference = GetSkin(model);
+            var instance = GetSkin(model);
 
-            if (!string.IsNullOrEmpty(reference.Configuration.SkinInfo.Name))
+            model.InstantiationInfo ??= instance.GetType().GetInvariantInstantiationInfo();
+
+            if (model.Name?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true)
+                populateMetadata(model, instance);
+        }
+
+        private void populateMetadata(SkinInfo item, Skin instance)
+        {
+            if (!string.IsNullOrEmpty(instance.Configuration.SkinInfo.Name))
             {
-                model.Name = reference.Configuration.SkinInfo.Name;
-                model.Creator = reference.Configuration.SkinInfo.Creator;
+                item.Name = instance.Configuration.SkinInfo.Name;
+                item.Creator = instance.Configuration.SkinInfo.Creator;
             }
             else
             {
-                model.Name = model.Name.Replace(".osk", "");
-                model.Creator ??= "Unknown";
+                item.Name = item.Name.Replace(".osk", "", StringComparison.OrdinalIgnoreCase);
+                item.Creator ??= unknown_creator_string;
             }
         }
 
@@ -105,15 +152,48 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <param name="skinInfo">The skin to lookup.</param>
         /// <returns>A <see cref="Skin"/> instance correlating to the provided <see cref="SkinInfo"/>.</returns>
-        public Skin GetSkin(SkinInfo skinInfo)
+        public Skin GetSkin(SkinInfo skinInfo) => skinInfo.CreateInstance(legacyDefaultResources, this);
+
+        /// <summary>
+        /// Ensure that the current skin is in a state it can accept user modifications.
+        /// This will create a copy of any internal skin and being tracking in the database if not already.
+        /// </summary>
+        public void EnsureMutableSkin()
         {
-            if (skinInfo == SkinInfo.Default)
-                return new DefaultSkin();
+            if (CurrentSkinInfo.Value.ID >= 1) return;
 
-            if (skinInfo == DefaultLegacySkin.Info)
-                return new DefaultLegacySkin(legacyDefaultResources, audio);
+            var skin = CurrentSkin.Value;
 
-            return new LegacySkin(skinInfo, Files.Store, audio);
+            // if the user is attempting to save one of the default skin implementations, create a copy first.
+            CurrentSkinInfo.Value = Import(new SkinInfo
+            {
+                Name = skin.SkinInfo.Name + " (modified)",
+                Creator = skin.SkinInfo.Creator,
+                InstantiationInfo = skin.SkinInfo.InstantiationInfo,
+            }).Result;
+        }
+
+        public void Save(Skin skin)
+        {
+            if (skin.SkinInfo.ID <= 0)
+                throw new InvalidOperationException($"Attempting to save a skin which is not yet tracked. Call {nameof(EnsureMutableSkin)} first.");
+
+            foreach (var drawableInfo in skin.DrawableComponentInfo)
+            {
+                string json = JsonConvert.SerializeObject(drawableInfo.Value, new JsonSerializerSettings { Formatting = Formatting.Indented });
+
+                using (var streamContent = new MemoryStream(Encoding.UTF8.GetBytes(json)))
+                {
+                    string filename = $"{drawableInfo.Key}.json";
+
+                    var oldFile = skin.SkinInfo.Files.FirstOrDefault(f => f.Filename == filename);
+
+                    if (oldFile != null)
+                        ReplaceFile(skin.SkinInfo, oldFile, streamContent, oldFile.Filename);
+                    else
+                        AddFile(skin.SkinInfo, streamContent, filename);
+                }
+            }
         }
 
         /// <summary>
@@ -127,10 +207,18 @@ namespace osu.Game.Skinning
 
         public Drawable GetDrawableComponent(ISkinComponent component) => CurrentSkin.Value.GetDrawableComponent(component);
 
-        public Texture GetTexture(string componentName) => CurrentSkin.Value.GetTexture(componentName);
+        public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => CurrentSkin.Value.GetTexture(componentName, wrapModeS, wrapModeT);
 
-        public SampleChannel GetSample(ISampleInfo sampleInfo) => CurrentSkin.Value.GetSample(sampleInfo);
+        public ISample GetSample(ISampleInfo sampleInfo) => CurrentSkin.Value.GetSample(sampleInfo);
 
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => CurrentSkin.Value.GetConfig<TLookup, TValue>(lookup);
+
+        #region IResourceStorageProvider
+
+        AudioManager IStorageResourceProvider.AudioManager => audio;
+        IResourceStore<byte[]> IStorageResourceProvider.Files => Files.Store;
+        IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
+
+        #endregion
     }
 }

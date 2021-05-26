@@ -5,8 +5,12 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Framework.Timing;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Play;
 
@@ -15,63 +19,120 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneSongProgress : OsuTestScene
     {
-        private readonly SongProgress progress;
-        private readonly TestSongProgressGraph graph;
+        private SongProgress progress;
+        private TestSongProgressGraph graph;
+        private readonly Container progressContainer;
 
         private readonly StopwatchClock clock;
+        private readonly FramedClock framedClock;
 
         [Cached]
         private readonly GameplayClock gameplayClock;
 
-        private readonly FramedClock framedClock;
-
         public TestSceneSongProgress()
         {
-            clock = new StopwatchClock(true);
-
+            clock = new StopwatchClock();
             gameplayClock = new GameplayClock(framedClock = new FramedClock(clock));
 
-            Add(progress = new SongProgress
+            Add(progressContainer = new Container
             {
                 RelativeSizeAxes = Axes.X,
-                Anchor = Anchor.BottomLeft,
-                Origin = Anchor.BottomLeft,
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                Height = 100,
+                Y = -100,
+                Child = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.Gray(1),
+                }
             });
-
-            Add(graph = new TestSongProgressGraph
-            {
-                RelativeSizeAxes = Axes.X,
-                Height = 200,
-                Anchor = Anchor.TopLeft,
-                Origin = Anchor.TopLeft,
-            });
-
-            AddWaitStep("wait some", 5);
-            AddAssert("ensure not created", () => graph.CreationCount == 0);
-
-            AddStep("display values", displayNewValues);
-            AddWaitStep("wait some", 5);
-            AddUntilStep("wait for creation count", () => graph.CreationCount == 1);
-
-            AddStep("Toggle Bar", () => progress.AllowSeeking = !progress.AllowSeeking);
-            AddWaitStep("wait some", 5);
-            AddUntilStep("wait for creation count", () => graph.CreationCount == 1);
-
-            AddStep("Toggle Bar", () => progress.AllowSeeking = !progress.AllowSeeking);
-            AddWaitStep("wait some", 5);
-            AddUntilStep("wait for creation count", () => graph.CreationCount == 1);
-            AddRepeatStep("New Values", displayNewValues, 5);
-
-            AddWaitStep("wait some", 5);
-            AddAssert("ensure debounced", () => graph.CreationCount == 2);
         }
 
-        private void displayNewValues()
+        [SetUpSteps]
+        public void SetupSteps()
         {
-            List<HitObject> objects = new List<HitObject>();
+            AddStep("add new song progress", () =>
+            {
+                if (progress != null)
+                {
+                    progress.Expire();
+                    progress = null;
+                }
+
+                progressContainer.Add(progress = new SongProgress
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                });
+            });
+
+            AddStep("add new big graph", () =>
+            {
+                if (graph != null)
+                {
+                    graph.Expire();
+                    graph = null;
+                }
+
+                Add(graph = new TestSongProgressGraph
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 200,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
+                });
+            });
+
+            AddStep("reset clock", clock.Reset);
+        }
+
+        [Test]
+        public void TestGraphRecreation()
+        {
+            AddAssert("ensure not created", () => graph.CreationCount == 0);
+            AddStep("display values", displayRandomValues);
+            AddUntilStep("wait for creation count", () => graph.CreationCount == 1);
+            AddRepeatStep("new values", displayRandomValues, 5);
+            AddWaitStep("wait some", 5);
+            AddAssert("ensure recreation debounced", () => graph.CreationCount == 2);
+        }
+
+        [Test]
+        public void TestDisplay()
+        {
+            AddStep("display max values", displayMaxValues);
+            AddUntilStep("wait for graph", () => graph.CreationCount == 1);
+            AddStep("start", clock.Start);
+            AddStep("allow seeking", () => progress.AllowSeeking.Value = true);
+            AddStep("hide graph", () => progress.ShowGraph.Value = false);
+            AddStep("disallow seeking", () => progress.AllowSeeking.Value = false);
+            AddStep("allow seeking", () => progress.AllowSeeking.Value = true);
+            AddStep("show graph", () => progress.ShowGraph.Value = true);
+            AddStep("stop", clock.Stop);
+        }
+
+        private void displayRandomValues()
+        {
+            var objects = new List<HitObject>();
             for (double i = 0; i < 5000; i += RNG.NextDouble() * 10 + i / 1000)
                 objects.Add(new HitObject { StartTime = i });
 
+            replaceObjects(objects);
+        }
+
+        private void displayMaxValues()
+        {
+            var objects = new List<HitObject>();
+            for (double i = 0; i < 5000; i++)
+                objects.Add(new HitObject { StartTime = i });
+
+            replaceObjects(objects);
+        }
+
+        private void replaceObjects(List<HitObject> objects)
+        {
             progress.Objects = objects;
             graph.Objects = objects;
 

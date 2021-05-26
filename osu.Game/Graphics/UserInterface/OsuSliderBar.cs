@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         private const int max_decimal_digits = 5;
 
-        private SampleChannel sample;
+        private Sample sample;
         private double lastSampleTime;
         private T lastSampleValue;
 
@@ -35,6 +35,11 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Container nubContainer;
 
         public virtual string TooltipText { get; private set; }
+
+        /// <summary>
+        /// Whether to format the tooltip as a percentage or the actual value.
+        /// </summary>
+        public bool DisplayAsPercentage { get; set; }
 
         private Color4 accentColour;
 
@@ -128,10 +133,10 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             Nub.Current.Value = false;
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override void OnUserChange(T value)
@@ -150,16 +155,15 @@ namespace osu.Game.Graphics.UserInterface
                 return;
 
             lastSampleValue = value;
-
             lastSampleTime = Clock.CurrentTime;
-            sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
 
+            var channel = sample.Play();
+
+            channel.Frequency.Value = 1 + NormalizedValue * 0.2f;
             if (NormalizedValue == 0)
-                sample.Frequency.Value -= 0.4f;
+                channel.Frequency.Value -= 0.4f;
             else if (NormalizedValue == 1)
-                sample.Frequency.Value += 0.4f;
-
-            sample.Play();
+                channel.Frequency.Value += 0.4f;
         }
 
         private void updateTooltipText(T value)
@@ -169,11 +173,11 @@ namespace osu.Game.Graphics.UserInterface
             else
             {
                 double floatValue = value.ToDouble(NumberFormatInfo.InvariantInfo);
-                double floatMinValue = CurrentNumber.MinValue.ToDouble(NumberFormatInfo.InvariantInfo);
-                double floatMaxValue = CurrentNumber.MaxValue.ToDouble(NumberFormatInfo.InvariantInfo);
 
-                if (floatMaxValue == 1 && floatMinValue >= -1)
-                    TooltipText = floatValue.ToString("P0");
+                if (DisplayAsPercentage)
+                {
+                    TooltipText = floatValue.ToString("0%");
+                }
                 else
                 {
                     var decimalPrecision = normalise(CurrentNumber.Precision.ToDecimal(NumberFormatInfo.InvariantInfo), max_decimal_digits);

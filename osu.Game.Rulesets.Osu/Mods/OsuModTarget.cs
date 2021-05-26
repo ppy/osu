@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Name => "Target";
         public override string Acronym => "TP";
         public override ModType Type => ModType.Conversion;
-        public override IconUsage Icon => OsuIcon.ModTarget;
+        public override IconUsage? Icon => OsuIcon.ModTarget;
         public override string Description => @"Practice keeping up with the beat of the song.";
         public override double ScoreMultiplier => 1;
     }

@@ -13,13 +13,21 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class Toolbar : VisibilityContainer
+    public class Toolbar : VisibilityContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float HEIGHT = 40;
         public const float TOOLTIP_HEIGHT = 30;
+
+        /// <summary>
+        /// Whether the user hid this <see cref="Toolbar"/> with <see cref="GlobalAction.ToggleToolbar"/>.
+        /// In this state, automatic toggles should not occur, respecting the user's preference to have no toolbar.
+        /// </summary>
+        private bool hiddenByUser;
 
         public Action OnHome;
 
@@ -28,15 +36,24 @@ namespace osu.Game.Overlays.Toolbar
 
         private const double transition_time = 500;
 
-        private const float alpha_hovering = 0.8f;
-        private const float alpha_normal = 0.6f;
+        protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
-        private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+        // Toolbar and its components need keyboard input even when hidden.
+        public override bool PropagateNonPositionalInputSubTree => true;
 
         public Toolbar()
         {
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, HEIGHT);
+            AlwaysPresent = true;
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            // this only needed to be set for the initial LoadComplete/Update, so layout completes and gets buttons in a state they can correctly handle keyboard input for hotkeys.
+            AlwaysPresent = false;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -69,8 +86,10 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
+                        new ToolbarNewsButton(),
                         new ToolbarChangelogButton(),
-                        new ToolbarDirectButton(),
+                        new ToolbarRankingsButton(),
+                        new ToolbarBeatmapListingButton(),
                         new ToolbarChatButton(),
                         new ToolbarSocialButton(),
                         new ToolbarMusicButton(),
@@ -87,19 +106,12 @@ namespace osu.Game.Overlays.Toolbar
             // Bound after the selector is added to the hierarchy to give it a chance to load the available rulesets
             rulesetSelector.Current.BindTo(parentRuleset);
 
-            State.ValueChanged += visibility =>
-            {
-                if (overlayActivationMode.Value == OverlayActivation.Disabled)
-                    Hide();
-            };
-
             if (osuGame != null)
-                overlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+                OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
         }
 
         public class ToolbarBackground : Container
         {
-            private readonly Box solidBackground;
             private readonly Box gradientBackground;
 
             public ToolbarBackground()
@@ -107,50 +119,80 @@ namespace osu.Game.Overlays.Toolbar
                 RelativeSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
-                    solidBackground = new Box
+                    new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = OsuColour.Gray(0.1f),
-                        Alpha = alpha_normal,
                     },
                     gradientBackground = new Box
                     {
                         RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.BottomLeft,
                         Alpha = 0,
-                        Height = 90,
+                        Height = 100,
                         Colour = ColourInfo.GradientVertical(
-                            OsuColour.Gray(0.1f).Opacity(0.5f), OsuColour.Gray(0.1f).Opacity(0)),
+                            OsuColour.Gray(0).Opacity(0.9f), OsuColour.Gray(0).Opacity(0)),
                     },
                 };
             }
 
             protected override bool OnHover(HoverEvent e)
             {
-                solidBackground.FadeTo(alpha_hovering, transition_time, Easing.OutQuint);
                 gradientBackground.FadeIn(transition_time, Easing.OutQuint);
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                solidBackground.FadeTo(alpha_normal, transition_time, Easing.OutQuint);
                 gradientBackground.FadeOut(transition_time, Easing.OutQuint);
             }
+        }
+
+        protected override void UpdateState(ValueChangedEvent<Visibility> state)
+        {
+            bool blockShow = hiddenByUser || OverlayActivationMode.Value == OverlayActivation.Disabled;
+
+            if (state.NewValue == Visibility.Visible && blockShow)
+            {
+                State.Value = Visibility.Hidden;
+                return;
+            }
+
+            base.UpdateState(state);
         }
 
         protected override void PopIn()
         {
             this.MoveToY(0, transition_time, Easing.OutQuint);
-            this.FadeIn(transition_time / 2, Easing.OutQuint);
+            this.FadeIn(transition_time / 4, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
-            userButton?.StateContainer.Hide();
+            userButton.StateContainer?.Hide();
 
             this.MoveToY(-DrawSize.Y, transition_time, Easing.OutQuint);
-            this.FadeOut(transition_time);
+            this.FadeOut(transition_time, Easing.InQuint);
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (OverlayActivationMode.Value == OverlayActivation.Disabled)
+                return false;
+
+            switch (action)
+            {
+                case GlobalAction.ToggleToolbar:
+                    hiddenByUser = State.Value == Visibility.Visible; // set before toggling to allow the operation to always succeed.
+                    ToggleVisibility();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
     }
 }

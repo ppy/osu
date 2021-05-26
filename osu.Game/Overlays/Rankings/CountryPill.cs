@@ -100,9 +100,9 @@ namespace osu.Game.Overlays.Rankings
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            background.Colour = colours.GreySeafoamDarker;
+            background.Colour = colourProvider.Background5;
         }
 
         protected override void LoadComplete()
@@ -154,9 +154,9 @@ namespace osu.Game.Overlays.Rankings
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider)
             {
-                IdleColour = colours.GreySeafoamLighter;
+                IdleColour = colourProvider.Light2;
                 HoverColour = Color4.White;
             }
         }

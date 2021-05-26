@@ -2,14 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
-using osu.Game.Online.Placeholders;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
@@ -20,15 +18,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public class TestSceneBeatmapLeaderboard : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(Placeholder),
-            typeof(MessagePlaceholder),
-            typeof(RetrievalFailurePlaceholder),
-            typeof(UserTopScoreContainer),
-            typeof(Leaderboard<BeatmapLeaderboardScope, ScoreInfo>),
-        };
-
         private readonly FailableLeaderboard leaderboard;
 
         [Cached]
@@ -59,31 +48,51 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"None selected", () => leaderboard.SetRetrievalState(PlaceholderState.NoneSelected));
             foreach (BeatmapSetOnlineStatus status in Enum.GetValues(typeof(BeatmapSetOnlineStatus)))
                 AddStep($"{status} beatmap", () => showBeatmapWithStatus(status));
+            AddStep("null personal best position", showPersonalBestWithNullPosition);
+        }
+
+        private void showPersonalBestWithNullPosition()
+        {
+            leaderboard.TopScore = new ScoreInfo
+            {
+                Rank = ScoreRank.XH,
+                Accuracy = 1,
+                MaxCombo = 244,
+                TotalScore = 1707827,
+                Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock() },
+                User = new User
+                {
+                    Id = 6602580,
+                    Username = @"waaiiru",
+                    Country = new Country
+                    {
+                        FullName = @"Spain",
+                        FlagName = @"ES",
+                    },
+                },
+            };
         }
 
         private void showPersonalBest()
         {
-            leaderboard.TopScore = new APILegacyUserTopScoreInfo
+            leaderboard.TopScore = new ScoreInfo
             {
                 Position = 999,
-                Score = new APILegacyScoreInfo
+                Rank = ScoreRank.XH,
+                Accuracy = 1,
+                MaxCombo = 244,
+                TotalScore = 1707827,
+                Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                User = new User
                 {
-                    Rank = ScoreRank.XH,
-                    Accuracy = 1,
-                    MaxCombo = 244,
-                    TotalScore = 1707827,
-                    Mods = new[] { new OsuModHidden().Acronym, new OsuModHardRock().Acronym, },
-                    User = new User
+                    Id = 6602580,
+                    Username = @"waaiiru",
+                    Country = new Country
                     {
-                        Id = 6602580,
-                        Username = @"waaiiru",
-                        Country = new Country
-                        {
-                            FullName = @"Spain",
-                            FlagName = @"ES",
-                        },
+                        FullName = @"Spain",
+                        FlagName = @"ES",
                     },
-                }
+                },
             };
         }
 

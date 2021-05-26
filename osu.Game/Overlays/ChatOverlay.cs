@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
@@ -22,21 +23,30 @@ using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
 using osuTK.Input;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
+using osu.Game.Online;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : OsuFocusedOverlayContainer
+    public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
+        public string IconTexture => "Icons/Hexacons/messaging";
+        public LocalisableString Title => ChatStrings.HeaderTitle;
+        public LocalisableString Description => ChatStrings.HeaderDescription;
+
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;
 
-        private ChannelManager channelManager;
+        [Resolved]
+        private ChannelManager channelManager { get; set; }
 
         private Container<DrawableChannel> currentChannelContainer;
 
         private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
 
-        private LoadingAnimation loading;
+        private LoadingSpinner loading;
 
         private FocusedTextBox textbox;
 
@@ -72,7 +82,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, OsuColour colours, ChannelManager channelManager)
+        private void load(OsuConfigManager config, OsuColour colours, TextureStore textures)
         {
             const float padding = 5;
 
@@ -111,41 +121,47 @@ namespace osu.Game.Overlays
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                currentChannelContainer = new Container<DrawableChannel>
+                                new OnlineViewContainer("Sign in to chat")
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding
-                                    {
-                                        Bottom = textbox_height
-                                    },
-                                },
-                                new Container
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = textbox_height,
-                                    Padding = new MarginPadding
-                                    {
-                                        Top = padding * 2,
-                                        Bottom = padding * 2,
-                                        Left = ChatLine.LEFT_PADDING + padding * 2,
-                                        Right = padding * 2,
-                                    },
                                     Children = new Drawable[]
                                     {
-                                        textbox = new FocusedTextBox
+                                        currentChannelContainer = new Container<DrawableChannel>
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Height = 1,
-                                            PlaceholderText = "type your message",
-                                            OnCommit = postMessage,
-                                            ReleaseFocusOnCommit = false,
-                                            HoldFocus = true,
-                                        }
-                                    }
-                                },
-                                loading = new LoadingAnimation(),
+                                            Padding = new MarginPadding
+                                            {
+                                                Bottom = textbox_height
+                                            },
+                                        },
+                                        new Container
+                                        {
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            RelativeSizeAxes = Axes.X,
+                                            Height = textbox_height,
+                                            Padding = new MarginPadding
+                                            {
+                                                Top = padding * 2,
+                                                Bottom = padding * 2,
+                                                Left = ChatLine.LEFT_PADDING + padding * 2,
+                                                Right = padding * 2,
+                                            },
+                                            Children = new Drawable[]
+                                            {
+                                                textbox = new FocusedTextBox
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Height = 1,
+                                                    PlaceholderText = "type your message",
+                                                    ReleaseFocusOnCommit = false,
+                                                    HoldFocus = true,
+                                                }
+                                            }
+                                        },
+                                        loading = new LoadingSpinner(),
+                                    },
+                                }
                             }
                         },
                         tabsArea = new TabsArea
@@ -157,13 +173,13 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4.Black,
                                 },
-                                new SpriteIcon
+                                new Sprite
                                 {
-                                    Icon = FontAwesome.Solid.Comments,
+                                    Texture = textures.Get(IconTexture),
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Size = new Vector2(20),
-                                    Margin = new MarginPadding(10),
+                                    Size = new Vector2(OverlayTitle.ICON_SIZE),
+                                    Margin = new MarginPadding { Left = 10 },
                                 },
                                 ChannelTabControl = CreateChannelTabControl().With(d =>
                                 {
@@ -178,6 +194,8 @@ namespace osu.Game.Overlays
                     },
                 },
             };
+
+            textbox.OnCommit += postMessage;
 
             ChannelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
             ChannelTabControl.ChannelSelectorActive.ValueChanged += active => ChannelSelectionOverlay.State.Value = active.NewValue ? Visibility.Visible : Visibility.Hidden;
@@ -209,8 +227,6 @@ namespace osu.Game.Overlays
 
             chatBackground.Colour = colours.ChatBlue;
 
-            this.channelManager = channelManager;
-
             loading.Show();
 
             // This is a relatively expensive (and blocking) operation.
@@ -219,17 +235,13 @@ namespace osu.Game.Overlays
             Schedule(() =>
             {
                 // TODO: consider scheduling bindable callbacks to not perform when overlay is not present.
-                channelManager.JoinedChannels.ItemsAdded += onChannelAddedToJoinedChannels;
-                channelManager.JoinedChannels.ItemsRemoved += onChannelRemovedFromJoinedChannels;
+                channelManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
 
                 foreach (Channel channel in channelManager.JoinedChannels)
                     ChannelTabControl.AddChannel(channel);
 
-                ChannelTabControl.Current.Value = channelManager.CurrentChannel.Value ?? channelManager.JoinedChannels.FirstOrDefault();
-
-                channelManager.AvailableChannels.ItemsAdded += availableChannelsChanged;
-                channelManager.AvailableChannels.ItemsRemoved += availableChannelsChanged;
-                ChannelSelectionOverlay.UpdateAvailableChannels(channelManager.AvailableChannels);
+                channelManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
+                availableChannelsChanged(null, null);
 
                 currentChannel = channelManager.CurrentChannel.GetBoundCopy();
                 currentChannel.BindValueChanged(currentChannelChanged, true);
@@ -302,7 +314,7 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
             if (isDragging)
             {
@@ -314,20 +326,20 @@ namespace osu.Game.Overlays
 
                 ChatHeight.Value = targetChatHeight;
             }
-
-            return true;
         }
 
-        protected override bool OnDragEnd(DragEndEvent e)
+        protected override void OnDragEnd(DragEndEvent e)
         {
             isDragging = false;
-            return base.OnDragEnd(e);
+            base.OnDragEnd(e);
         }
 
         private void selectTab(int index)
         {
-            var channel = ChannelTabControl.Items.Skip(index).FirstOrDefault();
-            if (channel != null && !(channel is ChannelSelectorTabItem.ChannelSelectorTabChannel))
+            var channel = ChannelTabControl.Items
+                                           .Where(tab => !(tab is ChannelSelectorTabItem.ChannelSelectorTabChannel))
+                                           .ElementAtOrDefault(index);
+            if (channel != null)
                 ChannelTabControl.Current.Value = channel;
         }
 
@@ -362,7 +374,7 @@ namespace osu.Game.Overlays
 
         protected override void OnFocus(FocusEvent e)
         {
-            //this is necessary as textbox is masked away and therefore can't get focus :(
+            // this is necessary as textbox is masked away and therefore can't get focus :(
             textbox.TakeFocus();
             base.OnFocus(e);
         }
@@ -388,34 +400,41 @@ namespace osu.Game.Overlays
             base.PopOut();
         }
 
-        private void onChannelAddedToJoinedChannels(IEnumerable<Channel> channels)
+        private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
-            foreach (Channel channel in channels)
-                ChannelTabControl.AddChannel(channel);
-        }
-
-        private void onChannelRemovedFromJoinedChannels(IEnumerable<Channel> channels)
-        {
-            foreach (Channel channel in channels)
+            switch (args.Action)
             {
-                ChannelTabControl.RemoveChannel(channel);
+                case NotifyCollectionChangedAction.Add:
+                    foreach (Channel channel in args.NewItems.Cast<Channel>())
+                        ChannelTabControl.AddChannel(channel);
+                    break;
 
-                var loaded = loadedChannels.Find(c => c.Channel == channel);
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (Channel channel in args.OldItems.Cast<Channel>())
+                    {
+                        ChannelTabControl.RemoveChannel(channel);
 
-                if (loaded != null)
-                {
-                    loadedChannels.Remove(loaded);
+                        var loaded = loadedChannels.Find(c => c.Channel == channel);
 
-                    // Because the container is only cleared in the async load callback of a new channel, it is forcefully cleared
-                    // to ensure that the previous channel doesn't get updated after it's disposed
-                    currentChannelContainer.Remove(loaded);
-                    loaded.Dispose();
-                }
+                        if (loaded != null)
+                        {
+                            loadedChannels.Remove(loaded);
+
+                            // Because the container is only cleared in the async load callback of a new channel, it is forcefully cleared
+                            // to ensure that the previous channel doesn't get updated after it's disposed
+                            currentChannelContainer.Remove(loaded);
+                            loaded.Dispose();
+                        }
+                    }
+
+                    break;
             }
         }
 
-        private void availableChannelsChanged(IEnumerable<Channel> channels)
-            => ChannelSelectionOverlay.UpdateAvailableChannels(channelManager.AvailableChannels);
+        private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            ChannelSelectionOverlay.UpdateAvailableChannels(channelManager.AvailableChannels);
+        }
 
         protected override void Dispose(bool isDisposing)
         {
@@ -424,10 +443,8 @@ namespace osu.Game.Overlays
             if (channelManager != null)
             {
                 channelManager.CurrentChannel.ValueChanged -= currentChannelChanged;
-                channelManager.JoinedChannels.ItemsAdded -= onChannelAddedToJoinedChannels;
-                channelManager.JoinedChannels.ItemsRemoved -= onChannelRemovedFromJoinedChannels;
-                channelManager.AvailableChannels.ItemsAdded -= availableChannelsChanged;
-                channelManager.AvailableChannels.ItemsRemoved -= availableChannelsChanged;
+                channelManager.JoinedChannels.CollectionChanged -= joinedChannelsChanged;
+                channelManager.AvailableChannels.CollectionChanged -= availableChannelsChanged;
             }
         }
 

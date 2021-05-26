@@ -21,6 +21,7 @@ namespace osu.Game.Tournament.Screens
             {
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
+                Depth = float.MinValue,
             });
         }
 

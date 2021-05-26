@@ -12,7 +12,7 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneFullscreenOverlay : OsuTestScene
     {
-        private FullscreenOverlay overlay;
+        private FullscreenOverlay<OverlayHeader> overlay;
 
         protected override void LoadComplete()
         {
@@ -38,9 +38,10 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("fire count 3", () => fireCount == 3);
         }
 
-        private class TestFullscreenOverlay : FullscreenOverlay
+        private class TestFullscreenOverlay : FullscreenOverlay<OverlayHeader>
         {
             public TestFullscreenOverlay()
+                : base(OverlayColourScheme.Pink)
             {
                 Children = new Drawable[]
                 {
@@ -50,6 +51,17 @@ namespace osu.Game.Tests.Visual.Online
                         RelativeSizeAxes = Axes.Both,
                     },
                 };
+            }
+
+            protected override OverlayHeader CreateHeader() => new TestHeader();
+
+            internal class TestHeader : OverlayHeader
+            {
+                protected override OverlayTitle CreateTitle() => new TestTitle();
+
+                internal class TestTitle : OverlayTitle
+                {
+                }
             }
         }
     }
