@@ -43,12 +43,12 @@ namespace osu.Game.Online.Chat
         {
             notifyOnMention = config.GetBindable<bool>(OsuSetting.ChatHighlightName);
             notifyOnPM = config.GetBindable<bool>(OsuSetting.ChatMessageNotification);
-
-            channelManager.JoinedChannels.BindTo(joinedChannels);
             api.LocalUser.BindTo(localUser);
 
             // Listen for new messages
             joinedChannels.CollectionChanged += channelsChanged;
+
+            channelManager.JoinedChannels.BindTo(joinedChannels);
         }
 
         private void channelsChanged(object sender, NotifyCollectionChangedEventArgs e)
