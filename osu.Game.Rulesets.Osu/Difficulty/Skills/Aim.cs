@@ -25,8 +25,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double fittsSnapConstant = 3.75;
 
         // Global Constants for the different types of aim.
-        private double snapStrainMultiplier = 9.875;
-        private double flowStrainMultiplier = 16.25;
+        private double snapStrainMultiplier = 10;
+        private double flowStrainMultiplier = 15.75;
         private double hybridStrainMultiplier = 8.25;
         private double sliderStrainMultiplier = 75;
         private double totalStrainMultiplier = .1675;

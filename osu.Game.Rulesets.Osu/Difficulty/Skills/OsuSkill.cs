@@ -105,8 +105,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 targetTime += Math.Min(2000, times[i] - times[i-1]) * (strains[i] / totalDifficulty);
             }
 
-            Console.WriteLine(targetTime / 1000 / 60);
-
             return targetTime;
         }
 
@@ -131,7 +129,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double fcTimeSkillLevel(double totalDifficulty)
         {
             double lengthEstimate = 0.4 * (times[times.Count - 1] - times[0]);
-            target_fc_time += 45 * Math.Max(0, expectedTargetTime(totalDifficulty) - 60000);
+            target_fc_time += 30 * Math.Max(0, expectedTargetTime(totalDifficulty) - 60000);
             // for every 30 seconds past 3 mins, add 5 mins to estimated time to FC. ^
             double fcProb = lengthEstimate / target_fc_time;
             double skill = skillLevel(fcProb, totalDifficulty);

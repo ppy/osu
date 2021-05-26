@@ -96,12 +96,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor += 0.2 * (Attributes.ApproachRate - 10.33);
+                approachRateFactor += 0.225 * (Attributes.ApproachRate - 10.33);
             else if (Attributes.ApproachRate < 8.0)
                 approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
 
             // scale aim with AR, sensitive to object count
-            aimValue *= 1.0 + approachRateFactor;
+            aimValue *= 1.0 + approachRateFactor * (.33 + .66 * Math.Min(1, totalHits / 1000));
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(h => h is OsuModHidden))
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor += 0.2 * (Attributes.ApproachRate - 10.33);
+                approachRateFactor += 0.225 * (Attributes.ApproachRate - 10.33);
             else if (Attributes.ApproachRate < 8.0)
                 approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
 
@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
-                speedValue *= Math.Pow((Math.Tan(Math.PI / 4 * (2 * (scoreMaxCombo / (double)Attributes.MaxCombo) - 1)) + 1) / 2, .8);
+                speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (countMiss > 0)
@@ -175,11 +175,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                 p50 * Math.Pow((m100 + m50) / 2.0, 2.0) +
                                 pm * Math.Pow(229.5 - 11 * Attributes.OverallDifficulty, 2.0);
 
-            // realObjectCount = Math.Min(amountHitObjectsWithAccuracy, 1600) + (amountHitObjectsWithAccuracy > 1600 ? 
-
             double accuracyValue = 2.83 * Math.Pow(1.52163, (79.5 - 2 * Math.Sqrt(variance)) / 6.0)
                                 * Math.Pow(Math.Log(1.0 + (Math.E - 1.0) * (Math.Min(amountHitObjectsWithAccuracy, 1600) / 1000.0)), 0.5);
-
 
             if (mods.Any(m => m is OsuModHidden))
                 accuracyValue *= 1.08;

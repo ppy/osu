@@ -35,6 +35,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
         }
 
+        private bool isRatioEqual(double ratio, double a, double b)
+        {
+            return a + 15 > ratio * b && a - 15 < ratio * b;
+        }
+
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
@@ -53,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 double prevDelta = ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime;
                 double currDelta = ((OsuDifficultyHitObject)Previous[i]).StrainTime;
 
-                if (Utils.IsRatioEqual(1.5, prevDelta, currDelta) || Utils.IsRatioEqual(1.5, currDelta, prevDelta))
+                if (isRatioEqual(1.5, prevDelta, currDelta) || isRatioEqual(1.5, currDelta, prevDelta))
                 {
                     if (Previous[i - 1].BaseObject is Slider || Previous[i].BaseObject is Slider)
                         specialTransitionCount += 50.0 / Math.Sqrt(prevDelta * currDelta) * ((double)i / HistoryLength);
@@ -63,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                 if (firstDeltaSwitch)
                 {
-                    if (Utils.IsRatioEqual(1.0, prevDelta, currDelta))
+                    if (isRatioEqual(1.0, prevDelta, currDelta))
                     {
                         islandSize++; // island is still progressing, count size.
                     }
