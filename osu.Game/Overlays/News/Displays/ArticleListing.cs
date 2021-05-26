@@ -2,13 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
 namespace osu.Game.Overlays.News.Displays
@@ -20,19 +23,11 @@ namespace osu.Game.Overlays.News.Displays
     {
         public Action RequestMorePosts;
 
+        private readonly BindableList<APINewsPost> posts = new BindableList<APINewsPost>();
+        private bool showMoreButtonIsVisible;
+
         private FillFlowContainer content;
         private ShowMoreButton showMore;
-
-        private readonly GetNewsResponse initialResponse;
-
-        /// <summary>
-        /// Instantiate a listing for the specified year.
-        /// </summary>
-        /// <param name="initialResponse">Initial response to create articles from.</param>
-        public ArticleListing(GetNewsResponse initialResponse)
-        {
-            this.initialResponse = initialResponse;
-        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -45,7 +40,6 @@ namespace osu.Game.Overlays.News.Displays
                 Left = 30,
                 Right = 50
             };
-
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -61,8 +55,7 @@ namespace osu.Game.Overlays.News.Displays
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 10),
-                        Children = initialResponse.NewsPosts.Select(p => new NewsCard(p)).ToList()
+                        Spacing = new Vector2(0, 10)
                     },
                     showMore = new ShowMoreButton
                     {
@@ -73,24 +66,45 @@ namespace osu.Game.Overlays.News.Displays
                             Top = 15
                         },
                         Action = RequestMorePosts,
-                        Alpha = initialResponse.Cursor != null ? 1 : 0
+                        Alpha = 0
                     }
                 }
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            posts.BindCollectionChanged((sender, args) =>
+            {
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        addPosts(args.NewItems.Cast<APINewsPost>());
+                        break;
+
+                    default:
+                        throw new NotSupportedException(@"You can only add items to this list. Other actions are not supported.");
+                }
+            }, true);
+        }
+
+        public void AddPosts(IEnumerable<APINewsPost> posts, bool showMoreButtonIsVisible)
+        {
+            this.showMoreButtonIsVisible = showMoreButtonIsVisible;
+            this.posts.AddRange(posts);
+        }
+
         private CancellationTokenSource cancellationToken;
 
-        public void AddPosts(GetNewsResponse response)
+        private void addPosts(IEnumerable<APINewsPost> posts)
         {
-            cancellationToken?.Cancel();
-
-            LoadComponentsAsync(response.NewsPosts.Select(p => new NewsCard(p)).ToList(), loaded =>
+            LoadComponentsAsync(posts.Select(p => new NewsCard(p)).ToList(), loaded =>
             {
                 content.AddRange(loaded);
-
                 showMore.IsLoading = false;
-                showMore.Alpha = response.Cursor != null ? 1 : 0;
+                showMore.Alpha = showMoreButtonIsVisible ? 1 : 0;
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
