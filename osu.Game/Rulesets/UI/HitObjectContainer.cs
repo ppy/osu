@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.TypeExtensions;
@@ -96,14 +97,14 @@ namespace osu.Game.Rulesets.UI
 
         #region Pooling support
 
-        public void Add(HitObjectLifetimeEntry entry)
+        public virtual void Add(HitObjectLifetimeEntry entry)
         {
             entry.StartTimeChanged += onStartTimeChanged;
             allEntries.Add(entry);
             lifetimeManager.AddEntry(entry);
         }
 
-        public bool Remove(HitObjectLifetimeEntry entry)
+        public virtual bool Remove(HitObjectLifetimeEntry entry)
         {
             if (!lifetimeManager.RemoveEntry(entry)) return false;
 
@@ -207,26 +208,20 @@ namespace osu.Game.Rulesets.UI
         #endregion
 
         /// <summary>
-        /// Invoked when a <see cref="DrawableHitObject"/> is added to this container.
+        /// Invoked when a <see cref="HitObjectLifetimeEntry"/> became alive and the corresponding <see cref="DrawableHitObject"/> is added to this container.
         /// </summary>
-        /// <remarks>
-        /// This method is not invoked for nested <see cref="DrawableHitObject"/>s.
-        /// </remarks>
         protected virtual void OnAdd(DrawableHitObject drawableHitObject)
         {
         }
 
         /// <summary>
-        /// Invoked when a <see cref="DrawableHitObject"/> is removed from this container.
+        /// Invoked when a <see cref="HitObjectLifetimeEntry"/> became dead and the corresponding <see cref="DrawableHitObject"/> is removed from this container.
         /// </summary>
-        /// <remarks>
-        /// This method is not invoked for nested <see cref="DrawableHitObject"/>s.
-        /// </remarks>
         protected virtual void OnRemove(DrawableHitObject drawableHitObject)
         {
         }
 
-        public virtual void Clear()
+        public void Clear()
         {
             foreach (var entry in Entries.ToArray())
                 Remove(entry);
@@ -245,12 +240,31 @@ namespace osu.Game.Rulesets.UI
         private void onNewResult(DrawableHitObject d, JudgementResult r) => NewResult?.Invoke(d, r);
         private void onRevertResult(DrawableHitObject d, JudgementResult r) => RevertResult?.Invoke(d, r);
 
+        /// <summary>
+        /// Try to get the <see cref="DrawableHitObject"/> corresponding to <paramref name="entry"/>.
+        /// If the entry was added to this container as non-pooled (via <see cref="Add(DrawableHitObject)"/>), it returns the drawable even if the drawable is not currently alive.
+        /// </summary>
+        protected bool TryGetDrawable(HitObjectLifetimeEntry entry, [MaybeNullWhen(false)] out DrawableHitObject drawableHitObject)
+        {
+            return nonPooledDrawableMap.TryGetValue(entry, out drawableHitObject) ||
+                   aliveDrawableMap.TryGetValue(entry, out drawableHitObject);
+        }
+
         #region Comparator + StartTime tracking
 
         private void onStartTimeChanged(HitObjectLifetimeEntry entry)
         {
+            OnStartTimeChanged(entry);
+
             if (LoadState >= LoadState.Ready)
                 SortInternal();
+        }
+
+        /// <summary>
+        /// Invoked when <see cref="HitObject.StartTime"/> of an entry is changed.
+        /// </summary>
+        protected virtual void OnStartTimeChanged(HitObjectLifetimeEntry entry)
+        {
         }
 
         protected override int Compare(Drawable x, Drawable y)

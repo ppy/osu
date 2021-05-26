@@ -28,6 +28,9 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Invoked when the start time of <see cref="HitObject"/> is changed.
         /// </summary>
+        /// <remarks>
+        /// It can be used to override the <see cref="LifetimeEntry.LifetimeStart"/> computation based on the start time.
+        /// </remarks>
         public event Action<HitObjectLifetimeEntry> StartTimeChanged;
 
         public readonly Bindable<double> StartTimeBindable = new Bindable<double>();

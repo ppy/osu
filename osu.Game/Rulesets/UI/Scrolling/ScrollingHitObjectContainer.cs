@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Layout;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
@@ -18,12 +20,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         /// <summary>
-        /// Hit objects which require lifetime computation in the next update call.
-        /// </summary>
-        private readonly HashSet<DrawableHitObject> toComputeLifetime = new HashSet<DrawableHitObject>();
-
-        /// <summary>
-        /// A set containing all <see cref="HitObjectContainer.AliveObjects"/> which have an up-to-date layout.
+        /// A set of <see cref="DrawableHitObject"/>s to cache the layout computation (e.g. nested drawable positions).
+        /// Only top-level hit objects are added.
         /// </summary>
         private readonly HashSet<DrawableHitObject> layoutComputed = new HashSet<DrawableHitObject>();
 
@@ -48,14 +46,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             direction.ValueChanged += _ => layoutCache.Invalidate();
             timeRange.ValueChanged += _ => layoutCache.Invalidate();
-        }
-
-        public override void Clear()
-        {
-            base.Clear();
-
-            toComputeLifetime.Clear();
-            layoutComputed.Clear();
         }
 
         /// <summary>
@@ -150,81 +140,53 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
         }
 
-        protected override void OnAdd(DrawableHitObject drawableHitObject) => onAddRecursive(drawableHitObject);
-
-        protected override void OnRemove(DrawableHitObject drawableHitObject) => onRemoveRecursive(drawableHitObject);
-
-        private void onAddRecursive(DrawableHitObject hitObject)
+        public override void Add(HitObjectLifetimeEntry entry)
         {
-            invalidateHitObject(hitObject);
-
-            hitObject.DefaultsApplied += invalidateHitObject;
-
-            foreach (var nested in hitObject.NestedHitObjects)
-                onAddRecursive(nested);
+            setComputedLifetimeStart(entry);
+            base.Add(entry);
         }
 
-        private void onRemoveRecursive(DrawableHitObject hitObject)
+        protected override void OnAdd(DrawableHitObject drawableHitObject)
         {
-            toComputeLifetime.Remove(hitObject);
-            layoutComputed.Remove(hitObject);
+            base.OnAdd(drawableHitObject);
 
-            hitObject.DefaultsApplied -= invalidateHitObject;
+            layoutComputed.Remove(drawableHitObject);
+            drawableHitObject.DefaultsApplied += invalidateHitObject;
+        }
 
-            foreach (var nested in hitObject.NestedHitObjects)
-                onRemoveRecursive(nested);
+        protected override void OnRemove(DrawableHitObject drawableHitObject)
+        {
+            base.OnRemove(drawableHitObject);
+
+            layoutComputed.Remove(drawableHitObject);
+            drawableHitObject.DefaultsApplied -= invalidateHitObject;
         }
 
         /// <summary>
-        /// Make this <see cref="DrawableHitObject"/> lifetime and layout computed in next update.
+        /// Invalidate layout cache of this hit object.
         /// </summary>
-        private void invalidateHitObject(DrawableHitObject hitObject)
-        {
-            // Lifetime computation is delayed until next update because
-            // when the hit object is not pooled this container is not loaded here and `scrollLength` cannot be computed.
-            toComputeLifetime.Add(hitObject);
-            layoutComputed.Remove(hitObject);
-        }
+        private void invalidateHitObject(DrawableHitObject drawableHitObject) => layoutComputed.Remove(drawableHitObject);
 
-        private float scrollLength;
+        protected override void OnStartTimeChanged(HitObjectLifetimeEntry entry)
+        {
+            base.OnStartTimeChanged(entry);
+            setComputedLifetimeStart(entry);
+        }
 
         protected override void Update()
         {
             base.Update();
 
-            if (!layoutCache.IsValid)
-            {
-                toComputeLifetime.Clear();
+            if (layoutCache.IsValid) return;
 
-                foreach (var hitObject in Objects)
-                {
-                    if (hitObject.HitObject != null)
-                        toComputeLifetime.Add(hitObject);
-                }
+            scrollingInfo.Algorithm.Reset();
 
-                layoutComputed.Clear();
+            foreach (var entry in Entries)
+                setComputedLifetimeStart(entry);
 
-                scrollingInfo.Algorithm.Reset();
+            layoutComputed.Clear();
 
-                switch (direction.Value)
-                {
-                    case ScrollingDirection.Up:
-                    case ScrollingDirection.Down:
-                        scrollLength = DrawSize.Y;
-                        break;
-
-                    default:
-                        scrollLength = DrawSize.X;
-                        break;
-                }
-
-                layoutCache.Validate();
-            }
-
-            foreach (var hitObject in toComputeLifetime)
-                hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
-
-            toComputeLifetime.Clear();
+            layoutCache.Validate();
         }
 
         protected override void UpdateAfterChildrenLife()
@@ -247,32 +209,52 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
         }
 
-        private double computeOriginAdjustedLifetimeStart(DrawableHitObject hitObject)
-        {
-            float originAdjustment = 0.0f;
+        /// <summary>
+        /// Compute a conservative maximum bounding box of a <see cref="DrawableHitObject"/> corresponding to <paramref name="entry"/>.
+        /// It is used to calculate when the hit object appears in the container.
+        /// </summary>
+        protected virtual RectangleF ComputeBoundingBox(HitObjectLifetimeEntry entry) => new RectangleF().Inflate(100);
 
-            // calculate the dimension of the part of the hitobject that should already be visible
-            // when the hitobject origin first appears inside the scrolling container
+        private double computeDisplayStartTime(HitObjectLifetimeEntry entry)
+        {
+            RectangleF boundingBox = ComputeBoundingBox(entry);
+            float startOffset = 0;
+
             switch (direction.Value)
             {
-                case ScrollingDirection.Up:
-                    originAdjustment = hitObject.OriginPosition.Y;
+                case ScrollingDirection.Right:
+                    startOffset = boundingBox.Right;
                     break;
 
                 case ScrollingDirection.Down:
-                    originAdjustment = hitObject.DrawHeight - hitObject.OriginPosition.Y;
+                    startOffset = boundingBox.Bottom;
                     break;
 
                 case ScrollingDirection.Left:
-                    originAdjustment = hitObject.OriginPosition.X;
+                    startOffset = -boundingBox.Left;
                     break;
 
-                case ScrollingDirection.Right:
-                    originAdjustment = hitObject.DrawWidth - hitObject.OriginPosition.X;
+                case ScrollingDirection.Up:
+                    startOffset = -boundingBox.Top;
                     break;
             }
 
-            return scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, originAdjustment, timeRange.Value, scrollLength);
+            return scrollingInfo.Algorithm.GetDisplayStartTime(entry.HitObject.StartTime, startOffset, timeRange.Value, getLength());
+        }
+
+        private void setComputedLifetimeStart(HitObjectLifetimeEntry entry)
+        {
+            // The scrolling info is not yet available.
+            // The lifetime of all entries will be updated in the first Update.
+            if (!IsLoaded)
+                return;
+
+            double lifetimeStart = computeDisplayStartTime(entry);
+            // Set Drawable's LifetimeStart if possible because DHO lifetime is not updated when entry lifetime is set.
+            if (TryGetDrawable(entry, out var drawable))
+                drawable.LifetimeStart = lifetimeStart;
+            else
+                entry.LifetimeStart = lifetimeStart;
         }
 
         private void updateLayoutRecursive(DrawableHitObject hitObject)
@@ -283,12 +265,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 {
                     case ScrollingDirection.Up:
                     case ScrollingDirection.Down:
-                        hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, e.EndTime, timeRange.Value, scrollLength);
+                        hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, e.EndTime, timeRange.Value, getLength());
                         break;
 
                     case ScrollingDirection.Left:
                     case ScrollingDirection.Right:
-                        hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, e.EndTime, timeRange.Value, scrollLength);
+                        hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, e.EndTime, timeRange.Value, getLength());
                         break;
                 }
             }
@@ -307,19 +289,19 @@ namespace osu.Game.Rulesets.UI.Scrolling
             switch (direction.Value)
             {
                 case ScrollingDirection.Up:
-                    hitObject.Y = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+                    hitObject.Y = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, getLength());
                     break;
 
                 case ScrollingDirection.Down:
-                    hitObject.Y = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+                    hitObject.Y = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, getLength());
                     break;
 
                 case ScrollingDirection.Left:
-                    hitObject.X = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+                    hitObject.X = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, getLength());
                     break;
 
                 case ScrollingDirection.Right:
-                    hitObject.X = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+                    hitObject.X = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, getLength());
                     break;
             }
         }
