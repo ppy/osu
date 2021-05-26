@@ -74,7 +74,13 @@ namespace osu.Game.Overlays
             base.LoadComplete();
 
             // should not be run until first pop-in to avoid requesting data before user views.
-            article.BindValueChanged(onArticleChanged);
+            article.BindValueChanged(a =>
+            {
+                if (a.NewValue == null)
+                    loadListing();
+                else
+                    loadArticle(a.NewValue);
+            });
         }
 
         protected override NewsHeader CreateHeader() => new NewsHeader { ShowFrontPage = ShowFrontPage };
@@ -131,14 +137,6 @@ namespace osu.Game.Overlays
             sidebarContainer.Y = Math.Clamp(ScrollFlow.Current - Header.DrawHeight, 0, Math.Max(ScrollFlow.ScrollContent.DrawHeight - DrawHeight - Header.DrawHeight, 0));
         }
 
-        private void onArticleChanged(ValueChangedEvent<string> article)
-        {
-            if (article.NewValue == null)
-                loadListing();
-            else
-                loadArticle(article.NewValue);
-        }
-
         private void loadListing(int? year = null)
         {
             beginLoading();
@@ -159,16 +157,6 @@ namespace osu.Game.Overlays
             });
         }
 
-        private void getMorePosts()
-        {
-            lastRequest?.Cancel();
-            performListingRequest(response =>
-            {
-                if (content.Child is ArticleListing listing)
-                    listing.AddPosts(response);
-            });
-        }
-
         private void loadArticle(string article)
         {
             beginLoading();
@@ -177,6 +165,16 @@ namespace osu.Game.Overlays
 
             // Temporary, should be handled by ArticleDisplay later
             LoadDisplay(Empty());
+        }
+
+        private void getMorePosts()
+        {
+            lastRequest?.Cancel();
+            performListingRequest(response =>
+            {
+                if (content.Child is ArticleListing listing)
+                    listing.AddPosts(response);
+            });
         }
 
         private void performListingRequest(Action<GetNewsResponse> onSuccess)
