@@ -250,7 +250,7 @@ namespace osu.Game.Screens.Select.Carousel
             else
                 state = TernaryState.False;
 
-            return new TernaryStateMenuItem(collection.Name.Value, MenuItemType.Standard, s =>
+            return new TernaryStateToggleMenuItem(collection.Name.Value, MenuItemType.Standard, s =>
             {
                 foreach (var b in beatmapSet.Beatmaps)
                 {

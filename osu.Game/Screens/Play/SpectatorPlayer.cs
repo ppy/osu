@@ -31,12 +31,12 @@ namespace osu.Game.Screens.Play
         }
 
         [Resolved]
-        private SpectatorStreamingClient spectatorStreaming { get; set; }
+        private SpectatorClient spectatorClient { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            spectatorStreaming.OnUserBeganPlaying += userBeganPlaying;
+            spectatorClient.OnUserBeganPlaying += userBeganPlaying;
 
             AddInternal(new OsuSpriteText
             {
@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(IScreen next)
         {
-            spectatorStreaming.OnUserBeganPlaying -= userBeganPlaying;
+            spectatorClient.OnUserBeganPlaying -= userBeganPlaying;
             return base.OnExiting(next);
         }
 
@@ -84,8 +84,8 @@ namespace osu.Game.Screens.Play
         {
             base.Dispose(isDisposing);
 
-            if (spectatorStreaming != null)
-                spectatorStreaming.OnUserBeganPlaying -= userBeganPlaying;
+            if (spectatorClient != null)
+                spectatorClient.OnUserBeganPlaying -= userBeganPlaying;
         }
     }
 }

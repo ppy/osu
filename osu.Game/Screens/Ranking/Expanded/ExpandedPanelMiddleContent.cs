@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     Margin = new MarginPadding { Top = 40 },
                                     RelativeSizeAxes = Axes.X,
                                     Height = 230,
-                                    Child = new AccuracyCircle(score, withFlair)
+                                    Child = new AccuracyCircle(score)
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,

@@ -168,13 +168,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             if (SelectedBlueprints.All(b => b.Item is IHasComboInformation))
             {
-                yield return new TernaryStateMenuItem("New combo") { State = { BindTarget = SelectionNewComboState } };
+                yield return new TernaryStateToggleMenuItem("New combo") { State = { BindTarget = SelectionNewComboState } };
             }
 
             yield return new OsuMenuItem("Sound")
             {
                 Items = SelectionSampleStates.Select(kvp =>
-                    new TernaryStateMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
+                    new TernaryStateToggleMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
             };
         }
 
