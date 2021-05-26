@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
@@ -74,6 +75,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
 
             return Math.Pow(SR, 1.0 / difficultyExponent);
+        }
+
+        /// <summary>
+        /// The peak difficulty value of the map. Used to calculate the total star rating.
+        /// </summary>
+        public double CalculateDisplayDifficultyValue()
+        {
+            double difficulty = 0;
+            double weight = 1;
+            double decayWeight = 0.9;
+
+            // Difficulty is the weighted sum of the highest strains from every section.
+            // We're sorting from highest to lowest strain.
+            foreach (double strain in strains.OrderByDescending(d => d))
+            {
+                difficulty += strain * weight;
+                weight *= decayWeight;
+            }
+
+            return difficulty;
         }
 
         public override double DifficultyValue()
