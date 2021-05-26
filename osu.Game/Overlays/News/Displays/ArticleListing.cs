@@ -3,11 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -22,9 +20,6 @@ namespace osu.Game.Overlays.News.Displays
     public class ArticleListing : CompositeDrawable
     {
         public Action RequestMorePosts;
-
-        private readonly BindableList<APINewsPost> posts = new BindableList<APINewsPost>();
-        private bool showMoreButtonIsVisible;
 
         private FillFlowContainer content;
         private ShowMoreButton showMore;
@@ -71,41 +66,16 @@ namespace osu.Game.Overlays.News.Displays
             };
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            posts.BindCollectionChanged((sender, args) =>
-            {
-                switch (args.Action)
-                {
-                    case NotifyCollectionChangedAction.Add:
-                        addPosts(args.NewItems.Cast<APINewsPost>());
-                        break;
-
-                    default:
-                        throw new NotSupportedException(@"You can only add items to this list. Other actions are not supported.");
-                }
-            }, true);
-        }
-
-        public void AddPosts(IEnumerable<APINewsPost> posts, bool showMoreButtonIsVisible)
-        {
-            this.showMoreButtonIsVisible = showMoreButtonIsVisible;
-            this.posts.AddRange(posts);
-        }
-
-        private CancellationTokenSource cancellationToken;
-
-        private void addPosts(IEnumerable<APINewsPost> posts)
-        {
+        public void AddPosts(IEnumerable<APINewsPost> posts, bool morePostsAvailable) => Schedule(() =>
             LoadComponentsAsync(posts.Select(p => new NewsCard(p)).ToList(), loaded =>
             {
                 content.AddRange(loaded);
                 showMore.IsLoading = false;
-                showMore.Alpha = showMoreButtonIsVisible ? 1 : 0;
-            }, (cancellationToken = new CancellationTokenSource()).Token);
-        }
+                showMore.Alpha = morePostsAvailable ? 1 : 0;
+            }, (cancellationToken = new CancellationTokenSource()).Token)
+        );
+
+        private CancellationTokenSource cancellationToken;
 
         protected override void Dispose(bool isDisposing)
         {
