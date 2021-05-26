@@ -66,14 +66,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             for (int i = 0; i < hitObjects.Count; i++)
             {
-                var distanceToPrev = 0f;
-
                 var hitObject = hitObjects[i];
 
                 var currentObjectInfo = new RandomObjectInfo(hitObject);
-
-                if (prevObjectInfo != null)
-                    distanceToPrev = Vector2.Distance(prevObjectInfo.EndPositionOriginal, currentObjectInfo.PositionOriginal);
 
                 // rateOfChangeMultiplier only changes every i iterations to prevent shaky-line-shaped streams
                 if (i % 3 == 0)
@@ -85,11 +80,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     continue;
                 }
 
-                applyRandomisation(rateOfChangeMultiplier,
-                    prevObjectInfo,
-                    distanceToPrev,
-                    currentObjectInfo
-                );
+                applyRandomisation(rateOfChangeMultiplier, prevObjectInfo, currentObjectInfo);
 
                 hitObject.Position = currentObjectInfo.PositionRandomised;
 
@@ -113,44 +104,46 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// Returns the final position of the hit object
         /// </summary>
         /// <returns>Final position of the hit object</returns>
-        private void applyRandomisation(float rateOfChangeMultiplier, RandomObjectInfo prevObject, float distanceToPrev, RandomObjectInfo currentObjectInfo)
+        private void applyRandomisation(float rateOfChangeMultiplier, RandomObjectInfo previous, RandomObjectInfo current)
         {
-            if (prevObject == null)
+            if (previous == null)
             {
                 var playfieldSize = OsuPlayfield.BASE_SIZE;
 
-                currentObjectInfo.AngleRad = (float)(rng.NextDouble() * 2 * Math.PI - Math.PI);
-                currentObjectInfo.PositionRandomised = new Vector2((float)rng.NextDouble() * playfieldSize.X, (float)rng.NextDouble() * playfieldSize.Y);
+                current.AngleRad = (float)(rng.NextDouble() * 2 * Math.PI - Math.PI);
+                current.PositionRandomised = new Vector2((float)rng.NextDouble() * playfieldSize.X, (float)rng.NextDouble() * playfieldSize.Y);
 
                 return;
             }
+
+            float distanceToPrev = Vector2.Distance(previous.EndPositionOriginal, current.PositionOriginal);
 
             // The max. angle (relative to the angle of the vector pointing from the 2nd last to the last hit object)
             // is proportional to the distance between the last and the current hit object
             // to allow jumps and prevent too sharp turns during streams.
             var randomAngleRad = rateOfChangeMultiplier * 2 * Math.PI * distanceToPrev / playfield_diagonal;
 
-            currentObjectInfo.AngleRad = (float)randomAngleRad + prevObject.AngleRad;
-            if (currentObjectInfo.AngleRad < 0)
-                currentObjectInfo.AngleRad += 2 * (float)Math.PI;
+            current.AngleRad = (float)randomAngleRad + previous.AngleRad;
+            if (current.AngleRad < 0)
+                current.AngleRad += 2 * (float)Math.PI;
 
             var posRelativeToPrev = new Vector2(
-                distanceToPrev * (float)Math.Cos(currentObjectInfo.AngleRad),
-                distanceToPrev * (float)Math.Sin(currentObjectInfo.AngleRad)
+                distanceToPrev * (float)Math.Cos(current.AngleRad),
+                distanceToPrev * (float)Math.Sin(current.AngleRad)
             );
 
-            posRelativeToPrev = getRotatedVector(prevObject.EndPositionRandomised, posRelativeToPrev);
+            posRelativeToPrev = getRotatedVector(previous.EndPositionRandomised, posRelativeToPrev);
 
-            currentObjectInfo.AngleRad = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
+            current.AngleRad = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
 
-            var position = Vector2.Add(prevObject.EndPositionRandomised, posRelativeToPrev);
+            var position = Vector2.Add(previous.EndPositionRandomised, posRelativeToPrev);
 
             // Move hit objects back into the playfield if they are outside of it,
             // which would sometimes happen during big jumps otherwise.
             position.X = MathHelper.Clamp(position.X, 0, OsuPlayfield.BASE_SIZE.X);
             position.Y = MathHelper.Clamp(position.Y, 0, OsuPlayfield.BASE_SIZE.Y);
 
-            currentObjectInfo.PositionRandomised = position;
+            current.PositionRandomised = position;
         }
 
         /// <summary>
