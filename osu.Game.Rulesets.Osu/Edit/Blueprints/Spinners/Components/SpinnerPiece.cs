@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
@@ -34,11 +34,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
                     Alpha = 0.5f,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
-                ring = new RingPiece
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                }
+                ring = new RingPiece()
             };
         }
 

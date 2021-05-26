@@ -1,13 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
@@ -18,14 +19,8 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneScoresContainer : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(DrawableTopScore),
-            typeof(TopScoreUserSection),
-            typeof(TopScoreStatisticsSection),
-            typeof(ScoreTable),
-            typeof(ScoreTableRowBackground),
-        };
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         public TestSceneScoresContainer()
         {
@@ -190,6 +185,29 @@ namespace osu.Game.Tests.Visual.Online
                 Position = 1337,
             };
 
+            var myBestScoreWithNullPosition = new APILegacyUserTopScoreInfo
+            {
+                Score = new APILegacyScoreInfo
+                {
+                    User = new User
+                    {
+                        Id = 7151382,
+                        Username = @"Mayuri Hana",
+                        Country = new Country
+                        {
+                            FullName = @"Thailand",
+                            FlagName = @"TH",
+                        },
+                    },
+                    Rank = ScoreRank.D,
+                    PP = 160,
+                    MaxCombo = 1234,
+                    TotalScore = 123456,
+                    Accuracy = 0.6543,
+                },
+                Position = null,
+            };
+
             var oneScore = new APILegacyScores
             {
                 Scores = new List<APILegacyScoreInfo>
@@ -243,6 +261,12 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Load scores with my best", () =>
             {
                 allScores.UserScore = myBestScore;
+                scoresContainer.Scores = allScores;
+            });
+
+            AddStep("Load scores with null my best position", () =>
+            {
+                allScores.UserScore = myBestScoreWithNullPosition;
                 scoresContainer.Scores = allScores;
             });
         }

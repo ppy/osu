@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 
@@ -48,34 +47,56 @@ namespace osu.Game.Screens.Edit
         /// <param name="beatDivisor">The beat divisor.</param>
         /// <param name="colours">The set of colours.</param>
         /// <returns>The applicable colour from <paramref name="colours"/> for <paramref name="beatDivisor"/>.</returns>
-        public static ColourInfo GetColourFor(int beatDivisor, OsuColour colours)
+        public static Color4 GetColourFor(int beatDivisor, OsuColour colours)
         {
             switch (beatDivisor)
             {
+                case 1:
+                    return Color4.White;
+
                 case 2:
-                    return colours.BlueLight;
+                    return colours.Red;
 
                 case 4:
                     return colours.Blue;
 
                 case 8:
-                    return colours.BlueDarker;
+                    return colours.Yellow;
 
                 case 16:
                     return colours.PurpleDark;
 
                 case 3:
-                    return colours.YellowLight;
+                    return colours.Purple;
 
                 case 6:
-                    return colours.Yellow;
+                    return colours.YellowDark;
 
                 case 12:
                     return colours.YellowDarker;
 
                 default:
-                    return Color4.White;
+                    return Color4.Red;
             }
+        }
+
+        /// <summary>
+        /// Retrieves the applicable divisor for a specific beat index.
+        /// </summary>
+        /// <param name="index">The 0-based beat index.</param>
+        /// <param name="beatDivisor">The beat divisor.</param>
+        /// <returns>The applicable divisor.</returns>
+        public static int GetDivisorForBeatIndex(int index, int beatDivisor)
+        {
+            int beat = index % beatDivisor;
+
+            foreach (var divisor in BindableBeatDivisor.VALID_DIVISORS)
+            {
+                if ((beat * divisor) % beatDivisor == 0)
+                    return divisor;
+            }
+
+            return 0;
         }
     }
 }

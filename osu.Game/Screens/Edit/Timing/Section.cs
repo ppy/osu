@@ -7,10 +7,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -24,16 +24,19 @@ namespace osu.Game.Screens.Edit.Timing
 
         protected Bindable<T> ControlPoint { get; } = new Bindable<T>();
 
-        private const float header_height = 20;
+        private const float header_height = 50;
 
         [Resolved]
-        protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
+        protected EditorBeatmap Beatmap { get; private set; }
 
         [Resolved]
         protected Bindable<ControlPointGroup> SelectedGroup { get; private set; }
 
+        [Resolved(canBeNull: true)]
+        protected IEditorChangeHandler ChangeHandler { get; private set; }
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colours)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeDuration = 200;
@@ -44,20 +47,18 @@ namespace osu.Game.Screens.Edit.Timing
 
             InternalChildren = new Drawable[]
             {
-                new Box
-                {
-                    Colour = colours.Gray1,
-                    RelativeSizeAxes = Axes.Both,
-                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = header_height,
+                    Padding = new MarginPadding { Horizontal = 10 },
                     Children = new Drawable[]
                     {
                         checkbox = new OsuCheckbox
                         {
-                            LabelText = typeof(T).Name.Replace(typeof(ControlPoint).Name, string.Empty)
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            LabelText = typeof(T).Name.Replace(nameof(Beatmaps.ControlPoints.ControlPoint), string.Empty)
                         }
                     }
                 },
@@ -70,12 +71,13 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         new Box
                         {
-                            Colour = colours.Gray2,
+                            Colour = colours.Background3,
                             RelativeSizeAxes = Axes.Both,
                         },
                         Flow = new FillFlowContainer
                         {
-                            Padding = new MarginPadding(10),
+                            Padding = new MarginPadding(20),
+                            Spacing = new Vector2(20),
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,

@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
+using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -27,8 +29,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Container zoomedContent;
         protected override Container<Drawable> Content => zoomedContent;
-
         private float currentZoom = 1;
+
+        /// <summary>
+        /// The current zoom level of <see cref="ZoomableScrollContainer" />.
+        /// It may differ from <see cref="Zoom" /> during transitions.
+        /// </summary>
+        public float CurrentZoom => currentZoom;
+
+        [Resolved(canBeNull: true)]
+        private IFrameBasedClock editorClock { get; set; }
 
         public ZoomableScrollContainer()
             : base(Direction.Horizontal)
@@ -36,12 +46,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.Content.Add(zoomedContent = new Container { RelativeSizeAxes = Axes.Y });
         }
 
-        private int minZoom = 1;
+        private float minZoom = 1;
 
         /// <summary>
         /// The minimum zoom level allowed.
         /// </summary>
-        public int MinZoom
+        public float MinZoom
         {
             get => minZoom;
             set
@@ -56,12 +66,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        private int maxZoom = 60;
+        private float maxZoom = 60;
 
         /// <summary>
         /// The maximum zoom level allowed.
         /// </summary>
-        public int MaxZoom
+        public float MaxZoom
         {
             get => maxZoom;
             set
@@ -103,12 +113,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            if (e.IsPrecise)
-                // for now, we don't support zoom when using a precision scroll device. this needs gesture support.
-                return base.OnScroll(e);
+            if (e.AltPressed)
+            {
+                // zoom when holding alt.
+                setZoomTarget(zoomTarget + e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
+                return true;
+            }
 
-            setZoomTarget(zoomTarget + e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
-            return true;
+            // can't handle scroll correctly while playing.
+            // the editor will handle this case for us.
+            if (editorClock?.IsRunning == true)
+                return false;
+
+            return base.OnScroll(e);
         }
 
         private void updateZoomedContentWidth() => zoomedContent.Width = DrawWidth * currentZoom;

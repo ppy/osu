@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Users;
 using osuTK;
@@ -23,7 +22,7 @@ namespace osu.Game.Overlays.Profile.Header
         public readonly Bindable<User> User = new Bindable<User>();
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
             Alpha = 0;
             AutoSizeAxes = Axes.Y;
@@ -34,9 +33,9 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.GreySeafoamDarker,
+                    Colour = colourProvider.Background5,
                 },
-                new Container //artificial shadow
+                new Container // artificial shadow
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 3,

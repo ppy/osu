@@ -3,13 +3,16 @@
 
 using System.Linq;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Catch.Objects.Drawable;
+using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Catch.Objects.Drawables;
+using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModHidden : ModHidden
+    public class CatchModHidden : ModHidden, IApplicableToDrawableRuleset<CatchHitObject>
     {
         public override string Description => @"Play with fading fruits.";
         public override double ScoreMultiplier => 1.06;
@@ -17,9 +20,21 @@ namespace osu.Game.Rulesets.Catch.Mods
         private const double fade_out_offset_multiplier = 0.6;
         private const double fade_out_duration_multiplier = 0.44;
 
-        protected override void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
+        public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
-            if (!(drawable is DrawableCatchHitObject catchDrawable))
+            var drawableCatchRuleset = (DrawableCatchRuleset)drawableRuleset;
+            var catchPlayfield = (CatchPlayfield)drawableCatchRuleset.Playfield;
+
+            catchPlayfield.CatcherArea.MovableCatcher.CatchFruitOnPlate = false;
+        }
+
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
+        }
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
+            if (!(hitObject is DrawableCatchHitObject catchDrawable))
                 return;
 
             if (catchDrawable.NestedHitObjects.Any())
@@ -41,7 +56,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             var offset = hitObject.TimePreempt * fade_out_offset_multiplier;
             var duration = offset - hitObject.TimePreempt * fade_out_duration_multiplier;
 
-            using (drawable.BeginAbsoluteSequence(hitObject.StartTime - offset, true))
+            using (drawable.BeginAbsoluteSequence(hitObject.StartTime - offset))
                 drawable.FadeOut(duration);
         }
     }

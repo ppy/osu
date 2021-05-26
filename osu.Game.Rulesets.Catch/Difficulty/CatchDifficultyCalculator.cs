@@ -19,9 +19,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchDifficultyCalculator : DifficultyCalculator
     {
-        private const double star_scaling_factor = 0.145;
+        private const double star_scaling_factor = 0.153;
 
-        protected override int SectionLength => 750;
+        private float halfCatcherWidth;
 
         public CatchDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -48,14 +48,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
-            float halfCatchWidth;
-
-            using (var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty))
-            {
-                halfCatchWidth = catcher.CatchWidth * 0.5f;
-                halfCatchWidth *= 0.8f; // We're only using 80% of the catcher's width to simulate imperfect gameplay.
-            }
-
             CatchHitObject lastObject = null;
 
             // In 2B beatmaps, it is possible that a normal Fruit is placed in the middle of a JuiceStream.
@@ -69,16 +61,24 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     continue;
 
                 if (lastObject != null)
-                    yield return new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatchWidth);
+                    yield return new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatcherWidth);
 
                 lastObject = hitObject;
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods)
         {
-            new Movement(),
-        };
+            halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.BeatmapInfo.BaseDifficulty) * 0.5f;
+
+            // For circle sizes above 5.5, reduce the catcher width further to simulate imperfect gameplay.
+            halfCatcherWidth *= 1 - (Math.Max(0, beatmap.BeatmapInfo.BaseDifficulty.CircleSize - 5.5f) * 0.0625f);
+
+            return new Skill[]
+            {
+                new Movement(mods, halfCatcherWidth),
+            };
+        }
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {

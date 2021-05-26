@@ -28,19 +28,16 @@ namespace osu.Game.Screens.Select
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
-        /// <param name="button">THe button to be added.</param>
+        /// <param name="button">The button to be added.</param>
         /// <param name="overlay">The <see cref="OverlayContainer"/> to be toggled by this button.</param>
         public void AddButton(FooterButton button, OverlayContainer overlay)
         {
-            overlays.Add(overlay);
-            button.Action = () => showOverlay(overlay);
+            if (overlay != null)
+            {
+                overlays.Add(overlay);
+                button.Action = () => showOverlay(overlay);
+            }
 
-            AddButton(button);
-        }
-
-        /// <param name="button">Button to be added.</param>
-        public void AddButton(FooterButton button)
-        {
             button.Hovered = updateModeLight;
             button.HoverLost = updateModeLight;
 
@@ -107,5 +104,7 @@ namespace osu.Game.Screens.Select
         protected override bool OnMouseDown(MouseDownEvent e) => true;
 
         protected override bool OnClick(ClickEvent e) => true;
+
+        protected override bool OnHover(HoverEvent e) => true;
     }
 }

@@ -33,8 +33,16 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private LoginOverlay login { get; set; }
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
+
+        protected Box Background { get; private set; }
+
         private readonly Comment comment;
-        private Box background;
+
         private Box hoverLayer;
         private CircularContainer borderContainer;
         private SpriteText sideNumber;
@@ -59,8 +67,12 @@ namespace osu.Game.Overlays.Comments
             AccentColour = borderContainer.BorderColour = sideNumber.Colour = colours.GreenLight;
             hoverLayer.Colour = Color4.Black.Opacity(0.5f);
 
-            if (api.IsLoggedIn && api.LocalUser.Value.Id != comment.UserId)
+            var ownComment = api.LocalUser.Value.Id == comment.UserId;
+
+            if (!ownComment)
                 Action = onAction;
+
+            Background.Alpha = ownComment ? 0 : 1;
         }
 
         protected override void LoadComplete()
@@ -68,12 +80,18 @@ namespace osu.Game.Overlays.Comments
             base.LoadComplete();
             isVoted.Value = comment.IsVoted;
             votesCount.Value = comment.VotesCount;
-            isVoted.BindValueChanged(voted => background.Colour = voted.NewValue ? AccentColour : OsuColour.Gray(0.05f), true);
+            isVoted.BindValueChanged(voted => Background.Colour = voted.NewValue ? AccentColour : colourProvider.Background6, true);
             votesCount.BindValueChanged(count => votesCounter.Text = $"+{count.NewValue}", true);
         }
 
         private void onAction()
         {
+            if (!api.IsLoggedIn)
+            {
+                login?.Show();
+                return;
+            }
+
             request = new CommentVoteRequest(comment.Id, isVoted.Value ? CommentVoteAction.UnVote : CommentVoteAction.Vote);
             request.Success += onSuccess;
             api.Queue(request);
@@ -99,7 +117,7 @@ namespace osu.Game.Overlays.Comments
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        background = new Box
+                        Background = new Box
                         {
                             RelativeSizeAxes = Axes.Both
                         },

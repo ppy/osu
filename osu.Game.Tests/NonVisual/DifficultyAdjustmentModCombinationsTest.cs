@@ -94,10 +94,57 @@ namespace osu.Game.Tests.NonVisual
             Assert.IsTrue(combinations[2] is ModIncompatibleWithAofA);
         }
 
+        [Test]
+        public void TestMultiModFlattening()
+        {
+            var combinations = new TestLegacyDifficultyCalculator(new ModA(), new MultiMod(new ModB(), new ModC())).CreateDifficultyAdjustmentModCombinations();
+
+            Assert.AreEqual(4, combinations.Length);
+            Assert.IsTrue(combinations[0] is ModNoMod);
+            Assert.IsTrue(combinations[1] is ModA);
+            Assert.IsTrue(combinations[2] is MultiMod);
+            Assert.IsTrue(combinations[3] is MultiMod);
+
+            Assert.IsTrue(((MultiMod)combinations[2]).Mods[0] is ModA);
+            Assert.IsTrue(((MultiMod)combinations[2]).Mods[1] is ModB);
+            Assert.IsTrue(((MultiMod)combinations[2]).Mods[2] is ModC);
+            Assert.IsTrue(((MultiMod)combinations[3]).Mods[0] is ModB);
+            Assert.IsTrue(((MultiMod)combinations[3]).Mods[1] is ModC);
+        }
+
+        [Test]
+        public void TestIncompatibleThroughMultiMod()
+        {
+            var combinations = new TestLegacyDifficultyCalculator(new ModA(), new MultiMod(new ModB(), new ModIncompatibleWithA())).CreateDifficultyAdjustmentModCombinations();
+
+            Assert.AreEqual(3, combinations.Length);
+            Assert.IsTrue(combinations[0] is ModNoMod);
+            Assert.IsTrue(combinations[1] is ModA);
+            Assert.IsTrue(combinations[2] is MultiMod);
+
+            Assert.IsTrue(((MultiMod)combinations[2]).Mods[0] is ModB);
+            Assert.IsTrue(((MultiMod)combinations[2]).Mods[1] is ModIncompatibleWithA);
+        }
+
+        [Test]
+        public void TestIncompatibleWithSameInstanceViaMultiMod()
+        {
+            var combinations = new TestLegacyDifficultyCalculator(new ModA(), new MultiMod(new ModA(), new ModB())).CreateDifficultyAdjustmentModCombinations();
+
+            Assert.AreEqual(3, combinations.Length);
+            Assert.IsTrue(combinations[0] is ModNoMod);
+            Assert.IsTrue(combinations[1] is ModA);
+            Assert.IsTrue(combinations[2] is MultiMod);
+
+            Assert.IsTrue(((MultiMod)combinations[2]).Mods[0] is ModA);
+            Assert.IsTrue(((MultiMod)combinations[2]).Mods[1] is ModB);
+        }
+
         private class ModA : Mod
         {
             public override string Name => nameof(ModA);
             public override string Acronym => nameof(ModA);
+            public override string Description => string.Empty;
             public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModIncompatibleWithA), typeof(ModIncompatibleWithAAndB) };
@@ -106,16 +153,26 @@ namespace osu.Game.Tests.NonVisual
         private class ModB : Mod
         {
             public override string Name => nameof(ModB);
+            public override string Description => string.Empty;
             public override string Acronym => nameof(ModB);
             public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModIncompatibleWithAAndB) };
         }
 
+        private class ModC : Mod
+        {
+            public override string Name => nameof(ModC);
+            public override string Acronym => nameof(ModC);
+            public override string Description => string.Empty;
+            public override double ScoreMultiplier => 1;
+        }
+
         private class ModIncompatibleWithA : Mod
         {
             public override string Name => $"Incompatible With {nameof(ModA)}";
             public override string Acronym => $"Incompatible With {nameof(ModA)}";
+            public override string Description => string.Empty;
             public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModA) };
@@ -134,6 +191,7 @@ namespace osu.Game.Tests.NonVisual
         {
             public override string Name => $"Incompatible With {nameof(ModA)} and {nameof(ModB)}";
             public override string Acronym => $"Incompatible With {nameof(ModA)} and {nameof(ModB)}";
+            public override string Description => string.Empty;
             public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModA), typeof(ModB) };
@@ -159,7 +217,7 @@ namespace osu.Game.Tests.NonVisual
                 throw new NotImplementedException();
             }
 
-            protected override Skill[] CreateSkills(IBeatmap beatmap)
+            protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods)
             {
                 throw new NotImplementedException();
             }

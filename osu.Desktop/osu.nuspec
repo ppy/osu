@@ -9,10 +9,9 @@
         <projectUrl>https://osu.ppy.sh/</projectUrl>
         <iconUrl>https://puu.sh/tYyXZ/9a01a5d1b0.ico</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>click the circles. to the beat.</description>
-        <summary>click the circles.</summary>
+        <description>A free-to-win rhythm game. Rhythm is just a *click* away!</description>
         <releaseNotes>testing</releaseNotes>
-        <copyright>Copyright (c) 2019 ppy Pty Ltd</copyright>
+        <copyright>Copyright (c) 2021 ppy Pty Ltd</copyright>
         <language>en-AU</language>
     </metadata>
     <files>

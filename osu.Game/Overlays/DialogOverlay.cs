@@ -14,6 +14,9 @@ namespace osu.Game.Overlays
     {
         private readonly Container dialogContainer;
 
+        protected override string PopInSampleName => "UI/dialog-pop-in";
+        protected override string PopOutSampleName => "UI/dialog-pop-out";
+
         public PopupDialog CurrentDialog { get; private set; }
 
         public DialogOverlay()
@@ -50,7 +53,7 @@ namespace osu.Game.Overlays
         {
             if (v != Visibility.Hidden) return;
 
-            //handle the dialog being dismissed.
+            // handle the dialog being dismissed.
             dialog.Delay(PopupDialog.EXIT_DURATION).Expire();
 
             if (dialog == CurrentDialog)

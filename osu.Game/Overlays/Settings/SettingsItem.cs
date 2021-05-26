@@ -15,13 +15,14 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osuTK;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Settings
 {
-    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem
+    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem, IHasCurrentValue<T>, IHasTooltip
     {
         protected abstract Drawable CreateControl();
 
@@ -33,32 +34,66 @@ namespace osu.Game.Overlays.Settings
 
         protected readonly FillFlowContainer FlowContent;
 
-        private SpriteText text;
+        private SpriteText labelText;
+
+        private OsuTextFlowContainer warningText;
 
         public bool ShowsDefaultIndicator = true;
 
-        public virtual string LabelText
+        public string TooltipText { get; set; }
+
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        public virtual LocalisableString LabelText
         {
-            get => text?.Text ?? string.Empty;
+            get => labelText?.Text ?? string.Empty;
             set
             {
-                if (text == null)
+                if (labelText == null)
                 {
                     // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    FlowContent.Insert(-1, text = new OsuSpriteText());
+                    FlowContent.Insert(-1, labelText = new OsuSpriteText());
+
+                    updateDisabled();
                 }
 
-                text.Text = value;
+                labelText.Text = value;
             }
         }
 
-        public virtual Bindable<T> Bindable
+        /// <summary>
+        /// Text to be displayed at the bottom of this <see cref="SettingsItem{T}"/>.
+        /// Generally used to recommend the user change their setting as the current one is considered sub-optimal.
+        /// </summary>
+        public string WarningText
+        {
+            set
+            {
+                if (warningText == null)
+                {
+                    // construct lazily for cases where the label is not needed (may be provided by the Control).
+                    FlowContent.Add(warningText = new OsuTextFlowContainer
+                    {
+                        Colour = colours.Yellow,
+                        Margin = new MarginPadding { Bottom = 5 },
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                    });
+                }
+
+                warningText.Alpha = string.IsNullOrWhiteSpace(value) ? 0 : 1;
+                warningText.Text = value;
+            }
+        }
+
+        public virtual Bindable<T> Current
         {
             get => controlWithCurrent.Current;
             set => controlWithCurrent.Current = value;
         }
 
-        public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText } : new List<string>(Keywords) { LabelText }.ToArray();
+        public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText.ToString() } : new List<string>(Keywords) { LabelText.ToString() }.ToArray();
 
         public IEnumerable<string> Keywords { get; set; }
 
@@ -87,7 +122,10 @@ namespace osu.Game.Overlays.Settings
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
-                    Child = Control = CreateControl()
+                    Children = new[]
+                    {
+                        Control = CreateControl(),
+                    },
                 },
             };
 
@@ -96,15 +134,23 @@ namespace osu.Game.Overlays.Settings
             if (controlWithCurrent != null)
             {
                 controlWithCurrent.Current.ValueChanged += _ => SettingChanged?.Invoke();
-                controlWithCurrent.Current.DisabledChanged += disabled => { Colour = disabled ? Color4.Gray : Color4.White; };
+                controlWithCurrent.Current.DisabledChanged += _ => updateDisabled();
 
                 if (ShowsDefaultIndicator)
                     restoreDefaultButton.Bindable = controlWithCurrent.Current;
             }
         }
 
-        private class RestoreDefaultValueButton : Container, IHasTooltip
+        private void updateDisabled()
         {
+            if (labelText != null)
+                labelText.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
+        }
+
+        protected internal class RestoreDefaultValueButton : Container, IHasTooltip
+        {
+            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
             private Bindable<T> bindable;
 
             public Bindable<T> Bindable
@@ -128,6 +174,7 @@ namespace osu.Game.Overlays.Settings
             {
                 RelativeSizeAxes = Axes.Y;
                 Width = SettingsPanel.CONTENT_MARGINS;
+                Padding = new MarginPadding { Vertical = 1.5f };
                 Alpha = 0f;
             }
 
@@ -150,7 +197,7 @@ namespace osu.Game.Overlays.Settings
                         Type = EdgeEffectType.Glow,
                         Radius = 2,
                     },
-                    Size = new Vector2(0.33f, 0.8f),
+                    Width = 0.33f,
                     Child = new Box { RelativeSizeAxes = Axes.Both },
                 };
             }
@@ -183,13 +230,9 @@ namespace osu.Game.Overlays.Settings
                 UpdateState();
             }
 
-            public void SetButtonColour(Color4 buttonColour)
-            {
-                this.buttonColour = buttonColour;
-                UpdateState();
-            }
+            public void UpdateState() => Scheduler.AddOnce(updateState);
 
-            public void UpdateState()
+            private void updateState()
             {
                 if (bindable == null)
                     return;

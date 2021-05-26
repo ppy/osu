@@ -2,67 +2,33 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModEasy : Mod, IApplicableToDifficulty, IApplicableFailOverride, IApplicableToHealthProcessor
+    public abstract class ModEasy : Mod, IApplicableToDifficulty
     {
         public override string Name => "Easy";
         public override string Acronym => "EZ";
-        public override IconUsage Icon => OsuIcon.ModEasy;
+        public override IconUsage? Icon => OsuIcon.ModEasy;
         public override ModType Type => ModType.DifficultyReduction;
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModHardRock), typeof(ModDifficultyAdjust) };
 
-        [SettingSource("Extra Lives", "Number of extra lives")]
-        public Bindable<int> Retries { get; } = new BindableInt(2)
+        public virtual void ReadFromDifficulty(BeatmapDifficulty difficulty)
         {
-            MinValue = 0,
-            MaxValue = 10
-        };
+        }
 
-        private int retries;
-
-        private BindableNumber<double> health;
-
-        public void ReadFromDifficulty(BeatmapDifficulty difficulty) { }
-
-        public void ApplyToDifficulty(BeatmapDifficulty difficulty)
+        public virtual void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
             const float ratio = 0.5f;
             difficulty.CircleSize *= ratio;
             difficulty.ApproachRate *= ratio;
             difficulty.DrainRate *= ratio;
             difficulty.OverallDifficulty *= ratio;
-
-            retries = Retries.Value;
-        }
-
-        public bool AllowFail
-        {
-            get
-            {
-                if (retries == 0) return true;
-
-                health.Value = health.MaxValue;
-                retries--;
-
-                return false;
-            }
-        }
-
-        public bool RestartOnFail => false;
-
-        public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
-        {
-            health = healthProcessor.Health.GetBoundCopy();
         }
     }
 }

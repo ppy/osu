@@ -5,7 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Screens;
-using osu.Game.Screens.Multi;
+using osu.Game.Screens.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -16,24 +16,26 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             int index = 0;
 
-            OsuScreenStack screenStack = new OsuScreenStack(new TestMultiplayerSubScreen(index)) { RelativeSizeAxes = Axes.Both };
+            OsuScreenStack screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
+
+            screenStack.Push(new TestOnlinePlaySubScreen(index));
 
             Children = new Drawable[]
             {
                 screenStack,
-                new Header(screenStack)
+                new Header("Multiplayer", screenStack)
             };
 
-            AddStep("push multi screen", () => screenStack.CurrentScreen.Push(new TestMultiplayerSubScreen(++index)));
+            AddStep("push multi screen", () => screenStack.CurrentScreen.Push(new TestOnlinePlaySubScreen(++index)));
         }
 
-        private class TestMultiplayerSubScreen : OsuScreen, IMultiplayerSubScreen
+        private class TestOnlinePlaySubScreen : OsuScreen, IOnlinePlaySubScreen
         {
             private readonly int index;
 
             public string ShortTitle => $"Screen {index}";
 
-            public TestMultiplayerSubScreen(int index)
+            public TestOnlinePlaySubScreen(int index)
             {
                 this.index = index;
             }

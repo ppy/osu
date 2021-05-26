@@ -1,8 +1,9 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -12,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -27,22 +29,25 @@ namespace osu.Game.Overlays.Profile.Header
 
         private Color4 iconColour;
 
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         public BottomHeaderContainer()
         {
             AutoSizeAxes = Axes.Y;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            iconColour = colours.GreySeafoamLighter;
+            iconColour = colourProvider.Foreground1;
 
             InternalChildren = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.GreySeafoamDark,
+                    Colour = colourProvider.Background4
                 },
                 new FillFlowContainer
                 {
@@ -82,7 +87,7 @@ namespace osu.Game.Overlays.Profile.Header
             else
             {
                 topLinkContainer.AddText("Joined ");
-                topLinkContainer.AddText(new DrawableDate(user.JoinDate), embolden);
+                topLinkContainer.AddText(new DrawableDate(user.JoinDate, italic: false), embolden);
             }
 
             addSpacer(topLinkContainer);
@@ -95,7 +100,7 @@ namespace osu.Game.Overlays.Profile.Header
             else if (user.LastVisit.HasValue)
             {
                 topLinkContainer.AddText("Last seen ");
-                topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value), embolden);
+                topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value, italic: false), embolden);
 
                 addSpacer(topLinkContainer);
             }
@@ -109,39 +114,50 @@ namespace osu.Game.Overlays.Profile.Header
             }
 
             topLinkContainer.AddText("Contributed ");
-            topLinkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: embolden);
+            topLinkContainer.AddLink("forum post".ToQuantity(user.PostCount, "#,##0"), $"{api.WebsiteRootUrl}/users/{user.Id}/posts", creationParameters: embolden);
 
-            string websiteWithoutProtcol = user.Website;
+            addSpacer(topLinkContainer);
 
-            if (!string.IsNullOrEmpty(websiteWithoutProtcol))
+            topLinkContainer.AddText("Posted ");
+            topLinkContainer.AddLink("comment".ToQuantity(user.CommentsCount, "#,##0"), $"{api.WebsiteRootUrl}/comments?user_id={user.Id}", creationParameters: embolden);
+
+            string websiteWithoutProtocol = user.Website;
+
+            if (!string.IsNullOrEmpty(websiteWithoutProtocol))
             {
-                if (Uri.TryCreate(websiteWithoutProtcol, UriKind.Absolute, out var uri))
+                if (Uri.TryCreate(websiteWithoutProtocol, UriKind.Absolute, out var uri))
                 {
-                    websiteWithoutProtcol = uri.Host + uri.PathAndQuery + uri.Fragment;
-                    websiteWithoutProtcol = websiteWithoutProtcol.TrimEnd('/');
+                    websiteWithoutProtocol = uri.Host + uri.PathAndQuery + uri.Fragment;
+                    websiteWithoutProtocol = websiteWithoutProtocol.TrimEnd('/');
                 }
             }
 
-            tryAddInfo(FontAwesome.Solid.MapMarker, user.Location);
-            tryAddInfo(OsuIcon.Heart, user.Interests);
-            tryAddInfo(FontAwesome.Solid.Suitcase, user.Occupation);
-            bottomLinkContainer.NewLine();
+            bool anyInfoAdded = false;
+
+            anyInfoAdded |= tryAddInfo(FontAwesome.Solid.MapMarker, user.Location);
+            anyInfoAdded |= tryAddInfo(OsuIcon.Heart, user.Interests);
+            anyInfoAdded |= tryAddInfo(FontAwesome.Solid.Suitcase, user.Occupation);
+
+            if (anyInfoAdded)
+                bottomLinkContainer.NewLine();
+
             if (!string.IsNullOrEmpty(user.Twitter))
-                tryAddInfo(FontAwesome.Brands.Twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
-            tryAddInfo(FontAwesome.Brands.Discord, user.Discord);
-            tryAddInfo(FontAwesome.Brands.Skype, user.Skype, @"skype:" + user.Skype + @"?chat");
-            tryAddInfo(FontAwesome.Brands.Lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
-            tryAddInfo(FontAwesome.Solid.Link, websiteWithoutProtcol, user.Website);
+                anyInfoAdded |= tryAddInfo(FontAwesome.Brands.Twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
+            anyInfoAdded |= tryAddInfo(FontAwesome.Brands.Discord, user.Discord);
+            anyInfoAdded |= tryAddInfo(FontAwesome.Solid.Link, websiteWithoutProtocol, user.Website);
+
+            // If no information was added to the bottomLinkContainer, hide it to avoid unwanted padding
+            bottomLinkContainer.Alpha = anyInfoAdded ? 1 : 0;
         }
 
         private void addSpacer(OsuTextFlowContainer textFlow) => textFlow.AddArbitraryDrawable(new Container { Width = 15 });
 
-        private void tryAddInfo(IconUsage icon, string content, string link = null)
+        private bool tryAddInfo(IconUsage icon, string content, string link = null)
         {
-            if (string.IsNullOrEmpty(content)) return;
+            if (string.IsNullOrEmpty(content)) return false;
 
             // newlines could be contained in API returned user content.
-            content = content.Replace("\n", " ");
+            content = content.Replace('\n', ' ');
 
             bottomLinkContainer.AddIcon(icon, text =>
             {
@@ -155,6 +171,7 @@ namespace osu.Game.Overlays.Profile.Header
                 bottomLinkContainer.AddText(" " + content, embolden);
 
             addSpacer(bottomLinkContainer);
+            return true;
         }
 
         private void embolden(SpriteText text) => text.Font = text.Font.With(weight: FontWeight.Bold);

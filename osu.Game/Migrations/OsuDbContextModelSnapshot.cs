@@ -43,7 +43,7 @@ namespace osu.Game.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AudioLeadIn");
+                    b.Property<double>("AudioLeadIn");
 
                     b.Property<double>("BPM");
 
@@ -56,6 +56,8 @@ namespace osu.Game.Migrations
                     b.Property<bool>("Countdown");
 
                     b.Property<double>("DistanceSpacing");
+
+                    b.Property<bool>("EpilepsyWarning");
 
                     b.Property<int>("GridSize");
 
@@ -124,6 +126,9 @@ namespace osu.Game.Migrations
 
                     b.Property<string>("AudioFile");
 
+                    b.Property<int>("AuthorID")
+                        .HasColumnName("AuthorID");
+
                     b.Property<string>("AuthorString")
                         .HasColumnName("Author");
 
@@ -138,8 +143,6 @@ namespace osu.Game.Migrations
                     b.Property<string>("Title");
 
                     b.Property<string>("TitleUnicode");
-
-                    b.Property<string>("VideoFile");
 
                     b.HasKey("ID");
 
@@ -350,7 +353,7 @@ namespace osu.Game.Migrations
 
                     b.Property<long>("TotalScore");
 
-                    b.Property<long?>("UserID")
+                    b.Property<int?>("UserID")
                         .HasColumnName("UserID");
 
                     b.Property<string>("UserString")
@@ -399,6 +402,8 @@ namespace osu.Game.Migrations
                     b.Property<bool>("DeletePending");
 
                     b.Property<string>("Hash");
+
+                    b.Property<string>("InstantiationInfo");
 
                     b.Property<string>("Name");
 

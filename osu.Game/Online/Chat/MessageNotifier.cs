@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -34,7 +35,7 @@ namespace osu.Game.Online.Chat
 
         private Bindable<bool> notifyOnMention;
         private Bindable<bool> notifyOnPM;
-        private Bindable<User> localUser;
+        private IBindable<User> localUser;
         private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
 
         [BackgroundDependencyLoader]
@@ -47,17 +48,25 @@ namespace osu.Game.Online.Chat
             channelManager.JoinedChannels.BindTo(joinedChannels);
 
             // Listen for new messages
-            joinedChannels.ItemsAdded += joinedChannels =>
-            {
-                foreach (var channel in joinedChannels)
-                    channel.NewMessagesArrived += newMessagesArrived;
-            };
+            joinedChannels.CollectionChanged += channelsChanged;
+        }
 
-            joinedChannels.ItemsRemoved += leftChannels =>
+        private void channelsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
             {
-                foreach (var channel in leftChannels)
-                    channel.NewMessagesArrived -= newMessagesArrived;
-            };
+                case NotifyCollectionChangedAction.Add:
+                    foreach (var channel in e.NewItems.Cast<Channel>())
+                        channel.NewMessagesArrived += newMessagesArrived;
+
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var channel in e.OldItems.Cast<Channel>())
+                        channel.NewMessagesArrived -= newMessagesArrived;
+
+                    break;
+            }
         }
 
         private void newMessagesArrived(IEnumerable<Message> messages)

@@ -1,21 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Game.Overlays.Comments;
 using osu.Framework.Utils;
+using osu.Framework.Allocation;
+using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneTotalCommentsCounter : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(TotalCommentsCounter),
-        };
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         public TestSceneTotalCommentsCounter()
         {

@@ -3,7 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Humanizer;
 using NUnit.Framework;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Changelog;
@@ -13,89 +17,186 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneChangelogOverlay : OsuTestScene
     {
-        private ChangelogOverlay changelog;
+        private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
-        public override IReadOnlyList<Type> RequiredTypes => new[]
+        private readonly Dictionary<string, APIUpdateStream> streams;
+        private readonly Dictionary<string, APIChangelogBuild> builds;
+
+        private APIChangelogBuild requestedBuild;
+        private TestChangelogOverlay changelog;
+
+        public TestSceneChangelogOverlay()
         {
-            typeof(UpdateStreamBadgeArea),
-            typeof(UpdateStreamBadge),
-            typeof(ChangelogHeader),
-            typeof(ChangelogContent),
-            typeof(ChangelogListing),
-            typeof(ChangelogSingleBuild),
-            typeof(ChangelogBuild),
-            typeof(Comments),
-        };
-
-        protected override bool UseOnlineAPI => true;
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Add(changelog = new ChangelogOverlay());
-            AddStep(@"Show", changelog.Show);
-            AddStep(@"Hide", changelog.Hide);
-
-            AddWaitStep("wait for hide", 3);
-
-            AddStep(@"Show with Lazer 2018.712.0", () =>
+            streams = APIUpdateStream.KNOWN_STREAMS.Keys.Select((stream, id) => new APIUpdateStream
             {
-                changelog.ShowBuild(new APIChangelogBuild
+                Id = id + 1,
+                Name = stream,
+                DisplayName = stream.Humanize(), // not quite there, but good enough.
+            }).ToDictionary(stream => stream.Name);
+
+            string version = DateTimeOffset.Now.ToString("yyyy.Mdd.0");
+            builds = APIUpdateStream.KNOWN_STREAMS.Keys.Select(stream => new APIChangelogBuild
+            {
+                Version = version,
+                DisplayVersion = version,
+                UpdateStream = streams[stream],
+                ChangelogEntries = new List<APIChangelogEntry>()
+            }).ToDictionary(build => build.UpdateStream.Name);
+
+            foreach (var stream in streams.Values)
+                stream.LatestBuild = builds[stream.Name];
+        }
+
+        [SetUp]
+        public void SetUp() => Schedule(() =>
+        {
+            requestedBuild = null;
+
+            dummyAPI.HandleRequest = request =>
+            {
+                switch (request)
                 {
-                    Version = "2018.712.0",
-                    DisplayVersion = "2018.712.0",
-                    UpdateStream = new APIUpdateStream { Name = OsuGameBase.CLIENT_STREAM_NAME },
-                    ChangelogEntries = new List<APIChangelogEntry>
-                    {
-                        new APIChangelogEntry
+                    case GetChangelogRequest changelogRequest:
+                        var changelogResponse = new APIChangelogIndex
                         {
-                            Category = "Test",
-                            Title = "Title",
-                            MessageHtml = "Message",
+                            Streams = streams.Values.ToList(),
+                            Builds = builds.Values.ToList()
+                        };
+                        changelogRequest.TriggerSuccess(changelogResponse);
+                        return true;
+
+                    case GetChangelogBuildRequest buildRequest:
+                        if (requestedBuild != null)
+                            buildRequest.TriggerSuccess(requestedBuild);
+                        return true;
+                }
+
+                return false;
+            };
+
+            Child = changelog = new TestChangelogOverlay();
+        });
+
+        [Test]
+        public void ShowWithNoFetch()
+        {
+            AddStep(@"Show", () => changelog.Show());
+            AddUntilStep(@"wait for streams", () => changelog.Streams?.Count > 0);
+            AddAssert(@"listing displayed", () => changelog.Current.Value == null);
+            AddAssert(@"no stream selected", () => changelog.Header.Streams.Current.Value == null);
+        }
+
+        [Test]
+        public void ShowWithListing()
+        {
+            AddStep(@"Show with listing", () => changelog.ShowListing());
+            AddUntilStep(@"wait for streams", () => changelog.Streams?.Count > 0);
+            AddAssert(@"listing displayed", () => changelog.Current.Value == null);
+            AddAssert(@"no stream selected", () => changelog.Header.Streams.Current.Value == null);
+        }
+
+        [Test]
+        public void ShowWithBuild()
+        {
+            showBuild(() => new APIChangelogBuild
+            {
+                Version = "2018.712.0",
+                DisplayVersion = "2018.712.0",
+                UpdateStream = streams[OsuGameBase.CLIENT_STREAM_NAME],
+                ChangelogEntries = new List<APIChangelogEntry>
+                {
+                    new APIChangelogEntry
+                    {
+                        Type = ChangelogEntryType.Fix,
+                        Category = "osu!",
+                        Title = "Fix thing",
+                        MessageHtml = "Additional info goes here.",
+                        Repository = "osu",
+                        GithubPullRequestId = 11100,
+                        GithubUser = new APIChangelogUser
+                        {
+                            OsuUsername = "smoogipoo",
+                            UserId = 1040328
                         }
-                    }
-                });
-                changelog.Show();
-            });
-
-            AddWaitStep("wait for show", 3);
-            AddStep(@"Hide", changelog.Hide);
-            AddWaitStep("wait for hide", 3);
-
-            AddStep(@"Show with listing", () =>
-            {
-                changelog.ShowListing();
-                changelog.Show();
-            });
-
-            AddStep(@"Ensure HTML string unescaping", () =>
-            {
-                changelog.ShowBuild(new APIChangelogBuild
-                {
-                    Version = "2019.920.0",
-                    DisplayVersion = "2019.920.0",
-                    UpdateStream = new APIUpdateStream
-                    {
-                        Name = "Test",
-                        DisplayName = "Test"
                     },
-                    ChangelogEntries = new List<APIChangelogEntry>
+                    new APIChangelogEntry
                     {
-                        new APIChangelogEntry
+                        Type = ChangelogEntryType.Add,
+                        Category = "osu!",
+                        Title = "Add thing",
+                        Major = true,
+                        Repository = "ppy/osu-framework",
+                        GithubPullRequestId = 4444,
+                        GithubUser = new APIChangelogUser
                         {
-                            Category = "Testing HTML strings unescaping",
-                            Title = "Ensuring HTML strings are being unescaped",
-                            MessageHtml = "&quot;&quot;&quot;This text should appear triple-quoted&quot;&quot;&quot;    &gt;_&lt;",
-                            GithubUser = new APIChangelogUser
-                            {
-                                DisplayName = "Dummy",
-                                OsuUsername = "Dummy",
-                            }
-                        },
+                            DisplayName = "frenzibyte",
+                            GithubUrl = "https://github.com/frenzibyte"
+                        }
+                    },
+                    new APIChangelogEntry
+                    {
+                        Type = ChangelogEntryType.Misc,
+                        Category = "Code quality",
+                        Title = "Clean up thing",
+                        GithubUser = new APIChangelogUser
+                        {
+                            DisplayName = "some dude"
+                        }
+                    },
+                    new APIChangelogEntry
+                    {
+                        Type = ChangelogEntryType.Misc,
+                        Category = "Code quality",
+                        Title = "Clean up another thing"
                     }
-                });
+                }
             });
+
+            AddUntilStep(@"wait for streams", () => changelog.Streams?.Count > 0);
+            AddAssert(@"correct build displayed", () => changelog.Current.Value.Version == "2018.712.0");
+            AddAssert(@"correct stream selected", () => changelog.Header.Streams.Current.Value.Id == 5);
+        }
+
+        [Test]
+        public void TestHTMLUnescaping()
+        {
+            showBuild(() => new APIChangelogBuild
+            {
+                Version = "2019.920.0",
+                DisplayVersion = "2019.920.0",
+                UpdateStream = new APIUpdateStream
+                {
+                    Name = "Test",
+                    DisplayName = "Test"
+                },
+                ChangelogEntries = new List<APIChangelogEntry>
+                {
+                    new APIChangelogEntry
+                    {
+                        Category = "Testing HTML strings unescaping",
+                        Title = "Ensuring HTML strings are being unescaped",
+                        MessageHtml = "&quot;&quot;&quot;This text should appear triple-quoted&quot;&quot;&quot;    &gt;_&lt;",
+                        GithubUser = new APIChangelogUser
+                        {
+                            DisplayName = "Dummy",
+                            OsuUsername = "Dummy",
+                        }
+                    },
+                }
+            });
+        }
+
+        private void showBuild(Func<APIChangelogBuild> build)
+        {
+            AddStep("set up build", () => requestedBuild = build.Invoke());
+            AddStep("show build", () => changelog.ShowBuild(requestedBuild));
+        }
+
+        private class TestChangelogOverlay : ChangelogOverlay
+        {
+            public new List<APIUpdateStream> Streams => base.Streams;
+
+            public new ChangelogHeader Header => base.Header;
         }
     }
 }

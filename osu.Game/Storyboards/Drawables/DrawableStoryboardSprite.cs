@@ -2,20 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
-using osu.Game.Beatmaps;
+using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable
+    public class DrawableStoryboardSprite : CompositeDrawable, IFlippable, IVectorScalable
     {
-        public StoryboardSprite Sprite { get; private set; }
+        public StoryboardSprite Sprite { get; }
 
         private bool flipH;
 
@@ -82,17 +81,17 @@ namespace osu.Game.Storyboards.Drawables
 
                 if (FlipH)
                 {
-                    if (origin.HasFlag(Anchor.x0))
+                    if (origin.HasFlagFast(Anchor.x0))
                         origin = Anchor.x2 | (origin & (Anchor.y0 | Anchor.y1 | Anchor.y2));
-                    else if (origin.HasFlag(Anchor.x2))
+                    else if (origin.HasFlagFast(Anchor.x2))
                         origin = Anchor.x0 | (origin & (Anchor.y0 | Anchor.y1 | Anchor.y2));
                 }
 
                 if (FlipV)
                 {
-                    if (origin.HasFlag(Anchor.y0))
+                    if (origin.HasFlagFast(Anchor.y0))
                         origin = Anchor.y2 | (origin & (Anchor.x0 | Anchor.x1 | Anchor.x2));
-                    else if (origin.HasFlag(Anchor.y2))
+                    else if (origin.HasFlagFast(Anchor.y2))
                         origin = Anchor.y0 | (origin & (Anchor.x0 | Anchor.x1 | Anchor.x2));
                 }
 
@@ -111,16 +110,18 @@ namespace osu.Game.Storyboards.Drawables
 
             LifetimeStart = sprite.StartTime;
             LifetimeEnd = sprite.EndTime;
+
+            AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
+        private void load(TextureStore textureStore, Storyboard storyboard)
         {
-            var path = beatmap.Value.BeatmapSetInfo?.Files?.Find(f => f.Filename.Equals(Sprite.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
-            if (path == null)
-                return;
+            var drawable = storyboard.CreateSpriteFromResourcePath(Sprite.Path, textureStore);
 
-            Texture = textureStore.Get(path);
+            if (drawable != null)
+                InternalChild = drawable;
+
             Sprite.ApplyTransforms(this);
         }
     }

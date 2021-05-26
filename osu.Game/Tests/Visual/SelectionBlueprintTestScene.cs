@@ -5,10 +5,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class SelectionBlueprintTestScene : ManualInputManagerTestScene
+    public abstract class SelectionBlueprintTestScene : OsuManualInputManagerTestScene
     {
         protected override Container<Drawable> Content => content ?? base.Content;
         private readonly Container content;
@@ -22,10 +23,11 @@ namespace osu.Game.Tests.Visual
             });
         }
 
-        protected void AddBlueprint(SelectionBlueprint blueprint)
+        protected void AddBlueprint(HitObjectSelectionBlueprint blueprint, DrawableHitObject drawableObject)
         {
             Add(blueprint.With(d =>
             {
+                d.DrawableObject = drawableObject;
                 d.Depth = float.MinValue;
                 d.Select();
             }));

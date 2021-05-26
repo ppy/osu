@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Play with blinds on your screen.";
         public override string Acronym => "BL";
 
-        public override IconUsage Icon => FontAwesome.Solid.Adjust;
+        public override IconUsage? Icon => FontAwesome.Solid.Adjust;
         public override ModType Type => ModType.DifficultyIncrease;
 
         public override bool Ranked => false;
@@ -64,8 +64,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             /// </summary>
             private const float target_clamp = 1;
 
-            private readonly float targetBreakMultiplier = 0;
-            private readonly float easing = 1;
+            private readonly float targetBreakMultiplier;
+            private readonly float easing;
 
             private readonly CompositeDrawable restrictTo;
 
@@ -86,6 +86,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 this.restrictTo = restrictTo;
                 this.beatmap = beatmap;
+
+                targetBreakMultiplier = 0;
+                easing = 1;
             }
 
             [BackgroundDependencyLoader]

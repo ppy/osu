@@ -25,7 +25,6 @@
     <DebugType>portable</DebugType>
     <Optimize>False</Optimize>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <EnableLLVM>false</EnableLLVM>
     <AndroidManagedSymbols>false</AndroidManagedSymbols>
     <AndroidUseSharedRuntime>true</AndroidUseSharedRuntime>
     <EmbedAssembliesIntoApk>false</EmbedAssembliesIntoApk>
@@ -34,7 +33,6 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>None</DebugType>
     <Optimize>True</Optimize>
-    <EnableLLVM>true</EnableLLVM>
     <AndroidManagedSymbols>false</AndroidManagedSymbols>
     <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
@@ -53,7 +51,7 @@
     <Reference Include="Java.Interop" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2019.1230.0" />
-    <PackageReference Include="ppy.osu.Framework.Android" Version="2020.111.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2021.422.0" />
+    <PackageReference Include="ppy.osu.Framework.Android" Version="2021.524.0" />
   </ItemGroup>
 </Project>

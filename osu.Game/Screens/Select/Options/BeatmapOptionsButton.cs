@@ -8,11 +8,11 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select.Options
@@ -40,19 +40,17 @@ namespace osu.Game.Screens.Select.Options
             set => iconText.Icon = value;
         }
 
-        public string FirstLineText
+        public LocalisableString FirstLineText
         {
             get => firstLine.Text;
             set => firstLine.Text = value;
         }
 
-        public string SecondLineText
+        public LocalisableString SecondLineText
         {
             get => secondLine.Text;
             set => secondLine.Text = value;
         }
-
-        public Key? HotKey;
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
@@ -60,10 +58,10 @@ namespace osu.Game.Screens.Select.Options
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             flash.FadeTo(0, 1000, Easing.OutQuint);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -73,17 +71,6 @@ namespace osu.Game.Screens.Select.Options
             flash.FadeOut(800, Easing.OutExpo);
 
             return base.OnClick(e);
-        }
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (!e.Repeat && e.Key == HotKey)
-            {
-                Click();
-                return true;
-            }
-
-            return false;
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);

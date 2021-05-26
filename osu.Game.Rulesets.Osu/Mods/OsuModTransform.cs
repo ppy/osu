@@ -2,21 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModTransform : Mod, IApplicableToDrawableHitObjects
+    internal class OsuModTransform : ModWithVisibilityAdjustment
     {
         public override string Name => "Transform";
         public override string Acronym => "TR";
-        public override IconUsage Icon => FontAwesome.Solid.ArrowsAlt;
+        public override IconUsage? Icon => FontAwesome.Solid.ArrowsAlt;
         public override ModType Type => ModType.Fun;
         public override string Description => "Everything rotates. EVERYTHING.";
         public override double ScoreMultiplier => 1;
@@ -24,29 +24,41 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private float theta;
 
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyTransform(hitObject, state);
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyTransform(hitObject, state);
+
+        private void applyTransform(DrawableHitObject drawable, ArmedState state)
         {
-            foreach (var drawable in drawables)
+            switch (drawable)
             {
-                var hitObject = (OsuHitObject)drawable.HitObject;
+                case DrawableSliderHead _:
+                case DrawableSliderTail _:
+                case DrawableSliderTick _:
+                case DrawableSliderRepeat _:
+                    return;
 
-                float appearDistance = (float)(hitObject.TimePreempt - hitObject.TimeFadeIn) / 2;
+                default:
+                    var hitObject = (OsuHitObject)drawable.HitObject;
 
-                Vector2 originalPosition = drawable.Position;
-                Vector2 appearOffset = new Vector2(MathF.Cos(theta), MathF.Sin(theta)) * appearDistance;
+                    float appearDistance = (float)(hitObject.TimePreempt - hitObject.TimeFadeIn) / 2;
 
-                //the - 1 and + 1 prevents the hit objects to appear in the wrong position.
-                double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
-                double moveDuration = hitObject.TimePreempt + 1;
+                    Vector2 originalPosition = drawable.Position;
+                    Vector2 appearOffset = new Vector2(MathF.Cos(theta), MathF.Sin(theta)) * appearDistance;
 
-                using (drawable.BeginAbsoluteSequence(appearTime, true))
-                {
-                    drawable
-                        .MoveToOffset(appearOffset)
-                        .MoveTo(originalPosition, moveDuration, Easing.InOutSine);
-                }
+                    // the - 1 and + 1 prevents the hit objects to appear in the wrong position.
+                    double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
+                    double moveDuration = hitObject.TimePreempt + 1;
 
-                theta += (float)hitObject.TimeFadeIn / 1000;
+                    using (drawable.BeginAbsoluteSequence(appearTime, true))
+                    {
+                        drawable
+                            .MoveToOffset(appearOffset)
+                            .MoveTo(originalPosition, moveDuration, Easing.InOutSine);
+                    }
+
+                    theta += (float)hitObject.TimeFadeIn / 1000;
+                    break;
             }
         }
     }
