@@ -101,6 +101,7 @@ namespace osu.Game.Overlays.KeyBinding
                     },
                 }
             };
+
             foreach (var b in bindings)
                 buttons.Add(new KeyButton(b));
         }
