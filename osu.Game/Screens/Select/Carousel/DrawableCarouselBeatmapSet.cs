@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved(CanBeNull = true)]
         private ManageCollectionsDialog manageCollectionsDialog { get; set; }
 
-        public IEnumerable<DrawableCarouselItem> DrawableBeatmaps => beatmapContainer?.Children ?? Enumerable.Empty<DrawableCarouselItem>();
+        public IEnumerable<DrawableCarouselItem> DrawableBeatmaps => beatmapContainer?.AliveChildren ?? Enumerable.Empty<DrawableCarouselItem>();
 
         [CanBeNull]
         private Container<DrawableCarouselItem> beatmapContainer;
