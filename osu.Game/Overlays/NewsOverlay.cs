@@ -16,7 +16,7 @@ namespace osu.Game.Overlays
 {
     public class NewsOverlay : OnlineOverlay<NewsHeader>
     {
-        private readonly Bindable<string> article = new Bindable<string>(null);
+        private readonly Bindable<string> article = new Bindable<string>();
 
         private readonly Container sidebarContainer;
         private readonly NewsSidebar sidebar;
