@@ -91,7 +91,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     case Slider slider:
                         shiftNestedObjects(slider, Vector2.Subtract(slider.Position, current.PositionOriginal));
+
+                        var oldPos = new Vector2(slider.Position.X, slider.Position.Y);
+
                         moveSliderIntoPlayfield(slider, current);
+
+                        shiftNestedObjects(slider, Vector2.Subtract(slider.Position, oldPos));
 
                         break;
                 }
@@ -151,8 +156,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// </summary>
         private void moveSliderIntoPlayfield(Slider slider, RandomObjectInfo currentObjectInfo)
         {
-            var oldPos = new Vector2(slider.Position.X, slider.Position.Y);
-
             // Min. distances from the slider's position to the playfield border
             var minMargin = new MarginPadding();
 
@@ -181,10 +184,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             currentObjectInfo.PositionRandomised = slider.Position;
             currentObjectInfo.EndPositionRandomised = slider.EndPosition;
-
-            var shift = Vector2.Subtract(slider.Position, oldPos);
-
-            shiftNestedObjects(slider, shift);
         }
 
         /// <summary>
