@@ -152,10 +152,9 @@ namespace osu.Game.Overlays
                 lastCursor = response.Cursor;
                 sidebar.Metadata.Value = response.SidebarMetadata;
 
-                LoadDisplay(new ArticleListing(response)
-                {
-                    RequestMorePosts = getMorePosts
-                });
+                var listing = new ArticleListing { RequestMorePosts = getMorePosts };
+                listing.AddPosts(response.NewsPosts, response.Cursor != null);
+                LoadDisplay(listing);
             });
 
             API.PerformAsync(request);
@@ -170,7 +169,7 @@ namespace osu.Game.Overlays
             {
                 lastCursor = response.Cursor;
                 if (content.Child is ArticleListing listing)
-                    listing.AddPosts(response);
+                    listing.AddPosts(response.NewsPosts, response.Cursor != null);
             });
 
             API.PerformAsync(request);
