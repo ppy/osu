@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var rng = new Random((int)Seed.Value);
 
-            RandomObjectInfo? prevObjectInfo = null;
+            RandomObjectInfo prevObjectInfo = null;
 
             float rateOfChangeMultiplier = 0;
 
@@ -70,24 +70,25 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 var currentObjectInfo = new RandomObjectInfo(hitObject);
 
-                if (i > 0 && hitObjects[i - 1] is Spinner)
-                    prevObjectInfo = null;
-                else if (prevObjectInfo != null)
-                    distanceToPrev = Vector2.Distance(((RandomObjectInfo)prevObjectInfo).EndPositionOriginal, currentObjectInfo.PositionOriginal);
+                if (prevObjectInfo != null)
+                    distanceToPrev = Vector2.Distance(prevObjectInfo.EndPositionOriginal, currentObjectInfo.PositionOriginal);
 
                 // rateOfChangeMultiplier only changes every i iterations to prevent shaky-line-shaped streams
                 if (i % 3 == 0)
                     rateOfChangeMultiplier = (float)rng.NextDouble() * 2 - 1;
 
                 if (hitObject is Spinner)
+                {
+                    prevObjectInfo = null;
                     continue;
+                }
 
                 applyRandomisation(
                     rng,
                     rateOfChangeMultiplier,
                     prevObjectInfo,
                     distanceToPrev,
-                    ref currentObjectInfo
+                    currentObjectInfo
                 );
 
                 hitObject.Position = currentObjectInfo.PositionRandomised;
@@ -99,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     case Slider slider:
                         shiftNestedObjects(slider, Vector2.Subtract(slider.Position, currentObjectInfo.PositionOriginal));
-                        moveSliderIntoPlayfield(ref slider, ref currentObjectInfo);
+                        moveSliderIntoPlayfield(slider, currentObjectInfo);
 
                         break;
                 }
@@ -112,9 +113,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// Returns the final position of the hit object
         /// </summary>
         /// <returns>Final position of the hit object</returns>
-        private void applyRandomisation(Random rng, float rateOfChangeMultiplier, RandomObjectInfo? prevObjectInfoNullable, float distanceToPrev, ref RandomObjectInfo currentObjectInfo)
+        private void applyRandomisation(float rateOfChangeMultiplier, RandomObjectInfo prevObject, float distanceToPrev, RandomObjectInfo currentObjectInfo)
         {
-            if (prevObjectInfoNullable == null)
+            if (prevObject == null)
             {
                 var playfieldSize = OsuPlayfield.BASE_SIZE;
 
@@ -124,14 +125,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
             }
 
-            var prevObjectInfo = (RandomObjectInfo)prevObjectInfoNullable;
-
             // The max. angle (relative to the angle of the vector pointing from the 2nd last to the last hit object)
             // is proportional to the distance between the last and the current hit object
             // to allow jumps and prevent too sharp turns during streams.
             var randomAngleRad = rateOfChangeMultiplier * 2 * Math.PI * distanceToPrev / playfield_diagonal;
 
-            currentObjectInfo.AngleRad = (float)randomAngleRad + prevObjectInfo.AngleRad;
+            currentObjectInfo.AngleRad = (float)randomAngleRad + prevObject.AngleRad;
             if (currentObjectInfo.AngleRad < 0)
                 currentObjectInfo.AngleRad += 2 * (float)Math.PI;
 
@@ -140,11 +139,11 @@ namespace osu.Game.Rulesets.Osu.Mods
                 distanceToPrev * (float)Math.Sin(currentObjectInfo.AngleRad)
             );
 
-            posRelativeToPrev = getRotatedVector(prevObjectInfo.EndPositionRandomised, posRelativeToPrev);
+            posRelativeToPrev = getRotatedVector(prevObject.EndPositionRandomised, posRelativeToPrev);
 
             currentObjectInfo.AngleRad = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
 
-            var position = Vector2.Add(prevObjectInfo.EndPositionRandomised, posRelativeToPrev);
+            var position = Vector2.Add(prevObject.EndPositionRandomised, posRelativeToPrev);
 
             // Move hit objects back into the playfield if they are outside of it,
             // which would sometimes happen during big jumps otherwise.
@@ -157,7 +156,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <summary>
         /// Moves the <see cref="Slider"/> and all necessary nested <see cref="OsuHitObject"/>s into the <see cref="OsuPlayfield"/> if they aren't already.
         /// </summary>
-        private void moveSliderIntoPlayfield(ref Slider slider, ref RandomObjectInfo currentObjectInfo)
+        private void moveSliderIntoPlayfield(Slider slider, RandomObjectInfo currentObjectInfo)
         {
             var oldPos = new Vector2(slider.Position.X, slider.Position.Y);
 
@@ -278,7 +277,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             );
         }
 
-        private struct RandomObjectInfo
+        private class RandomObjectInfo
         {
             public float AngleRad { get; set; }
 
