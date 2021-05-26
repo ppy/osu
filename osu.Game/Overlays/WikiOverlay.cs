@@ -20,7 +20,6 @@ namespace osu.Game.Overlays
 
         private readonly Bindable<string> path = new Bindable<string>(index_path);
 
-        [Cached]
         private readonly Bindable<APIWikiPage> wikiData = new Bindable<APIWikiPage>();
 
         [Resolved]
