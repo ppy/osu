@@ -60,7 +60,7 @@ namespace osu.Game.Skinning.Editor
             var selectionRect = getSelectionQuad().AABBFloat;
 
             // If the selection has no area we cannot scale it
-            if (selectionRect.Area == 0.0)
+            if (selectionRect.Area == 0)
                 return false;
 
             // copy to mutate, as we will need to compare to the original later on.
