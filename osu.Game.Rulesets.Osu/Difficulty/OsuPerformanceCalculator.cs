@@ -175,8 +175,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                 p50 * Math.Pow((m100 + m50) / 2.0, 2.0) +
                                 pm * Math.Pow(229.5 - 11 * Attributes.OverallDifficulty, 2.0);
 
+            // realObjectCount = Math.Min(amountHitObjectsWithAccuracy, 1600) + (amountHitObjectsWithAccuracy > 1600 ? 
+
             double accuracyValue = 2.83 * Math.Pow(1.52163, (79.5 - 2 * Math.Sqrt(variance)) / 6.0)
-                                * Math.Pow(Math.Log(1.0 + (Math.E - 1.0) * (amountHitObjectsWithAccuracy / 1000.0)), 0.5);
+                                * Math.Pow(Math.Log(1.0 + (Math.E - 1.0) * (Math.Min(amountHitObjectsWithAccuracy, 1600) / 1000.0)), 0.5);
 
 
             if (mods.Any(m => m is OsuModHidden))
