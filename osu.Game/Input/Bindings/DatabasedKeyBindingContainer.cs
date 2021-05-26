@@ -73,10 +73,11 @@ namespace osu.Game.Input.Bindings
             else
             {
                 KeyBindings = store.Query(ruleset?.ID, variant)
+                                   .OrderBy(b => defaults.FindIndex(d => (int)d.Action == b.IntAction))
                                    // this ordering is important to ensure that we read entries from the database in the order
                                    // enforced by DefaultKeyBindings. allow for song select to handle actions that may otherwise
                                    // have been eaten by the music controller due to query order.
-                                   .OrderBy(b => defaults.FindIndex(d => (int)d.Action == b.IntAction)).ToList();
+                                   .ToList();
             }
         }
     }

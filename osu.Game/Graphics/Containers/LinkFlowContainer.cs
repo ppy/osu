@@ -7,7 +7,10 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 
 namespace osu.Game.Graphics.Containers
@@ -58,6 +61,14 @@ namespace osu.Game.Graphics.Containers
 
         public void AddLink(string text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
             => createLink(AddText(text, creationParameters), new LinkDetails(action, argument), tooltipText);
+
+        public void AddLink(LocalisableString text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
+        {
+            var spriteText = new OsuSpriteText { Text = text };
+
+            AddText(spriteText, creationParameters);
+            createLink(spriteText.Yield(), new LinkDetails(action, argument), tooltipText);
+        }
 
         public void AddLink(IEnumerable<SpriteText> text, LinkAction action = LinkAction.External, string linkArgument = null, string tooltipText = null)
         {

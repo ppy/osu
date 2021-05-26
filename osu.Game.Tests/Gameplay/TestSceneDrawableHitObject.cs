@@ -45,15 +45,16 @@ namespace osu.Game.Tests.Gameplay
             AddStep("Create DHO", () =>
             {
                 dho = new TestDrawableHitObject(null);
-                dho.Apply(entry = new TestLifetimeEntry(new HitObject())
-                {
-                    LifetimeStart = 0,
-                    LifetimeEnd = 1000,
-                });
+                dho.Apply(entry = new TestLifetimeEntry(new HitObject()));
                 Child = dho;
             });
 
-            AddStep("KeepAlive = true", () => entry.KeepAlive = true);
+            AddStep("KeepAlive = true", () =>
+            {
+                entry.LifetimeStart = 0;
+                entry.LifetimeEnd = 1000;
+                entry.KeepAlive = true;
+            });
             AddAssert("Lifetime is overriden", () => entry.LifetimeStart == double.MinValue && entry.LifetimeEnd == double.MaxValue);
 
             AddStep("Set LifetimeStart", () => dho.LifetimeStart = 500);

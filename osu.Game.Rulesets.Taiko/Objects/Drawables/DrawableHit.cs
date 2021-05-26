@@ -52,21 +52,16 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void OnApply()
         {
             type.BindTo(HitObject.TypeBindable);
-            type.BindValueChanged(_ =>
-            {
-                updateActionsFromType();
-
-                // will overwrite samples, should only be called on subsequent changes
-                // after the initial application.
-                updateSamplesFromTypeChange();
-
-                RecreatePieces();
-            });
-
-            // action update also has to happen immediately on application.
-            updateActionsFromType();
+            // this doesn't need to be run inline as RecreatePieces is called by the base call below.
+            type.BindValueChanged(_ => Scheduler.AddOnce(RecreatePieces));
 
             base.OnApply();
+        }
+
+        protected override void RecreatePieces()
+        {
+            updateActionsFromType();
+            base.RecreatePieces();
         }
 
         protected override void OnFree()
@@ -81,33 +76,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             HitActions = null;
             HitAction = null;
             validActionPressed = pressHandledThisFrame = false;
-        }
-
-        private HitSampleInfo[] getRimSamples() => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE).ToArray();
-
-        protected override void LoadSamples()
-        {
-            base.LoadSamples();
-
-            type.Value = getRimSamples().Any() ? HitType.Rim : HitType.Centre;
-        }
-
-        private void updateSamplesFromTypeChange()
-        {
-            var rimSamples = getRimSamples();
-
-            bool isRimType = HitObject.Type == HitType.Rim;
-
-            if (isRimType != rimSamples.Any())
-            {
-                if (isRimType)
-                    HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_CLAP));
-                else
-                {
-                    foreach (var sample in rimSamples)
-                        HitObject.Samples.Remove(sample);
-                }
-            }
         }
 
         private void updateActionsFromType()

@@ -31,6 +31,12 @@
       "commands": [
         "CodeFileSanity"
       ]
+    },
+    "ppy.localisationanalyser.tools": {
+      "version": "2021.524.0",
+      "commands": [
+        "localisation"
+      ]
     }
   }
 }

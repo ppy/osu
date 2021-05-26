@@ -191,7 +191,7 @@ namespace osu.Game.Overlays
             Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
 
-        protected class SettingsSectionsContainer : SectionsContainer<SettingsSection>
+        public class SettingsSectionsContainer : SectionsContainer<SettingsSection>
         {
             public SearchContainer<SettingsSection> SearchContainer;
 
