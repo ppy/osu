@@ -6,7 +6,6 @@ using System.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.News;
 using osu.Game.Overlays.News.Displays;
@@ -22,9 +21,14 @@ namespace osu.Game.Overlays
         private readonly NewsSidebar sidebar;
         private readonly Container content;
 
-        private APIRequest lastRequest;
+        private GetNewsRequest lastRequest;
+
         private Cursor lastCursor;
-        private int? year;
+
+        /// <summary>
+        /// The year currently being displayed. If null, the main listing is being displayed.
+        /// </summary>
+        private int? displayedYear;
 
         private CancellationTokenSource cancellationToken;
 
@@ -100,7 +104,7 @@ namespace osu.Game.Overlays
 
         public void ShowYear(int year)
         {
-            loadFrontPage(year);
+            loadListing(year);
             Show();
         }
 
@@ -130,18 +134,18 @@ namespace osu.Game.Overlays
         private void onArticleChanged(ValueChangedEvent<string> article)
         {
             if (article.NewValue == null)
-                loadFrontPage();
+                loadListing();
             else
                 loadArticle(article.NewValue);
         }
 
-        private void loadFrontPage(int? year = null)
+        private void loadListing(int? year = null)
         {
             beginLoading();
 
             Header.SetFrontPage();
 
-            this.year = year;
+            displayedYear = year;
             lastCursor = null;
 
             performListingRequest(response =>
@@ -165,19 +169,6 @@ namespace osu.Game.Overlays
             });
         }
 
-        private void performListingRequest(Action<GetNewsResponse> onSuccess)
-        {
-            lastRequest = new GetNewsRequest(year, lastCursor);
-
-            ((GetNewsRequest)lastRequest).Success += response => Schedule(() =>
-            {
-                lastCursor = response.Cursor;
-                onSuccess?.Invoke(response);
-            });
-
-            API.PerformAsync(lastRequest);
-        }
-
         private void loadArticle(string article)
         {
             beginLoading();
@@ -186,6 +177,18 @@ namespace osu.Game.Overlays
 
             // Temporary, should be handled by ArticleDisplay later
             LoadDisplay(Empty());
+        }
+
+        private void performListingRequest(Action<GetNewsResponse> onSuccess)
+        {
+            lastRequest = new GetNewsRequest(displayedYear, lastCursor);
+            lastRequest.Success += response => Schedule(() =>
+            {
+                lastCursor = response.Cursor;
+                onSuccess?.Invoke(response);
+            });
+
+            API.PerformAsync(lastRequest);
         }
 
         private void beginLoading()
