@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
     {
         public string CurrentPath
         {
-            set => Schedule(() => DocumentUrl += $"wiki/{value}");
+            set => DocumentUrl = $"{DocumentUrl}wiki/{value}";
         }
 
         protected override void AddMarkdownComponent(IMarkdownObject markdownObject, FillFlowContainer container, int level)
