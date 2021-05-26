@@ -142,11 +142,11 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestSingleBindingResetButton()
         {
-            RestorableKeyBindingRow settingsKeyBindingRow = null;
+            KeyBindingRow settingsKeyBindingRow = null;
 
             AddStep("click first row", () =>
             {
-                settingsKeyBindingRow = panel.ChildrenOfType<RestorableKeyBindingRow>().First();
+                settingsKeyBindingRow = panel.ChildrenOfType<KeyBindingRow>().First();
 
                 InputManager.MoveMouseTo(settingsKeyBindingRow);
                 InputManager.Click(MouseButton.Left);
@@ -165,17 +165,17 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
 
-            AddAssert("binding cleared", () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.KeyBindingRow.Defaults.ElementAt(0)));
+            AddAssert("binding cleared", () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.Defaults.ElementAt(0)));
         }
 
         [Test]
         public void TestResetAllBindingsButton()
         {
-            RestorableKeyBindingRow settingsKeyBindingRow = null;
+            KeyBindingRow settingsKeyBindingRow = null;
 
             AddStep("click first row", () =>
             {
-                settingsKeyBindingRow = panel.ChildrenOfType<RestorableKeyBindingRow>().First();
+                settingsKeyBindingRow = panel.ChildrenOfType<KeyBindingRow>().First();
 
                 InputManager.MoveMouseTo(settingsKeyBindingRow);
                 InputManager.Click(MouseButton.Left);
@@ -194,7 +194,7 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
 
-            AddAssert("binding cleared", () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.KeyBindingRow.Defaults.ElementAt(0)));
+            AddAssert("binding cleared", () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.Defaults.ElementAt(0)));
         }
 
         [Test]

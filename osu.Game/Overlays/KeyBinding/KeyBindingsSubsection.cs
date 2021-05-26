@@ -37,13 +37,19 @@ namespace osu.Game.Overlays.KeyBinding
 
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {
+                int intKey = (int)defaultGroup.Key;
+
                 // one row per valid action.
-                Add(new RestorableKeyBindingRow(defaultGroup.Key, bindings, Ruleset, defaultGroup.Select(d => d.KeyCombination)));
+                Add(new KeyBindingRow(defaultGroup.Key, bindings.Where(b => ((int)b.Action).Equals(intKey)))
+                {
+                    AllowMainMouseButtons = Ruleset != null,
+                    Defaults = defaultGroup.Select(d => d.KeyCombination)
+                });
             }
 
             Add(new ResetButton
             {
-                Action = () => Children.OfType<RestorableKeyBindingRow>().ForEach(k => k.KeyBindingRow.RestoreDefaults())
+                Action = () => Children.OfType<KeyBindingRow>().ForEach(k => k.RestoreDefaults())
             });
         }
     }
