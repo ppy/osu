@@ -61,8 +61,8 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.ShowOnlineExplicitContent, false);
 
-            Set(OsuSetting.ChatHighlightName, true);
-            Set(OsuSetting.ChatMessageNotification, true);
+            SetDefault(OsuSetting.ChatHighlightName, true);
+            SetDefault(OsuSetting.ChatMessageNotification, true);
 
             // Audio
             SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);

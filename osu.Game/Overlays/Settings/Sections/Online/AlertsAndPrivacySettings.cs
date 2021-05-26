@@ -19,12 +19,12 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 new SettingsCheckbox
                 {
                     LabelText = "Show a notification popup when someone says your name",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ChatHighlightName)
+                    Current = config.GetBindable<bool>(OsuSetting.ChatHighlightName)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Show private message notifications",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ChatMessageNotification)
+                    Current = config.GetBindable<bool>(OsuSetting.ChatMessageNotification)
                 },
             };
         }
