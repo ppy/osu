@@ -23,10 +23,14 @@ namespace osu.Game.Graphics.Containers.Markdown
             LineSpacing = 21;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
+            var api = parent.Get<IAPIProvider>();
+
+            // needs to be set before the base BDL call executes to avoid invalidating any already populated markdown content.
             DocumentUrl = api.WebsiteRootUrl;
+
+            return base.CreateChildDependencies(parent);
         }
 
         protected override void AddMarkdownComponent(IMarkdownObject markdownObject, FillFlowContainer container, int level)
