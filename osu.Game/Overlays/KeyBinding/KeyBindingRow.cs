@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.KeyBinding
         private FillFlowContainer cancelAndClearButtons;
         private FillFlowContainer<KeyButton> buttons;
 
-        public Bindable<bool> IsDefault { get; } = new BindableBool(true);
+        private Bindable<bool> isDefault { get; } = new BindableBool(true);
 
         public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend(text.Text.ToString());
 
@@ -77,8 +77,6 @@ namespace osu.Game.Overlays.KeyBinding
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            updateIsDefaultValue();
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS };
@@ -87,7 +85,7 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 new RestoreDefaultValueButton<bool>
                 {
-                    Current = IsDefault,
+                    Current = isDefault,
                     Action = RestoreDefaults,
                     Origin = Anchor.TopRight,
                 },
@@ -143,19 +141,8 @@ namespace osu.Game.Overlays.KeyBinding
 
             foreach (var b in bindings)
                 buttons.Add(new KeyButton(b));
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            IsDefault.BindValueChanged(isDefault =>
-            {
-                if (isDefault.NewValue)
-                {
-                    finalise();
-                }
-            });
+            updateIsDefaultValue();
         }
 
         public void RestoreDefaults()
@@ -169,7 +156,7 @@ namespace osu.Game.Overlays.KeyBinding
                 store.Update(button.KeyBinding);
             }
 
-            updateIsDefaultValue();
+            isDefault.Value = true;
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -376,7 +363,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         private void updateIsDefaultValue()
         {
-            IsDefault.Value = bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
+            isDefault.Value = bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
         }
 
         private class CancelButton : TriangleButton
