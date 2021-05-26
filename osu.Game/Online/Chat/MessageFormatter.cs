@@ -173,7 +173,7 @@ namespace osu.Game.Online.Chat
                         }
                     }
 
-                    return new LinkDetails(LinkAction.External, null);
+                    return new LinkDetails(LinkAction.External, url);
 
                 case "osu":
                     // every internal link also needs some kind of argument
