@@ -152,7 +152,7 @@ namespace osu.Game.Overlays
                 lastCursor = response.Cursor;
                 sidebar.Metadata.Value = response.SidebarMetadata;
 
-                var listing = new ArticleListing { RequestMorePosts = getMorePosts };
+                var listing = new ArticleListing(getMorePosts);
                 listing.AddPosts(response.NewsPosts, response.Cursor != null);
                 LoadDisplay(listing);
             });
