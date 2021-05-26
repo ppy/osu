@@ -24,7 +24,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.KeyBinding
 {
-    public class KeyBindingRow : Container
+    public class KeyBindingRow : Container, IFilterable
     {
         private readonly object action;
         private readonly IEnumerable<Framework.Input.Bindings.KeyBinding> bindings;
@@ -35,20 +35,40 @@ namespace osu.Game.Overlays.KeyBinding
 
         private const float padding = 5;
 
+        private bool matchingFilter;
+
+        public bool MatchingFilter
+        {
+            get => matchingFilter;
+            set
+            {
+                matchingFilter = value;
+                this.FadeTo(!matchingFilter ? 0 : 1);
+            }
+        }
+
+        private Container content;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            content.ReceivePositionalInputAt(screenSpacePos);
+
+        public bool FilteringActive { get; set; }
+
+        private OsuSpriteText text;
         private FillFlowContainer cancelAndClearButtons;
         private FillFlowContainer<KeyButton> buttons;
 
         public Bindable<bool> IsDefault { get; } = new BindableBool(true);
 
+        public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend(text.Text.ToString());
+
         public KeyBindingRow(object action, IEnumerable<Framework.Input.Bindings.KeyBinding> bindings)
         {
             this.action = action;
             this.bindings = bindings;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-
-            Masking = true;
-            CornerRadius = padding;
         }
 
         [Resolved]
@@ -59,46 +79,65 @@ namespace osu.Game.Overlays.KeyBinding
         {
             updateIsDefaultValue();
 
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Radius = 2,
-                Colour = colours.YellowDark.Opacity(0),
-                Type = EdgeEffectType.Shadow,
-                Hollow = true,
-            };
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+            Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS };
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
-                new Box
+                new RestoreDefaultValueButton<bool>
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.6f,
-                },
-                new OsuSpriteText
-                {
-                    Text = action.GetDescription(),
-                    Margin = new MarginPadding(padding),
-                },
-                buttons = new FillFlowContainer<KeyButton>
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight
-                },
-                cancelAndClearButtons = new FillFlowContainer
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Padding = new MarginPadding(padding) { Top = height + padding * 2 },
-                    Anchor = Anchor.TopRight,
+                    Current = IsDefault,
+                    Action = RestoreDefaults,
                     Origin = Anchor.TopRight,
-                    Alpha = 0,
-                    Spacing = new Vector2(5),
+                },
+                content = new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Masking = true,
+                    CornerRadius = padding,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Radius = 2,
+                        Colour = colours.YellowDark.Opacity(0),
+                        Type = EdgeEffectType.Shadow,
+                        Hollow = true,
+                    },
                     Children = new Drawable[]
                     {
-                        new CancelButton { Action = finalise },
-                        new ClearButton { Action = clear },
-                    },
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black,
+                            Alpha = 0.6f,
+                        },
+                        text = new OsuSpriteText
+                        {
+                            Text = action.GetDescription(),
+                            Margin = new MarginPadding(padding),
+                        },
+                        buttons = new FillFlowContainer<KeyButton>
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight
+                        },
+                        cancelAndClearButtons = new FillFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Padding = new MarginPadding(padding) { Top = height + padding * 2 },
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            Alpha = 0,
+                            Spacing = new Vector2(5),
+                            Children = new Drawable[]
+                            {
+                                new CancelButton { Action = finalise },
+                                new ClearButton { Action = clear },
+                            },
+                        }
+                    }
                 }
             };
 
@@ -135,14 +174,14 @@ namespace osu.Game.Overlays.KeyBinding
 
         protected override bool OnHover(HoverEvent e)
         {
-            FadeEdgeEffectTo(1, transition_time, Easing.OutQuint);
+            content.FadeEdgeEffectTo(1, transition_time, Easing.OutQuint);
 
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            FadeEdgeEffectTo(0, transition_time, Easing.OutQuint);
+            content.FadeEdgeEffectTo(0, transition_time, Easing.OutQuint);
 
             base.OnHoverLost(e);
         }
@@ -307,14 +346,10 @@ namespace osu.Game.Overlays.KeyBinding
             cancelAndClearButtons.BypassAutoSizeAxes |= Axes.Y;
         }
 
-        private void updateIsDefaultValue() => IsDefault.Value = computeIsDefaultValue();
-
-        private bool computeIsDefaultValue() => bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
-
         protected override void OnFocus(FocusEvent e)
         {
-            AutoSizeDuration = 500;
-            AutoSizeEasing = Easing.OutQuint;
+            content.AutoSizeDuration = 500;
+            content.AutoSizeEasing = Easing.OutQuint;
 
             cancelAndClearButtons.FadeIn(300, Easing.OutQuint);
             cancelAndClearButtons.BypassAutoSizeAxes &= ~Axes.Y;
@@ -337,6 +372,11 @@ namespace osu.Game.Overlays.KeyBinding
             if (bindTarget != null) bindTarget.IsBinding = false;
             bindTarget = buttons.FirstOrDefault(b => b.IsHovered) ?? buttons.FirstOrDefault();
             if (bindTarget != null) bindTarget.IsBinding = true;
+        }
+
+        private void updateIsDefaultValue()
+        {
+            IsDefault.Value = bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
         }
 
         private class CancelButton : TriangleButton

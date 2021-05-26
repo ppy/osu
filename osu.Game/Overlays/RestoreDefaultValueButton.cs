@@ -21,6 +21,9 @@ namespace osu.Game.Overlays
 
         private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
 
+        // this is done to ensure a click on this button doesn't trigger focus on a parent element which contains the button.
+        public override bool AcceptsFocus => true;
+
         public Bindable<T> Current
         {
             get => current.Current;
