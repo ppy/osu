@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (Attributes.ApproachRate > 10.33)
                 approachRateFactor += 0.225 * (Attributes.ApproachRate - 10.33);
             else if (Attributes.ApproachRate < 8.0)
-                approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
+                approachRateFactor += 0.05 * (8.0 - Attributes.ApproachRate);
 
             // scale aim with AR, sensitive to object count
             aimValue *= 1.0 + approachRateFactor * (.33 + .66 * Math.Min(1, totalHits / 1000));
@@ -110,12 +110,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(h => h is OsuModFlashlight))
             {
                 // Apply object-based bonus for flashlight.
-                aimValue *= 1.0 + 0.35 * Math.Min(1.0, totalHits / 200.0) +
+                aimValue *= 1.0 + 0.25 * Math.Min(1.0, totalHits / 200.0) +
                             (totalHits > 200
                                 ? 0.3 * Math.Min(1.0, (totalHits - 200) / 300.0) +
                                   (totalHits > 500 ? (totalHits - 500) / 1200.0 : 0.0)
                                 : 0.0);
             }
+
+            if (mods.Any(h => h is OsuModFlashlight) && (mods.Any(h => h is OsuModHidden)))
+                aimValue *= 1.2;
 
             // Scale the aim value with accuracy _slightly_
             aimValue *= 0.5 + accuracy / 2.0;
@@ -132,8 +135,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
                 approachRateFactor += 0.225 * (Attributes.ApproachRate - 10.33);
-            else if (Attributes.ApproachRate < 8.0)
-                approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
 
             // scale speed sensitive to AR, without respect to object count.
             speedValue *= 1.0 + approachRateFactor;
