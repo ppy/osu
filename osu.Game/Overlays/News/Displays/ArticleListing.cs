@@ -19,10 +19,17 @@ namespace osu.Game.Overlays.News.Displays
     /// </summary>
     public class ArticleListing : CompositeDrawable
     {
-        public Action RequestMorePosts;
+        private readonly Action fetchMorePosts;
 
         private FillFlowContainer content;
         private ShowMoreButton showMore;
+
+        private CancellationTokenSource cancellationToken;
+
+        public ArticleListing(Action fetchMorePosts)
+        {
+            this.fetchMorePosts = fetchMorePosts;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -59,7 +66,7 @@ namespace osu.Game.Overlays.News.Displays
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Margin = new MarginPadding { Top = 15 },
-                        Action = RequestMorePosts,
+                        Action = fetchMorePosts,
                         Alpha = 0
                     }
                 }
@@ -74,8 +81,6 @@ namespace osu.Game.Overlays.News.Displays
                 showMore.Alpha = morePostsAvailable ? 1 : 0;
             }, (cancellationToken = new CancellationTokenSource()).Token)
         );
-
-        private CancellationTokenSource cancellationToken;
 
         protected override void Dispose(bool isDisposing)
         {
