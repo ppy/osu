@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.KeyBinding
@@ -13,7 +14,7 @@ namespace osu.Game.Overlays.KeyBinding
     public class RestorableKeyBindingRow : Container, IFilterable
     {
         private readonly object key;
-        private readonly ICollection<Input.Bindings.DatabasedKeyBinding> bindings;
+        private readonly ICollection<DatabasedKeyBinding> bindings;
         public readonly KeyBindingRow KeyBindingRow;
 
         private bool matchingFilter;
@@ -32,7 +33,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend(key.ToString());
 
-        public RestorableKeyBindingRow(object key, ICollection<Input.Bindings.DatabasedKeyBinding> bindings, RulesetInfo ruleset, IEnumerable<KeyCombination> defaults)
+        public RestorableKeyBindingRow(object key, ICollection<DatabasedKeyBinding> bindings, RulesetInfo ruleset, IEnumerable<KeyCombination> defaults)
         {
             this.key = key;
             this.bindings = bindings;
