@@ -34,12 +34,14 @@ namespace osu.Game.Overlays.News.Displays
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
             Padding = new MarginPadding
             {
                 Vertical = 20,
                 Left = 30,
                 Right = 50
             };
+
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -61,10 +63,7 @@ namespace osu.Game.Overlays.News.Displays
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Margin = new MarginPadding
-                        {
-                            Top = 15
-                        },
+                        Margin = new MarginPadding { Top = 15 },
                         Action = RequestMorePosts,
                         Alpha = 0
                     }
