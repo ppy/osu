@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             rng = new Random((int)Seed.Value);
 
-            RandomObjectInfo prevObjectInfo = null;
+            RandomObjectInfo previous = null;
 
             float rateOfChangeMultiplier = 0;
 
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 var hitObject = hitObjects[i];
 
-                var currentObjectInfo = new RandomObjectInfo(hitObject);
+                var current = new RandomObjectInfo(hitObject);
 
                 // rateOfChangeMultiplier only changes every i iterations to prevent shaky-line-shaped streams
                 if (i % 3 == 0)
@@ -76,27 +76,27 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 if (hitObject is Spinner)
                 {
-                    prevObjectInfo = null;
+                    previous = null;
                     continue;
                 }
 
-                applyRandomisation(rateOfChangeMultiplier, prevObjectInfo, currentObjectInfo);
+                applyRandomisation(rateOfChangeMultiplier, previous, current);
 
-                hitObject.Position = currentObjectInfo.PositionRandomised;
+                hitObject.Position = current.PositionRandomised;
 
                 // update end position as it may have changed as a result of the position update.
-                currentObjectInfo.EndPositionRandomised = currentObjectInfo.PositionRandomised;
+                current.EndPositionRandomised = current.PositionRandomised;
 
                 switch (hitObject)
                 {
                     case Slider slider:
-                        shiftNestedObjects(slider, Vector2.Subtract(slider.Position, currentObjectInfo.PositionOriginal));
-                        moveSliderIntoPlayfield(slider, currentObjectInfo);
+                        shiftNestedObjects(slider, Vector2.Subtract(slider.Position, current.PositionOriginal));
+                        moveSliderIntoPlayfield(slider, current);
 
                         break;
                 }
 
-                prevObjectInfo = currentObjectInfo;
+                previous = current;
             }
         }
 
