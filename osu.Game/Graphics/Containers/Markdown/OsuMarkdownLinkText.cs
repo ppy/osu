@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.Containers.Markdown
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             var textDrawable = CreateSpriteText().With(t => t.Text = text);
 
