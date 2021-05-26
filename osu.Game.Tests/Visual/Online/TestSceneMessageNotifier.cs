@@ -16,7 +16,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneMessageNotifier : ManualInputManagerTestScene
+    public class TestSceneMessageNotifier : OsuManualInputManagerTestScene
     {
         private User friend;
         private Channel publicChannel;
