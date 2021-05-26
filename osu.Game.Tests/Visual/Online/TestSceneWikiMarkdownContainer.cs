@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers.Markdown;
-using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Wiki.Markdown;
 
