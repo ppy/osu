@@ -34,9 +34,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestExitSongSelectWithEscape()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
             pushEscape();
@@ -51,9 +51,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestOpenModSelectOverlayUsingAction()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
             AddStep("Show mods overlay", () => InputManager.Key(Key.F1));
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
         }
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             Player player = null;
 
-            PushAndConfirm(() => new TestSongSelect());
+            PushAndConfirm(() => new TestPlaySongSelect());
 
             AddStep("import beatmap", () => ImportBeatmapTest.LoadQuickOszIntoOsu(Game).Wait());
 
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             WorkingBeatmap beatmap() => Game.Beatmap.Value;
 
-            PushAndConfirm(() => new TestSongSelect());
+            PushAndConfirm(() => new TestPlaySongSelect());
 
             AddStep("import beatmap", () => ImportBeatmapTest.LoadQuickOszIntoOsu(Game).Wait());
 
@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             WorkingBeatmap beatmap() => Game.Beatmap.Value;
 
-            PushAndConfirm(() => new TestSongSelect());
+            PushAndConfirm(() => new TestPlaySongSelect());
 
             AddStep("import beatmap", () => ImportBeatmapTest.LoadOszIntoOsu(Game, virtualTrack: true).Wait());
 
@@ -139,9 +139,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestMenuMakesMusic()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
 
             AddUntilStep("wait for no track", () => Game.MusicController.CurrentTrack.IsDummyDevice);
 
@@ -153,9 +153,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestExitSongSelectWithClick()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
             AddStep("Move mouse to backButton", () => InputManager.MoveMouseTo(backButtonPosition));
@@ -213,9 +213,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestModSelectInput()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
 
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
 
@@ -234,9 +234,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestBeatmapOptionsInput()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
 
             AddStep("Show options overlay", () => songSelect.BeatmapOptionsOverlay.Show());
 
@@ -312,11 +312,13 @@ namespace osu.Game.Tests.Visual.Navigation
             ConfirmAtMainMenu();
         }
 
-        private class TestSongSelect : PlaySongSelect
+        public class TestPlaySongSelect : PlaySongSelect
         {
             public ModSelectOverlay ModSelectOverlay => ModSelect;
 
             public BeatmapOptionsOverlay BeatmapOptionsOverlay => BeatmapOptions;
+
+            protected override bool DisplayStableImportPrompt => false;
         }
     }
 }

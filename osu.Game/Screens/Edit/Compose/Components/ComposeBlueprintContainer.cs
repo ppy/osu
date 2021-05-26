@@ -61,6 +61,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             inputManager = GetContainingInputManager();
 
+            Beatmap.HitObjectAdded += hitObjectAdded;
+
             // updates to selected are handled for us by SelectionHandler.
             NewCombo.BindTo(SelectionHandler.SelectionNewComboState);
 
@@ -72,6 +74,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 kvp.Value.BindValueChanged(_ => updatePlacementSamples());
             }
+        }
+
+        protected override void TransferBlueprintFor(HitObject hitObject, DrawableHitObject drawableObject)
+        {
+            base.TransferBlueprintFor(hitObject, drawableObject);
+
+            var blueprint = (HitObjectSelectionBlueprint)GetBlueprintFor(hitObject);
+            blueprint.DrawableObject = drawableObject;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -246,15 +256,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (drawable == null)
                 return null;
 
-            return CreateBlueprintFor(drawable);
+            return CreateHitObjectBlueprintFor(item).With(b => b.DrawableObject = drawable);
         }
 
-        public virtual OverlaySelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject) => null;
+        public virtual HitObjectSelectionBlueprint CreateHitObjectBlueprintFor(HitObject hitObject) => null;
 
-        protected override void OnBlueprintAdded(HitObject item)
+        private void hitObjectAdded(HitObject obj)
         {
-            base.OnBlueprintAdded(item);
-
+            // refresh the tool to handle the case of placement completing.
             refreshTool();
 
             // on successful placement, the new combo button should be reset as this is the most common user interaction.

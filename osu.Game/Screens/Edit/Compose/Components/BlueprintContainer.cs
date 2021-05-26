@@ -299,6 +299,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
         }
 
+        /// <summary>
+        /// Retrieves an item's blueprint.
+        /// </summary>
+        /// <param name="item">The item to retrieve the blueprint of.</param>
+        /// <returns>The blueprint.</returns>
+        protected SelectionBlueprint<T> GetBlueprintFor(T item) => blueprintMap[item];
+
         #endregion
 
         #region Selection
