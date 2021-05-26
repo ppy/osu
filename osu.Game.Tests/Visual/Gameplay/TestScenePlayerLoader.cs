@@ -184,10 +184,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("load slow dummy beatmap", () =>
             {
                 prepareBeatmap();
-                LoadScreen(loader = new TestPlayerLoader(() => slowPlayer = new SlowLoadPlayer(false, false)));
+                slowPlayer = new SlowLoadPlayer(false, false);
+                LoadScreen(loader = new TestPlayerLoader(() => slowPlayer));
             });
 
-            AddUntilStep("wait for slow player to be instantiated", () => slowPlayer != null);
             AddStep("schedule slow load", () => Scheduler.AddDelayed(() => slowPlayer.AllowLoad.Set(), 5000));
 
             AddUntilStep("wait for player to be current", () => slowPlayer.IsCurrentScreen());
