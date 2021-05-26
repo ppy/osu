@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         internal JudgementResult Result;
 
-        private readonly IBindable<double> startTimeBindable = new BindableDouble();
+        public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
 
         /// <summary>
         /// Creates a new <see cref="HitObjectLifetimeEntry"/>.
@@ -34,8 +34,8 @@ namespace osu.Game.Rulesets.Objects
         {
             HitObject = hitObject;
 
-            startTimeBindable.BindTo(HitObject.StartTimeBindable);
-            startTimeBindable.BindValueChanged(onStartTimeChanged, true);
+            StartTimeBindable.BindTo(HitObject.StartTimeBindable);
+            StartTimeBindable.BindValueChanged(onStartTimeChanged, true);
         }
 
         // The lifetime, as set by the hitobject.

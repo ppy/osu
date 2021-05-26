@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         internal double FutureLifetimeExtension { get; set; }
 
-        private readonly Dictionary<DrawableHitObject, IBindable> startTimeMap = new Dictionary<DrawableHitObject, IBindable>();
+        private readonly Dictionary<HitObjectLifetimeEntry, IBindable> startTimeMap = new Dictionary<HitObjectLifetimeEntry, IBindable>();
 
         private readonly Dictionary<HitObjectLifetimeEntry, DrawableHitObject> aliveDrawableMap = new Dictionary<HitObjectLifetimeEntry, DrawableHitObject>();
         private readonly Dictionary<HitObjectLifetimeEntry, DrawableHitObject> nonPooledDrawableMap = new Dictionary<HitObjectLifetimeEntry, DrawableHitObject>();
@@ -101,6 +101,7 @@ namespace osu.Game.Rulesets.UI
 
         public void Add(HitObjectLifetimeEntry entry)
         {
+            bindStartTime(entry);
             allEntries.Add(entry);
             lifetimeManager.AddEntry(entry);
         }
@@ -114,6 +115,7 @@ namespace osu.Game.Rulesets.UI
                 removeDrawable(drawable);
 
             allEntries.Remove(entry);
+            unbindStartTime(entry);
             return true;
         }
 
@@ -160,7 +162,6 @@ namespace osu.Game.Rulesets.UI
             drawable.OnNewResult += onNewResult;
             drawable.OnRevertResult += onRevertResult;
 
-            bindStartTime(drawable);
             AddInternal(drawable);
         }
 
@@ -168,8 +169,6 @@ namespace osu.Game.Rulesets.UI
         {
             drawable.OnNewResult -= onNewResult;
             drawable.OnRevertResult -= onRevertResult;
-
-            unbindStartTime(drawable);
 
             RemoveInternal(drawable);
         }
@@ -251,9 +250,9 @@ namespace osu.Game.Rulesets.UI
 
         #region Comparator + StartTime tracking
 
-        private void bindStartTime(DrawableHitObject hitObject)
+        private void bindStartTime(HitObjectLifetimeEntry entry)
         {
-            var bindable = hitObject.StartTimeBindable.GetBoundCopy();
+            var bindable = entry.StartTimeBindable.GetBoundCopy();
 
             bindable.BindValueChanged(_ =>
             {
@@ -261,13 +260,13 @@ namespace osu.Game.Rulesets.UI
                     SortInternal();
             });
 
-            startTimeMap[hitObject] = bindable;
+            startTimeMap[entry] = bindable;
         }
 
-        private void unbindStartTime(DrawableHitObject hitObject)
+        private void unbindStartTime(HitObjectLifetimeEntry entry)
         {
-            startTimeMap[hitObject].UnbindAll();
-            startTimeMap.Remove(hitObject);
+            startTimeMap[entry].UnbindAll();
+            startTimeMap.Remove(entry);
         }
 
         private void unbindAllStartTimes()
