@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Rulesets.Judgements;
@@ -23,6 +24,11 @@ namespace osu.Game.Rulesets.Objects
         /// This is set by the accompanying <see cref="DrawableHitObject"/>, and reused when required for rewinding.
         /// </summary>
         internal JudgementResult Result;
+
+        /// <summary>
+        /// Invoked when the start time of <see cref="HitObject"/> is changed.
+        /// </summary>
+        public event Action<HitObjectLifetimeEntry> StartTimeChanged;
 
         public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
 
@@ -91,6 +97,10 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Resets <see cref="LifetimeEntry.LifetimeStart"/> according to the change in start time of the <see cref="HitObject"/>.
         /// </summary>
-        private void onStartTimeChanged(ValueChangedEvent<double> startTime) => LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
+        private void onStartTimeChanged(ValueChangedEvent<double> startTime)
+        {
+            LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
+            StartTimeChanged?.Invoke(this);
+        }
     }
 }

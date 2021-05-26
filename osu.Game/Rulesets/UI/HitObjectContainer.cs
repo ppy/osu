@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -69,8 +68,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         internal double FutureLifetimeExtension { get; set; }
 
-        private readonly Dictionary<HitObjectLifetimeEntry, IBindable> startTimeMap = new Dictionary<HitObjectLifetimeEntry, IBindable>();
-
         private readonly Dictionary<HitObjectLifetimeEntry, DrawableHitObject> aliveDrawableMap = new Dictionary<HitObjectLifetimeEntry, DrawableHitObject>();
         private readonly Dictionary<HitObjectLifetimeEntry, DrawableHitObject> nonPooledDrawableMap = new Dictionary<HitObjectLifetimeEntry, DrawableHitObject>();
 
@@ -101,7 +98,7 @@ namespace osu.Game.Rulesets.UI
 
         public void Add(HitObjectLifetimeEntry entry)
         {
-            bindStartTime(entry);
+            entry.StartTimeChanged += onStartTimeChanged;
             allEntries.Add(entry);
             lifetimeManager.AddEntry(entry);
         }
@@ -115,7 +112,7 @@ namespace osu.Game.Rulesets.UI
                 removeDrawable(drawable);
 
             allEntries.Remove(entry);
-            unbindStartTime(entry);
+            entry.StartTimeChanged -= onStartTimeChanged;
             return true;
         }
 
@@ -231,11 +228,11 @@ namespace osu.Game.Rulesets.UI
 
         public virtual void Clear()
         {
-            lifetimeManager.ClearEntries();
-            foreach (var drawable in nonPooledDrawableMap.Values)
-                removeDrawable(drawable);
-            nonPooledDrawableMap.Clear();
-            Debug.Assert(InternalChildren.Count == 0 && startTimeMap.Count == 0 && aliveDrawableMap.Count == 0, "All hit objects should have been removed");
+            foreach (var entry in Entries.ToArray())
+                Remove(entry);
+
+            Debug.Assert(aliveDrawableMap.Count == 0, "No alive objects remain");
+            Debug.Assert(allEntries.Count == 0, "No entries remain");
         }
 
         protected override bool CheckChildrenLife()
@@ -250,30 +247,10 @@ namespace osu.Game.Rulesets.UI
 
         #region Comparator + StartTime tracking
 
-        private void bindStartTime(HitObjectLifetimeEntry entry)
+        private void onStartTimeChanged(HitObjectLifetimeEntry entry)
         {
-            var bindable = entry.StartTimeBindable.GetBoundCopy();
-
-            bindable.BindValueChanged(_ =>
-            {
-                if (LoadState >= LoadState.Ready)
-                    SortInternal();
-            });
-
-            startTimeMap[entry] = bindable;
-        }
-
-        private void unbindStartTime(HitObjectLifetimeEntry entry)
-        {
-            startTimeMap[entry].UnbindAll();
-            startTimeMap.Remove(entry);
-        }
-
-        private void unbindAllStartTimes()
-        {
-            foreach (var kvp in startTimeMap)
-                kvp.Value.UnbindAll();
-            startTimeMap.Clear();
+            if (LoadState >= LoadState.Ready)
+                SortInternal();
         }
 
         protected override int Compare(Drawable x, Drawable y)
@@ -287,11 +264,5 @@ namespace osu.Game.Rulesets.UI
         }
 
         #endregion
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            unbindAllStartTimes();
-        }
     }
 }
