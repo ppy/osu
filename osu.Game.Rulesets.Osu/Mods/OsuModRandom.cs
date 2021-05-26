@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
 
+        private Random rng;
+
         [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(OsuModRandomSettingsControl))]
         public Bindable<int?> Seed { get; } = new Bindable<int?>
         {
@@ -56,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             Seed.Value ??= RNG.Next();
 
-            var rng = new Random((int)Seed.Value);
+            rng = new Random((int)Seed.Value);
 
             RandomObjectInfo prevObjectInfo = null;
 
@@ -83,9 +85,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     continue;
                 }
 
-                applyRandomisation(
-                    rng,
-                    rateOfChangeMultiplier,
+                applyRandomisation(rateOfChangeMultiplier,
                     prevObjectInfo,
                     distanceToPrev,
                     currentObjectInfo
