@@ -21,7 +21,7 @@ namespace osu.Game.Overlays
         private readonly NewsSidebar sidebar;
         private readonly Container content;
 
-        private GetNewsRequest lastRequest;
+        private GetNewsRequest request;
 
         private Cursor lastCursor;
 
@@ -139,66 +139,64 @@ namespace osu.Game.Overlays
 
         private void loadListing(int? year = null)
         {
-            beginLoading();
-
             Header.SetFrontPage();
 
             displayedYear = year;
             lastCursor = null;
 
-            performListingRequest(response =>
+            beginLoading(true);
+
+            request = new GetNewsRequest(displayedYear);
+            request.Success += response => Schedule(() =>
             {
+                lastCursor = response.Cursor;
                 sidebar.Metadata.Value = response.SidebarMetadata;
 
-                var listing = new ArticleListing(response);
-                listing.RequestMorePosts += getMorePosts;
-
-                LoadDisplay(listing);
+                LoadDisplay(new ArticleListing(response)
+                {
+                    RequestMorePosts = getMorePosts
+                });
             });
-        }
 
-        private void loadArticle(string article)
-        {
-            beginLoading();
-
-            Header.SetArticle(article);
-
-            // Temporary, should be handled by ArticleDisplay later
-            LoadDisplay(Empty());
+            API.PerformAsync(request);
         }
 
         private void getMorePosts()
         {
-            lastRequest?.Cancel();
-            performListingRequest(response =>
+            beginLoading(false);
+
+            request = new GetNewsRequest(displayedYear, lastCursor);
+            request.Success += response => Schedule(() =>
             {
+                lastCursor = response.Cursor;
                 if (content.Child is ArticleListing listing)
                     listing.AddPosts(response);
             });
+
+            API.PerformAsync(request);
         }
 
-        private void performListingRequest(Action<GetNewsResponse> onSuccess)
+        private void loadArticle(string article)
         {
-            lastRequest = new GetNewsRequest(displayedYear, lastCursor);
-            lastRequest.Success += response => Schedule(() =>
-            {
-                lastCursor = response.Cursor;
-                onSuccess?.Invoke(response);
-            });
+            // This is not yet implemented nor called from anywhere.
+            beginLoading(true);
 
-            API.PerformAsync(lastRequest);
+            Header.SetArticle(article);
+            LoadDisplay(Empty());
         }
 
-        private void beginLoading()
+        private void beginLoading(bool showLoadingOverlay)
         {
-            lastRequest?.Cancel();
+            request?.Cancel();
             cancellationToken?.Cancel();
-            Loading.Show();
+
+            if (showLoadingOverlay)
+                Loading.Show();
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            lastRequest?.Cancel();
+            request?.Cancel();
             cancellationToken?.Cancel();
             base.Dispose(isDisposing);
         }
