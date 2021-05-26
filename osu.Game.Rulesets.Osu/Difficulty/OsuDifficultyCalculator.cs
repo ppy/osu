@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
         private const double difficulty_multiplier = 0.18;
-        private const double display_difficulty_multiplier = 2.8;
+        private const double display_difficulty_multiplier = 0.605;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -46,8 +46,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedRating = Math.Pow(skills[1].DifficultyValue(), .75) * difficulty_multiplier;
 
             // Calculate total star rating
-            double displayAimRating = Math.Sqrt((skills[0] as OsuSkill).CalculateDisplayDifficultyValue()) * display_difficulty_multiplier;
-            double displaySpeedRating = Math.Sqrt((skills[1] as OsuSkill).CalculateDisplayDifficultyValue()) * display_difficulty_multiplier;
+            double displayAimRating = Math.Pow((skills[0] as OsuSkill).CalculateDisplayDifficultyValue(), .75) * display_difficulty_multiplier;
+            double displaySpeedRating = Math.Pow((skills[1] as OsuSkill).CalculateDisplayDifficultyValue(), .75) * display_difficulty_multiplier;
 
             double displayAimPerformance = Math.Pow(5.0 * Math.Max(1.0, displayAimRating) - 4.0, 3.0) / 100000.0;
             double displaySpeedPerformance = Math.Pow(5.0 * Math.Max(1.0, displaySpeedRating) - 4.0, 3.0) / 100000.0;
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                 Math.Pow(displaySpeedPerformance, 1.1), 1.0/1.1
                                 );
 
-            double starRating = 0.027 * (Math.Pow(100000.0 / Math.Pow(2.0, 1.0 / 1.1) * totalpp, 0.33) + 4.0);
+            double starRating = 0.027 * (Math.Cbrt(100000.0 / Math.Pow(2.0, 1.0 / 1.1) * totalpp) + 4.0);
 
             int maxCombo = beatmap.HitObjects.Count;
             // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
