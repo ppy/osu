@@ -90,12 +90,15 @@ namespace osu.Game.Rulesets.Osu.Mods
                 switch (hitObject)
                 {
                     case Slider slider:
+                        // Shift nested objects the same distance as the slider got shifted in the randomisation process
+                        // so that moveSliderIntoPlayfield() can determine their relative distances to slider.Position and thus minMargin
                         shiftNestedObjects(slider, Vector2.Subtract(slider.Position, current.PositionOriginal));
 
                         var oldPos = new Vector2(slider.Position.X, slider.Position.Y);
 
                         moveSliderIntoPlayfield(slider, current);
 
+                        // Shift them again to move them to their final position after the slider got moved into the playfield
                         shiftNestedObjects(slider, Vector2.Subtract(slider.Position, oldPos));
 
                         break;
