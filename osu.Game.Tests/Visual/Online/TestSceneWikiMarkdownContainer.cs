@@ -106,7 +106,7 @@ needs_cleanup: true
         {
             AddStep("Add absolute image", () =>
             {
-                markdownContainer.DocumentUrl = "https://osu.ppy.sh";
+                markdownContainer.DocumentUrl = "https://dev.ppy.sh";
                 markdownContainer.Text = "![intro](/wiki/Interface/img/intro-screen.jpg)";
             });
         }
@@ -116,7 +116,7 @@ needs_cleanup: true
         {
             AddStep("Add relative image", () =>
             {
-                markdownContainer.DocumentUrl = "https://osu.ppy.sh";
+                markdownContainer.DocumentUrl = "https://dev.ppy.sh";
                 markdownContainer.CurrentPath = "Interface/";
                 markdownContainer.Text = "![intro](img/intro-screen.jpg)";
             });
@@ -127,7 +127,7 @@ needs_cleanup: true
         {
             AddStep("Add paragraph with block image", () =>
             {
-                markdownContainer.DocumentUrl = "https://osu.ppy.sh";
+                markdownContainer.DocumentUrl = "https://dev.ppy.sh";
                 markdownContainer.CurrentPath = "Interface/";
                 markdownContainer.Text = @"Line before image
 
@@ -142,7 +142,7 @@ Line after image";
         {
             AddStep("Add inline image", () =>
             {
-                markdownContainer.DocumentUrl = "https://osu.ppy.sh";
+                markdownContainer.DocumentUrl = "https://dev.ppy.sh";
                 markdownContainer.Text = "![osu! mode icon](/wiki/shared/mode/osu.png) osu!";
             });
         }
