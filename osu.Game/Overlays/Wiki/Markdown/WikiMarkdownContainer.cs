@@ -23,12 +23,10 @@ namespace osu.Game.Overlays.Wiki.Markdown
             {
                 case YamlFrontMatterBlock yamlFrontMatterBlock:
                     container.Add(CreateNotice(yamlFrontMatterBlock));
-                    break;
-
-                default:
-                    base.AddMarkdownComponent(markdownObject, container, level);
-                    break;
+                    return;
             }
+
+            base.AddMarkdownComponent(markdownObject, container, level);
         }
 
         public override MarkdownTextFlowContainer CreateTextFlow() => new WikiMarkdownTextFlowContainer();
