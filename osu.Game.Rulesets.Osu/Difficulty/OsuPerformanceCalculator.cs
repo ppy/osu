@@ -96,12 +96,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor += 0.25 * (Attributes.ApproachRate - 10.33);
+                approachRateFactor += 0.2 * (Attributes.ApproachRate - 10.33);
             else if (Attributes.ApproachRate < 8.0)
                 approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
 
             // scale aim with AR, sensitive to object count
-            aimValue *= 1.0 + Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
+            aimValue *= 1.0 + approachRateFactor;
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(h => h is OsuModHidden))
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor += 0.25 * (Attributes.ApproachRate - 10.33);
+                approachRateFactor += 0.2 * (Attributes.ApproachRate - 10.33);
             else if (Attributes.ApproachRate < 8.0)
                 approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
 

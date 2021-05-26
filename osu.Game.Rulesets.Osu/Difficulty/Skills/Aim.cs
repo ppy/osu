@@ -22,10 +22,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double baseDecay => 0.75;
 
         private double currStrain = 1;
-        private double fittsSnapConstant = 3.75;
+        private double fittsSnapConstant = 2.5;
 
         // Global Constants for the different types of aim.
-        private double snapStrainMultiplier = 10;
+        private double snapStrainMultiplier = 13.75;
         private double flowStrainMultiplier = 16.25;
         private double hybridStrainMultiplier = 8.25;
         private double sliderStrainMultiplier = 75;
@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double strain = currDistance
                             + angleAdjustment * osuCurrObj.SnapProbability * osuPrevObj.SnapProbability;
 
-            strain *= Math.Min(osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 20) , osuPrevObj.StrainTime / (osuPrevObj.StrainTime - 20));
+            // strain *= Math.Min(osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 20) , osuPrevObj.StrainTime / (osuPrevObj.StrainTime - 20));
             // buff high BPM slightly.
 
             return strain;

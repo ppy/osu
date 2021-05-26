@@ -95,6 +95,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         private double skillLevel(double probability, double difficulty) => difficulty * Math.Pow(-Math.Log(probability), -1 / difficultyExponent);
 
+        // A implementation to not overbuff length with a long map. Longer maps = more retries.
+        private double expectedTargetTime(double totalDifficulty)
+        {
+            double targetTime = 0;
+
+            for (int i=1;i<strains.Count;i++)
+            {
+                targetTime += Math.Min(2000, times[i] - times[i-1]) * (strains[i] / totalDifficulty);
+            }
+
+            Console.WriteLine(targetTime / 1000 / 60);
+
+            return targetTime;
+        }
+
         private double expectedFcTime(double skill)
         {
             double last_timestamp = times[0]-5; // time taken to retry map
@@ -116,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double fcTimeSkillLevel(double totalDifficulty)
         {
             double lengthEstimate = 0.4 * (times[times.Count - 1] - times[0]);
-            target_fc_time += 300000 * (Math.Max(0, (times[times.Count - 1] - times[0]) - 180000) / 30000);
+            target_fc_time += 45 * Math.Max(0, expectedTargetTime(totalDifficulty) - 60000);
             // for every 30 seconds past 3 mins, add 5 mins to estimated time to FC. ^
             double fcProb = lengthEstimate / target_fc_time;
             double skill = skillLevel(fcProb, totalDifficulty);
