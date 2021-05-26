@@ -280,13 +280,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private struct RandomObjectInfo
         {
-            internal float AngleRad { get; set; }
+            public float AngleRad { get; set; }
 
-            internal Vector2 PositionOriginal { get; }
-            internal Vector2 PositionRandomised { get; set; }
+            public Vector2 PositionOriginal { get; }
+            public Vector2 PositionRandomised { get; set; }
 
-            internal Vector2 EndPositionOriginal { get; }
-            internal Vector2 EndPositionRandomised { get; set; }
+            public Vector2 EndPositionOriginal { get; }
+            public Vector2 EndPositionRandomised { get; set; }
 
             public RandomObjectInfo(OsuHitObject hitObject)
             {
