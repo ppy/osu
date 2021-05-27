@@ -399,9 +399,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void updateTrailVisibility() => trails.DisplayTrail = Dashing || HyperDashing;
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected override void SkinChanged(ISkinSource skin)
         {
-            base.SkinChanged(skin, allowFallback);
+            base.SkinChanged(skin);
 
             hyperDashColour =
                 skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??
