@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -68,6 +69,8 @@ namespace osu.Game.Overlays.Wiki
         private IEnumerable<Drawable[]> createPanels(HtmlDocument html)
         {
             var panelsNode = html.DocumentNode.SelectNodes("//div[contains(@class, 'wiki-main-page-panel')]").ToArray();
+
+            Debug.Assert(panelsNode.Length > 1);
 
             var i = 0;
 
