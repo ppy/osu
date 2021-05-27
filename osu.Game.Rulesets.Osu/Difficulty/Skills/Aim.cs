@@ -22,11 +22,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double baseDecay => 0.75;
 
         private double currStrain = 1;
-        private double distanceConstant = 2.5;
+        private double distanceConstant = 3.5;
 
         // Global Constants for the different types of aim.
-        private double snapStrainMultiplier = 24.5;
-        private double flowStrainMultiplier = 23.75;
+        private double snapStrainMultiplier = 23.727;
+        private double flowStrainMultiplier = 24.727;
         private double sliderStrainMultiplier = 75;
         private double totalStrainMultiplier = .1675;
 
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double momentumChange = Math.Sqrt(Math.Abs(currVector.Length - prevVector.Length) * Math.Min(currVector.Length, prevVector.Length));
 
             strain = osuCurrObj.FlowProbability * (observedDistance.Length
-                                                    + momentumChange
+                                                    + momentumChange * (0.5 + 0.5 * osuPrevObj.FlowProbability)
                                                     + angularMomentumChange * osuPrevObj.FlowProbability);
 
             strain *= Math.Min(osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 20) , osuPrevObj.StrainTime / (osuPrevObj.StrainTime - 20));
@@ -81,9 +81,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             double strain = 0;
 
+            currVector = Vector2.Multiply(currVector, (float)snapScaling(osuCurrObj.JumpDistance / 100));
+            prevVector = Vector2.Multiply(prevVector, (float)snapScaling(osuPrevObj.JumpDistance / 100));
+
             var observedDistance = Vector2.Add(currVector, Vector2.Multiply(prevVector, (float)(0.35)));
 
-            strain = (observedDistance.Length * snapScaling((observedDistance.Length * osuCurrObj.StrainTime) / 100)) * osuCurrObj.SnapProbability;
+            strain = observedDistance.Length * osuCurrObj.SnapProbability;
 
             strain *= Math.Min(osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 20) , osuPrevObj.StrainTime / (osuPrevObj.StrainTime - 20));
             // buff high BPM slightly.

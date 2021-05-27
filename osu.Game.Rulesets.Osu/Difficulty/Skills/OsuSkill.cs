@@ -152,8 +152,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double fcTimeSkillLevel(double totalDifficulty)
         {
             double lengthEstimate = 0.4 * (times[times.Count - 1] - times[0]);
-            target_fc_time += 30 * Math.Max(0, expectedTargetTime(totalDifficulty) - 60000);
-            // for every minute of straining time past 1 minute, add 30 mins to estimated time to FC.
+            target_fc_time += 45 * Math.Max(0, expectedTargetTime(totalDifficulty) - 60000);
+            // for every minute of straining time past 1 minute, add 45 mins to estimated time to FC.
             double fcProb = lengthEstimate / target_fc_time;
             double skill = skillLevel(fcProb, totalDifficulty);
             for (int i=0; i<5; ++i)

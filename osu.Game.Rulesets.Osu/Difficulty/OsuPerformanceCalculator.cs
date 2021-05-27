@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
-                aimValue *= Math.Pow((Math.Tan(Math.PI / 4 * (2 * (scoreMaxCombo / (double)Attributes.MaxCombo) - 1)) + 1) / 2, .8);
+                aimValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)

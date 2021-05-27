@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double strainValue = .25;
 
-            double avgDeltaTime = (osuCurrent.StrainTime + ((OsuDifficultyHitObject)Previous[0]).StrainTime) / 2;
+            double avgDeltaTime = (osuCurrent.StrainTime + Math.Max(50, Previous[0].DeltaTime)) / 2;
 
             double rhythmComplexity = calculateRhythmDifficulty(); // equals 1 with no rhythm difficulty, otherwise scales with a sqrt
 
@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain += (1 + 0.75 * osuCurrent.SnapProbability) * strainValue * strainMultiplier;
 
             return Math.Min((1 / (1 - baseDecay)) * strainValue * strainMultiplier, // prevent over buffing strain past death stream level
-                            currentStrain * (Previous.Count / HistoryLength) * rhythmComplexity);
+                            currentStrain * rhythmComplexity);
         }
     }
 }
