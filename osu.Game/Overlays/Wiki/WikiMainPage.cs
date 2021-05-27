@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Wiki
 
         private Container createBlurb(HtmlDocument html)
         {
-            var blurbNode = html.DocumentNode.SelectNodes("//div[contains(@class, 'wiki-main-page__blurb')]").First();
+            var blurbNode = html.DocumentNode.SelectSingleNode("//div[contains(@class, 'wiki-main-page__blurb')]");
 
             return new Container
             {
