@@ -407,37 +407,5 @@ namespace osu.Game
 
             contextFactory.FlushConnections();
         }
-
-        private class OsuUserInputManager : UserInputManager
-        {
-            protected override MouseButtonEventManager CreateButtonEventManagerFor(MouseButton button)
-            {
-                switch (button)
-                {
-                    case MouseButton.Right:
-                        return new RightMouseManager(button);
-                }
-
-                return base.CreateButtonEventManagerFor(button);
-            }
-
-            private class RightMouseManager : MouseButtonEventManager
-            {
-                public RightMouseManager(MouseButton button)
-                    : base(button)
-                {
-                }
-
-                public override bool EnableDrag => true; // allow right-mouse dragging for absolute scroll in scroll containers.
-                public override bool EnableClick => false;
-                public override bool ChangeFocusOnClick => false;
-            }
-        }
-
-        public void Migrate(string path)
-        {
-            contextFactory.FlushConnections();
-            (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
-        }
     }
 }
