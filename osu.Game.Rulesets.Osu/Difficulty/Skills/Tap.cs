@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double singleStrain = 1;
 
         // Global Tap Strain Multiplier.
-        private double singleMultiplier = 2.675;
+        private double singleMultiplier = 2.375;
         private double strainMultiplier = 2.725;
         private double rhythmMultiplier = 1;
 
