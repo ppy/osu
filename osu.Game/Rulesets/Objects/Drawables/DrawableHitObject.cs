@@ -699,10 +699,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             Result.TimeOffset = Math.Min(MaximumJudgementOffset, Time.Current - HitObject.GetEndTime());
 
+            OnNewResult?.Invoke(this, Result);
+
             if (Result.HasResult)
                 updateState(Result.IsHit ? ArmedState.Hit : ArmedState.Miss);
-
-            OnNewResult?.Invoke(this, Result);
         }
 
         /// <summary>
