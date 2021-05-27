@@ -56,9 +56,9 @@ namespace osu.Game.Skinning
 
             this.legacyDefaultResources = legacyDefaultResources;
 
-            CurrentSkin.Value = new DefaultSkin(this);
-
             CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = GetSkin(skin.NewValue);
+
+            CurrentSkin.Value = new DefaultSkin(this);
             CurrentSkin.ValueChanged += skin =>
             {
                 if (skin.NewValue.SkinInfo != CurrentSkinInfo.Value)
