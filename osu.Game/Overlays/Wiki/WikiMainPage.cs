@@ -79,6 +79,7 @@ namespace osu.Game.Overlays.Wiki
                     {
                         new WikiPanelContainer(panelsNode[i].InnerText, true)
                         {
+                            // This is required to fill up the space of "null" drawable below.
                             Width = 2,
                         },
                         null,
