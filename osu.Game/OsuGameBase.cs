@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -41,7 +40,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Utils;
-using osuTK.Input;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 
 namespace osu.Game
@@ -51,7 +49,7 @@ namespace osu.Game
     /// Unlike <see cref="OsuGame"/>, this class will not load any kind of UI, allowing it to be used
     /// for provide dependencies to test cases without interfering with them.
     /// </summary>
-    public class OsuGameBase : Framework.Game, ICanAcceptFiles
+    public partial class OsuGameBase : Framework.Game, ICanAcceptFiles
     {
         public const string CLIENT_STREAM_NAME = @"lazer";
 
@@ -398,75 +396,6 @@ namespace osu.Game
                     db.Context.Migrate();
             }
         }
-
-        public override void SetHost(GameHost host)
-        {
-            base.SetHost(host);
-
-            // may be non-null for certain tests
-            Storage ??= host.Storage;
-
-            LocalConfig ??= UseDevelopmentServer
-                ? new DevelopmentOsuConfigManager(Storage)
-                : new OsuConfigManager(Storage);
-        }
-
-        /// <summary>
-        /// Use to programatically exit the game as if the user was triggering via alt-f4.
-        /// Will keep persisting until an exit occurs (exit may be blocked multiple times).
-        /// </summary>
-        public void GracefullyExit()
-        {
-            if (!OnExiting())
-                Exit();
-            else
-                Scheduler.AddDelayed(GracefullyExit, 2000);
-        }
-
-        protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
-
-        private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
-
-        /// <summary>
-        /// Register a global handler for file imports. Most recently registered will have precedence.
-        /// </summary>
-        /// <param name="handler">The handler to register.</param>
-        public void RegisterImportHandler(ICanAcceptFiles handler) => fileImporters.Insert(0, handler);
-
-        /// <summary>
-        /// Unregister a global handler for file imports.
-        /// </summary>
-        /// <param name="handler">The previously registered handler.</param>
-        public void UnregisterImportHandler(ICanAcceptFiles handler) => fileImporters.Remove(handler);
-
-        public async Task Import(params string[] paths)
-        {
-            if (paths.Length == 0)
-                return;
-
-            var filesPerExtension = paths.GroupBy(p => Path.GetExtension(p).ToLowerInvariant());
-
-            foreach (var groups in filesPerExtension)
-            {
-                foreach (var importer in fileImporters)
-                {
-                    if (importer.HandledExtensions.Contains(groups.Key))
-                        await importer.Import(groups.ToArray()).ConfigureAwait(false);
-                }
-            }
-        }
-
-        public virtual async Task Import(params ImportTask[] tasks)
-        {
-            var tasksPerExtension = tasks.GroupBy(t => Path.GetExtension(t.Path).ToLowerInvariant());
-            await Task.WhenAll(tasksPerExtension.Select(taskGroup =>
-            {
-                var importer = fileImporters.FirstOrDefault(i => i.HandledExtensions.Contains(taskGroup.Key));
-                return importer?.Import(taskGroup.ToArray()) ?? Task.CompletedTask;
-            })).ConfigureAwait(false);
-        }
-
-        public IEnumerable<string> HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions);
 
         protected override void Dispose(bool isDisposing)
         {
