@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Collections.IO
 
         [Test]
         public async Task TestImportWithNoBeatmaps()
-{
+        {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
