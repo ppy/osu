@@ -57,7 +57,33 @@ namespace osu.Game
 
         public const int SAMPLE_CONCURRENCY = 6;
 
+        /// <summary>
+        /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
+        /// </summary>
+        internal const double GLOBAL_TRACK_VOLUME_ADJUST = 0.5;
+
         public bool UseDevelopmentServer { get; }
+
+        public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
+
+        /// <summary>
+        /// MD5 representation of the game executable.
+        /// </summary>
+        public string VersionHash { get; private set; }
+
+        public bool IsDeployedBuild => AssemblyVersion.Major > 0;
+
+        public virtual string Version
+        {
+            get
+            {
+                if (!IsDeployedBuild)
+                    return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
+
+                var version = AssemblyVersion;
+                return $@"{version.Major}.{version.Minor}.{version.Build}";
+            }
+        }
 
         protected OsuConfigManager LocalConfig { get; private set; }
 
@@ -118,32 +144,17 @@ namespace osu.Game
 
         private MultiplayerClient multiplayerClient;
 
+        private DatabaseContextFactory contextFactory;
+
         protected override Container<Drawable> Content => content;
 
         private Container content;
 
+        private DependencyContainer dependencies;
+
         private Bindable<bool> fpsDisplayVisible;
 
-        public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
-
-        /// <summary>
-        /// MD5 representation of the game executable.
-        /// </summary>
-        public string VersionHash { get; private set; }
-
-        public bool IsDeployedBuild => AssemblyVersion.Major > 0;
-
-        public virtual string Version
-        {
-            get
-            {
-                if (!IsDeployedBuild)
-                    return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
-
-                var version = AssemblyVersion;
-                return $@"{version.Major}.{version.Minor}.{version.Build}";
-            }
-        }
+        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(GLOBAL_TRACK_VOLUME_ADJUST);
 
         public OsuGameBase()
         {
@@ -151,23 +162,14 @@ namespace osu.Game
             Name = @"osu!lazer";
         }
 
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
-        private DatabaseContextFactory contextFactory;
-
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
         protected virtual BatteryInfo CreateBatteryInfo() => null;
 
-        /// <summary>
-        /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
-        /// </summary>
-        internal const double GLOBAL_TRACK_VOLUME_ADJUST = 0.5;
+        protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
 
-        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(GLOBAL_TRACK_VOLUME_ADJUST);
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
         private void load()
@@ -345,6 +347,19 @@ namespace osu.Game
             Ruleset.BindValueChanged(onRulesetChanged);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // TODO: This is temporary until we reimplement the local FPS display.
+            // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
+            fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
+            fpsDisplayVisible.ValueChanged += visible => { FrameStatistics.Value = visible.NewValue ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
+            fpsDisplayVisible.TriggerChange();
+
+            FrameStatistics.ValueChanged += e => fpsDisplayVisible.Value = e.NewValue != FrameStatisticsMode.None;
+        }
+
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {
             var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
@@ -359,21 +374,6 @@ namespace osu.Game
                 SelectedMods.Value = Array.Empty<Mod>();
 
             AvailableMods.Value = dict;
-        }
-
-        protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // TODO: This is temporary until we reimplement the local FPS display.
-            // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
-            fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
-            fpsDisplayVisible.ValueChanged += visible => { FrameStatistics.Value = visible.NewValue ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
-            fpsDisplayVisible.TriggerChange();
-
-            FrameStatistics.ValueChanged += e => fpsDisplayVisible.Value = e.NewValue != FrameStatisticsMode.None;
         }
 
         private void runMigrations()
