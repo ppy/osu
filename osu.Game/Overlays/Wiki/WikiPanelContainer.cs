@@ -21,9 +21,6 @@ namespace osu.Game.Overlays.Wiki
 {
     public class WikiPanelContainer : Container
     {
-        [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
-
         private WikiPanelMarkdownContainer panelContainer;
 
         public string Text;
@@ -37,7 +34,7 @@ namespace osu.Game.Overlays.Wiki
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             Children = new Drawable[]
             {
