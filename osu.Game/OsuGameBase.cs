@@ -160,6 +160,36 @@ namespace osu.Game
             Name = @"osu!lazer";
         }
 
+        public override void SetHost(GameHost host)
+        {
+            base.SetHost(host);
+
+            // may be non-null for certain tests
+            Storage ??= host.Storage;
+
+            LocalConfig ??= UseDevelopmentServer
+                ? new DevelopmentOsuConfigManager(Storage)
+                : new OsuConfigManager(Storage);
+        }
+
+        /// <summary>
+        /// Use to programatically exit the game as if the user was triggering via alt-f4.
+        /// Will keep persisting until an exit occurs (exit may be blocked multiple times).
+        /// </summary>
+        public void GracefullyExit()
+        {
+            if (!OnExiting())
+                Exit();
+            else
+                Scheduler.AddDelayed(GracefullyExit, 2000);
+        }
+
+        public void Migrate(string path)
+        {
+            contextFactory.FlushConnections();
+            (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
+        }
+
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
         protected virtual BatteryInfo CreateBatteryInfo() => null;
@@ -168,6 +198,8 @@ namespace osu.Game
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+        protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
 
         [BackgroundDependencyLoader]
         private void load()
