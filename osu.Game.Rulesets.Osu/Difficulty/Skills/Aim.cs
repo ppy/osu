@@ -26,8 +26,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double distanceConstant = 2.5;
 
         // Global Constants for the different types of aim.
-        private double snapStrainMultiplier = 25.25;
-        private double flowStrainMultiplier = 16.75;
+        private double snapStrainMultiplier = 24.5;
+        private double flowStrainMultiplier = 23.75;
         private double hybridStrainMultiplier = 0;//8.25;
         private double sliderStrainMultiplier = 75;
         private double totalStrainMultiplier = .1675;
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double momentumChange = Math.Sqrt(Math.Abs(currVector.Length - prevVector.Length) * Math.Min(currVector.Length, prevVector.Length));
 
-            strain = osuCurrObj.FlowProbability * (2 * observedDistance.Length
+            strain = osuCurrObj.FlowProbability * (observedDistance.Length
                                                     + momentumChange
                                                     + angularMomentumChange);
 
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             //               + angleAdjustment * osuCurrObj.FlowProbability * osuPrevObj.FlowProbability;
             // // here we have the velocities of curr, prev, the difference between them, and our angle buff.
             //
-            strain *= Math.Min(osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 10) , osuPrevObj.StrainTime / (osuPrevObj.StrainTime - 10));
+            strain *= Math.Min(osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 20) , osuPrevObj.StrainTime / (osuPrevObj.StrainTime - 20));
             // // buff high BPM slightly.
 
             return strain;
@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double strain = 0;
 
-            var observedDistance = Vector2.Add(currVector, Vector2.Multiply(prevVector, (float)0.35));
+            var observedDistance = Vector2.Add(currVector, Vector2.Multiply(prevVector, (float)(0.35 * osuPrevObj.SnapProbability)));
 
             strain = (observedDistance.Length * snapScaling((observedDistance.Length * osuCurrObj.StrainTime) / 100)) * osuCurrObj.SnapProbability;
 

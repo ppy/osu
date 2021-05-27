@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain = 1;
         // Global Tap Strain Multiplier.
-        private double strainMultiplier = 2.575;
+        private double strainMultiplier = 2.625;
         private double rhythmMultiplier = 1;
 
         public Tap(Mod[] mods)
