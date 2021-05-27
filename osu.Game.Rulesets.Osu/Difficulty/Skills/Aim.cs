@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         // Global Constants for the different types of aim.
         private double snapStrainMultiplier = 23.727;
-        private double flowStrainMultiplier = 24.727;
+        private double flowStrainMultiplier = 30.727;
         private double sliderStrainMultiplier = 75;
         private double totalStrainMultiplier = .1675;
 
@@ -49,14 +49,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double nextAngularMomentumChange = Math.Abs(osuCurrObj.Angle * currVector.Length - osuNextObj.Angle * nextVector.Length);
 
             double angularMomentumChange = Math.Sqrt(Math.Min(currVector.Length, prevVector.Length) * Math.Abs(nextAngularMomentumChange - prevAngularMomentumChange) / (2 * Math.PI));
+            // buff for changes in angular momentum, but only if the momentum change doesnt equal the previous.
 
-            double momentumChange = Math.Sqrt(Math.Abs(currVector.Length - prevVector.Length) * Math.Min(currVector.Length, prevVector.Length));
+            double momentumChange = Math.Sqrt(Math.Max(0, prevVector.Length - currVector.Length) * Math.Min(currVector.Length, prevVector.Length));
+            // reward for accelerative changes in momentum
 
             strain = osuCurrObj.FlowProbability * (observedDistance.Length
-                                                    + momentumChange * (0.5 + 0.5 * osuPrevObj.FlowProbability)
-                                                    + angularMomentumChange * osuPrevObj.FlowProbability);
+                                                    + Math.Max(momentumChange * (0.5 + 0.5 * osuPrevObj.FlowProbability),
+                                                      angularMomentumChange * osuPrevObj.FlowProbability));
 
-            strain *= Math.Min(osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 20) , osuPrevObj.StrainTime / (osuPrevObj.StrainTime - 20));
+            strain *= Math.Min(osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 10) , osuPrevObj.StrainTime / (osuPrevObj.StrainTime - 10));
             // buff high BPM slightly.
 
             return strain;

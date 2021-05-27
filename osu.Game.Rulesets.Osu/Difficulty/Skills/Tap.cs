@@ -26,8 +26,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private int strainTimeBuffRange = 75;
 
         private double currentStrain = 1;
+        private double singleStrain = 1;
+
         // Global Tap Strain Multiplier.
-        private double strainMultiplier = 2.475;
+        private double singleMultiplier = 2.675;
+        private double strainMultiplier = 2.725;
         private double rhythmMultiplier = 1;
 
         public Tap(Mod[] mods)
@@ -142,11 +145,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             else
                 strainValue += Math.Pow(strainTimeBuffRange / avgDeltaTime, 1);
 
-            currentStrain *= computeDecay(baseDecay, osuCurrent.StrainTime);
-            currentStrain += (1 + 0.75 * osuCurrent.SnapProbability) * strainValue * strainMultiplier;
+            singleStrain *= computeDecay(baseDecay, osuCurrent.StrainTime);
+            singleStrain += (.5 + osuCurrent.SnapProbability) * strainValue * singleMultiplier;
 
-            return Math.Min((1 / (1 - baseDecay)) * strainValue * strainMultiplier, // prevent over buffing strain past death stream level
-                            currentStrain * rhythmComplexity);
+            currentStrain *= computeDecay(baseDecay, osuCurrent.StrainTime);
+            currentStrain += strainValue * strainMultiplier;
+
+            return Math.Max(Math.Min((1 / (1 - baseDecay)) * strainValue * strainMultiplier, // prevent over buffing strain past death stream level
+                                      currentStrain * rhythmComplexity),
+                            singleStrain); // we use a seperate strain for singles to not complete nuke boring 1-2 maps
         }
     }
 }
