@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             }
 
             if (!(component is TaikoSkinComponent taikoComponent))
-                return null;
+                return Source.GetDrawableComponent(component);
 
             switch (taikoComponent.Component)
             {
@@ -130,9 +130,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                 case TaikoSkinComponents.Mascot:
                     return new DrawableTaikoMascot();
-            }
 
-            return Source.GetDrawableComponent(component);
+                default:
+                    return Source.GetDrawableComponent(component);
+            }
         }
 
         private string getHitName(TaikoSkinComponents component)
