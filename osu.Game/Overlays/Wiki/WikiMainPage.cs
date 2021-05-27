@@ -77,10 +77,8 @@ namespace osu.Game.Overlays.Wiki
                 {
                     yield return new Drawable[]
                     {
-                        new WikiPanelContainer
+                        new WikiPanelContainer(panelsNode[i].InnerText, true)
                         {
-                            Text = panelsNode[i].InnerText,
-                            IsFullWidth = true,
                             Width = 2,
                         },
                         null,
@@ -91,14 +89,8 @@ namespace osu.Game.Overlays.Wiki
                 {
                     yield return new Drawable[]
                     {
-                        new WikiPanelContainer
-                        {
-                            Text = panelsNode[i].InnerText,
-                        },
-                        new WikiPanelContainer
-                        {
-                            Text = panelsNode[i + 1].InnerText,
-                        },
+                        new WikiPanelContainer(panelsNode[i].InnerText),
+                        new WikiPanelContainer(panelsNode[i + 1].InnerText),
                     };
                 }
             }
