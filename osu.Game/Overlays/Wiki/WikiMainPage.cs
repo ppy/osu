@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.Wiki
                     yield return new Drawable[]
                     {
                         new WikiPanelContainer(panelsNode[i++].InnerText),
-                        new WikiPanelContainer(panelsNode[i++].InnerText),
+                        i < panelsNode.Length ? new WikiPanelContainer(panelsNode[i++].InnerText) : null,
                     };
                 }
             }
