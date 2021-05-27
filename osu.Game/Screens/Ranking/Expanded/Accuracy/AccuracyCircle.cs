@@ -3,13 +3,18 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Platform;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -79,14 +84,69 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private Container<RankBadge> badges;
         private RankText rankText;
 
-        public AccuracyCircle(ScoreInfo score)
+        private DrawableSample scoreTickSound;
+        private DrawableSample badgeTickSound;
+        private DrawableSample badgeMaxSound;
+        private DrawableSample swooshUpSound;
+        private DrawableSample rankDImpactSound;
+        private DrawableSample rankBImpactSound;
+        private DrawableSample rankCImpactSound;
+        private DrawableSample rankAImpactSound;
+        private DrawableSample rankSImpactSound;
+        private DrawableSample rankSSImpactSound;
+        private DrawableSample rankDApplauseSound;
+        private DrawableSample rankBApplauseSound;
+        private DrawableSample rankCApplauseSound;
+        private DrawableSample rankAApplauseSound;
+        private DrawableSample rankSApplauseSound;
+        private DrawableSample rankSSApplauseSound;
+
+        private Bindable<double> tickPlaybackRate = new Bindable<double>();
+        private double lastTickPlaybackTime;
+        private bool isTicking;
+
+        private AudioManager audioManager;
+
+        public AccuracyCircleAudioSettings AudioSettings = new AccuracyCircleAudioSettings();
+
+        private readonly bool withFlair;
+
+        public AccuracyCircle(ScoreInfo score, bool withFlair)
         {
             this.score = score;
+            this.withFlair = withFlair;
+        }
+
+        public void BindAudioSettings(AccuracyCircleAudioSettings audioSettings)
+        {
+            foreach (var (_, prop) in audioSettings.GetSettingsSourceProperties())
+            {
+                var targetBindable = (IBindable)prop.GetValue(AudioSettings);
+                var sourceBindable = (IBindable)prop.GetValue(audioSettings);
+
+                targetBindable?.BindTo(sourceBindable);
+            }
+        }
+
+        private void loadSample(ref DrawableSample target, string sampleName, [CanBeNull] BindableDouble volumeBindable = null)
+        {
+            if (IsDisposed) return;
+
+            target?.Expire();
+            AddInternal(target = new DrawableSample(audioManager.Samples.Get($"Results/{sampleName}"))
+            {
+                Frequency = { Value = 1.0 }
+            });
+
+            if (volumeBindable != null)
+                target.Volume.BindTarget = volumeBindable;
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, GameHost host)
         {
+            audioManager = audio;
+
             InternalChildren = new Drawable[]
             {
                 new SmoothCircularProgress
@@ -204,6 +264,35 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 },
                 rankText = new RankText(score.Rank)
             };
+
+            if (withFlair)
+            {
+                tickPlaybackRate = new Bindable<double>(AudioSettings.TickDebounceStart.Value);
+
+                // score ticks
+                AudioSettings.TickSampleName.BindValueChanged(sample => loadSample(ref scoreTickSound, sample.NewValue), true);
+                AudioSettings.SwooshSampleName.BindValueChanged(sample => loadSample(ref swooshUpSound, sample.NewValue, AudioSettings.SwooshVolume), true);
+
+                // badge sounds
+                AudioSettings.BadgeSampleName.BindValueChanged(sample => loadSample(ref badgeTickSound, sample.NewValue, AudioSettings.BadgeDinkVolume), true);
+                AudioSettings.BadgeMaxSampleName.BindValueChanged(sample => loadSample(ref badgeMaxSound, sample.NewValue, AudioSettings.BadgeDinkVolume), true);
+
+                // impacts
+                AudioSettings.ImpactGradeDSampleName.BindValueChanged(sample => loadSample(ref rankDImpactSound, sample.NewValue, AudioSettings.ImpactVolume), true);
+                AudioSettings.ImpactGradeCSampleName.BindValueChanged(sample => loadSample(ref rankCImpactSound, sample.NewValue, AudioSettings.ImpactVolume), true);
+                AudioSettings.ImpactGradeBSampleName.BindValueChanged(sample => loadSample(ref rankBImpactSound, sample.NewValue, AudioSettings.ImpactVolume), true);
+                AudioSettings.ImpactGradeASampleName.BindValueChanged(sample => loadSample(ref rankAImpactSound, sample.NewValue, AudioSettings.ImpactVolume), true);
+                AudioSettings.ImpactGradeSSampleName.BindValueChanged(sample => loadSample(ref rankSImpactSound, sample.NewValue, AudioSettings.ImpactVolume), true);
+                AudioSettings.ImpactGradeSSSampleName.BindValueChanged(sample => loadSample(ref rankSSImpactSound, sample.NewValue, AudioSettings.ImpactVolume), true);
+
+                // applause
+                AudioSettings.ApplauseGradeDSampleName.BindValueChanged(sample => loadSample(ref rankDApplauseSound, sample.NewValue, AudioSettings.ApplauseVolume), true);
+                AudioSettings.ApplauseGradeCSampleName.BindValueChanged(sample => loadSample(ref rankCApplauseSound, sample.NewValue, AudioSettings.ApplauseVolume), true);
+                AudioSettings.ApplauseGradeBSampleName.BindValueChanged(sample => loadSample(ref rankBApplauseSound, sample.NewValue, AudioSettings.ApplauseVolume), true);
+                AudioSettings.ApplauseGradeASampleName.BindValueChanged(sample => loadSample(ref rankAApplauseSound, sample.NewValue, AudioSettings.ApplauseVolume), true);
+                AudioSettings.ApplauseGradeSSampleName.BindValueChanged(sample => loadSample(ref rankSApplauseSound, sample.NewValue, AudioSettings.ApplauseVolume), true);
+                AudioSettings.ApplauseGradeSSSampleName.BindValueChanged(sample => loadSample(ref rankSSApplauseSound, sample.NewValue, AudioSettings.ApplauseVolume), true);
+            }
         }
 
         private ScoreRank getRank(ScoreRank rank)
@@ -214,11 +303,28 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
             return rank;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!AudioSettings.PlayTicks.Value || !isTicking) return;
+
+            bool enoughTimePassedSinceLastPlayback = Clock.CurrentTime - lastTickPlaybackTime >= tickPlaybackRate.Value;
+
+            if (!enoughTimePassedSinceLastPlayback) return;
+
+            scoreTickSound?.Play();
+            lastTickPlaybackTime = Clock.CurrentTime;
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             this.ScaleTo(0).Then().ScaleTo(1, APPEAR_DURATION, Easing.OutQuint);
+
+            if (AudioSettings.PlaySwooshSound.Value)
+                this.Delay(AudioSettings.SwooshPreDelay.Value).Schedule(() => swooshUpSound?.Play());
 
             using (BeginDelayedSequence(RANK_CIRCLE_TRANSFORM_DELAY, true))
                 innerMask.FillTo(1f, RANK_CIRCLE_TRANSFORM_DURATION, ACCURACY_TRANSFORM_EASING);
@@ -229,6 +335,22 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
                 accuracyCircle.FillTo(targetAccuracy, ACCURACY_TRANSFORM_DURATION, ACCURACY_TRANSFORM_EASING);
 
+                if (AudioSettings.PlayTicks.Value)
+                {
+                    scoreTickSound?.FrequencyTo(1 + (targetAccuracy * AudioSettings.TickPitchFactor.Value), ACCURACY_TRANSFORM_DURATION, AudioSettings.TickPitchEasing.Value);
+                    scoreTickSound?.VolumeTo(AudioSettings.TickVolumeStart.Value).Then().VolumeTo(AudioSettings.TickVolumeEnd.Value, ACCURACY_TRANSFORM_DURATION, AudioSettings.TickVolumeEasing.Value);
+                    this.TransformBindableTo(tickPlaybackRate, AudioSettings.TickDebounceEnd.Value, ACCURACY_TRANSFORM_DURATION, AudioSettings.TickRateEasing.Value);
+                }
+
+                Schedule(() =>
+                {
+                    if (!AudioSettings.PlayTicks.Value) return;
+
+                    isTicking = true;
+                });
+
+                int badgeNum = 0;
+
                 foreach (var badge in badges)
                 {
                     if (badge.Accuracy > score.Accuracy)
@@ -237,12 +359,100 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     using (BeginDelayedSequence(inverseEasing(ACCURACY_TRANSFORM_EASING, Math.Min(1 - virtual_ss_percentage, badge.Accuracy) / targetAccuracy) * ACCURACY_TRANSFORM_DURATION, true))
                     {
                         badge.Appear();
+                        Schedule(() =>
+                        {
+                            if (badgeTickSound == null || badgeMaxSound == null || !AudioSettings.PlayBadgeSounds.Value) return;
+
+                            if (badgeNum < (badges.Count - 1))
+                            {
+                                badgeTickSound.Frequency.Value = 1 + (badgeNum++ * 0.05);
+                                badgeTickSound?.Play();
+                            }
+                            else
+                            {
+                                badgeMaxSound.Frequency.Value = 1 + (badgeNum++ * 0.05);
+                                badgeMaxSound?.Play();
+                                isTicking = false;
+                            }
+                        });
                     }
                 }
 
                 using (BeginDelayedSequence(TEXT_APPEAR_DELAY, true))
                 {
                     rankText.Appear();
+                    Schedule(() =>
+                    {
+                        isTicking = false;
+
+                        if (!AudioSettings.PlayImpact.Value) return;
+
+                        switch (score.Rank)
+                        {
+                            case ScoreRank.D:
+                                rankDImpactSound?.Play();
+                                break;
+
+                            case ScoreRank.C:
+                                rankCImpactSound?.Play();
+                                break;
+
+                            case ScoreRank.B:
+                                rankBImpactSound?.Play();
+                                break;
+
+                            case ScoreRank.A:
+                                rankAImpactSound?.Play();
+                                break;
+
+                            case ScoreRank.S:
+                            case ScoreRank.SH:
+                                rankSImpactSound?.Play();
+                                break;
+
+                            case ScoreRank.X:
+                            case ScoreRank.XH:
+                                rankSSImpactSound?.Play();
+                                break;
+                        }
+                    });
+
+                    using (BeginDelayedSequence(AudioSettings.ApplauseDelay.Value))
+                    {
+                        if (!AudioSettings.PlayApplause.Value) return;
+
+                        Schedule(() =>
+                        {
+                            switch (score.Rank)
+                            {
+                                case ScoreRank.D:
+                                    rankDApplauseSound?.Play();
+                                    break;
+
+                                case ScoreRank.C:
+                                    rankCApplauseSound?.Play();
+                                    break;
+
+                                case ScoreRank.B:
+                                    rankBApplauseSound?.Play();
+                                    break;
+
+                                case ScoreRank.A:
+                                    rankAApplauseSound?.Play();
+                                    break;
+
+                                case ScoreRank.S:
+                                case ScoreRank.SH:
+                                    rankSApplauseSound?.Play();
+                                    break;
+
+                                case ScoreRank.X:
+                                case ScoreRank.XH:
+                                    rankSSApplauseSound?.Play();
+                                    break;
+                            }
+                        });
+                    }
                 }
             }
         }
@@ -265,5 +475,165 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
             return test;
         }
+    }
+
+    public class AccuracyCircleAudioSettings
+    {
+        [SettingSource("setting")]
+        public Bindable<bool> PlayTicks { get; } = new Bindable<bool>(true);
+
+        [SettingSource("setting")]
+        public Bindable<string> TickSampleName { get; } = new Bindable<string>("badge-dink-2");
+
+        [SettingSource("setting")]
+        public Bindable<bool> PlayBadgeSounds { get; } = new Bindable<bool>(true);
+
+        [SettingSource("setting")]
+        public Bindable<string> BadgeSampleName { get; } = new Bindable<string>("badge-dink-3");
+
+        [SettingSource("setting")]
+        public Bindable<string> BadgeMaxSampleName { get; } = new Bindable<string>("badge-dink-8");
+
+        [SettingSource("setting")]
+        public Bindable<bool> PlaySwooshSound { get; } = new Bindable<bool>(true);
+
+        [SettingSource("setting")]
+        public Bindable<string> SwooshSampleName { get; } = new Bindable<string>("swoosh-up-2");
+
+        [SettingSource("setting")]
+        public Bindable<bool> PlayImpact { get; } = new Bindable<bool>(true);
+
+        [SettingSource("setting")]
+        public Bindable<string> ImpactGradeDSampleName { get; } = new Bindable<string>("rank-impact-d-1");
+
+        [SettingSource("setting")]
+        public Bindable<string> ImpactGradeCSampleName { get; } = new Bindable<string>("rank-impact-c-3");
+
+        [SettingSource("setting")]
+        public Bindable<string> ImpactGradeBSampleName { get; } = new Bindable<string>("rank-impact-b-3");
+
+        [SettingSource("setting")]
+        public Bindable<string> ImpactGradeASampleName { get; } = new Bindable<string>("rank-impact-a-3");
+
+        [SettingSource("setting")]
+        public Bindable<string> ImpactGradeSSampleName { get; } = new Bindable<string>("rank-impact-s-3");
+
+        [SettingSource("setting")]
+        public Bindable<string> ImpactGradeSSSampleName { get; } = new Bindable<string>("rank-impact-s-3");
+
+        [SettingSource("setting")]
+        public Bindable<bool> PlayApplause { get; } = new Bindable<bool>(true);
+
+        [SettingSource("setting")]
+        public BindableDouble ApplauseVolume { get; } = new BindableDouble(1)
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Precision = 0.1,
+        };
+
+        [SettingSource("setting")]
+        public BindableDouble ApplauseDelay { get; } = new BindableDouble(545)
+        {
+            MinValue = 0,
+            MaxValue = 10000,
+            Precision = 1,
+        };
+
+        [SettingSource("setting")]
+        public Bindable<string> ApplauseGradeDSampleName { get; } = new Bindable<string>("rank-applause-d-1");
+
+        [SettingSource("setting")]
+        public Bindable<string> ApplauseGradeCSampleName { get; } = new Bindable<string>("rank-applause-c-1");
+
+        [SettingSource("setting")]
+        public Bindable<string> ApplauseGradeBSampleName { get; } = new Bindable<string>("rank-applause-b-1");
+
+        [SettingSource("setting")]
+        public Bindable<string> ApplauseGradeASampleName { get; } = new Bindable<string>("rank-applause-a-1");
+
+        [SettingSource("setting")]
+        public Bindable<string> ApplauseGradeSSampleName { get; } = new Bindable<string>("rank-applause-s-1");
+
+        [SettingSource("setting")]
+        public Bindable<string> ApplauseGradeSSSampleName { get; } = new Bindable<string>("rank-applause-s-1");
+
+        [SettingSource("setting")]
+        public BindableDouble TickPitchFactor { get; } = new BindableDouble(1)
+        {
+            MinValue = 0,
+            MaxValue = 3,
+            Precision = 0.1,
+        };
+
+        [SettingSource("setting")]
+        public BindableDouble TickDebounceStart { get; } = new BindableDouble(10)
+        {
+            MinValue = 1,
+            MaxValue = 100,
+        };
+
+        [SettingSource("setting")]
+        public BindableDouble TickDebounceEnd { get; } = new BindableDouble(400)
+        {
+            MinValue = 100,
+            MaxValue = 1000,
+        };
+
+        [SettingSource("setting")]
+        public BindableDouble SwooshPreDelay { get; } = new BindableDouble(450)
+        {
+            MinValue = -1000,
+            MaxValue = 1000,
+        };
+
+        [SettingSource("setting")]
+        public Bindable<Easing> TickRateEasing { get; } = new Bindable<Easing>(Easing.None);
+
+        [SettingSource("setting")]
+        public Bindable<Easing> TickPitchEasing { get; } = new Bindable<Easing>(Easing.None);
+
+        [SettingSource("setting")]
+        public Bindable<Easing> TickVolumeEasing { get; } = new Bindable<Easing>(Easing.OutSine);
+
+        [SettingSource("setting")]
+        public BindableDouble TickVolumeStart { get; } = new BindableDouble(0.6)
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Precision = 0.1,
+        };
+
+        [SettingSource("setting")]
+        public BindableDouble TickVolumeEnd { get; } = new BindableDouble(1.0)
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Precision = 0.1,
+        };
+
+        [SettingSource("setting")]
+        public BindableDouble ImpactVolume { get; } = new BindableDouble(1.0)
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Precision = 0.1,
+        };
+
+        [SettingSource("setting")]
+        public BindableDouble BadgeDinkVolume { get; } = new BindableDouble(0.5)
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Precision = 0.1,
+        };
+
+        [SettingSource("setting")]
+        public BindableDouble SwooshVolume { get; } = new BindableDouble(0.5)
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Precision = 0.1,
+        };
     }
 }
