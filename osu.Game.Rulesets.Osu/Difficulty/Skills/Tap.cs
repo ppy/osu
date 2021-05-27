@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain = 1;
         // Global Tap Strain Multiplier.
-        private double strainMultiplier = 2.625;
+        private double strainMultiplier = 2.475;
         private double rhythmMultiplier = 1;
 
         public Tap(Mod[] mods)
@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 strainValue += Math.Pow(strainTimeBuffRange / avgDeltaTime, 1);
 
             currentStrain *= computeDecay(baseDecay, osuCurrent.StrainTime);
-            currentStrain += strainValue * strainMultiplier;
+            currentStrain += (1 + 0.75 * osuCurrent.SnapProbability) * strainValue * strainMultiplier;
 
             return Math.Min((1 / (1 - baseDecay)) * strainValue * strainMultiplier, // prevent over buffing strain past death stream level
                             currentStrain * (Previous.Count / HistoryLength) * rhythmComplexity);
