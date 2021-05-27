@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online;
@@ -258,14 +259,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         }
 
         [Resolved]
-        private AudioManager audio { get; set; }
+        private BackgroundTrackManager backgroundTrackManager { get; set; }
 
         [Resolved]
         private OsuConfigManager config { get; set; }
 
         private readonly Bindable<double> volumeMultiplayerRoom = new Bindable<double>();
-
-        private readonly BindableNumber<double> trackVolumeAdjust = new BindableDouble(1);
 
         protected override void LoadComplete()
         {
@@ -291,8 +290,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override void OnResuming(IScreen last)
         {
-            this.TransformBindableTo(trackVolumeAdjust, volumeMultiplayerRoom.Value, 1000, Easing.OutQuad);
-            volumeMultiplayerRoom.BindValueChanged(d => trackVolumeAdjust.Set(d.NewValue));
+            backgroundTrackManager.SetDimming(volumeMultiplayerRoom.Value, 1000, Easing.OutQuint);
+            volumeMultiplayerRoom.BindValueChanged(d => backgroundTrackManager.SetDimming(d.NewValue));
 
             base.OnResuming(last);
         }
@@ -300,16 +299,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public override void OnSuspending(IScreen next)
         {
             volumeMultiplayerRoom.UnbindEvents();
-            this.TransformBindableTo(trackVolumeAdjust, 1, 1000, Easing.OutQuad);
+            backgroundTrackManager.RemoveDimming(1000, Easing.OutQuint);
 
             base.OnSuspending(next);
         }
 
         public override void OnEntering(IScreen last)
         {
-            audio.Tracks.AddAdjustment(AdjustableProperty.Volume, trackVolumeAdjust);
-            this.TransformBindableTo(trackVolumeAdjust, volumeMultiplayerRoom.Value, 1000, Easing.OutQuad);
-            volumeMultiplayerRoom.BindValueChanged(d => trackVolumeAdjust.Set(d.NewValue));
+            backgroundTrackManager.SetDimming(volumeMultiplayerRoom.Value, 1000, Easing.OutQuint);
+            volumeMultiplayerRoom.BindValueChanged(d => backgroundTrackManager.SetDimming(d.NewValue));
 
             base.OnEntering(last);
         }
@@ -317,8 +315,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public override bool OnExiting(IScreen next)
         {
             volumeMultiplayerRoom.UnbindEvents();
-            var transform = this.TransformBindableTo(trackVolumeAdjust, 1, 1000, Easing.OutQuad);
-            transform.Finally(_ => audio.Tracks.RemoveAdjustment(AdjustableProperty.Volume, trackVolumeAdjust));
+            backgroundTrackManager.RemoveDimming(1000, Easing.OutQuint);
 
             return base.OnExiting(next);
         }

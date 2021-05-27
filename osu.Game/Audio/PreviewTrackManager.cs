@@ -23,6 +23,9 @@ namespace osu.Game.Audio
         [Resolved]
         private AudioManager audio { get; set; }
 
+        [Resolved]
+        private BackgroundTrackManager backgroundTrackManager { get; set; }
+
         private PreviewTrackStore trackStore;
 
         protected TrackManagerPreviewTrack CurrentTrack;
@@ -32,8 +35,6 @@ namespace osu.Game.Audio
         [BackgroundDependencyLoader]
         private void load()
         {
-            // this is a temporary solution to get around muting ourselves.
-            // todo: update this once we have a BackgroundTrackManager or similar.
             trackStore = new PreviewTrackStore(new OnlineStore());
 
             audio.AddItem(trackStore);
@@ -54,7 +55,7 @@ namespace osu.Game.Audio
             {
                 CurrentTrack?.Stop();
                 CurrentTrack = track;
-                audio.Tracks.AddAdjustment(AdjustableProperty.Volume, muteBindable);
+                backgroundTrackManager.Mute(100, Easing.OutQuint);
             });
 
             track.Stopped += () => Schedule(() =>
@@ -63,7 +64,7 @@ namespace osu.Game.Audio
                     return;
 
                 CurrentTrack = null;
-                audio.Tracks.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
+                backgroundTrackManager.Unmute(100, Easing.OutQuint);
             });
 
             return track;
