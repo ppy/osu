@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
@@ -25,6 +26,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
     public class SliderSelectionBlueprint : OsuSelectionBlueprint<Slider>
     {
+        protected new DrawableSlider DrawableObject => (DrawableSlider)base.DrawableObject;
+
         protected SliderBodyPiece BodyPiece { get; private set; }
         protected SliderCircleOverlay HeadOverlay { get; private set; }
         protected SliderCircleOverlay TailOverlay { get; private set; }
@@ -236,7 +239,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             new OsuMenuItem("Add control point", MenuItemType.Standard, () => addControlPoint(rightClickPosition)),
         };
 
-        public override Vector2 ScreenSpaceSelectionPoint => BodyPiece.ToScreenSpace(BodyPiece.PathStartLocation);
+        // Always refer to the drawable object's slider body so subsequent movement deltas are calculated with updated positions.
+        public override Vector2 ScreenSpaceSelectionPoint => DrawableObject.SliderBody?.ToScreenSpace(DrawableObject.SliderBody.PathOffset)
+                                                             ?? BodyPiece.ToScreenSpace(BodyPiece.PathStartLocation);
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             BodyPiece.ReceivePositionalInputAt(screenSpacePos) || ControlPointVisualiser?.Pieces.Any(p => p.ReceivePositionalInputAt(screenSpacePos)) == true;

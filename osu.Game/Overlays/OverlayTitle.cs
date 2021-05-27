@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -19,15 +20,15 @@ namespace osu.Game.Overlays
         private readonly OsuSpriteText titleText;
         private readonly Container icon;
 
-        private string title;
+        private LocalisableString title;
 
-        public string Title
+        public LocalisableString Title
         {
             get => title;
             protected set => titleText.Text = title = value;
         }
 
-        public string Description { get; protected set; }
+        public LocalisableString Description { get; protected set; }
 
         private string iconTexture;
 
