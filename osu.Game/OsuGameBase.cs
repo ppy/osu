@@ -53,50 +53,52 @@ namespace osu.Game
     /// </summary>
     public class OsuGameBase : Framework.Game, ICanAcceptFiles
     {
-        public const string CLIENT_STREAM_NAME = "lazer";
+        public const string CLIENT_STREAM_NAME = @"lazer";
 
         public const int SAMPLE_CONCURRENCY = 6;
 
         public bool UseDevelopmentServer { get; }
 
-        protected OsuConfigManager LocalConfig;
+        protected OsuConfigManager LocalConfig { get; private set; }
 
         protected SessionStatics SessionStatics { get; private set; }
 
-        protected BeatmapManager BeatmapManager;
+        protected BeatmapManager BeatmapManager { get; private set; }
 
-        protected ScoreManager ScoreManager;
+        protected ScoreManager ScoreManager { get; private set; }
 
-        protected BeatmapDifficultyCache DifficultyCache;
+        protected BeatmapDifficultyCache DifficultyCache { get; private set; }
 
-        protected UserLookupCache UserCache;
+        protected UserLookupCache UserCache { get; private set; }
 
-        protected SkinManager SkinManager;
+        protected SkinManager SkinManager { get; private set; }
 
-        protected RulesetStore RulesetStore;
+        protected RulesetStore RulesetStore { get; private set; }
 
-        protected FileStore FileStore;
+        protected FileStore FileStore { get; private set; }
 
-        protected KeyBindingStore KeyBindingStore;
+        protected KeyBindingStore KeyBindingStore { get; private set; }
 
-        protected SettingsStore SettingsStore;
+        protected SettingsStore SettingsStore { get; private set; }
 
-        protected RulesetConfigCache RulesetConfigCache;
+        protected RulesetConfigCache RulesetConfigCache { get; private set; }
 
-        protected IAPIProvider API;
+        protected MenuCursorContainer MenuCursorContainer { get; private set; }
+
+        protected MusicController MusicController { get; private set; }
+
+        protected IAPIProvider API { get; set; }
+
+        protected Storage Storage { get; set; }
+
+        protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
 
         private SpectatorClient spectatorClient;
         private MultiplayerClient multiplayerClient;
 
-        protected MenuCursorContainer MenuCursorContainer;
-
-        protected MusicController MusicController;
-
         private Container content;
 
         protected override Container<Drawable> Content => content;
-
-        protected Storage Storage { get; set; }
 
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
@@ -118,8 +120,6 @@ namespace osu.Game
         /// Mods available for the current <see cref="Ruleset"/>.
         /// </summary>
         public readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> AvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
-
-        protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
 
         private Bindable<bool> fpsDisplayVisible;
 
