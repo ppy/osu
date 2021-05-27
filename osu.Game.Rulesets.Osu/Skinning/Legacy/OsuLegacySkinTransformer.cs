@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
             if (!(component is OsuSkinComponent osuComponent))
-                return null;
+                return Source.GetDrawableComponent(component);
 
             switch (osuComponent.Component)
             {
@@ -115,9 +115,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return new LegacyOldStyleSpinner();
 
                     return null;
-            }
 
-            return null;
+                default:
+                    return Source.GetDrawableComponent(component);
+            }
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)

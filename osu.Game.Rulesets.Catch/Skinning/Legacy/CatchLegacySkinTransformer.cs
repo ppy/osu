@@ -28,12 +28,15 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 {
                     case HUDSkinComponents.ComboCounter:
                         // catch may provide its own combo counter; hide the default.
-                        return providesComboCounter ? Drawable.Empty() : null;
+                        if (providesComboCounter)
+                            return Drawable.Empty();
+
+                        break;
                 }
             }
 
             if (!(component is CatchSkinComponent catchSkinComponent))
-                return null;
+                return Source.GetDrawableComponent(component);
 
             switch (catchSkinComponent.Component)
             {
@@ -41,19 +44,19 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     if (GetTexture("fruit-pear") != null)
                         return new LegacyFruitPiece();
 
-                    break;
+                    return null;
 
                 case CatchSkinComponents.Banana:
                     if (GetTexture("fruit-bananas") != null)
                         return new LegacyBananaPiece();
 
-                    break;
+                    return null;
 
                 case CatchSkinComponents.Droplet:
                     if (GetTexture("fruit-drop") != null)
                         return new LegacyDropletPiece();
 
-                    break;
+                    return null;
 
                 case CatchSkinComponents.CatcherIdle:
                     return this.GetAnimation("fruit-catcher-idle", true, true, true) ??
@@ -71,10 +74,11 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     if (providesComboCounter)
                         return new LegacyCatchComboCounter(Source);
 
-                    break;
-            }
+                    return null;
 
-            return null;
+                default:
+                    return Source.GetDrawableComponent(component);
+            }
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
