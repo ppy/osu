@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Input
             => AddStep($"make window {mode}", () => frameworkConfigManager.GetBindable<WindowMode>(FrameworkSetting.WindowMode).Value = mode);
 
         private void setGameSideModeTo(OsuConfineMouseMode mode)
-            => AddStep($"set {mode} game-side", () => Game.LocalConfig.Set(OsuSetting.ConfineMouseMode, mode));
+            => AddStep($"set {mode} game-side", () => Game.LocalConfig.SetValue(OsuSetting.ConfineMouseMode, mode));
 
         private void setLocalUserPlayingTo(bool playing)
             => AddStep($"local user {(playing ? "playing" : "not playing")}", () => Game.LocalUserPlaying.Value = playing);

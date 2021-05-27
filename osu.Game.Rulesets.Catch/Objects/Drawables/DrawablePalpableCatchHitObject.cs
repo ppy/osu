@@ -55,10 +55,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            XBindable.BindValueChanged(x =>
-            {
-                X = x.NewValue;
-            }, true);
+            OriginalXBindable.BindValueChanged(updateXPosition);
+            XOffsetBindable.BindValueChanged(updateXPosition, true);
 
             ScaleBindable.BindValueChanged(scale =>
             {
@@ -67,6 +65,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             }, true);
 
             IndexInBeatmap.BindValueChanged(_ => UpdateComboColour());
+        }
+
+        private void updateXPosition(ValueChangedEvent<float> _)
+        {
+            X = OriginalXBindable.Value + XOffsetBindable.Value;
         }
 
         protected override void OnApply()

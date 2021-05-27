@@ -15,11 +15,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public abstract class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
     {
-        public readonly Bindable<float> XBindable = new Bindable<float>();
+        public readonly Bindable<float> OriginalXBindable = new Bindable<float>();
+        public readonly Bindable<float> XOffsetBindable = new Bindable<float>();
 
         protected override double InitialLifetimeOffset => HitObject.TimePreempt;
 
-        protected override float SamplePlaybackPosition => HitObject.X / CatchPlayfield.WIDTH;
+        protected override float SamplePlaybackPosition => HitObject.EffectiveX / CatchPlayfield.WIDTH;
 
         public int RandomSeed => HitObject?.RandomSeed ?? 0;
 
@@ -38,14 +39,16 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
             base.OnApply();
 
-            XBindable.BindTo(HitObject.XBindable);
+            OriginalXBindable.BindTo(HitObject.OriginalXBindable);
+            XOffsetBindable.BindTo(HitObject.XOffsetBindable);
         }
 
         protected override void OnFree()
         {
             base.OnFree();
 
-            XBindable.UnbindFrom(HitObject.XBindable);
+            OriginalXBindable.UnbindFrom(HitObject.OriginalXBindable);
+            XOffsetBindable.UnbindFrom(HitObject.XOffsetBindable);
         }
 
         public Func<CatchHitObject, bool> CheckPosition;

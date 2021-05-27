@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -16,31 +18,37 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// A circle explodes from the hit target to indicate a hitobject has been hit.
     /// </summary>
-    internal class HitExplosion : CircularContainer
+    internal class HitExplosion : PoolableDrawable
     {
         public override bool RemoveWhenNotAlive => true;
-
-        [Cached(typeof(DrawableHitObject))]
-        public readonly DrawableHitObject JudgedObject;
+        public override bool RemoveCompletedTransforms => false;
 
         private readonly HitResult result;
 
+        private double? secondHitTime;
+
+        [CanBeNull]
+        public DrawableHitObject JudgedObject;
+
         private SkinnableDrawable skinnable;
 
-        public override double LifetimeStart => skinnable.Drawable.LifetimeStart;
-
-        public override double LifetimeEnd => skinnable.Drawable.LifetimeEnd;
-
-        public HitExplosion(DrawableHitObject judgedObject, HitResult result)
+        /// <summary>
+        /// This constructor only exists to meet the <c>new()</c> type constraint of <see cref="DrawablePool{T}"/>.
+        /// </summary>
+        public HitExplosion()
+            : this(HitResult.Great)
         {
-            JudgedObject = judgedObject;
+        }
+
+        public HitExplosion(HitResult result)
+        {
             this.result = result;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            RelativeSizeAxes = Axes.Both;
             Size = new Vector2(TaikoHitObject.DEFAULT_SIZE);
+            RelativeSizeAxes = Axes.Both;
 
             RelativePositionAxes = Axes.Both;
         }
@@ -48,7 +56,47 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = skinnable = new SkinnableDrawable(new TaikoSkinComponent(getComponentName(result)), _ => new DefaultHitExplosion(JudgedObject, result));
+            InternalChild = skinnable = new SkinnableDrawable(new TaikoSkinComponent(getComponentName(result)), _ => new DefaultHitExplosion(result));
+            skinnable.OnSkinChanged += runAnimation;
+        }
+
+        public void Apply([CanBeNull] DrawableHitObject drawableHitObject)
+        {
+            JudgedObject = drawableHitObject;
+            secondHitTime = null;
+        }
+
+        protected override void PrepareForUse()
+        {
+            base.PrepareForUse();
+            runAnimation();
+        }
+
+        private void runAnimation()
+        {
+            if (JudgedObject?.Result == null)
+                return;
+
+            double resultTime = JudgedObject.Result.TimeAbsolute;
+
+            LifetimeStart = resultTime;
+
+            ApplyTransformsAt(double.MinValue, true);
+            ClearTransforms(true);
+
+            using (BeginAbsoluteSequence(resultTime))
+                (skinnable.Drawable as IAnimatableHitExplosion)?.Animate(JudgedObject);
+
+            if (secondHitTime != null)
+            {
+                using (BeginAbsoluteSequence(secondHitTime.Value))
+                {
+                    this.ResizeTo(new Vector2(TaikoStrongableHitObject.DEFAULT_STRONG_SIZE), 50);
+                    (skinnable.Drawable as IAnimatableHitExplosion)?.AnimateSecondHit();
+                }
+            }
+
+            LifetimeEnd = skinnable.Drawable.LatestTransformEndTime;
         }
 
         private static TaikoSkinComponents getComponentName(HitResult result)
@@ -68,12 +116,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             throw new ArgumentOutOfRangeException(nameof(result), $"Invalid result type: {result}");
         }
 
-        /// <summary>
-        /// Transforms this hit explosion to visualise a secondary hit.
-        /// </summary>
-        public void VisualiseSecondHit()
+        public void VisualiseSecondHit(JudgementResult judgementResult)
         {
-            this.ResizeTo(new Vector2(TaikoHitObject.DEFAULT_STRONG_SIZE), 50);
+            secondHitTime = judgementResult.TimeAbsolute;
+            runAnimation();
         }
     }
 }

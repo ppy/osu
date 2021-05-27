@@ -17,10 +17,12 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Legacy;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osuTK;
 using osuTK.Graphics;
@@ -129,6 +131,31 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("no DHOs shown", () => !this.ChildrenOfType<DrawableTestHitObject>().Any());
         }
 
+        [Test]
+        public void TestApplyHitResultOnKilled()
+        {
+            ManualClock clock = null;
+            bool anyJudged = false;
+
+            void onNewResult(JudgementResult _) => anyJudged = true;
+
+            var beatmap = new Beatmap();
+            beatmap.HitObjects.Add(new TestKilledHitObject { Duration = 20 });
+
+            createTest(beatmap, 10, () => new FramedClock(clock = new ManualClock()));
+
+            AddStep("subscribe to new result", () =>
+            {
+                anyJudged = false;
+                drawableRuleset.NewResult += onNewResult;
+            });
+            AddStep("skip past object", () => clock.CurrentTime = beatmap.HitObjects[0].GetEndTime() + 1000);
+
+            AddAssert("object judged", () => anyJudged);
+
+            AddStep("clean up", () => drawableRuleset.NewResult -= onNewResult);
+        }
+
         private void createTest(IBeatmap beatmap, int poolSize, Func<IFrameBasedClock> createClock = null) => AddStep("create test", () =>
         {
             var ruleset = new TestPoolingRuleset();
@@ -192,6 +219,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             private void load()
             {
                 RegisterPool<TestHitObject, DrawableTestHitObject>(poolSize);
+                RegisterPool<TestKilledHitObject, DrawableTestKilledHitObject>(poolSize);
             }
 
             protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new TestHitObjectLifetimeEntry(hitObject);
@@ -220,19 +248,30 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             protected override IEnumerable<TestHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
             {
-                yield return new TestHitObject
+                switch (original)
                 {
-                    StartTime = original.StartTime,
-                    Duration = 250
-                };
+                    case TestKilledHitObject h:
+                        yield return h;
+
+                        break;
+
+                    default:
+                        yield return new TestHitObject
+                        {
+                            StartTime = original.StartTime,
+                            Duration = 250
+                        };
+
+                        break;
+                }
             }
         }
 
         #endregion
 
-        #region HitObject
+        #region HitObjects
 
-        private class TestHitObject : ConvertHitObject
+        private class TestHitObject : ConvertHitObject, IHasDuration
         {
             public double EndTime => StartTime + Duration;
 
@@ -284,6 +323,30 @@ namespace osu.Game.Tests.Visual.Gameplay
                         this.FadeOut(250);
                         break;
                 }
+            }
+        }
+
+        private class TestKilledHitObject : TestHitObject
+        {
+        }
+
+        private class DrawableTestKilledHitObject : DrawableHitObject<TestKilledHitObject>
+        {
+            public DrawableTestKilledHitObject()
+                : base(null)
+            {
+            }
+
+            protected override void UpdateHitStateTransforms(ArmedState state)
+            {
+                base.UpdateHitStateTransforms(state);
+                Expire();
+            }
+
+            public override void OnKilled()
+            {
+                base.OnKilled();
+                ApplyResult(r => r.Type = r.Judgement.MinResult);
             }
         }
 

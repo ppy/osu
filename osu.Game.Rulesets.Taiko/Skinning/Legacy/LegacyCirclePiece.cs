@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 const string normal_hit = "taikohit";
                 const string big_hit = "taikobig";
 
-                string prefix = ((drawableHitObject as DrawableTaikoHitObject)?.HitObject.IsStrong ?? false) ? big_hit : normal_hit;
+                string prefix = ((drawableHitObject.HitObject as TaikoStrongableHitObject)?.IsStrong ?? false) ? big_hit : normal_hit;
 
                 return skin.GetAnimation($"{prefix}{lookup}", true, false) ??
                        // fallback to regular size if "big" version doesn't exist.

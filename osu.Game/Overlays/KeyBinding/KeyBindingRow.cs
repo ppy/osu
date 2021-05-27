@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -51,7 +52,7 @@ namespace osu.Game.Overlays.KeyBinding
         private FillFlowContainer cancelAndClearButtons;
         private FillFlowContainer<KeyButton> buttons;
 
-        public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend((string)text.Text);
+        public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend(text.Text.ToString());
 
         public KeyBindingRow(object action, IEnumerable<Framework.Input.Bindings.KeyBinding> bindings)
         {
@@ -339,21 +340,12 @@ namespace osu.Game.Overlays.KeyBinding
             }
         }
 
-        public class ClearButton : TriangleButton
+        public class ClearButton : DangerousTriangleButton
         {
             public ClearButton()
             {
                 Text = "Clear";
                 Size = new Vector2(80, 20);
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                BackgroundColour = colours.Pink;
-
-                Triangles.ColourDark = colours.PinkDark;
-                Triangles.ColourLight = colours.PinkLight;
             }
         }
 
@@ -454,6 +446,9 @@ namespace osu.Game.Overlays.KeyBinding
 
             public void UpdateKeyCombination(KeyCombination newCombination)
             {
+                if ((KeyBinding as DatabasedKeyBinding)?.RulesetID != null && !KeyBindingStore.CheckValidForGameplay(newCombination))
+                    return;
+
                 KeyBinding.KeyCombination = newCombination;
                 Text.Text = KeyBinding.KeyCombination.ReadableString();
             }

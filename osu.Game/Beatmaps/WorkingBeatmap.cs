@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +13,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
-using osu.Framework.Statistics;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -34,8 +34,6 @@ namespace osu.Game.Beatmaps
 
         protected AudioManager AudioManager { get; }
 
-        private static readonly GlobalStatistic<int> total_count = GlobalStatistics.Get<int>(nameof(Beatmaps), $"Total {nameof(WorkingBeatmap)}s");
-
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
         {
             AudioManager = audioManager;
@@ -47,8 +45,6 @@ namespace osu.Game.Beatmaps
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
             skin = new RecyclableLazy<ISkin>(GetSkin);
-
-            total_count.Value++;
         }
 
         protected virtual Track GetVirtualTrack(double emptyLength = 0)
@@ -267,6 +263,26 @@ namespace osu.Game.Beatmaps
         public Track LoadTrack() => loadedTrack = GetBeatmapTrack() ?? GetVirtualTrack(1000);
 
         /// <summary>
+        /// Reads the correct track restart point from beatmap metadata and sets looping to enabled.
+        /// </summary>
+        public void PrepareTrackForPreviewLooping()
+        {
+            Track.Looping = true;
+            Track.RestartPoint = Metadata.PreviewTime;
+
+            if (Track.RestartPoint == -1)
+            {
+                if (!Track.IsLoaded)
+                {
+                    // force length to be populated (https://github.com/ppy/osu-framework/issues/4202)
+                    Track.Seek(Track.CurrentTime);
+                }
+
+                Track.RestartPoint = 0.4f * Track.Length;
+            }
+        }
+
+        /// <summary>
         /// Transfer a valid audio track into this working beatmap. Used as an optimisation to avoid reload / track swap
         /// across difficulties in the same beatmap set.
         /// </summary>
@@ -308,13 +324,10 @@ namespace osu.Game.Beatmaps
         public bool SkinLoaded => skin.IsResultAvailable;
         public ISkin Skin => skin.Value;
 
-        protected virtual ISkin GetSkin() => new DefaultSkin();
+        protected virtual ISkin GetSkin() => new DefaultSkin(null);
         private readonly RecyclableLazy<ISkin> skin;
 
-        ~WorkingBeatmap()
-        {
-            total_count.Value--;
-        }
+        public abstract Stream GetStream(string storagePath);
 
         public class RecyclableLazy<T>
         {

@@ -11,6 +11,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Chat.Selection;
@@ -63,6 +65,24 @@ namespace osu.Game.Tests.Visual.Online
 
                 chatOverlay = container.ChatOverlay;
                 channelManager = container.ChannelManager;
+            });
+        }
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("register request handling", () =>
+            {
+                ((DummyAPIAccess)API).HandleRequest = req =>
+                {
+                    switch (req)
+                    {
+                        case JoinChannelRequest _:
+                            return true;
+                    }
+
+                    return false;
+                };
             });
         }
 

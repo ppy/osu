@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Menu
         private const double box_fade_in_time = 65;
         private const int box_width = 200;
 
-        private Bindable<User> user;
+        private IBindable<User> user;
         private Bindable<Skin> skin;
 
         [Resolved]

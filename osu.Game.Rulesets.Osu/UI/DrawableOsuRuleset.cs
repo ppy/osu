@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osuTK;
 
@@ -44,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuFramedReplayInputHandler(replay);
 
-        protected override ReplayRecorder CreateReplayRecorder(Replay replay) => new OsuReplayRecorder(replay);
+        protected override ReplayRecorder CreateReplayRecorder(Score score) => new OsuReplayRecorder(score);
 
         public override double GameplayStartTime
         {

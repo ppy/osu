@@ -14,6 +14,9 @@ namespace osu.Game.Overlays
     {
         private readonly Container dialogContainer;
 
+        protected override string PopInSampleName => "UI/dialog-pop-in";
+        protected override string PopOutSampleName => "UI/dialog-pop-out";
+
         public PopupDialog CurrentDialog { get; private set; }
 
         public DialogOverlay()

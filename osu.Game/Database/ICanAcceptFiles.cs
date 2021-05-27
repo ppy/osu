@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace osu.Game.Database
@@ -19,11 +18,10 @@ namespace osu.Game.Database
         Task Import(params string[] paths);
 
         /// <summary>
-        /// Import the provided stream as a simple item.
+        /// Import the specified files from the given import tasks.
         /// </summary>
-        /// <param name="stream">The stream to import files from. Should be in a supported archive format.</param>
-        /// <param name="filename">The filename of the archive being imported.</param>
-        Task Import(Stream stream, string filename);
+        /// <param name="tasks">The import tasks from which the files should be imported.</param>
+        Task Import(params ImportTask[] tasks);
 
         /// <summary>
         /// An array of accepted file extensions (in the standard format of ".abc").

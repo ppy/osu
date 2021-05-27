@@ -52,7 +52,7 @@ namespace osu.Game.Updater
 
             // debug / local compilations will reset to a non-release string.
             // can be useful to check when an install has transitioned between release and otherwise (see OsuConfigManager's migrations).
-            config.Set(OsuSetting.Version, version);
+            config.SetValue(OsuSetting.Version, version);
         }
 
         private readonly object updateTaskLock = new object();
@@ -69,7 +69,7 @@ namespace osu.Game.Updater
             lock (updateTaskLock)
                 waitTask = (updateCheckTask ??= PerformUpdateCheck());
 
-            bool hasUpdates = await waitTask;
+            bool hasUpdates = await waitTask.ConfigureAwait(false);
 
             lock (updateTaskLock)
                 updateCheckTask = null;

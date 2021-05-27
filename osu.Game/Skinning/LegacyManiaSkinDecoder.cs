@@ -31,8 +31,6 @@ namespace osu.Game.Skinning
 
         protected override void ParseLine(List<LegacyManiaSkinConfiguration> output, Section section, string line)
         {
-            line = StripComments(line);
-
             switch (section)
             {
                 case Section.Mania:
@@ -87,11 +85,15 @@ namespace osu.Game.Skinning
                         break;
 
                     case "HitPosition":
-                        currentConfig.HitPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        currentConfig.HitPosition = (480 - Math.Clamp(float.Parse(pair.Value, CultureInfo.InvariantCulture), 240, 480)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "LightPosition":
                         currentConfig.LightPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        break;
+
+                    case "ScorePosition":
+                        currentConfig.ScorePosition = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "JudgementLine":

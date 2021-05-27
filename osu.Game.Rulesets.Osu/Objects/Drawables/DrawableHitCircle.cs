@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableHitCircle : DrawableOsuHitObject
+    public class DrawableHitCircle : DrawableOsuHitObject, IHasMainCirclePiece
     {
         public OsuAction? HitAction => HitArea.HitAction;
         protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
@@ -66,7 +66,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                                 return true;
                             },
                         },
-                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(CirclePieceComponent), _ => new MainCirclePiece()),
+                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(CirclePieceComponent), _ => new MainCirclePiece())
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
                         ApproachCircle = new ApproachCircle
                         {
                             Alpha = 0,
@@ -123,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 return;
             }
 
-            var result = HitObject.HitWindows.ResultFor(timeOffset);
+            var result = ResultFor(timeOffset);
 
             if (result == HitResult.None || CheckHittable?.Invoke(this, Time.Current) == false)
             {
@@ -146,6 +150,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             });
         }
 
+        /// <summary>
+        /// Retrieves the <see cref="HitResult"/> for a time offset.
+        /// </summary>
+        /// <param name="timeOffset">The time offset.</param>
+        /// <returns>The hit result, or <see cref="HitResult.None"/> if <paramref name="timeOffset"/> doesn't result in a judgement.</returns>
+        protected virtual HitResult ResultFor(double timeOffset) => HitObject.HitWindows.ResultFor(timeOffset);
+
         protected override void UpdateInitialTransforms()
         {
             base.UpdateInitialTransforms();
@@ -157,27 +168,30 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ApproachCircle.Expire(true);
         }
 
+        protected override void UpdateStartTimeStateTransforms()
+        {
+            base.UpdateStartTimeStateTransforms();
+
+            ApproachCircle.FadeOut(50);
+        }
+
         protected override void UpdateHitStateTransforms(ArmedState state)
         {
             Debug.Assert(HitObject.HitWindows != null);
 
+            // todo: temporary / arbitrary, used for lifetime optimisation.
+            this.Delay(800).FadeOut();
+
+            (CirclePiece.Drawable as IMainCirclePiece)?.Animate(state);
+
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.Delay(HitObject.TimePreempt).FadeOut(500);
                     HitArea.HitAction = null;
                     break;
 
                 case ArmedState.Miss:
-                    ApproachCircle.FadeOut(50);
                     this.FadeOut(100);
-                    break;
-
-                case ArmedState.Hit:
-                    ApproachCircle.FadeOut(50);
-
-                    // todo: temporary / arbitrary
-                    this.Delay(800).FadeOut();
                     break;
             }
 

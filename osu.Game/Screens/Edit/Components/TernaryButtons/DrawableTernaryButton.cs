@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.TernaryButtons
 {
-    internal class DrawableTernaryButton : TriangleButton
+    internal class DrawableTernaryButton : OsuButton
     {
         private Color4 defaultBackgroundColour;
         private Color4 defaultBubbleColour;
@@ -42,8 +42,6 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             defaultBubbleColour = defaultBackgroundColour.Darken(0.5f);
             selectedBackgroundColour = colours.BlueDark;
             selectedBubbleColour = selectedBackgroundColour.Lighten(0.5f);
-
-            Triangles.Alpha = 0;
 
             Content.EdgeEffect = new EdgeEffectParameters
             {
