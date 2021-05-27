@@ -86,7 +86,7 @@ namespace osu.Game.Beatmaps
                             beatmap.Metadata.AuthorID = res.AuthorID;
 
                         if (beatmap.BeatmapSet.Metadata != null)
-                            beatmap.BeatmapSet.Metadata.AuthorID = res.AuthorID;
+                            beatmap.BeatmapSet.Metadata.AuthorID = res.BeatmapSet.AuthorID;
 
                         LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
                     }
