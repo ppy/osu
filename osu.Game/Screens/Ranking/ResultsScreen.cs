@@ -156,13 +156,6 @@ namespace osu.Game.Screens.Ranking
                 bool shouldFlair = player != null && !Score.Mods.Any(m => m is ModAutoplay);
 
                 ScorePanelList.AddScore(Score, shouldFlair);
-
-                if (shouldFlair)
-                {
-                    AddInternal(applauseSound = Score.Rank >= ScoreRank.A
-                        ? new SkinnableSound(new SampleInfo("Results/rankpass", "applause"))
-                        : new SkinnableSound(new SampleInfo("Results/rankfail")));
-                }
             }
 
             if (allowWatchingReplay)

@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Ranking
                         }
                     }
                 },
-                new AccuracyCircle(score)
+                new AccuracyCircle(score, true)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
