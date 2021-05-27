@@ -69,7 +69,9 @@ namespace osu.Game.Overlays.Wiki
         {
             var panelsNode = html.DocumentNode.SelectNodes("//div[contains(@class, 'wiki-main-page-panel')]").ToArray();
 
-            for (var i = 0; i < panelsNode.Length; i++)
+            var i = 0;
+
+            while (i < panelsNode.Length)
             {
                 var isFullWidth = panelsNode[i].HasClass("wiki-main-page-panel--full");
 
@@ -77,7 +79,7 @@ namespace osu.Game.Overlays.Wiki
                 {
                     yield return new Drawable[]
                     {
-                        new WikiPanelContainer(panelsNode[i].InnerText, true)
+                        new WikiPanelContainer(panelsNode[i++].InnerText, true)
                         {
                             // This is required to fill up the space of "null" drawable below.
                             Width = 2,
@@ -85,13 +87,12 @@ namespace osu.Game.Overlays.Wiki
                         null,
                     };
                 }
-
-                if (i % 2 == 1)
+                else
                 {
                     yield return new Drawable[]
                     {
-                        new WikiPanelContainer(panelsNode[i].InnerText),
-                        new WikiPanelContainer(panelsNode[i + 1].InnerText),
+                        new WikiPanelContainer(panelsNode[i++].InnerText),
+                        new WikiPanelContainer(panelsNode[i++].InnerText),
                     };
                 }
             }
