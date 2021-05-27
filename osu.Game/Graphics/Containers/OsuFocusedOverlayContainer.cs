@@ -18,13 +18,17 @@ namespace osu.Game.Graphics.Containers
     [Cached(typeof(IPreviewTrackOwner))]
     public abstract class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
     {
-        private SampleChannel samplePopIn;
-        private SampleChannel samplePopOut;
+        private Sample samplePopIn;
+        private Sample samplePopOut;
+        protected virtual string PopInSampleName => "UI/overlay-pop-in";
+        protected virtual string PopOutSampleName => "UI/overlay-pop-out";
+
+        protected override bool BlockScrollInput => false;
 
         protected override bool BlockNonPositionalInput => true;
 
         /// <summary>
-        /// Temporary to allow for overlays in the main screen content to not dim theirselves.
+        /// Temporary to allow for overlays in the main screen content to not dim themselves.
         /// Should be eventually replaced by dimming which is aware of the target dim container (traverse parent for certain interface type?).
         /// </summary>
         protected virtual bool DimMainContent => true;
@@ -40,8 +44,8 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio)
         {
-            samplePopIn = audio.Samples.Get(@"UI/overlay-pop-in");
-            samplePopOut = audio.Samples.Get(@"UI/overlay-pop-out");
+            samplePopIn = audio.Samples.Get(PopInSampleName);
+            samplePopOut = audio.Samples.Get(PopOutSampleName);
         }
 
         protected override void LoadComplete()

@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mania.Difficulty;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.Tests
@@ -16,6 +17,10 @@ namespace osu.Game.Rulesets.Mania.Tests
         [TestCase(2.3449735700206298d, "diffcalc-test")]
         public void Test(double expected, string name)
             => base.Test(expected, name);
+
+        [TestCase(2.7879104989252959d, "diffcalc-test")]
+        public void TestClockRateAdjusted(double expected, string name)
+            => Test(expected, name, new ManiaModDoubleTime());
 
         protected override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new ManiaDifficultyCalculator(new ManiaRuleset(), beatmap);
 

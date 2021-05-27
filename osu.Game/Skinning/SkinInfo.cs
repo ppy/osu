@@ -3,8 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.IO.Stores;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Extensions;
+using osu.Game.IO;
 
 namespace osu.Game.Skinning
 {
@@ -22,7 +26,22 @@ namespace osu.Game.Skinning
 
         public string Creator { get; set; }
 
-        public List<SkinFileInfo> Files { get; set; }
+        public string InstantiationInfo { get; set; }
+
+        public virtual Skin CreateInstance(IResourceStore<byte[]> legacyDefaultResources, IStorageResourceProvider resources)
+        {
+            var type = string.IsNullOrEmpty(InstantiationInfo)
+                // handle the case of skins imported before InstantiationInfo was added.
+                ? typeof(LegacySkin)
+                : Type.GetType(InstantiationInfo).AsNonNull();
+
+            if (type == typeof(DefaultLegacySkin))
+                return (Skin)Activator.CreateInstance(type, this, legacyDefaultResources, resources);
+
+            return (Skin)Activator.CreateInstance(type, this, resources);
+        }
+
+        public List<SkinFileInfo> Files { get; set; } = new List<SkinFileInfo>();
 
         public List<DatabasedSetting> Settings { get; set; }
 
@@ -32,7 +51,8 @@ namespace osu.Game.Skinning
         {
             ID = DEFAULT_SKIN,
             Name = "osu!lazer",
-            Creator = "team osu!"
+            Creator = "team osu!",
+            InstantiationInfo = typeof(DefaultSkin).GetInvariantInstantiationInfo()
         };
 
         public bool Equals(SkinInfo other) => other != null && ID == other.ID;

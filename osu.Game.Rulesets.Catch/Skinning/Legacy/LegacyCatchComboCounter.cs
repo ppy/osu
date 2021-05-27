@@ -7,7 +7,6 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
-using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
@@ -22,9 +21,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         public LegacyCatchComboCounter(ISkin skin)
         {
-            var fontName = skin.GetConfig<LegacySetting, string>(LegacySetting.ComboPrefix)?.Value ?? "score";
-            var fontOverlap = skin.GetConfig<LegacySetting, float>(LegacySetting.ComboOverlap)?.Value ?? -2f;
-
             AutoSizeAxes = Axes.Both;
 
             Alpha = 0f;
@@ -34,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
             InternalChildren = new Drawable[]
             {
-                explosion = new LegacyRollingCounter(skin, fontName, fontOverlap)
+                explosion = new LegacyRollingCounter(LegacyFont.Combo)
                 {
                     Alpha = 0.65f,
                     Blending = BlendingParameters.Additive,
@@ -42,7 +38,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     Origin = Anchor.Centre,
                     Scale = new Vector2(1.5f),
                 },
-                counter = new LegacyRollingCounter(skin, fontName, fontOverlap)
+                counter = new LegacyRollingCounter(LegacyFont.Combo)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

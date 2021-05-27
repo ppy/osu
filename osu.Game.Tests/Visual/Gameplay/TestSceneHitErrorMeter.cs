@@ -1,32 +1,39 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
-using osu.Game.Rulesets.Judgements;
-using osu.Framework.Utils;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Catch.Scoring;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Scoring;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneHitErrorMeter : OsuTestScene
     {
-        private BarHitErrorMeter barMeter;
-        private BarHitErrorMeter barMeter2;
-        private BarHitErrorMeter barMeter3;
-        private ColourHitErrorMeter colourMeter;
-        private ColourHitErrorMeter colourMeter2;
-        private ColourHitErrorMeter colourMeter3;
-        private HitWindows hitWindows;
+        [Cached]
+        private ScoreProcessor scoreProcessor = new ScoreProcessor();
+
+        [Cached(typeof(DrawableRuleset))]
+        private TestDrawableRuleset drawableRuleset = new TestDrawableRuleset();
 
         public TestSceneHitErrorMeter()
         {
@@ -34,8 +41,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddRepeatStep("New random judgement", () => newJudgement(), 40);
 
-            AddRepeatStep("New max negative", () => newJudgement(-hitWindows.WindowFor(HitResult.Meh)), 20);
-            AddRepeatStep("New max positive", () => newJudgement(hitWindows.WindowFor(HitResult.Meh)), 20);
+            AddRepeatStep("New max negative", () => newJudgement(-drawableRuleset.HitWindows.WindowFor(HitResult.Meh)), 20);
+            AddRepeatStep("New max positive", () => newJudgement(drawableRuleset.HitWindows.WindowFor(HitResult.Meh)), 20);
             AddStep("New fixed judgement (50ms)", () => newJudgement(50));
 
             AddStep("Judgement barrage", () =>
@@ -85,9 +92,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void recreateDisplay(HitWindows hitWindows, float overallDifficulty)
         {
-            this.hitWindows = hitWindows;
-
             hitWindows?.SetDifficulty(overallDifficulty);
+
+            drawableRuleset.HitWindows = hitWindows;
 
             Clear();
 
@@ -105,40 +112,40 @@ namespace osu.Game.Tests.Visual.Gameplay
                 }
             });
 
-            Add(barMeter = new BarHitErrorMeter(hitWindows, true)
+            Add(new BarHitErrorMeter
             {
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
             });
 
-            Add(barMeter2 = new BarHitErrorMeter(hitWindows, false)
+            Add(new BarHitErrorMeter
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
             });
 
-            Add(barMeter3 = new BarHitErrorMeter(hitWindows, true)
+            Add(new BarHitErrorMeter
             {
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.CentreLeft,
                 Rotation = 270,
             });
 
-            Add(colourMeter = new ColourHitErrorMeter(hitWindows)
+            Add(new ColourHitErrorMeter
             {
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
                 Margin = new MarginPadding { Right = 50 }
             });
 
-            Add(colourMeter2 = new ColourHitErrorMeter(hitWindows)
+            Add(new ColourHitErrorMeter
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 Margin = new MarginPadding { Left = 50 }
             });
 
-            Add(colourMeter3 = new ColourHitErrorMeter(hitWindows)
+            Add(new ColourHitErrorMeter
             {
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.CentreLeft,
@@ -149,18 +156,47 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void newJudgement(double offset = 0)
         {
-            var judgement = new JudgementResult(new HitObject(), new Judgement())
+            scoreProcessor.ApplyResult(new JudgementResult(new HitCircle { HitWindows = drawableRuleset.HitWindows }, new Judgement())
             {
                 TimeOffset = offset == 0 ? RNG.Next(-150, 150) : offset,
                 Type = HitResult.Perfect,
-            };
+            });
+        }
 
-            barMeter.OnNewJudgement(judgement);
-            barMeter2.OnNewJudgement(judgement);
-            barMeter3.OnNewJudgement(judgement);
-            colourMeter.OnNewJudgement(judgement);
-            colourMeter2.OnNewJudgement(judgement);
-            colourMeter3.OnNewJudgement(judgement);
+        [SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]
+        private class TestDrawableRuleset : DrawableRuleset
+        {
+            public HitWindows HitWindows;
+
+            public override IEnumerable<HitObject> Objects => new[] { new HitCircle { HitWindows = HitWindows } };
+
+            public override event Action<JudgementResult> NewResult;
+            public override event Action<JudgementResult> RevertResult;
+
+            public override Playfield Playfield { get; }
+            public override Container Overlays { get; }
+            public override Container FrameStableComponents { get; }
+            public override IFrameStableClock FrameStableClock { get; }
+            public override IReadOnlyList<Mod> Mods { get; }
+
+            public override double GameplayStartTime { get; }
+            public override GameplayCursorContainer Cursor { get; }
+
+            public TestDrawableRuleset()
+                : base(new OsuRuleset())
+            {
+                // won't compile without this.
+                NewResult?.Invoke(null);
+                RevertResult?.Invoke(null);
+            }
+
+            public override void SetReplayScore(Score replayScore) => throw new NotImplementedException();
+
+            public override void SetRecordTarget(Score score) => throw new NotImplementedException();
+
+            public override void RequestResume(Action continueResume) => throw new NotImplementedException();
+
+            public override void CancelResume() => throw new NotImplementedException();
         }
     }
 }

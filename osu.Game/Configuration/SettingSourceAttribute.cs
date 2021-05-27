@@ -1,13 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Configuration
@@ -22,15 +26,23 @@ namespace osu.Game.Configuration
     /// </remarks>
     [MeansImplicitUse]
     [AttributeUsage(AttributeTargets.Property)]
-    public class SettingSourceAttribute : Attribute
+    public class SettingSourceAttribute : Attribute, IComparable<SettingSourceAttribute>
     {
-        public string Label { get; }
+        public LocalisableString Label { get; }
 
         public string Description { get; }
 
         public int? OrderPosition { get; }
 
-        public SettingSourceAttribute(string label, string description = null)
+        /// <summary>
+        /// The type of the settings control which handles this setting source.
+        /// </summary>
+        /// <remarks>
+        /// Must be a type deriving <see cref="SettingsItem{T}"/> with a public parameterless constructor.
+        /// </remarks>
+        public Type? SettingControlType { get; set; }
+
+        public SettingSourceAttribute(string? label, string? description = null)
         {
             Label = label ?? string.Empty;
             Description = description ?? string.Empty;
@@ -40,6 +52,21 @@ namespace osu.Game.Configuration
             : this(label, description)
         {
             OrderPosition = orderPosition;
+        }
+
+        public int CompareTo(SettingSourceAttribute other)
+        {
+            if (OrderPosition == other.OrderPosition)
+                return 0;
+
+            // unordered items come last (are greater than any ordered items).
+            if (OrderPosition == null)
+                return 1;
+            if (other.OrderPosition == null)
+                return -1;
+
+            // ordered items are sorted by the order value.
+            return OrderPosition.Value.CompareTo(other.OrderPosition);
         }
     }
 
@@ -51,12 +78,29 @@ namespace osu.Game.Configuration
             {
                 object value = property.GetValue(obj);
 
+                if (attr.SettingControlType != null)
+                {
+                    var controlType = attr.SettingControlType;
+                    if (controlType.EnumerateBaseTypes().All(t => !t.IsGenericType || t.GetGenericTypeDefinition() != typeof(SettingsItem<>)))
+                        throw new InvalidOperationException($"{nameof(SettingSourceAttribute)} had an unsupported custom control type ({controlType.ReadableName()})");
+
+                    var control = (Drawable)Activator.CreateInstance(controlType);
+                    controlType.GetProperty(nameof(SettingsItem<object>.LabelText))?.SetValue(control, attr.Label);
+                    controlType.GetProperty(nameof(SettingsItem<object>.TooltipText))?.SetValue(control, attr.Description);
+                    controlType.GetProperty(nameof(SettingsItem<object>.Current))?.SetValue(control, value);
+
+                    yield return control;
+
+                    continue;
+                }
+
                 switch (value)
                 {
                     case BindableNumber<float> bNumber:
                         yield return new SettingsSlider<float>
                         {
                             LabelText = attr.Label,
+                            TooltipText = attr.Description,
                             Current = bNumber,
                             KeyboardStep = 0.1f,
                         };
@@ -67,6 +111,7 @@ namespace osu.Game.Configuration
                         yield return new SettingsSlider<double>
                         {
                             LabelText = attr.Label,
+                            TooltipText = attr.Description,
                             Current = bNumber,
                             KeyboardStep = 0.1f,
                         };
@@ -77,6 +122,7 @@ namespace osu.Game.Configuration
                         yield return new SettingsSlider<int>
                         {
                             LabelText = attr.Label,
+                            TooltipText = attr.Description,
                             Current = bNumber
                         };
 
@@ -86,6 +132,7 @@ namespace osu.Game.Configuration
                         yield return new SettingsCheckbox
                         {
                             LabelText = attr.Label,
+                            TooltipText = attr.Description,
                             Current = bBool
                         };
 
@@ -95,6 +142,7 @@ namespace osu.Game.Configuration
                         yield return new SettingsTextBox
                         {
                             LabelText = attr.Label,
+                            TooltipText = attr.Description,
                             Current = bString
                         };
 
@@ -105,6 +153,7 @@ namespace osu.Game.Configuration
                         var dropdown = (Drawable)Activator.CreateInstance(dropdownType);
 
                         dropdownType.GetProperty(nameof(SettingsDropdown<object>.LabelText))?.SetValue(dropdown, attr.Label);
+                        dropdownType.GetProperty(nameof(SettingsDropdown<object>.TooltipText))?.SetValue(dropdown, attr.Description);
                         dropdownType.GetProperty(nameof(SettingsDropdown<object>.Current))?.SetValue(dropdown, bindable);
 
                         yield return dropdown;
@@ -130,14 +179,9 @@ namespace osu.Game.Configuration
             }
         }
 
-        public static IEnumerable<(SettingSourceAttribute, PropertyInfo)> GetOrderedSettingsSourceProperties(this object obj)
-        {
-            var original = obj.GetSettingsSourceProperties();
-
-            var orderedRelative = original.Where(attr => attr.Item1.OrderPosition != null).OrderBy(attr => attr.Item1.OrderPosition);
-            var unordered = original.Except(orderedRelative);
-
-            return orderedRelative.Concat(unordered);
-        }
+        public static ICollection<(SettingSourceAttribute, PropertyInfo)> GetOrderedSettingsSourceProperties(this object obj)
+            => obj.GetSettingsSourceProperties()
+                  .OrderBy(attr => attr.Item1)
+                  .ToArray();
     }
 }

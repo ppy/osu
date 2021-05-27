@@ -91,7 +91,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
             scrollingInfo = new LocalScrollingInfo();
             scrollingInfo.Direction.BindTo(Direction);
             scrollingInfo.TimeRange.BindTo(TimeRange);
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             switch (VisualisationMethod)
             {
                 case ScrollVisualisationMethod.Sequential:
@@ -106,11 +110,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     scrollingInfo.Algorithm = new ConstantScrollAlgorithm();
                     break;
             }
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             double lastObjectTime = Objects.LastOrDefault()?.GetEndTime() ?? double.MaxValue;
             double baseBeatLength = TimingControlPoint.DEFAULT_BEAT_LENGTH;
 

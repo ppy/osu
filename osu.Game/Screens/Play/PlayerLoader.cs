@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -25,6 +24,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Users;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Play
 
                 backgroundBrightnessReduction = value;
 
-                Background.FadeColour(OsuColour.Gray(backgroundBrightnessReduction ? 0.8f : 1), 200);
+                ApplyToBackground(b => b.FadeColour(OsuColour.Gray(backgroundBrightnessReduction ? 0.8f : 1), 200));
             }
         }
 
@@ -113,6 +113,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private AudioManager audioManager { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private BatteryInfo batteryInfo { get; set; }
+
         public PlayerLoader(Func<Player> createPlayer)
         {
             this.createPlayer = createPlayer;
@@ -122,6 +125,7 @@ namespace osu.Game.Screens.Play
         private void load(SessionStatics sessionStatics)
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
+            batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce);
 
             InternalChild = (content = new LogoTrackingContainer
             {
@@ -176,12 +180,17 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
 
-            if (epilepsyWarning != null)
-                epilepsyWarning.DimmableBackground = Background;
+            ApplyToBackground(b =>
+            {
+                if (epilepsyWarning != null)
+                    epilepsyWarning.DimmableBackground = b;
+
+                b?.FadeColour(Color4.White, 800, Easing.OutQuint);
+            });
+
             Beatmap.Value.Track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             content.ScaleTo(0.7f);
-            Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
 
             contentIn();
 
@@ -189,9 +198,10 @@ namespace osu.Game.Screens.Play
 
             // after an initial delay, start the debounced load check.
             // this will continue to execute even after resuming back on restart.
-            Scheduler.Add(new ScheduledDelegate(pushWhenLoaded, 1800, 0));
+            Scheduler.Add(new ScheduledDelegate(pushWhenLoaded, Clock.CurrentTime + 1800, 0));
 
             showMuteWarningIfNeeded();
+            showBatteryWarningIfNeeded();
         }
 
         public override void OnResuming(IScreen last)
@@ -225,7 +235,8 @@ namespace osu.Game.Screens.Play
             content.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
 
-            Background.EnableUserDim.Value = false;
+            ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
+
             BackgroundBrightnessReduction = false;
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
@@ -270,16 +281,22 @@ namespace osu.Game.Screens.Play
             if (inputManager.HoveredDrawables.Contains(VisualSettings))
             {
                 // Preview user-defined background dim and blur when hovered on the visual settings panel.
-                Background.EnableUserDim.Value = true;
-                Background.BlurAmount.Value = 0;
+                ApplyToBackground(b =>
+                {
+                    b.IgnoreUserSettings.Value = false;
+                    b.BlurAmount.Value = 0;
+                });
 
                 BackgroundBrightnessReduction = false;
             }
             else
             {
-                // Returns background dim and blur to the values specified by PlayerLoader.
-                Background.EnableUserDim.Value = false;
-                Background.BlurAmount.Value = BACKGROUND_BLUR;
+                ApplyToBackground(b =>
+                {
+                    // Returns background dim and blur to the values specified by PlayerLoader.
+                    b.IgnoreUserSettings.Value = true;
+                    b.BlurAmount.Value = BACKGROUND_BLUR;
+                });
 
                 BackgroundBrightnessReduction = true;
             }
@@ -298,10 +315,8 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
-            var restartCount = player?.RestartCount + 1 ?? 0;
-
             player = createPlayer();
-            player.RestartCount = restartCount;
+            player.RestartCount = restartCount++;
             player.RestartRequested = restartRequested;
 
             LoadTask = LoadComponentAsync(player, _ => MetadataInfo.Loading = false);
@@ -417,6 +432,8 @@ namespace osu.Game.Screens.Play
 
         private Bindable<bool> muteWarningShownOnce;
 
+        private int restartCount;
+
         private void showMuteWarningIfNeeded()
         {
             if (!muteWarningShownOnce.Value)
@@ -453,6 +470,49 @@ namespace osu.Game.Screens.Play
                     audioManager.Volume.SetDefault();
                     audioManager.VolumeTrack.SetDefault();
 
+                    return true;
+                };
+            }
+        }
+
+        #endregion
+
+        #region Low battery warning
+
+        private Bindable<bool> batteryWarningShownOnce;
+
+        private void showBatteryWarningIfNeeded()
+        {
+            if (batteryInfo == null) return;
+
+            if (!batteryWarningShownOnce.Value)
+            {
+                if (!batteryInfo.IsCharging && batteryInfo.ChargeLevel <= 0.25)
+                {
+                    notificationOverlay?.Post(new BatteryWarningNotification());
+                    batteryWarningShownOnce.Value = true;
+                }
+            }
+        }
+
+        private class BatteryWarningNotification : SimpleNotification
+        {
+            public override bool IsImportant => true;
+
+            public BatteryWarningNotification()
+            {
+                Text = "Your battery level is low! Charge your device to prevent interruptions during gameplay.";
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours, NotificationOverlay notificationOverlay)
+            {
+                Icon = FontAwesome.Solid.BatteryQuarter;
+                IconBackgound.Colour = colours.RedDark;
+
+                Activated = delegate
+                {
+                    notificationOverlay.Hide();
                     return true;
                 };
             }

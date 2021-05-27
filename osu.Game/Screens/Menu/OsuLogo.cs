@@ -43,8 +43,9 @@ namespace osu.Game.Screens.Menu
 
         private readonly IntroSequence intro;
 
-        private SampleChannel sampleClick;
-        private SampleChannel sampleBeat;
+        private Sample sampleClick;
+        private Sample sampleBeat;
+        private Sample sampleDownbeat;
 
         private readonly Container colourAndTriangles;
         private readonly Triangles triangles;
@@ -259,6 +260,7 @@ namespace osu.Game.Screens.Menu
         {
             sampleClick = audio.Samples.Get(@"Menu/osu-logo-select");
             sampleBeat = audio.Samples.Get(@"Menu/osu-logo-heartbeat");
+            sampleDownbeat = audio.Samples.Get(@"Menu/osu-logo-downbeat");
 
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");
@@ -281,7 +283,15 @@ namespace osu.Game.Screens.Menu
             if (beatIndex < 0) return;
 
             if (IsHovered)
-                this.Delay(early_activation).Schedule(() => sampleBeat.Play());
+            {
+                this.Delay(early_activation).Schedule(() =>
+                {
+                    if (beatIndex % (int)timingPoint.TimeSignature == 0)
+                        sampleDownbeat.Play();
+                    else
+                        sampleBeat.Play();
+                });
+            }
 
             logoBeatContainer
                 .ScaleTo(1 - 0.02f * amplitudeAdjust, early_activation, Easing.Out).Then()

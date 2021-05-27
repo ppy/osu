@@ -15,6 +15,9 @@ namespace osu.Game.Online.API.Requests
 {
     public class SearchBeatmapSetsRequest : APIRequest<SearchBeatmapSetsResponse>
     {
+        [CanBeNull]
+        public IReadOnlyCollection<SearchGeneral> General { get; }
+
         public SearchCategory SearchCategory { get; }
 
         public SortCriteria SortCriteria { get; }
@@ -30,6 +33,8 @@ namespace osu.Game.Online.API.Requests
 
         public SearchPlayed Played { get; }
 
+        public SearchExplicit ExplicitContent { get; }
+
         [CanBeNull]
         public IReadOnlyCollection<ScoreRank> Ranks { get; }
 
@@ -43,6 +48,7 @@ namespace osu.Game.Online.API.Requests
             string query,
             RulesetInfo ruleset,
             Cursor cursor = null,
+            IReadOnlyCollection<SearchGeneral> general = null,
             SearchCategory searchCategory = SearchCategory.Any,
             SortCriteria sortCriteria = SortCriteria.Ranked,
             SortDirection sortDirection = SortDirection.Descending,
@@ -50,12 +56,14 @@ namespace osu.Game.Online.API.Requests
             SearchLanguage language = SearchLanguage.Any,
             IReadOnlyCollection<SearchExtra> extra = null,
             IReadOnlyCollection<ScoreRank> ranks = null,
-            SearchPlayed played = SearchPlayed.Any)
+            SearchPlayed played = SearchPlayed.Any,
+            SearchExplicit explicitContent = SearchExplicit.Hide)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
             this.cursor = cursor;
 
+            General = general;
             SearchCategory = searchCategory;
             SortCriteria = sortCriteria;
             SortDirection = sortDirection;
@@ -64,12 +72,16 @@ namespace osu.Game.Online.API.Requests
             Extra = extra;
             Ranks = ranks;
             Played = played;
+            ExplicitContent = explicitContent;
         }
 
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
             req.AddParameter("q", query);
+
+            if (General != null && General.Any())
+                req.AddParameter("c", string.Join('.', General.Select(e => e.ToString().ToLowerInvariant())));
 
             if (ruleset.ID.HasValue)
                 req.AddParameter("m", ruleset.ID.Value.ToString());
@@ -92,6 +104,8 @@ namespace osu.Game.Online.API.Requests
 
             if (Played != SearchPlayed.Any)
                 req.AddParameter("played", Played.ToString().ToLowerInvariant());
+
+            req.AddParameter("nsfw", ExplicitContent == SearchExplicit.Show ? "true" : "false");
 
             req.AddCursor(cursor);
 

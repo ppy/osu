@@ -20,16 +20,23 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private double lastTrailTime;
         private IBindable<float> cursorSize;
 
-        public LegacyCursorTrail()
-        {
-            Blending = BlendingParameters.Additive;
-        }
-
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, OsuConfigManager config)
         {
             Texture = skin.GetTexture("cursortrail");
             disjointTrail = skin.GetTexture("cursormiddle") == null;
+
+            if (disjointTrail)
+            {
+                bool centre = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.CursorCentre)?.Value ?? true;
+
+                TrailOrigin = centre ? Anchor.Centre : Anchor.TopLeft;
+                Blending = BlendingParameters.Inherit;
+            }
+            else
+            {
+                Blending = BlendingParameters.Additive;
+            }
 
             if (Texture != null)
             {

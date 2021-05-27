@@ -22,7 +22,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public double? PP { get; set; }
 
         [JsonProperty(@"room_id")]
-        public int RoomID { get; set; }
+        public long RoomID { get; set; }
 
         [JsonProperty("total_score")]
         public long TotalScore { get; set; }

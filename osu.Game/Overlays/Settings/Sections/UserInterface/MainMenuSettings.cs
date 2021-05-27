@@ -1,11 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
+using osu.Game.Online.API;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
@@ -13,9 +14,15 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
     {
         protected override string Header => "Main Menu";
 
+        private IBindable<User> user;
+
+        private SettingsEnumDropdown<BackgroundSource> backgroundSourceDropdown;
+
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, IAPIProvider api)
         {
+            user = api.LocalUser.GetBoundCopy();
+
             Children = new Drawable[]
             {
                 new SettingsCheckbox
@@ -28,25 +35,34 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = "osu! music theme",
                     Current = config.GetBindable<bool>(OsuSetting.MenuMusic)
                 },
-                new SettingsDropdown<IntroSequence>
+                new SettingsEnumDropdown<IntroSequence>
                 {
                     LabelText = "Intro sequence",
                     Current = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence),
-                    Items = Enum.GetValues(typeof(IntroSequence)).Cast<IntroSequence>()
                 },
-                new SettingsDropdown<BackgroundSource>
+                backgroundSourceDropdown = new SettingsEnumDropdown<BackgroundSource>
                 {
                     LabelText = "Background source",
                     Current = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource),
-                    Items = Enum.GetValues(typeof(BackgroundSource)).Cast<BackgroundSource>()
                 },
-                new SettingsDropdown<SeasonalBackgroundMode>
+                new SettingsEnumDropdown<SeasonalBackgroundMode>
                 {
                     LabelText = "Seasonal backgrounds",
                     Current = config.GetBindable<SeasonalBackgroundMode>(OsuSetting.SeasonalBackgroundMode),
-                    Items = Enum.GetValues(typeof(SeasonalBackgroundMode)).Cast<SeasonalBackgroundMode>()
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            user.BindValueChanged(u =>
+            {
+                const string not_supporter_note = "Changes to this setting will only apply with an active osu!supporter tag.";
+
+                backgroundSourceDropdown.WarningText = u.NewValue?.IsSupporter != true ? not_supporter_note : string.Empty;
+            }, true);
         }
     }
 }

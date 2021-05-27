@@ -33,10 +33,5 @@ namespace osu.Game.Rulesets.Osu.Objects
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
         public override Judgement CreateJudgement() => new SliderTickJudgement();
-
-        public class SliderTickJudgement : OsuJudgement
-        {
-            public override HitResult MaxResult => HitResult.LargeTickHit;
-        }
     }
 }

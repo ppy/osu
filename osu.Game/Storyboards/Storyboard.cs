@@ -27,7 +27,24 @@ namespace osu.Game.Storyboards
 
         public bool HasDrawable => Layers.Any(l => l.Elements.Any(e => e.IsDrawable));
 
-        public double FirstEventTime => Layers.Min(l => l.Elements.FirstOrDefault()?.StartTime ?? 0);
+        /// <summary>
+        /// Across all layers, find the earliest point in time that a storyboard element exists at.
+        /// Will return null if there are no elements.
+        /// </summary>
+        /// <remarks>
+        /// This iterates all elements and as such should be used sparingly or stored locally.
+        /// </remarks>
+        public double? EarliestEventTime => Layers.SelectMany(l => l.Elements).OrderBy(e => e.StartTime).FirstOrDefault()?.StartTime;
+
+        /// <summary>
+        /// Across all layers, find the latest point in time that a storyboard element ends at.
+        /// Will return null if there are no elements.
+        /// </summary>
+        /// <remarks>
+        /// This iterates all elements and as such should be used sparingly or stored locally.
+        /// Videos and samples return StartTime as their EndTIme.
+        /// </remarks>
+        public double? LatestEventTime => Layers.SelectMany(l => l.Elements).OrderBy(e => e.GetEndTime()).LastOrDefault()?.GetEndTime();
 
         /// <summary>
         /// Depth of the currently front-most storyboard layer, excluding the overlay layer.
