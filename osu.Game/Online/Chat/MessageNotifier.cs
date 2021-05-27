@@ -35,7 +35,7 @@ namespace osu.Game.Online.Chat
 
         private Bindable<bool> notifyOnMention;
         private Bindable<bool> notifyOnPM;
-        private IBindable<User> localUser = new Bindable<User>();
+        private readonly IBindable<User> localUser = new Bindable<User>();
         private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
 
         [BackgroundDependencyLoader]
@@ -171,7 +171,8 @@ namespace osu.Game.Online.Chat
 
         public class PrivateMessageNotification : OpenChannelNotification
         {
-            public PrivateMessageNotification(string username, Channel channel) : base(channel)
+            public PrivateMessageNotification(string username, Channel channel)
+                : base(channel)
             {
                 Icon = FontAwesome.Solid.Envelope;
                 Text = $"You received a private message from '{username}'. Click to read it!";
@@ -180,7 +181,8 @@ namespace osu.Game.Online.Chat
 
         public class MentionNotification : OpenChannelNotification
         {
-            public MentionNotification(string username, Channel channel) : base(channel)
+            public MentionNotification(string username, Channel channel)
+                : base(channel)
             {
                 Icon = FontAwesome.Solid.At;
                 Text = $"Your name was mentioned in chat by '{username}'. Click to find out why!";
