@@ -334,6 +334,10 @@ namespace osu.Game
             KeyBindingStore.Register(globalBindings);
             dependencies.Cache(globalBindings);
 
+            BackgroundTrackManager backgroundTrackManager;
+            dependencies.Cache(backgroundTrackManager = new BackgroundTrackManager());
+            Add(backgroundTrackManager);
+
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager());
             Add(previewTrackManager);
