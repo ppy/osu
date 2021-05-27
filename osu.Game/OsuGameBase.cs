@@ -67,21 +67,11 @@ namespace osu.Game
 
         protected ScoreManager ScoreManager { get; private set; }
 
-        protected BeatmapDifficultyCache DifficultyCache { get; private set; }
-
-        protected UserLookupCache UserCache { get; private set; }
-
         protected SkinManager SkinManager { get; private set; }
 
         protected RulesetStore RulesetStore { get; private set; }
 
-        protected FileStore FileStore { get; private set; }
-
         protected KeyBindingStore KeyBindingStore { get; private set; }
-
-        protected SettingsStore SettingsStore { get; private set; }
-
-        protected RulesetConfigCache RulesetConfigCache { get; private set; }
 
         protected MenuCursorContainer MenuCursorContainer { get; private set; }
 
@@ -92,13 +82,6 @@ namespace osu.Game
         protected Storage Storage { get; set; }
 
         protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
-
-        private SpectatorClient spectatorClient;
-        private MultiplayerClient multiplayerClient;
-
-        private Container content;
-
-        protected override Container<Drawable> Content => content;
 
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
@@ -120,6 +103,24 @@ namespace osu.Game
         /// Mods available for the current <see cref="Ruleset"/>.
         /// </summary>
         public readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> AvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
+
+        private BeatmapDifficultyCache difficultyCache;
+
+        private UserLookupCache userCache;
+
+        private FileStore fileStore;
+
+        private SettingsStore settingsStore;
+
+        private RulesetConfigCache rulesetConfigCache;
+
+        private SpectatorClient spectatorClient;
+
+        private MultiplayerClient multiplayerClient;
+
+        protected override Container<Drawable> Content => content;
+
+        private Container content;
 
         private Bindable<bool> fpsDisplayVisible;
 
@@ -246,10 +247,10 @@ namespace osu.Game
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
-            dependencies.Cache(FileStore = new FileStore(contextFactory, Storage));
+            dependencies.Cache(fileStore = new FileStore(contextFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Host, () => DifficultyCache, LocalConfig));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Host, () => difficultyCache, LocalConfig));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap, true));
 
             // this should likely be moved to ArchiveModelManager when another case appers where it is necessary
@@ -273,19 +274,19 @@ namespace osu.Game
                     ScoreManager.Undelete(getBeatmapScores(item), true);
             });
 
-            dependencies.Cache(DifficultyCache = new BeatmapDifficultyCache());
-            AddInternal(DifficultyCache);
+            dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
+            AddInternal(difficultyCache);
 
-            dependencies.Cache(UserCache = new UserLookupCache());
-            AddInternal(UserCache);
+            dependencies.Cache(userCache = new UserLookupCache());
+            AddInternal(userCache);
 
             var scorePerformanceManager = new ScorePerformanceCache();
             dependencies.Cache(scorePerformanceManager);
             AddInternal(scorePerformanceManager);
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
-            dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
-            dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
+            dependencies.Cache(settingsStore = new SettingsStore(contextFactory));
+            dependencies.Cache(rulesetConfigCache = new RulesetConfigCache(settingsStore));
 
             var powerStatus = CreateBatteryInfo();
             if (powerStatus != null)
@@ -308,7 +309,7 @@ namespace osu.Game
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
             dependencies.CacheAs(Beatmap);
 
-            FileStore.Cleanup();
+            fileStore.Cleanup();
 
             // add api components to hierarchy.
             if (API is APIAccess apiAccess)
@@ -316,7 +317,7 @@ namespace osu.Game
             AddInternal(spectatorClient);
             AddInternal(multiplayerClient);
 
-            AddInternal(RulesetConfigCache);
+            AddInternal(rulesetConfigCache);
 
             GlobalActionContainer globalBindings;
 
