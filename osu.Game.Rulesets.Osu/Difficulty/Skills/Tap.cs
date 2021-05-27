@@ -27,8 +27,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentStrain = 1;
         // Global Tap Strain Multiplier.
-        private double strainMultiplier = 2.65;
-        private double rhythmMultiplier = 0.75;
+        private double strainMultiplier = 2.575;
+        private double rhythmMultiplier = 1;
 
         public Tap(Mod[] mods)
             : base(mods)
@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain *= computeDecay(baseDecay, osuCurrent.StrainTime);
             currentStrain += strainValue * strainMultiplier;
 
-            return currentStrain * (Previous.Count / HistoryLength) * rhythmComplexity;
+            return Math.Min(10 * strainValue * strainMultiplier, currentStrain * (Previous.Count / HistoryLength) * rhythmComplexity);
         }
     }
 }
