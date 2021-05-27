@@ -116,7 +116,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         private double skillLevel(double probability, double difficulty) => difficulty * Math.Pow(-Math.Log(probability), -1 / difficultyExponent);
 
-        // A implementation to not overbuff length with a long map. Longer maps = more retries.
+        /// <summary>
+        /// Approximates the amount of time spent straining during the beatmap. Used for scaling expected target time
+        /// </summary>
         private double expectedTargetTime(double totalDifficulty)
         {
             double targetTime = 0;
@@ -151,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             double lengthEstimate = 0.4 * (times[times.Count - 1] - times[0]);
             target_fc_time += 30 * Math.Max(0, expectedTargetTime(totalDifficulty) - 60000);
-            // for every 30 seconds past 3 mins, add 5 mins to estimated time to FC. ^
+            // for every minute of straining time past 1 minute, add 30 mins to estimated time to FC.
             double fcProb = lengthEstimate / target_fc_time;
             double skill = skillLevel(fcProb, totalDifficulty);
             for (int i=0; i<5; ++i)

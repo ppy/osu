@@ -22,13 +22,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double baseDecay => 0.75;
 
         private double currStrain = 1;
-        // private double fittsSnapConstant = 3.75;
         private double distanceConstant = 2.5;
 
         // Global Constants for the different types of aim.
         private double snapStrainMultiplier = 24.5;
         private double flowStrainMultiplier = 23.75;
-        private double hybridStrainMultiplier = 0;//8.25;
         private double sliderStrainMultiplier = 75;
         private double totalStrainMultiplier = .1675;
 
@@ -56,33 +54,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             strain = osuCurrObj.FlowProbability * (observedDistance.Length
                                                     + momentumChange
-                                                    + angularMomentumChange);
+                                                    + angularMomentumChange * osuPrevObj.FlowProbability);
 
-            // double angleAdjustment = 0;
-            //
-            // double angle = (Math.Abs(osuCurrObj.Angle) + Math.Abs(osuNextObj.Angle)) / 2; // average the angles, we want to award acute stream cuts, but not when they're back and forths.
-            //
-            // double minDistance = Math.Min(currVector.Length, prevVector.Length);
-            //
-            // if (angle < Math.PI / 4) // angles less than 45, we assume overlap and dont award. (these angles are usually basically snaps, but at extremely high bpm)
-            //     angleAdjustment = 0;
-            // else if (angle > Math.PI / 2) // angles greater than 90, we want to buff for having tighter angles (more curve in stream)
-            //     angleAdjustment = Math.Max(0, Math.Min(100 / osuCurrObj.StrainTime,
-            //                                           prevDiffVector.Length - Math.Max(currVector.Length, prevVector.Length) / 2));
-            // else // we want to do the same acute angle buffs as above, but slowly transition down to 0 with a 45 degree angle.
-            //     angleAdjustment = Math.Min(1, Math.Max(0, osuCurrObj.JumpDistance - 75) / 50)
-            //                       * Math.Pow(Math.Sin(2 * (angle - Math.PI / 4)), 2)
-            //                       * Math.Max(0, Math.Min(100 / osuCurrObj.StrainTime,
-            //                                          prevDiffVector.Length - Math.Max(currVector.Length, prevVector.Length) / 2));
-            //
-            // double strain = prevVector.Length * osuPrevObj.FlowProbability
-            //               + currVector.Length * osuCurrObj.FlowProbability
-            //               + Math.Min(Math.Min(currVector.Length, prevVector.Length), Math.Abs(currVector.Length - prevVector.Length)) * osuCurrObj.FlowProbability * osuPrevObj.FlowProbability
-            //               + angleAdjustment * osuCurrObj.FlowProbability * osuPrevObj.FlowProbability;
-            // // here we have the velocities of curr, prev, the difference between them, and our angle buff.
-            //
             strain *= Math.Min(osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 20) , osuPrevObj.StrainTime / (osuPrevObj.StrainTime - 20));
-            // // buff high BPM slightly.
+            // buff high BPM slightly.
 
             return strain;
         }
@@ -104,65 +79,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double snapStrainAt(OsuDifficultyHitObject osuPrevObj, OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuNextObj,
                                     Vector2 prevVector, Vector2 currVector, Vector2 nextVector)
         {
-            // currVector = Vector2.Divide(Vector2.Multiply(osuCurrObj.DistanceVector, (float)snapScaling(osuCurrObj.JumpDistance / 100)), (float)osuCurrObj.StrainTime);
-            // prevVector = Vector2.Divide(Vector2.Multiply(osuPrevObj.DistanceVector, (float)snapScaling(osuPrevObj.JumpDistance / 100)), (float)osuPrevObj.StrainTime);
-
             double strain = 0;
 
-            var observedDistance = Vector2.Add(currVector, Vector2.Multiply(prevVector, (float)(0.35 * osuPrevObj.SnapProbability)));
+            var observedDistance = Vector2.Add(currVector, Vector2.Multiply(prevVector, (float)(0.35)));
 
             strain = (observedDistance.Length * snapScaling((observedDistance.Length * osuCurrObj.StrainTime) / 100)) * osuCurrObj.SnapProbability;
 
-            // strain = observedDistance.Length * osuCurrObj.SnapProbability;
-
-            // Here we want to scale vectors with fitt's law, so we have to recreate them...
-
-            // var prevDiffVector = Vector2.Add(prevVector, currVector);
-            // double angleDistance = Math.Max(0, prevDiffVector.Length - Math.Max(currVector.Length, prevVector.Length));
-            // // We want to award wide angles, so we add the vectors, and then subtract the largest vector out to get a distance beyond 60 degrees.
-            //
-            // double angleAdjustment = 0;
-            //
-            // double currDistance = currVector.Length * osuCurrObj.SnapProbability + prevVector.Length * osuPrevObj.SnapProbability;
-            //
-            // double angle = Math.Abs(osuCurrObj.Angle);
-            //
-            // if (angle < Math.PI / 3)
-            // {
-            //     angleAdjustment -= .2 * Math.Abs(currDistance - angleDistance) * Math.Pow(Math.Sin(Math.PI / 2 - angle * 1.5), 2); // penalize acute angles in snapping.
-            // }
-            // else
-            // {
-            //     angleAdjustment += Math.Min(1, Math.Max(0, angleDistance - 100 / Math.Min(osuCurrObj.StrainTime, osuPrevObj.StrainTime)) / (100 / Math.Min(osuCurrObj.StrainTime, osuPrevObj.StrainTime))) *
-            //                         angleDistance * (1 + .5 * Math.Pow(Math.Sin(angle - Math.PI / 4), 2)); // buff wide angles, especially in the 90 degree range.
-            // }
-            //
-            // double strain = currDistance
-            //                 + angleAdjustment * osuCurrObj.SnapProbability * osuPrevObj.SnapProbability;
-            //
             strain *= Math.Min(osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 20) , osuPrevObj.StrainTime / (osuPrevObj.StrainTime - 20));
-            // // buff high BPM slightly.
-            //
-            return strain;
-        }
-
-        /// <summary>
-        /// Calculates the interactional difficulty associated with transitioning from flow to snap or from snap to flow for the current <see cref="OsuDifficultyHitObject"/>.
-        /// </summary>
-        private double hybridStrainAt(OsuDifficultyHitObject osuPrevObj, OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuNextObj,
-                                      Vector2 prevVector, Vector2 currVector, Vector2 nextVector)
-        {
-            var flowToSnapVector = Vector2.Subtract(prevVector, currVector);
-            var snapToFlowVector = Vector2.Add(currVector, nextVector);
-
-            double flowToSnapStrain = flowToSnapVector.Length * osuCurrObj.SnapProbability * osuPrevObj.FlowProbability;
-            double snapToFlowStrain = snapToFlowVector.Length * osuCurrObj.SnapProbability * osuNextObj.FlowProbability;
-
-            double strain = Math.Max(Math.Sqrt(flowToSnapStrain * Math.Sqrt(currVector.Length * prevVector.Length)),
-                                     Math.Sqrt(snapToFlowStrain * Math.Sqrt(currVector.Length * nextVector.Length)));
-
-            // Here we are taking a geometric average of the two vectors associated with our calculation, with their vector's interaction.
-            // We want to buff wide angles for snap to flow, and buff acute angles for flow to snap.
+            // buff high BPM slightly.
 
             return strain;
         }
@@ -211,13 +135,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                                                  currVector,
                                                  nextVector);
 
-                double hybridStrain = hybridStrainAt(osuPrevObj,
-                                                     osuCurrObj,
-                                                     osuNextObj,
-                                                     prevVector,
-                                                     currVector,
-                                                     nextVector);
-
                 double sliderStrain = sliderStrainAt(osuPrevObj,
                                                      osuCurrObj,
                                                      osuNextObj);
@@ -226,7 +143,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 currStrain *= computeDecay(baseDecay, osuCurrent.StrainTime);
                 currStrain += snapStrain * snapStrainMultiplier;
                 currStrain += flowStrain * flowStrainMultiplier;
-                currStrain += hybridStrain * hybridStrainMultiplier;
                 currStrain += sliderStrain * sliderStrainMultiplier;
 
                 strain = totalStrainMultiplier * currStrain;

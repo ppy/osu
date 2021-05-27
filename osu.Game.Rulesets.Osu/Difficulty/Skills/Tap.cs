@@ -145,7 +145,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain *= computeDecay(baseDecay, osuCurrent.StrainTime);
             currentStrain += strainValue * strainMultiplier;
 
-            return Math.Min(10 * strainValue * strainMultiplier, currentStrain * (Previous.Count / HistoryLength) * rhythmComplexity);
+            return Math.Min((1 / (1 - baseDecay)) * strainValue * strainMultiplier, // prevent over buffing strain past death stream level
+                            currentStrain * (Previous.Count / HistoryLength) * rhythmComplexity);
         }
     }
 }
