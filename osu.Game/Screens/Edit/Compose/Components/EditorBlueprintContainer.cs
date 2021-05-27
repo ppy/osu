@@ -77,7 +77,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 double offset = result.Time.Value - blueprints.First().Item.StartTime;
 
                 if (offset != 0)
-                    Beatmap.PerformOnSelection(obj => obj.StartTime += offset);
+                {
+                    Beatmap.PerformOnSelection(obj =>
+                    {
+                        obj.StartTime += offset;
+                        Beatmap.Update(obj);
+                    });
+                }
             }
 
             return true;
