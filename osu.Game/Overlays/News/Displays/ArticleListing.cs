@@ -2,14 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
@@ -20,26 +19,16 @@ namespace osu.Game.Overlays.News.Displays
     /// </summary>
     public class ArticleListing : CompositeDrawable
     {
-        public Action<APINewsSidebar> SidebarMetadataUpdated;
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
+        private readonly Action fetchMorePosts;
 
         private FillFlowContainer content;
         private ShowMoreButton showMore;
 
-        private GetNewsRequest request;
-        private Cursor lastCursor;
+        private CancellationTokenSource cancellationToken;
 
-        private readonly int? year;
-
-        /// <summary>
-        /// Instantiate a listing for the specified year.
-        /// </summary>
-        /// <param name="year">The year to load articles from. If null, will show the most recent articles.</param>
-        public ArticleListing(int? year = null)
+        public ArticleListing(Action fetchMorePosts)
         {
-            this.year = year;
+            this.fetchMorePosts = fetchMorePosts;
         }
 
         [BackgroundDependencyLoader]
@@ -47,6 +36,7 @@ namespace osu.Game.Overlays.News.Displays
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
             Padding = new MarginPadding
             {
                 Vertical = 20,
@@ -75,53 +65,25 @@ namespace osu.Game.Overlays.News.Displays
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Margin = new MarginPadding
-                        {
-                            Top = 15
-                        },
-                        Action = performFetch,
+                        Margin = new MarginPadding { Top = 15 },
+                        Action = fetchMorePosts,
                         Alpha = 0
                     }
                 }
             };
-
-            performFetch();
         }
 
-        private void performFetch()
-        {
-            request?.Cancel();
-
-            request = new GetNewsRequest(year, lastCursor);
-            request.Success += response => Schedule(() => onSuccess(response));
-            api.PerformAsync(request);
-        }
-
-        private CancellationTokenSource cancellationToken;
-
-        private void onSuccess(GetNewsResponse response)
-        {
-            cancellationToken?.Cancel();
-
-            // only needs to be updated on the initial load, as the content won't change during pagination.
-            if (lastCursor == null)
-                SidebarMetadataUpdated?.Invoke(response.SidebarMetadata);
-
-            // store cursor for next pagination request.
-            lastCursor = response.Cursor;
-
-            LoadComponentsAsync(response.NewsPosts.Select(p => new NewsCard(p)).ToList(), loaded =>
+        public void AddPosts(IEnumerable<APINewsPost> posts, bool morePostsAvailable) => Schedule(() =>
+            LoadComponentsAsync(posts.Select(p => new NewsCard(p)).ToList(), loaded =>
             {
                 content.AddRange(loaded);
-
                 showMore.IsLoading = false;
-                showMore.Alpha = response.Cursor != null ? 1 : 0;
-            }, (cancellationToken = new CancellationTokenSource()).Token);
-        }
+                showMore.Alpha = morePostsAvailable ? 1 : 0;
+            }, (cancellationToken = new CancellationTokenSource()).Token)
+        );
 
         protected override void Dispose(bool isDisposing)
         {
-            request?.Cancel();
             cancellationToken?.Cancel();
             base.Dispose(isDisposing);
         }
