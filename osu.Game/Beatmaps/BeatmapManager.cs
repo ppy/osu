@@ -287,9 +287,6 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo?.BeatmapSet == null)
                 return DefaultBeatmap;
 
-            if (beatmapInfo == DefaultBeatmap?.BeatmapInfo)
-                return DefaultBeatmap;
-
             // if there are no files, presume the full beatmap info has not yet been fetched from the database.
             if (beatmapInfo.BeatmapSet.Files.Count == 0)
             {
