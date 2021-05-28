@@ -293,11 +293,7 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo?.BeatmapSet == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
 
-            // files may be null in some tests.
-            if (beatmapInfo.BeatmapSet?.Files == null)
-                return DefaultBeatmap;
-
-            if (beatmapInfo.BeatmapSet.Files.Count == 0)
+            if (beatmapInfo.BeatmapSet.Files == null)
             {
                 var info = beatmapInfo;
                 beatmapInfo = QueryBeatmap(b => b.ID == info.ID);
