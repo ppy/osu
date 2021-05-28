@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Audio.Track;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -95,19 +93,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods) {
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods) => new Skill[]
+        {
+            new Aim(mods),
+            new Tap(mods)
+        };
 
-            Skill[] skills = new Skill[]
-            {
-                new Aim(mods),
-                new Tap(mods)
-            };
-
-            var track = new TrackVirtual(10000);
-            mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
-
-            return skills;
-        }
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
             new OsuModDoubleTime(),

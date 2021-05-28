@@ -16,7 +16,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         protected new OsuHitObject BaseObject => (OsuHitObject)base.BaseObject;
 
+        /// <summary>
+        /// Predicted probability that the player will 'flow' from previous <see cref="OsuDifficultyHitObject"/> to this <see cref="OsuDifficultyHitObject"/>.
+        /// </summary>
         public double FlowProbability { get; private set; }
+
+        /// <summary>
+        /// Predicted probability that the player will 'snap' from previous <see cref="OsuDifficultyHitObject"/> to this <see cref="OsuDifficultyHitObject"/>.
+        /// </summary>
         public double SnapProbability => 1.0 - FlowProbability;
 
         public Vector2 DistanceVector { get; private set; }

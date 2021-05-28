@@ -132,20 +132,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double speedValue = Math.Pow(5.0 * Math.Max(1.0, Attributes.SpeedStrain / 0.0675) - 4.0, 3.0) / 100000.0;
 
+            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
+            if (countMiss > 0)
+                speedValue *= 0.97 * Math.Pow(1 - Math.Pow((double)countMiss / totalHits, 0.775), countMiss);
+
+            // Combo scaling
+            if (Attributes.MaxCombo > 0)
+                speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
+
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
                 approachRateFactor += 0.3 * (Attributes.ApproachRate - 10.33);
 
             // scale speed sensitive to AR, without respect to object count.
             speedValue *= 1.0 + approachRateFactor;
-
-            // Combo scaling
-            if (Attributes.MaxCombo > 0)
-                speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
-
-            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
-            if (countMiss > 0)
-                speedValue *= 0.97 * Math.Pow(1 - Math.Pow((double)countMiss / totalHits, 0.775), countMiss);
 
             // Scale the speed value with accuracy and OD
             speedValue *= (0.575 + Math.Pow(Attributes.OverallDifficulty, 2) / 250) * Math.Pow(accuracy, 2.75);//(14.5 - Math.Max(Attributes.OverallDifficulty, 8)) / 2);
@@ -159,8 +159,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             int amountHitObjectsWithAccuracy = Attributes.HitCircleCount;
 
-            // tr3 acc pp
-            // i'm sure someone will document it :D
+            // This section should be documented by Tr3, but effectively we're calculating the exact same way as before, but
+            // we calculate a variance based on the object count and # of 50s, 100s, etc. This prevents us from having cases
+            // where an SS on lower OD is actually worth more than a 95% on OD11, even though the OD11 requires a greater
+            // window of precision.
+
             double p100 = (double)countOk / amountHitObjectsWithAccuracy;
             double p50 = (double)countMeh / amountHitObjectsWithAccuracy;
             double pm = (double)countMiss / amountHitObjectsWithAccuracy;
