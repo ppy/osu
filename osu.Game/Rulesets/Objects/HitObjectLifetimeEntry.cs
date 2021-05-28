@@ -35,7 +35,9 @@ namespace osu.Game.Rulesets.Objects
             HitObject = hitObject;
 
             startTimeBindable.BindTo(HitObject.StartTimeBindable);
-            startTimeBindable.BindValueChanged(onStartTimeChanged, true);
+            startTimeBindable.BindValueChanged(_ => setInitialLifetime(), true);
+
+            HitObject.DefaultsApplied += _ => setInitialLifetime();
         }
 
         // The lifetime, as set by the hitobject.
@@ -89,8 +91,8 @@ namespace osu.Game.Rulesets.Objects
         protected virtual double InitialLifetimeOffset => 10000;
 
         /// <summary>
-        /// Resets <see cref="LifetimeEntry.LifetimeStart"/> according to the change in start time of the <see cref="HitObject"/>.
+        /// Set <see cref="LifetimeEntry.LifetimeStart"/> using <see cref="InitialLifetimeOffset"/>.
         /// </summary>
-        private void onStartTimeChanged(ValueChangedEvent<double> startTime) => LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
+        private void setInitialLifetime() => LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
     }
 }
