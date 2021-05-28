@@ -24,8 +24,6 @@ namespace osu.Game.Tests.Visual.Editing
 
         protected override bool EditorComponentsReady => Editor.ChildrenOfType<SetupScreen>().SingleOrDefault()?.IsLoaded == true;
 
-        protected override bool IsolateSavingFromDatabase => false;
-
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
