@@ -36,7 +36,6 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SoundDesign
 {
-    [Serializable]
     public class TestSceneAccuracyCircle : OsuTestScene
     {
         [Resolved]
@@ -845,7 +844,7 @@ namespace osu.Game.Tests.Visual.SoundDesign
                 Size = new Vector2(230),
             };
 
-            newAccuracyCircle.BindAudioSettings(settings);
+            // newAccuracyCircle.BindAudioSettings(settings);
 
             return newAccuracyCircle;
         }
@@ -964,6 +963,167 @@ namespace osu.Game.Tests.Visual.SoundDesign
                 { HitResult.Good, 100 },
                 { HitResult.Great, 300 },
             }
+        };
+    }
+
+    [Serializable]
+    public class AccuracyCircleAudioSettings
+    {
+        [SettingSource("setting")]
+        public Bindable<bool> PlayTicks { get; } = new Bindable<bool>(true);
+
+        [SettingSource("setting")]
+        public Bindable<string> TickSampleName { get; } = new Bindable<string>("score-tick");
+
+        [SettingSource("setting")]
+        public Bindable<bool> PlayBadgeSounds { get; } = new Bindable<bool>(true);
+
+        [SettingSource("setting")]
+        public Bindable<string> BadgeSampleName { get; } = new Bindable<string>("badge-dink");
+
+        [SettingSource("setting")]
+        public Bindable<string> BadgeMaxSampleName { get; } = new Bindable<string>("badge-dink-max");
+
+        [SettingSource("setting")]
+        public Bindable<bool> PlaySwooshSound { get; } = new Bindable<bool>(true);
+
+        [SettingSource("setting")]
+        public Bindable<string> SwooshSampleName { get; } = new Bindable<string>("swoosh-up");
+
+        [SettingSource("setting")]
+        public Bindable<bool> PlayImpact { get; } = new Bindable<bool>(true);
+
+        [SettingSource("setting")]
+        public Bindable<string> ImpactGradeDSampleName { get; } = new Bindable<string>("rank-impact-fail-d");
+
+        [SettingSource("setting")]
+        public Bindable<string> ImpactGradeCSampleName { get; } = new Bindable<string>("rank-impact-fail");
+
+        [SettingSource("setting")]
+        public Bindable<string> ImpactGradeBSampleName { get; } = new Bindable<string>("rank-impact-fail");
+
+        [SettingSource("setting")]
+        public Bindable<string> ImpactGradeASampleName { get; } = new Bindable<string>("rank-impact-pass");
+
+        [SettingSource("setting")]
+        public Bindable<string> ImpactGradeSSampleName { get; } = new Bindable<string>("rank-impact-pass");
+
+        [SettingSource("setting")]
+        public Bindable<string> ImpactGradeSSSampleName { get; } = new Bindable<string>("rank-impact-pass-ss");
+
+        [SettingSource("setting")]
+        public Bindable<bool> PlayApplause { get; } = new Bindable<bool>(true);
+
+        [SettingSource("setting")]
+        public BindableDouble ApplauseVolume { get; } = new BindableDouble(0.8)
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Precision = 0.1
+        };
+
+        [SettingSource("setting")]
+        public BindableDouble ApplauseDelay { get; } = new BindableDouble(545)
+        {
+            MinValue = 0,
+            MaxValue = 10000,
+            Precision = 1
+        };
+
+        [SettingSource("setting")]
+        public Bindable<string> ApplauseGradeDSampleName { get; } = new Bindable<string>("applause-d");
+
+        [SettingSource("setting")]
+        public Bindable<string> ApplauseGradeCSampleName { get; } = new Bindable<string>("applause-c");
+
+        [SettingSource("setting")]
+        public Bindable<string> ApplauseGradeBSampleName { get; } = new Bindable<string>("applause-b");
+
+        [SettingSource("setting")]
+        public Bindable<string> ApplauseGradeASampleName { get; } = new Bindable<string>("applause-a");
+
+        [SettingSource("setting")]
+        public Bindable<string> ApplauseGradeSSampleName { get; } = new Bindable<string>("applause-s");
+
+        [SettingSource("setting")]
+        public Bindable<string> ApplauseGradeSSSampleName { get; } = new Bindable<string>("applause-s");
+
+        [SettingSource("setting")]
+        public BindableDouble TickPitchFactor { get; } = new BindableDouble(1)
+        {
+            MinValue = 0,
+            MaxValue = 3,
+            Precision = 0.1
+        };
+
+        [SettingSource("setting")]
+        public BindableDouble TickDebounceStart { get; } = new BindableDouble(18)
+        {
+            MinValue = 1,
+            MaxValue = 100
+        };
+
+        [SettingSource("setting")]
+        public BindableDouble TickDebounceEnd { get; } = new BindableDouble(300)
+        {
+            MinValue = 100,
+            MaxValue = 1000
+        };
+
+        [SettingSource("setting")]
+        public BindableDouble SwooshPreDelay { get; } = new BindableDouble(443)
+        {
+            MinValue = -1000,
+            MaxValue = 1000
+        };
+
+        [SettingSource("setting")]
+        public Bindable<Easing> TickRateEasing { get; } = new Bindable<Easing>(Easing.OutSine);
+
+        [SettingSource("setting")]
+        public Bindable<Easing> TickPitchEasing { get; } = new Bindable<Easing>(Easing.OutSine);
+
+        [SettingSource("setting")]
+        public Bindable<Easing> TickVolumeEasing { get; } = new Bindable<Easing>(Easing.OutSine);
+
+        [SettingSource("setting")]
+        public BindableDouble TickVolumeStart { get; } = new BindableDouble(0.6)
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Precision = 0.1
+        };
+
+        [SettingSource("setting")]
+        public BindableDouble TickVolumeEnd { get; } = new BindableDouble(1.0)
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Precision = 0.1
+        };
+
+        [SettingSource("setting")]
+        public BindableDouble ImpactVolume { get; } = new BindableDouble(1.0)
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Precision = 0.1
+        };
+
+        [SettingSource("setting")]
+        public BindableDouble BadgeDinkVolume { get; } = new BindableDouble(1)
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Precision = 0.1
+        };
+
+        [SettingSource("setting")]
+        public BindableDouble SwooshVolume { get; } = new BindableDouble(0.4)
+        {
+            MinValue = 0,
+            MaxValue = 1,
+            Precision = 0.1
         };
     }
 }

@@ -10,6 +10,7 @@ using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -394,6 +395,43 @@ namespace osu.Game.Skinning
                     }
 
                     return null;
+
+                case GameplaySkinComponent<GameplaySkinSamples> sampleComponent:
+                    var applause = GetSample(new SampleInfo("applause"));
+
+                    switch (sampleComponent.Component)
+                    {
+                        case GameplaySkinSamples.Applause:
+                            if (applause != null)
+                                return new DrawableSample(applause);
+
+                            break;
+
+                        case GameplaySkinSamples.ResultScoreTick:
+                        case GameplaySkinSamples.ResultBadgeTick:
+                        case GameplaySkinSamples.ResultBadgeTickMax:
+                        case GameplaySkinSamples.ResultSwooshUp:
+                        case GameplaySkinSamples.ResultRank_D:
+                        case GameplaySkinSamples.ResultRank_B:
+                        case GameplaySkinSamples.ResultRank_C:
+                        case GameplaySkinSamples.ResultRank_A:
+                        case GameplaySkinSamples.ResultRank_S:
+                        case GameplaySkinSamples.ResultRank_SS:
+                        case GameplaySkinSamples.ResultApplause_D:
+                        case GameplaySkinSamples.ResultApplause_B:
+                        case GameplaySkinSamples.ResultApplause_C:
+                        case GameplaySkinSamples.ResultApplause_A:
+                        case GameplaySkinSamples.ResultApplause_S:
+                        case GameplaySkinSamples.ResultApplause_SS:
+                            if (applause != null)
+                                // Legacy skins don't have sounds for the result screen, but may instead have an 'applause' sound.
+                                // This lets a legacy skin's applause sound play instead of  result screen sounds (as to not play over each other)
+                                return Drawable.Empty();
+
+                            break;
+                    }
+
+                    break;
 
                 case HUDSkinComponent hudComponent:
                 {
