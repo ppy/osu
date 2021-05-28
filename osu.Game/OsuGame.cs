@@ -51,6 +51,7 @@ using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
 using osu.Game.IO;
+using osu.Game.Localisation;
 using osu.Game.Skinning.Editor;
 
 namespace osu.Game
@@ -99,6 +100,9 @@ namespace osu.Game
 
         [Cached]
         private readonly DifficultyRecommender difficultyRecommender = new DifficultyRecommender();
+
+        [Cached]
+        private readonly StableImportManager stableImportManager = new StableImportManager();
 
         [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
@@ -559,6 +563,12 @@ namespace osu.Game
         {
             base.LoadComplete();
 
+            foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
+            {
+                var cultureCode = language.ToString();
+                Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
+            }
+
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
             // in the cursor being shown for a few frames during the intro.
             // This prevents the cursor from showing until we have a screen with CursorVisible = true
@@ -566,14 +576,11 @@ namespace osu.Game
 
             // todo: all archive managers should be able to be looped here.
             SkinManager.PostNotification = n => notifications.Post(n);
-            SkinManager.GetStableStorage = GetStorageForStableInstall;
 
             BeatmapManager.PostNotification = n => notifications.Post(n);
-            BeatmapManager.GetStableStorage = GetStorageForStableInstall;
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First());
 
             ScoreManager.PostNotification = n => notifications.Post(n);
-            ScoreManager.GetStableStorage = GetStorageForStableInstall;
             ScoreManager.PresentImport = items => PresentScore(items.First());
 
             // make config aware of how to lookup skins for on-screen display purposes.
@@ -690,10 +697,10 @@ namespace osu.Game
             loadComponentSingleFile(new CollectionManager(Storage)
             {
                 PostNotification = n => notifications.Post(n),
-                GetStableStorage = GetStorageForStableInstall
             }, Add, true);
 
             loadComponentSingleFile(difficultyRecommender, Add);
+            loadComponentSingleFile(stableImportManager, Add);
 
             loadComponentSingleFile(screenshotManager, Add);
 

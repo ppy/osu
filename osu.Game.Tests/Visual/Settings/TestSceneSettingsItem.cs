@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Overlays.Settings;
+using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Settings
 {
@@ -37,7 +38,7 @@ namespace osu.Game.Tests.Visual.Settings
 
         private class TestSettingsTextBox : SettingsTextBox
         {
-            public new Drawable RestoreDefaultValueButton => this.ChildrenOfType<RestoreDefaultValueButton>().Single();
+            public Drawable RestoreDefaultValueButton => this.ChildrenOfType<RestoreDefaultValueButton<string>>().Single();
         }
     }
 }
