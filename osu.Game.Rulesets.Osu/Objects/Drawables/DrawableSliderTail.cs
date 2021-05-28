@@ -7,13 +7,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking, ITrackSnaking, IHasMainCirclePiece
+    public class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking, IHasMainCirclePiece
     {
         public new SliderTailCircle HitObject => (SliderTailCircle)base.HitObject;
 
@@ -111,7 +112,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
-        public void UpdateSnakingPosition(Vector2 start, Vector2 end) =>
-            Position = HitObject.RepeatIndex % 2 == 0 ? end : start;
+        protected override void OnApply()
+        {
+            base.OnApply();
+
+            if (Slider != null)
+                Position = Slider.CurvePositionAt(HitObject.RepeatIndex % 2 == 0 ? 1 : 0);
+        }
     }
 }

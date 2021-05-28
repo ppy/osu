@@ -50,6 +50,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected DrawableManiaHitObject(ManiaHitObject hitObject)
             : base(hitObject)
         {
+            RelativeSizeAxes = Axes.X;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -59,7 +60,29 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 Action.BindTo(action);
 
             Direction.BindTo(scrollingInfo.Direction);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             Direction.BindValueChanged(OnDirectionChanged, true);
+        }
+
+        protected override void OnApply()
+        {
+            base.OnApply();
+
+            if (ParentHitObject != null)
+                AccentColour.BindTo(ParentHitObject.AccentColour);
+        }
+
+        protected override void OnFree()
+        {
+            base.OnFree();
+
+            if (ParentHitObject != null)
+                AccentColour.UnbindFrom(ParentHitObject.AccentColour);
         }
 
         private double computedLifetimeStart;
@@ -147,12 +170,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     public abstract class DrawableManiaHitObject<TObject> : DrawableManiaHitObject
         where TObject : ManiaHitObject
     {
-        public new readonly TObject HitObject;
+        public new TObject HitObject => (TObject)base.HitObject;
 
         protected DrawableManiaHitObject(TObject hitObject)
             : base(hitObject)
         {
-            HitObject = hitObject;
         }
     }
 }
