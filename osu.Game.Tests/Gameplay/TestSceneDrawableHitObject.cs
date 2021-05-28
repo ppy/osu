@@ -79,16 +79,38 @@ namespace osu.Game.Tests.Gameplay
             AddStep("Create entry", () => entry = new TestLifetimeEntry(new HitObject()) { LifetimeStart = 1 });
             AddStep("ApplyDefaults", () => entry.HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty()));
             AddAssert("Lifetime is updated", () => entry.LifetimeStart == -TestLifetimeEntry.INITIAL_LIFETIME_OFFSET);
+
+            TestDrawableHitObject dho = null;
+            AddStep("Create DHO", () =>
+            {
+                dho = new TestDrawableHitObject(null);
+                dho.Apply(entry);
+                Child = dho;
+                dho.SetLifetimeStartOnApply = true;
+            });
+            AddStep("ApplyDefaults", () => entry.HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty()));
+            AddAssert("Lifetime is correct", () => dho.LifetimeStart == TestDrawableHitObject.LIFETIME_ON_APPLY && entry.LifetimeStart == TestDrawableHitObject.LIFETIME_ON_APPLY);
         }
 
         private class TestDrawableHitObject : DrawableHitObject
         {
             public const double INITIAL_LIFETIME_OFFSET = 100;
+            public const double LIFETIME_ON_APPLY = 222;
             protected override double InitialLifetimeOffset => INITIAL_LIFETIME_OFFSET;
+
+            public bool SetLifetimeStartOnApply;
 
             public TestDrawableHitObject(HitObject hitObject)
                 : base(hitObject)
             {
+            }
+
+            protected override void OnApply()
+            {
+                base.OnApply();
+
+                if (SetLifetimeStartOnApply)
+                    LifetimeStart = LIFETIME_ON_APPLY;
             }
         }
 
