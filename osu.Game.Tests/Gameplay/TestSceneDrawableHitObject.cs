@@ -3,6 +3,8 @@
 
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Tests.Visual;
@@ -68,6 +70,15 @@ namespace osu.Game.Tests.Gameplay
                 entry.KeepAlive = false;
             });
             AddAssert("Lifetime is changed", () => entry.LifetimeStart == double.MinValue && entry.LifetimeEnd == 1000);
+        }
+
+        [Test]
+        public void TestLifetimeUpdatedOnDefaultApplied()
+        {
+            TestLifetimeEntry entry = null;
+            AddStep("Create entry", () => entry = new TestLifetimeEntry(new HitObject()) { LifetimeStart = 1 });
+            AddStep("ApplyDefaults", () => entry.HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty()));
+            AddAssert("Lifetime is updated", () => entry.LifetimeStart == -TestLifetimeEntry.INITIAL_LIFETIME_OFFSET);
         }
 
         private class TestDrawableHitObject : DrawableHitObject
