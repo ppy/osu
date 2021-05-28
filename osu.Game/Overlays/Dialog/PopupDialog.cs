@@ -95,6 +95,8 @@ namespace osu.Game.Overlays.Dialog
             }
         }
 
+        // We always want dialogs to show their appear animation, so we request they start hidden.
+        // Normally this would not be required, but is here due to the manual Show() call that occurs before LoadComplete().
         protected override bool StartHidden => true;
 
         protected PopupDialog()
