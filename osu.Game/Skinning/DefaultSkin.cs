@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
@@ -58,6 +59,60 @@ namespace osu.Game.Skinning
 
             switch (component)
             {
+                case GameplaySkinComponent<GameplaySkinSamples> sample:
+                    switch (sample.Component)
+                    {
+                        case GameplaySkinSamples.ResultScoreTick:
+                            return new DrawableSample(GetSample(new SampleInfo("Results/score-tick")));
+
+                        case GameplaySkinSamples.ResultBadgeTick:
+                            return new DrawableSample(GetSample(new SampleInfo("Results/badge-dink")));
+
+                        case GameplaySkinSamples.ResultBadgeTickMax:
+                            return new DrawableSample(GetSample(new SampleInfo("Results/badge-dink-max")));
+
+                        case GameplaySkinSamples.ResultSwooshUp:
+                            return new DrawableSample(GetSample(new SampleInfo("Results/swoosh-up")));
+
+                        case GameplaySkinSamples.ResultRank_D:
+                            return new DrawableSample(GetSample(new SampleInfo("Results/rank-impact-fail-d")));
+
+                        case GameplaySkinSamples.ResultRank_B:
+                            return new DrawableSample(GetSample(new SampleInfo("Results/rank-impact-fail")));
+
+                        case GameplaySkinSamples.ResultRank_C:
+                            return new DrawableSample(GetSample(new SampleInfo("Results/rank-impact-fail")));
+
+                        case GameplaySkinSamples.ResultRank_A:
+                            return new DrawableSample(GetSample(new SampleInfo("Results/rank-impact-pass")));
+
+                        case GameplaySkinSamples.ResultRank_S:
+                            return new DrawableSample(GetSample(new SampleInfo("Results/rank-impact-pass")));
+
+                        case GameplaySkinSamples.ResultRank_SS:
+                            return new DrawableSample(GetSample(new SampleInfo("Results/rank-impact-pass-ss")));
+
+                        case GameplaySkinSamples.ResultApplause_D:
+                            return new DrawableSample(GetSample(new SampleInfo("Results/applause-d")));
+
+                        case GameplaySkinSamples.ResultApplause_B:
+                            return new DrawableSample(GetSample(new SampleInfo("Results/applause-b")));
+
+                        case GameplaySkinSamples.ResultApplause_C:
+                            return new DrawableSample(GetSample(new SampleInfo("Results/applause-c")));
+
+                        case GameplaySkinSamples.ResultApplause_A:
+                            return new DrawableSample(GetSample(new SampleInfo("Results/applause-a")));
+
+                        case GameplaySkinSamples.ResultApplause_S:
+                            return new DrawableSample(GetSample(new SampleInfo("Results/applause-s")));
+
+                        case GameplaySkinSamples.ResultApplause_SS:
+                            return new DrawableSample(GetSample(new SampleInfo("Results/applause-s")));
+                    }
+
+                    break;
+
                 case SkinnableTargetComponent target:
                     switch (target.Target)
                     {
