@@ -1,34 +1,42 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
 namespace osu.Game.Overlays.News.Displays
 {
-    public class FrontPageDisplay : CompositeDrawable
+    /// <summary>
+    /// Lists articles in a vertical flow for a specified year.
+    /// </summary>
+    public class ArticleListing : CompositeDrawable
     {
-        [Resolved]
-        private IAPIProvider api { get; set; }
+        private readonly Action fetchMorePosts;
 
         private FillFlowContainer content;
         private ShowMoreButton showMore;
 
-        private GetNewsRequest request;
-        private Cursor lastCursor;
+        private CancellationTokenSource cancellationToken;
+
+        public ArticleListing(Action fetchMorePosts)
+        {
+            this.fetchMorePosts = fetchMorePosts;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
             Padding = new MarginPadding
             {
                 Vertical = 20,
@@ -57,56 +65,25 @@ namespace osu.Game.Overlays.News.Displays
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Margin = new MarginPadding
-                        {
-                            Top = 15
-                        },
-                        Action = performFetch,
+                        Margin = new MarginPadding { Top = 15 },
+                        Action = fetchMorePosts,
                         Alpha = 0
                     }
                 }
             };
-
-            performFetch();
         }
 
-        private void performFetch()
-        {
-            request?.Cancel();
-
-            request = new GetNewsRequest(lastCursor);
-            request.Success += response => Schedule(() => onSuccess(response));
-            api.PerformAsync(request);
-        }
-
-        private CancellationTokenSource cancellationToken;
-
-        private void onSuccess(GetNewsResponse response)
-        {
-            cancellationToken?.Cancel();
-
-            lastCursor = response.Cursor;
-
-            var flow = new FillFlowContainer<NewsCard>
+        public void AddPosts(IEnumerable<APINewsPost> posts, bool morePostsAvailable) => Schedule(() =>
+            LoadComponentsAsync(posts.Select(p => new NewsCard(p)).ToList(), loaded =>
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 10),
-                Children = response.NewsPosts.Select(p => new NewsCard(p)).ToList()
-            };
-
-            LoadComponentAsync(flow, loaded =>
-            {
-                content.Add(loaded);
+                content.AddRange(loaded);
                 showMore.IsLoading = false;
-                showMore.Alpha = lastCursor == null ? 0 : 1;
-            }, (cancellationToken = new CancellationTokenSource()).Token);
-        }
+                showMore.Alpha = morePostsAvailable ? 1 : 0;
+            }, (cancellationToken = new CancellationTokenSource()).Token)
+        );
 
         protected override void Dispose(bool isDisposing)
         {
-            request?.Cancel();
             cancellationToken?.Cancel();
             base.Dispose(isDisposing);
         }
