@@ -69,7 +69,11 @@ namespace osu.Game.Rulesets.Taiko.Edit
         {
             EditorBeatmap.PerformOnSelection(h =>
             {
-                if (h is Hit taikoHit) taikoHit.Type = state ? HitType.Rim : HitType.Centre;
+                if (h is Hit taikoHit)
+                {
+                    taikoHit.Type = state ? HitType.Rim : HitType.Centre;
+                    EditorBeatmap.Update(h);
+                }
             });
         }
 
