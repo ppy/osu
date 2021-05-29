@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Lists;
 using osu.Framework.Testing;
@@ -116,18 +115,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 public TestOsuLegacySkinTransformer(ISkinSource source)
                     : base(source)
                 {
-                }
-
-                public override Drawable GetDrawableComponent(ISkinComponent component)
-                {
-                    var drawable = base.GetDrawableComponent(component);
-                    if (drawable != null)
-                        return drawable;
-
-                    // this isn't really supposed to make a difference from returning null,
-                    // but it appears it does, returning null will skip over falling back to beatmap skin,
-                    // while calling Source.GetDrawableComponent() doesn't.
-                    return Source.GetDrawableComponent(component);
                 }
             }
         }
