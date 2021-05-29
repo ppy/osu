@@ -25,6 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
+    [Cached]
     public class Catcher : SkinReloadableDrawable, IKeyBindingHandler<CatchAction>
     {
         /// <summary>
@@ -108,7 +109,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Width of the area that can be used to attempt catches during gameplay.
         /// </summary>
-        private readonly float catchWidth;
+        public readonly float CatchWidth;
 
         private readonly CatcherSprite catcherIdle;
         private readonly CatcherSprite catcherKiai;
@@ -126,8 +127,8 @@ namespace osu.Game.Rulesets.Catch.UI
         private float hyperDashTargetPosition;
         private Bindable<bool> hitLighting;
 
-        private readonly DrawablePool<HitExplosion> hitExplosionPool;
-        private readonly Container<HitExplosion> hitExplosionContainer;
+        private readonly DrawablePool<PoolableHitExplosion> hitExplosionPool;
+        private readonly Container<PoolableHitExplosion> hitExplosionContainer;
 
         private readonly DrawablePool<CaughtFruit> caughtFruitPool;
         private readonly DrawablePool<CaughtBanana> caughtBananaPool;
@@ -144,11 +145,11 @@ namespace osu.Game.Rulesets.Catch.UI
             if (difficulty != null)
                 Scale = calculateScale(difficulty);
 
-            catchWidth = CalculateCatchWidth(Scale);
+            CatchWidth = CalculateCatchWidth(Scale);
 
             InternalChildren = new Drawable[]
             {
-                hitExplosionPool = new DrawablePool<HitExplosion>(10),
+                hitExplosionPool = new DrawablePool<PoolableHitExplosion>(10),
                 caughtFruitPool = new DrawablePool<CaughtFruit>(50),
                 caughtBananaPool = new DrawablePool<CaughtBanana>(100),
                 // less capacity is needed compared to fruit because droplet is not stacked
@@ -173,7 +174,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     Anchor = Anchor.TopCentre,
                     Alpha = 0,
                 },
-                hitExplosionContainer = new Container<HitExplosion>
+                hitExplosionContainer = new Container<PoolableHitExplosion>
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.BottomCentre,
@@ -228,7 +229,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (!(hitObject is PalpableCatchHitObject fruit))
                 return false;
 
-            var halfCatchWidth = catchWidth * 0.5f;
+            var halfCatchWidth = CatchWidth * 0.5f;
 
             // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
             var catchObjectPosition = fruit.EffectiveX;
@@ -256,7 +257,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     placeCaughtObject(palpableObject, positionInStack);
 
                 if (hitLighting.Value)
-                    addLighting(hitObject, positionInStack.X, drawableObject.AccentColour.Value);
+                    addLighting(positionInStack.X, drawableObject.AccentColour.Value, result);
             }
 
             // droplet doesn't affect the catcher state
@@ -297,7 +298,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             caughtObjectContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
             droppedObjectTarget.RemoveAll(d => d.HitObject == drawableObject.HitObject);
-            hitExplosionContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
+            hitExplosionContainer.RemoveAll(d => d.JudgementResult.Value.HitObject == drawableObject.HitObject);
         }
 
         /// <summary>
@@ -508,13 +509,12 @@ namespace osu.Game.Rulesets.Catch.UI
             return position;
         }
 
-        private void addLighting(CatchHitObject hitObject, float x, Color4 colour)
+        private void addLighting(float catchPosition, Color4 colour, JudgementResult result)
         {
-            HitExplosion hitExplosion = hitExplosionPool.Get();
-            hitExplosion.HitObject = hitObject;
-            hitExplosion.X = x;
-            hitExplosion.Scale = new Vector2(hitObject.Scale);
-            hitExplosion.ObjectColour = colour;
+            PoolableHitExplosion hitExplosion = hitExplosionPool.Get();
+            hitExplosion.CatchPosition.Value = catchPosition;
+            hitExplosion.ObjectColour.Value = colour;
+            hitExplosion.JudgementResult.Value = result;
             hitExplosionContainer.Add(hitExplosion);
         }
 

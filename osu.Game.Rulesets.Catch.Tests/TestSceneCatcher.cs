@@ -216,7 +216,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("enable hit lighting", () => config.SetValue(OsuSetting.HitLighting, true));
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
             AddAssert("correct hit lighting colour", () =>
-                catcher.ChildrenOfType<HitExplosion>().First()?.ObjectColour == fruitColour);
+                catcher.ChildrenOfType<PoolableHitExplosion>().First()?.ObjectColour.Value == fruitColour);
         }
 
         [Test]
@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             AddStep("disable hit lighting", () => config.SetValue(OsuSetting.HitLighting, false));
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
-            AddAssert("no hit lighting", () => !catcher.ChildrenOfType<HitExplosion>().Any());
+            AddAssert("no hit lighting", () => !catcher.ChildrenOfType<PoolableHitExplosion>().Any());
         }
 
         private void checkPlate(int count) => AddAssert($"{count} objects on the plate", () => catcher.CaughtObjects.Count() == count);

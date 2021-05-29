@@ -1,51 +1,64 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Pooling;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Judgements;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class HitExplosion : PoolableDrawable
+    public class DefaultHitExplosion : CatchHitExplosion
     {
-        private Color4 objectColour;
-        public CatchHitObject HitObject;
-
-        public Color4 ObjectColour
-        {
-            get => objectColour;
-            set
-            {
-                if (objectColour == value) return;
-
-                objectColour = value;
-                onColourChanged();
-            }
-        }
-
         private readonly CircularContainer largeFaint;
         private readonly CircularContainer smallFaint;
         private readonly CircularContainer directionalGlow1;
         private readonly CircularContainer directionalGlow2;
 
-        public HitExplosion()
+        [Resolved]
+        private Bindable<Color4> objectColour { get; set; }
+
+        [Resolved]
+        private Bindable<JudgementResult> judgementResult { get; set; }
+
+        [Resolved]
+        private Bindable<float> catchPosition { get; set; }
+
+        public DefaultHitExplosion()
         {
             Size = new Vector2(20);
             Anchor = Anchor.TopCentre;
             Origin = Anchor.BottomCentre;
 
-            // scale roughly in-line with visual appearance of notes
             const float initial_height = 10;
 
             InternalChildren = new Drawable[]
             {
+                directionalGlow1 = new CircularContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Blending = BlendingParameters.Additive,
+                    Size = new Vector2(0.01f, initial_height)
+                },
+                directionalGlow2 = new CircularContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Blending = BlendingParameters.Additive,
+                    Size = new Vector2(0.01f, initial_height),
+                },
                 largeFaint = new CircularContainer
                 {
                     Anchor = Anchor.Centre,
@@ -61,46 +74,8 @@ namespace osu.Game.Rulesets.Catch.UI
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
                     Blending = BlendingParameters.Additive,
-                },
-                directionalGlow1 = new CircularContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Size = new Vector2(0.01f, initial_height),
-                    Blending = BlendingParameters.Additive,
-                },
-                directionalGlow2 = new CircularContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Size = new Vector2(0.01f, initial_height),
-                    Blending = BlendingParameters.Additive,
                 }
             };
-        }
-
-        protected override void PrepareForUse()
-        {
-            base.PrepareForUse();
-
-            const double duration = 400;
-
-            // we want our size to be very small so the glow dominates it.
-            largeFaint.Size = new Vector2(0.8f);
-            largeFaint
-                .ResizeTo(largeFaint.Size * new Vector2(5, 1), duration, Easing.OutQuint)
-                .FadeOut(duration * 2);
-
-            const float angle_variangle = 15; // should be less than 45
-            directionalGlow1.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
-            directionalGlow2.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
-
-            this.FadeInFromZero(50).Then().FadeOut(duration, Easing.Out);
-            Expire(true);
         }
 
         private void onColourChanged()
@@ -110,7 +85,7 @@ namespace osu.Game.Rulesets.Catch.UI
             largeFaint.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
-                Colour = Interpolation.ValueAt(0.1f, objectColour, Color4.White, 0, 1).Opacity(0.3f),
+                Colour = Interpolation.ValueAt(0.1f, objectColour.Value, Color4.White, 0, 1).Opacity(0.3f),
                 Roundness = 160,
                 Radius = 200,
             };
@@ -118,7 +93,7 @@ namespace osu.Game.Rulesets.Catch.UI
             smallFaint.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
-                Colour = Interpolation.ValueAt(0.6f, objectColour, Color4.White, 0, 1),
+                Colour = Interpolation.ValueAt(0.6f, objectColour.Value, Color4.White, 0, 1),
                 Roundness = 20,
                 Radius = 50,
             };
@@ -126,10 +101,41 @@ namespace osu.Game.Rulesets.Catch.UI
             directionalGlow1.EdgeEffect = directionalGlow2.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
-                Colour = Interpolation.ValueAt(0.4f, objectColour, Color4.White, 0, 1),
+                Colour = Interpolation.ValueAt(0.4f, objectColour.Value, Color4.White, 0, 1),
                 Roundness = roundness,
                 Radius = 40,
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            objectColour.BindValueChanged(_ => onColourChanged());
+            judgementResult.BindValueChanged(judgement =>
+            {
+                if (judgement.NewValue.HitObject is PalpableCatchHitObject hitObject)
+                {
+                    Scale = new Vector2(hitObject.Scale);
+                }
+            });
+            catchPosition.BindValueChanged(position => X = position.NewValue);
+        }
+
+        public override void Animate()
+        {
+            const double duration = 400;
+
+            largeFaint.Size = new Vector2(0.8f);
+            largeFaint
+                .ResizeTo(largeFaint.Size * new Vector2(5, 1), duration, Easing.OutQuint)
+                .FadeOutFromOne(duration * 2);
+
+            const float angle_variangle = 15; // should be less than 45
+
+            directionalGlow1.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
+            directionalGlow2.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
+
+            this.FadeInFromZero(50).Then().FadeOut(duration, Easing.Out);
         }
     }
 }
