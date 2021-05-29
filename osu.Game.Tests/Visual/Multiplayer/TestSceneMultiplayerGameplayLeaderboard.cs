@@ -28,8 +28,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private const int users = 16;
 
-        [Cached(typeof(SpectatorStreamingClient))]
-        private TestMultiplayerStreaming streamingClient = new TestMultiplayerStreaming();
+        [Cached(typeof(SpectatorClient))]
+        private TestMultiplayerSpectatorClient spectatorClient = new TestMultiplayerSpectatorClient();
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestSceneCurrentlyPlayingDisplay.TestUserLookupCache();
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.Content.Children = new Drawable[]
             {
-                streamingClient,
+                spectatorClient,
                 lookupCache,
                 Content
             };
@@ -71,10 +71,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var playable = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
 
                 for (int i = 0; i < users; i++)
-                    streamingClient.StartPlay(i, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
+                    spectatorClient.StartPlay(i, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
 
-                Client.CurrentMatchPlayingUserIds.Clear();
-                Client.CurrentMatchPlayingUserIds.AddRange(streamingClient.PlayingUsers);
+                spectatorClient.Schedule(() =>
+                {
+                    Client.CurrentMatchPlayingUserIds.Clear();
+                    Client.CurrentMatchPlayingUserIds.AddRange(spectatorClient.PlayingUsers);
+                });
 
                 Children = new Drawable[]
                 {
@@ -83,7 +86,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 scoreProcessor.ApplyBeatmap(playable);
 
-                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, streamingClient.PlayingUsers.ToArray())
+                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, spectatorClient.PlayingUsers.ToArray())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -91,12 +94,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for load", () => leaderboard.IsLoaded);
+            AddUntilStep("wait for user population", () => Client.CurrentMatchPlayingUserIds.Count > 0);
         }
 
         [Test]
         public void TestScoreUpdates()
         {
-            AddRepeatStep("update state", () => streamingClient.RandomlyUpdateState(), 100);
+            AddRepeatStep("update state", () => spectatorClient.RandomlyUpdateState(), 100);
             AddToggleStep("switch compact mode", expanded => leaderboard.Expanded.Value = expanded);
         }
 
@@ -109,12 +113,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestChangeScoringMode()
         {
-            AddRepeatStep("update state", () => streamingClient.RandomlyUpdateState(), 5);
+            AddRepeatStep("update state", () => spectatorClient.RandomlyUpdateState(), 5);
             AddStep("change to classic", () => config.SetValue(OsuSetting.ScoreDisplayMode, ScoringMode.Classic));
             AddStep("change to standardised", () => config.SetValue(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised));
         }
 
-        public class TestMultiplayerStreaming : TestSpectatorStreamingClient
+        public class TestMultiplayerSpectatorClient : TestSpectatorClient
         {
             private readonly Dictionary<int, FrameHeader> lastHeaders = new Dictionary<int, FrameHeader>();
 

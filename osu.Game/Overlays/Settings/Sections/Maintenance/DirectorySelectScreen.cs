@@ -11,9 +11,9 @@ using osuTK;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Screens;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
@@ -69,20 +69,24 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         RelativeSizeAxes = Axes.Both,
                         RowDimensions = new[]
                         {
+                            new Dimension(GridSizeMode.AutoSize),
                             new Dimension(),
-                            new Dimension(GridSizeMode.Relative, 0.8f),
-                            new Dimension(),
+                            new Dimension(GridSizeMode.AutoSize),
                         },
                         Content = new[]
                         {
                             new Drawable[]
                             {
-                                new OsuSpriteText
+                                new OsuTextFlowContainer(cp =>
                                 {
-                                    Text = HeaderText,
-                                    Font = OsuFont.Default.With(size: 40),
-                                    Origin = Anchor.Centre,
-                                    Anchor = Anchor.Centre,
+                                    cp.Font = OsuFont.Default.With(size: 24);
+                                })
+                                {
+                                    Text = HeaderText.ToString(),
+                                    TextAnchor = Anchor.TopCentre,
+                                    Margin = new MarginPadding(10),
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
                                 }
                             },
                             new Drawable[]
@@ -99,6 +103,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Width = 300,
+                                    Margin = new MarginPadding(10),
                                     Text = "Select directory",
                                     Action = () => OnSelection(directorySelector.CurrentPath.Value)
                                 },

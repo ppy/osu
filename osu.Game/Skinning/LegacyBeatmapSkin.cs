@@ -18,7 +18,7 @@ namespace osu.Game.Skinning
         protected override bool UseCustomSampleBanks => true;
 
         public LegacyBeatmapSkin(BeatmapInfo beatmap, IResourceStore<byte[]> storage, IStorageResourceProvider resources)
-            : base(BeatmapSkinExtensions.CreateSkinInfo(beatmap), new LegacySkinResourceStore<BeatmapSetFileInfo>(beatmap.BeatmapSet, storage), resources, beatmap.Path)
+            : base(createSkinInfo(beatmap), new LegacySkinResourceStore<BeatmapSetFileInfo>(beatmap.BeatmapSet, storage), resources, beatmap.Path)
         {
             // Disallow default colours fallback on beatmap skins to allow using parent skin combo colours. (via SkinProvidingContainer)
             Configuration.AllowDefaultComboColoursFallback = false;
@@ -69,5 +69,8 @@ namespace osu.Game.Skinning
 
             return base.GetSample(sampleInfo);
         }
+
+        private static SkinInfo createSkinInfo(BeatmapInfo beatmap) =>
+            new SkinInfo { Name = beatmap.ToString(), Creator = beatmap.Metadata.Author.ToString() };
     }
 }

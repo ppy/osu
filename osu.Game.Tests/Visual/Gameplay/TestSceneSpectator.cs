@@ -27,8 +27,8 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private readonly User streamingUser = new User { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Test user" };
 
-        [Cached(typeof(SpectatorStreamingClient))]
-        private TestSpectatorStreamingClient testSpectatorStreamingClient = new TestSpectatorStreamingClient();
+        [Cached(typeof(SpectatorClient))]
+        private TestSpectatorClient testSpectatorClient = new TestSpectatorClient();
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestUserLookupCache();
@@ -61,8 +61,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("add streaming client", () =>
             {
-                Remove(testSpectatorStreamingClient);
-                Add(testSpectatorStreamingClient);
+                Remove(testSpectatorClient);
+                Add(testSpectatorClient);
             });
 
             finish();
@@ -212,9 +212,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void waitForPlayer() => AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
 
-        private void start(int? beatmapId = null) => AddStep("start play", () => testSpectatorStreamingClient.StartPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
+        private void start(int? beatmapId = null) => AddStep("start play", () => testSpectatorClient.StartPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
 
-        private void finish(int? beatmapId = null) => AddStep("end play", () => testSpectatorStreamingClient.EndPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
+        private void finish() => AddStep("end play", () => testSpectatorClient.EndPlay(streamingUser.Id));
 
         private void checkPaused(bool state) =>
             AddUntilStep($"game is {(state ? "paused" : "playing")}", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value == state);
@@ -223,7 +223,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("send frames", () =>
             {
-                testSpectatorStreamingClient.SendFrames(streamingUser.Id, nextFrame, count);
+                testSpectatorClient.SendFrames(streamingUser.Id, nextFrame, count);
                 nextFrame += count;
             });
         }

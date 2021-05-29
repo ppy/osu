@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
@@ -19,13 +20,20 @@ using osu.Game.Online.API;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
     public abstract class ResultsScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
+        /// <summary>
+        /// Delay before the default applause sound should be played, in order to match the grade display timing in <see cref="AccuracyCircle"/>.
+        /// </summary>
+        public const double APPLAUSE_DELAY = AccuracyCircle.ACCURACY_TRANSFORM_DELAY + AccuracyCircle.TEXT_APPEAR_DELAY + ScorePanel.RESIZE_DURATION + ScorePanel.TOP_LAYER_EXPAND_DELAY - 1440;
+
         protected const float BACKGROUND_BLUR = 20;
         private static readonly float screen_height = 768 - TwoLayerButton.SIZE_EXTENDED.Y;
 
@@ -55,6 +63,8 @@ namespace osu.Game.Screens.Ranking
 
         private readonly bool allowRetry;
         private readonly bool allowWatchingReplay;
+
+        private SkinnableSound applauseSound;
 
         protected ResultsScreen(ScoreInfo score, bool allowRetry, bool allowWatchingReplay = true)
         {
@@ -146,6 +156,13 @@ namespace osu.Game.Screens.Ranking
                 bool shouldFlair = player != null && !Score.Mods.Any(m => m is ModAutoplay);
 
                 ScorePanelList.AddScore(Score, shouldFlair);
+
+                if (shouldFlair)
+                {
+                    AddInternal(applauseSound = Score.Rank >= ScoreRank.A
+                        ? new SkinnableSound(new SampleInfo("Results/rankpass", "applause"))
+                        : new SkinnableSound(new SampleInfo("Results/rankfail")));
+                }
             }
 
             if (allowWatchingReplay)
@@ -183,6 +200,9 @@ namespace osu.Game.Screens.Ranking
                 api.Queue(req);
 
             statisticsPanel.State.BindValueChanged(onStatisticsStateChanged, true);
+
+            using (BeginDelayedSequence(APPLAUSE_DELAY))
+                Schedule(() => applauseSound?.Play());
         }
 
         protected override void Update()
