@@ -17,6 +17,7 @@ using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Beatmaps
 {
@@ -215,6 +216,8 @@ namespace osu.Game.Tests.Beatmaps
             protected override Texture GetBackground() => throw new NotImplementedException();
 
             protected override Track GetBeatmapTrack() => throw new NotImplementedException();
+
+            protected override ISkin GetSkin() => throw new NotImplementedException();
 
             public override Stream GetStream(string storagePath) => throw new NotImplementedException();
 

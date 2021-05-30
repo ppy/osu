@@ -14,6 +14,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
@@ -354,6 +355,29 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #region Helper Methods
 
         /// <summary>
+        /// Rotate a point around an arbitrary origin.
+        /// </summary>
+        /// <param name="point">The point.</param>
+        /// <param name="origin">The centre origin to rotate around.</param>
+        /// <param name="angle">The angle to rotate (in degrees).</param>
+        protected static Vector2 RotatePointAroundOrigin(Vector2 point, Vector2 origin, float angle)
+        {
+            angle = -angle;
+
+            point.X -= origin.X;
+            point.Y -= origin.Y;
+
+            Vector2 ret;
+            ret.X = point.X * MathF.Cos(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Sin(MathUtils.DegreesToRadians(angle));
+            ret.Y = point.X * -MathF.Sin(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Cos(MathUtils.DegreesToRadians(angle));
+
+            ret.X += origin.X;
+            ret.Y += origin.Y;
+
+            return ret;
+        }
+
+        /// <summary>
         /// Given a flip direction, a surrounding quad for all selected objects, and a position,
         /// will return the flipped position in screen space coordinates.
         /// </summary>
@@ -371,6 +395,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     position.Y = centre.Y - (position.Y - centre.Y);
                     break;
             }
+
+            return position;
+        }
+
+        /// <summary>
+        /// Given a scale vector, a surrounding quad for all selected objects, and a position,
+        /// will return the scaled position in screen space coordinates.
+        /// </summary>
+        protected static Vector2 GetScaledPosition(Anchor reference, Vector2 scale, Quad selectionQuad, Vector2 position)
+        {
+            // adjust the direction of scale depending on which side the user is dragging.
+            float xOffset = ((reference & Anchor.x0) > 0) ? -scale.X : 0;
+            float yOffset = ((reference & Anchor.y0) > 0) ? -scale.Y : 0;
+
+            // guard against no-ops and NaN.
+            if (scale.X != 0 && selectionQuad.Width > 0)
+                position.X = selectionQuad.TopLeft.X + xOffset + (position.X - selectionQuad.TopLeft.X) / selectionQuad.Width * (selectionQuad.Width + scale.X);
+
+            if (scale.Y != 0 && selectionQuad.Height > 0)
+                position.Y = selectionQuad.TopLeft.Y + yOffset + (position.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height * (selectionQuad.Height + scale.Y);
 
             return position;
         }

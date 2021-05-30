@@ -57,7 +57,13 @@ namespace osu.Game.Storyboards.Drawables
         public DrawableStoryboard(Storyboard storyboard)
         {
             Storyboard = storyboard;
+
             Size = new Vector2(640, 480);
+
+            bool onlyHasVideoElements = Storyboard.Layers.SelectMany(l => l.Elements).Any(e => !(e is StoryboardVideo));
+
+            Width = Height * (storyboard.BeatmapInfo.WidescreenStoryboard || onlyHasVideoElements ? 16 / 9f : 4 / 3f);
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 

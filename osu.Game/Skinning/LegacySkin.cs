@@ -337,6 +337,7 @@ namespace osu.Game.Skinning
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<GameplayAccuracyCounter>().FirstOrDefault();
+                                var combo = container.OfType<LegacyComboCounter>().FirstOrDefault();
 
                                 if (score != null && accuracy != null)
                                 {
@@ -352,9 +353,12 @@ namespace osu.Game.Skinning
                                     hitError.Anchor = Anchor.BottomCentre;
                                     hitError.Origin = Anchor.CentreLeft;
                                     hitError.Rotation = -90;
+                                }
 
-                                    if (songProgress != null)
-                                        hitError.Y -= SongProgress.MAX_HEIGHT;
+                                if (songProgress != null)
+                                {
+                                    if (hitError != null) hitError.Y -= SongProgress.MAX_HEIGHT;
+                                    if (combo != null) combo.Y -= SongProgress.MAX_HEIGHT;
                                 }
                             })
                             {

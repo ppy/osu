@@ -61,8 +61,11 @@ namespace osu.Game.Overlays.KeyBinding
         {
             Text = "Reset all bindings in section";
             RelativeSizeAxes = Axes.X;
-            Margin = new MarginPadding { Top = 5 };
-            Height = 20;
+            Width = 0.5f;
+            Anchor = Anchor.TopCentre;
+            Origin = Anchor.TopCentre;
+            Margin = new MarginPadding { Top = 15 };
+            Height = 30;
 
             Content.CornerRadius = 5;
         }
