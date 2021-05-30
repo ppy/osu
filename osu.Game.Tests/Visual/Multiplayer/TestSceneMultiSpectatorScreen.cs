@@ -289,7 +289,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             => AddAssert($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().GameplayClock.IsRunning != state);
 
         private void assertMuted(int userId, bool muted)
-            => AddAssert($"{userId} {(muted ? "is" : "is not")} muted", () => getInstance(userId).Mute == muted);
+            => AddUntilStep($"{userId} {(muted ? "is" : "is not")} muted", () => getInstance(userId).Mute == muted);
 
         private void waitForCatchup(int userId)
             => AddUntilStep($"{userId} not catching up", () => !getInstance(userId).GameplayClock.IsCatchingUp);
