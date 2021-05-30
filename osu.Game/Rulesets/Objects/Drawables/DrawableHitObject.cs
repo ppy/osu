@@ -620,7 +620,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected internal new ScheduledDelegate Schedule(Action action) => base.Schedule(action);
 
         /// <summary>
-        /// A offset prior to the start time of <see cref="HitObject"/> at which this <see cref="DrawableHitObject"/> may begin displaying contents.
+        /// An offset prior to the start time of <see cref="HitObject"/> at which this <see cref="DrawableHitObject"/> may begin displaying contents.
         /// By default, <see cref="DrawableHitObject"/>s are assumed to display their contents within 10 seconds prior to the start time of <see cref="HitObject"/>.
         /// </summary>
         /// <remarks>
