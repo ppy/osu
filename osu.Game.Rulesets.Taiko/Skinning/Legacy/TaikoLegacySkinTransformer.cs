@@ -38,98 +38,98 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     return Drawable.Empty().With(d => d.Expire());
             }
 
-            if (!(component is TaikoSkinComponent taikoComponent))
-                return null;
-
-            switch (taikoComponent.Component)
+            if (component is TaikoSkinComponent taikoComponent)
             {
-                case TaikoSkinComponents.DrumRollBody:
-                    if (GetTexture("taiko-roll-middle") != null)
-                        return new LegacyDrumRoll();
+                switch (taikoComponent.Component)
+                {
+                    case TaikoSkinComponents.DrumRollBody:
+                        if (GetTexture("taiko-roll-middle") != null)
+                            return new LegacyDrumRoll();
 
-                    return null;
+                        return null;
 
-                case TaikoSkinComponents.InputDrum:
-                    if (GetTexture("taiko-bar-left") != null)
-                        return new LegacyInputDrum();
+                    case TaikoSkinComponents.InputDrum:
+                        if (GetTexture("taiko-bar-left") != null)
+                            return new LegacyInputDrum();
 
-                    return null;
+                        return null;
 
-                case TaikoSkinComponents.CentreHit:
-                case TaikoSkinComponents.RimHit:
+                    case TaikoSkinComponents.CentreHit:
+                    case TaikoSkinComponents.RimHit:
 
-                    if (GetTexture("taikohitcircle") != null)
-                        return new LegacyHit(taikoComponent.Component);
+                        if (GetTexture("taikohitcircle") != null)
+                            return new LegacyHit(taikoComponent.Component);
 
-                    return null;
+                        return null;
 
-                case TaikoSkinComponents.DrumRollTick:
-                    return this.GetAnimation("sliderscorepoint", false, false);
+                    case TaikoSkinComponents.DrumRollTick:
+                        return this.GetAnimation("sliderscorepoint", false, false);
 
-                case TaikoSkinComponents.HitTarget:
-                    if (GetTexture("taikobigcircle") != null)
-                        return new TaikoLegacyHitTarget();
+                    case TaikoSkinComponents.HitTarget:
+                        if (GetTexture("taikobigcircle") != null)
+                            return new TaikoLegacyHitTarget();
 
-                    return null;
+                        return null;
 
-                case TaikoSkinComponents.PlayfieldBackgroundRight:
-                    if (GetTexture("taiko-bar-right") != null)
-                        return new TaikoLegacyPlayfieldBackgroundRight();
+                    case TaikoSkinComponents.PlayfieldBackgroundRight:
+                        if (GetTexture("taiko-bar-right") != null)
+                            return new TaikoLegacyPlayfieldBackgroundRight();
 
-                    return null;
+                        return null;
 
-                case TaikoSkinComponents.PlayfieldBackgroundLeft:
-                    // This is displayed inside LegacyInputDrum. It is required to be there for layout purposes (can be seen on legacy skins).
-                    if (GetTexture("taiko-bar-right") != null)
-                        return Drawable.Empty();
+                    case TaikoSkinComponents.PlayfieldBackgroundLeft:
+                        // This is displayed inside LegacyInputDrum. It is required to be there for layout purposes (can be seen on legacy skins).
+                        if (GetTexture("taiko-bar-right") != null)
+                            return Drawable.Empty();
 
-                    return null;
+                        return null;
 
-                case TaikoSkinComponents.BarLine:
-                    if (GetTexture("taiko-barline") != null)
-                        return new LegacyBarLine();
+                    case TaikoSkinComponents.BarLine:
+                        if (GetTexture("taiko-barline") != null)
+                            return new LegacyBarLine();
 
-                    return null;
+                        return null;
 
-                case TaikoSkinComponents.TaikoExplosionMiss:
+                    case TaikoSkinComponents.TaikoExplosionMiss:
 
-                    var missSprite = this.GetAnimation(getHitName(taikoComponent.Component), true, false);
-                    if (missSprite != null)
-                        return new LegacyHitExplosion(missSprite);
+                        var missSprite = this.GetAnimation(getHitName(taikoComponent.Component), true, false);
+                        if (missSprite != null)
+                            return new LegacyHitExplosion(missSprite);
 
-                    return null;
+                        return null;
 
-                case TaikoSkinComponents.TaikoExplosionOk:
-                case TaikoSkinComponents.TaikoExplosionGreat:
+                    case TaikoSkinComponents.TaikoExplosionOk:
+                    case TaikoSkinComponents.TaikoExplosionGreat:
 
-                    var hitName = getHitName(taikoComponent.Component);
-                    var hitSprite = this.GetAnimation(hitName, true, false);
+                        var hitName = getHitName(taikoComponent.Component);
+                        var hitSprite = this.GetAnimation(hitName, true, false);
 
-                    if (hitSprite != null)
-                    {
-                        var strongHitSprite = this.GetAnimation($"{hitName}k", true, false);
+                        if (hitSprite != null)
+                        {
+                            var strongHitSprite = this.GetAnimation($"{hitName}k", true, false);
 
-                        return new LegacyHitExplosion(hitSprite, strongHitSprite);
-                    }
+                            return new LegacyHitExplosion(hitSprite, strongHitSprite);
+                        }
 
-                    return null;
+                        return null;
 
-                case TaikoSkinComponents.TaikoExplosionKiai:
-                    // suppress the default kiai explosion if the skin brings its own sprites.
-                    // the drawable needs to expire as soon as possible to avoid accumulating empty drawables on the playfield.
-                    if (hasExplosion.Value)
-                        return Drawable.Empty().With(d => d.Expire());
+                    case TaikoSkinComponents.TaikoExplosionKiai:
+                        // suppress the default kiai explosion if the skin brings its own sprites.
+                        // the drawable needs to expire as soon as possible to avoid accumulating empty drawables on the playfield.
+                        if (hasExplosion.Value)
+                            return Drawable.Empty().With(d => d.Expire());
 
-                    return null;
+                        return null;
 
-                case TaikoSkinComponents.Scroller:
-                    if (GetTexture("taiko-slider") != null)
-                        return new LegacyTaikoScroller();
+                    case TaikoSkinComponents.Scroller:
+                        if (GetTexture("taiko-slider") != null)
+                            return new LegacyTaikoScroller();
 
-                    return null;
+                        return null;
 
-                case TaikoSkinComponents.Mascot:
-                    return new DrawableTaikoMascot();
+                    case TaikoSkinComponents.Mascot:
+                        return new DrawableTaikoMascot();
+                }
             }
 
             return Source.GetDrawableComponent(component);

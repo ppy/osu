@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -45,7 +46,7 @@ namespace osu.Game.Overlays.Wiki
 
         private Container createBlurb(HtmlDocument html)
         {
-            var blurbNode = html.DocumentNode.SelectNodes("//div[contains(@class, 'wiki-main-page__blurb')]").First();
+            var blurbNode = html.DocumentNode.SelectSingleNode("//div[contains(@class, 'wiki-main-page__blurb')]");
 
             return new Container
             {
@@ -69,7 +70,11 @@ namespace osu.Game.Overlays.Wiki
         {
             var panelsNode = html.DocumentNode.SelectNodes("//div[contains(@class, 'wiki-main-page-panel')]").ToArray();
 
-            for (var i = 0; i < panelsNode.Length; i++)
+            Debug.Assert(panelsNode.Length > 1);
+
+            var i = 0;
+
+            while (i < panelsNode.Length)
             {
                 var isFullWidth = panelsNode[i].HasClass("wiki-main-page-panel--full");
 
@@ -77,28 +82,20 @@ namespace osu.Game.Overlays.Wiki
                 {
                     yield return new Drawable[]
                     {
-                        new WikiPanelContainer
+                        new WikiPanelContainer(panelsNode[i++].InnerText, true)
                         {
-                            Text = panelsNode[i].InnerText,
-                            IsFullWidth = true,
+                            // This is required to fill up the space of "null" drawable below.
                             Width = 2,
                         },
                         null,
                     };
                 }
-
-                if (i % 2 == 1)
+                else
                 {
                     yield return new Drawable[]
                     {
-                        new WikiPanelContainer
-                        {
-                            Text = panelsNode[i].InnerText,
-                        },
-                        new WikiPanelContainer
-                        {
-                            Text = panelsNode[i + 1].InnerText,
-                        },
+                        new WikiPanelContainer(panelsNode[i++].InnerText),
+                        i < panelsNode.Length ? new WikiPanelContainer(panelsNode[i++].InnerText) : null,
                     };
                 }
             }
