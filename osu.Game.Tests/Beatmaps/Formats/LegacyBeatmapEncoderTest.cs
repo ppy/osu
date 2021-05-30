@@ -169,6 +169,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             protected override Track GetBeatmapTrack() => throw new NotImplementedException();
 
+            protected override ISkin GetSkin() => throw new NotImplementedException();
+
             public override Stream GetStream(string storagePath) => throw new NotImplementedException();
         }
     }
