@@ -120,14 +120,12 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
                         case ManiaSkinComponents.StageForeground:
                             return new LegacyStageForeground();
-
-                        default:
-                            return Source.GetDrawableComponent(component);
                     }
 
-                default:
-                    return Source.GetDrawableComponent(component);
+                    break;
             }
+
+            return Source.GetDrawableComponent(component);
         }
 
         private Drawable getResult(HitResult result)
