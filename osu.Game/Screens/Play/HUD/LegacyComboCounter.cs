@@ -47,6 +47,13 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly Container counterContainer;
 
+        /// <summary>
+        /// Changes the visibility state of the combo counter internally without affecting its <see cref="SkinnableInfo"/>.
+        /// </summary>
+        /// <remarks>
+        /// This is temporarily done for rulesets that provide their own combo counter and don't want the HUD one to be visible,
+        /// without potentially affecting the user's selected skin.
+        /// </remarks>
         public bool ContentVisible
         {
             set => counterContainer.Alpha = value ? 1 : 0;
