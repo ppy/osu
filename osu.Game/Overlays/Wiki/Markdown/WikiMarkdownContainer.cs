@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
@@ -14,7 +15,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
     {
         public string CurrentPath
         {
-            set => Schedule(() => DocumentUrl += $"wiki/{value}");
+            set => DocumentUrl = $"{DocumentUrl}wiki/{value}";
         }
 
         protected override void AddMarkdownComponent(IMarkdownObject markdownObject, FillFlowContainer container, int level)
@@ -22,20 +23,24 @@ namespace osu.Game.Overlays.Wiki.Markdown
             switch (markdownObject)
             {
                 case YamlFrontMatterBlock yamlFrontMatterBlock:
-                    container.Add(CreateNotice(yamlFrontMatterBlock));
+                    container.Add(new WikiNoticeContainer(yamlFrontMatterBlock));
                     break;
 
-                default:
-                    base.AddMarkdownComponent(markdownObject, container, level);
+                case ParagraphBlock paragraphBlock:
+                    // Check if paragraph only contains an image
+                    if (paragraphBlock.Inline.Count() == 1 && paragraphBlock.Inline.FirstChild is LinkInline { IsImage: true } linkInline)
+                    {
+                        container.Add(new WikiMarkdownImageBlock(linkInline));
+                        return;
+                    }
+
                     break;
             }
+
+            base.AddMarkdownComponent(markdownObject, container, level);
         }
 
         public override MarkdownTextFlowContainer CreateTextFlow() => new WikiMarkdownTextFlowContainer();
-
-        protected override MarkdownParagraph CreateParagraph(ParagraphBlock paragraphBlock, int level) => new WikiMarkdownParagraph(paragraphBlock);
-
-        protected virtual FillFlowContainer CreateNotice(YamlFrontMatterBlock yamlFrontMatterBlock) => new WikiNoticeContainer(yamlFrontMatterBlock);
 
         private class WikiMarkdownTextFlowContainer : OsuMarkdownTextFlowContainer
         {

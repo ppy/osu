@@ -21,23 +21,23 @@ namespace osu.Game.Overlays.Wiki
 {
     public class WikiPanelContainer : Container
     {
-        [Resolved]
-        private OverlayColourProvider colourProvider { get; set; }
-
         private WikiPanelMarkdownContainer panelContainer;
 
-        public string Text;
+        private readonly string text;
 
-        public bool IsFullWidth;
+        private readonly bool isFullWidth;
 
-        public WikiPanelContainer()
+        public WikiPanelContainer(string text, bool isFullWidth = false)
         {
+            this.text = text;
+            this.isFullWidth = isFullWidth;
+
             RelativeSizeAxes = Axes.X;
             Padding = new MarginPadding(3);
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             Children = new Drawable[]
             {
@@ -59,12 +59,11 @@ namespace osu.Game.Overlays.Wiki
                         RelativeSizeAxes = Axes.Both,
                     },
                 },
-                panelContainer = new WikiPanelMarkdownContainer
+                panelContainer = new WikiPanelMarkdownContainer(isFullWidth)
                 {
-                    Text = Text,
+                    Text = text,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    IsFullWidth = IsFullWidth,
                 }
             };
         }
@@ -77,10 +76,12 @@ namespace osu.Game.Overlays.Wiki
 
         private class WikiPanelMarkdownContainer : WikiMarkdownContainer
         {
-            public bool IsFullWidth;
+            private readonly bool isFullWidth;
 
-            public WikiPanelMarkdownContainer()
+            public WikiPanelMarkdownContainer(bool isFullWidth)
             {
+                this.isFullWidth = isFullWidth;
+
                 LineSpacing = 0;
                 DocumentPadding = new MarginPadding(30);
                 DocumentMargin = new MarginPadding(0);
@@ -95,7 +96,7 @@ namespace osu.Game.Overlays.Wiki
 
             protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock) => new WikiPanelHeading(headingBlock)
             {
-                IsFullWidth = IsFullWidth,
+                IsFullWidth = isFullWidth,
             };
         }
 
