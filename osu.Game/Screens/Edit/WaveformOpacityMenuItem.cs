@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Edit
     {
         private readonly Bindable<float> waveformOpacity;
 
-        private readonly Dictionary<float, ToggleMenuItem> menuItemLookup = new Dictionary<float, ToggleMenuItem>();
+        private readonly Dictionary<float, TernaryStateRadioMenuItem> menuItemLookup = new Dictionary<float, TernaryStateRadioMenuItem>();
 
         public WaveformOpacityMenuItem(Bindable<float> waveformOpacity)
             : base("Waveform opacity")
@@ -29,13 +29,13 @@ namespace osu.Game.Screens.Edit
             waveformOpacity.BindValueChanged(opacity =>
             {
                 foreach (var kvp in menuItemLookup)
-                    kvp.Value.State.Value = kvp.Key == opacity.NewValue;
+                    kvp.Value.State.Value = kvp.Key == opacity.NewValue ? TernaryState.True : TernaryState.False;
             }, true);
         }
 
-        private ToggleMenuItem createMenuItem(float opacity)
+        private TernaryStateRadioMenuItem createMenuItem(float opacity)
         {
-            var item = new ToggleMenuItem($"{opacity * 100}%", MenuItemType.Standard, _ => updateOpacity(opacity));
+            var item = new TernaryStateRadioMenuItem($"{opacity * 100}%", MenuItemType.Standard, _ => updateOpacity(opacity));
             menuItemLookup[opacity] = item;
             return item;
         }

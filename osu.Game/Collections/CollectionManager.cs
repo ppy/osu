@@ -8,13 +8,13 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.IO;
 using osu.Game.IO.Legacy;
 using osu.Game.Overlays.Notifications;
 
@@ -38,8 +38,6 @@ namespace osu.Game.Collections
 
         public readonly BindableList<BeatmapCollection> Collections = new BindableList<BeatmapCollection>();
 
-        public bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
-
         [Resolved]
         private GameHost host { get; set; }
 
@@ -60,8 +58,13 @@ namespace osu.Game.Collections
 
             if (storage.Exists(database_name))
             {
+                List<BeatmapCollection> beatmapCollections;
+
                 using (var stream = storage.GetStream(database_name))
-                    importCollections(readCollections(stream));
+                    beatmapCollections = readCollections(stream);
+
+                // intentionally fire-and-forget async.
+                importCollections(beatmapCollections);
             }
         }
 
@@ -97,24 +100,11 @@ namespace osu.Game.Collections
         public Action<Notification> PostNotification { protected get; set; }
 
         /// <summary>
-        /// Set a storage with access to an osu-stable install for import purposes.
-        /// </summary>
-        public Func<Storage> GetStableStorage { private get; set; }
-
-        /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
-        public Task ImportFromStableAsync()
+        public Task ImportFromStableAsync(StableStorage stableStorage)
         {
-            var stable = GetStableStorage?.Invoke();
-
-            if (stable == null)
-            {
-                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
-                return Task.CompletedTask;
-            }
-
-            if (!stable.Exists(database_name))
+            if (!stableStorage.Exists(database_name))
             {
                 // This handles situations like when the user does not have a collections.db file
                 Logger.Log($"No {database_name} available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
@@ -123,7 +113,7 @@ namespace osu.Game.Collections
 
             return Task.Run(async () =>
             {
-                using (var stream = stable.GetStream(database_name))
+                using (var stream = stableStorage.GetStream(database_name))
                     await Import(stream).ConfigureAwait(false);
             });
         }

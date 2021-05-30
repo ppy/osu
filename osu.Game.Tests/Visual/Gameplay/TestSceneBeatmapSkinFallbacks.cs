@@ -6,7 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Lists;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -20,7 +20,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
-using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -38,13 +37,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
 
         protected override bool HasCustomSteps => true;
-
-        [Test]
-        public void TestEmptyDefaultBeatmapSkinFallsBack()
-        {
-            CreateSkinTest(DefaultLegacySkin.Info, () => new TestWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)).Skin);
-            AddAssert("hud from default legacy skin", () => AssertComponentsFromExpectedSource(SkinnableTarget.MainHUDComponents, skinManager.CurrentSkin.Value));
-        }
 
         [Test]
         public void TestEmptyLegacyBeatmapSkinFallsBack()
@@ -67,24 +59,41 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected bool AssertComponentsFromExpectedSource(SkinnableTarget target, ISkin expectedSource)
         {
+            var actualComponentsContainer = Player.ChildrenOfType<SkinnableTargetContainer>().First(s => s.Target == target)
+                                                  .ChildrenOfType<SkinnableTargetComponentsContainer>().SingleOrDefault();
+
+            if (actualComponentsContainer == null)
+                return false;
+
+            var actualInfo = actualComponentsContainer.CreateSkinnableInfo();
+
             var expectedComponentsContainer = (SkinnableTargetComponentsContainer)expectedSource.GetDrawableComponent(new SkinnableTargetComponent(target));
+            if (expectedComponentsContainer == null)
+                return false;
 
-            Add(expectedComponentsContainer);
-            expectedComponentsContainer?.UpdateSubTree();
-            var expectedInfo = expectedComponentsContainer?.CreateSkinnableInfo();
-            Remove(expectedComponentsContainer);
+            var expectedComponentsAdjustmentContainer = new Container
+            {
+                Position = actualComponentsContainer.Parent.ToSpaceOfOtherDrawable(actualComponentsContainer.DrawPosition, Content),
+                Size = actualComponentsContainer.DrawSize,
+                Child = expectedComponentsContainer,
+            };
 
-            var actualInfo = Player.ChildrenOfType<SkinnableTargetContainer>().First(s => s.Target == target)
-                                   .ChildrenOfType<SkinnableTargetComponentsContainer>().Single().CreateSkinnableInfo();
+            Add(expectedComponentsAdjustmentContainer);
+            expectedComponentsAdjustmentContainer.UpdateSubTree();
+            var expectedInfo = expectedComponentsContainer.CreateSkinnableInfo();
+            Remove(expectedComponentsAdjustmentContainer);
 
-            return almostEqual(actualInfo, expectedInfo, 2f);
+            return almostEqual(actualInfo, expectedInfo);
 
-            static bool almostEqual(SkinnableInfo info, SkinnableInfo other, float positionTolerance) =>
+            static bool almostEqual(SkinnableInfo info, SkinnableInfo other) =>
                 other != null
+                && info.Type == other.Type
                 && info.Anchor == other.Anchor
                 && info.Origin == other.Origin
-                && Precision.AlmostEquals(info.Position, other.Position, positionTolerance)
-                && info.Children.SequenceEqual(other.Children, new FuncEqualityComparer<SkinnableInfo>((s1, s2) => almostEqual(s1, s2, positionTolerance)));
+                && Precision.AlmostEquals(info.Position, other.Position)
+                && Precision.AlmostEquals(info.Scale, other.Scale)
+                && Precision.AlmostEquals(info.Rotation, other.Rotation)
+                && info.Children.SequenceEqual(other.Children, new FuncEqualityComparer<SkinnableInfo>(almostEqual));
         }
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
@@ -114,18 +123,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 public TestOsuLegacySkinTransformer(ISkinSource source)
                     : base(source)
                 {
-                }
-
-                public override Drawable GetDrawableComponent(ISkinComponent component)
-                {
-                    var drawable = base.GetDrawableComponent(component);
-                    if (drawable != null)
-                        return drawable;
-
-                    // this isn't really supposed to make a difference from returning null,
-                    // but it appears it does, returning null will skip over falling back to beatmap skin,
-                    // while calling Source.GetDrawableComponent() doesn't.
-                    return Source.GetDrawableComponent(component);
                 }
             }
         }
