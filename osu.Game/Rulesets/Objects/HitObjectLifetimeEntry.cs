@@ -82,9 +82,8 @@ namespace osu.Game.Rulesets.Objects
         /// By default, <see cref="HitObject"/>s are assumed to display their contents within 10 seconds prior to their start time.
         /// </summary>
         /// <remarks>
-        /// This is only used as an optimisation to delay the initial update of the <see cref="HitObject"/> and may be tuned more aggressively if required.
-        /// It is indirectly used to decide the automatic transform offset provided to <see cref="DrawableHitObject.UpdateInitialTransforms"/>.
-        /// A more accurate <see cref="LifetimeEntry.LifetimeStart"/> should be set for further optimisation (in <see cref="DrawableHitObject.LoadComplete"/>, for example).
+        /// This is only used as an optimisation to delay the initial application of the <see cref="HitObject"/> to a <see cref="DrawableHitObject"/>.
+        /// A more accurate <see cref="LifetimeEntry.LifetimeStart"/> should be set on the hit object application, for further optimisation.
         /// </remarks>
         protected virtual double InitialLifetimeOffset => 10000;
 
