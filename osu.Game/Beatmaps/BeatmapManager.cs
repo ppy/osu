@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -244,6 +245,8 @@ namespace osu.Game.Beatmaps
         {
             var setInfo = info.BeatmapSet;
 
+            Debug.Assert(setInfo.Files != null);
+
             using (var stream = new MemoryStream())
             {
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
@@ -290,7 +293,9 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo?.BeatmapSet == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
 
-            if (beatmapInfo.BeatmapSet.Files == null)
+            // force a re-query if files are not in a state which looks like the model has
+            // full database information present.
+            if (beatmapInfo.BeatmapSet.Files == null || beatmapInfo.BeatmapSet.Files.Count == 0)
             {
                 var info = beatmapInfo;
                 beatmapInfo = QueryBeatmap(b => b.ID == info.ID);
