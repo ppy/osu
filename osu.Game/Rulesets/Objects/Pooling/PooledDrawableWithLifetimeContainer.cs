@@ -40,6 +40,12 @@ namespace osu.Game.Rulesets.Objects.Pooling
         public IEnumerable<(TEntry Entry, TDrawable Drawable)> AliveEntries => aliveDrawableMap.Select(x => (x.Key, x.Value));
 
         /// <summary>
+        /// Whether to remove an entry when clock goes backward and crossed its <see cref="LifetimeEntry.LifetimeStart"/>.
+        /// Used when entries are dynamically added at its <see cref="LifetimeEntry.LifetimeStart"/> to prevent duplicated entries.
+        /// </summary>
+        protected virtual bool RemoveRewoundEntry => false;
+
+        /// <summary>
         /// The amount of time prior to the current time within which entries should be considered alive.
         /// </summary>
         internal double PastLifetimeExtension { get; set; }
@@ -130,11 +136,10 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// </remarks>
         protected virtual void RemoveDrawable(TEntry entry, TDrawable drawable) => RemoveInternal(drawable);
 
-        private void entryCrossedBoundary(LifetimeEntry lifetimeEntry, LifetimeBoundaryKind kind, LifetimeBoundaryCrossingDirection direction) =>
-            OnEntryCrossedBoundary((TEntry)lifetimeEntry, kind, direction);
-
-        protected virtual void OnEntryCrossedBoundary(TEntry entry, LifetimeBoundaryKind kind, LifetimeBoundaryCrossingDirection direction)
+        private void entryCrossedBoundary(LifetimeEntry lifetimeEntry, LifetimeBoundaryKind kind, LifetimeBoundaryCrossingDirection direction)
         {
+            if (RemoveRewoundEntry && kind == LifetimeBoundaryKind.Start && direction == LifetimeBoundaryCrossingDirection.Backward)
+                Remove((TEntry)lifetimeEntry);
         }
 
         /// <summary>
