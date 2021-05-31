@@ -18,12 +18,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         /// <summary>
-        /// Hit objects which require lifetime computation in the next update call.
-        /// </summary>
-        private readonly HashSet<DrawableHitObject> toComputeLifetime = new HashSet<DrawableHitObject>();
-
-        /// <summary>
-        /// A set containing all <see cref="HitObjectContainer.AliveObjects"/> which have an up-to-date layout.
+        /// A set of top-level <see cref="DrawableHitObject"/>s which have an up-to-date layout.
         /// </summary>
         private readonly HashSet<DrawableHitObject> layoutComputed = new HashSet<DrawableHitObject>();
 
@@ -54,7 +49,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             base.Clear();
 
-            toComputeLifetime.Clear();
             layoutComputed.Clear();
         }
 
@@ -83,7 +77,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             flipPositionIfRequired(ref position);
 
-            return scrollingInfo.Algorithm.TimeAt(position, Time.Current, scrollingInfo.TimeRange.Value, getLength());
+            return scrollingInfo.Algorithm.TimeAt(position, Time.Current, scrollingInfo.TimeRange.Value, scrollLength);
         }
 
         /// <summary>
@@ -91,7 +85,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         public Vector2 ScreenSpacePositionAtTime(double time)
         {
-            var pos = scrollingInfo.Algorithm.PositionAt(time, Time.Current, scrollingInfo.TimeRange.Value, getLength());
+            var pos = scrollingInfo.Algorithm.PositionAt(time, Time.Current, scrollingInfo.TimeRange.Value, scrollLength);
 
             flipPositionIfRequired(ref pos);
 
@@ -106,16 +100,19 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
         }
 
-        private float getLength()
+        private float scrollLength
         {
-            switch (scrollingInfo.Direction.Value)
+            get
             {
-                case ScrollingDirection.Left:
-                case ScrollingDirection.Right:
-                    return DrawWidth;
+                switch (scrollingInfo.Direction.Value)
+                {
+                    case ScrollingDirection.Left:
+                    case ScrollingDirection.Right:
+                        return DrawWidth;
 
-                default:
-                    return DrawHeight;
+                    default:
+                        return DrawHeight;
+                }
             }
         }
 
@@ -150,79 +147,41 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
         }
 
-        protected override void OnAdd(DrawableHitObject drawableHitObject) => onAddRecursive(drawableHitObject);
-
-        protected override void OnRemove(DrawableHitObject drawableHitObject) => onRemoveRecursive(drawableHitObject);
-
-        private void onAddRecursive(DrawableHitObject hitObject)
+        protected override void OnAdd(DrawableHitObject drawableHitObject)
         {
-            invalidateHitObject(hitObject);
-
-            hitObject.DefaultsApplied += invalidateHitObject;
-
-            foreach (var nested in hitObject.NestedHitObjects)
-                onAddRecursive(nested);
+            invalidateHitObject(drawableHitObject);
+            drawableHitObject.DefaultsApplied += invalidateHitObject;
         }
 
-        private void onRemoveRecursive(DrawableHitObject hitObject)
+        protected override void OnRemove(DrawableHitObject drawableHitObject)
         {
-            toComputeLifetime.Remove(hitObject);
-            layoutComputed.Remove(hitObject);
+            layoutComputed.Remove(drawableHitObject);
 
-            hitObject.DefaultsApplied -= invalidateHitObject;
-
-            foreach (var nested in hitObject.NestedHitObjects)
-                onRemoveRecursive(nested);
+            drawableHitObject.DefaultsApplied -= invalidateHitObject;
         }
 
-        /// <summary>
-        /// Make this <see cref="DrawableHitObject"/> lifetime and layout computed in next update.
-        /// </summary>
         private void invalidateHitObject(DrawableHitObject hitObject)
         {
-            // Lifetime computation is delayed until next update because
-            // when the hit object is not pooled this container is not loaded here and `scrollLength` cannot be computed.
-            toComputeLifetime.Add(hitObject);
+            hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
             layoutComputed.Remove(hitObject);
         }
-
-        private float scrollLength;
 
         protected override void Update()
         {
             base.Update();
 
-            if (!layoutCache.IsValid)
-            {
-                toComputeLifetime.Clear();
-                layoutComputed.Clear();
+            if (layoutCache.IsValid) return;
 
-                // Reset lifetime to the conservative estimation.
-                // If a drawable becomes alive by this lifetime, its lifetime will be updated to a more precise lifetime in the next update.
-                foreach (var entry in Entries)
-                    entry.SetInitialLifetime();
+            layoutComputed.Clear();
 
-                scrollingInfo.Algorithm.Reset();
+            // Reset lifetime to the conservative estimation.
+            // If a drawable becomes alive by this lifetime, its lifetime will be updated to a more precise lifetime in the next update.
+            foreach (var entry in Entries)
+                entry.SetInitialLifetime();
 
-                switch (direction.Value)
-                {
-                    case ScrollingDirection.Up:
-                    case ScrollingDirection.Down:
-                        scrollLength = DrawSize.Y;
-                        break;
+            scrollingInfo.Algorithm.Reset();
 
-                    default:
-                        scrollLength = DrawSize.X;
-                        break;
-                }
-
-                layoutCache.Validate();
-            }
-
-            foreach (var hitObject in toComputeLifetime)
-                hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
-
-            toComputeLifetime.Clear();
+            layoutCache.Validate();
         }
 
         protected override void UpdateAfterChildrenLife()
