@@ -556,5 +556,16 @@ namespace osu.Game.Skinning
             Textures?.Dispose();
             Samples?.Dispose();
         }
+
+        ISkin ISkin.FindProvider(Func<ISkin, bool> lookupFunction)
+        {
+            if (lookupFunction(this))
+                return this;
+
+            if (!fallbackToDefault)
+                return null;
+
+            return (legacyDefaultFallback as ISkin)?.FindProvider(lookupFunction);
+        }
     }
 }

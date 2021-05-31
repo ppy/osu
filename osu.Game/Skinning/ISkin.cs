@@ -57,5 +57,13 @@ namespace osu.Game.Skinning
         /// <returns>A matching value boxed in an <see cref="IBindable{TValue}"/>, or null if unavailable.</returns>
         [CanBeNull]
         IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
+
+        /// <summary>
+        /// For the specified texture, find any potential skin that can fulfill the lookup.
+        /// This should be used for cases where subsequent lookups (for related components) need to occur on the same skin.
+        /// </summary>
+        /// <returns>The skin to be used for subsequent lookups, or <c>null</c> if none is available.</returns>
+        [CanBeNull]
+        ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(this) ? this : null;
     }
 }
