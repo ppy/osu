@@ -84,10 +84,6 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private ScoreManager scoreManager { get; set; }
 
-        private RulesetInfo rulesetInfo;
-
-        private Ruleset ruleset;
-
         [Resolved]
         private IAPIProvider api { get; set; }
 
@@ -96,6 +92,10 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
+
+        protected Ruleset GameplayRuleset { get; private set; }
+
+        protected GameplayBeatmap GameplayBeatmap { get; private set; }
 
         private Sample sampleRestart;
 
@@ -144,8 +144,6 @@ namespace osu.Game.Screens.Play
         {
             Configuration = configuration ?? new PlayerConfiguration();
         }
-
-        private GameplayBeatmap gameplayBeatmap;
 
         private ScreenSuspensionHandler screenSuspension;
 
@@ -204,16 +202,16 @@ namespace osu.Game.Screens.Play
             if (game is OsuGame osuGame)
                 LocalUserPlaying.BindTo(osuGame.LocalUserPlaying);
 
-            DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
+            DrawableRuleset = GameplayRuleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
             dependencies.CacheAs(DrawableRuleset);
 
-            ScoreProcessor = ruleset.CreateScoreProcessor();
+            ScoreProcessor = GameplayRuleset.CreateScoreProcessor();
             ScoreProcessor.ApplyBeatmap(playableBeatmap);
             ScoreProcessor.Mods.BindTo(Mods);
 
             dependencies.CacheAs(ScoreProcessor);
 
-            HealthProcessor = ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
+            HealthProcessor = GameplayRuleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
             HealthProcessor.ApplyBeatmap(playableBeatmap);
 
             dependencies.CacheAs(HealthProcessor);
@@ -223,16 +221,16 @@ namespace osu.Game.Screens.Play
 
             InternalChild = GameplayClockContainer = CreateGameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime);
 
-            AddInternal(gameplayBeatmap = new GameplayBeatmap(playableBeatmap));
+            AddInternal(GameplayBeatmap = new GameplayBeatmap(playableBeatmap));
             AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
 
-            dependencies.CacheAs(gameplayBeatmap);
+            dependencies.CacheAs(GameplayBeatmap);
 
             var beatmapSkinProvider = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
 
             // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
             // full access to all skin sources.
-            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
+            var rulesetSkinProvider = new SkinProvidingContainer(GameplayRuleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
 
             // load the skinning hierarchy first.
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
@@ -247,7 +245,7 @@ namespace osu.Game.Screens.Play
 
             // also give the HUD a ruleset container to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
             // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
-            var hudRulesetContainer = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
+            var hudRulesetContainer = new SkinProvidingContainer(GameplayRuleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
 
             // add the overlay components as a separate step as they proxy some elements from the above underlay/gameplay components.
             GameplayClockContainer.Add(hudRulesetContainer.WithChild(createOverlayComponents(Beatmap.Value)));
@@ -284,7 +282,7 @@ namespace osu.Game.Screens.Play
             {
                 HealthProcessor.ApplyResult(r);
                 ScoreProcessor.ApplyResult(r);
-                gameplayBeatmap.ApplyResult(r);
+                GameplayBeatmap.ApplyResult(r);
             };
 
             DrawableRuleset.RevertResult += r =>
@@ -473,18 +471,18 @@ namespace osu.Game.Screens.Play
                 if (Beatmap.Value.Beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
 
-                rulesetInfo = Ruleset.Value ?? Beatmap.Value.BeatmapInfo.Ruleset;
-                ruleset = rulesetInfo.CreateInstance();
+                var rulesetInfo = Ruleset.Value ?? Beatmap.Value.BeatmapInfo.Ruleset;
+                GameplayRuleset = rulesetInfo.CreateInstance();
 
                 try
                 {
-                    playable = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, Mods.Value);
+                    playable = Beatmap.Value.GetPlayableBeatmap(GameplayRuleset.RulesetInfo, Mods.Value);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
                     // A playable beatmap may not be creatable with the user's preferred ruleset, so try using the beatmap's default ruleset
                     rulesetInfo = Beatmap.Value.BeatmapInfo.Ruleset;
-                    ruleset = rulesetInfo.CreateInstance();
+                    GameplayRuleset = rulesetInfo.CreateInstance();
 
                     playable = Beatmap.Value.GetPlayableBeatmap(rulesetInfo, Mods.Value);
                 }
@@ -915,7 +913,7 @@ namespace osu.Game.Screens.Play
                 ScoreInfo = new ScoreInfo
                 {
                     Beatmap = Beatmap.Value.BeatmapInfo,
-                    Ruleset = rulesetInfo,
+                    Ruleset = GameplayRuleset.RulesetInfo,
                     Mods = Mods.Value.ToArray(),
                 }
             };
@@ -951,7 +949,7 @@ namespace osu.Game.Screens.Play
 
             using (var stream = new MemoryStream())
             {
-                new LegacyScoreEncoder(score, gameplayBeatmap.PlayableBeatmap).Encode(stream);
+                new LegacyScoreEncoder(score, GameplayBeatmap.PlayableBeatmap).Encode(stream);
                 replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
             }
 
