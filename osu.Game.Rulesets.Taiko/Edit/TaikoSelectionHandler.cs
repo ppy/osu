@@ -69,17 +69,21 @@ namespace osu.Game.Rulesets.Taiko.Edit
         {
             EditorBeatmap.PerformOnSelection(h =>
             {
-                if (h is Hit taikoHit) taikoHit.Type = state ? HitType.Rim : HitType.Centre;
+                if (h is Hit taikoHit)
+                {
+                    taikoHit.Type = state ? HitType.Rim : HitType.Centre;
+                    EditorBeatmap.Update(h);
+                }
             });
         }
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<HitObject>> selection)
         {
             if (selection.All(s => s.Item is Hit))
-                yield return new TernaryStateMenuItem("Rim") { State = { BindTarget = selectionRimState } };
+                yield return new TernaryStateToggleMenuItem("Rim") { State = { BindTarget = selectionRimState } };
 
             if (selection.All(s => s.Item is TaikoHitObject))
-                yield return new TernaryStateMenuItem("Strong") { State = { BindTarget = selectionStrongState } };
+                yield return new TernaryStateToggleMenuItem("Strong") { State = { BindTarget = selectionStrongState } };
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;

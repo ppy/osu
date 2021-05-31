@@ -20,7 +20,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestMultiplayerClient : StatefulMultiplayerClient
+    public class TestMultiplayerClient : MultiplayerClient
     {
         public override IBindable<bool> IsConnected => isConnected;
         private readonly Bindable<bool> isConnected = new Bindable<bool>(true);

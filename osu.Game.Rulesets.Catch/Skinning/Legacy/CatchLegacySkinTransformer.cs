@@ -22,49 +22,49 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
-            if (!(component is CatchSkinComponent catchSkinComponent))
-                return null;
-
-            switch (catchSkinComponent.Component)
+            if (component is CatchSkinComponent catchSkinComponent)
             {
-                case CatchSkinComponents.Fruit:
-                    if (GetTexture("fruit-pear") != null)
-                        return new LegacyFruitPiece();
+                switch (catchSkinComponent.Component)
+                {
+                    case CatchSkinComponents.Fruit:
+                        if (GetTexture("fruit-pear") != null)
+                            return new LegacyFruitPiece();
 
-                    break;
+                        return null;
 
-                case CatchSkinComponents.Banana:
-                    if (GetTexture("fruit-bananas") != null)
-                        return new LegacyBananaPiece();
+                    case CatchSkinComponents.Banana:
+                        if (GetTexture("fruit-bananas") != null)
+                            return new LegacyBananaPiece();
 
-                    break;
+                        return null;
 
-                case CatchSkinComponents.Droplet:
-                    if (GetTexture("fruit-drop") != null)
-                        return new LegacyDropletPiece();
+                    case CatchSkinComponents.Droplet:
+                        if (GetTexture("fruit-drop") != null)
+                            return new LegacyDropletPiece();
 
-                    break;
+                        return null;
 
-                case CatchSkinComponents.CatcherIdle:
-                    return this.GetAnimation("fruit-catcher-idle", true, true, true) ??
-                           this.GetAnimation("fruit-ryuuta", true, true, true);
+                    case CatchSkinComponents.CatcherIdle:
+                        return this.GetAnimation("fruit-catcher-idle", true, true, true) ??
+                               this.GetAnimation("fruit-ryuuta", true, true, true);
 
-                case CatchSkinComponents.CatcherFail:
-                    return this.GetAnimation("fruit-catcher-fail", true, true, true) ??
-                           this.GetAnimation("fruit-ryuuta", true, true, true);
+                    case CatchSkinComponents.CatcherFail:
+                        return this.GetAnimation("fruit-catcher-fail", true, true, true) ??
+                               this.GetAnimation("fruit-ryuuta", true, true, true);
 
-                case CatchSkinComponents.CatcherKiai:
-                    return this.GetAnimation("fruit-catcher-kiai", true, true, true) ??
-                           this.GetAnimation("fruit-ryuuta", true, true, true);
+                    case CatchSkinComponents.CatcherKiai:
+                        return this.GetAnimation("fruit-catcher-kiai", true, true, true) ??
+                               this.GetAnimation("fruit-ryuuta", true, true, true);
 
-                case CatchSkinComponents.CatchComboCounter:
-                    if (providesComboCounter)
-                        return new LegacyCatchComboCounter(Source);
+                    case CatchSkinComponents.CatchComboCounter:
+                        if (providesComboCounter)
+                            return new LegacyCatchComboCounter(Source);
 
-                    break;
+                        return null;
+                }
             }
 
-            return null;
+            return Source.GetDrawableComponent(component);
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
