@@ -210,7 +210,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private double currentFrameStableTime
             => player.ChildrenOfType<FrameStabilityContainer>().First().FrameStableClock.CurrentTime;
 
-        private void waitForPlayer() => AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
+        private void waitForPlayer() => AddUntilStep("wait for player", () => (Stack.CurrentScreen as Player)?.IsLoaded == true);
 
         private void start(int? beatmapId = null) => AddStep("start play", () => testSpectatorClient.StartPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
 
