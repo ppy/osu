@@ -24,7 +24,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
-    public class LegacySkin : Skin
+    public class LegacySkin : Skin, ISkin
     {
         private readonly bool fallbackToDefault;
 
@@ -56,6 +56,7 @@ namespace osu.Game.Skinning
 
         private readonly Dictionary<int, LegacyManiaSkinConfiguration> maniaConfigurations = new Dictionary<int, LegacyManiaSkinConfiguration>();
 
+        [CanBeNull]
         private readonly DefaultLegacySkin legacyDefaultFallback;
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
@@ -71,12 +72,12 @@ namespace osu.Game.Skinning
         /// <param name="storage">A storage for looking up files within this skin using user-facing filenames.</param>
         /// <param name="resources">Access to raw game resources.</param>
         /// <param name="configurationFilename">The user-facing filename of the configuration file to be parsed. Can accept an .osu or skin.ini file.</param>
-        /// <param name="fallbackToDefault">Whether lookups should fallback to the <see cref="DefaultLegacySkin"/> implementations if not provided locally.</param>
+        /// <param name="fallbackToDefault">Whether lookups via <see cref="ISkin.FindProvider"/> fallback to the <see cref="DefaultLegacySkin"/> implementations if not provided locally.</param>
         protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename, bool fallbackToDefault = false)
             : base(skin, resources)
         {
             this.fallbackToDefault = fallbackToDefault;
-            legacyDefaultFallback = new DefaultLegacySkin(storage, resources);
+            legacyDefaultFallback = CreateFallbackSkin(storage, resources);
 
             using (var stream = storage?.GetStream(configurationFilename))
             {
@@ -116,6 +117,10 @@ namespace osu.Game.Skinning
                 lookupForMania<string>(new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value ?? "mania-key1", true,
                 true) != null);
         }
+
+        [CanBeNull]
+        protected virtual DefaultLegacySkin CreateFallbackSkin(IResourceStore<byte[]> storage, IStorageResourceProvider resources) =>
+            new DefaultLegacySkin(storage, resources);
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
@@ -157,7 +162,7 @@ namespace osu.Game.Skinning
                     return genericLookup<TLookup, TValue>(lookup);
             }
 
-            return fallbackToDefault ? legacyDefaultFallback.GetConfig<TLookup, TValue>(lookup) : null;
+            return legacyDefaultFallback?.GetConfig<TLookup, TValue>(lookup);
         }
 
         private IBindable<TValue> lookupForMania<TValue>(LegacyManiaSkinConfigurationLookup maniaLookup)
@@ -334,7 +339,7 @@ namespace osu.Game.Skinning
             {
             }
 
-            return fallbackToDefault ? legacyDefaultFallback.GetConfig<TLookup, TValue>(lookup) : null;
+            return legacyDefaultFallback?.GetConfig<TLookup, TValue>(lookup);
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
@@ -434,7 +439,12 @@ namespace osu.Game.Skinning
                     break;
             }
 
-            return this.GetAnimation(component.LookupName, false, false);
+            var animation = this.GetAnimation(component.LookupName, false, false);
+
+            if (animation != null)
+                return animation;
+
+            return legacyDefaultFallback?.GetDrawableComponent(component);
         }
 
         private Texture getParticleTexture(HitResult result)
@@ -494,7 +504,7 @@ namespace osu.Game.Skinning
                 return texture;
             }
 
-            return null;
+            return legacyDefaultFallback?.GetTexture(componentName, wrapModeS, wrapModeT);
         }
 
         public override ISample GetSample(ISampleInfo sampleInfo)
@@ -516,7 +526,7 @@ namespace osu.Game.Skinning
                     return sample;
             }
 
-            return fallbackToDefault ? legacyDefaultFallback.GetSample(sampleInfo) : null;
+            return legacyDefaultFallback?.GetSample(sampleInfo);
         }
 
         private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)
