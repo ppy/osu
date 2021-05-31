@@ -563,7 +563,11 @@ namespace osu.Game.Skinning
 
             // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
             string lastPiece = componentName.Split('/').Last();
-            yield return componentName.StartsWith("Gameplay/taiko/", StringComparison.Ordinal) ? "taiko-" + lastPiece : lastPiece;
+
+            if (componentName.StartsWith("Gameplay/taiko/", StringComparison.Ordinal))
+                yield return "taiko-" + lastPiece;
+
+            yield return lastPiece;
         }
 
         protected override void Dispose(bool isDisposing)
