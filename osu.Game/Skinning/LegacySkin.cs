@@ -26,6 +26,8 @@ namespace osu.Game.Skinning
 {
     public class LegacySkin : Skin
     {
+        private readonly bool fallbackToDefault;
+
         [CanBeNull]
         protected TextureStore Textures;
 
@@ -54,16 +56,29 @@ namespace osu.Game.Skinning
 
         private readonly Dictionary<int, LegacyManiaSkinConfiguration> maniaConfigurations = new Dictionary<int, LegacyManiaSkinConfiguration>();
 
+        private readonly DefaultLegacySkin legacyDefaultFallback;
+
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public LegacySkin(SkinInfo skin, IStorageResourceProvider resources)
-            : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, resources.Files), resources, "skin.ini")
+            : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, resources.Files), resources, "skin.ini", true)
         {
         }
 
-        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string filename)
+        /// <summary>
+        /// Construct a new legacy skin instance.
+        /// </summary>
+        /// <param name="skin">The model for this skin.</param>
+        /// <param name="storage">A storage for looking up files within this skin using user-facing filenames.</param>
+        /// <param name="resources">Access to raw game resources.</param>
+        /// <param name="configurationFilename">The user-facing filename of the configuration file to be parsed. Can accept an .osu or skin.ini file.</param>
+        /// <param name="fallbackToDefault">Whether lookups should fallback to the <see cref="DefaultLegacySkin"/> implementations if not provided locally.</param>
+        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename, bool fallbackToDefault = false)
             : base(skin, resources)
         {
-            using (var stream = storage?.GetStream(filename))
+            this.fallbackToDefault = fallbackToDefault;
+            legacyDefaultFallback = new DefaultLegacySkin(storage, resources);
+
+            using (var stream = storage?.GetStream(configurationFilename))
             {
                 if (stream != null)
                 {
