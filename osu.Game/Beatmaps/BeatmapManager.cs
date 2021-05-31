@@ -73,6 +73,7 @@ namespace osu.Game.Beatmaps
         private readonly RulesetStore rulesets;
         private readonly BeatmapStore beatmaps;
         private readonly AudioManager audioManager;
+        private readonly IResourceStore<byte[]> resources;
         private readonly LargeTextureStore largeTextureStore;
         private readonly ITrackStore trackStore;
 
@@ -82,12 +83,13 @@ namespace osu.Game.Beatmaps
         [CanBeNull]
         private readonly BeatmapOnlineLookupQueue onlineLookupQueue;
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, GameHost host = null,
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
             : base(storage, contextFactory, api, new BeatmapStore(contextFactory), host)
         {
             this.rulesets = rulesets;
             this.audioManager = audioManager;
+            this.resources = resources;
             this.host = host;
 
             DefaultBeatmap = defaultBeatmap;
@@ -511,6 +513,7 @@ namespace osu.Game.Beatmaps
         ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
         AudioManager IStorageResourceProvider.AudioManager => audioManager;
         IResourceStore<byte[]> IStorageResourceProvider.Files => Files.Store;
+        IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host?.CreateTextureLoaderStore(underlyingStore);
 
         #endregion

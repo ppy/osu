@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Gameplay
     public class TestSceneHitObjectSamples : HitObjectSampleTest
     {
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
-        protected override IResourceStore<byte[]> Resources => TestResources.GetStore();
+        public override IResourceStore<byte[]> Resources => TestResources.GetStore();
 
         /// <summary>
         /// Tests that a hitobject which provides no custom sample set retrieves samples from the user skin.

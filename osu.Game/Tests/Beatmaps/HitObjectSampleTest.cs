@@ -28,7 +28,8 @@ namespace osu.Game.Tests.Beatmaps
     [HeadlessTest]
     public abstract class HitObjectSampleTest : PlayerTestScene, IStorageResourceProvider
     {
-        protected abstract IResourceStore<byte[]> Resources { get; }
+        protected abstract IResourceStore<byte[]> RulesetResources { get; }
+
         protected LegacySkin Skin { get; private set; }
 
         [Resolved]
@@ -127,6 +128,7 @@ namespace osu.Game.Tests.Beatmaps
 
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => userSkinResourceStore;
+        public new IResourceStore<byte[]> Resources => base.Resources;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
 
         #endregion
