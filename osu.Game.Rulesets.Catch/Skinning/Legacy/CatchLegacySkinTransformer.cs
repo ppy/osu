@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                             // catch may provide its own combo counter; hide the default.
                             // todo: this should be done in an elegant way per ruleset, defining which HUD skin components should be displayed.
                             foreach (var legacyComboCounter in components.OfType<LegacyComboCounter>())
-                                legacyComboCounter.ContentVisible = false;
+                                legacyComboCounter.HiddenByRulesetImplementation = false;
                         }
 
                         return components;
