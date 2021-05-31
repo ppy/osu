@@ -145,10 +145,11 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// <summary>
         /// Remove all <typeparamref name="TEntry"/>s.
         /// </summary>
-        public virtual void Clear()
+        public void Clear()
         {
             foreach (var entry in Entries.ToArray())
                 Remove(entry);
+
             Debug.Assert(aliveDrawableMap.Count == 0);
         }
 
