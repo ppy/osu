@@ -26,16 +26,6 @@ namespace osu.Game.Tests.Beatmaps
 
         private WorkingBeatmap testBeatmap;
 
-        public virtual void TestBeatmapComboColours(bool userHasCustomColours, bool useBeatmapSkin) => ConfigureTest(useBeatmapSkin, true, userHasCustomColours);
-
-        public virtual void TestBeatmapComboColoursOverride(bool useBeatmapSkin) => ConfigureTest(useBeatmapSkin, false, true);
-
-        public virtual void TestBeatmapComboColoursOverrideWithDefaultColours(bool useBeatmapSkin) => ConfigureTest(useBeatmapSkin, false, false);
-
-        public virtual void TestBeatmapNoComboColours(bool useBeatmapSkin, bool useBeatmapColour) => ConfigureTest(useBeatmapSkin, useBeatmapColour, false);
-
-        public virtual void TestBeatmapNoComboColoursSkinOverride(bool useBeatmapSkin, bool useBeatmapColour) => ConfigureTest(useBeatmapSkin, useBeatmapColour, true);
-
         protected void PrepareBeatmap(Func<WorkingBeatmap> createBeatmap) => AddStep("prepare beatmap", () => testBeatmap = createBeatmap());
 
         protected void ConfigureTest(bool useBeatmapSkin, bool useBeatmapColours, bool userHasCustomColours)
