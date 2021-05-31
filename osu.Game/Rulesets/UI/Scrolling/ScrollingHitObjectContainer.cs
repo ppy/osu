@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         private readonly HashSet<DrawableHitObject> toComputeLifetime = new HashSet<DrawableHitObject>();
 
         /// <summary>
-        /// A set containing all <see cref="HitObjectContainer.AliveObjects"/> which have an up-to-date layout.
+        /// A set of top-level <see cref="DrawableHitObject"/>s which have an up-to-date layout.
         /// </summary>
         private readonly HashSet<DrawableHitObject> layoutComputed = new HashSet<DrawableHitObject>();
 
@@ -150,29 +150,18 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
         }
 
-        protected override void OnAdd(DrawableHitObject drawableHitObject) => onAddRecursive(drawableHitObject);
-
-        protected override void OnRemove(DrawableHitObject drawableHitObject) => onRemoveRecursive(drawableHitObject);
-
-        private void onAddRecursive(DrawableHitObject hitObject)
+        protected override void OnAdd(DrawableHitObject drawableHitObject)
         {
-            invalidateHitObject(hitObject);
-
-            hitObject.DefaultsApplied += invalidateHitObject;
-
-            foreach (var nested in hitObject.NestedHitObjects)
-                onAddRecursive(nested);
+            invalidateHitObject(drawableHitObject);
+            drawableHitObject.DefaultsApplied += invalidateHitObject;
         }
 
-        private void onRemoveRecursive(DrawableHitObject hitObject)
+        protected override void OnRemove(DrawableHitObject drawableHitObject)
         {
-            toComputeLifetime.Remove(hitObject);
-            layoutComputed.Remove(hitObject);
+            toComputeLifetime.Remove(drawableHitObject);
+            layoutComputed.Remove(drawableHitObject);
 
-            hitObject.DefaultsApplied -= invalidateHitObject;
-
-            foreach (var nested in hitObject.NestedHitObjects)
-                onRemoveRecursive(nested);
+            drawableHitObject.DefaultsApplied -= invalidateHitObject;
         }
 
         /// <summary>
