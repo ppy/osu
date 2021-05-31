@@ -33,10 +33,15 @@ namespace osu.Game.Tests.Visual
         {
             base.SetUpSteps();
 
-            AddStep("load editor", () => LoadScreen(Editor = CreateEditor()));
+            AddStep("load editor", LoadEditor);
             AddUntilStep("wait for editor to load", () => EditorComponentsReady);
             AddStep("get beatmap", () => EditorBeatmap = Editor.ChildrenOfType<EditorBeatmap>().Single());
             AddStep("get clock", () => EditorClock = Editor.ChildrenOfType<EditorClock>().Single());
+        }
+
+        protected virtual void LoadEditor()
+        {
+            LoadScreen(Editor = CreateEditor());
         }
 
         /// <summary>
