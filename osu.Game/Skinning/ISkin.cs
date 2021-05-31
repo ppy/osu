@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
@@ -64,6 +65,6 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <returns>The skin to be used for subsequent lookups, or <c>null</c> if none is available.</returns>
         [CanBeNull]
-        ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(this) ? this : null;
+        ISkin FindProvider(Func<ISkin, bool> lookupFunction);
     }
 }
