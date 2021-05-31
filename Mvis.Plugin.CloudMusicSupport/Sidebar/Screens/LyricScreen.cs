@@ -24,13 +24,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         [Resolved]
         private MvisScreen mvisScreen { get; set; }
 
-        private readonly OsuScrollContainer scroll;
+        protected readonly OsuScrollContainer LyricScroll;
         protected readonly FillFlowContainer<DrawableLyric> LyricFlow;
 
         protected LyricScreen()
         {
             RelativeSizeAxes = Axes.Both;
-            InternalChild = scroll = new OsuScrollContainer
+            InternalChild = LyricScroll = new OsuScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = LyricFlow = new FillFlowContainer<DrawableLyric>
@@ -80,18 +80,18 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         protected virtual void ScrollToCurrent()
         {
             var pos = LyricFlow.Children.FirstOrDefault(p =>
-                p.Value == plugin.Lyrics.FindLast(l => plugin.GetCurrentTrack().CurrentTime >= l.Time))?.Y ?? 0;
+                p.Value.Equals(plugin.Lyrics.FindLast(l => plugin.GetCurrentTrack().CurrentTime >= l.Time)))?.Y ?? 0;
 
-            if (pos + scroll.DrawHeight > LyricFlow.Height)
-                scroll.ScrollToEnd();
+            if (pos + LyricScroll.DrawHeight > LyricFlow.Height)
+                LyricScroll.ScrollToEnd();
             else
-                scroll.ScrollTo(pos);
+                LyricScroll.ScrollTo(pos);
         }
 
         protected virtual void RefreshLrcInfo(List<Lyric> lyrics)
         {
             LyricFlow.Clear();
-            scroll.ScrollToStart();
+            LyricScroll.ScrollToStart();
 
             foreach (var t in lyrics)
             {

@@ -1,8 +1,10 @@
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Graphics.UserInterface;
@@ -62,13 +64,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             },
             new IconButton
             {
-                Icon = FontAwesome.Solid.AngleDown,
-                Size = new Vector2(45),
-                TooltipText = "滚动到当前歌词",
-                Action = ScrollToCurrent
-            },
-            new IconButton
-            {
                 Icon = FontAwesome.Solid.Edit,
                 Size = new Vector2(45),
                 TooltipText = "编辑",
@@ -107,6 +102,26 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             }, true);
 
             base.LoadComplete();
+        }
+
+        private readonly BindableFloat followCooldown = new BindableFloat();
+
+        protected override void Update()
+        {
+            if (followCooldown.Value == 0) ScrollToCurrent();
+            base.Update();
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            followCooldown.Value = 1;
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            this.TransformBindableTo(followCooldown, 0, 3000);
+            base.OnHoverLost(e);
         }
 
         public override void OnEntering(IScreen last)
