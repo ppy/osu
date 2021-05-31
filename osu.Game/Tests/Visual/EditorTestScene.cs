@@ -5,6 +5,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -40,7 +41,7 @@ namespace osu.Game.Tests.Visual
             Beatmap.Value = working;
 
             if (IsolateSavingFromDatabase)
-                Dependencies.CacheAs<BeatmapManager>(new TestBeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, Beatmap.Default, working));
+                Dependencies.CacheAs<BeatmapManager>(new TestBeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default, working));
         }
 
         protected virtual bool EditorComponentsReady => Editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true
@@ -92,8 +93,8 @@ namespace osu.Game.Tests.Visual
         {
             private readonly WorkingBeatmap testBeatmap;
 
-            public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, GameHost host, WorkingBeatmap defaultBeatmap, WorkingBeatmap testBeatmap)
-                : base(storage, contextFactory, rulesets, api, audioManager, host, defaultBeatmap, false)
+            public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host, WorkingBeatmap defaultBeatmap, WorkingBeatmap testBeatmap)
+                : base(storage, contextFactory, rulesets, api, audioManager, resources, host, defaultBeatmap, false)
             {
                 this.testBeatmap = testBeatmap;
             }

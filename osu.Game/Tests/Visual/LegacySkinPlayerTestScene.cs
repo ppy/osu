@@ -4,7 +4,6 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
@@ -21,9 +20,9 @@ namespace osu.Game.Tests.Visual
         protected override TestPlayer CreatePlayer(Ruleset ruleset) => new SkinProvidingPlayer(legacySkinSource);
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, SkinManager skins)
+        private void load(SkinManager skins)
         {
-            LegacySkin = new DefaultLegacySkin(new NamespacedResourceStore<byte[]>(game.Resources, "Skins/Legacy"), skins);
+            LegacySkin = new DefaultLegacySkin(skins);
             legacySkinSource = new SkinProvidingContainer(LegacySkin);
         }
 
