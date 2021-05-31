@@ -142,7 +142,7 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookup maniaLookup:
                     if (!AllowManiaSkin)
-                        return null;
+                        break;
 
                     var result = lookupForMania<TValue>(maniaLookup);
                     if (result != null)
@@ -157,7 +157,7 @@ namespace osu.Game.Skinning
                     return genericLookup<TLookup, TValue>(lookup);
             }
 
-            return null;
+            return fallbackToDefault ? legacyDefaultFallback.GetConfig<TLookup, TValue>(lookup) : null;
         }
 
         private IBindable<TValue> lookupForMania<TValue>(LegacyManiaSkinConfigurationLookup maniaLookup)
@@ -334,7 +334,7 @@ namespace osu.Game.Skinning
             {
             }
 
-            return null;
+            return fallbackToDefault ? legacyDefaultFallback.GetConfig<TLookup, TValue>(lookup) : null;
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
@@ -516,7 +516,7 @@ namespace osu.Game.Skinning
                     return sample;
             }
 
-            return null;
+            return fallbackToDefault ? legacyDefaultFallback.GetSample(sampleInfo) : null;
         }
 
         private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)
