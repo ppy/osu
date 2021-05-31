@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private void sourceChanged()
         {
-            hasHitCircle = new Lazy<bool>(() => Source.GetTexture("hitcircle") != null);
+            hasHitCircle = new Lazy<bool>(() => FindProvider(s => s.GetTexture("hitcircle") != null) != null);
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)

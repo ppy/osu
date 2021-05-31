@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -47,5 +48,7 @@ namespace osu.Game.Skinning
         }
 
         public abstract IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
+
+        public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => Source.FindProvider(lookupFunction);
     }
 }

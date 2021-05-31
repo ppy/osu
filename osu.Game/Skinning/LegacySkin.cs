@@ -54,16 +54,29 @@ namespace osu.Game.Skinning
 
         private readonly Dictionary<int, LegacyManiaSkinConfiguration> maniaConfigurations = new Dictionary<int, LegacyManiaSkinConfiguration>();
 
+        [CanBeNull]
+        private readonly DefaultLegacySkin legacyDefaultFallback;
+
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public LegacySkin(SkinInfo skin, IStorageResourceProvider resources)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, resources.Files), resources, "skin.ini")
         {
         }
 
-        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string filename)
+        /// <summary>
+        /// Construct a new legacy skin instance.
+        /// </summary>
+        /// <param name="skin">The model for this skin.</param>
+        /// <param name="storage">A storage for looking up files within this skin using user-facing filenames.</param>
+        /// <param name="resources">Access to raw game resources.</param>
+        /// <param name="configurationFilename">The user-facing filename of the configuration file to be parsed. Can accept an .osu or skin.ini file.</param>
+        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename)
             : base(skin, resources)
         {
-            using (var stream = storage?.GetStream(filename))
+            if (resources != null)
+                legacyDefaultFallback = CreateFallbackSkin(storage, resources);
+
+            using (var stream = storage?.GetStream(configurationFilename))
             {
                 if (stream != null)
                 {
@@ -102,6 +115,9 @@ namespace osu.Game.Skinning
                 true) != null);
         }
 
+        [CanBeNull]
+        protected virtual DefaultLegacySkin CreateFallbackSkin(IResourceStore<byte[]> storage, IStorageResourceProvider resources) => new DefaultLegacySkin(resources);
+
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
             switch (lookup)
@@ -127,7 +143,7 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookup maniaLookup:
                     if (!AllowManiaSkin)
-                        return null;
+                        break;
 
                     var result = lookupForMania<TValue>(maniaLookup);
                     if (result != null)
@@ -142,7 +158,7 @@ namespace osu.Game.Skinning
                     return genericLookup<TLookup, TValue>(lookup);
             }
 
-            return null;
+            return legacyDefaultFallback?.GetConfig<TLookup, TValue>(lookup);
         }
 
         private IBindable<TValue> lookupForMania<TValue>(LegacyManiaSkinConfigurationLookup maniaLookup)
@@ -319,7 +335,7 @@ namespace osu.Game.Skinning
             {
             }
 
-            return null;
+            return legacyDefaultFallback?.GetConfig<TLookup, TValue>(lookup);
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
@@ -333,7 +349,6 @@ namespace osu.Game.Skinning
                     switch (target.Target)
                     {
                         case SkinnableTarget.MainHUDComponents:
-
                             var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
@@ -420,7 +435,12 @@ namespace osu.Game.Skinning
                     break;
             }
 
-            return this.GetAnimation(component.LookupName, false, false);
+            var animation = this.GetAnimation(component.LookupName, false, false);
+
+            if (animation != null)
+                return animation;
+
+            return legacyDefaultFallback?.GetDrawableComponent(component);
         }
 
         private Texture getParticleTexture(HitResult result)
@@ -480,7 +500,7 @@ namespace osu.Game.Skinning
                 return texture;
             }
 
-            return null;
+            return legacyDefaultFallback?.GetTexture(componentName, wrapModeS, wrapModeT);
         }
 
         public override ISample GetSample(ISampleInfo sampleInfo)
@@ -502,7 +522,17 @@ namespace osu.Game.Skinning
                     return sample;
             }
 
-            return null;
+            return legacyDefaultFallback?.GetSample(sampleInfo);
+        }
+
+        public override ISkin FindProvider(Func<ISkin, bool> lookupFunction)
+        {
+            var source = base.FindProvider(lookupFunction);
+
+            if (source != null)
+                return source;
+
+            return legacyDefaultFallback?.FindProvider(lookupFunction);
         }
 
         private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)
@@ -533,7 +563,11 @@ namespace osu.Game.Skinning
 
             // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
             string lastPiece = componentName.Split('/').Last();
-            yield return componentName.StartsWith("Gameplay/taiko/", StringComparison.Ordinal) ? "taiko-" + lastPiece : lastPiece;
+
+            if (componentName.StartsWith("Gameplay/taiko/", StringComparison.Ordinal))
+                yield return "taiko-" + lastPiece;
+
+            yield return lastPiece;
         }
 
         protected override void Dispose(bool isDisposing)
