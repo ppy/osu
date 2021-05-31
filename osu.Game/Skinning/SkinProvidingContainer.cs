@@ -41,6 +41,14 @@ namespace osu.Game.Skinning
             RelativeSizeAxes = Axes.Both;
         }
 
+        public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
+        {
+            if (lookupFunction(skin))
+                return skin;
+
+            return fallbackSource.FindProvider(lookupFunction);
+        }
+
         public Drawable GetDrawableComponent(ISkinComponent component)
         {
             Drawable sourceDrawable;
