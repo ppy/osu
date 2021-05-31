@@ -280,9 +280,8 @@ namespace osu.Game.Beatmaps
         /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
         /// </summary>
         /// <param name="beatmapInfo">The beatmap to lookup.</param>
-        /// <param name="previous">The currently loaded <see cref="WorkingBeatmap"/>. Allows for optimisation where elements are shared with the new beatmap. May be returned if beatmapInfo requested matches</param>
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
-        public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
+        public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
         {
             if (beatmapInfo?.BeatmapSet == null)
                 return DefaultBeatmap;
@@ -293,9 +292,6 @@ namespace osu.Game.Beatmaps
                 int lookupId = beatmapInfo.ID;
                 beatmapInfo = QueryBeatmap(b => b.ID == lookupId);
             }
-
-            if (beatmapInfo.ID > 0 && previous != null && previous.BeatmapInfo?.ID == beatmapInfo.ID)
-                return previous;
 
             lock (workingCache)
             {
