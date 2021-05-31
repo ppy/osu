@@ -91,7 +91,7 @@ namespace osu.Game.Storyboards
         public Drawable CreateSpriteFromResourcePath(string path, TextureStore textureStore)
         {
             Drawable drawable = null;
-            var storyboardPath = BeatmapInfo.BeatmapSet?.Files?.Find(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+            var storyboardPath = BeatmapInfo.BeatmapSet?.Files.Find(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
             if (storyboardPath != null)
                 drawable = new Sprite { Texture = textureStore.Get(storyboardPath) };

@@ -70,6 +70,14 @@ namespace osu.Game.Skinning
             return base.GetSample(sampleInfo);
         }
 
+        protected override DefaultLegacySkin CreateFallbackSkin(IResourceStore<byte[]> storage, IStorageResourceProvider resources)
+        {
+            // for simplicity, beatmap skins don't do lookups on the default skin.
+            // this will mean that fallback always occurs to the user (then default) skin.
+            // this may not offer perfect behaviour, but helps keep things simple.
+            return null;
+        }
+
         private static SkinInfo createSkinInfo(BeatmapInfo beatmap) =>
             new SkinInfo { Name = beatmap.ToString(), Creator = beatmap.Metadata?.AuthorString };
     }

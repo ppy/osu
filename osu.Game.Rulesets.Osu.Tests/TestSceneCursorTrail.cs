@@ -102,6 +102,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;
 
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
+
             public event Action SourceChanged
             {
                 add { }
