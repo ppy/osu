@@ -235,6 +235,9 @@ namespace osu.Game.Online.Spectator
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
+            if (!IsPlaying)
+                return;
+
             if (frame is IConvertibleReplayFrame convertible)
                 pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
 
