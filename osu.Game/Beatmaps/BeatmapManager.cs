@@ -283,15 +283,15 @@ namespace osu.Game.Beatmaps
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
         public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
         {
-            if (beatmapInfo?.BeatmapSet == null)
-                return DefaultBeatmap;
-
             // if there are no files, presume the full beatmap info has not yet been fetched from the database.
-            if (beatmapInfo.BeatmapSet.Files.Count == 0)
+            if (beatmapInfo?.BeatmapSet?.Files.Count == 0)
             {
                 int lookupId = beatmapInfo.ID;
                 beatmapInfo = QueryBeatmap(b => b.ID == lookupId);
             }
+
+            if (beatmapInfo?.BeatmapSet == null)
+                return DefaultBeatmap;
 
             lock (workingCache)
             {
