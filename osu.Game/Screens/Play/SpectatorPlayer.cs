@@ -9,6 +9,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Spectator;
+using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 
@@ -43,6 +45,36 @@ namespace osu.Game.Screens.Play
             });
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            spectatorClient.OnNewFrames += userSentFrames;
+        }
+
+        private void userSentFrames(int userId, FrameDataBundle bundle)
+        {
+            if (userId != score.ScoreInfo.User.Id)
+                return;
+
+            if (!LoadedBeatmapSuccessfully)
+                return;
+
+            if (!this.IsCurrentScreen())
+                return;
+
+            foreach (var frame in bundle.Frames)
+            {
+                IConvertibleReplayFrame convertibleFrame = GameplayRuleset.CreateConvertibleReplayFrame();
+                convertibleFrame.FromLegacy(frame, GameplayBeatmap.PlayableBeatmap);
+
+                var convertedFrame = (ReplayFrame)convertibleFrame;
+                convertedFrame.Time = frame.Time;
+
+                score.Replay.Frames.Add(convertedFrame);
+            }
+        }
+
         protected override ResultsScreen CreateResults(ScoreInfo score)
         {
             return new SpectatorResultsScreen(score);
@@ -67,6 +99,8 @@ namespace osu.Game.Screens.Play
         public override bool OnExiting(IScreen next)
         {
             spectatorClient.OnUserBeganPlaying -= userBeganPlaying;
+            spectatorClient.OnNewFrames -= userSentFrames;
+
             return base.OnExiting(next);
         }
 
@@ -85,7 +119,10 @@ namespace osu.Game.Screens.Play
             base.Dispose(isDisposing);
 
             if (spectatorClient != null)
+            {
                 spectatorClient.OnUserBeganPlaying -= userBeganPlaying;
+                spectatorClient.OnNewFrames -= userSentFrames;
+            }
         }
     }
 }
