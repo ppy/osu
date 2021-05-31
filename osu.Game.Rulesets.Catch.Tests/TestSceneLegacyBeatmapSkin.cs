@@ -32,28 +32,28 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase(true, false)]
         [TestCase(false, true)]
         [TestCase(false, false)]
-        public override void TestBeatmapComboColours(bool userHasCustomColours, bool useBeatmapSkin)
+        public void TestBeatmapComboColours(bool userHasCustomColours, bool useBeatmapSkin)
         {
             PrepareBeatmap(() => new CatchCustomSkinWorkingBeatmap(audio, true));
-            base.TestBeatmapComboColours(userHasCustomColours, useBeatmapSkin);
+            ConfigureTest(useBeatmapSkin, true, userHasCustomColours);
             AddAssert("is beatmap skin colours", () => TestPlayer.UsableComboColours.SequenceEqual(TestBeatmapSkin.Colours));
         }
 
         [TestCase(true)]
         [TestCase(false)]
-        public override void TestBeatmapComboColoursOverride(bool useBeatmapSkin)
+        public void TestBeatmapComboColoursOverride(bool useBeatmapSkin)
         {
             PrepareBeatmap(() => new CatchCustomSkinWorkingBeatmap(audio, true));
-            base.TestBeatmapComboColoursOverride(useBeatmapSkin);
+            ConfigureTest(useBeatmapSkin, false, true);
             AddAssert("is user custom skin colours", () => TestPlayer.UsableComboColours.SequenceEqual(TestSkin.Colours));
         }
 
         [TestCase(true)]
         [TestCase(false)]
-        public override void TestBeatmapComboColoursOverrideWithDefaultColours(bool useBeatmapSkin)
+        public void TestBeatmapComboColoursOverrideWithDefaultColours(bool useBeatmapSkin)
         {
             PrepareBeatmap(() => new CatchCustomSkinWorkingBeatmap(audio, true));
-            base.TestBeatmapComboColoursOverrideWithDefaultColours(useBeatmapSkin);
+            ConfigureTest(useBeatmapSkin, false, false);
             AddAssert("is default user skin colours", () => TestPlayer.UsableComboColours.SequenceEqual(SkinConfiguration.DefaultComboColours));
         }
 
@@ -61,10 +61,10 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase(false, true)]
         [TestCase(true, false)]
         [TestCase(false, false)]
-        public override void TestBeatmapNoComboColours(bool useBeatmapSkin, bool useBeatmapColour)
+        public void TestBeatmapNoComboColours(bool useBeatmapSkin, bool useBeatmapColour)
         {
             PrepareBeatmap(() => new CatchCustomSkinWorkingBeatmap(audio, false));
-            base.TestBeatmapNoComboColours(useBeatmapSkin, useBeatmapColour);
+            ConfigureTest(useBeatmapSkin, useBeatmapColour, false);
             AddAssert("is default user skin colours", () => TestPlayer.UsableComboColours.SequenceEqual(SkinConfiguration.DefaultComboColours));
         }
 
@@ -72,10 +72,10 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase(false, true)]
         [TestCase(true, false)]
         [TestCase(false, false)]
-        public override void TestBeatmapNoComboColoursSkinOverride(bool useBeatmapSkin, bool useBeatmapColour)
+        public void TestBeatmapNoComboColoursSkinOverride(bool useBeatmapSkin, bool useBeatmapColour)
         {
             PrepareBeatmap(() => new CatchCustomSkinWorkingBeatmap(audio, false));
-            base.TestBeatmapNoComboColoursSkinOverride(useBeatmapSkin, useBeatmapColour);
+            ConfigureTest(useBeatmapSkin, useBeatmapColour, true);
             AddAssert("is custom user skin colours", () => TestPlayer.UsableComboColours.SequenceEqual(TestSkin.Colours));
         }
 
