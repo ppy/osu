@@ -37,8 +37,8 @@ namespace osu.Game.Rulesets.Objects
             startTimeBindable.BindTo(HitObject.StartTimeBindable);
             startTimeBindable.BindValueChanged(_ => setInitialLifetime(), true);
 
-            // It is important to subscribe to this event before applied to a DrawableHitObject.
-            // Otherwise DHO cannot overwrite LifetimeStart set in setInitialLifetime.
+            // Subscribe to this event before the DrawableHitObject so that the local callback is invoked before the entry is re-applied as a result of DefaultsApplied.
+            // This way, the DrawableHitObject can use OnApply() to overwrite the LifetimeStart that was set inside setInitialLifetime().
             HitObject.DefaultsApplied += _ => setInitialLifetime();
         }
 
