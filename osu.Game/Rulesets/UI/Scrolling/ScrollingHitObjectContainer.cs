@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             flipPositionIfRequired(ref position);
 
-            return scrollingInfo.Algorithm.TimeAt(position, Time.Current, scrollingInfo.TimeRange.Value, getLength());
+            return scrollingInfo.Algorithm.TimeAt(position, Time.Current, scrollingInfo.TimeRange.Value, scrollLength);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         public Vector2 ScreenSpacePositionAtTime(double time)
         {
-            var pos = scrollingInfo.Algorithm.PositionAt(time, Time.Current, scrollingInfo.TimeRange.Value, getLength());
+            var pos = scrollingInfo.Algorithm.PositionAt(time, Time.Current, scrollingInfo.TimeRange.Value, scrollLength);
 
             flipPositionIfRequired(ref pos);
 
@@ -100,16 +100,19 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
         }
 
-        private float getLength()
+        private float scrollLength
         {
-            switch (scrollingInfo.Direction.Value)
+            get
             {
-                case ScrollingDirection.Left:
-                case ScrollingDirection.Right:
-                    return DrawWidth;
+                switch (scrollingInfo.Direction.Value)
+                {
+                    case ScrollingDirection.Left:
+                    case ScrollingDirection.Right:
+                        return DrawWidth;
 
-                default:
-                    return DrawHeight;
+                    default:
+                        return DrawHeight;
+                }
             }
         }
 
@@ -163,8 +166,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
             layoutComputed.Remove(hitObject);
         }
 
-        private float scrollLength;
-
         protected override void Update()
         {
             base.Update();
@@ -178,18 +179,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
 
             scrollingInfo.Algorithm.Reset();
-
-            switch (direction.Value)
-            {
-                case ScrollingDirection.Up:
-                case ScrollingDirection.Down:
-                    scrollLength = DrawSize.Y;
-                    break;
-
-                default:
-                    scrollLength = DrawSize.X;
-                    break;
-            }
 
             layoutCache.Validate();
         }
