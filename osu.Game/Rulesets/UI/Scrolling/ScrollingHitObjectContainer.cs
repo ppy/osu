@@ -18,11 +18,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         /// <summary>
-        /// Hit objects which require lifetime computation in the next update call.
-        /// </summary>
-        private readonly HashSet<DrawableHitObject> toComputeLifetime = new HashSet<DrawableHitObject>();
-
-        /// <summary>
         /// A set of top-level <see cref="DrawableHitObject"/>s which have an up-to-date layout.
         /// </summary>
         private readonly HashSet<DrawableHitObject> layoutComputed = new HashSet<DrawableHitObject>();
@@ -54,7 +49,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             base.Clear();
 
-            toComputeLifetime.Clear();
             layoutComputed.Clear();
         }
 
@@ -158,20 +152,14 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         protected override void OnRemove(DrawableHitObject drawableHitObject)
         {
-            toComputeLifetime.Remove(drawableHitObject);
             layoutComputed.Remove(drawableHitObject);
 
             drawableHitObject.DefaultsApplied -= invalidateHitObject;
         }
 
-        /// <summary>
-        /// Make this <see cref="DrawableHitObject"/> lifetime and layout computed in next update.
-        /// </summary>
         private void invalidateHitObject(DrawableHitObject hitObject)
         {
-            // Lifetime computation is delayed until next update because
-            // when the hit object is not pooled this container is not loaded here and `scrollLength` cannot be computed.
-            toComputeLifetime.Add(hitObject);
+            hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
             layoutComputed.Remove(hitObject);
         }
 
@@ -181,39 +169,29 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             base.Update();
 
-            if (!layoutCache.IsValid)
+            if (layoutCache.IsValid) return;
+
+            foreach (var hitObject in Objects)
             {
-                toComputeLifetime.Clear();
-
-                foreach (var hitObject in Objects)
-                {
-                    if (hitObject.HitObject != null)
-                        toComputeLifetime.Add(hitObject);
-                }
-
-                layoutComputed.Clear();
-
-                scrollingInfo.Algorithm.Reset();
-
-                switch (direction.Value)
-                {
-                    case ScrollingDirection.Up:
-                    case ScrollingDirection.Down:
-                        scrollLength = DrawSize.Y;
-                        break;
-
-                    default:
-                        scrollLength = DrawSize.X;
-                        break;
-                }
-
-                layoutCache.Validate();
+                if (hitObject.HitObject != null)
+                    invalidateHitObject(hitObject);
             }
 
-            foreach (var hitObject in toComputeLifetime)
-                hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
+            scrollingInfo.Algorithm.Reset();
 
-            toComputeLifetime.Clear();
+            switch (direction.Value)
+            {
+                case ScrollingDirection.Up:
+                case ScrollingDirection.Down:
+                    scrollLength = DrawSize.Y;
+                    break;
+
+                default:
+                    scrollLength = DrawSize.X;
+                    break;
+            }
+
+            layoutCache.Validate();
         }
 
         protected override void UpdateAfterChildrenLife()
