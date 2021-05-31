@@ -72,8 +72,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Depth = float.MinValue,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.5f,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
                     Child = userModsSelectOverlay = new UserModSelectOverlay
                     {

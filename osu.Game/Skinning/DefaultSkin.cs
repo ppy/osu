@@ -12,7 +12,9 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Extensions;
 using osu.Game.IO;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osuTK;
 using osuTK.Graphics;
 
@@ -77,6 +79,24 @@ namespace osu.Game.Skinning
                                         combo.Position = new Vector2(accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 + horizontal_padding, vertical_offset + 5);
                                         combo.Anchor = Anchor.TopCentre;
                                     }
+
+                                    var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
+
+                                    if (hitError != null)
+                                    {
+                                        hitError.Anchor = Anchor.CentreLeft;
+                                        hitError.Origin = Anchor.CentreLeft;
+                                    }
+
+                                    var hitError2 = container.OfType<HitErrorMeter>().LastOrDefault();
+
+                                    if (hitError2 != null)
+                                    {
+                                        hitError2.Anchor = Anchor.CentreRight;
+                                        hitError2.Scale = new Vector2(-1, 1);
+                                        // origin flipped to match scale above.
+                                        hitError2.Origin = Anchor.CentreLeft;
+                                    }
                                 }
                             })
                             {
@@ -86,6 +106,9 @@ namespace osu.Game.Skinning
                                     new DefaultScoreCounter(),
                                     new DefaultAccuracyCounter(),
                                     new DefaultHealthDisplay(),
+                                    new SongProgress(),
+                                    new BarHitErrorMeter(),
+                                    new BarHitErrorMeter(),
                                 }
                             };
 

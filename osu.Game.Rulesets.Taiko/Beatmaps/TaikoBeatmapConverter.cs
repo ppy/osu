@@ -79,8 +79,6 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             // Old osu! used hit sounding to determine various hit type information
             IList<HitSampleInfo> samples = obj.Samples;
 
-            bool strong = samples.Any(s => s.Name == HitSampleInfo.HIT_FINISH);
-
             switch (obj)
             {
                 case IHasDistance distanceData:
@@ -94,15 +92,11 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                         for (double j = obj.StartTime; j <= obj.StartTime + taikoDuration + tickSpacing / 8; j += tickSpacing)
                         {
                             IList<HitSampleInfo> currentSamples = allSamples[i];
-                            bool isRim = currentSamples.Any(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE);
-                            strong = currentSamples.Any(s => s.Name == HitSampleInfo.HIT_FINISH);
 
                             yield return new Hit
                             {
                                 StartTime = j,
-                                Type = isRim ? HitType.Rim : HitType.Centre,
                                 Samples = currentSamples,
-                                IsStrong = strong
                             };
 
                             i = (i + 1) % allSamples.Count;
@@ -117,7 +111,6 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                         {
                             StartTime = obj.StartTime,
                             Samples = obj.Samples,
-                            IsStrong = strong,
                             Duration = taikoDuration,
                             TickRate = beatmap.BeatmapInfo.BaseDifficulty.SliderTickRate == 3 ? 3 : 4
                         };
@@ -143,16 +136,10 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
                 default:
                 {
-                    bool isRimDefinition(HitSampleInfo s) => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE;
-
-                    bool isRim = samples.Any(isRimDefinition);
-
                     yield return new Hit
                     {
                         StartTime = obj.StartTime,
-                        Type = isRim ? HitType.Rim : HitType.Centre,
                         Samples = samples,
-                        IsStrong = strong
                     };
 
                     break;

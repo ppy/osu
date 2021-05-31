@@ -53,7 +53,7 @@ namespace osu.Game.Storyboards
 
         public Storyboard()
         {
-            layers.Add("Video", new StoryboardLayer("Video", 4, false));
+            layers.Add("Video", new StoryboardVideoLayer("Video", 4, false));
             layers.Add("Background", new StoryboardLayer("Background", 3));
             layers.Add("Fail", new StoryboardLayer("Fail", 2) { VisibleWhenPassing = false, });
             layers.Add("Pass", new StoryboardLayer("Pass", 1) { VisibleWhenFailing = false, });
@@ -85,12 +85,8 @@ namespace osu.Game.Storyboards
             }
         }
 
-        public DrawableStoryboard CreateDrawable(WorkingBeatmap working = null)
-        {
-            var drawable = new DrawableStoryboard(this);
-            drawable.Width = drawable.Height * (BeatmapInfo.WidescreenStoryboard ? 16 / 9f : 4 / 3f);
-            return drawable;
-        }
+        public DrawableStoryboard CreateDrawable(WorkingBeatmap working = null) =>
+            new DrawableStoryboard(this);
 
         public Drawable CreateSpriteFromResourcePath(string path, TextureStore textureStore)
         {

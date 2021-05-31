@@ -96,7 +96,8 @@ namespace osu.Game.Overlays.Mods
             Waves.ThirdWaveColour = Color4Extensions.FromHex(@"005774");
             Waves.FourthWaveColour = Color4Extensions.FromHex(@"003a4e");
 
-            RelativeSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
+            Height = HEIGHT;
 
             Padding = new MarginPadding { Horizontal = -OsuScreen.HORIZONTAL_OVERFLOW_PADDING };
 

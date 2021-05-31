@@ -39,6 +39,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Bindable<bool> isSpinning;
         private bool spinnerFrequencyModulate;
 
+        private const float spinning_sample_initial_frequency = 1.0f;
+        private const float spinning_sample_modulated_base_frequency = 0.5f;
+
         /// <summary>
         /// The amount of bonus score gained from spinning after the required number of spins, for display purposes.
         /// </summary>
@@ -105,9 +108,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             isSpinning = RotationTracker.IsSpinning.GetBoundCopy();
             isSpinning.BindValueChanged(updateSpinningSample);
         }
-
-        private const float spinning_sample_initial_frequency = 1.0f;
-        private const float spinning_sample_modulated_base_frequency = 0.5f;
 
         protected override void OnFree()
         {

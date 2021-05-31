@@ -17,7 +17,9 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -331,15 +333,32 @@ namespace osu.Game.Skinning
                     switch (target.Target)
                     {
                         case SkinnableTarget.MainHUDComponents:
-
                             var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<GameplayAccuracyCounter>().FirstOrDefault();
+                                var combo = container.OfType<LegacyComboCounter>().FirstOrDefault();
 
                                 if (score != null && accuracy != null)
                                 {
                                     accuracy.Y = container.ToLocalSpace(score.ScreenSpaceDrawQuad.BottomRight).Y;
+                                }
+
+                                var songProgress = container.OfType<SongProgress>().FirstOrDefault();
+
+                                var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
+
+                                if (hitError != null)
+                                {
+                                    hitError.Anchor = Anchor.BottomCentre;
+                                    hitError.Origin = Anchor.CentreLeft;
+                                    hitError.Rotation = -90;
+                                }
+
+                                if (songProgress != null)
+                                {
+                                    if (hitError != null) hitError.Y -= SongProgress.MAX_HEIGHT;
+                                    if (combo != null) combo.Y -= SongProgress.MAX_HEIGHT;
                                 }
                             })
                             {
@@ -350,6 +369,8 @@ namespace osu.Game.Skinning
                                         new LegacyScoreCounter(),
                                         new LegacyAccuracyCounter(),
                                         new LegacyHealthDisplay(),
+                                        new SongProgress(),
+                                        new BarHitErrorMeter(),
                                     }
                                     : new Drawable[]
                                     {
@@ -358,6 +379,8 @@ namespace osu.Game.Skinning
                                         new DefaultScoreCounter(),
                                         new DefaultAccuracyCounter(),
                                         new DefaultHealthDisplay(),
+                                        new SongProgress(),
+                                        new BarHitErrorMeter(),
                                     }
                             };
 

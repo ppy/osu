@@ -358,7 +358,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap.Equals(target));
 
             // this is an important check, to make sure updateComponentFromBeatmap() was actually run
-            AddUntilStep("selection shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap.BeatmapInfo == target);
+            AddUntilStep("selection shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap.BeatmapInfo.Equals(target));
         }
 
         [Test]
@@ -390,7 +390,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("has correct ruleset", () => Ruleset.Value.ID == 0);
 
             // this is an important check, to make sure updateComponentFromBeatmap() was actually run
-            AddUntilStep("selection shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap.BeatmapInfo == target);
+            AddUntilStep("selection shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap.BeatmapInfo.Equals(target));
         }
 
         [Test]
@@ -781,7 +781,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.ID == 3);
 
-            AddAssert("Check first item in group selected", () => Beatmap.Value.BeatmapInfo == groupIcon.Items.First().Beatmap);
+            AddAssert("Check first item in group selected", () => Beatmap.Value.BeatmapInfo.Equals(groupIcon.Items.First().Beatmap));
         }
 
         [Test]
