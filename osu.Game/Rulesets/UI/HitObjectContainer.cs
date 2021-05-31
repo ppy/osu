@@ -122,18 +122,20 @@ namespace osu.Game.Rulesets.UI
             var entry = (HitObjectLifetimeEntry)lifetimeEntry;
             Debug.Assert(!aliveDrawableMap.ContainsKey(entry));
 
-            bool isNonPooled = nonPooledDrawableMap.TryGetValue(entry, out var drawable);
+            bool isPooled = !nonPooledDrawableMap.TryGetValue(entry, out var drawable);
             drawable ??= pooledObjectProvider?.GetPooledDrawableRepresentation(entry.HitObject, null);
             if (drawable == null)
                 throw new InvalidOperationException($"A drawable representation could not be retrieved for hitobject type: {entry.HitObject.GetType().ReadableName()}.");
 
             aliveDrawableMap[entry] = drawable;
+
+            if (isPooled)
+            {
+                addDrawable(drawable);
+                HitObjectUsageBegan?.Invoke(entry.HitObject);
+            }
+
             OnAdd(drawable);
-
-            if (isNonPooled) return;
-
-            addDrawable(drawable);
-            HitObjectUsageBegan?.Invoke(entry.HitObject);
         }
 
         private void entryBecameDead(LifetimeEntry lifetimeEntry)
@@ -142,17 +144,18 @@ namespace osu.Game.Rulesets.UI
             Debug.Assert(aliveDrawableMap.ContainsKey(entry));
 
             var drawable = aliveDrawableMap[entry];
-            bool isNonPooled = nonPooledDrawableMap.ContainsKey(entry);
+            bool isPooled = !nonPooledDrawableMap.ContainsKey(entry);
 
             drawable.OnKilled();
             aliveDrawableMap.Remove(entry);
+
+            if (isPooled)
+            {
+                removeDrawable(drawable);
+                HitObjectUsageFinished?.Invoke(entry.HitObject);
+            }
+
             OnRemove(drawable);
-
-            if (isNonPooled) return;
-
-            removeDrawable(drawable);
-            // The hit object is not freed when the DHO was not pooled.
-            HitObjectUsageFinished?.Invoke(entry.HitObject);
         }
 
         private void addDrawable(DrawableHitObject drawable)
@@ -211,21 +214,16 @@ namespace osu.Game.Rulesets.UI
         #endregion
 
         /// <summary>
-        /// Invoked when a <see cref="DrawableHitObject"/> is added to this container.
+        /// Invoked after a <see cref="DrawableHitObject"/> is added to this container.
         /// </summary>
-        /// <remarks>
-        /// This method is not invoked for nested <see cref="DrawableHitObject"/>s.
-        /// </remarks>
         protected virtual void OnAdd(DrawableHitObject drawableHitObject)
         {
+            Debug.Assert(drawableHitObject.LoadState >= LoadState.Ready);
         }
 
         /// <summary>
-        /// Invoked when a <see cref="DrawableHitObject"/> is removed from this container.
+        /// Invoked after a <see cref="DrawableHitObject"/> is removed from this container.
         /// </summary>
-        /// <remarks>
-        /// This method is not invoked for nested <see cref="DrawableHitObject"/>s.
-        /// </remarks>
         protected virtual void OnRemove(DrawableHitObject drawableHitObject)
         {
         }
