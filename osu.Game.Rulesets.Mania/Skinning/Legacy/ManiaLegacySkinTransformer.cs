@@ -69,8 +69,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         private void sourceChanged()
         {
-            isLegacySkin = new Lazy<bool>(() => Source.FindProvider(s => s.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version) != null) != null);
-            hasKeyTexture = new Lazy<bool>(() => Source.FindProvider(s => s.GetAnimation(
+            isLegacySkin = new Lazy<bool>(() => FindProvider(s => s.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version) != null) != null);
+            hasKeyTexture = new Lazy<bool>(() => FindProvider(s => s.GetAnimation(
                 this.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.KeyImage, 0)?.Value
                 ?? "mania-key1", true, true) != null) != null);
         }
