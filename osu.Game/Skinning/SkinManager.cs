@@ -212,6 +212,8 @@ namespace osu.Game.Skinning
 
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => CurrentSkin.Value.GetConfig<TLookup, TValue>(lookup);
 
+        public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => CurrentSkin.Value.FindProvider(lookupFunction);
+
         #region IResourceStorageProvider
 
         AudioManager IStorageResourceProvider.AudioManager => audio;

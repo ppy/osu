@@ -24,10 +24,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
-    public class LegacySkin : Skin, ISkin
+    public class LegacySkin : Skin
     {
-        private readonly bool fallbackToDefault;
-
         [CanBeNull]
         protected TextureStore Textures;
 
@@ -61,7 +59,7 @@ namespace osu.Game.Skinning
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public LegacySkin(SkinInfo skin, IStorageResourceProvider resources)
-            : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, resources.Files), resources, "skin.ini", true)
+            : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, resources.Files), resources, "skin.ini")
         {
         }
 
@@ -72,11 +70,9 @@ namespace osu.Game.Skinning
         /// <param name="storage">A storage for looking up files within this skin using user-facing filenames.</param>
         /// <param name="resources">Access to raw game resources.</param>
         /// <param name="configurationFilename">The user-facing filename of the configuration file to be parsed. Can accept an .osu or skin.ini file.</param>
-        /// <param name="fallbackToDefault">Whether lookups via <see cref="ISkin.FindProvider"/> fallback to the <see cref="DefaultLegacySkin"/> implementations if not provided locally.</param>
-        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename, bool fallbackToDefault = false)
+        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename)
             : base(skin, resources)
         {
-            this.fallbackToDefault = fallbackToDefault;
             legacyDefaultFallback = CreateFallbackSkin(storage, resources);
 
             using (var stream = storage?.GetStream(configurationFilename))
@@ -529,6 +525,16 @@ namespace osu.Game.Skinning
             return legacyDefaultFallback?.GetSample(sampleInfo);
         }
 
+        public override ISkin FindProvider(Func<ISkin, bool> lookupFunction)
+        {
+            var source = base.FindProvider(lookupFunction);
+
+            if (source != null)
+                return source;
+
+            return legacyDefaultFallback?.FindProvider(lookupFunction);
+        }
+
         private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)
         {
             var lookupNames = hitSample.LookupNames.SelectMany(getFallbackNames);
@@ -565,17 +571,6 @@ namespace osu.Game.Skinning
             base.Dispose(isDisposing);
             Textures?.Dispose();
             Samples?.Dispose();
-        }
-
-        ISkin ISkin.FindProvider(Func<ISkin, bool> lookupFunction)
-        {
-            if (lookupFunction(this))
-                return this;
-
-            if (!fallbackToDefault)
-                return null;
-
-            return (legacyDefaultFallback as ISkin)?.FindProvider(lookupFunction);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -18,7 +19,7 @@ namespace osu.Game.Skinning
         protected override bool UseCustomSampleBanks => true;
 
         public LegacyBeatmapSkin(BeatmapInfo beatmap, IResourceStore<byte[]> storage, IStorageResourceProvider resources)
-            : base(createSkinInfo(beatmap), new LegacySkinResourceStore<BeatmapSetFileInfo>(beatmap.BeatmapSet, storage), resources, beatmap.Path, fallbackToDefault: false)
+            : base(createSkinInfo(beatmap), new LegacySkinResourceStore<BeatmapSetFileInfo>(beatmap.BeatmapSet, storage), resources, beatmap.Path)
         {
             // Disallow default colours fallback on beatmap skins to allow using parent skin combo colours. (via SkinProvidingContainer)
             Configuration.AllowDefaultComboColoursFallback = false;
@@ -68,6 +69,15 @@ namespace osu.Game.Skinning
             }
 
             return base.GetSample(sampleInfo);
+        }
+
+        public override ISkin FindProvider(Func<ISkin, bool> lookupFunction)
+        {
+            if (lookupFunction(this))
+                return this;
+
+            // beatmap skins don't do lookups on the default skin. this allows fallback to user / game default skins.
+            return null;
         }
 
         private static SkinInfo createSkinInfo(BeatmapInfo beatmap) =>
