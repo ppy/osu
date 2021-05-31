@@ -73,7 +73,8 @@ namespace osu.Game.Skinning
         protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename)
             : base(skin, resources)
         {
-            legacyDefaultFallback = CreateFallbackSkin(storage, resources);
+            if (resources != null)
+                legacyDefaultFallback = CreateFallbackSkin(storage, resources);
 
             using (var stream = storage?.GetStream(configurationFilename))
             {
@@ -115,8 +116,7 @@ namespace osu.Game.Skinning
         }
 
         [CanBeNull]
-        protected virtual DefaultLegacySkin CreateFallbackSkin(IResourceStore<byte[]> storage, IStorageResourceProvider resources) =>
-            new DefaultLegacySkin(storage, resources);
+        protected virtual DefaultLegacySkin CreateFallbackSkin(IResourceStore<byte[]> storage, IStorageResourceProvider resources) => new DefaultLegacySkin(resources);
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {

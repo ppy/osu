@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
@@ -20,8 +21,10 @@ namespace osu.Game.Skinning
     {
         public event Action SourceChanged;
 
+        [CanBeNull]
         private readonly ISkin skin;
 
+        [CanBeNull]
         private ISkinSource fallbackSource;
 
         protected virtual bool AllowDrawableLookup(ISkinComponent component) => true;
@@ -43,10 +46,10 @@ namespace osu.Game.Skinning
 
         public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
         {
-            if (lookupFunction(skin))
+            if (skin != null && lookupFunction(skin))
                 return skin;
 
-            return fallbackSource.FindProvider(lookupFunction);
+            return fallbackSource?.FindProvider(lookupFunction);
         }
 
         public Drawable GetDrawableComponent(ISkinComponent component)
@@ -93,7 +96,7 @@ namespace osu.Game.Skinning
         {
             if (canUseSkinLookup)
             {
-                var bindable = skin.GetConfig<TLookup, TValue>(lookup);
+                var bindable = skin?.GetConfig<TLookup, TValue>(lookup);
                 if (bindable != null)
                     return bindable;
             }
