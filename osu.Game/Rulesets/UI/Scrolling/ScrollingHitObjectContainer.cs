@@ -45,13 +45,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
             timeRange.ValueChanged += _ => layoutCache.Invalidate();
         }
 
-        public override void Clear()
-        {
-            base.Clear();
-
-            layoutComputed.Clear();
-        }
-
         /// <summary>
         /// Given a position in screen space, return the time within this column.
         /// </summary>
