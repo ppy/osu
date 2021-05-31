@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual
             protected override string ComputeHash(BeatmapSetInfo item, ArchiveReader reader = null)
                 => string.Empty;
 
-            public override WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
+            public override WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
                 => testBeatmap;
 
             public override void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null)
