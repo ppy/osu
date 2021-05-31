@@ -28,17 +28,23 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
         public EditableLyricPiece(Lyric lrc)
         {
-            CornerRadius = 5f;
-            Masking = true;
-
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
             Value = lrc;
+        }
+
+        public EditableLyricPiece()
+        {
+            Value = new Lyric();
         }
 
         [BackgroundDependencyLoader]
         private void load(CustomColourProvider colourProvider, OsuColour osuColour)
         {
+            CornerRadius = 5f;
+            Masking = true;
+
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+
             Box bgBox;
             OsuTextBox timeTextBox;
             OsuTextBox contentTextBox;
@@ -168,5 +174,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
             hoverBox.FadeOut(300);
             base.OnHoverLost(e);
         }
+
+        //下方按钮(40) + 3 * 文本框高度(40) + 2 * 文本框Spacing(5) + 上下Margin(10) + Spacing(10)
+        public override int FinalHeight() => 40 + 3 * 40 + 2 * 5 + 10 + 10;
     }
 }

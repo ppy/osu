@@ -15,7 +15,7 @@ using osuTK;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 {
-    public class LyricViewScreen : LyricScreen
+    public class LyricViewScreen : LyricScreen<LyricPiece>
     {
         [Resolved]
         private MvisScreen mvisScreen { get; set; }
@@ -35,7 +35,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         [Resolved]
         private LyricSidebarSectionContainer sectionContainer { get; set; }
 
-        protected override DrawableLyric CreateDrawableLyric(Lyric lyric)
+        protected override LyricPiece CreateDrawableLyric(Lyric lyric)
             => new LyricPiece(lyric)
             {
                 Action = l => mvisScreen.SeekTo(l.Time + 1)
@@ -108,7 +108,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
         protected override void Update()
         {
-            if (followCooldown.Value == 0) ScrollToCurrent();
+            //if (followCooldown.Value == 0) ScrollToCurrent();
             base.Update();
         }
 

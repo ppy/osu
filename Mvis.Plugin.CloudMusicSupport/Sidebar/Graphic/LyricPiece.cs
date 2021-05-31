@@ -21,24 +21,32 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         public string TooltipText { get; private set; }
 
         private Box hoverBox;
+        private OsuSpriteText contentText;
+        private OsuSpriteText translateText;
 
         public LyricPiece(Lyric lrc)
+        {
+            Value = lrc;
+        }
+
+        public LyricPiece()
+        {
+            Value = new Lyric();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(CustomColourProvider colourProvider)
         {
             CornerRadius = 5f;
             Masking = true;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Value = lrc;
 
-            Colour = string.IsNullOrEmpty(lrc.Content)
+            Colour = string.IsNullOrEmpty(Value.Content)
                 ? Color4Extensions.FromHex(@"555")
                 : Color4.White;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(CustomColourProvider colourProvider)
-        {
             var timeSpan = TimeSpan.FromMilliseconds(Value.Time);
 
             Box fgBox;
@@ -74,20 +82,22 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                                 },
                             }
                         },
-                        new OsuSpriteText
+                        contentText = new OsuSpriteText
                         {
                             Text = Value.Content,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             RelativeSizeAxes = Axes.X,
+                            Truncate = true,
                             Margin = new MarginPadding { Left = 5, Bottom = 5 }
                         },
-                        new OsuSpriteText
+                        translateText = new OsuSpriteText
                         {
                             Text = Value.TranslatedString,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             RelativeSizeAxes = Axes.X,
+                            Truncate = true,
                             Margin = new MarginPadding { Left = 5, Bottom = 5 }
                         },
                     }
@@ -126,5 +136,15 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
             hoverBox.FadeOut(300);
             base.OnHoverLost(e);
         }
+
+        //时间显示的高度(23) + 时间显示的Margin(10) + 2 * (文本高度 + 文本Margin(5))
+        public override int FinalHeight() => 23 + 10
+                                                + (int)(string.IsNullOrEmpty(Value.TranslatedString)
+                                                    ? 0
+                                                    : (contentText?.Height ?? 18 + 5))
+                                                + (int)(string.IsNullOrEmpty(Value.Content)
+                                                    ? 0
+                                                    : (translateText?.Height ?? 18 + 5))
+                                                + 10; //向下Margin
     }
 }

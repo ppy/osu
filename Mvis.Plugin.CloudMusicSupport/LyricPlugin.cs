@@ -144,7 +144,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             }
 
             Lyrics.Clear();
-            currentLine = null;
+            CurrentLine = null;
 
             processor.StartFetchLrcFor(currentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail);
         }
@@ -202,7 +202,7 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         protected override bool PostInit() => true;
 
-        private Lyric currentLine;
+        public Lyric CurrentLine;
         private readonly Lyric defaultLrc = new Lyric();
 
         protected override void Update()
@@ -215,12 +215,12 @@ namespace Mvis.Plugin.CloudMusicSupport
             {
                 var lrc = Lyrics.FindLast(l => targetTime >= l.Time) ?? defaultLrc;
 
-                if (!lrc.Equals(currentLine))
+                if (!lrc.Equals(CurrentLine))
                 {
                     lrcLine.Text = lrc.Content;
                     lrcLine.TranslatedText = lrc.TranslatedString;
 
-                    currentLine = lrc.GetCopy();
+                    CurrentLine = lrc.GetCopy();
                 }
             }
         }

@@ -187,7 +187,7 @@ namespace Mvis.Plugin.RulesetPanel.Objects
             /// <returns></returns>
             private static string getShortTitle(string longTitle)
             {
-                var newTitle = longTitle;
+                var newTitle = string.IsNullOrEmpty(longTitle) ? string.Empty : longTitle;
 
                 for (int i = 0; i < title_chars.Length; i++)
                 {
