@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -71,12 +70,11 @@ namespace osu.Game.Skinning
             return base.GetSample(sampleInfo);
         }
 
-        public override ISkin FindProvider(Func<ISkin, bool> lookupFunction)
+        protected override DefaultLegacySkin CreateFallbackSkin(IResourceStore<byte[]> storage, IStorageResourceProvider resources)
         {
-            if (lookupFunction(this))
-                return this;
-
-            // beatmap skins don't do lookups on the default skin. this allows fallback to user / game default skins.
+            // for simplicity, beatmap skins don't do lookups on the default skin.
+            // this will mean that fallback always occurs to the user (then default) skin.
+            // this may not offer perfect behaviour, but helps keep things simple.
             return null;
         }
 
