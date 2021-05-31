@@ -29,7 +29,6 @@ namespace osu.Game.Tests.Beatmaps
     public abstract class HitObjectSampleTest : PlayerTestScene, IStorageResourceProvider
     {
         protected abstract IResourceStore<byte[]> RulesetResources { get; }
-
         protected LegacySkin Skin { get; private set; }
 
         [Resolved]
@@ -76,7 +75,7 @@ namespace osu.Game.Tests.Beatmaps
 
                 AddStep($"load {filename}", () =>
                 {
-                    using (var reader = new LineBufferedReader(Resources.GetStream($"Resources/SampleLookups/{filename}")))
+                    using (var reader = new LineBufferedReader(RulesetResources.GetStream($"Resources/SampleLookups/{filename}")))
                         currentTestBeatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
 
                     // populate ruleset for beatmap converters that require it to be present.
