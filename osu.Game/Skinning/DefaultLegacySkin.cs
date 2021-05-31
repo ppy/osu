@@ -11,14 +11,14 @@ namespace osu.Game.Skinning
 {
     public class DefaultLegacySkin : LegacySkin
     {
-        public DefaultLegacySkin(IResourceStore<byte[]> storage, IStorageResourceProvider resources)
-            : this(Info, storage, resources)
+        public DefaultLegacySkin(IStorageResourceProvider resources)
+            : this(Info, resources)
         {
         }
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
-        public DefaultLegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, IStorageResourceProvider resources)
-            : base(skin, storage, resources, string.Empty)
+        public DefaultLegacySkin(SkinInfo skin, IStorageResourceProvider resources)
+            : base(skin, new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Legacy"), resources, string.Empty)
         {
             Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);
             Configuration.AddComboColours(

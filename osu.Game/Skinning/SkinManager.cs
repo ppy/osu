@@ -39,8 +39,6 @@ namespace osu.Game.Skinning
 
         private readonly IResourceStore<byte[]> resources;
 
-        private readonly IResourceStore<byte[]> legacyDefaultResources;
-
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>(new DefaultSkin(null));
         public readonly Bindable<SkinInfo> CurrentSkinInfo = new Bindable<SkinInfo>(SkinInfo.Default) { Default = SkinInfo.Default };
 
@@ -56,8 +54,6 @@ namespace osu.Game.Skinning
             this.audio = audio;
             this.host = host;
             this.resources = resources;
-
-            legacyDefaultResources = new NamespacedResourceStore<byte[]>(resources, "Skins/Legacy");
 
             CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = GetSkin(skin.NewValue);
             CurrentSkin.ValueChanged += skin =>
@@ -155,7 +151,7 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <param name="skinInfo">The skin to lookup.</param>
         /// <returns>A <see cref="Skin"/> instance correlating to the provided <see cref="SkinInfo"/>.</returns>
-        public Skin GetSkin(SkinInfo skinInfo) => skinInfo.CreateInstance(legacyDefaultResources, this);
+        public Skin GetSkin(SkinInfo skinInfo) => skinInfo.CreateInstance(this);
 
         /// <summary>
         /// Ensure that the current skin is in a state it can accept user modifications.
