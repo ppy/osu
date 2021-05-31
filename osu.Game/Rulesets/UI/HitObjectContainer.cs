@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -92,26 +91,19 @@ namespace osu.Game.Rulesets.UI
 
         protected override void AddDrawable(HitObjectLifetimeEntry entry, DrawableHitObject drawable)
         {
-            if (!nonPooledDrawableMap.ContainsKey(entry))
-            {
-                addDrawable(drawable);
-                HitObjectUsageBegan?.Invoke(entry.HitObject);
-            }
+            if (nonPooledDrawableMap.ContainsKey(entry)) return;
 
-            OnAdd(drawable);
+            addDrawable(drawable);
+            HitObjectUsageBegan?.Invoke(entry.HitObject);
         }
 
         protected override void RemoveDrawable(HitObjectLifetimeEntry entry, DrawableHitObject drawable)
         {
             drawable.OnKilled();
+            if (nonPooledDrawableMap.ContainsKey(entry)) return;
 
-            if (!nonPooledDrawableMap.ContainsKey(entry))
-            {
-                removeDrawable(drawable);
-                HitObjectUsageFinished?.Invoke(entry.HitObject);
-            }
-
-            OnRemove(drawable);
+            removeDrawable(drawable);
+            HitObjectUsageFinished?.Invoke(entry.HitObject);
         }
 
         private void addDrawable(DrawableHitObject drawable)
@@ -158,21 +150,6 @@ namespace osu.Game.Rulesets.UI
         public int IndexOf(DrawableHitObject hitObject) => IndexOfInternal(hitObject);
 
         #endregion
-
-        /// <summary>
-        /// Invoked after a <see cref="DrawableHitObject"/> is added to this container.
-        /// </summary>
-        protected virtual void OnAdd(DrawableHitObject drawableHitObject)
-        {
-            Debug.Assert(drawableHitObject.LoadState >= LoadState.Ready);
-        }
-
-        /// <summary>
-        /// Invoked after a <see cref="DrawableHitObject"/> is removed from this container.
-        /// </summary>
-        protected virtual void OnRemove(DrawableHitObject drawableHitObject)
-        {
-        }
 
         private void onNewResult(DrawableHitObject d, JudgementResult r) => NewResult?.Invoke(d, r);
         private void onRevertResult(DrawableHitObject d, JudgementResult r) => RevertResult?.Invoke(d, r);
