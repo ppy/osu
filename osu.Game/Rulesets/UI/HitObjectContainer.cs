@@ -9,8 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Performance;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -158,16 +156,6 @@ namespace osu.Game.Rulesets.UI
         }
 
         public int IndexOf(DrawableHitObject hitObject) => IndexOfInternal(hitObject);
-
-        protected override void OnEntryCrossedBoundary(HitObjectLifetimeEntry entry, LifetimeBoundaryKind kind, LifetimeBoundaryCrossingDirection direction)
-        {
-            if (nonPooledDrawableMap.TryGetValue(entry, out var drawable))
-                OnChildLifetimeBoundaryCrossed(new LifetimeBoundaryCrossedEvent(drawable, kind, direction));
-        }
-
-        protected virtual void OnChildLifetimeBoundaryCrossed(LifetimeBoundaryCrossedEvent e)
-        {
-        }
 
         #endregion
 
