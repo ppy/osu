@@ -37,6 +37,8 @@ namespace osu.Game.Skinning
 
         private readonly GameHost host;
 
+        private readonly IResourceStore<byte[]> resources;
+
         private readonly IResourceStore<byte[]> legacyDefaultResources;
 
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>(new DefaultSkin(null));
@@ -48,13 +50,14 @@ namespace osu.Game.Skinning
 
         protected override string ImportFromStablePath => "Skins";
 
-        public SkinManager(Storage storage, DatabaseContextFactory contextFactory, GameHost host, AudioManager audio, IResourceStore<byte[]> legacyDefaultResources)
+        public SkinManager(Storage storage, DatabaseContextFactory contextFactory, GameHost host, IResourceStore<byte[]> resources, AudioManager audio)
             : base(storage, contextFactory, new SkinStore(contextFactory, storage), host)
         {
             this.audio = audio;
             this.host = host;
+            this.resources = resources;
 
-            this.legacyDefaultResources = legacyDefaultResources;
+            legacyDefaultResources = new NamespacedResourceStore<byte[]>(resources, "Skins/Legacy");
 
             CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = GetSkin(skin.NewValue);
             CurrentSkin.ValueChanged += skin =>
@@ -216,6 +219,7 @@ namespace osu.Game.Skinning
         #region IResourceStorageProvider
 
         AudioManager IStorageResourceProvider.AudioManager => audio;
+        IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
         IResourceStore<byte[]> IStorageResourceProvider.Files => Files.Store;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
 

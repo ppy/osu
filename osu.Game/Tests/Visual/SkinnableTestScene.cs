@@ -156,6 +156,7 @@ namespace osu.Game.Tests.Visual
 
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => null;
+        public new IResourceStore<byte[]> Resources => base.Resources;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
 
         #endregion
