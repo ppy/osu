@@ -36,6 +36,52 @@ namespace osu.Game.Overlays
         {
         }
 
+        public void ShowPage(string pagePath = index_path)
+        {
+            path.Value = pagePath.Trim('/');
+            Show();
+        }
+
+        protected override WikiHeader CreateHeader() => new WikiHeader
+        {
+            ShowIndexPage = () => ShowPage(),
+            ShowParentPage = showParentPage,
+        };
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            path.BindValueChanged(onPathChanged);
+            wikiData.BindTo(Header.WikiPageData);
+        }
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+
+            if (displayUpdateRequired)
+            {
+                path.TriggerChange();
+                displayUpdateRequired = false;
+            }
+        }
+
+        protected override void PopOutComplete()
+        {
+            base.PopOutComplete();
+            displayUpdateRequired = true;
+        }
+
+        protected void LoadDisplay(Drawable display)
+        {
+            ScrollFlow.ScrollToStart();
+            LoadComponentAsync(display, loaded =>
+            {
+                Child = loaded;
+                Loading.Hide();
+            }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
         private void onPathChanged(ValueChangedEvent<string> e)
         {
             cancellationToken?.Cancel();
@@ -90,52 +136,6 @@ namespace osu.Game.Overlays
         {
             var parentPath = string.Join("/", path.Value.Split('/').SkipLast(1));
             ShowPage(parentPath);
-        }
-
-        public void ShowPage(string pagePath = index_path)
-        {
-            path.Value = pagePath.Trim('/');
-            Show();
-        }
-
-        protected override WikiHeader CreateHeader() => new WikiHeader
-        {
-            ShowIndexPage = () => ShowPage(),
-            ShowParentPage = showParentPage,
-        };
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            path.BindValueChanged(onPathChanged);
-            wikiData.BindTo(Header.WikiPageData);
-        }
-
-        protected override void PopIn()
-        {
-            base.PopIn();
-
-            if (displayUpdateRequired)
-            {
-                path.TriggerChange();
-                displayUpdateRequired = false;
-            }
-        }
-
-        protected override void PopOutComplete()
-        {
-            base.PopOutComplete();
-            displayUpdateRequired = true;
-        }
-
-        protected void LoadDisplay(Drawable display)
-        {
-            ScrollFlow.ScrollToStart();
-            LoadComponentAsync(display, loaded =>
-            {
-                Child = loaded;
-                Loading.Hide();
-            }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
         protected override void Dispose(bool isDisposing)
