@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+#nullable enable
+
 namespace osu.Game.Online.Chat
 {
     public static class MessageFormatter
@@ -61,7 +63,7 @@ namespace osu.Game.Online.Chat
 
         private static string websiteRootUrl = "osu.ppy.sh";
 
-        private static void handleMatches(Regex regex, string display, string link, MessageFormatterResult result, int startIndex = 0, LinkAction? linkActionOverride = null, char[] escapeChars = null)
+        private static void handleMatches(Regex regex, string display, string link, MessageFormatterResult result, int startIndex = 0, LinkAction? linkActionOverride = null, char[]? escapeChars = null)
         {
             int captureOffset = 0;
 
@@ -170,12 +172,12 @@ namespace osu.Game.Online.Chat
                         }
                     }
 
-                    return new LinkDetails(LinkAction.External, null);
+                    break;
 
                 case "osu":
                     // every internal link also needs some kind of argument
                     if (args.Length < 3)
-                        return new LinkDetails(LinkAction.External, null);
+                        break;
 
                     LinkAction linkType;
 
