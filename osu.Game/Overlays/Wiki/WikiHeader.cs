@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Wiki
 {
     public class WikiHeader : BreadcrumbControlOverlayHeader
     {
-        private const string index_page_string = "index";
+        private const string index_page_string = "主页";
         private const string index_path = "Main_Page";
 
         public readonly Bindable<APIWikiPage> WikiPageData = new Bindable<APIWikiPage>();
@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Wiki
             public WikiHeaderTitle()
             {
                 Title = "wiki";
-                Description = "knowledge base";
+                Description = "知识宝库";
                 IconTexture = "Icons/Hexacons/wiki";
             }
         }
