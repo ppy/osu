@@ -16,7 +16,7 @@ namespace osu.Game.Overlays
 {
     public class WikiOverlay : OnlineOverlay<WikiHeader>
     {
-        private const string index_path = "Main_Page";
+        private const string index_path = @"main_page";
 
         private readonly Bindable<string> path = new Bindable<string>(index_path);
 
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays
         {
             wikiData.Value = response;
 
-            if (response.Layout == "main_page")
+            if (response.Layout == index_path)
             {
                 LoadDisplay(new WikiMainPage
                 {
