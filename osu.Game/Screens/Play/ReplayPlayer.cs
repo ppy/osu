@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
+using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -17,7 +18,7 @@ namespace osu.Game.Screens.Play
     {
         protected Score Score { get; private set; }
 
-        private readonly Func<GameplayBeatmap, IReadOnlyList<Mod>, Score> createScore;
+        private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
         // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
         protected override bool CheckModsAllowFailure() => false;
@@ -27,7 +28,7 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        public ReplayPlayer(Func<GameplayBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration configuration = null)
+        public ReplayPlayer(Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore, PlayerConfiguration configuration = null)
             : base(configuration)
         {
             this.createScore = createScore;
@@ -38,7 +39,7 @@ namespace osu.Game.Screens.Play
         {
             if (!LoadedBeatmapSuccessfully) return;
 
-            Score = createScore(GameplayBeatmap, Mods.Value);
+            Score = createScore(GameplayBeatmap.PlayableBeatmap, Mods.Value);
         }
 
         protected override void PrepareReplay()
