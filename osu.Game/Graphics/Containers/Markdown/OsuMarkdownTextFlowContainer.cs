@@ -37,6 +37,8 @@ namespace osu.Game.Graphics.Containers.Markdown
             private void load(OverlayColourProvider colourProvider)
             {
                 AutoSizeAxes = Axes.Both;
+                CornerRadius = 4;
+                Masking = true;
                 Children = new Drawable[]
                 {
                     new Box
@@ -48,6 +50,11 @@ namespace osu.Game.Graphics.Containers.Markdown
                     {
                         t.Colour = colourProvider.Light1;
                         t.Text = Text;
+                        t.Padding = new MarginPadding
+                        {
+                            Vertical = 1,
+                            Horizontal = 4,
+                        };
                     }),
                 };
             }
