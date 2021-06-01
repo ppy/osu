@@ -217,7 +217,7 @@ namespace osu.Game.Online.Chat
                     return new LinkDetails(LinkAction.JoinMultiplayerMatch, args[1]);
             }
 
-            return new LinkDetails(LinkAction.External, null);
+            return new LinkDetails(LinkAction.External, url);
         }
 
         private static MessageFormatterResult format(string toFormat, int startIndex = 0, int space = 3)
