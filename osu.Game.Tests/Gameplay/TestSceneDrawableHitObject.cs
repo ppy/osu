@@ -117,12 +117,14 @@ namespace osu.Game.Tests.Gameplay
             AddStep("Modify start time", () => entry.HitObject.StartTime = 100);
             AddAssert("Drawable lifetime is correct", () => dho.LifetimeStart == double.MinValue);
 
+            AddStep("Set LifetimeStart", () => dho.LifetimeStart = 666);
+            AddAssert("Lifetime change is blocked", () => dho.LifetimeStart == double.MinValue);
+
             AddStep("Set LifetimeEnd", () => dho.LifetimeEnd = 999);
             AddAssert("Lifetime change is blocked", () => dho.LifetimeEnd == double.MaxValue);
 
             AddStep("KeepAlive = false", () => entry.KeepAlive = false);
-            AddAssert("Drawable lifetime is restored", () =>
-                dho.LifetimeStart == 100 - TestLifetimeEntry.INITIAL_LIFETIME_OFFSET && dho.LifetimeEnd == 999);
+            AddAssert("Drawable lifetime is restored", () => dho.LifetimeStart == 666 && dho.LifetimeEnd == 999);
         }
 
         private class TestDrawableHitObject : DrawableHitObject
