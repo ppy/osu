@@ -333,7 +333,6 @@ namespace osu.Game.Skinning
                     switch (target.Target)
                     {
                         case SkinnableTarget.MainHUDComponents:
-
                             var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();

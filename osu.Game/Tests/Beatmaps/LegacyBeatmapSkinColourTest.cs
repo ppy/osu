@@ -21,23 +21,17 @@ namespace osu.Game.Tests.Beatmaps
     {
         protected readonly Bindable<bool> BeatmapSkins = new Bindable<bool>();
         protected readonly Bindable<bool> BeatmapColours = new Bindable<bool>();
+
         protected ExposedPlayer TestPlayer;
-        protected WorkingBeatmap TestBeatmap;
 
-        public virtual void TestBeatmapComboColours(bool userHasCustomColours, bool useBeatmapSkin) => ConfigureTest(useBeatmapSkin, true, userHasCustomColours);
+        private WorkingBeatmap testBeatmap;
 
-        public virtual void TestBeatmapComboColoursOverride(bool useBeatmapSkin) => ConfigureTest(useBeatmapSkin, false, true);
+        protected void PrepareBeatmap(Func<WorkingBeatmap> createBeatmap) => AddStep("prepare beatmap", () => testBeatmap = createBeatmap());
 
-        public virtual void TestBeatmapComboColoursOverrideWithDefaultColours(bool useBeatmapSkin) => ConfigureTest(useBeatmapSkin, false, false);
-
-        public virtual void TestBeatmapNoComboColours(bool useBeatmapSkin, bool useBeatmapColour) => ConfigureTest(useBeatmapSkin, useBeatmapColour, false);
-
-        public virtual void TestBeatmapNoComboColoursSkinOverride(bool useBeatmapSkin, bool useBeatmapColour) => ConfigureTest(useBeatmapSkin, useBeatmapColour, true);
-
-        protected virtual void ConfigureTest(bool useBeatmapSkin, bool useBeatmapColours, bool userHasCustomColours)
+        protected void ConfigureTest(bool useBeatmapSkin, bool useBeatmapColours, bool userHasCustomColours)
         {
             configureSettings(useBeatmapSkin, useBeatmapColours);
-            AddStep($"load {(((CustomSkinWorkingBeatmap)TestBeatmap).HasColours ? "coloured " : "")} beatmap", () => TestPlayer = LoadBeatmap(userHasCustomColours));
+            AddStep("load beatmap", () => TestPlayer = LoadBeatmap(userHasCustomColours));
             AddUntilStep("wait for player load", () => TestPlayer.IsLoaded);
         }
 
@@ -57,7 +51,7 @@ namespace osu.Game.Tests.Beatmaps
         {
             ExposedPlayer player;
 
-            Beatmap.Value = TestBeatmap;
+            Beatmap.Value = testBeatmap;
 
             LoadScreen(player = CreateTestPlayer(userHasCustomColours));
 

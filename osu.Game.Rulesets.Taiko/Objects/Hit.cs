@@ -17,12 +17,24 @@ namespace osu.Game.Rulesets.Taiko.Objects
         public HitType Type
         {
             get => TypeBindable.Value;
-            set
-            {
-                TypeBindable.Value = value;
-                updateSamplesFromType();
-            }
+            set => TypeBindable.Value = value;
         }
+
+        public Hit()
+        {
+            TypeBindable.BindValueChanged(_ => updateSamplesFromType());
+            SamplesBindable.BindCollectionChanged((_, __) => updateTypeFromSamples());
+        }
+
+        private void updateTypeFromSamples()
+        {
+            Type = getRimSamples().Any() ? HitType.Rim : HitType.Centre;
+        }
+
+        /// <summary>
+        /// Returns an array of any samples which would cause this object to be a "rim" type hit.
+        /// </summary>
+        private HitSampleInfo[] getRimSamples() => Samples.Where(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE).ToArray();
 
         private void updateSamplesFromType()
         {
@@ -41,11 +53,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
                 }
             }
         }
-
-        /// <summary>
-        /// Returns an array of any samples which would cause this object to be a "rim" type hit.
-        /// </summary>
-        private HitSampleInfo[] getRimSamples() => Samples.Where(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE).ToArray();
 
         protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit { StartTime = startTime };
 
