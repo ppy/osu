@@ -37,7 +37,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
         private void adjustPieceTime(DrawableLyric drawableLyric)
         {
-            AvaliableLyrics.Remove(drawableLyric);
+            AvaliableDrawableLyrics.Remove(drawableLyric);
             drawableLyric.Value.Time = (int)Plugin.GetCurrentTrack().CurrentTime;
 
             sortPiece(drawableLyric);
@@ -86,10 +86,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         {
             var list = new List<Lyric>();
 
-            //foreach (var drawableLyric in LyricFlow.Children)
-            //{
-            //    list.Add(drawableLyric.Value);
-            //}
+            foreach (var drawableLyric in AvaliableDrawableLyrics)
+            {
+                list.Add(drawableLyric.Value);
+            }
 
             localList = list;
 
@@ -181,6 +181,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             var piece = CreateDrawableLyric(lrc);
 
             sortPiece(piece);
+            Cache.Invalidate();
         }
 
         private void sortPiece(DrawableLyric piece)
@@ -193,24 +194,29 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             //获取在歌词列表中的index
             var targetIndex = localList.IndexOf(lrc);
 
+            RefreshLrcInfo(localList);
+
             //遍历LyricFlow，找到任何LyricFlow中Index大于等于目标Index的片，并将他们的Index+1以实现靠后
-            foreach (var d in AvaliableLyrics)
-            {
-                //获取在LyricFlow中的Index
-                //drawableIndex不是目标index
-                var drawableIndex = AvaliableLyrics.IndexOf(d);
-
-                //如果这个片比目标Index大，则将该片的Index+1
-                if (drawableIndex >= targetIndex)
-                {
-                    AvaliableLyrics.Remove(d);
-                    AvaliableLyrics.Insert(drawableIndex + 1, d);
-                    break;
-                }
-            }
-
-            //插入
-            AvaliableLyrics.Insert(targetIndex, piece);
+            //foreach (var d in AvaliableDrawableLyrics)
+            //{
+            //    //获取在LyricFlow中的Index
+            //    //drawableIndex不是目标index
+            //    var drawableIndex = AvaliableDrawableLyrics.IndexOf(d);
+            //
+            //    //如果这个片比目标Index大，则将该片的Index+1
+            //    if (drawableIndex >= targetIndex)
+            //    {
+            //        AvaliableDrawableLyrics.Remove(d);
+            //        if (drawableIndex + 1 > AvaliableDrawableLyrics.Count)
+            //            AvaliableDrawableLyrics.Add(d);
+            //        else
+            //            AvaliableDrawableLyrics.Insert(drawableIndex + 1, d);
+            //        break;
+            //    }
+            //}
+            //
+            ////插入
+            //AvaliableDrawableLyrics.Insert(targetIndex, piece);
 
             //临时保存
             performSave(false);
@@ -222,13 +228,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
         protected override void RefreshLrcInfo(List<Lyric> lyrics)
         {
-            AvaliableLyrics.Clear();
+            AvaliableDrawableLyrics.Clear();
 
             int index = 0;
 
             foreach (var t in lyrics)
             {
-                AvaliableLyrics.Insert(index, CreateDrawableLyric(t));
+                AvaliableDrawableLyrics.Insert(index, CreateDrawableLyric(t));
                 index++;
             }
         }

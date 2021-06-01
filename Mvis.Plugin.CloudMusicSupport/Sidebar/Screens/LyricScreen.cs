@@ -5,6 +5,7 @@ using Mvis.Plugin.CloudMusicSupport.Misc;
 using Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Graphics.Containers;
@@ -26,10 +27,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         private MvisScreen mvisScreen { get; set; }
 
         protected readonly OsuScrollContainer<DrawableLyric> LyricScroll;
-        private readonly DrawablePool<T> lyricPool = new DrawablePool<T>(100);
+        private DrawablePool<T> lyricPool = new DrawablePool<T>(100);
 
         private readonly List<DrawableLyric> visibleLyrics = new List<DrawableLyric>();
-        protected readonly List<DrawableLyric> AvaliableLyrics = new List<DrawableLyric>();
+        protected readonly List<DrawableLyric> AvaliableDrawableLyrics = new List<DrawableLyric>();
 
         private float distanceLoadUnload => 150;
 
@@ -56,6 +57,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         }
 
         private readonly DrawableLyric dummyDrawableLyric = new DummyDrawableLyric();
+        protected Cached Cache = new Cached();
 
         private float visibleTop => LyricScroll.Current;
         private float visibleBottom => LyricScroll.Current + DrawHeight;
@@ -82,23 +84,26 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         {
             visibleLyrics.Clear();
 
-            var currentY = 0;
-
-            foreach (var drawableLyric in AvaliableLyrics)
+            if (!Cache.IsValid)
             {
-                drawableLyric.CurrentY = currentY;
-                visibleLyrics.Add(drawableLyric);
+                var currentY = 0;
 
-                currentY += drawableLyric.FinalHeight();
+                foreach (var drawableLyric in AvaliableDrawableLyrics)
+                {
+                    drawableLyric.CurrentY = currentY;
+                    visibleLyrics.Add(drawableLyric);
+
+                    currentY += drawableLyric.FinalHeight();
+                }
+
+                LyricScroll.ScrollContent.Height = currentY;
+
+                //获取显示范围
+                var range = getRange();
+
+                if (range != currentRange)
+                    updateFromRange(range);
             }
-
-            LyricScroll.ScrollContent.Height = currentY;
-
-            //获取显示范围
-            var range = getRange();
-
-            if (range != currentRange)
-                updateFromRange(range);
 
             base.Update();
         }
@@ -134,15 +139,16 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
                 // Add those items within the previously found index range that should be displayed.
                 foreach (var item in toDisplay)
                 {
-                    var drawable = CreateDrawableLyric(lyricPool.Get(d => d.Value = item.Value).Value);
-                    drawable.CurrentY = item.CurrentY;
+                    var panel = lyricPool.Get(p => p.Value = item.Value);
 
-                    drawable.Depth = drawable.CurrentY;
-                    drawable.Y = drawable.CurrentY;
+                    panel.Depth = item.CurrentY;
+                    panel.Y = item.CurrentY;
 
-                    LyricScroll.Add(drawable);
+                    LyricScroll.Add(panel);
                 }
             }
+
+            //Cache.Validate();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -186,12 +192,16 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         {
             LyricScroll.Clear();
             LyricScroll.ScrollToStart();
-            AvaliableLyrics.Clear();
+            AvaliableDrawableLyrics.Clear();
+
+            lyricPool.Expire();
+            lyricPool = new DrawablePool<T>(100);
+            AddInternal(lyricPool);
 
             foreach (var t in lyrics)
-            {
-                AvaliableLyrics.Add(CreateDrawableLyric(t));
-            }
+                AvaliableDrawableLyrics.Add(CreateDrawableLyric(t));
+
+            Cache.Invalidate();
         }
     }
 }

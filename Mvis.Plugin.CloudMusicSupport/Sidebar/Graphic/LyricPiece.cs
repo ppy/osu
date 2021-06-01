@@ -23,6 +23,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         private Box hoverBox;
         private OsuSpriteText contentText;
         private OsuSpriteText translateText;
+        private OsuSpriteText timeText;
 
         public LyricPiece(Lyric lrc)
         {
@@ -31,7 +32,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
         public LyricPiece()
         {
-            Value = new Lyric();
+            Value = new Lyric
+            {
+                Content = "missingno"
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -46,8 +50,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
             Colour = string.IsNullOrEmpty(Value.Content)
                 ? Color4Extensions.FromHex(@"555")
                 : Color4.White;
-
-            var timeSpan = TimeSpan.FromMilliseconds(Value.Time);
 
             Box fgBox;
             InternalChildren = new Drawable[]
@@ -73,10 +75,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                                     Colour = colourProvider.Highlight1,
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                new OsuSpriteText
+                                timeText = new OsuSpriteText
                                 {
                                     Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold),
-                                    Text = $"{timeSpan:mm\\:ss\\.fff}",
                                     Colour = Color4.Black,
                                     Margin = new MarginPadding { Horizontal = 5, Vertical = 3 }
                                 },
@@ -84,7 +85,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                         },
                         contentText = new OsuSpriteText
                         {
-                            Text = Value.Content,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             RelativeSizeAxes = Axes.X,
@@ -93,7 +93,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                         },
                         translateText = new OsuSpriteText
                         {
-                            Text = Value.TranslatedString,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             RelativeSizeAxes = Axes.X,
@@ -111,12 +110,19 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                 new HoverClickSounds()
             };
 
-            TooltipText = $"调整到 {timeSpan:mm\\:ss\\.fff}";
-
             colourProvider.HueColour.BindValueChanged(_ =>
             {
                 fgBox.Colour = colourProvider.Highlight1;
             }, true);
+        }
+
+        protected override void UpdateValue(Lyric lyric)
+        {
+            contentText.Text = lyric.Content;
+            translateText.Text = lyric.TranslatedString;
+
+            var timeSpan = TimeSpan.FromMilliseconds(lyric.Time);
+            timeText.Text = TooltipText = $"{timeSpan:mm\\:ss\\.fff}";
         }
 
         protected override bool OnClick(ClickEvent e)
