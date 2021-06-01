@@ -519,7 +519,9 @@ namespace osu.Game.Skinning
                 var sample = Samples?.Get(lookup);
 
                 if (sample != null)
+                {
                     return sample;
+                }
             }
 
             return legacyDefaultFallback?.GetSample(sampleInfo);
