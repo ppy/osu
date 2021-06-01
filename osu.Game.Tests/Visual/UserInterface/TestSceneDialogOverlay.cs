@@ -3,7 +3,9 @@
 
 using System;
 using NUnit.Framework;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 
@@ -12,13 +14,20 @@ namespace osu.Game.Tests.Visual.UserInterface
     [TestFixture]
     public class TestSceneDialogOverlay : OsuTestScene
     {
-        public TestSceneDialogOverlay()
+        private DialogOverlay overlay;
+
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            DialogOverlay overlay;
+            AddStep("create dialog overlay", () => Child = overlay = new DialogOverlay());
+        }
 
-            Add(overlay = new DialogOverlay());
+        [Test]
+        public void TestBasic()
+        {
+            TestPopupDialog dialog = null;
 
-            AddStep("dialog #1", () => overlay.Push(new TestPopupDialog
+            AddStep("dialog #1", () => overlay.Push(dialog = new TestPopupDialog
             {
                 Icon = FontAwesome.Regular.TrashAlt,
                 HeaderText = @"Confirm deletion of",
@@ -38,7 +47,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 },
             }));
 
-            AddStep("dialog #2", () => overlay.Push(new TestPopupDialog
+            AddAssert("first dialog displayed", () => overlay.CurrentDialog == dialog);
+
+            AddStep("dialog #2", () => overlay.Push(dialog = new TestPopupDialog
             {
                 Icon = FontAwesome.Solid.Cog,
                 HeaderText = @"What do you want to do with",
@@ -71,6 +82,42 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                 },
             }));
+
+            AddAssert("second dialog displayed", () => overlay.CurrentDialog == dialog);
+        }
+
+        [Test]
+        public void TestDismissBeforePush()
+        {
+            AddStep("dismissed dialog push", () =>
+            {
+                overlay.Push(new TestPopupDialog
+                {
+                    State = { Value = Visibility.Hidden }
+                });
+            });
+
+            AddAssert("no dialog pushed", () => overlay.CurrentDialog == null);
+        }
+
+        [Test]
+        public void TestDismissBeforePushViaButtonPress()
+        {
+            AddStep("dismissed dialog push", () =>
+            {
+                TestPopupDialog dialog;
+                overlay.Push(dialog = new TestPopupDialog
+                {
+                    Buttons = new PopupDialogButton[]
+                    {
+                        new PopupDialogOkButton { Text = @"OK" },
+                    },
+                });
+
+                dialog.PerformOkAction();
+            });
+
+            AddAssert("no dialog pushed", () => overlay.CurrentDialog == null);
         }
 
         private class TestPopupDialog : PopupDialog

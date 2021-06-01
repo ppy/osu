@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Collections.IO
                 {
                     var osu = LoadOsuIntoHost(host);
 
-                    await osu.CollectionManager.Import(new MemoryStream());
+                    await importCollectionsFromStream(osu, new MemoryStream());
 
                     Assert.That(osu.CollectionManager.Collections.Count, Is.Zero);
                 }
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Collections.IO
                 {
                     var osu = LoadOsuIntoHost(host);
 
-                    await osu.CollectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
+                    await importCollectionsFromStream(osu, TestResources.OpenResource("Collections/collections.db"));
 
                     Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(2));
 
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Collections.IO
                 {
                     var osu = LoadOsuIntoHost(host, true);
 
-                    await osu.CollectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
+                    await importCollectionsFromStream(osu, TestResources.OpenResource("Collections/collections.db"));
 
                     Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(2));
 
@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Collections.IO
 
                         ms.Seek(0, SeekOrigin.Begin);
 
-                        await osu.CollectionManager.Import(ms);
+                        await importCollectionsFromStream(osu, ms);
                     }
 
                     Assert.That(host.UpdateThread.Running, Is.True);
@@ -134,7 +134,7 @@ namespace osu.Game.Tests.Collections.IO
                 {
                     var osu = LoadOsuIntoHost(host, true);
 
-                    await osu.CollectionManager.Import(TestResources.OpenResource("Collections/collections.db"));
+                    await importCollectionsFromStream(osu, TestResources.OpenResource("Collections/collections.db"));
 
                     // Move first beatmap from second collection into the first.
                     osu.CollectionManager.Collections[0].Beatmaps.Add(osu.CollectionManager.Collections[1].Beatmaps[0]);
@@ -168,6 +168,13 @@ namespace osu.Game.Tests.Collections.IO
                     host.Exit();
                 }
             }
+        }
+
+        private static async Task importCollectionsFromStream(TestOsuGameBase osu, Stream stream)
+        {
+            // intentionally spin this up on a separate task to avoid disposal deadlocks.
+            // see https://github.com/EventStore/EventStore/issues/1179
+            await Task.Run(() => osu.CollectionManager.Import(stream).Wait());
         }
     }
 }
