@@ -73,7 +73,7 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    CurrentPath = $"{path.Value}/",
+                    CurrentPath = $@"{api.WebsiteRootUrl}/wiki/{path.Value}/",
                     Text = response.Markdown,
                     DocumentMargin = new MarginPadding(0),
                     DocumentPadding = new MarginPadding
