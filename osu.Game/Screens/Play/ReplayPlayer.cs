@@ -36,6 +36,8 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
+            if (!LoadedBeatmapSuccessfully) return;
+
             Score = createScore(GameplayBeatmap, Mods.Value);
         }
 
