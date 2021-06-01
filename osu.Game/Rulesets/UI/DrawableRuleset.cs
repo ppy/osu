@@ -349,6 +349,9 @@ namespace osu.Game.Rulesets.UI
             foreach (var mod in mods.OfType<IApplicableToDrawableRuleset<TObject>>())
                 mod.ApplyToDrawableRuleset(this);
 
+            foreach (var mod in mods.OfType<ICreateReplay>())
+                SetReplayScore(mod.CreateReplayScore(Beatmap, mods));
+
             foreach (var mod in mods.OfType<IReadFromConfig>())
                 mod.ReadFromConfig(config);
         }
