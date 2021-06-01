@@ -34,7 +34,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="ppy.osu.Framework" Version="2021.528.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2021.601.0" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2021.525.0" />
     <PackageReference Include="Sentry" Version="3.3.4" />
     <PackageReference Include="SharpCompress" Version="0.28.2" />
