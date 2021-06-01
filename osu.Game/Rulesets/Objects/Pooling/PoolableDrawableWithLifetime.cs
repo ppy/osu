@@ -37,8 +37,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
                 if (Entry == null) return;
 
-                Entry.LifetimeStart = value;
-                base.LifetimeStart = Entry.LifetimeStart;
+                base.LifetimeStart = Entry.LifetimeStart = value;
             }
         }
 
@@ -52,8 +51,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
                 if (Entry == null) return;
 
-                Entry.LifetimeEnd = value;
-                base.LifetimeEnd = Entry.LifetimeEnd;
+                base.LifetimeEnd = Entry.LifetimeEnd = value;
             }
         }
 
@@ -84,8 +82,8 @@ namespace osu.Game.Rulesets.Objects.Pooling
                 free();
 
             Entry = entry;
-            entry.LifetimeChanged += entryLifetimeChanged;
-            setLifetimeFromEntry();
+            entry.LifetimeChanged += setLifetimeFromEntry;
+            setLifetimeFromEntry(entry);
 
             OnApply(entry);
 
@@ -121,23 +119,19 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
             OnFree(Entry);
 
-            Entry.LifetimeChanged -= entryLifetimeChanged;
+            Entry.LifetimeChanged -= setLifetimeFromEntry;
             Entry = null;
-            setLifetimeFromEntry();
+            base.LifetimeStart = double.MinValue;
+            base.LifetimeEnd = double.MaxValue;
 
             HasEntryApplied = false;
         }
 
-        private void entryLifetimeChanged(LifetimeEntry entry)
+        private void setLifetimeFromEntry(LifetimeEntry entry)
         {
             Debug.Assert(entry == Entry);
-            setLifetimeFromEntry();
-        }
-
-        private void setLifetimeFromEntry()
-        {
-            base.LifetimeStart = Entry?.LifetimeStart ?? double.MinValue;
-            base.LifetimeEnd = Entry?.LifetimeEnd ?? double.MaxValue;
+            base.LifetimeStart = entry.LifetimeStart;
+            base.LifetimeEnd = entry.LifetimeEnd;
         }
     }
 }
