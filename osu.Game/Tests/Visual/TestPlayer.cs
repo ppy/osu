@@ -51,12 +51,16 @@ namespace osu.Game.Tests.Visual
 
         protected override void PrepareReplay()
         {
-            var replayGeneratingMod = Mods.Value.OfType<ICreateReplay>().FirstOrDefault();
+            var autoplayMod = Mods.Value.OfType<ModAutoplay>().FirstOrDefault();
 
-            if (replayGeneratingMod != null)
+            // This logic should really not exist (and tests should be instantiating a ReplayPlayer), but a lot of base work is required to make that happen.
+            if (autoplayMod != null)
             {
-                // This logic should really not exist (and tests should be instantiating a ReplayPlayer), but a lot of base work is required to make that happen.
-                DrawableRuleset?.SetReplayScore(replayGeneratingMod.CreateReplayScore(GameplayBeatmap.PlayableBeatmap, Mods.Value));
+                var replayScore = autoplayMod.CreateReplayScore(GameplayBeatmap.PlayableBeatmap, Mods.Value);
+
+                DrawableRuleset?.SetReplayScore(replayScore);
+
+                ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(replayScore.ScoreInfo);
                 return;
             }
 
