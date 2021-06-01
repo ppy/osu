@@ -37,6 +37,8 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
                 if (Entry == null) return;
 
+                // Cannot write it as `base.LifetimeStart = Entry.LifetimeStart = value` because the change may be blocked (when `HitObjectLifetimeEntry.KeepAlive` is true).
+                Entry.LifetimeStart = value;
                 base.LifetimeStart = Entry.LifetimeStart = value;
             }
         }
@@ -51,7 +53,8 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
                 if (Entry == null) return;
 
-                base.LifetimeEnd = Entry.LifetimeEnd = value;
+                Entry.LifetimeEnd = value;
+                base.LifetimeEnd = Entry.LifetimeEnd;
             }
         }
 
