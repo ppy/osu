@@ -179,26 +179,6 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// Invoked when a <see cref="HitObjectLifetimeEntry"/> is added to this <see cref="Playfield"/>.
-        /// </summary>
-        /// <remarks>
-        /// This is also invoked for nested hit objects while <see cref="OnHitObjectAdded"/> is not.
-        /// </remarks>
-        protected virtual void OnHitObjectLifetimeEntryAdded(HitObjectLifetimeEntry entry)
-        {
-        }
-
-        /// <summary>
-        /// Invoked when a <see cref="HitObjectLifetimeEntry"/> is removed from this <see cref="Playfield"/>.
-        /// </summary>
-        /// <remarks>
-        /// This is also invoked for nested hit objects while <see cref="OnHitObjectRemoved"/> is not.
-        /// </remarks>
-        protected virtual void OnHitObjectLifetimeEntryRemoved(HitObjectLifetimeEntry entry)
-        {
-        }
-
-        /// <summary>
         /// Invoked before a new <see cref="DrawableHitObject"/> is added to this <see cref="Playfield"/>.
         /// It is invoked only once even if the drawable is pooled and used multiple times for different <see cref="HitObject"/>s.
         /// </summary>
@@ -311,8 +291,6 @@ namespace osu.Game.Rulesets.UI
             entry = CreateLifetimeEntry(hitObject);
             lifetimeEntryMap[hitObject] = entry;
 
-            OnHitObjectLifetimeEntryAdded(entry);
-
             return entry;
         }
 
@@ -322,8 +300,6 @@ namespace osu.Game.Rulesets.UI
                 return false;
 
             hitObject.RemoveNestedHitObjects -= removeNestedHitObjects;
-
-            OnHitObjectLifetimeEntryRemoved(entry);
 
             return true;
         }
