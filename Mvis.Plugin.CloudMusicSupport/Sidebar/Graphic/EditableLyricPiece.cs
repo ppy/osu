@@ -25,6 +25,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         public Action OnAdjustTriggered;
         public Action OnDeleted;
         public Action OnSave;
+        private OsuTextBox timeTextBox;
+        private OsuTextBox translationTextBox;
+        private OsuTextBox contentTextBox;
 
         public EditableLyricPiece(Lyric lrc)
         {
@@ -46,9 +49,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
             AutoSizeAxes = Axes.Y;
 
             Box bgBox;
-            OsuTextBox timeTextBox;
-            OsuTextBox contentTextBox;
-            OsuTextBox translationTextBox;
             InternalChildren = new Drawable[]
             {
                 bgBox = new Box
@@ -66,7 +66,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                     {
                         timeTextBox = new OsuTextBox
                         {
-                            Text = Value.Time.ToString(),
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
                             Width = 0.5f,
@@ -75,7 +74,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                         },
                         contentTextBox = new OsuTextBox
                         {
-                            Text = Value.Content,
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
                             PlaceholderText = "歌词原文",
@@ -83,7 +81,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                         },
                         translationTextBox = new OsuTextBox
                         {
-                            Text = Value.TranslatedString,
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
                             PlaceholderText = "歌词翻译",
@@ -177,5 +174,12 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
         //下方按钮(40) + 3 * 文本框高度(40) + 2 * 文本框Spacing(5) + 上下Margin(10) + Spacing(10)
         public override int FinalHeight() => 40 + 3 * 40 + 2 * 5 + 10 + 10;
+
+        protected override void UpdateValue(Lyric lyric)
+        {
+            contentTextBox.Text = lyric.Content;
+            translationTextBox.Text = lyric.TranslatedString;
+            timeTextBox.Text = lyric.Time.ToString();
+        }
     }
 }

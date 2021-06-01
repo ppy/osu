@@ -5,7 +5,6 @@ using Mvis.Plugin.CloudMusicSupport.Misc;
 using Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Graphics.Containers;
@@ -57,7 +56,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         }
 
         private readonly DrawableLyric dummyDrawableLyric = new DummyDrawableLyric();
-        protected Cached Cache = new Cached();
 
         private float visibleTop => LyricScroll.Current;
         private float visibleBottom => LyricScroll.Current + DrawHeight;
@@ -84,26 +82,23 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         {
             visibleLyrics.Clear();
 
-            if (!Cache.IsValid)
+            var currentY = 0;
+
+            foreach (var drawableLyric in AvaliableDrawableLyrics)
             {
-                var currentY = 0;
+                drawableLyric.CurrentY = currentY;
+                visibleLyrics.Add(drawableLyric);
 
-                foreach (var drawableLyric in AvaliableDrawableLyrics)
-                {
-                    drawableLyric.CurrentY = currentY;
-                    visibleLyrics.Add(drawableLyric);
-
-                    currentY += drawableLyric.FinalHeight();
-                }
-
-                LyricScroll.ScrollContent.Height = currentY;
-
-                //获取显示范围
-                var range = getRange();
-
-                if (range != currentRange)
-                    updateFromRange(range);
+                currentY += drawableLyric.FinalHeight();
             }
+
+            LyricScroll.ScrollContent.Height = currentY;
+
+            //获取显示范围
+            var range = getRange();
+
+            if (range != currentRange)
+                updateFromRange(range);
 
             base.Update();
         }
@@ -147,8 +142,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
                     LyricScroll.Add(panel);
                 }
             }
-
-            //Cache.Validate();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -201,7 +194,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             foreach (var t in lyrics)
                 AvaliableDrawableLyrics.Add(CreateDrawableLyric(t));
 
-            Cache.Invalidate();
+            //workaround: 恢复后歌词不显示
+            currentRange.first = currentRange.last = 0;
         }
     }
 }

@@ -29,9 +29,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
             base.LoadComplete();
         }
 
-        protected virtual void UpdateValue(Lyric lyric)
-        {
-        }
+        protected abstract void UpdateValue(Lyric lyric);
 
         public int CompareTo(DrawableLyric other) => CurrentY.CompareTo(other.CurrentY);
     }

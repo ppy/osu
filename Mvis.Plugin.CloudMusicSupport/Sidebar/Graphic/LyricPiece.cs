@@ -47,10 +47,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Colour = string.IsNullOrEmpty(Value.Content)
-                ? Color4Extensions.FromHex(@"555")
-                : Color4.White;
-
             Box fgBox;
             InternalChildren = new Drawable[]
             {
@@ -123,6 +119,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
             var timeSpan = TimeSpan.FromMilliseconds(lyric.Time);
             timeText.Text = TooltipText = $"{timeSpan:mm\\:ss\\.fff}";
+
+            Colour = string.IsNullOrEmpty(lyric.Content)
+                ? Color4Extensions.FromHex(@"555")
+                : Color4.White;
         }
 
         protected override bool OnClick(ClickEvent e)

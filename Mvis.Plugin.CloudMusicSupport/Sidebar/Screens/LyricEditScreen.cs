@@ -181,7 +181,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             var piece = CreateDrawableLyric(lrc);
 
             sortPiece(piece);
-            Cache.Invalidate();
         }
 
         private void sortPiece(DrawableLyric piece)
