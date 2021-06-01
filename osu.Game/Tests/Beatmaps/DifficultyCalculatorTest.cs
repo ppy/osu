@@ -31,12 +31,16 @@ namespace osu.Game.Tests.Beatmaps
             using (var stream = new LineBufferedReader(resStream))
             {
                 var decoder = Decoder.GetDecoder<Beatmap>(stream);
+
                 ((LegacyBeatmapDecoder)decoder).ApplyOffsets = false;
 
-                var working = new TestWorkingBeatmap(decoder.Decode(stream));
-                working.BeatmapInfo.Ruleset = CreateRuleset().RulesetInfo;
-
-                return working;
+                return new TestWorkingBeatmap(decoder.Decode(stream))
+                {
+                    BeatmapInfo =
+                    {
+                        Ruleset = CreateRuleset().RulesetInfo
+                    }
+                };
             }
         }
 

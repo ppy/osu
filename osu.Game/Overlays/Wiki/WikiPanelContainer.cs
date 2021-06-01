@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers.Markdown;
+using osu.Game.Online.API;
 using osu.Game.Overlays.Wiki.Markdown;
 using osuTK;
 using osuTK.Graphics;
@@ -37,7 +38,7 @@ namespace osu.Game.Overlays.Wiki
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, IAPIProvider api)
         {
             Children = new Drawable[]
             {
@@ -61,6 +62,7 @@ namespace osu.Game.Overlays.Wiki
                 },
                 panelContainer = new WikiPanelMarkdownContainer(isFullWidth)
                 {
+                    CurrentPath = $@"{api.WebsiteRootUrl}/wiki/",
                     Text = text,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
