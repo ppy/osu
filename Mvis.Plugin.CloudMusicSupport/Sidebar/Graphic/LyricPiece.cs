@@ -17,7 +17,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 {
     public class LyricPiece : DrawableLyric, IHasTooltip
     {
-        public Action<Lyric> Action;
         public string TooltipText { get; private set; }
 
         private Box hoverBox;
@@ -37,6 +36,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                 Content = "missingno"
             };
         }
+
+        [Resolved]
+        private MvisScreen mvisScreen { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(CustomColourProvider colourProvider)
@@ -127,7 +129,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
         protected override bool OnClick(ClickEvent e)
         {
-            Action?.Invoke(Value);
+            mvisScreen.SeekTo(Value.Time + 1);
             return base.OnClick(e);
         }
 
