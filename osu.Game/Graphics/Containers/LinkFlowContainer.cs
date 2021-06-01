@@ -70,7 +70,7 @@ namespace osu.Game.Graphics.Containers
             createLink(spriteText.Yield(), new LinkDetails(action, argument), tooltipText);
         }
 
-        public void AddLink(IEnumerable<SpriteText> text, LinkAction action = LinkAction.External, string linkArgument = null, string tooltipText = null)
+        public void AddLink(IEnumerable<SpriteText> text, LinkAction action, string linkArgument, string tooltipText = null)
         {
             foreach (var t in text)
                 AddArbitraryDrawable(t);
