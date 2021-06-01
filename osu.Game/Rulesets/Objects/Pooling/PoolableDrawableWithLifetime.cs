@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
                 // Cannot write it as `base.LifetimeStart = Entry.LifetimeStart = value` because the change may be blocked (when `HitObjectLifetimeEntry.KeepAlive` is true).
                 Entry.LifetimeStart = value;
-                base.LifetimeStart = Entry.LifetimeStart = value;
+                base.LifetimeStart = Entry.LifetimeStart;
             }
         }
 
