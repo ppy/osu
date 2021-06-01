@@ -56,11 +56,7 @@ namespace osu.Game.Tests.Visual
             // This logic should really not exist (and tests should be instantiating a ReplayPlayer), but a lot of base work is required to make that happen.
             if (autoplayMod != null)
             {
-                var replayScore = autoplayMod.CreateReplayScore(GameplayBeatmap.PlayableBeatmap, Mods.Value);
-
-                DrawableRuleset?.SetReplayScore(replayScore);
-
-                ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(replayScore.ScoreInfo);
+                DrawableRuleset?.SetReplayScore(autoplayMod.CreateReplayScore(GameplayBeatmap.PlayableBeatmap, Mods.Value));
                 return;
             }
 
