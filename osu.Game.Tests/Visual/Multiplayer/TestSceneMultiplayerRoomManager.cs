@@ -141,14 +141,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private Room createRoom(Action<Room> initFunc = null)
         {
-            var room = new Room();
-
-            room.Name.Value = "test room";
-            room.Playlist.Add(new PlaylistItem
+            var room = new Room
             {
-                Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
-                Ruleset = { Value = Ruleset.Value }
-            });
+                Name =
+                {
+                    Value = "test room"
+                },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
+                        Ruleset = { Value = Ruleset.Value }
+                    }
+                }
+            };
 
             initFunc?.Invoke(room);
             return room;

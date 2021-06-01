@@ -96,15 +96,19 @@ namespace osu.Game.Screens.OnlinePlay
         {
             itemSelected = true;
 
-            var item = new PlaylistItem();
+            var item = new PlaylistItem
+            {
+                Beatmap =
+                {
+                    Value = Beatmap.Value.BeatmapInfo
+                },
+                Ruleset =
+                {
+                    Value = Ruleset.Value
+                }
+            };
 
-            item.Beatmap.Value = Beatmap.Value.BeatmapInfo;
-            item.Ruleset.Value = Ruleset.Value;
-
-            item.RequiredMods.Clear();
             item.RequiredMods.AddRange(Mods.Value.Select(m => m.CreateCopy()));
-
-            item.AllowedMods.Clear();
             item.AllowedMods.AddRange(FreeMods.Value.Select(m => m.CreateCopy()));
 
             SelectItem(item);
