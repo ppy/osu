@@ -35,11 +35,8 @@ namespace osu.Game.Rulesets.Objects.Pooling
                 if (Entry == null && LifetimeStart != value)
                     throw new InvalidOperationException($"Cannot modify lifetime of {nameof(PoolableDrawableWithLifetime<TEntry>)} when entry is not set");
 
-                if (Entry == null) return;
-
-                // Cannot write it as `base.LifetimeStart = Entry.LifetimeStart = value` because the change may be blocked (when `HitObjectLifetimeEntry.KeepAlive` is true).
-                Entry.LifetimeStart = value;
-                base.LifetimeStart = Entry.LifetimeStart;
+                if (Entry != null)
+                    Entry.LifetimeStart = value;
             }
         }
 
@@ -51,10 +48,8 @@ namespace osu.Game.Rulesets.Objects.Pooling
                 if (Entry == null && LifetimeEnd != value)
                     throw new InvalidOperationException($"Cannot modify lifetime of {nameof(PoolableDrawableWithLifetime<TEntry>)} when entry is not set");
 
-                if (Entry == null) return;
-
-                Entry.LifetimeEnd = value;
-                base.LifetimeEnd = Entry.LifetimeEnd;
+                if (Entry != null)
+                    Entry.LifetimeEnd = value;
             }
         }
 
