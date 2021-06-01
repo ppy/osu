@@ -6,6 +6,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
+using osu.Game.Skinning;
 using osu.Game.Storyboards;
 
 namespace osu.Game.Tests.Beatmaps
@@ -35,6 +36,8 @@ namespace osu.Game.Tests.Beatmaps
         protected override IBeatmap GetBeatmap() => beatmap;
 
         protected override Storyboard GetStoryboard() => storyboard ?? base.GetStoryboard();
+
+        protected override ISkin GetSkin() => null;
 
         public override Stream GetStream(string storagePath) => null;
 
