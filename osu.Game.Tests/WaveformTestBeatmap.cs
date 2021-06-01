@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.IO.Archives;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 
@@ -51,6 +52,10 @@ namespace osu.Game.Tests
         protected override Texture GetBackground() => null;
 
         protected override Waveform GetWaveform() => new Waveform(trackStore.GetStream(firstAudioFile));
+
+        protected override ISkin GetSkin() => null;
+
+        public override Stream GetStream(string storagePath) => null;
 
         protected override Track GetBeatmapTrack() => trackStore.Get(firstAudioFile);
 

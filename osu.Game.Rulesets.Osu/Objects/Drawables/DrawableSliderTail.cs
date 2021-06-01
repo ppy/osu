@@ -7,12 +7,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking, ITrackSnaking
+    public class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking, IHasMainCirclePiece
     {
         public new SliderTailCircle HitObject => (SliderTailCircle)base.HitObject;
 
@@ -26,9 +28,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         public override bool DisplayResult => false;
 
+        /// <summary>
+        /// Whether the hit samples only play on successful hits.
+        /// If <c>false</c>, the hit samples will also play on misses.
+        /// </summary>
+        public bool SamplePlaysOnlyOnHit { get; set; } = true;
+
         public bool Tracking { get; set; }
 
-        private SkinnableDrawable circlePiece;
+        public SkinnableDrawable CirclePiece { get; private set; }
+
         private Container scaleContainer;
 
         public DrawableSliderTail()
@@ -57,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Children = new Drawable[]
                     {
                         // no default for this; only visible in legacy skins.
-                        circlePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTailHitCircle), _ => Empty())
+                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTailHitCircle), _ => Empty())
                     }
                 },
             };
@@ -69,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
-            circlePiece.FadeInFromZero(HitObject.TimeFadeIn);
+            CirclePiece.FadeInFromZero(HitObject.TimeFadeIn);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
@@ -77,6 +86,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdateHitStateTransforms(state);
 
             Debug.Assert(HitObject.HitWindows != null);
+
+            (CirclePiece.Drawable as IMainCirclePiece)?.Animate(state);
 
             switch (state)
             {
@@ -101,7 +112,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
-        public void UpdateSnakingPosition(Vector2 start, Vector2 end) =>
-            Position = HitObject.RepeatIndex % 2 == 0 ? end : start;
+        protected override void OnApply()
+        {
+            base.OnApply();
+
+            if (Slider != null)
+                Position = Slider.CurvePositionAt(HitObject.RepeatIndex % 2 == 0 ? 1 : 0);
+        }
     }
 }

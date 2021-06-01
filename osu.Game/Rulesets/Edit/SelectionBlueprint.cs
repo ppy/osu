@@ -3,44 +3,38 @@
 
 using System;
 using osu.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
     /// <summary>
-    /// A blueprint placed above a <see cref="DrawableHitObject"/> adding editing functionality.
+    /// A blueprint placed above a displaying item adding editing functionality.
     /// </summary>
-    public abstract class SelectionBlueprint : CompositeDrawable, IStateful<SelectionState>
+    public abstract class SelectionBlueprint<T> : CompositeDrawable, IStateful<SelectionState>
     {
-        public readonly HitObject HitObject;
+        public readonly T Item;
 
         /// <summary>
-        /// Invoked when this <see cref="SelectionBlueprint"/> has been selected.
+        /// Invoked when this <see cref="SelectionBlueprint{T}"/> has been selected.
         /// </summary>
-        public event Action<SelectionBlueprint> Selected;
+        public event Action<SelectionBlueprint<T>> Selected;
 
         /// <summary>
-        /// Invoked when this <see cref="SelectionBlueprint"/> has been deselected.
+        /// Invoked when this <see cref="SelectionBlueprint{T}"/> has been deselected.
         /// </summary>
-        public event Action<SelectionBlueprint> Deselected;
+        public event Action<SelectionBlueprint<T>> Deselected;
 
         public override bool HandlePositionalInput => ShouldBeAlive;
         public override bool RemoveWhenNotAlive => false;
 
-        [Resolved(CanBeNull = true)]
-        private HitObjectComposer composer { get; set; }
-
-        protected SelectionBlueprint(HitObject hitObject)
+        protected SelectionBlueprint(T item)
         {
-            HitObject = hitObject;
+            Item = item;
 
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
@@ -91,7 +85,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected virtual void OnDeselected()
         {
-            // selection blueprints are AlwaysPresent while the related DrawableHitObject is visible
+            // selection blueprints are AlwaysPresent while the related item is visible
             // set the body piece's alpha directly to avoid arbitrarily rendering frame buffers etc. of children.
             foreach (var d in InternalChildren)
                 d.Hide();
@@ -111,38 +105,36 @@ namespace osu.Game.Rulesets.Edit
         protected override bool ShouldBeConsideredForInput(Drawable child) => State == SelectionState.Selected;
 
         /// <summary>
-        /// Selects this <see cref="OverlaySelectionBlueprint"/>, causing it to become visible.
+        /// Selects this <see cref="SelectionBlueprint{T}"/>, causing it to become visible.
         /// </summary>
         public void Select() => State = SelectionState.Selected;
 
         /// <summary>
-        /// Deselects this <see cref="OverlaySelectionBlueprint"/>, causing it to become invisible.
+        /// Deselects this <see cref="HitObjectSelectionBlueprint"/>, causing it to become invisible.
         /// </summary>
         public void Deselect() => State = SelectionState.NotSelected;
 
         /// <summary>
-        /// Toggles the selection state of this <see cref="OverlaySelectionBlueprint"/>.
+        /// Toggles the selection state of this <see cref="HitObjectSelectionBlueprint"/>.
         /// </summary>
         public void ToggleSelection() => State = IsSelected ? SelectionState.NotSelected : SelectionState.Selected;
 
         public bool IsSelected => State == SelectionState.Selected;
 
         /// <summary>
-        /// The <see cref="MenuItem"/>s to be displayed in the context menu for this <see cref="OverlaySelectionBlueprint"/>.
+        /// The <see cref="MenuItem"/>s to be displayed in the context menu for this <see cref="HitObjectSelectionBlueprint"/>.
         /// </summary>
         public virtual MenuItem[] ContextMenuItems => Array.Empty<MenuItem>();
 
         /// <summary>
-        /// The screen-space point that causes this <see cref="OverlaySelectionBlueprint"/> to be selected.
+        /// The screen-space point that causes this <see cref="HitObjectSelectionBlueprint"/> to be selected via a drag.
         /// </summary>
         public virtual Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.Centre;
 
         /// <summary>
-        /// The screen-space quad that outlines this <see cref="OverlaySelectionBlueprint"/> for selections.
+        /// The screen-space quad that outlines this <see cref="HitObjectSelectionBlueprint"/> for selections.
         /// </summary>
         public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
-
-        public virtual Vector2 GetInstantDelta(Vector2 screenSpacePosition) => Parent.ToLocalSpace(screenSpacePosition) - Position;
 
         /// <summary>
         /// Handle to perform a partial deletion when the user requests a quick delete (Shift+Right Click).

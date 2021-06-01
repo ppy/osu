@@ -1,13 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
+using System.Collections.Specialized;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 
@@ -16,11 +19,20 @@ namespace osu.Game.Screens.Play.HUD
     [LongRunningLoad]
     public class MultiplayerGameplayLeaderboard : GameplayLeaderboard
     {
+        protected readonly Dictionary<int, TrackedUserData> UserScores = new Dictionary<int, TrackedUserData>();
+
+        [Resolved]
+        private SpectatorClient spectatorClient { get; set; }
+
+        [Resolved]
+        private MultiplayerClient multiplayerClient { get; set; }
+
+        [Resolved]
+        private UserLookupCache userLookupCache { get; set; }
+
         private readonly ScoreProcessor scoreProcessor;
-
-        private readonly int[] userIds;
-
-        private readonly Dictionary<int, TrackedUserData> userScores = new Dictionary<int, TrackedUserData>();
+        private readonly BindableList<int> playingUsers;
+        private Bindable<ScoringMode> scoringMode;
 
         /// <summary>
         /// Construct a new leaderboard.
@@ -33,99 +45,154 @@ namespace osu.Game.Screens.Play.HUD
             this.scoreProcessor = scoreProcessor;
 
             // todo: this will likely be passed in as User instances.
-            this.userIds = userIds;
+            playingUsers = new BindableList<int>(userIds);
         }
-
-        [Resolved]
-        private SpectatorStreamingClient streamingClient { get; set; }
-
-        [Resolved]
-        private UserLookupCache userLookupCache { get; set; }
-
-        private Bindable<ScoringMode> scoringMode;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, IAPIProvider api)
         {
-            streamingClient.OnNewFrames += handleIncomingFrames;
-
-            foreach (var user in userIds)
-            {
-                streamingClient.WatchUser(user);
-
-                // probably won't be required in the final implementation.
-                var resolvedUser = userLookupCache.GetUserAsync(user).Result;
-
-                var trackedUser = new TrackedUserData();
-
-                userScores[user] = trackedUser;
-                var leaderboardScore = AddPlayer(resolvedUser, resolvedUser.Id == api.LocalUser.Value.Id);
-
-                ((IBindable<double>)leaderboardScore.Accuracy).BindTo(trackedUser.Accuracy);
-                ((IBindable<double>)leaderboardScore.TotalScore).BindTo(trackedUser.Score);
-                ((IBindable<int>)leaderboardScore.Combo).BindTo(trackedUser.CurrentCombo);
-            }
-
             scoringMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
-            scoringMode.BindValueChanged(updateAllScores, true);
-        }
 
-        private void updateAllScores(ValueChangedEvent<ScoringMode> mode)
-        {
-            foreach (var trackedData in userScores.Values)
-                trackedData.UpdateScore(scoreProcessor, mode.NewValue);
-        }
-
-        private void handleIncomingFrames(int userId, FrameDataBundle bundle)
-        {
-            if (userScores.TryGetValue(userId, out var trackedData))
+            foreach (var userId in playingUsers)
             {
-                trackedData.LastHeader = bundle.Header;
-                trackedData.UpdateScore(scoreProcessor, scoringMode.Value);
+                // probably won't be required in the final implementation.
+                var resolvedUser = userLookupCache.GetUserAsync(userId).Result;
+
+                var trackedUser = CreateUserData(userId, scoreProcessor);
+                trackedUser.ScoringMode.BindTo(scoringMode);
+
+                var leaderboardScore = AddPlayer(resolvedUser, resolvedUser?.Id == api.LocalUser.Value.Id);
+                leaderboardScore.Accuracy.BindTo(trackedUser.Accuracy);
+                leaderboardScore.TotalScore.BindTo(trackedUser.Score);
+                leaderboardScore.Combo.BindTo(trackedUser.CurrentCombo);
+                leaderboardScore.HasQuit.BindTo(trackedUser.UserQuit);
+
+                UserScores[userId] = trackedUser;
             }
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // BindableList handles binding in a really bad way (Clear then AddRange) so we need to do this manually..
+            foreach (int userId in playingUsers)
+            {
+                spectatorClient.WatchUser(userId);
+
+                if (!multiplayerClient.CurrentMatchPlayingUserIds.Contains(userId))
+                    usersChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new[] { userId }));
+            }
+
+            playingUsers.BindTo(multiplayerClient.CurrentMatchPlayingUserIds);
+            playingUsers.BindCollectionChanged(usersChanged);
+
+            // this leaderboard should be guaranteed to be completely loaded before the gameplay starts (is a prerequisite in MultiplayerPlayer).
+            spectatorClient.OnNewFrames += handleIncomingFrames;
+        }
+
+        private void usersChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var userId in e.OldItems.OfType<int>())
+                    {
+                        spectatorClient.StopWatchingUser(userId);
+
+                        if (UserScores.TryGetValue(userId, out var trackedData))
+                            trackedData.MarkUserQuit();
+                    }
+
+                    break;
+            }
+        }
+
+        private void handleIncomingFrames(int userId, FrameDataBundle bundle) => Schedule(() =>
+        {
+            if (!UserScores.TryGetValue(userId, out var trackedData))
+                return;
+
+            trackedData.Frames.Add(new TimedFrame(bundle.Frames.First().Time, bundle.Header));
+            trackedData.UpdateScore();
+        });
+
+        protected virtual TrackedUserData CreateUserData(int userId, ScoreProcessor scoreProcessor) => new TrackedUserData(userId, scoreProcessor);
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            if (streamingClient != null)
+            if (spectatorClient != null)
             {
-                foreach (var user in userIds)
+                foreach (var user in playingUsers)
                 {
-                    streamingClient.StopWatchingUser(user);
+                    spectatorClient.StopWatchingUser(user);
                 }
 
-                streamingClient.OnNewFrames -= handleIncomingFrames;
+                spectatorClient.OnNewFrames -= handleIncomingFrames;
             }
         }
 
-        private class TrackedUserData
+        protected class TrackedUserData
         {
-            public IBindableNumber<double> Score => score;
+            public readonly int UserId;
+            public readonly ScoreProcessor ScoreProcessor;
 
-            private readonly BindableDouble score = new BindableDouble();
+            public readonly BindableDouble Score = new BindableDouble();
+            public readonly BindableDouble Accuracy = new BindableDouble(1);
+            public readonly BindableInt CurrentCombo = new BindableInt();
+            public readonly BindableBool UserQuit = new BindableBool();
 
-            public IBindableNumber<double> Accuracy => accuracy;
+            public readonly IBindable<ScoringMode> ScoringMode = new Bindable<ScoringMode>();
 
-            private readonly BindableDouble accuracy = new BindableDouble(1);
+            public readonly List<TimedFrame> Frames = new List<TimedFrame>();
 
-            public IBindableNumber<int> CurrentCombo => currentCombo;
-
-            private readonly BindableInt currentCombo = new BindableInt();
-
-            [CanBeNull]
-            public FrameHeader LastHeader;
-
-            public void UpdateScore(ScoreProcessor processor, ScoringMode mode)
+            public TrackedUserData(int userId, ScoreProcessor scoreProcessor)
             {
-                if (LastHeader == null)
+                UserId = userId;
+                ScoreProcessor = scoreProcessor;
+
+                ScoringMode.BindValueChanged(_ => UpdateScore());
+            }
+
+            public void MarkUserQuit() => UserQuit.Value = true;
+
+            public virtual void UpdateScore()
+            {
+                if (Frames.Count == 0)
                     return;
 
-                (score.Value, accuracy.Value) = processor.GetScoreAndAccuracy(mode, LastHeader.MaxCombo, LastHeader.Statistics);
-
-                currentCombo.Value = LastHeader.Combo;
+                SetFrame(Frames.Last());
             }
+
+            protected void SetFrame(TimedFrame frame)
+            {
+                var header = frame.Header;
+
+                Score.Value = ScoreProcessor.GetImmediateScore(ScoringMode.Value, header.MaxCombo, header.Statistics);
+                Accuracy.Value = header.Accuracy;
+                CurrentCombo.Value = header.Combo;
+            }
+        }
+
+        protected class TimedFrame : IComparable<TimedFrame>
+        {
+            public readonly double Time;
+            public readonly FrameHeader Header;
+
+            public TimedFrame(double time)
+            {
+                Time = time;
+            }
+
+            public TimedFrame(double time, FrameHeader header)
+            {
+                Time = time;
+                Header = header;
+            }
+
+            public int CompareTo(TimedFrame other) => Time.CompareTo(other.Time);
         }
     }
 }
