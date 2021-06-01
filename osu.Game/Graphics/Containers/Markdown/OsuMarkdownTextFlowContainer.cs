@@ -4,7 +4,9 @@
 using Markdig.Syntax.Inlines;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays;
 
@@ -24,5 +26,32 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         protected override SpriteText CreateEmphasisedSpriteText(bool bold, bool italic)
             => CreateSpriteText().With(t => t.Font = t.Font.With(weight: bold ? FontWeight.Bold : FontWeight.Regular, italics: italic));
+
+        private class OsuMarkdownInlineCode : Container
+        {
+            [Resolved]
+            private IMarkdownTextComponent parentTextComponent { get; set; }
+
+            public string Text;
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                AutoSizeAxes = Axes.Both;
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colourProvider.Background6,
+                    },
+                    parentTextComponent.CreateSpriteText().With(t =>
+                    {
+                        t.Colour = colourProvider.Light1;
+                        t.Text = Text;
+                    }),
+                };
+            }
+        }
     }
 }
