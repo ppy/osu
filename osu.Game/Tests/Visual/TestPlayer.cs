@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Judgements;
@@ -46,6 +47,20 @@ namespace osu.Game.Tests.Visual
             })
         {
             PauseOnFocusLost = pauseOnFocusLost;
+        }
+
+        protected override void PrepareReplay()
+        {
+            var replayGeneratingMod = Mods.Value.OfType<ICreateReplay>().FirstOrDefault();
+
+            if (replayGeneratingMod != null)
+            {
+                // This logic should really not exist (and tests should be instantiating a ReplayPlayer), but a lot of base work is required to make that happen.
+                DrawableRuleset?.SetReplayScore(replayGeneratingMod.CreateReplayScore(GameplayBeatmap.PlayableBeatmap, Mods.Value));
+                return;
+            }
+
+            base.PrepareReplay();
         }
 
         [BackgroundDependencyLoader]
