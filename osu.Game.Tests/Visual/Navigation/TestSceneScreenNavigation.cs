@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
 
-            AddStep("set autoplay", () => Game.SelectedMods.Value = new[] { new OsuModAutoplay() });
+            AddStep("set nofail", () => Game.SelectedMods.Value = new[] { new OsuModNoFail() });
 
             AddStep("press enter", () => InputManager.Key(Key.Enter));
             AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
