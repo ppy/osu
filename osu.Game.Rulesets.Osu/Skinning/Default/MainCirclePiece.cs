@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class MainCirclePiece : CompositeDrawable, IMainCirclePiece
+    public class MainCirclePiece : CompositeDrawable
     {
         private readonly CirclePiece circle;
         private readonly RingPiece ring;
@@ -70,17 +70,19 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             indexInCurrentCombo.BindValueChanged(index => number.Text = (index.NewValue + 1).ToString(), true);
 
-            armedState.BindValueChanged(state => Animate(state.NewValue), true);
+            armedState.BindValueChanged(animate, true);
         }
 
-        public void Animate(ArmedState state)
+        private void animate(ValueChangedEvent<ArmedState> state)
         {
+            ClearTransforms(true);
+
             using (BeginAbsoluteSequence(drawableObject.StateUpdateTime))
                 glow.FadeOut(400);
 
             using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
             {
-                switch (state)
+                switch (state.NewValue)
                 {
                     case ArmedState.Hit:
                         const double flash_in = 40;
@@ -93,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                         explode.FadeIn(flash_in);
                         this.ScaleTo(1.5f, 400, Easing.OutQuad);
 
-                        using (BeginDelayedSequence(flash_in, true))
+                        using (BeginDelayedSequence(flash_in))
                         {
                             // after the flash, we can hide some elements that were behind it
                             ring.FadeOut();
