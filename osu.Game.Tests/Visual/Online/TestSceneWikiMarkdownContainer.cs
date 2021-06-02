@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestLink()
         {
-            AddStep("set current path", () => markdownContainer.CurrentPath = "Article_styling_criteria/");
+            AddStep("set current path", () => markdownContainer.CurrentPath = $"{API.WebsiteRootUrl}/wiki/Article_styling_criteria/");
 
             AddStep("set '/wiki/Main_Page''", () => markdownContainer.Text = "[wiki main page](/wiki/Main_Page)");
             AddAssert("check url", () => markdownContainer.Link.Url == $"{API.WebsiteRootUrl}/wiki/Main_Page");
@@ -113,7 +113,7 @@ needs_cleanup: true
             AddStep("Add relative image", () =>
             {
                 markdownContainer.DocumentUrl = "https://dev.ppy.sh";
-                markdownContainer.CurrentPath = "Interface/";
+                markdownContainer.CurrentPath = $"{API.WebsiteRootUrl}/wiki/Interface/";
                 markdownContainer.Text = "![intro](img/intro-screen.jpg)";
             });
         }
@@ -124,7 +124,7 @@ needs_cleanup: true
             AddStep("Add paragraph with block image", () =>
             {
                 markdownContainer.DocumentUrl = "https://dev.ppy.sh";
-                markdownContainer.CurrentPath = "Interface/";
+                markdownContainer.CurrentPath = $"{API.WebsiteRootUrl}/wiki/Interface/";
                 markdownContainer.Text = @"Line before image
 
 ![play menu](img/play-menu.jpg ""Main Menu in osu!"")

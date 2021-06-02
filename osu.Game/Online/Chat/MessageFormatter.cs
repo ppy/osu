@@ -167,10 +167,13 @@ namespace osu.Game.Online.Chat
                             case "u":
                             case "users":
                                 return new LinkDetails(LinkAction.OpenUserProfile, mainArg);
+
+                            case "wiki":
+                                return new LinkDetails(LinkAction.OpenWiki, string.Join('/', args.Skip(3)));
                         }
                     }
 
-                    return new LinkDetails(LinkAction.External, null);
+                    return new LinkDetails(LinkAction.External, url);
 
                 case "osu":
                     // every internal link also needs some kind of argument
@@ -311,7 +314,8 @@ namespace osu.Game.Online.Chat
         JoinMultiplayerMatch,
         Spectate,
         OpenUserProfile,
-        Custom
+        OpenWiki,
+        Custom,
     }
 
     public class Link : IComparable<Link>
