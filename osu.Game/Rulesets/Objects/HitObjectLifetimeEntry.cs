@@ -94,6 +94,6 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Set <see cref="LifetimeEntry.LifetimeStart"/> using <see cref="InitialLifetimeOffset"/>.
         /// </summary>
-        public void SetInitialLifetime() => LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
+        internal void SetInitialLifetime() => LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
     }
 }
