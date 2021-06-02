@@ -92,6 +92,41 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("Lifetime is correct", () => dho.LifetimeStart == TestDrawableHitObject.LIFETIME_ON_APPLY && entry.LifetimeStart == TestDrawableHitObject.LIFETIME_ON_APPLY);
         }
 
+        [Test]
+        public void TestDrawableLifetimeUpdateOnEntryLifetimeChange()
+        {
+            TestDrawableHitObject dho = null;
+            TestLifetimeEntry entry = null;
+            AddStep("Create DHO", () =>
+            {
+                dho = new TestDrawableHitObject(null);
+                dho.Apply(entry = new TestLifetimeEntry(new HitObject()));
+                Child = dho;
+            });
+
+            AddStep("Set entry lifetime", () =>
+            {
+                entry.LifetimeStart = 777;
+                entry.LifetimeEnd = 888;
+            });
+            AddAssert("Drawable lifetime is updated", () => dho.LifetimeStart == 777 && dho.LifetimeEnd == 888);
+
+            AddStep("KeepAlive = true", () => entry.KeepAlive = true);
+            AddAssert("Drawable lifetime is updated", () => dho.LifetimeStart == double.MinValue && dho.LifetimeEnd == double.MaxValue);
+
+            AddStep("Modify start time", () => entry.HitObject.StartTime = 100);
+            AddAssert("Drawable lifetime is correct", () => dho.LifetimeStart == double.MinValue);
+
+            AddStep("Set LifetimeStart", () => dho.LifetimeStart = 666);
+            AddAssert("Lifetime change is blocked", () => dho.LifetimeStart == double.MinValue);
+
+            AddStep("Set LifetimeEnd", () => dho.LifetimeEnd = 999);
+            AddAssert("Lifetime change is blocked", () => dho.LifetimeEnd == double.MaxValue);
+
+            AddStep("KeepAlive = false", () => entry.KeepAlive = false);
+            AddAssert("Drawable lifetime is restored", () => dho.LifetimeStart == 666 && dho.LifetimeEnd == 999);
+        }
+
         private class TestDrawableHitObject : DrawableHitObject
         {
             public const double INITIAL_LIFETIME_OFFSET = 100;
