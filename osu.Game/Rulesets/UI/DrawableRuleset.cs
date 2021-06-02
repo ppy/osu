@@ -182,16 +182,9 @@ namespace osu.Game.Rulesets.UI
                         .WithChild(ResumeOverlay)));
             }
 
-            RegenerateAutoplay();
+            applyRulesetMods(Mods, config);
 
             loadObjects(cancellationToken ?? default);
-        }
-
-        public void RegenerateAutoplay()
-        {
-            // for now this is applying mods which aren't just autoplay.
-            // we'll need to reconsider this flow in the future.
-            applyRulesetMods(Mods, config);
         }
 
         /// <summary>
@@ -348,9 +341,6 @@ namespace osu.Game.Rulesets.UI
 
             foreach (var mod in mods.OfType<IApplicableToDrawableRuleset<TObject>>())
                 mod.ApplyToDrawableRuleset(this);
-
-            foreach (var mod in mods.OfType<ICreateReplay>())
-                SetReplayScore(mod.CreateReplayScore(Beatmap, mods));
 
             foreach (var mod in mods.OfType<IReadFromConfig>())
                 mod.ReadFromConfig(config);
