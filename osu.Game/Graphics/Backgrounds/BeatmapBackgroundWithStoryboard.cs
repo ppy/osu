@@ -21,14 +21,11 @@ namespace osu.Game.Graphics.Backgrounds
         {
             LoadComponentAsync(new DrawableStoryboard(Beatmap.Storyboard)
                 {
-                    Alpha = 0,
                     Clock = new InterpolatingFramedClock(Beatmap.Track),
                 },
                 loaded =>
                 {
                     AddInternal(loaded);
-                    loaded.FadeIn(300, Easing.OutQuint);
-
                     if (Beatmap.Storyboard.ReplacesBackground)
                         Sprite.FadeOut(300, Easing.OutQuint);
                 });
