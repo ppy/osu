@@ -13,16 +13,21 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly string fallbackTextureName;
 
+        [Resolved]
+        private LargeTextureStore textures { get; set; }
+
         public BeatmapBackground(WorkingBeatmap beatmap, string fallbackTextureName = @"Backgrounds/bg1")
         {
             Beatmap = beatmap;
             this.fallbackTextureName = fallbackTextureName;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(LargeTextureStore textures)
+        protected override void LoadComplete()
         {
-            Sprite.Texture = Beatmap?.Background ?? textures.Get(fallbackTextureName);
+            base.LoadComplete();
+            Initialize();
         }
+
+        protected virtual void Initialize() => Sprite.Texture = Beatmap?.Background ?? textures.Get(fallbackTextureName);
     }
 }
