@@ -41,6 +41,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
+        private readonly IBindable<ArmedState> armedState = new Bindable<ArmedState>();
 
         [Resolved]
         private DrawableHitObject drawableObject { get; set; }
@@ -115,6 +116,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             accentColour.BindTo(drawableObject.AccentColour);
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
+            armedState.BindTo(drawableObject.State);
 
             Texture getTextureWithFallback(string name)
             {
@@ -139,6 +141,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             accentColour.BindValueChanged(colour => hitCircleSprite.Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue), true);
             if (hasNumber)
                 indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
+
+            armedState.BindValueChanged(state => Animate(state.NewValue), true);
         }
 
         public void Animate(ArmedState state)
