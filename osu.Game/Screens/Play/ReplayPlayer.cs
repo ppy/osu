@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
@@ -16,8 +15,6 @@ namespace osu.Game.Screens.Play
 {
     public class ReplayPlayer : Player, IKeyBindingHandler<GlobalAction>
     {
-        protected Score Score { get; private set; }
-
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
         // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
@@ -34,28 +31,15 @@ namespace osu.Game.Screens.Play
             this.createScore = createScore;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            if (!LoadedBeatmapSuccessfully) return;
-
-            Score = createScore(GameplayBeatmap.PlayableBeatmap, Mods.Value);
-        }
-
         protected override void PrepareReplay()
         {
             DrawableRuleset?.SetReplayScore(Score);
+
+            // todo: move to base class along with Score?
+            ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(Score.ScoreInfo);
         }
 
-        protected override Score CreateScore()
-        {
-            var baseScore = base.CreateScore();
-
-            // Since the replay score doesn't contain statistics, we'll pass them through here.
-            Score.ScoreInfo.HitEvents = baseScore.ScoreInfo.HitEvents;
-
-            return Score;
-        }
+        protected override Score CreateScore() => createScore(GameplayBeatmap.PlayableBeatmap, Mods.Value);
 
         // Don't re-import replay scores as they're already present in the database.
         protected override Task ImportScore(Score score) => Task.CompletedTask;
