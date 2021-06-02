@@ -42,6 +42,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
+        private readonly IBindable<ArmedState> armedState = new Bindable<ArmedState>();
 
         [Resolved]
         private DrawableHitObject drawableObject { get; set; }
@@ -53,6 +54,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
             accentColour.BindTo(drawableObject.AccentColour);
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
+            armedState.BindTo(drawableObject.State);
         }
 
         protected override void LoadComplete()
@@ -67,6 +69,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             }, true);
 
             indexInCurrentCombo.BindValueChanged(index => number.Text = (index.NewValue + 1).ToString(), true);
+
+            armedState.BindValueChanged(state => Animate(state.NewValue), true);
         }
 
         public void Animate(ArmedState state)
