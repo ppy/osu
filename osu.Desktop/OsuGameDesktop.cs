@@ -57,7 +57,7 @@ namespace osu.Desktop
 
         private string getStableInstallPath()
         {
-            static bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs"));
+            static bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs")) || File.Exists("osu!.cfg");
 
             string stableInstallPath;
 
