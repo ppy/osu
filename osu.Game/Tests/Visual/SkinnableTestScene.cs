@@ -52,9 +52,7 @@ namespace osu.Game.Tests.Visual
 
         private readonly List<Drawable> createdDrawables = new List<Drawable>();
 
-        public void SetContents(Func<Drawable> creationFunction) => SetContents(_ => creationFunction?.Invoke());
-
-        public void SetContents(Func<ISkin, Drawable> creationFunction)
+        protected void SetContents(Func<ISkin, Drawable> creationFunction)
         {
             createdDrawables.Clear();
 
