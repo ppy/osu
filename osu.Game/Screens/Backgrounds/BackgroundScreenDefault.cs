@@ -110,6 +110,10 @@ namespace osu.Game.Screens.Backgrounds
                         newBackground = new BeatmapBackground(beatmap.Value, backgroundName);
                         break;
 
+                    case BackgroundSource.BeatmapWithStoryboard:
+                        newBackground = new BeatmapBackgroundWithStoryboard(beatmap.Value, backgroundName);
+                        break;
+
                     default:
                         newBackground = new SkinnedBackground(skin.Value, backgroundName);
                         break;
