@@ -18,6 +18,9 @@ namespace osu.Game.Screens.Play
     {
         private readonly Score score;
 
+        [Resolved]
+        private SpectatorClient spectatorClient { get; set; }
+
         protected override bool CheckModsAllowFailure() => false; // todo: better support starting mid-way through beatmap
 
         public SpectatorPlayer(Score score)
@@ -25,13 +28,10 @@ namespace osu.Game.Screens.Play
             this.score = score;
         }
 
-        protected override ResultsScreen CreateResults(ScoreInfo score)
-        {
-            return new SpectatorResultsScreen(score);
-        }
+        protected override Score CreateScore() => score;
 
-        [Resolved]
-        private SpectatorClient spectatorClient { get; set; }
+        protected override ResultsScreen CreateResults(ScoreInfo score)
+            => new SpectatorResultsScreen(score);
 
         [BackgroundDependencyLoader]
         private void load()
