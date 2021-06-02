@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual
 
         private readonly List<Drawable> createdDrawables = new List<Drawable>();
 
-        public void SetContents(Func<Drawable> creationFunction)
+        protected void SetContents(Func<ISkin, Drawable> creationFunction)
         {
             createdDrawables.Clear();
 
@@ -67,9 +67,9 @@ namespace osu.Game.Tests.Visual
 
         protected IEnumerable<Drawable> CreatedDrawables => createdDrawables;
 
-        private Drawable createProvider(Skin skin, Func<Drawable> creationFunction, IBeatmap beatmap)
+        private Drawable createProvider(Skin skin, Func<ISkin, Drawable> creationFunction, IBeatmap beatmap)
         {
-            var created = creationFunction();
+            var created = creationFunction(skin);
 
             createdDrawables.Add(created);
 
