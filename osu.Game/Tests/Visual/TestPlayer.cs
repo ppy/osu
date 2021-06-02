@@ -51,9 +51,15 @@ namespace osu.Game.Tests.Visual
 
         protected override void PrepareReplay()
         {
+            // Generally, replay generation is handled by whatever is constructing the player.
+            // This is implemented locally here to ease migration of test scenes that have some executions
+            // running with autoplay and some not, but are not written in a way that lends to instantiating
+            // different `Player` types.
+            //
+            // Eventually we will want to remove this and update all test usages which rely on autoplay to use
+            // a `TestReplayPlayer`.
             var autoplayMod = Mods.Value.OfType<ModAutoplay>().FirstOrDefault();
 
-            // This logic should really not exist (and tests should be instantiating a ReplayPlayer), but a lot of base work is required to make that happen.
             if (autoplayMod != null)
             {
                 DrawableRuleset?.SetReplayScore(autoplayMod.CreateReplayScore(GameplayBeatmap.PlayableBeatmap, Mods.Value));
