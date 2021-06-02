@@ -3,9 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -38,8 +36,6 @@ namespace osu.Game.Tests.Visual
 
         public new bool PauseCooldownActive => base.PauseCooldownActive;
 
-        public readonly List<JudgementResult> Results = new List<JudgementResult>();
-
         /// <summary>
         /// Instantiate a replay player that renders an autoplay mod.
         /// </summary>
@@ -64,12 +60,6 @@ namespace osu.Game.Tests.Visual
             })
         {
             PauseOnFocusLost = pauseOnFocusLost;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            ScoreProcessor.NewJudgement += r => Results.Add(r);
         }
     }
 }
