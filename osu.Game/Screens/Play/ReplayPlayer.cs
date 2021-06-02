@@ -34,9 +34,6 @@ namespace osu.Game.Screens.Play
         protected override void PrepareReplay()
         {
             DrawableRuleset?.SetReplayScore(Score);
-
-            // todo: move to base class along with Score?
-            ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(Score.ScoreInfo);
         }
 
         protected override Score CreateScore() => createScore(GameplayBeatmap.PlayableBeatmap, Mods.Value);
