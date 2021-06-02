@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create editor overlay", () =>
             {
-                SetContents(() =>
+                SetContents(_ =>
                 {
                     var ruleset = new OsuRuleset();
                     var mods = new[] { ruleset.GetAutoplayMod() };
