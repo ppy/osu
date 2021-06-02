@@ -98,7 +98,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private const double sfx_rank_impact_volume = 1.0f;
 
         // applause
-        private const bool sfx_applause_enabled = true;
         private const double sfx_applause_pre_delay = 545f;
         private const double sfx_applause_volume = 0.8f;
 
@@ -115,29 +114,19 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private DrawableSample badgeTickSound;
         private DrawableSample badgeMaxSound;
         private DrawableSample swooshUpSound;
-        private DrawableSample rankDImpactSound;
-        private DrawableSample rankBImpactSound;
-        private DrawableSample rankCImpactSound;
-        private DrawableSample rankAImpactSound;
-        private DrawableSample rankSImpactSound;
-        private DrawableSample rankSSImpactSound;
-        private DrawableSample rankDApplauseSound;
-        private DrawableSample rankBApplauseSound;
-        private DrawableSample rankCApplauseSound;
-        private DrawableSample rankAApplauseSound;
-        private DrawableSample rankSApplauseSound;
-        private DrawableSample rankSSApplauseSound;
+        private DrawableSample rankImpactSound;
+        private DrawableSample rankApplauseSound;
 
         private Bindable<double> tickPlaybackRate = new Bindable<double>();
         private double lastTickPlaybackTime;
         private bool isTicking;
 
-        private readonly bool withFlair;
+        private readonly bool sfxEnabled;
 
-        public AccuracyCircle(ScoreInfo score, bool withFlair)
+        public AccuracyCircle(ScoreInfo score, bool sfxEnabled = false)
         {
             this.score = score;
-            this.withFlair = withFlair;
+            this.sfxEnabled = sfxEnabled;
         }
 
         [BackgroundDependencyLoader]
@@ -261,28 +250,53 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 rankText = new RankText(score.Rank)
             };
 
-            if (withFlair)
+            if (sfxEnabled)
             {
                 tickPlaybackRate = new Bindable<double>(sfx_score_tick_debounce_rate_start);
 
+                switch (score.Rank)
+                {
+                    case ScoreRank.D:
+                        rankImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_D)) as DrawableSample;
+                        rankApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_D)) as DrawableSample;
+                        break;
+
+                    case ScoreRank.C:
+                        rankImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_C)) as DrawableSample;
+                        rankApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_C)) as DrawableSample;
+                        break;
+
+                    case ScoreRank.B:
+                        rankImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_B)) as DrawableSample;
+                        rankApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_B)) as DrawableSample;
+                        break;
+
+                    case ScoreRank.A:
+                        rankImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_A)) as DrawableSample;
+                        rankApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_A)) as DrawableSample;
+                        break;
+
+                    case ScoreRank.S:
+                    case ScoreRank.SH:
+                        rankImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_S)) as DrawableSample;
+                        rankApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_S)) as DrawableSample;
+                        break;
+
+                    case ScoreRank.X:
+                    case ScoreRank.XH:
+                        rankImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_SS)) as DrawableSample;
+                        rankApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_SS)) as DrawableSample;
+                        break;
+                }
+
                 AddRangeInternal(new Drawable[]
                 {
+                    rankImpactSound,
+                    rankApplauseSound,
                     scoreTickSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultScoreTick)) as DrawableSample,
                     badgeTickSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultBadgeTick)) as DrawableSample,
                     badgeMaxSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultBadgeTickMax)) as DrawableSample,
-                    swooshUpSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultSwooshUp)) as DrawableSample,
-                    rankDImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_D)) as DrawableSample,
-                    rankBImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_B)) as DrawableSample,
-                    rankCImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_C)) as DrawableSample,
-                    rankAImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_A)) as DrawableSample,
-                    rankSImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_S)) as DrawableSample,
-                    rankSSImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_SS)) as DrawableSample,
-                    rankDApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_D)) as DrawableSample,
-                    rankBApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_B)) as DrawableSample,
-                    rankCApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_C)) as DrawableSample,
-                    rankAApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_A)) as DrawableSample,
-                    rankSApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_S)) as DrawableSample,
-                    rankSSApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_SS)) as DrawableSample
+                    swooshUpSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultSwooshUp)) as DrawableSample
                 });
             }
         }
@@ -315,7 +329,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
             this.ScaleTo(0).Then().ScaleTo(1, APPEAR_DURATION, Easing.OutQuint);
 
-            if (swooshUpSound != null)
+            if (sfxEnabled)
             {
                 this.Delay(sfx_swoosh_pre_delay).Schedule(() =>
                 {
@@ -333,18 +347,17 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
                 accuracyCircle.FillTo(targetAccuracy, ACCURACY_TRANSFORM_DURATION, ACCURACY_TRANSFORM_EASING);
 
-                Schedule(() =>
+                if (sfxEnabled)
                 {
-                    if (scoreTickSound != null)
+                    Schedule(() =>
                     {
-                        // doesn't work
-                        scoreTickSound.FrequencyTo(1).Then().FrequencyTo(1 + targetAccuracy, ACCURACY_TRANSFORM_DURATION, sfx_score_tick_pitch_easing);
+                        scoreTickSound.FrequencyTo(1 + targetAccuracy, ACCURACY_TRANSFORM_DURATION, sfx_score_tick_pitch_easing);
                         scoreTickSound.VolumeTo(sfx_score_tick_volume_start).Then().VolumeTo(sfx_score_tick_volume_end, ACCURACY_TRANSFORM_DURATION, sfx_score_tick_volume_easing);
                         this.TransformBindableTo(tickPlaybackRate, sfx_score_tick_debounce_rate_end, ACCURACY_TRANSFORM_DURATION, sfx_score_tick_debounce_rate_easing);
-                    }
 
-                    isTicking = true;
-                });
+                        isTicking = true;
+                    });
+                }
 
                 int badgeNum = 0;
 
@@ -353,20 +366,20 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     if (badge.Accuracy > score.Accuracy)
                         continue;
 
-                    using (BeginDelayedSequence(inverseEasing(ACCURACY_TRANSFORM_EASING, Math.Min(1 - virtual_ss_percentage, badge.Accuracy) / targetAccuracy) * ACCURACY_TRANSFORM_DURATION, true))
+                    using (BeginDelayedSequence(inverseEasing(ACCURACY_TRANSFORM_EASING, Math.Min(1 - virtual_ss_percentage, badge.Accuracy) / targetAccuracy) * ACCURACY_TRANSFORM_DURATION))
                     {
                         badge.Appear();
 
-                        Schedule(() =>
+                        if (sfxEnabled)
                         {
-                            DrawableSample dink = badgeNum < badges.Count - 1 ? badgeTickSound : badgeMaxSound;
-
-                            if (dink == null) return;
-
-                            dink.FrequencyTo(1 + badgeNum++ * 0.05);
-                            dink.VolumeTo(sfx_badge_dink_volume);
-                            dink.Play();
-                        });
+                            Schedule(() =>
+                            {
+                                DrawableSample dink = badgeNum < badges.Count - 1 ? badgeTickSound : badgeMaxSound;
+                                dink.FrequencyTo(1 + badgeNum++ * 0.05);
+                                dink.VolumeTo(sfx_badge_dink_volume);
+                                dink.Play();
+                            });
+                        }
                     }
                 }
 
@@ -374,88 +387,21 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 {
                     rankText.Appear();
 
+                    if (!sfxEnabled) return;
+
                     Schedule(() =>
                     {
                         isTicking = false;
-
-                        DrawableSample impact = null;
-
-                        switch (score.Rank)
-                        {
-                            case ScoreRank.D:
-                                impact = rankDImpactSound;
-                                break;
-
-                            case ScoreRank.C:
-                                impact = rankCImpactSound;
-                                break;
-
-                            case ScoreRank.B:
-                                impact = rankBImpactSound;
-                                break;
-
-                            case ScoreRank.A:
-                                impact = rankAImpactSound;
-                                break;
-
-                            case ScoreRank.S:
-                            case ScoreRank.SH:
-                                impact = rankSImpactSound;
-                                break;
-
-                            case ScoreRank.X:
-                            case ScoreRank.XH:
-                                impact = rankSSImpactSound;
-                                break;
-                        }
-
-                        if (impact == null) return;
-
-                        impact.VolumeTo(sfx_rank_impact_volume);
-                        impact.Play();
+                        rankImpactSound.VolumeTo(sfx_rank_impact_volume);
+                        rankImpactSound.Play();
                     });
 
                     using (BeginDelayedSequence(sfx_applause_pre_delay))
                     {
-                        if (!sfx_applause_enabled) return;
-
                         Schedule(() =>
                         {
-                            DrawableSample applause = null;
-
-                            switch (score.Rank)
-                            {
-                                case ScoreRank.D:
-                                    applause = rankDApplauseSound;
-                                    break;
-
-                                case ScoreRank.C:
-                                    applause = rankCApplauseSound;
-                                    break;
-
-                                case ScoreRank.B:
-                                    applause = rankBApplauseSound;
-                                    break;
-
-                                case ScoreRank.A:
-                                    applause = rankAApplauseSound;
-                                    break;
-
-                                case ScoreRank.S:
-                                case ScoreRank.SH:
-                                    applause = rankSApplauseSound;
-                                    break;
-
-                                case ScoreRank.X:
-                                case ScoreRank.XH:
-                                    applause = rankSSApplauseSound;
-                                    break;
-                            }
-
-                            if (applause == null) return;
-
-                            applause.VolumeTo(sfx_applause_volume);
-                            applause.Play();
+                            rankApplauseSound.VolumeTo(sfx_applause_volume);
+                            rankApplauseSound.Play();
                         });
                     }
                 }
