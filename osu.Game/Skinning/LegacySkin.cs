@@ -362,45 +362,32 @@ namespace osu.Game.Skinning
                                 }
                             })
                             {
-                                Children = new[]
-                                {
-                                    // TODO: these should fallback to the osu!classic skin.
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ComboCounter)) ?? new DefaultComboCounter(),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreCounter)) ?? new DefaultScoreCounter(),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter)) ?? new DefaultAccuracyCounter(),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.HealthDisplay)) ?? new DefaultHealthDisplay(),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.SongProgress)) ?? new SongProgress(),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.BarHitErrorMeter)) ?? new BarHitErrorMeter(),
-                                }
+                                Children = this.HasFont(LegacyFont.Score)
+                                    ? new Drawable[]
+                                    {
+                                        new LegacyComboCounter(),
+                                        new LegacyScoreCounter(),
+                                        new LegacyAccuracyCounter(),
+                                        new LegacyHealthDisplay(),
+                                        new SongProgress(),
+                                        new BarHitErrorMeter(),
+                                    }
+                                    : new Drawable[]
+                                    {
+                                        // TODO: these should fallback to using osu!classic skin textures, rather than doing this.
+                                        new DefaultComboCounter(),
+                                        new DefaultScoreCounter(),
+                                        new DefaultAccuracyCounter(),
+                                        new DefaultHealthDisplay(),
+                                        new SongProgress(),
+                                        new BarHitErrorMeter(),
+                                    }
                             };
 
                             return skinnableTargetWrapper;
                     }
 
                     return null;
-
-                case HUDSkinComponent hudComponent:
-                {
-                    if (!this.HasFont(LegacyFont.Score))
-                        return null;
-
-                    switch (hudComponent.Component)
-                    {
-                        case HUDSkinComponents.ComboCounter:
-                            return new LegacyComboCounter();
-
-                        case HUDSkinComponents.ScoreCounter:
-                            return new LegacyScoreCounter();
-
-                        case HUDSkinComponents.AccuracyCounter:
-                            return new LegacyAccuracyCounter();
-
-                        case HUDSkinComponents.HealthDisplay:
-                            return new LegacyHealthDisplay();
-                    }
-
-                    return null;
-                }
 
                 case GameplaySkinComponent<HitResult> resultComponent:
                     Func<Drawable> createDrawable = () => getJudgementAnimation(resultComponent.Component);

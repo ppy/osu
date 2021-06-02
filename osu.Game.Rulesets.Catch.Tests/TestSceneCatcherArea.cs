@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 CircleSize = circleSize
             };
 
-            SetContents(() =>
+            SetContents(_ =>
             {
                 var droppedObjectContainer = new Container<CaughtObject>
                 {
