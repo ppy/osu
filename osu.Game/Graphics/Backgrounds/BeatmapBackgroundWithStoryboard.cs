@@ -11,8 +11,6 @@ namespace osu.Game.Graphics.Backgrounds
 {
     public class BeatmapBackgroundWithStoryboard : BeatmapBackground
     {
-        private DrawableStoryboard storyboard;
-
         public BeatmapBackgroundWithStoryboard(WorkingBeatmap beatmap, string fallbackTextureName = "Backgrounds/bg1")
             : base(beatmap, fallbackTextureName)
         {
@@ -21,20 +19,19 @@ namespace osu.Game.Graphics.Backgrounds
         [BackgroundDependencyLoader]
         private void load()
         {
-            var clock = new InterpolatingFramedClock(Beatmap.Track);
             LoadComponentAsync(new DrawableStoryboard(Beatmap.Storyboard)
-            {
-                Alpha = 0,
-                Clock = clock,
-            },
-            loaded =>
-            {
-                AddInternal(storyboard = loaded);
-                storyboard.FadeIn(300, Easing.OutQuint);
+                {
+                    Alpha = 0,
+                    Clock = new InterpolatingFramedClock(Beatmap.Track),
+                },
+                loaded =>
+                {
+                    AddInternal(loaded);
+                    loaded.FadeIn(300, Easing.OutQuint);
 
-                if (Beatmap.Storyboard.ReplacesBackground)
-                    Sprite.FadeOut(300, Easing.OutQuint);
-            });
+                    if (Beatmap.Storyboard.ReplacesBackground)
+                        Sprite.FadeOut(300, Easing.OutQuint);
+                });
         }
     }
 }
