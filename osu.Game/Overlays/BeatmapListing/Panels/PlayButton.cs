@@ -13,20 +13,22 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
-
 namespace osu.Game.Overlays.BeatmapListing.Panels
 {
     public class PlayButton : CompositeDrawable
     {
+        /// <summary>
+        /// Whether this button should be usable. If disabled, it will generally be hidden from view.
+        /// </summary>
+        public readonly BindableBool Disabled = new BindableBool();
+
         private const float transition_duration = 500;
 
         private Button button;
 
-        protected IBindable<bool> Disabled => disabled;
+        protected IBindable<bool> ShouldDisplay => shouldDisplay;
 
-        private readonly BindableBool disabled = new BindableBool();
-
-        public BindableBool AlwaysDisabled = new BindableBool();
+        private readonly BindableBool shouldDisplay = new BindableBool();
 
         public IBindable<bool> Playing => playing;
 
@@ -50,7 +52,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 Preview = null;
 
                 if (IsLoaded)
-                    updateEnabledState();
+                    updateDisabledState();
 
                 if (playing.Value)
                     playing.Value = false;
@@ -82,12 +84,12 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         {
             base.LoadComplete();
 
-            AlwaysDisabled.BindValueChanged(_ => updateEnabledState(), true);
+            Disabled.BindValueChanged(_ => updateDisabledState(), true);
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (Disabled.Value)
+            if (ShouldDisplay.Value)
                 return true;
 
             playing.Toggle();
@@ -142,14 +144,14 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 playing.Value = false;
         }
 
-        private void updateEnabledState()
+        private void updateDisabledState()
         {
-            var disabledValue = AlwaysDisabled.Value || BeatmapSet == null;
+            var disabledValue = Disabled.Value || BeatmapSet == null;
 
             if (playing.Value && disabledValue)
                 playing.Value = false;
 
-            disabled.Value = disabledValue;
+            shouldDisplay.Value = disabledValue;
         }
 
         private class Button : CompositeDrawable
@@ -180,10 +182,10 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 }
             }
 
-            public Button(PlayButton player)
+            public Button(PlayButton playButton)
             {
-                playing = player.Playing.GetBoundCopy();
-                disabled = player.Disabled.GetBoundCopy();
+                playing = playButton.Playing.GetBoundCopy();
+                disabled = playButton.ShouldDisplay.GetBoundCopy();
 
                 InternalChildren = new Drawable[]
                 {
@@ -207,8 +209,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 base.LoadComplete();
 
                 playing.BindValueChanged(_ => updateDisplay());
-                disabled.BindValueChanged(_ => updateDisplay());
-                updateDisplay();
+                disabled.BindValueChanged(_ => updateDisplay(), true);
             }
 
             protected override bool OnHover(HoverEvent e)

@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 progress.FadeTo(playing.NewValue ? 1 : 0, 100);
             }, true);
 
-            Disabled.BindValueChanged(_ => updateDisplay(), true);
+            ShouldDisplay.BindValueChanged(_ => updateDisplay(), true);
         }
 
         protected override void Update()
@@ -98,6 +98,6 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             base.OnHoverLost(e);
         }
 
-        private void updateDisplay() => background.FadeTo(IsHovered && !Disabled.Value ? 0.75f : 0.5f, 80);
+        private void updateDisplay() => background.FadeTo(IsHovered && !ShouldDisplay.Value ? 0.75f : 0.5f, 80);
     }
 }

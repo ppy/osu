@@ -158,7 +158,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 base.LoadComplete();
 
-                PlayButton.AlwaysDisabled.Value = true;
+                PlayButton.Disabled.Value = true;
             }
         }
     }
