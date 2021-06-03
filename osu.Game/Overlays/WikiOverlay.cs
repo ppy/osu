@@ -139,7 +139,7 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 CurrentPath = $@"{api.WebsiteRootUrl}/wiki/",
-                Text = "There is something wrong when fetching this page. [Back to main page.](Main_Page)",
+                Text = $"Something went wrong when trying to fetch page \"{path.Value}\".\n\n[Go back to main page.](Main_Page)",
                 DocumentMargin = new MarginPadding(0),
                 DocumentPadding = new MarginPadding
                 {
