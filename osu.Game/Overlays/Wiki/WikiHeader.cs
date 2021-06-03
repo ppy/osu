@@ -52,6 +52,7 @@ namespace osu.Game.Overlays.Wiki
 
         private void onCurrentChange(ValueChangedEvent<string> e)
         {
+            // Don't invoke page change when Header's Current doesn't change and current page is not blank
             if (e.NewValue == TabControl.Items.LastOrDefault() && WikiPageData.Value != null)
                 return;
 
