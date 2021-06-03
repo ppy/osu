@@ -18,7 +18,6 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Orange);
 
-        [Cached]
         private readonly Bindable<APIWikiPage> wikiPageData = new Bindable<APIWikiPage>(new APIWikiPage
         {
             Title = "Main Page",
@@ -82,7 +81,14 @@ namespace osu.Game.Tests.Visual.Online
             return result;
         }
 
-        private void dummyShowIndexPage() => wikiPageData.SetDefault();
+        private void dummyShowIndexPage()
+        {
+            wikiPageData.Value = new APIWikiPage
+            {
+                Title = "Main Page",
+                Path = "Main_Page",
+            };
+        }
 
         private void dummyShowParentPage()
         {
