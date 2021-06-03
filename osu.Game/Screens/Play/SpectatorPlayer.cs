@@ -1,11 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Spectator;
@@ -50,6 +48,7 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
 
             spectatorClient.OnNewFrames += userSentFrames;
+            seekToGameplay();
         }
 
         private void userSentFrames(int userId, FrameDataBundle bundle)
@@ -73,6 +72,20 @@ namespace osu.Game.Screens.Play
 
                 score.Replay.Frames.Add(convertedFrame);
             }
+
+            seekToGameplay();
+        }
+
+        private bool seekedToGameplay;
+
+        private void seekToGameplay()
+        {
+            if (seekedToGameplay || score.Replay.Frames.Count == 0)
+                return;
+
+            NonFrameStableSeek(score.Replay.Frames[0].Time);
+
+            seekedToGameplay = true;
         }
 
         protected override ResultsScreen CreateResults(ScoreInfo score)
@@ -83,17 +96,6 @@ namespace osu.Game.Screens.Play
         protected override void PrepareReplay()
         {
             DrawableRuleset?.SetReplayScore(score);
-        }
-
-        protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
-        {
-            // if we already have frames, start gameplay at the point in time they exist, should they be too far into the beatmap.
-            double? firstFrameTime = score.Replay.Frames.FirstOrDefault()?.Time;
-
-            if (firstFrameTime == null || firstFrameTime <= gameplayStart + 5000)
-                return base.CreateGameplayClockContainer(beatmap, gameplayStart);
-
-            return new MasterGameplayClockContainer(beatmap, firstFrameTime.Value, true);
         }
 
         public override bool OnExiting(IScreen next)
