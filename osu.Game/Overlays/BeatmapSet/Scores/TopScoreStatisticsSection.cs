@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -112,7 +111,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 accuracyColumn.Text = value.DisplayAccuracy;
                 maxComboColumn.Text = $@"{value.MaxCombo:N0}x";
-                ppColumn.Alpha = value.Beatmap?.Status == BeatmapSetOnlineStatus.Ranked ? 1 : 0;
+
+                ppColumn.Alpha = value.Beatmap?.Status.GrantsPerformancePoints() == true ? 1 : 0;
                 ppColumn.Text = $@"{value.PP:N0}";
 
                 statisticsColumns.ChildrenEnumerable = value.GetStatisticsForDisplay().Select(createStatisticsColumn);
@@ -204,7 +204,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 this.text = text;
             }
 
-            public LocalisedString Text
+            public string Text
             {
                 set => text.Text = value;
             }

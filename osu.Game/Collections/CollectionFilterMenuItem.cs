@@ -36,7 +36,19 @@ namespace osu.Game.Collections
         }
 
         public bool Equals(CollectionFilterMenuItem other)
-            => other != null && CollectionName.Value == other.CollectionName.Value;
+        {
+            if (other == null)
+                return false;
+
+            // collections may have the same name, so compare first on reference equality.
+            // this relies on the assumption that only one instance of the BeatmapCollection exists game-wide, managed by CollectionManager.
+            if (Collection != null)
+                return Collection == other.Collection;
+
+            // fallback to name-based comparison.
+            // this is required for special dropdown items which don't have a collection (all beatmaps / manage collections items below).
+            return CollectionName.Value == other.CollectionName.Value;
+        }
 
         public override int GetHashCode() => CollectionName.Value.GetHashCode();
     }

@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             base.UpdateTimeAndPosition(result);
 
-            if (!PlacementActive)
+            if (PlacementActive == PlacementState.Waiting)
                 Column = result.Playfield as Column;
         }
     }

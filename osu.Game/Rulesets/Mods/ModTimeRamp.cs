@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
         public abstract BindableBool AdjustPitch { get; }
 
+        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust) };
+
         public override string SettingDescription => $"{InitialRate.Value:N2}x to {FinalRate.Value:N2}x";
 
         private double finalRateTime;

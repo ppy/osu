@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = "flyte",
                 Id = 3103765,
                 IsOnline = true,
-                CurrentModeRank = 1111,
+                Statistics = new UserStatistics { GlobalRank = 1111 },
                 Country = new Country { FlagName = "JP" },
                 CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
             },
@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = "peppy",
                 Id = 2,
                 IsOnline = false,
-                CurrentModeRank = 2222,
+                Statistics = new UserStatistics { GlobalRank = 2222 },
                 Country = new Country { FlagName = "AU" },
                 CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                 IsSupporter = true,

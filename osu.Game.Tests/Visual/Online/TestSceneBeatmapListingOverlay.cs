@@ -30,13 +30,14 @@ namespace osu.Game.Tests.Visual.Online
 
             ((DummyAPIAccess)API).HandleRequest = req =>
             {
-                if (req is SearchBeatmapSetsRequest searchBeatmapSetsRequest)
+                if (!(req is SearchBeatmapSetsRequest searchBeatmapSetsRequest)) return false;
+
+                searchBeatmapSetsRequest.TriggerSuccess(new SearchBeatmapSetsResponse
                 {
-                    searchBeatmapSetsRequest.TriggerSuccess(new SearchBeatmapSetsResponse
-                    {
-                        BeatmapSets = setsForResponse,
-                    });
-                }
+                    BeatmapSets = setsForResponse,
+                });
+
+                return true;
             };
         }
 

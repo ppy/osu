@@ -28,7 +28,7 @@ using osuTK;
 namespace osu.Game.Screens.OnlinePlay
 {
     [Cached]
-    public abstract class OnlinePlayScreen : OsuScreen
+    public abstract class OnlinePlayScreen : OsuScreen, IHasSubScreenStack
     {
         public override bool CursorVisible => (screenStack.CurrentScreen as IOnlinePlaySubScreen)?.CursorVisible ?? true;
 
@@ -355,5 +355,7 @@ namespace osu.Game.Screens.OnlinePlay
                 protected override double TransformDuration => 200;
             }
         }
+
+        ScreenStack IHasSubScreenStack.SubScreenStack => screenStack;
     }
 }

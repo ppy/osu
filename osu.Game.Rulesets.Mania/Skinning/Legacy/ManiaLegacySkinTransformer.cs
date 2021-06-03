@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     break;
             }
 
-            return null;
+            return Source.GetDrawableComponent(component);
         }
 
         private Drawable getResult(HitResult result)
@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             return animation == null ? null : new LegacyManiaJudgementPiece(result, animation);
         }
 
-        public override Sample GetSample(ISampleInfo sampleInfo)
+        public override ISample GetSample(ISampleInfo sampleInfo)
         {
             // layered hit sounds never play in mania
             if (sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacySample && legacySample.IsLayered)

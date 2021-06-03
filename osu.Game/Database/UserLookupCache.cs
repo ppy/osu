@@ -28,7 +28,7 @@ namespace osu.Game.Database
         public Task<User> GetUserAsync(int userId, CancellationToken token = default) => GetAsync(userId, token);
 
         protected override async Task<User> ComputeValueAsync(int lookup, CancellationToken token = default)
-            => await queryUser(lookup);
+            => await queryUser(lookup).ConfigureAwait(false);
 
         private readonly Queue<(int id, TaskCompletionSource<User>)> pendingUserTasks = new Queue<(int, TaskCompletionSource<User>)>();
         private Task pendingRequestTask;

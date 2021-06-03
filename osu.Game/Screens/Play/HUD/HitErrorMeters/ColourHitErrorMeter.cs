@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -19,14 +18,13 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private readonly JudgementFlow judgementsFlow;
 
-        public ColourHitErrorMeter(HitWindows hitWindows)
-            : base(hitWindows)
+        public ColourHitErrorMeter()
         {
             AutoSizeAxes = Axes.Both;
             InternalChild = judgementsFlow = new JudgementFlow();
         }
 
-        public override void OnNewJudgement(JudgementResult judgement) => judgementsFlow.Push(GetColourForHitResult(HitWindows.ResultFor(judgement.TimeOffset)));
+        protected override void OnNewJudgement(JudgementResult judgement) => judgementsFlow.Push(GetColourForHitResult(judgement.Type));
 
         private class JudgementFlow : FillFlowContainer<HitErrorCircle>
         {

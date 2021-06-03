@@ -13,10 +13,11 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultHealthDisplay : HealthDisplay, IHasAccentColour
+    public class DefaultHealthDisplay : HealthDisplay, IHasAccentColour, ISkinnableDrawable
     {
         /// <summary>
         /// The base opacity of the glow.
@@ -77,7 +78,7 @@ namespace osu.Game.Screens.Play.HUD
             RelativeSizeAxes = Axes.X;
             Margin = new MarginPadding { Top = 20 };
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {
@@ -107,7 +108,7 @@ namespace osu.Game.Screens.Play.HUD
             GlowColour = colours.BlueDarker;
         }
 
-        public override void Flash(JudgementResult result) => Scheduler.AddOnce(flash);
+        protected override void Flash(JudgementResult result) => Scheduler.AddOnce(flash);
 
         private void flash()
         {

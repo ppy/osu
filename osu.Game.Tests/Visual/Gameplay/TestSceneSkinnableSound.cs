@@ -145,7 +145,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public Drawable GetDrawableComponent(ISkinComponent component) => source?.GetDrawableComponent(component);
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => source?.GetTexture(componentName, wrapModeS, wrapModeT);
-            public Sample GetSample(ISampleInfo sampleInfo) => source?.GetSample(sampleInfo);
+            public ISample GetSample(ISampleInfo sampleInfo) => source?.GetSample(sampleInfo);
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => source?.GetConfig<TLookup, TValue>(lookup);
 
             public void TriggerSourceChanged()

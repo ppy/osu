@@ -3,11 +3,10 @@
 
 using System.Buffers;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
 using MessagePack;
 using MessagePack.Formatters;
-using osu.Framework.Bindables;
+using osu.Game.Utils;
 
 namespace osu.Game.Online.API
 {
@@ -24,36 +23,7 @@ namespace osu.Game.Online.API
                 var stringBytes = new ReadOnlySequence<byte>(Encoding.UTF8.GetBytes(kvp.Key));
                 writer.WriteString(in stringBytes);
 
-                switch (kvp.Value)
-                {
-                    case Bindable<double> d:
-                        primitiveFormatter.Serialize(ref writer, d.Value, options);
-                        break;
-
-                    case Bindable<int> i:
-                        primitiveFormatter.Serialize(ref writer, i.Value, options);
-                        break;
-
-                    case Bindable<float> f:
-                        primitiveFormatter.Serialize(ref writer, f.Value, options);
-                        break;
-
-                    case Bindable<bool> b:
-                        primitiveFormatter.Serialize(ref writer, b.Value, options);
-                        break;
-
-                    case IBindable u:
-                        // A mod with unknown (e.g. enum) generic type.
-                        var valueMethod = u.GetType().GetProperty(nameof(IBindable<int>.Value));
-                        Debug.Assert(valueMethod != null);
-                        primitiveFormatter.Serialize(ref writer, valueMethod.GetValue(u), options);
-                        break;
-
-                    default:
-                        // fall back for non-bindable cases.
-                        primitiveFormatter.Serialize(ref writer, kvp.Value, options);
-                        break;
-                }
+                primitiveFormatter.Serialize(ref writer, ModUtils.GetSettingUnderlyingValue(kvp.Value), options);
             }
         }
 

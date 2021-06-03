@@ -64,12 +64,21 @@ namespace osu.Game.Input.Bindings
 
         protected override void ReloadMappings()
         {
+            var defaults = DefaultKeyBindings.ToList();
+
             if (ruleset != null && !ruleset.ID.HasValue)
                 // if the provided ruleset is not stored to the database, we have no way to retrieve custom bindings.
                 // fallback to defaults instead.
-                KeyBindings = DefaultKeyBindings;
+                KeyBindings = defaults;
             else
-                KeyBindings = store.Query(ruleset?.ID, variant).ToList();
+            {
+                KeyBindings = store.Query(ruleset?.ID, variant)
+                                   .OrderBy(b => defaults.FindIndex(d => (int)d.Action == b.IntAction))
+                                   // this ordering is important to ensure that we read entries from the database in the order
+                                   // enforced by DefaultKeyBindings. allow for song select to handle actions that may otherwise
+                                   // have been eaten by the music controller due to query order.
+                                   .ToList();
+            }
         }
     }
 }

@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.UI
         public int RecordFrameRate = 60;
 
         [Resolved(canBeNull: true)]
-        private SpectatorStreamingClient spectatorStreaming { get; set; }
+        private SpectatorClient spectatorClient { get; set; }
 
         [Resolved]
         private GameplayBeatmap gameplayBeatmap { get; set; }
@@ -49,13 +49,19 @@ namespace osu.Game.Rulesets.UI
 
             inputManager = GetContainingInputManager();
 
-            spectatorStreaming?.BeginPlaying(gameplayBeatmap, target);
+            spectatorClient?.BeginPlaying(gameplayBeatmap, target);
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            spectatorStreaming?.EndPlaying();
+            spectatorClient?.EndPlaying();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            recordFrame(false);
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -92,7 +98,7 @@ namespace osu.Game.Rulesets.UI
             {
                 target.Replay.Frames.Add(frame);
 
-                spectatorStreaming?.HandleFrame(frame);
+                spectatorClient?.HandleFrame(frame);
             }
         }
 

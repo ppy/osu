@@ -17,7 +17,7 @@ using osu.Game.Database;
 
 namespace osu.Android
 {
-    [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.FullUser, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = false, LaunchMode = LaunchMode.SingleInstance)]
+    [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.FullUser, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = false, LaunchMode = LaunchMode.SingleInstance, Exported = true)]
     [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osz", DataHost = "*", DataMimeType = "*/*")]
     [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osk", DataHost = "*", DataMimeType = "*/*")]
     [IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault }, DataMimeTypes = new[] { "application/zip", "application/octet-stream", "application/download", "application/x-zip", "application/x-zip-compressed" })]
@@ -100,15 +100,15 @@ namespace osu.Android
                 // copy to an arbitrary-access memory stream to be able to proceed with the import.
                 var copy = new MemoryStream();
                 using (var stream = ContentResolver.OpenInputStream(uri))
-                    await stream.CopyToAsync(copy);
+                    await stream.CopyToAsync(copy).ConfigureAwait(false);
 
                 lock (tasks)
                 {
                     tasks.Add(new ImportTask(copy, filename));
                 }
-            }));
+            })).ConfigureAwait(false);
 
-            await game.Import(tasks.ToArray());
+            await game.Import(tasks.ToArray()).ConfigureAwait(false);
         }, TaskCreationOptions.LongRunning);
     }
 }

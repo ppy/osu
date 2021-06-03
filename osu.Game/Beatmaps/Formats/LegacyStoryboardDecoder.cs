@@ -45,8 +45,6 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override void ParseLine(Storyboard storyboard, Section section, string line)
         {
-            line = StripComments(line);
-
             switch (section)
             {
                 case Section.General:

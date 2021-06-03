@@ -48,7 +48,7 @@ namespace osu.Game.Skinning
         /// <param name="sampleInfo">The requested sample.</param>
         /// <returns>A matching sample channel, or null if unavailable.</returns>
         [CanBeNull]
-        Sample GetSample(ISampleInfo sampleInfo);
+        ISample GetSample(ISampleInfo sampleInfo);
 
         /// <summary>
         /// Retrieve a configuration value.

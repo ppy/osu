@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Menu
 
                 rulesets.Hide();
                 lazerLogo.Hide();
-                background.Hide();
+                background.ApplyToBackground(b => b.Hide());
 
                 using (BeginAbsoluteSequence(0, true))
                 {
@@ -231,7 +231,8 @@ namespace osu.Game.Screens.Menu
                             lazerLogo.Dispose(); // explicit disposal as we are pushing a new screen and the expire may not get run.
 
                             logo.FadeIn();
-                            background.FadeIn();
+
+                            background.ApplyToBackground(b => b.Show());
 
                             game.Add(new GameWideFlash());
 

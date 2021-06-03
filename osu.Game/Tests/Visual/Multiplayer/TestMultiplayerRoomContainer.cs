@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        [Cached(typeof(StatefulMultiplayerClient))]
+        [Cached(typeof(MultiplayerClient))]
         public readonly TestMultiplayerClient Client;
 
         [Cached(typeof(IRoomManager))]
@@ -32,11 +32,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             RelativeSizeAxes = Axes.Both;
 
+            RoomManager = new TestMultiplayerRoomManager();
+            Client = new TestMultiplayerClient(RoomManager);
+            OngoingOperationTracker = new OngoingOperationTracker();
+
             AddRangeInternal(new Drawable[]
             {
-                Client = new TestMultiplayerClient(),
-                RoomManager = new TestMultiplayerRoomManager(),
-                OngoingOperationTracker = new OngoingOperationTracker(),
+                Client,
+                RoomManager,
+                OngoingOperationTracker,
                 content = new Container { RelativeSizeAxes = Axes.Both }
             });
         }

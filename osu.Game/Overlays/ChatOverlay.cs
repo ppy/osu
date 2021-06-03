@@ -24,6 +24,8 @@ using osu.Game.Overlays.Chat.Tabs;
 using osuTK.Input;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Online;
 
 namespace osu.Game.Overlays
@@ -31,8 +33,8 @@ namespace osu.Game.Overlays
     public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
         public string IconTexture => "Icons/Hexacons/messaging";
-        public string Title => "chat";
-        public string Description => "join the real-time discussion";
+        public LocalisableString Title => ChatStrings.HeaderTitle;
+        public LocalisableString Description => ChatStrings.HeaderDescription;
 
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;

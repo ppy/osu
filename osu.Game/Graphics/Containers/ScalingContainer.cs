@@ -36,6 +36,24 @@ namespace osu.Game.Graphics.Containers
 
         private BackgroundScreenStack backgroundStack;
 
+        private bool allowScaling = true;
+
+        /// <summary>
+        /// Whether user scaling preferences should be applied. Enabled by default.
+        /// </summary>
+        public bool AllowScaling
+        {
+            get => allowScaling;
+            set
+            {
+                if (value == allowScaling)
+                    return;
+
+                allowScaling = value;
+                if (IsLoaded) updateSize();
+            }
+        }
+
         /// <summary>
         /// Create a new instance.
         /// </summary>
@@ -139,7 +157,7 @@ namespace osu.Game.Graphics.Containers
                     backgroundStack?.FadeOut(fade_time);
             }
 
-            bool scaling = targetMode == null || scalingMode.Value == targetMode;
+            bool scaling = AllowScaling && (targetMode == null || scalingMode.Value == targetMode);
 
             var targetSize = scaling ? new Vector2(sizeX.Value, sizeY.Value) : Vector2.One;
             var targetPosition = scaling ? new Vector2(posX.Value, posY.Value) * (Vector2.One - targetSize) : Vector2.Zero;

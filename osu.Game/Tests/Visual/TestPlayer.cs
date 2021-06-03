@@ -34,6 +34,8 @@ namespace osu.Game.Tests.Visual
 
         public new HealthProcessor HealthProcessor => base.HealthProcessor;
 
+        public new bool PauseCooldownActive => base.PauseCooldownActive;
+
         public readonly List<JudgementResult> Results = new List<JudgementResult>();
 
         public TestPlayer(bool allowPause = true, bool showResults = true, bool pauseOnFocusLost = false)

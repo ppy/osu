@@ -29,15 +29,8 @@ namespace osu.Game.Users
         [JsonProperty(@"global_rank")]
         public int? GlobalRank;
 
+        [JsonProperty(@"country_rank")]
         public int? CountryRank;
-
-        [JsonProperty(@"rank")]
-        private UserRanks ranks
-        {
-            // eventually that will also become an own json property instead of reading from a `rank` object.
-            // see https://github.com/ppy/osu-web/blob/cb79bb72186c8f1a25f6a6f5ef315123decb4231/app/Transformers/UserStatisticsTransformer.php#L53.
-            set => CountryRank = value.Country;
-        }
 
         // populated via User model, as that's where the data currently lives.
         public RankHistoryData RankHistory;
@@ -49,10 +42,10 @@ namespace osu.Game.Users
         public long RankedScore;
 
         [JsonProperty(@"hit_accuracy")]
-        public decimal Accuracy;
+        public double Accuracy;
 
         [JsonIgnore]
-        public string DisplayAccuracy => Accuracy.FormatAccuracy();
+        public string DisplayAccuracy => (Accuracy / 100).FormatAccuracy();
 
         [JsonProperty(@"play_count")]
         public int PlayCount;
@@ -119,13 +112,5 @@ namespace osu.Game.Users
                 }
             }
         }
-
-#pragma warning disable 649
-        private struct UserRanks
-        {
-            [JsonProperty(@"country")]
-            public int? Country;
-        }
-#pragma warning restore 649
     }
 }

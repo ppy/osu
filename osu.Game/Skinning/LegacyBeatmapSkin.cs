@@ -3,6 +3,7 @@
 
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -23,6 +24,25 @@ namespace osu.Game.Skinning
             Configuration.AllowDefaultComboColoursFallback = false;
         }
 
+        public override Drawable GetDrawableComponent(ISkinComponent component)
+        {
+            if (component is SkinnableTargetComponent targetComponent)
+            {
+                switch (targetComponent.Target)
+                {
+                    case SkinnableTarget.MainHUDComponents:
+                        // this should exist in LegacySkin instead, but there isn't a fallback skin for LegacySkins yet.
+                        // therefore keep the check here until fallback default legacy skin is supported.
+                        if (!this.HasFont(LegacyFont.Score))
+                            return null;
+
+                        break;
+                }
+            }
+
+            return base.GetDrawableComponent(component);
+        }
+
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
             switch (lookup)
@@ -39,7 +59,7 @@ namespace osu.Game.Skinning
             return base.GetConfig<TLookup, TValue>(lookup);
         }
 
-        public override Sample GetSample(ISampleInfo sampleInfo)
+        public override ISample GetSample(ISampleInfo sampleInfo)
         {
             if (sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy && legacy.CustomSampleBank == 0)
             {
@@ -51,6 +71,6 @@ namespace osu.Game.Skinning
         }
 
         private static SkinInfo createSkinInfo(BeatmapInfo beatmap) =>
-            new SkinInfo { Name = beatmap.ToString(), Creator = beatmap.Metadata.Author.ToString() };
+            new SkinInfo { Name = beatmap.ToString(), Creator = beatmap.Metadata?.AuthorString };
     }
 }

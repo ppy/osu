@@ -95,6 +95,10 @@ namespace osu.Game.Overlays.Dialog
             }
         }
 
+        // We always want dialogs to show their appear animation, so we request they start hidden.
+        // Normally this would not be required, but is here due to the manual Show() call that occurs before LoadComplete().
+        protected override bool StartHidden => true;
+
         protected PopupDialog()
         {
             RelativeSizeAxes = Axes.Both;
@@ -205,7 +209,16 @@ namespace osu.Game.Overlays.Dialog
                     },
                 },
             };
+
+            // It's important we start in a visible state so our state fires on hide, even before load.
+            // This is used by the DialogOverlay to know when the dialog was dismissed.
+            Show();
         }
+
+        /// <summary>
+        /// Programmatically clicks the first <see cref="PopupDialogOkButton"/>.
+        /// </summary>
+        public void PerformOkAction() => Buttons.OfType<PopupDialogOkButton>().First().Click();
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {

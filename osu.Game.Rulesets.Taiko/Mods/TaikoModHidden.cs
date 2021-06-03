@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
@@ -10,5 +11,13 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override string Description => @"Beats fade out before you hit them!";
         public override double ScoreMultiplier => 1.06;
         public override bool HasImplementation => false;
+
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
+        }
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
+        }
     }
 }
