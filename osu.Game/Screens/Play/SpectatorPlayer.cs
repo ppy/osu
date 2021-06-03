@@ -43,9 +43,9 @@ namespace osu.Game.Screens.Play
             });
         }
 
-        protected override void LoadComplete()
+        protected override void StartGameplay()
         {
-            base.LoadComplete();
+            base.StartGameplay();
 
             spectatorClient.OnNewFrames += userSentFrames;
             seekToGameplay();
