@@ -522,7 +522,10 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
             {
                 ValidForResume = false;
-                this.MakeCurrent();
+
+                // in the potential case that this instance has already been exited, this is required to avoid a crash.
+                if (this.GetChildScreen() != null)
+                    this.MakeCurrent();
                 return;
             }
 

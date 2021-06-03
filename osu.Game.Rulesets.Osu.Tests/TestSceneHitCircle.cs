@@ -23,18 +23,18 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestVariousHitCircles()
         {
-            AddStep("Miss Big Single", () => SetContents(() => testSingle(2)));
-            AddStep("Miss Medium Single", () => SetContents(() => testSingle(5)));
-            AddStep("Miss Small Single", () => SetContents(() => testSingle(7)));
-            AddStep("Hit Big Single", () => SetContents(() => testSingle(2, true)));
-            AddStep("Hit Medium Single", () => SetContents(() => testSingle(5, true)));
-            AddStep("Hit Small Single", () => SetContents(() => testSingle(7, true)));
-            AddStep("Miss Big Stream", () => SetContents(() => testStream(2)));
-            AddStep("Miss Medium Stream", () => SetContents(() => testStream(5)));
-            AddStep("Miss Small Stream", () => SetContents(() => testStream(7)));
-            AddStep("Hit Big Stream", () => SetContents(() => testStream(2, true)));
-            AddStep("Hit Medium Stream", () => SetContents(() => testStream(5, true)));
-            AddStep("Hit Small Stream", () => SetContents(() => testStream(7, true)));
+            AddStep("Miss Big Single", () => SetContents(_ => testSingle(2)));
+            AddStep("Miss Medium Single", () => SetContents(_ => testSingle(5)));
+            AddStep("Miss Small Single", () => SetContents(_ => testSingle(7)));
+            AddStep("Hit Big Single", () => SetContents(_ => testSingle(2, true)));
+            AddStep("Hit Medium Single", () => SetContents(_ => testSingle(5, true)));
+            AddStep("Hit Small Single", () => SetContents(_ => testSingle(7, true)));
+            AddStep("Miss Big Stream", () => SetContents(_ => testStream(2)));
+            AddStep("Miss Medium Stream", () => SetContents(_ => testStream(5)));
+            AddStep("Miss Small Stream", () => SetContents(_ => testStream(7)));
+            AddStep("Hit Big Stream", () => SetContents(_ => testStream(2, true)));
+            AddStep("Hit Medium Stream", () => SetContents(_ => testStream(5, true)));
+            AddStep("Hit Small Stream", () => SetContents(_ => testStream(7, true)));
         }
 
         private Drawable testSingle(float circleSize, bool auto = false, double timeOffset = 0, Vector2? positionOffset = null)

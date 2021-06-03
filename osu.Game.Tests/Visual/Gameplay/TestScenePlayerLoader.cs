@@ -88,13 +88,18 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             beforeLoadAction?.Invoke();
 
+            prepareBeatmap();
+
+            LoadScreen(loader = new TestPlayerLoader(() => player = new TestPlayer(interactive, interactive)));
+        }
+
+        private void prepareBeatmap()
+        {
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
             Beatmap.Value.BeatmapInfo.EpilepsyWarning = epilepsyWarning;
 
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(Beatmap.Value.Track);
-
-            LoadScreen(loader = new TestPlayerLoader(() => player = new TestPlayer(interactive, interactive)));
         }
 
         [Test]
@@ -178,9 +183,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("load slow dummy beatmap", () =>
             {
-                LoadScreen(loader = new TestPlayerLoader(() => slowPlayer = new SlowLoadPlayer(false, false)));
-                Scheduler.AddDelayed(() => slowPlayer.AllowLoad.Set(), 5000);
+                prepareBeatmap();
+                slowPlayer = new SlowLoadPlayer(false, false);
+                LoadScreen(loader = new TestPlayerLoader(() => slowPlayer));
             });
+
+            AddStep("schedule slow load", () => Scheduler.AddDelayed(() => slowPlayer.AllowLoad.Set(), 5000));
 
             AddUntilStep("wait for player to be current", () => slowPlayer.IsCurrentScreen());
         }
