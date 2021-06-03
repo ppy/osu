@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
@@ -34,17 +33,16 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         /// </summary>
         private readonly double catcherSpeedMultiplier;
 
-        public Movement(Mod[] mods, float halfCatcherWidth)
+        public Movement(Mod[] mods, float halfCatcherWidth, double clockRate)
             : base(mods)
         {
             HalfCatcherWidth = halfCatcherWidth;
 
-            // In catch, rate adjustment mods do not only affect the timings of hitobjects,
+            // In catch, clockrate adjustments do not only affect the timings of hitobjects,
             // but also the speed of the player's catcher, which has an impact on difficulty
             // TODO: Support variable clockrates caused by mods such as ModTimeRamp
             //  (perhaps by using IApplicableToRate within the CatchDifficultyHitObject constructor to set a catcher speed for each object before processing)
-            var rateAdjustMod = mods.FirstOrDefault(m => m is ModRateAdjust);
-            catcherSpeedMultiplier = (rateAdjustMod as ModRateAdjust)?.SpeedChange.Value ?? 1;
+            catcherSpeedMultiplier = clockRate;
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
