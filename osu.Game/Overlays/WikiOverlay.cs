@@ -92,7 +92,7 @@ namespace osu.Game.Overlays
             Loading.Show();
 
             request.Success += response => Schedule(() => onSuccess(response));
-            request.Failure += _ => Schedule(() => LoadDisplay(Empty()));
+            request.Failure += _ => Schedule(onFail);
 
             api.PerformAsync(request);
         }
@@ -130,6 +130,12 @@ namespace osu.Game.Overlays
                     },
                 });
             }
+        }
+
+        private void onFail()
+        {
+            wikiData.Value = null;
+            LoadDisplay(Empty());
         }
 
         private void showParentPage()
