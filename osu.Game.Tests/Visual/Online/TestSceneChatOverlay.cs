@@ -246,7 +246,7 @@ namespace osu.Game.Tests.Visual.Online
 
             // Want to close channel 2
             AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
-            AddStep("Press keys", pressCloseDocumentKeys);
+            AddStep("Close tab via shortcut", pressCloseDocumentKeys);
 
             // Channel 2 should be closed
             AddAssert("Channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
@@ -255,7 +255,7 @@ namespace osu.Game.Tests.Visual.Online
             // Want to close channel 1
             AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
 
-            AddStep("Press keys", pressCloseDocumentKeys);
+            AddStep("Close tab via shortcut", pressCloseDocumentKeys);
             // Channel 1 and channel 2 should be closed
             AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
         }
@@ -270,7 +270,7 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             // Want to join another channel
-            AddStep("Press keys", pressNewTabKeys);
+            AddStep("Press new tab shortcut", pressNewTabKeys);
 
             // Selector should be visible
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
@@ -287,7 +287,7 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             // Should do nothing
-            AddStep("Press keys", pressRestoreTabKeys);
+            AddStep("Restore tab via shortcut", pressRestoreTabKeys);
             AddAssert("All channels still open", () => channelManager.JoinedChannels.Count == 3);
 
             // Close channel 1
@@ -297,7 +297,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Other channels still open", () => channelManager.JoinedChannels.Count == 2);
 
             // Reopen channel 1
-            AddStep("Press keys", pressRestoreTabKeys);
+            AddStep("Restore tab via shortcut", pressRestoreTabKeys);
             AddAssert("All channels now open", () => channelManager.JoinedChannels.Count == 3);
             AddAssert("Current channel is channel 1", () => currentChannel == channel1);
 
@@ -310,13 +310,13 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Current channel is channel 3", () => currentChannel == channel3);
 
             // Should first re-open channel 2
-            AddStep("Press keys", pressRestoreTabKeys);
+            AddStep("Restore tab via shortcut", pressRestoreTabKeys);
             AddAssert("Channel 1 still closed", () => !channelManager.JoinedChannels.Contains(channel1));
             AddAssert("Channel 2 now open", () => channelManager.JoinedChannels.Contains(channel2));
             AddAssert("Current channel is channel 2", () => currentChannel == channel2);
 
             // Should then re-open channel 1
-            AddStep("Press keys", pressRestoreTabKeys);
+            AddStep("Restore tab via shortcut", pressRestoreTabKeys);
             AddAssert("All channels now open", () => channelManager.JoinedChannels.Count == 3);
             AddAssert("Current channel is channel 1", () => currentChannel == channel1);
         }
