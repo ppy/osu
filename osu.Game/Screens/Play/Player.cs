@@ -577,6 +577,24 @@ namespace osu.Game.Screens.Play
         public void Seek(double time) => GameplayClockContainer.Seek(time);
 
         /// <summary>
+        /// Seeks to a specific time in gameplay, bypassing frame stability.
+        /// </summary>
+        /// <remarks>
+        /// Intermediate hitobject judgements may not be applied or reverted correctly during this seek.
+        /// </remarks>
+        /// <param name="time">The destination time to seek to.</param>
+        public void NonFrameStableSeek(double time)
+        {
+            bool wasFrameStable = DrawableRuleset.FrameStablePlayback;
+            DrawableRuleset.FrameStablePlayback = false;
+
+            Seek(time);
+
+            // Delay resetting frame-stable playback for one frame to give the FrameStabilityContainer a chance to seek.
+            ScheduleAfterChildren(() => DrawableRuleset.FrameStablePlayback = wasFrameStable);
+        }
+
+        /// <summary>
         /// Restart gameplay via a parent <see cref="PlayerLoader"/>.
         /// <remarks>This can be called from a child screen in order to trigger the restart process.</remarks>
         /// </summary>
