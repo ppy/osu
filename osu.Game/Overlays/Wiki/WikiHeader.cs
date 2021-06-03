@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Wiki
 
         private void onCurrentChange(ValueChangedEvent<string> e)
         {
-            if (e.NewValue == TabControl.Items.LastOrDefault())
+            if (e.NewValue == TabControl.Items.LastOrDefault() && WikiPageData.Value != null)
                 return;
 
             if (e.NewValue == index_page_string)
