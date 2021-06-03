@@ -22,15 +22,16 @@ namespace osu.Game.Graphics.Backgrounds
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (!Beatmap.Storyboard.HasDrawable)
-                return;
-
             var storyboard = new Storyboard { BeatmapInfo = Beatmap.BeatmapInfo };
+
             foreach (var layer in storyboard.Layers)
             {
                 if (layer.Name != "Fail")
                     layer.Elements = Beatmap.Storyboard.GetLayer(layer.Name).Elements.Where(e => !(e is StoryboardSampleInfo)).ToList();
             }
+
+            if (!storyboard.HasDrawable)
+                return;
 
             if (storyboard.ReplacesBackground)
             {
