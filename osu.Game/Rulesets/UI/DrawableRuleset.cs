@@ -267,6 +267,12 @@ namespace osu.Game.Rulesets.UI
             if (!(KeyBindingInputManager is IHasRecordingHandler recordingInputManager))
                 throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports recording is not available");
 
+            if (score == null)
+            {
+                recordingInputManager.Recorder = null;
+                return;
+            }
+
             var recorder = CreateReplayRecorder(score);
 
             if (recorder == null)
@@ -511,7 +517,7 @@ namespace osu.Game.Rulesets.UI
         /// Sets a replay to be used to record gameplay.
         /// </summary>
         /// <param name="score">The target to be recorded to.</param>
-        public abstract void SetRecordTarget(Score score);
+        public abstract void SetRecordTarget([CanBeNull] Score score);
 
         /// <summary>
         /// Invoked when the interactive user requests resuming from a paused state.
