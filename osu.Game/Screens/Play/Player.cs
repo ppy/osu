@@ -583,6 +583,8 @@ namespace osu.Game.Screens.Play
         /// <param name="time">The destination time to seek to.</param>
         public void Seek(double time) => GameplayClockContainer.Seek(time);
 
+        private ScheduledDelegate frameStablePlaybackResetDelegate;
+
         /// <summary>
         /// Seeks to a specific time in gameplay, bypassing frame stability.
         /// </summary>
@@ -592,13 +594,16 @@ namespace osu.Game.Screens.Play
         /// <param name="time">The destination time to seek to.</param>
         public void NonFrameStableSeek(double time)
         {
+            if (frameStablePlaybackResetDelegate?.Cancelled == false && !frameStablePlaybackResetDelegate.Completed)
+                frameStablePlaybackResetDelegate.RunTask();
+
             bool wasFrameStable = DrawableRuleset.FrameStablePlayback;
             DrawableRuleset.FrameStablePlayback = false;
 
             Seek(time);
 
             // Delay resetting frame-stable playback for one frame to give the FrameStabilityContainer a chance to seek.
-            ScheduleAfterChildren(() => DrawableRuleset.FrameStablePlayback = wasFrameStable);
+            frameStablePlaybackResetDelegate = ScheduleAfterChildren(() => DrawableRuleset.FrameStablePlayback = wasFrameStable);
         }
 
         /// <summary>
@@ -931,11 +936,10 @@ namespace osu.Game.Screens.Play
         /// Creates the player's <see cref="Scoring.Score"/>.
         /// </summary>
         /// <returns>The <see cref="Scoring.Score"/>.</returns>
-        protected virtual Score CreateScore() =>
-            new Score
-            {
-                ScoreInfo = new ScoreInfo { User = api.LocalUser.Value },
-            };
+        protected virtual Score CreateScore() => new Score
+        {
+            ScoreInfo = new ScoreInfo { User = api.LocalUser.Value },
+        };
 
         /// <summary>
         /// Imports the player's <see cref="Scoring.Score"/> to the local database.
