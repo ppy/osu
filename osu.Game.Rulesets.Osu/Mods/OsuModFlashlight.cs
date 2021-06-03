@@ -9,10 +9,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
@@ -22,6 +24,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1.12;
 
         private const float default_flashlight_size = 180;
+
+        private const double default_follow_delay = 120;
 
         private OsuFlashlight flashlight;
 
@@ -35,8 +39,25 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
+        public override void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
+        {
+            base.ApplyToDrawableRuleset(drawableRuleset);
+
+            flashlight.FollowDelay = FollowDelay.Value;
+        }
+
+        [SettingSource("Follow delay", "Milliseconds until the flashlight reaches the cursor")]
+        public BindableNumber<double> FollowDelay { get; } = new BindableDouble(default_follow_delay)
+        {
+            MinValue = default_follow_delay,
+            MaxValue = default_follow_delay * 10,
+            Precision = default_follow_delay,
+        };
+
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
+            public double FollowDelay { private get; set; }
+
             public OsuFlashlight()
             {
                 FlashlightSize = new Vector2(0, getSizeFor(0));
@@ -50,13 +71,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                const double follow_delay = 120;
-
                 var position = FlashlightPosition;
                 var destination = e.MousePosition;
 
                 FlashlightPosition = Interpolation.ValueAt(
-                    Math.Min(Math.Abs(Clock.ElapsedFrameTime), follow_delay), position, destination, 0, follow_delay, Easing.Out);
+                    Math.Min(Math.Abs(Clock.ElapsedFrameTime), FollowDelay), position, destination, 0, FollowDelay, Easing.Out);
 
                 return base.OnMouseMove(e);
             }

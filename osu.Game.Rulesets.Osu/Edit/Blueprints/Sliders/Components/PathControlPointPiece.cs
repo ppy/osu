@@ -2,14 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -28,6 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     public class PathControlPointPiece : BlueprintPiece<Slider>, IHasTooltip
     {
         public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;
+        public List<PathControlPoint> PointsInSegment;
 
         public readonly BindableBool IsSelected = new BindableBool();
         public readonly PathControlPoint ControlPoint;
@@ -53,6 +58,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             this.slider = slider;
             ControlPoint = controlPoint;
+
+            // we don't want to run the path type update on construction as it may inadvertently change the slider.
+            cachePoints(slider);
+
+            slider.Path.Version.BindValueChanged(_ =>
+            {
+                cachePoints(slider);
+                updatePathType();
+            });
 
             controlPoint.Type.BindValueChanged(_ => updateMarkerDisplay());
 
@@ -150,6 +164,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         protected override bool OnClick(ClickEvent e) => RequestSelection != null;
 
         private Vector2 dragStartPosition;
+        private PathType? dragPathType;
 
         protected override bool OnDragStart(DragStartEvent e)
         {
@@ -159,6 +174,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (e.Button == MouseButton.Left)
             {
                 dragStartPosition = ControlPoint.Position.Value;
+                dragPathType = PointsInSegment[0].Type.Value;
+
                 changeHandler?.BeginChange();
                 return true;
             }
@@ -168,6 +185,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override void OnDrag(DragEvent e)
         {
+            Vector2[] oldControlPoints = slider.Path.ControlPoints.Select(cp => cp.Position.Value).ToArray();
+            var oldPosition = slider.Position;
+            var oldStartTime = slider.StartTime;
+
             if (ControlPoint == slider.Path.ControlPoints[0])
             {
                 // Special handling for the head control point - the position of the slider changes which means the snapped position and time have to be taken into account
@@ -184,9 +205,44 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
             else
                 ControlPoint.Position.Value = dragStartPosition + (e.MousePosition - e.MouseDownPosition);
+
+            if (!slider.Path.HasValidLength)
+            {
+                for (var i = 0; i < slider.Path.ControlPoints.Count; i++)
+                    slider.Path.ControlPoints[i].Position.Value = oldControlPoints[i];
+
+                slider.Position = oldPosition;
+                slider.StartTime = oldStartTime;
+                return;
+            }
+
+            // Maintain the path type in case it got defaulted to bezier at some point during the drag.
+            PointsInSegment[0].Type.Value = dragPathType;
         }
 
         protected override void OnDragEnd(DragEndEvent e) => changeHandler?.EndChange();
+
+        private void cachePoints(Slider slider) => PointsInSegment = slider.Path.PointsInSegment(ControlPoint);
+
+        /// <summary>
+        /// Handles correction of invalid path types.
+        /// </summary>
+        private void updatePathType()
+        {
+            if (ControlPoint.Type.Value != PathType.PerfectCurve)
+                return;
+
+            if (PointsInSegment.Count > 3)
+                ControlPoint.Type.Value = PathType.Bezier;
+
+            if (PointsInSegment.Count != 3)
+                return;
+
+            ReadOnlySpan<Vector2> points = PointsInSegment.Select(p => p.Position.Value).ToArray();
+            RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
+            if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
+                ControlPoint.Type.Value = PathType.Bezier;
+        }
 
         /// <summary>
         /// Updates the state of the circular control point marker.

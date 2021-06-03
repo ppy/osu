@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -22,6 +23,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     [Cached]
     public class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
+        private readonly Drawable userContent;
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
 
         public readonly Bindable<bool> ControlPointsVisible = new Bindable<bool>();
@@ -55,8 +57,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private Track track;
 
-        public Timeline()
+        private const float timeline_height = 72;
+        private const float timeline_expanded_height = 156;
+
+        public Timeline(Drawable userContent)
         {
+            this.userContent = userContent;
+
+            RelativeSizeAxes = Axes.X;
+            Height = timeline_height;
+
             ZoomDuration = 200;
             ZoomEasing = Easing.OutQuint;
             ScrollbarVisible = false;
@@ -68,18 +78,31 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private TimelineControlPointDisplay controlPoints;
 
+        private Container mainContent;
+
         private Bindable<float> waveformOpacity;
 
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
         {
+            CentreMarker centreMarker;
+
+            // We don't want the centre marker to scroll
+            AddInternal(centreMarker = new CentreMarker());
+
             AddRange(new Drawable[]
             {
-                new Container
+                controlPoints = new TimelineControlPointDisplay
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    Height = timeline_expanded_height,
+                },
+                mainContent = new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = timeline_height,
                     Depth = float.MaxValue,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
                         waveform = new WaveformGraph
                         {
@@ -89,21 +112,22 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             MidColour = colours.BlueDark,
                             HighColour = colours.BlueDarker,
                         },
+                        centreMarker.CreateProxy(),
                         ticks = new TimelineTickDisplay(),
-                        controlPoints = new TimelineControlPointDisplay(),
+                        new Box
+                        {
+                            Name = "zero marker",
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 2,
+                            Origin = Anchor.TopCentre,
+                            Colour = colours.YellowDarker,
+                        },
+                        userContent,
                     }
                 },
             });
 
-            // We don't want the centre marker to scroll
-            AddInternal(new CentreMarker { Depth = float.MaxValue });
-
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
-            waveformOpacity.BindValueChanged(_ => updateWaveformOpacity(), true);
-
-            WaveformVisible.ValueChanged += _ => updateWaveformOpacity();
-            ControlPointsVisible.ValueChanged += visible => controlPoints.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
-            TicksVisible.ValueChanged += visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
 
             Beatmap.BindTo(beatmap);
             Beatmap.BindValueChanged(b =>
@@ -117,6 +141,35 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     MaxZoom = getZoomLevelForVisibleMilliseconds(500);
                     MinZoom = getZoomLevelForVisibleMilliseconds(10000);
                     Zoom = getZoomLevelForVisibleMilliseconds(2000);
+                }
+            }, true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            waveformOpacity.BindValueChanged(_ => updateWaveformOpacity(), true);
+
+            WaveformVisible.ValueChanged += _ => updateWaveformOpacity();
+            TicksVisible.ValueChanged += visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            ControlPointsVisible.BindValueChanged(visible =>
+            {
+                if (visible.NewValue)
+                {
+                    this.ResizeHeightTo(timeline_expanded_height, 200, Easing.OutQuint);
+                    mainContent.MoveToY(36, 200, Easing.OutQuint);
+
+                    // delay the fade in else masking looks weird.
+                    controlPoints.Delay(180).FadeIn(400, Easing.OutQuint);
+                }
+                else
+                {
+                    controlPoints.FadeOut(200, Easing.OutQuint);
+
+                    // likewise, delay the resize until the fade is complete.
+                    this.Delay(180).ResizeHeightTo(timeline_height, 200, Easing.OutQuint);
+                    mainContent.Delay(180).MoveToY(0, 200, Easing.OutQuint);
                 }
             }, true);
         }

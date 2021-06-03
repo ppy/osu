@@ -45,6 +45,8 @@ namespace osu.Game.Tests.Visual.Settings
             public Bindable<Vector2> AreaOffset { get; } = new Bindable<Vector2>();
             public Bindable<Vector2> AreaSize { get; } = new Bindable<Vector2>();
 
+            public Bindable<float> Rotation { get; } = new Bindable<float>();
+
             public IBindable<TabletInfo> Tablet => tablet;
 
             private readonly Bindable<TabletInfo> tablet = new Bindable<TabletInfo>();

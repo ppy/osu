@@ -23,10 +23,12 @@ namespace osu.Game.Graphics.Containers
         protected virtual string PopInSampleName => "UI/overlay-pop-in";
         protected virtual string PopOutSampleName => "UI/overlay-pop-out";
 
+        protected override bool BlockScrollInput => false;
+
         protected override bool BlockNonPositionalInput => true;
 
         /// <summary>
-        /// Temporary to allow for overlays in the main screen content to not dim theirselves.
+        /// Temporary to allow for overlays in the main screen content to not dim themselves.
         /// Should be eventually replaced by dimming which is aware of the target dim container (traverse parent for certain interface type?).
         /// </summary>
         protected virtual bool DimMainContent => true;

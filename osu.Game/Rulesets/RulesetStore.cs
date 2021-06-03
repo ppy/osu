@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using osu.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
@@ -111,7 +112,7 @@ namespace osu.Game.Rulesets
                 {
                     try
                     {
-                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo))).RulesetInfo;
+                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo).AsNonNull())).RulesetInfo;
 
                         r.Name = instanceInfo.Name;
                         r.ShortName = instanceInfo.ShortName;
@@ -173,7 +174,7 @@ namespace osu.Game.Rulesets
         {
             var filename = Path.GetFileNameWithoutExtension(file);
 
-            if (loadedAssemblies.Values.Any(t => t.Namespace == filename))
+            if (loadedAssemblies.Values.Any(t => Path.GetFileNameWithoutExtension(t.Assembly.Location) == filename))
                 return;
 
             try

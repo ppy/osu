@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -80,8 +79,6 @@ namespace osu.Game.Database
         private readonly Bindable<WeakReference<TModel>> itemRemoved = new Bindable<WeakReference<TModel>>();
 
         public virtual IEnumerable<string> HandledExtensions => new[] { ".zip" };
-
-        public virtual bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
         protected readonly FileStore Files;
 
@@ -156,33 +153,44 @@ namespace osu.Game.Database
 
             bool isLowPriorityImport = tasks.Length > low_priority_import_batch_size;
 
-            await Task.WhenAll(tasks.Select(async task =>
+            try
             {
-                notification.CancellationToken.ThrowIfCancellationRequested();
-
-                try
+                await Task.WhenAll(tasks.Select(async task =>
                 {
-                    var model = await Import(task, isLowPriorityImport, notification.CancellationToken).ConfigureAwait(false);
+                    notification.CancellationToken.ThrowIfCancellationRequested();
 
-                    lock (imported)
+                    try
                     {
-                        if (model != null)
-                            imported.Add(model);
-                        current++;
+                        var model = await Import(task, isLowPriorityImport, notification.CancellationToken).ConfigureAwait(false);
 
-                        notification.Text = $"Imported {current} of {tasks.Length} {HumanisedModelName}s";
-                        notification.Progress = (float)current / tasks.Length;
+                        lock (imported)
+                        {
+                            if (model != null)
+                                imported.Add(model);
+                            current++;
+
+                            notification.Text = $"Imported {current} of {tasks.Length} {HumanisedModelName}s";
+                            notification.Progress = (float)current / tasks.Length;
+                        }
                     }
-                }
-                catch (TaskCanceledException)
+                    catch (TaskCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
+                    }
+                })).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                if (imported.Count == 0)
                 {
-                    throw;
+                    notification.State = ProgressNotificationState.Cancelled;
+                    return imported;
                 }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
-                }
-            })).ConfigureAwait(false);
+            }
 
             if (imported.Count == 0)
             {
@@ -422,15 +430,25 @@ namespace osu.Game.Database
             if (retrievedItem == null)
                 throw new ArgumentException("Specified model could not be found", nameof(item));
 
+            using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
+                ExportModelTo(retrievedItem, outputStream);
+
+            exportStorage.OpenInNativeExplorer();
+        }
+
+        /// <summary>
+        /// Exports an item to the given output stream.
+        /// </summary>
+        /// <param name="model">The item to export.</param>
+        /// <param name="outputStream">The output stream to export to.</param>
+        protected virtual void ExportModelTo(TModel model, Stream outputStream)
+        {
             using (var archive = ZipArchive.Create())
             {
-                foreach (var file in retrievedItem.Files)
+                foreach (var file in model.Files)
                     archive.AddEntry(file.Filename, Files.Storage.GetStream(file.FileInfo.StoragePath));
 
-                using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
-                    archive.SaveTo(outputStream);
-
-                exportStorage.OpenInNativeExplorer();
+                archive.SaveTo(outputStream);
             }
         }
 
@@ -451,7 +469,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Delete new file.
+        /// Delete an existing file.
         /// </summary>
         /// <param name="model">The item to operate on.</param>
         /// <param name="file">The existing file to be deleted.</param>
@@ -649,16 +667,6 @@ namespace osu.Game.Database
         #region osu-stable import
 
         /// <summary>
-        /// Set a storage with access to an osu-stable install for import purposes.
-        /// </summary>
-        public Func<StableStorage> GetStableStorage { private get; set; }
-
-        /// <summary>
-        /// Denotes whether an osu-stable installation is present to perform automated imports from.
-        /// </summary>
-        public bool StableInstallationAvailable => GetStableStorage?.Invoke() != null;
-
-        /// <summary>
         /// The relative path from osu-stable's data directory to import items from.
         /// </summary>
         protected virtual string ImportFromStablePath => null;
@@ -679,22 +687,16 @@ namespace osu.Game.Database
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
-        public Task ImportFromStableAsync()
+        public Task ImportFromStableAsync(StableStorage stableStorage)
         {
-            var stableStorage = GetStableStorage?.Invoke();
-
-            if (stableStorage == null)
-            {
-                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
-                return Task.CompletedTask;
-            }
-
             var storage = PrepareStableStorage(stableStorage);
 
+            // Handle situations like when the user does not have a Skins folder.
             if (!storage.ExistsDirectory(ImportFromStablePath))
             {
-                // This handles situations like when the user does not have a Skins folder
-                Logger.Log($"No {ImportFromStablePath} folder available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
+                string fullPath = storage.GetFullPath(ImportFromStablePath);
+
+                Logger.Log($"Folder \"{fullPath}\" not available in the target osu!stable installation to import {HumanisedModelName}s.", LoggingTarget.Information, LogLevel.Error);
                 return Task.CompletedTask;
             }
 

@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private IAPIProvider api { get; set; }
 
         [Resolved]
-        private SpectatorStreamingClient streamingClient { get; set; }
+        private SpectatorClient spectatorClient { get; set; }
 
         [Cached]
         private GameplayBeatmap gameplayBeatmap = new GameplayBeatmap(new Beatmap());
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             replay = new Replay();
 
-            users.BindTo(streamingClient.PlayingUsers);
+            users.BindTo(spectatorClient.PlayingUsers);
             users.BindCollectionChanged((obj, args) =>
             {
                 switch (args.Action)
@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         foreach (int user in args.NewItems)
                         {
                             if (user == api.LocalUser.Value.Id)
-                                streamingClient.WatchUser(user);
+                                spectatorClient.WatchUser(user);
                         }
 
                         break;
@@ -91,14 +91,14 @@ namespace osu.Game.Tests.Visual.Gameplay
                         foreach (int user in args.OldItems)
                         {
                             if (user == api.LocalUser.Value.Id)
-                                streamingClient.StopWatchingUser(user);
+                                spectatorClient.StopWatchingUser(user);
                         }
 
                         break;
                 }
             }, true);
 
-            streamingClient.OnNewFrames += onNewFrames;
+            spectatorClient.OnNewFrames += onNewFrames;
 
             Add(new GridContainer
             {
@@ -189,7 +189,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
         }
 
-        private double latency = SpectatorStreamingClient.TIME_BETWEEN_SENDS;
+        private double latency = SpectatorClient.TIME_BETWEEN_SENDS;
 
         protected override void Update()
         {
@@ -204,27 +204,27 @@ namespace osu.Game.Tests.Visual.Gameplay
                 return;
             }
 
-            if (replayHandler.NextFrame != null)
-            {
-                var lastFrame = replay.Frames.LastOrDefault();
+            if (!replayHandler.HasFrames)
+                return;
 
-                // this isn't perfect as we basically can't be aware of the rate-of-send here (the streamer is not sending data when not being moved).
-                // in gameplay playback, the case where NextFrame is null would pause gameplay and handle this correctly; it's strictly a test limitation / best effort implementation.
-                if (lastFrame != null)
-                    latency = Math.Max(latency, Time.Current - lastFrame.Time);
+            var lastFrame = replay.Frames.LastOrDefault();
 
-                latencyDisplay.Text = $"latency: {latency:N1}";
+            // this isn't perfect as we basically can't be aware of the rate-of-send here (the streamer is not sending data when not being moved).
+            // in gameplay playback, the case where NextFrame is null would pause gameplay and handle this correctly; it's strictly a test limitation / best effort implementation.
+            if (lastFrame != null)
+                latency = Math.Max(latency, Time.Current - lastFrame.Time);
 
-                double proposedTime = Time.Current - latency + Time.Elapsed;
+            latencyDisplay.Text = $"latency: {latency:N1}";
 
-                // this will either advance by one or zero frames.
-                double? time = replayHandler.SetFrameFromTime(proposedTime);
+            double proposedTime = Time.Current - latency + Time.Elapsed;
 
-                if (time == null)
-                    return;
+            // this will either advance by one or zero frames.
+            double? time = replayHandler.SetFrameFromTime(proposedTime);
 
-                manualClock.CurrentTime = time.Value;
-            }
+            if (time == null)
+                return;
+
+            manualClock.CurrentTime = time.Value;
         }
 
         [TearDownSteps]
@@ -233,7 +233,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("stop recorder", () =>
             {
                 recorder.Expire();
-                streamingClient.OnNewFrames -= onNewFrames;
+                spectatorClient.OnNewFrames -= onNewFrames;
             });
         }
 

@@ -26,14 +26,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
     public class SliderSelectionBlueprint : OsuSelectionBlueprint<Slider>
     {
+        protected new DrawableSlider DrawableObject => (DrawableSlider)base.DrawableObject;
+
         protected SliderBodyPiece BodyPiece { get; private set; }
-        protected SliderCircleSelectionBlueprint HeadBlueprint { get; private set; }
-        protected SliderCircleSelectionBlueprint TailBlueprint { get; private set; }
+        protected SliderCircleOverlay HeadOverlay { get; private set; }
+        protected SliderCircleOverlay TailOverlay { get; private set; }
 
         [CanBeNull]
         protected PathControlPointVisualiser ControlPointVisualiser { get; private set; }
-
-        private readonly DrawableSlider slider;
 
         [Resolved(CanBeNull = true)]
         private HitObjectComposer composer { get; set; }
@@ -52,10 +52,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private readonly BindableList<PathControlPoint> controlPoints = new BindableList<PathControlPoint>();
         private readonly IBindable<int> pathVersion = new Bindable<int>();
 
-        public SliderSelectionBlueprint(DrawableSlider slider)
+        public SliderSelectionBlueprint(Slider slider)
             : base(slider)
         {
-            this.slider = slider;
         }
 
         [BackgroundDependencyLoader]
@@ -64,8 +63,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             InternalChildren = new Drawable[]
             {
                 BodyPiece = new SliderBodyPiece(),
-                HeadBlueprint = CreateCircleSelectionBlueprint(slider, SliderPosition.Start),
-                TailBlueprint = CreateCircleSelectionBlueprint(slider, SliderPosition.End),
+                HeadOverlay = CreateCircleOverlay(HitObject, SliderPosition.Start),
+                TailOverlay = CreateCircleOverlay(HitObject, SliderPosition.End),
             };
         }
 
@@ -103,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected override void OnSelected()
         {
-            AddInternal(ControlPointVisualiser = new PathControlPointVisualiser(slider.HitObject, true)
+            AddInternal(ControlPointVisualiser = new PathControlPointVisualiser(HitObject, true)
             {
                 RemoveControlPointsRequested = removeControlPoints
             });
@@ -215,7 +214,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
 
             // If there are 0 or 1 remaining control points, the slider is in a degenerate (single point) form and should be deleted
-            if (controlPoints.Count <= 1)
+            if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLength)
             {
                 placementHandler?.Delete(HitObject);
                 return;
@@ -240,11 +239,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             new OsuMenuItem("Add control point", MenuItemType.Standard, () => addControlPoint(rightClickPosition)),
         };
 
-        public override Vector2 ScreenSpaceSelectionPoint => BodyPiece.ToScreenSpace(BodyPiece.PathStartLocation);
+        // Always refer to the drawable object's slider body so subsequent movement deltas are calculated with updated positions.
+        public override Vector2 ScreenSpaceSelectionPoint => DrawableObject.SliderBody?.ToScreenSpace(DrawableObject.SliderBody.PathOffset)
+                                                             ?? BodyPiece.ToScreenSpace(BodyPiece.PathStartLocation);
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             BodyPiece.ReceivePositionalInputAt(screenSpacePos) || ControlPointVisualiser?.Pieces.Any(p => p.ReceivePositionalInputAt(screenSpacePos)) == true;
 
-        protected virtual SliderCircleSelectionBlueprint CreateCircleSelectionBlueprint(DrawableSlider slider, SliderPosition position) => new SliderCircleSelectionBlueprint(slider, position);
+        protected virtual SliderCircleOverlay CreateCircleOverlay(Slider slider, SliderPosition position) => new SliderCircleOverlay(slider, position);
     }
 }

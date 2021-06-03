@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
@@ -11,7 +10,7 @@ using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Mania.Replays
 {
-    internal class ManiaAutoGenerator : AutoGenerator
+    internal class ManiaAutoGenerator : AutoGenerator<ManiaReplayFrame>
     {
         public const double RELEASE_DELAY = 20;
 
@@ -22,8 +21,6 @@ namespace osu.Game.Rulesets.Mania.Replays
         public ManiaAutoGenerator(ManiaBeatmap beatmap)
             : base(beatmap)
         {
-            Replay = new Replay();
-
             columnActions = new ManiaAction[Beatmap.TotalColumns];
 
             var normalAction = ManiaAction.Key1;
@@ -43,12 +40,10 @@ namespace osu.Game.Rulesets.Mania.Replays
             }
         }
 
-        protected Replay Replay;
-
-        public override Replay Generate()
+        protected override void GenerateFrames()
         {
             if (Beatmap.HitObjects.Count == 0)
-                return Replay;
+                return;
 
             var pointGroups = generateActionPoints().GroupBy(a => a.Time).OrderBy(g => g.First().Time);
 
@@ -70,14 +65,8 @@ namespace osu.Game.Rulesets.Mania.Replays
                     }
                 }
 
-                // todo: can be removed once FramedReplayInputHandler correctly handles rewinding before first frame.
-                if (Replay.Frames.Count == 0)
-                    Replay.Frames.Add(new ManiaReplayFrame(group.First().Time - 1));
-
-                Replay.Frames.Add(new ManiaReplayFrame(group.First().Time, actions.ToArray()));
+                Frames.Add(new ManiaReplayFrame(group.First().Time, actions.ToArray()));
             }
-
-            return Replay;
         }
 
         private IEnumerable<IActionPoint> generateActionPoints()

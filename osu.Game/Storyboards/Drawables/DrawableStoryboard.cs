@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using osuTK;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
@@ -18,6 +19,13 @@ namespace osu.Game.Storyboards.Drawables
     {
         [Cached]
         public Storyboard Storyboard { get; }
+
+        /// <summary>
+        /// Whether the storyboard is considered finished.
+        /// </summary>
+        public IBindable<bool> HasStoryboardEnded => hasStoryboardEnded;
+
+        private readonly BindableBool hasStoryboardEnded = new BindableBool();
 
         protected override Container<DrawableStoryboardLayer> Content { get; }
 
@@ -39,6 +47,8 @@ namespace osu.Game.Storyboards.Drawables
 
         public override bool RemoveCompletedTransforms => false;
 
+        private double? lastEventEndTime;
+
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
@@ -47,7 +57,13 @@ namespace osu.Game.Storyboards.Drawables
         public DrawableStoryboard(Storyboard storyboard)
         {
             Storyboard = storyboard;
+
             Size = new Vector2(640, 480);
+
+            bool onlyHasVideoElements = Storyboard.Layers.SelectMany(l => l.Elements).Any(e => !(e is StoryboardVideo));
+
+            Width = Height * (storyboard.BeatmapInfo.WidescreenStoryboard || onlyHasVideoElements ? 16 / 9f : 4 / 3f);
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
@@ -73,6 +89,14 @@ namespace osu.Game.Storyboards.Drawables
 
                 Add(layer.CreateDrawable());
             }
+
+            lastEventEndTime = Storyboard.LatestEventTime;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            hasStoryboardEnded.Value = lastEventEndTime == null || Time.Current >= lastEventEndTime;
         }
 
         public DrawableStoryboardLayer OverlayLayer => Children.Single(layer => layer.Name == "Overlay");

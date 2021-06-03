@@ -4,11 +4,11 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultScoreCounter : ScoreCounter
+    public class DefaultScoreCounter : GameplayScoreCounter, ISkinnableDrawable
     {
         public DefaultScoreCounter()
             : base(6)
@@ -24,12 +24,6 @@ namespace osu.Game.Screens.Play.HUD
         private void load(OsuColour colours)
         {
             Colour = colours.BlueLighter;
-
-            // todo: check if default once health display is skinnable
-            hud?.ShowHealthbar.BindValueChanged(healthBar =>
-            {
-                this.MoveToY(healthBar.NewValue ? 30 : 0, HUDOverlay.FADE_DURATION, HUDOverlay.FADE_EASING);
-            }, true);
         }
     }
 }

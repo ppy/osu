@@ -3,8 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using osu.Framework.Bindables;
+using osu.Game.Online.API;
 using osu.Game.Rulesets.Mods;
 
 #nullable enable
@@ -89,7 +92,7 @@ namespace osu.Game.Utils
         /// <param name="mods">The mods to check.</param>
         /// <param name="invalidMods">Invalid mods, if any were found. Can be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
-        public static bool CheckValidForGameplay(IEnumerable<Mod> mods, out List<Mod>? invalidMods)
+        public static bool CheckValidForGameplay(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
         {
             mods = mods.ToArray();
 
@@ -128,6 +131,39 @@ namespace osu.Game.Utils
             }
             else
                 yield return mod;
+        }
+
+        /// <summary>
+        /// Returns the underlying value of the given mod setting object.
+        /// Used in <see cref="APIMod"/> for serialization and equality comparison purposes.
+        /// </summary>
+        /// <param name="setting">The mod setting.</param>
+        public static object GetSettingUnderlyingValue(object setting)
+        {
+            switch (setting)
+            {
+                case Bindable<double> d:
+                    return d.Value;
+
+                case Bindable<int> i:
+                    return i.Value;
+
+                case Bindable<float> f:
+                    return f.Value;
+
+                case Bindable<bool> b:
+                    return b.Value;
+
+                case IBindable u:
+                    // A mod with unknown (e.g. enum) generic type.
+                    var valueMethod = u.GetType().GetProperty(nameof(IBindable<int>.Value));
+                    Debug.Assert(valueMethod != null);
+                    return valueMethod.GetValue(u);
+
+                default:
+                    // fall back for non-bindable cases.
+                    return setting;
+            }
         }
     }
 }

@@ -8,10 +8,12 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetNewsRequest : APIRequest<GetNewsResponse>
     {
+        private readonly int? year;
         private readonly Cursor cursor;
 
-        public GetNewsRequest(Cursor cursor = null)
+        public GetNewsRequest(int? year = null, Cursor cursor = null)
         {
+            this.year = year;
             this.cursor = cursor;
         }
 
@@ -19,6 +21,10 @@ namespace osu.Game.Online.API.Requests
         {
             var req = base.CreateWebRequest();
             req.AddCursor(cursor);
+
+            if (year.HasValue)
+                req.AddParameter("year", year.Value.ToString());
+
             return req;
         }
 

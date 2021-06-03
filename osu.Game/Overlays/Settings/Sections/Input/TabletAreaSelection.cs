@@ -25,6 +25,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private readonly Bindable<Vector2> areaOffset = new Bindable<Vector2>();
         private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
 
+        private readonly BindableNumber<float> rotation = new BindableNumber<float>();
+
         private readonly IBindable<TabletInfo> tablet = new Bindable<TabletInfo>();
 
         private OsuSpriteText tabletName;
@@ -124,6 +126,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 usableAreaText.Text = $"{(float)x / commonDivider}:{(float)y / commonDivider}";
             }, true);
 
+            rotation.BindTo(handler.Rotation);
+            rotation.BindValueChanged(val =>
+            {
+                tabletContainer.RotateTo(-val.NewValue, 800, Easing.OutQuint);
+                usableAreaContainer.RotateTo(val.NewValue, 100, Easing.OutQuint)
+                                   .OnComplete(_ => checkBounds()); // required as we are using SSDQ.
+            }, true);
+
             tablet.BindTo(handler.Tablet);
             tablet.BindValueChanged(_ => Scheduler.AddOnce(updateTabletDetails));
 
@@ -174,8 +184,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (!(tablet.Value?.Size is Vector2 size))
                 return;
 
-            float fitX = size.X / (DrawWidth - Padding.Left - Padding.Right);
-            float fitY = size.Y / DrawHeight;
+            float maxDimension = size.LengthFast;
+
+            float fitX = maxDimension / (DrawWidth - Padding.Left - Padding.Right);
+            float fitY = maxDimension / DrawHeight;
 
             float adjust = MathF.Max(fitX, fitY);
 

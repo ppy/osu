@@ -85,6 +85,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The beatmap.
         /// </summary>
+        [Cached(typeof(IBeatmap))]
         public readonly Beatmap<TObject> Beatmap;
 
         public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
@@ -181,16 +182,9 @@ namespace osu.Game.Rulesets.UI
                         .WithChild(ResumeOverlay)));
             }
 
-            RegenerateAutoplay();
+            applyRulesetMods(Mods, config);
 
             loadObjects(cancellationToken ?? default);
-        }
-
-        public void RegenerateAutoplay()
-        {
-            // for now this is applying mods which aren't just autoplay.
-            // we'll need to reconsider this flow in the future.
-            applyRulesetMods(Mods, config);
         }
 
         /// <summary>

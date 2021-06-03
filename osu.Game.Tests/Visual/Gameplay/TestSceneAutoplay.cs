@@ -18,12 +18,12 @@ namespace osu.Game.Tests.Visual.Gameplay
     [Description("Player instantiated with an autoplay mod.")]
     public class TestSceneAutoplay : TestSceneAllRulesetPlayers
     {
-        protected new TestPlayer Player => (TestPlayer)base.Player;
+        protected new TestReplayPlayer Player => (TestReplayPlayer)base.Player;
 
         protected override Player CreatePlayer(Ruleset ruleset)
         {
             SelectedMods.Value = new[] { ruleset.GetAutoplayMod() };
-            return new TestPlayer(false);
+            return new TestReplayPlayer(false);
         }
 
         protected override void AddCheckSteps()
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void seekToBreak(int breakIndex)
         {
             AddStep($"seek to break {breakIndex}", () => Player.GameplayClockContainer.Seek(destBreak().StartTime));
-            AddUntilStep("wait for seek to complete", () => Player.HUDOverlay.Progress.ReferenceClock.CurrentTime >= destBreak().StartTime);
+            AddUntilStep("wait for seek to complete", () => Player.DrawableRuleset.FrameStableClock.CurrentTime >= destBreak().StartTime);
 
             BreakPeriod destBreak() => Beatmap.Value.Beatmap.Breaks.ElementAt(breakIndex);
         }
