@@ -6,13 +6,11 @@ using Markdig.Extensions.AutoIdentifiers;
 using Markdig.Extensions.Tables;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
@@ -21,16 +19,6 @@ namespace osu.Game.Graphics.Containers.Markdown
         public OsuMarkdownContainer()
         {
             LineSpacing = 21;
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var api = parent.Get<IAPIProvider>();
-
-            // needs to be set before the base BDL call executes to avoid invalidating any already populated markdown content.
-            DocumentUrl = api.WebsiteRootUrl;
-
-            return base.CreateChildDependencies(parent);
         }
 
         protected override void AddMarkdownComponent(IMarkdownObject markdownObject, FillFlowContainer container, int level)

@@ -39,7 +39,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         public event Action<SelectionState> StateChanged;
 
         private readonly Box selectionBox;
-        private CachedModelDependencyContainer<Room> dependencies;
 
         [Resolved(canBeNull: true)]
         private OnlinePlayScreen parentScreen { get; set; }
@@ -209,9 +208,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            dependencies = new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
-            dependencies.Model.Value = Room;
-            return dependencies;
+            return new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent))
+            {
+                Model = { Value = Room }
+            };
         }
 
         protected override void LoadComplete()
