@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            SetContents(() => new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageBackground, stageDefinition: new StageDefinition { Columns = 4 }),
+            SetContents(_ => new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageBackground, stageDefinition: new StageDefinition { Columns = 4 }),
                 _ => new DefaultStageBackground())
             {
                 Anchor = Anchor.Centre,
