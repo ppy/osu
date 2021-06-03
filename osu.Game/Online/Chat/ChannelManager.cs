@@ -441,7 +441,7 @@ namespace osu.Game.Online.Chat
                 closedChannels.RemoveAt(0);
             }
 
-            // For PM channels, we store the user ID; else, we store the channel id
+            // For PM channels, we store the user ID; else, we store the channel ID
             closedChannels.Add(channel.Type == ChannelType.PM
                 ? new ClosedChannel(ChannelType.PM, channel.Users.Single().Id)
                 : new ClosedChannel(channel.Type, channel.Id));
@@ -454,18 +454,14 @@ namespace osu.Game.Online.Chat
         });
 
         /// <summary>
-        /// Opens the most recently closed channel that has not
-        /// already been reopened
+        /// Opens the most recently closed channel that has not already been reopened,
         /// Works similarly to reopening the last closed tab on a web browser.
         /// </summary>
         public void JoinLastClosedChannel()
         {
-            // This loop could be eliminated if a check was added so that
-            // when the code opens a channel it removes from the closedChannel list.
-            // However, this would require adding an O(|closeChannels|) work operation
-            // every time the user joins a channel, which would make joining a channel
-            // slower. We wanted to centralize all major slowdowns so they
-            // can only occur if the user actually decides to use this feature.
+            // This loop could be eliminated if the join channel operation ensured that every channel joined
+            // is removed from the closedChannels list, but it'd require a linear scan of closed channels on every join.
+            // To keep the overhead of joining channels low, just lazily scan the list of closed channels locally.
             while (closedChannels.Count > 0)
             {
                 ClosedChannel lastClosedChannel = closedChannels.Last();
@@ -479,12 +475,12 @@ namespace osu.Game.Online.Chat
 
                 if (lastChannel != null)
                 {
-                    // Channel exists as an availaable channel, directly join it
+                    // Channel exists as an available channel, directly join it
                     CurrentChannel.Value = JoinChannel(lastChannel);
                 }
                 else if (lastClosedChannel.Type == ChannelType.PM)
                 {
-                    // Try to get User to open PM chat
+                    // Try to get user in order to open PM chat
                     users.GetUserAsync((int)lastClosedChannel.Id).ContinueWith(u =>
                     {
                         if (u.Result == null) return;
@@ -583,7 +579,7 @@ namespace osu.Game.Online.Chat
     }
 
     /// <summary>
-    /// Class that stores information about a closed channel
+    /// Stores information about a closed channel
     /// </summary>
     public class ClosedChannel
     {
