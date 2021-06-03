@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, Beatmap.Default));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
 
             beatmaps = new List<BeatmapInfo>();
 
@@ -56,7 +56,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 beatmaps.Add(new BeatmapInfo
                 {
                     Ruleset = rulesets.GetRuleset(i % 4),
-                    RulesetID = i % 4, // workaround for efcore 5 compatibility.
                     OnlineBeatmapID = beatmapId,
                     Length = length,
                     BPM = bpm,

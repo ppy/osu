@@ -11,7 +11,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Scoring;
-using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
@@ -19,8 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    // Todo: The "room" part of PlaylistsPlayer should be split out into an abstract player class to be inherited instead.
-    public class MultiplayerPlayer : PlaylistsPlayer
+    public class MultiplayerPlayer : RoomSubmittingPlayer
     {
         protected override bool PauseOnFocusLost => false;
 
@@ -28,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override bool CheckModsAllowFailure() => false;
 
         [Resolved]
-        private StatefulMultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; }
 
         private IBindable<bool> isConnected;
 
@@ -50,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 AllowPause = false,
                 AllowRestart = false,
-                AllowSkippingIntro = false,
+                AllowSkipping = false,
             })
         {
             this.userIds = userIds;
@@ -63,9 +61,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(ScoreProcessor, userIds), HUDOverlay.Add);
 
             HUDOverlay.Add(loadingDisplay = new LoadingLayer(true) { Depth = float.MaxValue });
+        }
 
-            if (Token == null)
-                return; // Todo: Somehow handle token retrieval failure.
+        protected override void LoadAsyncComplete()
+        {
+            base.LoadAsyncComplete();
+
+            if (!ValidForResume)
+                return; // token retrieval may have failed.
 
             client.MatchStarted += onMatchStarted;
             client.ResultsReady += onResultsReady;
@@ -135,9 +138,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onResultsReady() => resultsReady.SetResult(true);
 
-        protected override async Task SubmitScore(Score score)
+        protected override async Task PrepareScoreForResultsAsync(Score score)
         {
-            await base.SubmitScore(score).ConfigureAwait(false);
+            await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
 
             await client.ChangeState(MultiplayerUserState.FinishedPlay).ConfigureAwait(false);
 

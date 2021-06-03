@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -38,13 +39,13 @@ namespace osu.Game.Tests.Online
         private BeatmapSetInfo testBeatmapSet;
 
         private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
-        private OnlinePlayBeatmapAvailablilityTracker availablilityTracker;
+        private OnlinePlayBeatmapAvailabilityTracker availabilityTracker;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, GameHost host)
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.CacheAs<BeatmapManager>(beatmaps = new TestBeatmapManager(LocalStorage, ContextFactory, rulesets, API, audio, host, Beatmap.Default));
+            Dependencies.CacheAs<BeatmapManager>(beatmaps = new TestBeatmapManager(LocalStorage, ContextFactory, rulesets, API, audio, Resources, host, Beatmap.Default));
         }
 
         [SetUp]
@@ -67,7 +68,7 @@ namespace osu.Game.Tests.Online
                 Ruleset = { Value = testBeatmapInfo.Ruleset },
             };
 
-            Child = availablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
+            Child = availabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
             {
                 SelectedItem = { BindTarget = selectedItem, }
             };
@@ -118,7 +119,7 @@ namespace osu.Game.Tests.Online
             });
             addAvailabilityCheckStep("state still not downloaded", BeatmapAvailability.NotDownloaded);
 
-            AddStep("recreate tracker", () => Child = availablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
+            AddStep("recreate tracker", () => Child = availabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
             {
                 SelectedItem = { BindTarget = selectedItem }
             });
@@ -127,7 +128,7 @@ namespace osu.Game.Tests.Online
 
         private void addAvailabilityCheckStep(string description, Func<BeatmapAvailability> expected)
         {
-            AddAssert(description, () => availablilityTracker.Availability.Value.Equals(expected.Invoke()));
+            AddAssert(description, () => availabilityTracker.Availability.Value.Equals(expected.Invoke()));
         }
 
         private static BeatmapInfo getTestBeatmapInfo(string archiveFile)
@@ -160,8 +161,8 @@ namespace osu.Game.Tests.Online
             protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize)
                 => new TestDownloadRequest(set);
 
-            public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, GameHost host = null, WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
-                : base(storage, contextFactory, rulesets, api, audioManager, host, defaultBeatmap, performOnlineLookups)
+            public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null, WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
+                : base(storage, contextFactory, rulesets, api, audioManager, resources, host, defaultBeatmap, performOnlineLookups)
             {
             }
 

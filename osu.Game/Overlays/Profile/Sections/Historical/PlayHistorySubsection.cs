@@ -9,6 +9,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 {
     public class PlayHistorySubsection : ChartProfileSubsection
     {
+        protected override string GraphCounterName => "Plays";
+
         public PlayHistorySubsection(Bindable<User> user)
             : base(user, "Play History")
         {

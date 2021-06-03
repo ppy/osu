@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -27,10 +28,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         protected const float SPRITE_SCALE = 0.625f;
 
+        private const float spm_hide_offset = 50f;
+
         protected DrawableSpinner DrawableSpinner { get; private set; }
 
         private Sprite spin;
         private Sprite clear;
+
+        private LegacySpriteText bonusCounter;
+
+        private Sprite spmBackground;
+        private LegacySpriteText spmCounter;
 
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableHitObject, ISkinSource source)
@@ -45,35 +53,78 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             DrawableSpinner = (DrawableSpinner)drawableHitObject;
 
-            AddRangeInternal(new[]
+            AddInternal(new Container
             {
-                spin = new Sprite
+                Depth = float.MinValue,
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.Centre,
-                    Depth = float.MinValue,
-                    Texture = source.GetTexture("spinner-spin"),
-                    Scale = new Vector2(SPRITE_SCALE),
-                    Y = SPINNER_TOP_OFFSET + 335,
-                },
-                clear = new Sprite
-                {
-                    Alpha = 0,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.Centre,
-                    Depth = float.MinValue,
-                    Texture = source.GetTexture("spinner-clear"),
-                    Scale = new Vector2(SPRITE_SCALE),
-                    Y = SPINNER_TOP_OFFSET + 115,
-                },
+                    spin = new Sprite
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-spin"),
+                        Scale = new Vector2(SPRITE_SCALE),
+                        Y = SPINNER_TOP_OFFSET + 335,
+                    },
+                    clear = new Sprite
+                    {
+                        Alpha = 0,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-clear"),
+                        Scale = new Vector2(SPRITE_SCALE),
+                        Y = SPINNER_TOP_OFFSET + 115,
+                    },
+                    bonusCounter = new LegacySpriteText(LegacyFont.Score)
+                    {
+                        Alpha = 0f,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(SPRITE_SCALE),
+                        Y = SPINNER_TOP_OFFSET + 299,
+                    }.With(s => s.Font = s.Font.With(fixedWidth: false)),
+                    spmBackground = new Sprite
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopLeft,
+                        Texture = source.GetTexture("spinner-rpm"),
+                        Scale = new Vector2(SPRITE_SCALE),
+                        Position = new Vector2(-87, 445 + spm_hide_offset),
+                    },
+                    spmCounter = new LegacySpriteText(LegacyFont.Score)
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopRight,
+                        Scale = new Vector2(SPRITE_SCALE * 0.9f),
+                        Position = new Vector2(80, 448 + spm_hide_offset),
+                    }.With(s => s.Font = s.Font.With(fixedWidth: false)),
+                }
             });
         }
+
+        private IBindable<double> gainedBonus;
+        private IBindable<double> spinsPerMinute;
 
         private readonly Bindable<bool> completed = new Bindable<bool>();
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            gainedBonus = DrawableSpinner.GainedBonus.GetBoundCopy();
+            gainedBonus.BindValueChanged(bonus =>
+            {
+                bonusCounter.Text = bonus.NewValue.ToString(NumberFormatInfo.InvariantInfo);
+                bonusCounter.FadeOutFromOne(800, Easing.Out);
+                bonusCounter.ScaleTo(SPRITE_SCALE * 2f).Then().ScaleTo(SPRITE_SCALE * 1.28f, 800, Easing.Out);
+            });
+
+            spinsPerMinute = DrawableSpinner.SpinsPerMinute.GetBoundCopy();
+            spinsPerMinute.BindValueChanged(spm =>
+            {
+                spmCounter.Text = Math.Truncate(spm.NewValue).ToString(@"#0");
+            }, true);
 
             completed.BindValueChanged(onCompletedChanged, true);
 
@@ -118,10 +169,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             switch (drawableHitObject)
             {
                 case DrawableSpinner d:
-                    double fadeOutLength = Math.Min(400, d.HitObject.Duration);
+                    using (BeginAbsoluteSequence(d.HitObject.StartTime - d.HitObject.TimeFadeIn))
+                    {
+                        spmBackground.MoveToOffset(new Vector2(0, -spm_hide_offset), d.HitObject.TimeFadeIn, Easing.Out);
+                        spmCounter.MoveToOffset(new Vector2(0, -spm_hide_offset), d.HitObject.TimeFadeIn, Easing.Out);
+                    }
 
-                    using (BeginAbsoluteSequence(drawableHitObject.HitStateUpdateTime - fadeOutLength, true))
-                        spin.FadeOutFromOne(fadeOutLength);
+                    double spinFadeOutLength = Math.Min(400, d.HitObject.Duration);
+
+                    using (BeginAbsoluteSequence(drawableHitObject.HitStateUpdateTime - spinFadeOutLength, true))
+                        spin.FadeOutFromOne(spinFadeOutLength);
                     break;
 
                 case DrawableSpinnerTick d:

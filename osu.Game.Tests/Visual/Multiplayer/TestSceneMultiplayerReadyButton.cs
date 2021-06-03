@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneMultiplayerReadyButton : MultiplayerTestScene
     {
         private MultiplayerReadyButton button;
-        private OnlinePlayBeatmapAvailablilityTracker beatmapTracker;
+        private OnlinePlayBeatmapAvailabilityTracker beatmapTracker;
         private BeatmapSetInfo importedSet;
 
         private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
@@ -41,10 +41,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, Beatmap.Default));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
             beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
 
-            Add(beatmapTracker = new OnlinePlayBeatmapAvailablilityTracker
+            Add(beatmapTracker = new OnlinePlayBeatmapAvailabilityTracker
             {
                 SelectedItem = { BindTarget = selectedItem }
             });
@@ -209,9 +209,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             addClickButtonStep();
             AddAssert("user waiting for load", () => Client.Room?.Users[0].State == MultiplayerUserState.WaitingForLoad);
-            AddAssert("ready button disabled", () => !button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
 
+            AddAssert("ready button disabled", () => !button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
             AddStep("transitioned to gameplay", () => readyClickOperation.Dispose());
+
+            AddStep("finish gameplay", () =>
+            {
+                Client.ChangeUserState(Client.Room?.Users[0].UserID ?? 0, MultiplayerUserState.Loaded);
+                Client.ChangeUserState(Client.Room?.Users[0].UserID ?? 0, MultiplayerUserState.FinishedPlay);
+            });
+
             AddAssert("ready button enabled", () => button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
         }
     }
