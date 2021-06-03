@@ -9,6 +9,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -37,6 +39,9 @@ namespace osu.Game.Tests.Visual.Online
         private Channel channel1 => channels[0];
         private Channel channel2 => channels[1];
         private Channel channel3 => channels[2];
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         public TestSceneChatOverlay()
         {
@@ -231,7 +236,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestCtrlWShortcut()
+        public void TestCloseTabShortcut()
         {
             AddStep("Join 2 channels", () =>
             {
@@ -241,7 +246,7 @@ namespace osu.Game.Tests.Visual.Online
 
             // Want to close channel 2
             AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
-            AddStep("Press Ctrl + W", pressControlW);
+            AddStep("Press keys", pressCloseDocumentKeys);
 
             // Channel 2 should be closed
             AddAssert("Channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
@@ -250,13 +255,13 @@ namespace osu.Game.Tests.Visual.Online
             // Want to close channel 1
             AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
 
-            AddStep("Press Ctrl + W", pressControlW);
+            AddStep("Press keys", pressCloseDocumentKeys);
             // Channel 1 and channel 2 should be closed
             AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
         }
 
         [Test]
-        public void TestCtrlTShortcut()
+        public void TestNewTabShortcut()
         {
             AddStep("Join 2 channels", () =>
             {
@@ -265,14 +270,14 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             // Want to join another channel
-            AddStep("Press Ctrl + T", pressControlT);
+            AddStep("Press keys", pressNewTabKeys);
 
             // Selector should be visible
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
         }
 
         [Test]
-        public void TestCtrlShiftTShortcut()
+        public void TestRestoreTabShortcut()
         {
             AddStep("Join 3 channels", () =>
             {
@@ -282,7 +287,7 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             // Should do nothing
-            AddStep("Press Ctrl + Shift + T", pressControlShiftT);
+            AddStep("Press keys", pressRestoreTabKeys);
             AddAssert("All channels still open", () => channelManager.JoinedChannels.Count == 3);
 
             // Close channel 1
@@ -292,7 +297,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Other channels still open", () => channelManager.JoinedChannels.Count == 2);
 
             // Reopen channel 1
-            AddStep("Press Ctrl + Shift + T", pressControlShiftT);
+            AddStep("Press keys", pressRestoreTabKeys);
             AddAssert("All channels now open", () => channelManager.JoinedChannels.Count == 3);
             AddAssert("Current channel is channel 1", () => currentChannel == channel1);
 
@@ -305,13 +310,13 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Current channel is channel 3", () => currentChannel == channel3);
 
             // Should first re-open channel 2
-            AddStep("Press Ctrl + Shift + T", pressControlShiftT);
+            AddStep("Press keys", pressRestoreTabKeys);
             AddAssert("Channel 1 still closed", () => !channelManager.JoinedChannels.Contains(channel1));
             AddAssert("Channel 2 now open", () => channelManager.JoinedChannels.Contains(channel2));
             AddAssert("Current channel is channel 2", () => currentChannel == channel2);
 
             // Should then re-open channel 1
-            AddStep("Press Ctrl + Shift + T", pressControlShiftT);
+            AddStep("Press keys", pressRestoreTabKeys);
             AddAssert("All channels now open", () => channelManager.JoinedChannels.Count == 3);
             AddAssert("Current channel is channel 1", () => currentChannel == channel1);
         }
@@ -324,27 +329,21 @@ namespace osu.Game.Tests.Visual.Online
             InputManager.ReleaseKey(Key.AltLeft);
         }
 
-        private void pressControlW()
-        {
-            InputManager.PressKey(Key.ControlLeft);
-            InputManager.Key(Key.W);
-            InputManager.ReleaseKey(Key.ControlLeft);
-        }
+        private void pressCloseDocumentKeys() => pressKeysFor(PlatformActionType.DocumentClose);
 
-        private void pressControlT()
-        {
-            InputManager.PressKey(Key.ControlLeft);
-            InputManager.Key(Key.T);
-            InputManager.ReleaseKey(Key.ControlLeft);
-        }
+        private void pressNewTabKeys() => pressKeysFor(PlatformActionType.TabNew);
 
-        private void pressControlShiftT()
+        private void pressRestoreTabKeys() => pressKeysFor(PlatformActionType.TabRestore);
+
+        private void pressKeysFor(PlatformActionType type)
         {
-            InputManager.PressKey(Key.ControlLeft);
-            InputManager.PressKey(Key.ShiftLeft);
-            InputManager.Key(Key.T);
-            InputManager.ReleaseKey(Key.ShiftLeft);
-            InputManager.ReleaseKey(Key.ControlLeft);
+            var binding = host.PlatformKeyBindings.First(b => ((PlatformAction)b.Action).ActionType == type);
+
+            foreach (var k in binding.KeyCombination.Keys)
+                InputManager.PressKey((Key)k);
+
+            foreach (var k in binding.KeyCombination.Keys)
+                InputManager.ReleaseKey((Key)k);
         }
 
         private void clickDrawable(Drawable d)
