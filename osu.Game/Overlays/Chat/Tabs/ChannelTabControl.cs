@@ -81,8 +81,10 @@ namespace osu.Game.Overlays.Chat.Tabs
             RemoveItem(channel);
 
             if (SelectedTab == null)
-                SelectTab(selectorTab);
+                SelectChannelSelectorTab();
         }
+
+        public void SelectChannelSelectorTab() => SelectTab(selectorTab);
 
         protected override void SelectTab(TabItem<Channel> tab)
         {
@@ -94,11 +96,6 @@ namespace osu.Game.Overlays.Chat.Tabs
 
             base.SelectTab(tab);
             selectorTab.Active.Value = false;
-        }
-
-        public void SelectChannelSelectorTab()
-        {
-            SelectTab(selectorTab);
         }
 
         protected override TabFillFlowContainer CreateTabFlow() => new ChannelTabFillFlowContainer
