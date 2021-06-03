@@ -3,15 +3,9 @@
 
 using System;
 using System.Linq;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -41,13 +35,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
 
         private Random rng;
-
-        [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(OsuModRandomSettingsControl))]
-        public Bindable<int?> Seed { get; } = new Bindable<int?>
-        {
-            Default = null,
-            Value = null
-        };
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
@@ -287,83 +274,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 PositionRandomised = PositionOriginal = hitObject.Position;
                 EndPositionRandomised = EndPositionOriginal = hitObject.EndPosition;
                 AngleRad = 0;
-            }
-        }
-
-        public class OsuModRandomSettingsControl : SettingsItem<int?>
-        {
-            protected override Drawable CreateControl() => new SeedControl
-            {
-                RelativeSizeAxes = Axes.X,
-                Margin = new MarginPadding { Top = 5 }
-            };
-
-            private sealed class SeedControl : CompositeDrawable, IHasCurrentValue<int?>
-            {
-                private readonly BindableWithCurrent<int?> current = new BindableWithCurrent<int?>();
-
-                public Bindable<int?> Current
-                {
-                    get => current;
-                    set
-                    {
-                        current.Current = value;
-                        seedNumberBox.Text = value.Value.ToString();
-                    }
-                }
-
-                private readonly OsuNumberBox seedNumberBox;
-
-                public SeedControl()
-                {
-                    AutoSizeAxes = Axes.Y;
-
-                    InternalChildren = new[]
-                    {
-                        new GridContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            ColumnDimensions = new[]
-                            {
-                                new Dimension(),
-                                new Dimension(GridSizeMode.Absolute, 2),
-                                new Dimension(GridSizeMode.Relative, 0.25f)
-                            },
-                            RowDimensions = new[]
-                            {
-                                new Dimension(GridSizeMode.AutoSize)
-                            },
-                            Content = new[]
-                            {
-                                new Drawable[]
-                                {
-                                    seedNumberBox = new OsuNumberBox
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        CommitOnFocusLost = true
-                                    }
-                                }
-                            }
-                        }
-                    };
-
-                    seedNumberBox.Current.BindValueChanged(e =>
-                    {
-                        int? value = null;
-
-                        if (int.TryParse(e.NewValue, out var intVal))
-                            value = intVal;
-
-                        current.Value = value;
-                    });
-                }
-
-                protected override void Update()
-                {
-                    if (current.Value == null)
-                        seedNumberBox.Text = current.Current.Value.ToString();
-                }
             }
         }
     }
