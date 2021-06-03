@@ -472,10 +472,10 @@ namespace osu.Game.Online.Chat
                 closedChannels.RemoveAt(closedChannels.Count - 1);
 
                 // If the user has already joined the channel, try the next one
-                if (joinedChannels.FirstOrDefault(lastClosedChannel.IsEqual) != null)
+                if (joinedChannels.FirstOrDefault(lastClosedChannel.Matches) != null)
                     continue;
 
-                Channel lastChannel = AvailableChannels.FirstOrDefault(lastClosedChannel.IsEqual);
+                Channel lastChannel = AvailableChannels.FirstOrDefault(lastClosedChannel.Matches);
 
                 if (lastChannel != null)
                 {
@@ -596,7 +596,7 @@ namespace osu.Game.Online.Chat
             Id = id;
         }
 
-        public bool IsEqual(Channel channel)
+        public bool Matches(Channel channel)
         {
             if (channel.Type != Type) return false;
 
