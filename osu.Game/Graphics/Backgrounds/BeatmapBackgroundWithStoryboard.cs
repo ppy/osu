@@ -1,7 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Storyboards.Drawables;
@@ -15,21 +16,19 @@ namespace osu.Game.Graphics.Backgrounds
         {
         }
 
-        protected override void Initialize()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            if (Beatmap.Storyboard.HasDrawable)
-            {
-                LoadComponentAsync(new DrawableStoryboard(Beatmap.Storyboard) { Clock = new InterpolatingFramedClock(Beatmap.Track) }, AddInternal);
-            }
-
-            if (Beatmap.Storyboard.ReplacesBackground || Beatmap.Storyboard.Layers.First(l => l.Name == "Video").Elements.Any())
-            {
-                Sprite.Expire();
-            }
-            else
-            {
-                base.Initialize();
-            }
+            LoadComponentAsync(new DrawableStoryboard(Beatmap.Storyboard)
+                {
+                    Clock = new InterpolatingFramedClock(Beatmap.Track),
+                },
+                loaded =>
+                {
+                    AddInternal(loaded);
+                    if (Beatmap.Storyboard.ReplacesBackground)
+                        Sprite.FadeOut(300, Easing.OutQuint);
+                });
         }
     }
 }
