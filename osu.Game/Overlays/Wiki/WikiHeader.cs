@@ -30,13 +30,12 @@ namespace osu.Game.Overlays.Wiki
 
         private void onWikiPageChange(ValueChangedEvent<APIWikiPage> e)
         {
-            if (e.NewValue == null)
-                return;
-
             TabControl.Clear();
             Current.Value = null;
-
             TabControl.AddItem(index_page_string);
+
+            if (e.NewValue == null)
+                return;
 
             if (e.NewValue.Path == index_path)
             {
