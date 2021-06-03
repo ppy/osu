@@ -587,8 +587,8 @@ namespace osu.Game.Online.Chat
     /// </summary>
     public class ClosedChannel
     {
-        public ChannelType Type;
-        public long Id;
+        public readonly ChannelType Type;
+        public readonly long Id;
 
         public ClosedChannel(ChannelType type, long id)
         {
