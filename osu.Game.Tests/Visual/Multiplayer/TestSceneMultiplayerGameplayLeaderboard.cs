@@ -4,16 +4,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -21,6 +20,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Visual.Online;
+using osu.Game.Tests.Visual.Spectator;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -28,8 +28,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private const int users = 16;
 
-        [Cached(typeof(SpectatorStreamingClient))]
-        private TestMultiplayerStreaming streamingClient = new TestMultiplayerStreaming(users);
+        [Cached(typeof(SpectatorClient))]
+        private TestMultiplayerSpectatorClient spectatorClient = new TestMultiplayerSpectatorClient();
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestSceneCurrentlyPlayingDisplay.TestUserLookupCache();
@@ -38,19 +38,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
+        private OsuConfigManager config;
+
         public TestSceneMultiplayerGameplayLeaderboard()
         {
             base.Content.Children = new Drawable[]
             {
-                streamingClient,
+                spectatorClient,
                 lookupCache,
                 Content
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Dependencies.Cache(config = new OsuConfigManager(LocalStorage));
+        }
+
         [SetUpSteps]
         public override void SetUpSteps()
         {
+            AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = lookupCache.GetUserAsync(1).Result);
+
             AddStep("create leaderboard", () =>
             {
                 leaderboard?.Expire();
@@ -60,10 +70,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 var playable = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
 
-                streamingClient.Start(Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
+                for (int i = 0; i < users; i++)
+                    spectatorClient.StartPlay(i, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
 
-                Client.CurrentMatchPlayingUserIds.Clear();
-                Client.CurrentMatchPlayingUserIds.AddRange(streamingClient.PlayingUsers);
+                spectatorClient.Schedule(() =>
+                {
+                    Client.CurrentMatchPlayingUserIds.Clear();
+                    Client.CurrentMatchPlayingUserIds.AddRange(spectatorClient.PlayingUsers);
+                });
 
                 Children = new Drawable[]
                 {
@@ -72,7 +86,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 scoreProcessor.ApplyBeatmap(playable);
 
-                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, streamingClient.PlayingUsers.ToArray())
+                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, spectatorClient.PlayingUsers.ToArray())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -80,12 +94,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for load", () => leaderboard.IsLoaded);
+            AddUntilStep("wait for user population", () => Client.CurrentMatchPlayingUserIds.Count > 0);
         }
 
         [Test]
         public void TestScoreUpdates()
         {
-            AddRepeatStep("update state", () => streamingClient.RandomlyUpdateState(), 100);
+            AddRepeatStep("update state", () => spectatorClient.RandomlyUpdateState(), 100);
+            AddToggleStep("switch compact mode", expanded => leaderboard.Expanded.Value = expanded);
         }
 
         [Test]
@@ -94,30 +110,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddRepeatStep("mark user quit", () => Client.CurrentMatchPlayingUserIds.RemoveAt(0), users);
         }
 
-        public class TestMultiplayerStreaming : SpectatorStreamingClient
+        [Test]
+        public void TestChangeScoringMode()
         {
-            public new BindableList<int> PlayingUsers => (BindableList<int>)base.PlayingUsers;
+            AddRepeatStep("update state", () => spectatorClient.RandomlyUpdateState(), 5);
+            AddStep("change to classic", () => config.SetValue(OsuSetting.ScoreDisplayMode, ScoringMode.Classic));
+            AddStep("change to standardised", () => config.SetValue(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised));
+        }
 
-            private readonly int totalUsers;
-
-            public TestMultiplayerStreaming(int totalUsers)
-                : base(new DevelopmentEndpointConfiguration())
-            {
-                this.totalUsers = totalUsers;
-            }
-
-            public void Start(int beatmapId)
-            {
-                for (int i = 0; i < totalUsers; i++)
-                {
-                    ((ISpectatorClient)this).UserBeganPlaying(i, new SpectatorState
-                    {
-                        BeatmapID = beatmapId,
-                        RulesetID = 0,
-                    });
-                }
-            }
-
+        public class TestMultiplayerSpectatorClient : TestSpectatorClient
+        {
             private readonly Dictionary<int, FrameHeader> lastHeaders = new Dictionary<int, FrameHeader>();
 
             public void RandomlyUpdateState()
@@ -160,11 +162,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             break;
                     }
 
-                    ((ISpectatorClient)this).UserSentFrames(userId, new FrameDataBundle(header, Array.Empty<LegacyReplayFrame>()));
+                    ((ISpectatorClient)this).UserSentFrames(userId, new FrameDataBundle(header, new[] { new LegacyReplayFrame(Time.Current, 0, 0, ReplayButtonState.None) }));
                 }
             }
-
-            protected override Task Connect() => Task.CompletedTask;
         }
     }
 }

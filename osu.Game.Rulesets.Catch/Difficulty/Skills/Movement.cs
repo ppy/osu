@@ -5,10 +5,11 @@ using System;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
-    public class Movement : Skill
+    public class Movement : StrainSkill
     {
         private const float absolute_player_positioning_error = 16f;
         private const float normalized_hitobject_radius = 41.0f;
@@ -19,13 +20,16 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
         protected override double DecayWeight => 0.94;
 
+        protected override int SectionLength => 750;
+
         protected readonly float HalfCatcherWidth;
 
         private float? lastPlayerPosition;
         private float lastDistanceMoved;
         private double lastStrainTime;
 
-        public Movement(float halfCatcherWidth)
+        public Movement(Mod[] mods, float halfCatcherWidth)
+            : base(mods)
         {
             HalfCatcherWidth = halfCatcherWidth;
         }

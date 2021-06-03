@@ -13,7 +13,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
 
@@ -21,8 +20,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerReadyButton : MultiplayerRoomComposite
     {
-        public Bindable<PlaylistItem> SelectedItem => button.SelectedItem;
-
         public Action OnReadyClick
         {
             set => button.Action = value;
@@ -39,7 +36,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private IBindable<bool> operationInProgress;
 
-        private SampleChannel sampleReadyCount;
+        private Sample sampleReadyCount;
 
         private readonly ButtonWithTrianglesExposed button;
 
@@ -81,8 +78,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             Debug.Assert(Room != null);
 
             int newCountReady = Room.Users.Count(u => u.State == MultiplayerUserState.Ready);
+            int newCountTotal = Room.Users.Count(u => u.State != MultiplayerUserState.Spectating);
 
-            string countText = $"({newCountReady} / {Room.Users.Count} ready)";
+            string countText = $"({newCountReady} / {newCountTotal} ready)";
 
             switch (localUser.State)
             {
@@ -91,6 +89,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     updateButtonColour(true);
                     break;
 
+                case MultiplayerUserState.Spectating:
                 case MultiplayerUserState.Ready:
                     if (Room?.Host?.Equals(localUser) == true)
                     {
@@ -106,7 +105,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     break;
             }
 
-            button.Enabled.Value = Client.Room?.State == MultiplayerRoomState.Open && !operationInProgress.Value;
+            bool enableButton = Client.Room?.State == MultiplayerRoomState.Open && !operationInProgress.Value;
+
+            // When the local user is the host and spectating the match, the "start match" state should be enabled if any users are ready.
+            if (localUser.State == MultiplayerUserState.Spectating)
+                enableButton &= Room?.Host?.Equals(localUser) == true && newCountReady > 0;
+
+            button.Enabled.Value = enableButton;
 
             if (newCountReady != countReady)
             {
@@ -120,8 +125,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             if (sampleReadyCount == null)
                 return;
 
-            sampleReadyCount.Frequency.Value = 0.77f + countReady * 0.06f;
-            sampleReadyCount.Play();
+            var channel = sampleReadyCount.GetChannel();
+            channel.Frequency.Value = 0.77f + countReady * 0.06f;
+            channel.Play();
         }
 
         private void updateButtonColour(bool green)

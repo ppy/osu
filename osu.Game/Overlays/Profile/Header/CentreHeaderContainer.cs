@@ -144,8 +144,8 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void updateDisplay(User user)
         {
-            hiddenDetailGlobal.Content = user?.Statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
-            hiddenDetailCountry.Content = user?.Statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
+            hiddenDetailGlobal.Content = user?.Statistics?.GlobalRank?.ToString("\\##,##0") ?? "-";
+            hiddenDetailCountry.Content = user?.Statistics?.CountryRank?.ToString("\\##,##0") ?? "-";
         }
     }
 }

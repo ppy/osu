@@ -15,13 +15,19 @@ namespace osu.Game.Online.Rooms
     public class PlaylistItem : IEquatable<PlaylistItem>
     {
         [JsonProperty("id")]
-        public int ID { get; set; }
+        public long ID { get; set; }
 
         [JsonProperty("beatmap_id")]
         public int BeatmapID { get; set; }
 
         [JsonProperty("ruleset_id")]
         public int RulesetID { get; set; }
+
+        /// <summary>
+        /// Whether this <see cref="PlaylistItem"/> is still a valid selection for the <see cref="Room"/>.
+        /// </summary>
+        [JsonProperty("expired")]
+        public bool Expired { get; set; }
 
         [JsonIgnore]
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();

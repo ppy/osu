@@ -14,6 +14,9 @@ namespace osu.Game.Overlays
     {
         private readonly Container dialogContainer;
 
+        protected override string PopInSampleName => "UI/dialog-pop-in";
+        protected override string PopOutSampleName => "UI/dialog-pop-out";
+
         public PopupDialog CurrentDialog { get; private set; }
 
         public DialogOverlay()
@@ -32,15 +35,16 @@ namespace osu.Game.Overlays
 
         public void Push(PopupDialog dialog)
         {
-            if (dialog == CurrentDialog) return;
+            if (dialog == CurrentDialog || dialog.State.Value != Visibility.Visible) return;
 
+            // if any existing dialog is being displayed, dismiss it before showing a new one.
             CurrentDialog?.Hide();
+
             CurrentDialog = dialog;
+            CurrentDialog.State.ValueChanged += state => onDialogOnStateChanged(dialog, state.NewValue);
 
             dialogContainer.Add(CurrentDialog);
 
-            CurrentDialog.Show();
-            CurrentDialog.State.ValueChanged += state => onDialogOnStateChanged(dialog, state.NewValue);
             Show();
         }
 

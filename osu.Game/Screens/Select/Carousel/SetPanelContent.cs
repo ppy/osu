@@ -41,13 +41,13 @@ namespace osu.Game.Screens.Select.Carousel
                 {
                     new OsuSpriteText
                     {
-                        Text = new LocalisedString((beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title)),
+                        Text = new RomanisableString(beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title),
                         Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22, italics: true),
                         Shadow = true,
                     },
                     new OsuSpriteText
                     {
-                        Text = new LocalisedString((beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist)),
+                        Text = new RomanisableString(beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist),
                         Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 17, italics: true),
                         Shadow = true,
                     },

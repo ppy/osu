@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Testing;
 using osu.Game.Database;
 
@@ -30,6 +31,9 @@ namespace osu.Game.Beatmaps
         public BeatmapMetadata Metadata { get; set; }
 
         public List<BeatmapInfo> Beatmaps { get; set; }
+
+        [NotNull]
+        public List<BeatmapSetFileInfo> Files { get; set; } = new List<BeatmapSetFileInfo>();
 
         [NotMapped]
         public BeatmapSetOnlineInfo OnlineInfo { get; set; }
@@ -57,9 +61,14 @@ namespace osu.Game.Beatmaps
 
         public string Hash { get; set; }
 
-        public string StoryboardFile => Files?.Find(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename;
+        public string StoryboardFile => Files.Find(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename;
 
-        public List<BeatmapSetFileInfo> Files { get; set; }
+        /// <summary>
+        /// Returns the storage path for the file in this beatmapset with the given filename, if any exists, otherwise null.
+        /// The path returned is relative to the user file storage.
+        /// </summary>
+        /// <param name="filename">The name of the file to get the storage path of.</param>
+        public string GetPathForFile(string filename) => Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
         public override string ToString() => Metadata?.ToString() ?? base.ToString();
 

@@ -40,14 +40,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         public DefaultSpinnerDisc()
         {
-            RelativeSizeAxes = Axes.Both;
-
             // we are slightly bigger than our parent, to clip the top and bottom of the circle
             // this should probably be revisited when scaled spinners are a thing.
             Scale = new Vector2(initial_scale);
-
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
         }
 
         [BackgroundDependencyLoader]

@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(300, 0),
                 }),
                 RepeatCount = 1
-            }), null));
+            })));
         }
 
         [Test]

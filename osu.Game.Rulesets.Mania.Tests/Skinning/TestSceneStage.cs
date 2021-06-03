@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            SetContents(() =>
+            SetContents(_ =>
             {
                 ManiaAction normalAction = ManiaAction.Key1;
                 ManiaAction specialAction = ManiaAction.Special1;

@@ -59,7 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private IRoomManager manager { get; set; }
 
             [Resolved]
-            private StatefulMultiplayerClient client { get; set; }
+            private MultiplayerClient client { get; set; }
 
             [Resolved]
             private Bindable<Room> currentRoom { get; set; }
@@ -357,7 +357,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         public class CreateOrUpdateButton : TriangleButton
         {
             [Resolved(typeof(Room), nameof(Room.RoomID))]
-            private Bindable<int?> roomId { get; set; }
+            private Bindable<long?> roomId { get; set; }
 
             protected override void LoadComplete()
             {

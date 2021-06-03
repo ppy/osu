@@ -116,7 +116,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             joinedRoom.Value = null;
         }
 
-        private readonly HashSet<int> ignoredRooms = new HashSet<int>();
+        private readonly HashSet<long> ignoredRooms = new HashSet<long>();
 
         private void onRoomsReceived(List<Room> received)
         {

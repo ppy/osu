@@ -3,9 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
@@ -23,7 +21,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private readonly BindableNumber<int> volume;
 
         private OsuSpriteText text;
-        private Box volumeBox;
+        private Container volumeBox;
+
+        private const int max_volume_height = 22;
 
         public SamplePointPiece(SampleControlPoint samplePoint)
         {
@@ -35,8 +35,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Origin = Anchor.TopLeft;
-            Anchor = Anchor.TopLeft;
+            Margin = new MarginPadding { Vertical = 5 };
+
+            Origin = Anchor.BottomCentre;
+            Anchor = Anchor.BottomCentre;
 
             AutoSizeAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
@@ -45,40 +47,43 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             InternalChildren = new Drawable[]
             {
+                volumeBox = new Circle
+                {
+                    CornerRadius = 5,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Y = -20,
+                    Width = 10,
+                    Colour = colour,
+                },
                 new Container
                 {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 20,
+                    AutoSizeAxes = Axes.X,
+                    Height = 16,
+                    Masking = true,
+                    CornerRadius = 8,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
                     Children = new Drawable[]
                     {
-                        volumeBox = new Box
-                        {
-                            X = 2,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Colour = ColourInfo.GradientVertical(colour, Color4.Black),
-                            RelativeSizeAxes = Axes.Both,
-                        },
                         new Box
                         {
-                            Colour = colour.Lighten(0.2f),
-                            Width = 2,
-                            RelativeSizeAxes = Axes.Y,
+                            Colour = colour,
+                            RelativeSizeAxes = Axes.Both,
                         },
+                        text = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Padding = new MarginPadding(5),
+                            Font = OsuFont.Default.With(size: 12, weight: FontWeight.SemiBold),
+                            Colour = colours.B5,
+                        }
                     }
                 },
-                text = new OsuSpriteText
-                {
-                    X = 2,
-                    Y = -5,
-                    Anchor = Anchor.BottomLeft,
-                    Alpha = 0.9f,
-                    Rotation = -90,
-                    Font = OsuFont.Default.With(weight: FontWeight.SemiBold)
-                }
             };
 
-            volume.BindValueChanged(volume => volumeBox.Height = volume.NewValue / 100f, true);
+            volume.BindValueChanged(volume => volumeBox.Height = max_volume_height * volume.NewValue / 100f, true);
             bank.BindValueChanged(bank => text.Text = bank.NewValue, true);
         }
     }
