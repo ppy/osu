@@ -39,6 +39,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
             // In catch, rate adjustment mods do not only affect the timings of hitobjects,
             // but also the speed of the player's catcher, which has an impact on difficulty
+            // TODO: Support variable clockrates caused by mods such as ModTimeRamp
+            //  (perhaps by using IApplicableToRate within the CatchDifficultyHitObject constructor to set a catcher speed for each object before processing)
             var rateAdjustMod = mods.FirstOrDefault(m => m is ModRateAdjust);
             catcherSpeedMultiplier = (rateAdjustMod as ModRateAdjust)?.SpeedChange.Value ?? 1;
         }
