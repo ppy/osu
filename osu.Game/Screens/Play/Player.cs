@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -24,10 +23,8 @@ using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
-using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -137,6 +134,8 @@ namespace osu.Game.Screens.Play
 
         public readonly PlayerConfiguration Configuration;
 
+        protected Score Score { get; private set; }
+
         /// <summary>
         /// Create a new player instance.
         /// </summary>
@@ -145,7 +144,7 @@ namespace osu.Game.Screens.Play
             Configuration = configuration ?? new PlayerConfiguration();
         }
 
-        private GameplayBeatmap gameplayBeatmap;
+        protected GameplayBeatmap GameplayBeatmap { get; private set; }
 
         private ScreenSuspensionHandler screenSuspension;
 
@@ -161,24 +160,32 @@ namespace osu.Game.Screens.Play
             if (!LoadedBeatmapSuccessfully)
                 return;
 
-            // replays should never be recorded or played back when autoplay is enabled
-            if (!Mods.Value.Any(m => m is ModAutoplay))
-                PrepareReplay();
+            Score = CreateScore();
+
+            // ensure the score is in a consistent state with the current player.
+            Score.ScoreInfo.Beatmap = Beatmap.Value.BeatmapInfo;
+            Score.ScoreInfo.Ruleset = rulesetInfo;
+            Score.ScoreInfo.Mods = Mods.Value.ToArray();
+
+            PrepareReplay();
+
+            ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(Score.ScoreInfo);
 
             gameActive.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
         }
-
-        [CanBeNull]
-        private Score recordingScore;
 
         /// <summary>
         /// Run any recording / playback setup for replays.
         /// </summary>
         protected virtual void PrepareReplay()
         {
-            DrawableRuleset.SetRecordTarget(recordingScore = new Score());
+            DrawableRuleset.SetRecordTarget(Score);
+        }
 
-            ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(recordingScore.ScoreInfo);
+        protected virtual void PrepareScoreForResults()
+        {
+            // perform one final population to ensure everything is up-to-date.
+            ScoreProcessor.PopulateScore(Score.ScoreInfo);
         }
 
         [BackgroundDependencyLoader(true)]
@@ -223,10 +230,10 @@ namespace osu.Game.Screens.Play
 
             InternalChild = GameplayClockContainer = CreateGameplayClockContainer(Beatmap.Value, DrawableRuleset.GameplayStartTime);
 
-            AddInternal(gameplayBeatmap = new GameplayBeatmap(playableBeatmap));
+            AddInternal(GameplayBeatmap = new GameplayBeatmap(playableBeatmap));
             AddInternal(screenSuspension = new ScreenSuspensionHandler(GameplayClockContainer));
 
-            dependencies.CacheAs(gameplayBeatmap);
+            dependencies.CacheAs(GameplayBeatmap);
 
             var beatmapSkinProvider = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
 
@@ -284,7 +291,7 @@ namespace osu.Game.Screens.Play
             {
                 HealthProcessor.ApplyResult(r);
                 ScoreProcessor.ApplyResult(r);
-                gameplayBeatmap.ApplyResult(r);
+                GameplayBeatmap.ApplyResult(r);
             };
 
             DrawableRuleset.RevertResult += r =>
@@ -633,11 +640,11 @@ namespace osu.Game.Screens.Play
 
             prepareScoreForDisplayTask ??= Task.Run(async () =>
             {
-                var score = CreateScore();
+                PrepareScoreForResults();
 
                 try
                 {
-                    await PrepareScoreForResultsAsync(score).ConfigureAwait(false);
+                    await PrepareScoreForResultsAsync(Score).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -646,14 +653,14 @@ namespace osu.Game.Screens.Play
 
                 try
                 {
-                    await ImportScore(score).ConfigureAwait(false);
+                    await ImportScore(Score).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
                     Logger.Error(ex, "Score import failed!");
                 }
 
-                return score.ScoreInfo;
+                return Score.ScoreInfo;
             });
 
             if (skipStoryboardOutro)
@@ -905,41 +912,19 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
-        /// Creates the player's <see cref="Score"/>.
+        /// Creates the player's <see cref="Scoring.Score"/>.
         /// </summary>
-        /// <returns>The <see cref="Score"/>.</returns>
-        protected virtual Score CreateScore()
-        {
-            var score = new Score
+        /// <returns>The <see cref="Scoring.Score"/>.</returns>
+        protected virtual Score CreateScore() =>
+            new Score
             {
-                ScoreInfo = new ScoreInfo
-                {
-                    Beatmap = Beatmap.Value.BeatmapInfo,
-                    Ruleset = rulesetInfo,
-                    Mods = Mods.Value.ToArray(),
-                }
+                ScoreInfo = new ScoreInfo { User = api.LocalUser.Value },
             };
 
-            if (DrawableRuleset.ReplayScore != null)
-            {
-                score.ScoreInfo.User = DrawableRuleset.ReplayScore.ScoreInfo?.User ?? new GuestUser();
-                score.Replay = DrawableRuleset.ReplayScore.Replay;
-            }
-            else
-            {
-                score.ScoreInfo.User = api.LocalUser.Value;
-                score.Replay = new Replay { Frames = recordingScore?.Replay.Frames.ToList() ?? new List<ReplayFrame>() };
-            }
-
-            ScoreProcessor.PopulateScore(score.ScoreInfo);
-
-            return score;
-        }
-
         /// <summary>
-        /// Imports the player's <see cref="Score"/> to the local database.
+        /// Imports the player's <see cref="Scoring.Score"/> to the local database.
         /// </summary>
-        /// <param name="score">The <see cref="Score"/> to import.</param>
+        /// <param name="score">The <see cref="Scoring.Score"/> to import.</param>
         /// <returns>The imported score.</returns>
         protected virtual async Task ImportScore(Score score)
         {
@@ -951,7 +936,7 @@ namespace osu.Game.Screens.Play
 
             using (var stream = new MemoryStream())
             {
-                new LegacyScoreEncoder(score, gameplayBeatmap.PlayableBeatmap).Encode(stream);
+                new LegacyScoreEncoder(score, GameplayBeatmap.PlayableBeatmap).Encode(stream);
                 replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
             }
 
@@ -970,9 +955,9 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
-        /// Prepare the <see cref="Score"/> for display at results.
+        /// Prepare the <see cref="Scoring.Score"/> for display at results.
         /// </summary>
-        /// <param name="score">The <see cref="Score"/> to prepare.</param>
+        /// <param name="score">The <see cref="Scoring.Score"/> to prepare.</param>
         /// <returns>A task that prepares the provided score. On completion, the score is assumed to be ready for display.</returns>
         protected virtual Task PrepareScoreForResultsAsync(Score score) => Task.CompletedTask;
 
