@@ -3,28 +3,28 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Testing;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinnableHealthDisplay : SkinnableTestScene
+    public class TestSceneSkinnableHealthDisplay : SkinnableHUDComponentTestScene
     {
-        protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
-
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
+
+        protected override Drawable CreateDefaultImplementation() => new DefaultHealthDisplay();
+        protected override Drawable CreateLegacyImplementation() => new LegacyHealthDisplay();
 
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("Create health displays", () => SetContents(() => new SkinnableDrawable(new HUDSkinComponent(HUDSkinComponents.HealthDisplay))));
             AddStep(@"Reset all", delegate
             {
                 healthProcessor.Health.Value = 1;

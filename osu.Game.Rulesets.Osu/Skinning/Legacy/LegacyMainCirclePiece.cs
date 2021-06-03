@@ -12,7 +12,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -20,7 +19,7 @@ using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyMainCirclePiece : CompositeDrawable, IMainCirclePiece
+    public class LegacyMainCirclePiece : CompositeDrawable
     {
         private readonly string priorityLookup;
         private readonly bool hasNumber;
@@ -41,6 +40,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
+        private readonly IBindable<ArmedState> armedState = new Bindable<ArmedState>();
 
         [Resolved]
         private DrawableHitObject drawableObject { get; set; }
@@ -115,6 +115,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             accentColour.BindTo(drawableObject.AccentColour);
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
+            armedState.BindTo(drawableObject.State);
 
             Texture getTextureWithFallback(string name)
             {
@@ -139,15 +140,19 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             accentColour.BindValueChanged(colour => hitCircleSprite.Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue), true);
             if (hasNumber)
                 indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
+
+            armedState.BindValueChanged(animate, true);
         }
 
-        public void Animate(ArmedState state)
+        private void animate(ValueChangedEvent<ArmedState> state)
         {
             const double legacy_fade_duration = 240;
 
-            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime, true))
+            ClearTransforms(true);
+
+            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
             {
-                switch (state)
+                switch (state.NewValue)
                 {
                     case ArmedState.Hit:
                         circleSprites.FadeOut(legacy_fade_duration, Easing.Out);
