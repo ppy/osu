@@ -172,10 +172,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
         protected virtual void ScrollToCurrent()
         {
-            var pos = visibleLyrics.FirstOrDefault(p =>
-                p.Value.Equals(plugin.Lyrics.FindLast(l => plugin.GetCurrentTrack().CurrentTime >= l.Time)))?.Y ?? 0;
+            var pos = AvaliableDrawableLyrics.FirstOrDefault(p =>
+                p.Value.Equals(plugin.CurrentLine))?.CurrentY ?? 0;
 
-            if (pos + LyricScroll.DrawHeight > LyricScroll.Height)
+            if (pos > LyricScroll.ScrollContent.Height)
                 LyricScroll.ScrollToEnd();
             else
                 LyricScroll.ScrollTo(pos);
