@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[]
         {
             new Colour(mods),
             new Rhythm(mods),
@@ -133,11 +133,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
             List<double> peaks = new List<double>();
 
-            for (int i = 0; i < colour.StrainPeaks.Count; i++)
+            var colourPeaks = colour.GetCurrentStrainPeaks().ToList();
+            var rhythmPeaks = rhythm.GetCurrentStrainPeaks().ToList();
+            var staminaRightPeaks = staminaRight.GetCurrentStrainPeaks().ToList();
+            var staminaLeftPeaks = staminaLeft.GetCurrentStrainPeaks().ToList();
+
+            for (int i = 0; i < colourPeaks.Count; i++)
             {
-                double colourPeak = colour.StrainPeaks[i] * colour_skill_multiplier;
-                double rhythmPeak = rhythm.StrainPeaks[i] * rhythm_skill_multiplier;
-                double staminaPeak = (staminaRight.StrainPeaks[i] + staminaLeft.StrainPeaks[i]) * stamina_skill_multiplier * staminaPenalty;
+                double colourPeak = colourPeaks[i] * colour_skill_multiplier;
+                double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier;
+                double staminaPeak = (staminaRightPeaks[i] + staminaLeftPeaks[i]) * stamina_skill_multiplier * staminaPenalty;
                 peaks.Add(norm(2, colourPeak, rhythmPeak, staminaPeak));
             }
 

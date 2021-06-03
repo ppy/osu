@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Testing.Input;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
@@ -24,18 +25,31 @@ namespace osu.Game.Tests.Visual
         private readonly TriangleButton buttonTest;
         private readonly TriangleButton buttonLocal;
 
+        /// <summary>
+        /// Whether to create a nested container to handle <see cref="GlobalAction"/>s that result from local (manual) test input.
+        /// This should be disabled when instantiating an <see cref="OsuGame"/> instance else actions will be lost.
+        /// </summary>
+        protected virtual bool CreateNestedActionContainer => true;
+
         protected OsuManualInputManagerTestScene()
         {
             MenuCursorContainer cursorContainer;
+
+            CompositeDrawable mainContent =
+                (cursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both })
+                .WithChild(content = new OsuTooltipContainer(cursorContainer.Cursor) { RelativeSizeAxes = Axes.Both });
+
+            if (CreateNestedActionContainer)
+            {
+                mainContent = new GlobalActionContainer(null).WithChild(mainContent);
+            }
 
             base.Content.AddRange(new Drawable[]
             {
                 InputManager = new ManualInputManager
                 {
                     UseParentInput = true,
-                    Child = new GlobalActionContainer(null)
-                        .WithChild((cursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both })
-                            .WithChild(content = new OsuTooltipContainer(cursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }))
+                    Child = new PlatformActionContainer().WithChild(mainContent)
                 },
                 new Container
                 {

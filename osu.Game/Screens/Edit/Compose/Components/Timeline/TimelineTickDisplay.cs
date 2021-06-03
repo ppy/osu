@@ -6,9 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
@@ -32,6 +30,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         [Resolved]
         private OsuColour colours { get; set; }
+
+        private static readonly int highest_divisor = BindableBeatDivisor.VALID_DIVISORS.Last();
 
         public TimelineTickDisplay()
         {
@@ -80,8 +80,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (timeline != null)
             {
                 var newRange = (
-                    (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopLeft).X - PointVisualisation.WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X,
-                    (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopRight).X + PointVisualisation.WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X);
+                    (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopLeft).X - PointVisualisation.MAX_WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X,
+                    (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopRight).X + PointVisualisation.MAX_WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X);
 
                 if (visibleRange != newRange)
                 {
@@ -100,7 +100,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private void createTicks()
         {
             int drawableIndex = 0;
-            int highestDivisor = BindableBeatDivisor.VALID_DIVISORS.Last();
 
             nextMinTick = null;
             nextMaxTick = null;
@@ -131,25 +130,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         var divisor = BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value);
                         var colour = BindableBeatDivisor.GetColourFor(divisor, colours);
 
-                        bool isMainBeat = indexInBar == 0;
-
                         // even though "bar lines" take up the full vertical space, we render them in two pieces because it allows for less anchor/origin churn.
-                        float height = isMainBeat ? 0.5f : 0.4f - (float)divisor / highestDivisor * 0.2f;
-                        float gradientOpacity = isMainBeat ? 1 : 0;
 
-                        var topPoint = getNextUsablePoint();
-                        topPoint.X = xPos;
-                        topPoint.Height = height;
-                        topPoint.Colour = ColourInfo.GradientVertical(colour, colour.Opacity(gradientOpacity));
-                        topPoint.Anchor = Anchor.TopLeft;
-                        topPoint.Origin = Anchor.TopCentre;
-
-                        var bottomPoint = getNextUsablePoint();
-                        bottomPoint.X = xPos;
-                        bottomPoint.Anchor = Anchor.BottomLeft;
-                        bottomPoint.Colour = ColourInfo.GradientVertical(colour.Opacity(gradientOpacity), colour);
-                        bottomPoint.Origin = Anchor.BottomCentre;
-                        bottomPoint.Height = height;
+                        var line = getNextUsableLine();
+                        line.X = xPos;
+                        line.Width = PointVisualisation.MAX_WIDTH * getWidth(indexInBar, divisor);
+                        line.Height = 0.9f * getHeight(indexInBar, divisor);
+                        line.Colour = colour;
                     }
 
                     beat++;
@@ -168,7 +155,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             tickCache.Validate();
 
-            Drawable getNextUsablePoint()
+            Drawable getNextUsableLine()
             {
                 PointVisualisation point;
                 if (drawableIndex >= Count)
@@ -180,6 +167,54 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 point.Show();
 
                 return point;
+            }
+        }
+
+        private static float getWidth(int indexInBar, int divisor)
+        {
+            if (indexInBar == 0)
+                return 1;
+
+            switch (divisor)
+            {
+                case 1:
+                case 2:
+                    return 0.6f;
+
+                case 3:
+                case 4:
+                    return 0.5f;
+
+                case 6:
+                case 8:
+                    return 0.4f;
+
+                default:
+                    return 0.3f;
+            }
+        }
+
+        private static float getHeight(int indexInBar, int divisor)
+        {
+            if (indexInBar == 0)
+                return 1;
+
+            switch (divisor)
+            {
+                case 1:
+                case 2:
+                    return 0.9f;
+
+                case 3:
+                case 4:
+                    return 0.8f;
+
+                case 6:
+                case 8:
+                    return 0.7f;
+
+                default:
+                    return 0.6f;
             }
         }
 

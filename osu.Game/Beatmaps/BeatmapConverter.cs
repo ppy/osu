@@ -27,8 +27,6 @@ namespace osu.Game.Beatmaps
 
         public IBeatmap Beatmap { get; }
 
-        private CancellationToken cancellationToken;
-
         protected BeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
         {
             Beatmap = beatmap;
@@ -41,8 +39,6 @@ namespace osu.Game.Beatmaps
 
         public IBeatmap Convert(CancellationToken cancellationToken = default)
         {
-            this.cancellationToken = cancellationToken;
-
             // We always operate on a clone of the original beatmap, to not modify it game-wide
             return ConvertBeatmap(Beatmap.Clone(), cancellationToken);
         }
@@ -54,19 +50,6 @@ namespace osu.Game.Beatmaps
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The converted Beatmap.</returns>
         protected virtual Beatmap<T> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
-        {
-#pragma warning disable 618
-            return ConvertBeatmap(original);
-#pragma warning restore 618
-        }
-
-        /// <summary>
-        /// Performs the conversion of a Beatmap using this Beatmap Converter.
-        /// </summary>
-        /// <param name="original">The un-converted Beatmap.</param>
-        /// <returns>The converted Beatmap.</returns>
-        [Obsolete("Use the cancellation-supporting override")] // Can be removed 20210318
-        protected virtual Beatmap<T> ConvertBeatmap(IBeatmap original)
         {
             var beatmap = CreateBeatmap();
 
@@ -121,21 +104,6 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmap">The un-converted Beatmap.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The converted hit object.</returns>
-        protected virtual IEnumerable<T> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
-        {
-#pragma warning disable 618
-            return ConvertHitObject(original, beatmap);
-#pragma warning restore 618
-        }
-
-        /// <summary>
-        /// Performs the conversion of a hit object.
-        /// This method is generally executed sequentially for all objects in a beatmap.
-        /// </summary>
-        /// <param name="original">The hit object to convert.</param>
-        /// <param name="beatmap">The un-converted Beatmap.</param>
-        /// <returns>The converted hit object.</returns>
-        [Obsolete("Use the cancellation-supporting override")] // Can be removed 20210318
-        protected virtual IEnumerable<T> ConvertHitObject(HitObject original, IBeatmap beatmap) => Enumerable.Empty<T>();
+        protected virtual IEnumerable<T> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken) => Enumerable.Empty<T>();
     }
 }

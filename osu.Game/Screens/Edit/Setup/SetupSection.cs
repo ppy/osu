@@ -4,12 +4,14 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal class SetupSection : Container
+    internal abstract class SetupSection : Container
     {
         private readonly FillFlowContainer flow;
 
@@ -21,19 +23,40 @@ namespace osu.Game.Screens.Edit.Setup
 
         protected override Container<Drawable> Content => flow;
 
-        public SetupSection()
+        public abstract LocalisableString Title { get; }
+
+        protected SetupSection()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Padding = new MarginPadding(10);
+            Padding = new MarginPadding
+            {
+                Vertical = 10,
+                Horizontal = EditorRoundedScreen.HORIZONTAL_PADDING
+            };
 
-            InternalChild = flow = new FillFlowContainer
+            InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(20),
                 Direction = FillDirection.Vertical,
+                Children = new Drawable[]
+                {
+                    new OsuSpriteText
+                    {
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                        Text = Title
+                    },
+                    flow = new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(20),
+                        Direction = FillDirection.Vertical,
+                    }
+                }
             };
         }
     }

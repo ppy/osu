@@ -4,7 +4,10 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
+using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Tests.Mods
 {
@@ -26,6 +29,16 @@ namespace osu.Game.Tests.Mods
             Assert.That(orderedSettings[3].Item2.Name, Is.EqualTo(nameof(ClassWithSettings.UnorderedSetting)));
         }
 
+        [Test]
+        public void TestCustomControl()
+        {
+            var objectWithCustomSettingControl = new ClassWithCustomSettingControl();
+            var settings = objectWithCustomSettingControl.CreateSettingsControls().ToArray();
+
+            Assert.That(settings, Has.Length.EqualTo(1));
+            Assert.That(settings[0], Is.TypeOf<CustomSettingsControl>());
+        }
+
         private class ClassWithSettings
         {
             [SettingSource("Unordered setting", "Should be last")]
@@ -39,6 +52,22 @@ namespace osu.Game.Tests.Mods
 
             [SettingSource("Third setting", "Yet another description", 3)]
             public BindableInt ThirdSetting { get; set; } = new BindableInt();
+        }
+
+        private class ClassWithCustomSettingControl
+        {
+            [SettingSource("Custom setting", "Should be a custom control", SettingControlType = typeof(CustomSettingsControl))]
+            public BindableInt UnorderedSetting { get; set; } = new BindableInt();
+        }
+
+        private class CustomSettingsControl : SettingsItem<int>
+        {
+            protected override Drawable CreateControl() => new CustomControl();
+
+            private class CustomControl : Drawable, IHasCurrentValue<int>
+            {
+                public Bindable<int> Current { get; set; } = new Bindable<int>();
+            }
         }
     }
 }

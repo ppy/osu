@@ -4,92 +4,65 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Audio;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     /// <summary>
-    /// A component which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
+    /// A component which outlines items and handles movement of selections.
     /// </summary>
-    public class SelectionHandler : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
+    public abstract class SelectionHandler<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
-        public IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
-        private readonly List<SelectionBlueprint> selectedBlueprints;
+        /// <summary>
+        /// The currently selected blueprints.
+        /// Should be used when operations are dealing directly with the visible blueprints.
+        /// For more general selection operations, use <see cref="SelectedItems"/> instead.
+        /// </summary>
+        public IReadOnlyList<SelectionBlueprint<T>> SelectedBlueprints => selectedBlueprints;
 
-        public int SelectedCount => selectedBlueprints.Count;
+        /// <summary>
+        /// The currently selected items.
+        /// </summary>
+        public readonly BindableList<T> SelectedItems = new BindableList<T>();
 
-        private Drawable content;
-
-        private OsuSpriteText selectionDetailsText;
+        private readonly List<SelectionBlueprint<T>> selectedBlueprints;
 
         protected SelectionBox SelectionBox { get; private set; }
-
-        [Resolved]
-        protected EditorBeatmap EditorBeatmap { get; private set; }
 
         [Resolved(CanBeNull = true)]
         protected IEditorChangeHandler ChangeHandler { get; private set; }
 
-        public SelectionHandler()
+        protected SelectionHandler()
         {
-            selectedBlueprints = new List<SelectionBlueprint>();
+            selectedBlueprints = new List<SelectionBlueprint<T>>();
 
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
-            Alpha = 0;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            createStateBindables();
+            InternalChild = SelectionBox = CreateSelectionBox();
 
-            InternalChild = content = new Container
+            SelectedItems.CollectionChanged += (sender, args) =>
             {
-                Children = new Drawable[]
-                {
-                    // todo: should maybe be inside the SelectionBox?
-                    new Container
-                    {
-                        Name = "info text",
-                        AutoSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                Colour = colours.YellowDark,
-                                RelativeSizeAxes = Axes.Both,
-                            },
-                            selectionDetailsText = new OsuSpriteText
-                            {
-                                Padding = new MarginPadding(2),
-                                Colour = colours.Gray0,
-                                Font = OsuFont.Default.With(size: 11)
-                            }
-                        }
-                    },
-                    SelectionBox = CreateSelectionBox(),
-                }
+                Scheduler.AddOnce(updateVisibility);
             };
         }
 
@@ -124,45 +97,44 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #region User Input Handling
 
         /// <summary>
-        /// Handles the selected <see cref="DrawableHitObject"/>s being moved.
+        /// Handles the selected items being moved.
         /// </summary>
         /// <remarks>
-        /// Just returning true is enough to allow <see cref="HitObject.StartTime"/> updates to take place.
+        /// Just returning true is enough to allow default movement to take place.
         /// Custom implementation is only required if other attributes are to be considered, like changing columns.
         /// </remarks>
         /// <param name="moveEvent">The move event.</param>
         /// <returns>
-        /// Whether any <see cref="DrawableHitObject"/>s could be moved.
-        /// Returning true will also propagate StartTime changes provided by the closest <see cref="IPositionSnapProvider.SnapScreenSpacePositionToValidTime"/>.
+        /// Whether any items could be moved.
         /// </returns>
-        public virtual bool HandleMovement(MoveSelectionEvent moveEvent) => false;
+        public virtual bool HandleMovement(MoveSelectionEvent<T> moveEvent) => false;
 
         /// <summary>
-        /// Handles the selected <see cref="DrawableHitObject"/>s being rotated.
+        /// Handles the selected items being rotated.
         /// </summary>
         /// <param name="angle">The delta angle to apply to the selection.</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be rotated.</returns>
+        /// <returns>Whether any items could be rotated.</returns>
         public virtual bool HandleRotation(float angle) => false;
 
         /// <summary>
-        /// Handles the selected <see cref="DrawableHitObject"/>s being scaled.
+        /// Handles the selected items being scaled.
         /// </summary>
-        /// <param name="scale">The delta scale to apply, in playfield local coordinates.</param>
+        /// <param name="scale">The delta scale to apply, in local coordinates.</param>
         /// <param name="anchor">The point of reference where the scale is originating from.</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be scaled.</returns>
+        /// <returns>Whether any items could be scaled.</returns>
         public virtual bool HandleScale(Vector2 scale, Anchor anchor) => false;
 
         /// <summary>
-        /// Handles the selected <see cref="DrawableHitObject"/>s being flipped.
+        /// Handles the selected items being flipped.
         /// </summary>
         /// <param name="direction">The direction to flip</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be flipped.</returns>
+        /// <returns>Whether any items could be flipped.</returns>
         public virtual bool HandleFlip(Direction direction) => false;
 
         /// <summary>
-        /// Handles the selected <see cref="DrawableHitObject"/>s being reversed pattern-wise.
+        /// Handles the selected items being reversed pattern-wise.
         /// </summary>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be reversed.</returns>
+        /// <returns>Whether any items could be reversed.</returns>
         public virtual bool HandleReverse() => false;
 
         public bool OnPressed(PlatformAction action)
@@ -170,7 +142,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (action.ActionMethod)
             {
                 case PlatformActionMethod.Delete:
-                    deleteSelected();
+                    DeleteSelected();
                     return true;
             }
 
@@ -194,24 +166,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Handle a blueprint becoming selected.
         /// </summary>
         /// <param name="blueprint">The blueprint.</param>
-        internal void HandleSelected(SelectionBlueprint blueprint)
+        internal virtual void HandleSelected(SelectionBlueprint<T> blueprint)
         {
-            selectedBlueprints.Add(blueprint);
+            // there are potentially multiple SelectionHandlers active, but we only want to add items to the selected list once.
+            if (!SelectedItems.Contains(blueprint.Item))
+                SelectedItems.Add(blueprint.Item);
 
-            // there are potentially multiple SelectionHandlers active, but we only want to add hitobjects to the selected list once.
-            if (!EditorBeatmap.SelectedHitObjects.Contains(blueprint.HitObject))
-                EditorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
+            selectedBlueprints.Add(blueprint);
         }
 
         /// <summary>
         /// Handle a blueprint becoming deselected.
         /// </summary>
         /// <param name="blueprint">The blueprint.</param>
-        internal void HandleDeselected(SelectionBlueprint blueprint)
+        internal virtual void HandleDeselected(SelectionBlueprint<T> blueprint)
         {
+            SelectedItems.Remove(blueprint.Item);
             selectedBlueprints.Remove(blueprint);
-
-            EditorBeatmap.SelectedHitObjects.Remove(blueprint.HitObject);
         }
 
         /// <summary>
@@ -220,45 +191,87 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="blueprint">The blueprint.</param>
         /// <param name="e">The mouse event responsible for selection.</param>
         /// <returns>Whether a selection was performed.</returns>
-        internal bool HandleSelectionRequested(SelectionBlueprint blueprint, MouseButtonEvent e)
+        internal bool MouseDownSelectionRequested(SelectionBlueprint<T> blueprint, MouseButtonEvent e)
         {
             if (e.ShiftPressed && e.Button == MouseButton.Right)
             {
                 handleQuickDeletion(blueprint);
-                return false;
+                return true;
             }
 
-            if (e.ControlPressed && e.Button == MouseButton.Left)
+            // while holding control, we only want to add to selection, not replace an existing selection.
+            if (e.ControlPressed && e.Button == MouseButton.Left && !blueprint.IsSelected)
+            {
                 blueprint.ToggleSelection();
-            else
-                ensureSelected(blueprint);
+                return true;
+            }
 
-            return true;
+            return ensureSelected(blueprint);
         }
 
-        private void handleQuickDeletion(SelectionBlueprint blueprint)
+        /// <summary>
+        /// Handle a blueprint requesting selection.
+        /// </summary>
+        /// <param name="blueprint">The blueprint.</param>
+        /// <param name="e">The mouse event responsible for deselection.</param>
+        /// <returns>Whether a deselection was performed.</returns>
+        internal bool MouseUpSelectionRequested(SelectionBlueprint<T> blueprint, MouseButtonEvent e)
+        {
+            if (blueprint.IsSelected)
+            {
+                blueprint.ToggleSelection();
+                return true;
+            }
+
+            return false;
+        }
+
+        private void handleQuickDeletion(SelectionBlueprint<T> blueprint)
         {
             if (blueprint.HandleQuickDeletion())
                 return;
 
             if (!blueprint.IsSelected)
-                EditorBeatmap.Remove(blueprint.HitObject);
+                DeleteItems(new[] { blueprint.Item });
             else
-                deleteSelected();
+                DeleteSelected();
         }
 
-        private void ensureSelected(SelectionBlueprint blueprint)
+        /// <summary>
+        /// Given a selection target and a function of truth, retrieve the correct ternary state for display.
+        /// </summary>
+        protected static TernaryState GetStateFromSelection<TObject>(IEnumerable<TObject> selection, Func<TObject, bool> func)
+        {
+            if (selection.Any(func))
+                return selection.All(func) ? TernaryState.True : TernaryState.Indeterminate;
+
+            return TernaryState.False;
+        }
+
+        /// <summary>
+        /// Called whenever the deletion of items has been requested.
+        /// </summary>
+        /// <param name="items">The items to be deleted.</param>
+        protected abstract void DeleteItems(IEnumerable<T> items);
+
+        /// <summary>
+        /// Ensure the blueprint is in a selected state.
+        /// </summary>
+        /// <param name="blueprint">The blueprint to select.</param>
+        /// <returns>Whether selection state was changed.</returns>
+        private bool ensureSelected(SelectionBlueprint<T> blueprint)
         {
             if (blueprint.IsSelected)
-                return;
+                return false;
 
             DeselectAll?.Invoke();
             blueprint.Select();
+            return true;
         }
 
-        private void deleteSelected()
+        protected void DeleteSelected()
         {
-            EditorBeatmap.RemoveRange(selectedBlueprints.Select(b => b.HitObject));
+            DeleteItems(selectedBlueprints.Select(b => b.Item));
         }
 
         #endregion
@@ -266,20 +279,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #region Outline Display
 
         /// <summary>
-        /// Updates whether this <see cref="SelectionHandler"/> is visible.
+        /// Updates whether this <see cref="SelectionHandler{T}"/> is visible.
         /// </summary>
         private void updateVisibility()
         {
-            int count = selectedBlueprints.Count;
+            int count = SelectedItems.Count;
 
-            selectionDetailsText.Text = count > 0 ? count.ToString() : string.Empty;
+            SelectionBox.Text = count > 0 ? count.ToString() : string.Empty;
+            SelectionBox.FadeTo(count > 0 ? 1 : 0);
 
-            this.FadeTo(count > 0 ? 1 : 0);
             OnSelectionChanged();
         }
 
         /// <summary>
-        /// Triggered whenever the set of selected objects changes.
+        /// Triggered whenever the set of selected items changes.
         /// Should update the selection box's state to match supported operations.
         /// </summary>
         protected virtual void OnSelectionChanged()
@@ -293,159 +306,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (selectedBlueprints.Count == 0)
                 return;
 
-            // Move the rectangle to cover the hitobjects
-            var topLeft = new Vector2(float.MaxValue, float.MaxValue);
-            var bottomRight = new Vector2(float.MinValue, float.MinValue);
+            // Move the rectangle to cover the items
+            RectangleF selectionRect = ToLocalSpace(selectedBlueprints[0].SelectionQuad).AABBFloat;
 
-            foreach (var blueprint in selectedBlueprints)
-            {
-                topLeft = Vector2.ComponentMin(topLeft, ToLocalSpace(blueprint.SelectionQuad.TopLeft));
-                bottomRight = Vector2.ComponentMax(bottomRight, ToLocalSpace(blueprint.SelectionQuad.BottomRight));
-            }
+            for (int i = 1; i < selectedBlueprints.Count; i++)
+                selectionRect = RectangleF.Union(selectionRect, ToLocalSpace(selectedBlueprints[i].SelectionQuad).AABBFloat);
 
-            topLeft -= new Vector2(5);
-            bottomRight += new Vector2(5);
+            selectionRect = selectionRect.Inflate(5f);
 
-            content.Size = bottomRight - topLeft;
-            content.Position = topLeft;
-        }
-
-        #endregion
-
-        #region Sample Changes
-
-        /// <summary>
-        /// Adds a hit sample to all selected <see cref="HitObject"/>s.
-        /// </summary>
-        /// <param name="sampleName">The name of the hit sample.</param>
-        public void AddHitSample(string sampleName)
-        {
-            EditorBeatmap.PerformOnSelection(h =>
-            {
-                // Make sure there isn't already an existing sample
-                if (h.Samples.Any(s => s.Name == sampleName))
-                    return;
-
-                h.Samples.Add(new HitSampleInfo(sampleName));
-            });
-        }
-
-        /// <summary>
-        /// Set the new combo state of all selected <see cref="HitObject"/>s.
-        /// </summary>
-        /// <param name="state">Whether to set or unset.</param>
-        /// <exception cref="InvalidOperationException">Throws if any selected object doesn't implement <see cref="IHasComboInformation"/></exception>
-        public void SetNewCombo(bool state)
-        {
-            EditorBeatmap.PerformOnSelection(h =>
-            {
-                var comboInfo = h as IHasComboInformation;
-
-                if (comboInfo == null || comboInfo.NewCombo == state) return;
-
-                comboInfo.NewCombo = state;
-                EditorBeatmap.Update(h);
-            });
-        }
-
-        /// <summary>
-        /// Removes a hit sample from all selected <see cref="HitObject"/>s.
-        /// </summary>
-        /// <param name="sampleName">The name of the hit sample.</param>
-        public void RemoveHitSample(string sampleName)
-        {
-            EditorBeatmap.PerformOnSelection(h => h.SamplesBindable.RemoveAll(s => s.Name == sampleName));
-        }
-
-        #endregion
-
-        #region Selection State
-
-        /// <summary>
-        /// The state of "new combo" for all selected hitobjects.
-        /// </summary>
-        public readonly Bindable<TernaryState> SelectionNewComboState = new Bindable<TernaryState>();
-
-        /// <summary>
-        /// The state of each sample type for all selected hitobjects. Keys match with <see cref="HitSampleInfo"/> constant specifications.
-        /// </summary>
-        public readonly Dictionary<string, Bindable<TernaryState>> SelectionSampleStates = new Dictionary<string, Bindable<TernaryState>>();
-
-        /// <summary>
-        /// Set up ternary state bindables and bind them to selection/hitobject changes (in both directions)
-        /// </summary>
-        private void createStateBindables()
-        {
-            foreach (var sampleName in HitSampleInfo.AllAdditions)
-            {
-                var bindable = new Bindable<TernaryState>
-                {
-                    Description = sampleName.Replace("hit", string.Empty).Titleize()
-                };
-
-                bindable.ValueChanged += state =>
-                {
-                    switch (state.NewValue)
-                    {
-                        case TernaryState.False:
-                            RemoveHitSample(sampleName);
-                            break;
-
-                        case TernaryState.True:
-                            AddHitSample(sampleName);
-                            break;
-                    }
-                };
-
-                SelectionSampleStates[sampleName] = bindable;
-            }
-
-            // new combo
-            SelectionNewComboState.ValueChanged += state =>
-            {
-                switch (state.NewValue)
-                {
-                    case TernaryState.False:
-                        SetNewCombo(false);
-                        break;
-
-                    case TernaryState.True:
-                        SetNewCombo(true);
-                        break;
-                }
-            };
-
-            // bring in updates from selection changes
-            EditorBeatmap.HitObjectUpdated += _ => Scheduler.AddOnce(UpdateTernaryStates);
-            EditorBeatmap.SelectedHitObjects.CollectionChanged += (sender, args) =>
-            {
-                Scheduler.AddOnce(updateVisibility);
-                Scheduler.AddOnce(UpdateTernaryStates);
-            };
-        }
-
-        /// <summary>
-        /// Called when context menu ternary states may need to be recalculated (selection changed or hitobject updated).
-        /// </summary>
-        protected virtual void UpdateTernaryStates()
-        {
-            SelectionNewComboState.Value = GetStateFromSelection(EditorBeatmap.SelectedHitObjects.OfType<IHasComboInformation>(), h => h.NewCombo);
-
-            foreach (var (sampleName, bindable) in SelectionSampleStates)
-            {
-                bindable.Value = GetStateFromSelection(EditorBeatmap.SelectedHitObjects, h => h.Samples.Any(s => s.Name == sampleName));
-            }
-        }
-
-        /// <summary>
-        /// Given a selection target and a function of truth, retrieve the correct ternary state for display.
-        /// </summary>
-        protected TernaryState GetStateFromSelection<T>(IEnumerable<T> selection, Func<T, bool> func)
-        {
-            if (selection.Any(func))
-                return selection.All(func) ? TernaryState.True : TernaryState.Indeterminate;
-
-            return TernaryState.False;
+            SelectionBox.Position = selectionRect.Location;
+            SelectionBox.Size = selectionRect.Size;
         }
 
         #endregion
@@ -456,30 +326,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             get
             {
-                if (!selectedBlueprints.Any(b => b.IsHovered))
+                if (!SelectedBlueprints.Any(b => b.IsHovered))
                     return Array.Empty<MenuItem>();
 
                 var items = new List<MenuItem>();
 
-                items.AddRange(GetContextMenuItemsForSelection(selectedBlueprints));
+                items.AddRange(GetContextMenuItemsForSelection(SelectedBlueprints));
 
-                if (selectedBlueprints.All(b => b.HitObject is IHasComboInformation))
-                {
-                    items.Add(new TernaryStateMenuItem("New combo") { State = { BindTarget = SelectionNewComboState } });
-                }
+                if (SelectedBlueprints.Count == 1)
+                    items.AddRange(SelectedBlueprints[0].ContextMenuItems);
 
-                if (selectedBlueprints.Count == 1)
-                    items.AddRange(selectedBlueprints[0].ContextMenuItems);
-
-                items.AddRange(new[]
-                {
-                    new OsuMenuItem("Sound")
-                    {
-                        Items = SelectionSampleStates.Select(kvp =>
-                            new TernaryStateMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
-                    },
-                    new OsuMenuItem("Delete", MenuItemType.Destructive, deleteSelected),
-                });
+                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, DeleteSelected));
 
                 return items.ToArray();
             }
@@ -490,8 +347,101 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         /// <param name="selection">The current selection.</param>
         /// <returns>The relevant menu items.</returns>
-        protected virtual IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint> selection)
+        protected virtual IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<T>> selection)
             => Enumerable.Empty<MenuItem>();
+
+        #endregion
+
+        #region Helper Methods
+
+        /// <summary>
+        /// Rotate a point around an arbitrary origin.
+        /// </summary>
+        /// <param name="point">The point.</param>
+        /// <param name="origin">The centre origin to rotate around.</param>
+        /// <param name="angle">The angle to rotate (in degrees).</param>
+        protected static Vector2 RotatePointAroundOrigin(Vector2 point, Vector2 origin, float angle)
+        {
+            angle = -angle;
+
+            point.X -= origin.X;
+            point.Y -= origin.Y;
+
+            Vector2 ret;
+            ret.X = point.X * MathF.Cos(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Sin(MathUtils.DegreesToRadians(angle));
+            ret.Y = point.X * -MathF.Sin(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Cos(MathUtils.DegreesToRadians(angle));
+
+            ret.X += origin.X;
+            ret.Y += origin.Y;
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Given a flip direction, a surrounding quad for all selected objects, and a position,
+        /// will return the flipped position in screen space coordinates.
+        /// </summary>
+        protected static Vector2 GetFlippedPosition(Direction direction, Quad quad, Vector2 position)
+        {
+            var centre = quad.Centre;
+
+            switch (direction)
+            {
+                case Direction.Horizontal:
+                    position.X = centre.X - (position.X - centre.X);
+                    break;
+
+                case Direction.Vertical:
+                    position.Y = centre.Y - (position.Y - centre.Y);
+                    break;
+            }
+
+            return position;
+        }
+
+        /// <summary>
+        /// Given a scale vector, a surrounding quad for all selected objects, and a position,
+        /// will return the scaled position in screen space coordinates.
+        /// </summary>
+        protected static Vector2 GetScaledPosition(Anchor reference, Vector2 scale, Quad selectionQuad, Vector2 position)
+        {
+            // adjust the direction of scale depending on which side the user is dragging.
+            float xOffset = ((reference & Anchor.x0) > 0) ? -scale.X : 0;
+            float yOffset = ((reference & Anchor.y0) > 0) ? -scale.Y : 0;
+
+            // guard against no-ops and NaN.
+            if (scale.X != 0 && selectionQuad.Width > 0)
+                position.X = selectionQuad.TopLeft.X + xOffset + (position.X - selectionQuad.TopLeft.X) / selectionQuad.Width * (selectionQuad.Width + scale.X);
+
+            if (scale.Y != 0 && selectionQuad.Height > 0)
+                position.Y = selectionQuad.TopLeft.Y + yOffset + (position.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height * (selectionQuad.Height + scale.Y);
+
+            return position;
+        }
+
+        /// <summary>
+        /// Returns a quad surrounding the provided points.
+        /// </summary>
+        /// <param name="points">The points to calculate a quad for.</param>
+        protected static Quad GetSurroundingQuad(IEnumerable<Vector2> points)
+        {
+            if (!points.Any())
+                return new Quad();
+
+            Vector2 minPosition = new Vector2(float.MaxValue, float.MaxValue);
+            Vector2 maxPosition = new Vector2(float.MinValue, float.MinValue);
+
+            // Go through all hitobjects to make sure they would remain in the bounds of the editor after movement, before any movement is attempted
+            foreach (var p in points)
+            {
+                minPosition = Vector2.ComponentMin(minPosition, p);
+                maxPosition = Vector2.ComponentMax(maxPosition, p);
+            }
+
+            Vector2 size = maxPosition - minPosition;
+
+            return new Quad(minPosition.X, minPosition.Y, size.X, size.Y);
+        }
 
         #endregion
     }

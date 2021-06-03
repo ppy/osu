@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.IO.Stores;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osuTK.Graphics;
 
@@ -9,8 +11,14 @@ namespace osu.Game.Skinning
 {
     public class DefaultLegacySkin : LegacySkin
     {
-        public DefaultLegacySkin(IResourceStore<byte[]> storage, IStorageResourceProvider resources)
-            : base(Info, storage, resources, string.Empty)
+        public DefaultLegacySkin(IStorageResourceProvider resources)
+            : this(Info, resources)
+        {
+        }
+
+        [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
+        public DefaultLegacySkin(SkinInfo skin, IStorageResourceProvider resources)
+            : base(skin, new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Legacy"), resources, string.Empty)
         {
             Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);
             Configuration.AddComboColours(
@@ -27,7 +35,8 @@ namespace osu.Game.Skinning
         {
             ID = SkinInfo.CLASSIC_SKIN, // this is temporary until database storage is decided upon.
             Name = "osu!classic",
-            Creator = "team osu!"
+            Creator = "team osu!",
+            InstantiationInfo = typeof(DefaultLegacySkin).GetInvariantInstantiationInfo()
         };
     }
 }

@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Microsoft.Win32;
+using osu.Desktop.Security;
 using osu.Desktop.Overlays;
 using osu.Framework.Platform;
 using osu.Game;
@@ -18,6 +20,7 @@ using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
+using osu.Framework.Threading;
 using osu.Game.IO;
 
 namespace osu.Desktop
@@ -54,7 +57,7 @@ namespace osu.Desktop
 
         private string getStableInstallPath()
         {
-            static bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs"));
+            static bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs")) || File.Exists(Path.Combine(p, "osu!.cfg"));
 
             string stableInstallPath;
 
@@ -111,6 +114,8 @@ namespace osu.Desktop
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
+
+            LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
         }
 
         protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)
@@ -144,13 +149,39 @@ namespace osu.Desktop
             desktopWindow.DragDrop += f => fileDrop(new[] { f });
         }
 
+        private readonly List<string> importableFiles = new List<string>();
+        private ScheduledDelegate importSchedule;
+
         private void fileDrop(string[] filePaths)
         {
-            var firstExtension = Path.GetExtension(filePaths.First());
+            lock (importableFiles)
+            {
+                var firstExtension = Path.GetExtension(filePaths.First());
 
-            if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
+                if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
 
-            Task.Factory.StartNew(() => Import(filePaths), TaskCreationOptions.LongRunning);
+                importableFiles.AddRange(filePaths);
+
+                Logger.Log($"Adding {filePaths.Length} files for import");
+
+                // File drag drop operations can potentially trigger hundreds or thousands of these calls on some platforms.
+                // In order to avoid spawning multiple import tasks for a single drop operation, debounce a touch.
+                importSchedule?.Cancel();
+                importSchedule = Scheduler.AddDelayed(handlePendingImports, 100);
+            }
+        }
+
+        private void handlePendingImports()
+        {
+            lock (importableFiles)
+            {
+                Logger.Log($"Handling batch import of {importableFiles.Count} files");
+
+                var paths = importableFiles.ToArray();
+                importableFiles.Clear();
+
+                Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
+            }
         }
     }
 }

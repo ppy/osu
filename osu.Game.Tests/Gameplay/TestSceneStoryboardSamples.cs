@@ -20,6 +20,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
@@ -67,17 +68,47 @@ namespace osu.Game.Tests.Gameplay
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
                 working.LoadTrack();
 
-                Add(gameplayContainer = new GameplayClockContainer(working, 0));
-
-                gameplayContainer.Add(sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
+                Add(gameplayContainer = new MasterGameplayClockContainer(working, 0)
                 {
-                    Clock = gameplayContainer.GameplayClock
+                    IsPaused = { Value = true },
+                    Child = new FrameStabilityContainer
+                    {
+                        Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
+                    }
+                });
+            });
+
+            AddStep("reset clock", () => gameplayContainer.Start());
+
+            AddUntilStep("sample played", () => sample.RequestedPlaying);
+            AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
+        }
+
+        [Test]
+        public void TestSampleHasLifetimeEndWithInitialClockTime()
+        {
+            GameplayClockContainer gameplayContainer = null;
+            DrawableStoryboardSample sample = null;
+
+            AddStep("create container", () =>
+            {
+                var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+                working.LoadTrack();
+
+                Add(gameplayContainer = new MasterGameplayClockContainer(working, 1000, true)
+                {
+                    IsPaused = { Value = true },
+                    Child = new FrameStabilityContainer
+                    {
+                        Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
+                    }
                 });
             });
 
             AddStep("start time", () => gameplayContainer.Start());
 
-            AddUntilStep("sample playback succeeded", () => sample.LifetimeEnd < double.MaxValue);
+            AddUntilStep("sample not played", () => !sample.RequestedPlaying);
+            AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
         }
 
         [TestCase(typeof(OsuModDoubleTime), 1.5)]
@@ -114,7 +145,7 @@ namespace osu.Game.Tests.Gameplay
 
                 var beatmapSkinSourceContainer = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
 
-                Add(gameplayContainer = new GameplayClockContainer(Beatmap.Value, 0)
+                Add(gameplayContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
                 {
                     Child = beatmapSkinSourceContainer
                 });
@@ -188,6 +219,7 @@ namespace osu.Game.Tests.Gameplay
 
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => null;
+        public new IResourceStore<byte[]> Resources => base.Resources;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
 
         #endregion

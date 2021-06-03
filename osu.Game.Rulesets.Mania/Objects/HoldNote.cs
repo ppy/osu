@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// <summary>
         /// The head note of the hold.
         /// </summary>
-        public Note Head { get; private set; }
+        public HeadNote Head { get; private set; }
 
         /// <summary>
         /// The tail note of the hold.
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
             createTicks(cancellationToken);
 
-            AddNested(Head = new Note
+            AddNested(Head = new HeadNote
             {
                 StartTime = StartTime,
                 Column = Column,

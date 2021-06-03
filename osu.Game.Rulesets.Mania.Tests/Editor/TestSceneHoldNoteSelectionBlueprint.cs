@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                 }
             };
 
-            AddBlueprint(new HoldNoteSelectionBlueprint(drawableObject));
+            AddBlueprint(new HoldNoteSelectionBlueprint(holdNote), drawableObject);
         }
 
         protected override void Update()

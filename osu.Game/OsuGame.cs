@@ -27,7 +27,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
@@ -52,6 +51,8 @@ using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
 using osu.Game.IO;
+using osu.Game.Localisation;
+using osu.Game.Skinning.Editor;
 
 namespace osu.Game
 {
@@ -80,8 +81,30 @@ namespace osu.Game
 
         private BeatmapSetOverlay beatmapSetOverlay;
 
+        private WikiOverlay wikiOverlay;
+
+        private SkinEditorOverlay skinEditor;
+
+        private Container overlayContent;
+
+        private Container rightFloatingOverlayContent;
+
+        private Container leftFloatingOverlayContent;
+
+        private Container topMostOverlayContent;
+
+        private ScalingContainer screenContainer;
+
+        private Container screenOffsetContainer;
+
+        [Resolved]
+        private FrameworkConfigManager frameworkConfig { get; set; }
+
         [Cached]
         private readonly DifficultyRecommender difficultyRecommender = new DifficultyRecommender();
+
+        [Cached]
+        private readonly StableImportManager stableImportManager = new StableImportManager();
 
         [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
@@ -254,7 +277,7 @@ namespace osu.Game
             {
                 case LinkAction.OpenBeatmap:
                     // TODO: proper query params handling
-                    if (link.Argument != null && int.TryParse(link.Argument.Contains('?') ? link.Argument.Split('?')[0] : link.Argument, out int beatmapId))
+                    if (int.TryParse(link.Argument.Contains('?') ? link.Argument.Split('?')[0] : link.Argument, out int beatmapId))
                         ShowBeatmap(beatmapId);
                     break;
 
@@ -284,6 +307,10 @@ namespace osu.Game
                 case LinkAction.OpenUserProfile:
                     if (int.TryParse(link.Argument, out int userId))
                         ShowUser(userId);
+                    break;
+
+                case LinkAction.OpenWiki:
+                    ShowWiki(link.Argument);
                     break;
 
                 default:
@@ -332,6 +359,12 @@ namespace osu.Game
         /// </summary>
         /// <param name="beatmapId">The beatmap to show.</param>
         public void ShowBeatmap(int beatmapId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId));
+
+        /// <summary>
+        /// Show a wiki's page as an overlay
+        /// </summary>
+        /// <param name="path">The wiki page to show</param>
+        public void ShowWiki(string path) => waitForReady(() => wikiOverlay, _ => wikiOverlay.ShowPage(path));
 
         /// <summary>
         /// Present a beatmap at song select immediately.
@@ -542,6 +575,12 @@ namespace osu.Game
         {
             base.LoadComplete();
 
+            foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
+            {
+                var cultureCode = language.ToString();
+                Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
+            }
+
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
             // in the cursor being shown for a few frames during the intro.
             // This prevents the cursor from showing until we have a screen with CursorVisible = true
@@ -549,14 +588,11 @@ namespace osu.Game
 
             // todo: all archive managers should be able to be looped here.
             SkinManager.PostNotification = n => notifications.Post(n);
-            SkinManager.GetStableStorage = GetStorageForStableInstall;
 
             BeatmapManager.PostNotification = n => notifications.Post(n);
-            BeatmapManager.GetStableStorage = GetStorageForStableInstall;
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First());
 
             ScoreManager.PostNotification = n => notifications.Post(n);
-            ScoreManager.GetStableStorage = GetStorageForStableInstall;
             ScoreManager.PresentImport = items => PresentScore(items.First());
 
             // make config aware of how to lookup skins for on-screen display purposes.
@@ -578,6 +614,15 @@ namespace osu.Game
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
 
+            var sessionIdleTracker = new GameIdleTracker(300000);
+            sessionIdleTracker.IsIdle.BindValueChanged(idle =>
+            {
+                if (idle.NewValue)
+                    SessionStatics.ResetValues();
+            });
+
+            Add(sessionIdleTracker);
+
             AddRange(new Drawable[]
             {
                 new VolumeControlReceptor
@@ -586,26 +631,35 @@ namespace osu.Game
                     ActionRequested = action => volume.Adjust(action),
                     ScrollActionRequested = (action, amount, isPrecise) => volume.Adjust(action, amount, isPrecise),
                 },
-                screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
+                screenOffsetContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        receptor = new BackButton.Receptor(),
-                        ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                        BackButton = new BackButton(receptor)
+                        screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Action = () =>
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Children = new Drawable[]
                             {
-                                var currentScreen = ScreenStack.CurrentScreen as IOsuScreen;
+                                receptor = new BackButton.Receptor(),
+                                ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                                BackButton = new BackButton(receptor)
+                                {
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    Action = () =>
+                                    {
+                                        var currentScreen = ScreenStack.CurrentScreen as IOsuScreen;
 
-                                if (currentScreen?.AllowBackButton == true && !currentScreen.OnBackButton())
-                                    ScreenStack.Exit();
+                                        if (currentScreen?.AllowBackButton == true && !currentScreen.OnBackButton())
+                                            ScreenStack.Exit();
+                                    }
+                                },
+                                logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                             }
                         },
-                        logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both },
@@ -655,10 +709,10 @@ namespace osu.Game
             loadComponentSingleFile(new CollectionManager(Storage)
             {
                 PostNotification = n => notifications.Post(n),
-                GetStableStorage = GetStorageForStableInstall
             }, Add, true);
 
             loadComponentSingleFile(difficultyRecommender, Add);
+            loadComponentSingleFile(stableImportManager, Add);
 
             loadComponentSingleFile(screenshotManager, Add);
 
@@ -677,6 +731,8 @@ namespace osu.Game
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(screenContainer), overlayContent.Add);
 
             loadComponentSingleFile(new LoginOverlay
             {
@@ -726,7 +782,7 @@ namespace osu.Game
             }
 
             // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, news, dashboard, beatmapListing, changelogOverlay, rankingsOverlay };
+            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, news, dashboard, beatmapListing, changelogOverlay, rankingsOverlay, wikiOverlay };
 
             foreach (var overlay in singleDisplayOverlays)
             {
@@ -754,7 +810,7 @@ namespace osu.Game
                 if (notifications.State.Value == Visibility.Visible)
                     offset -= Toolbar.HEIGHT / 2;
 
-                screenContainer.MoveToX(offset, SettingsPanel.TRANSITION_LENGTH, Easing.OutQuint);
+                screenOffsetContainer.MoveToX(offset, SettingsPanel.TRANSITION_LENGTH, Easing.OutQuint);
             }
 
             Settings.State.ValueChanged += _ => updateScreenOffset();
@@ -879,13 +935,6 @@ namespace osu.Game
             return component;
         }
 
-        protected override bool OnScroll(ScrollEvent e)
-        {
-            // forward any unhandled mouse scroll events to the volume control.
-            volume.Adjust(GlobalAction.IncreaseVolume, e.ScrollDelta.Y, e.IsPrecise);
-            return true;
-        }
-
         public bool OnPressed(GlobalAction action)
         {
             if (introScreen == null) return false;
@@ -928,19 +977,6 @@ namespace osu.Game
         {
         }
 
-        private Container overlayContent;
-
-        private Container rightFloatingOverlayContent;
-
-        private Container leftFloatingOverlayContent;
-
-        private Container topMostOverlayContent;
-
-        [Resolved]
-        private FrameworkConfigManager frameworkConfig { get; set; }
-
-        private ScalingContainer screenContainer;
-
         protected override bool OnExiting()
         {
             if (ScreenStack.CurrentScreen is Loader)
@@ -959,7 +995,7 @@ namespace osu.Game
         {
             base.UpdateAfterChildren();
 
-            screenContainer.Padding = new MarginPadding { Top = ToolbarOffset };
+            screenOffsetContainer.Padding = new MarginPadding { Top = ToolbarOffset };
             overlayContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
             MenuCursorContainer.CanShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
@@ -967,6 +1003,8 @@ namespace osu.Game
 
         protected virtual void ScreenChanged(IScreen current, IScreen newScreen)
         {
+            skinEditor.Reset();
+
             switch (newScreen)
             {
                 case IntroScreen intro:

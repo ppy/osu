@@ -114,6 +114,7 @@ namespace osu.Game.Rulesets.Catch
                     return new Mod[]
                     {
                         new CatchModDifficultyAdjust(),
+                        new CatchModClassic(),
                     };
 
                 case ModType.Automation:
@@ -126,7 +127,8 @@ namespace osu.Game.Rulesets.Catch
                 case ModType.Fun:
                     return new Mod[]
                     {
-                        new MultiMod(new ModWindUp(), new ModWindDown())
+                        new MultiMod(new ModWindUp(), new ModWindDown()),
+                        new CatchModFloatingFruits()
                     };
 
                 default:
@@ -159,13 +161,13 @@ namespace osu.Game.Rulesets.Catch
             switch (result)
             {
                 case HitResult.LargeTickHit:
-                    return "large droplet";
+                    return "Large droplet";
 
                 case HitResult.SmallTickHit:
-                    return "small droplet";
+                    return "Small droplet";
 
                 case HitResult.LargeBonus:
-                    return "banana";
+                    return "Banana";
             }
 
             return base.GetDisplayNameForHitResult(result);

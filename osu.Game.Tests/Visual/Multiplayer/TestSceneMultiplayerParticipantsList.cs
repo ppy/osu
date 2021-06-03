@@ -127,6 +127,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestToggleSpectateState()
+        {
+            AddStep("make user spectating", () => Client.ChangeState(MultiplayerUserState.Spectating));
+            AddStep("make user idle", () => Client.ChangeState(MultiplayerUserState.Idle));
+        }
+
+        [Test]
         public void TestCrownChangesStateWhenHostTransferred()
         {
             AddStep("add user", () => Client.AddUser(new User

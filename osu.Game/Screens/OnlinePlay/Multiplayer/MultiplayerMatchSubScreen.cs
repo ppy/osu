@@ -14,6 +14,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -25,6 +26,8 @@ using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osuTK;
@@ -40,7 +43,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public override string ShortTitle => "room";
 
         [Resolved]
-        private StatefulMultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; }
 
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
@@ -221,7 +224,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         {
                             new MultiplayerMatchFooter
                             {
-                                OnReadyClick = onReadyClick
+                                OnReadyClick = onReadyClick,
+                                OnSpectateClick = onSpectateClick
                             }
                         }
                     },
@@ -352,10 +356,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             client.ChangeBeatmapAvailability(availability.NewValue);
 
-            // while this flow is handled server-side, this covers the edge case of the local user being in a ready state and then deleting the current beatmap.
-            if (availability.NewValue != Online.Rooms.BeatmapAvailability.LocallyAvailable()
-                && client.LocalUser?.State == MultiplayerUserState.Ready)
-                client.ChangeState(MultiplayerUserState.Idle);
+            if (availability.NewValue.State != DownloadState.LocallyAvailable)
+            {
+                // while this flow is handled server-side, this covers the edge case of the local user being in a ready state and then deleting the current beatmap.
+                if (client.LocalUser?.State == MultiplayerUserState.Ready)
+                    client.ChangeState(MultiplayerUserState.Idle);
+            }
+            else
+            {
+                if (client.LocalUser?.State == MultiplayerUserState.Spectating && (client.Room?.State == MultiplayerRoomState.WaitingForLoad || client.Room?.State == MultiplayerRoomState.Playing))
+                    onLoadRequested();
+            }
         }
 
         private void onReadyClick()
@@ -363,7 +374,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Debug.Assert(readyClickOperation == null);
             readyClickOperation = ongoingOperationTracker.BeginOperation();
 
-            if (client.IsHost && client.LocalUser?.State == MultiplayerUserState.Ready)
+            if (client.IsHost && (client.LocalUser?.State == MultiplayerUserState.Ready || client.LocalUser?.State == MultiplayerUserState.Spectating))
             {
                 client.StartMatch()
                       .ContinueWith(t =>
@@ -390,22 +401,60 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
         }
 
+        private void onSpectateClick()
+        {
+            Debug.Assert(readyClickOperation == null);
+            readyClickOperation = ongoingOperationTracker.BeginOperation();
+
+            client.ToggleSpectate().ContinueWith(t => endOperation());
+
+            void endOperation()
+            {
+                readyClickOperation?.Dispose();
+                readyClickOperation = null;
+            }
+        }
+
         private void onRoomUpdated()
         {
-            // user mods may have changed.
             Scheduler.AddOnce(UpdateMods);
         }
 
         private void onLoadRequested()
         {
-            Debug.Assert(client.Room != null);
+            if (BeatmapAvailability.Value.State != DownloadState.LocallyAvailable)
+                return;
 
-            int[] userIds = client.CurrentMatchPlayingUserIds.ToArray();
+            // In the case of spectating, IMultiplayerClient.LoadRequested can be fired while the game is still spectating a previous session.
+            // For now, we want to game to switch to the new game so need to request exiting from the play screen.
+            if (!ParentScreen.IsCurrentScreen())
+            {
+                ParentScreen.MakeCurrent();
 
-            StartPlay(() => new MultiplayerPlayer(SelectedItem.Value, userIds));
+                Schedule(onLoadRequested);
+                return;
+            }
+
+            StartPlay();
 
             readyClickOperation?.Dispose();
             readyClickOperation = null;
+        }
+
+        protected override Screen CreateGameplayScreen()
+        {
+            Debug.Assert(client.LocalUser != null);
+
+            int[] userIds = client.CurrentMatchPlayingUserIds.ToArray();
+
+            switch (client.LocalUser.State)
+            {
+                case MultiplayerUserState.Spectating:
+                    return new MultiSpectatorScreen(userIds);
+
+                default:
+                    return new PlayerLoader(() => new MultiplayerPlayer(SelectedItem.Value, userIds));
+            }
         }
 
         protected override void Dispose(bool isDisposing)

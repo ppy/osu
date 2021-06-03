@@ -72,6 +72,7 @@ namespace osu.Game.Beatmaps
         private readonly RulesetStore rulesets;
         private readonly BeatmapStore beatmaps;
         private readonly AudioManager audioManager;
+        private readonly IResourceStore<byte[]> resources;
         private readonly LargeTextureStore largeTextureStore;
         private readonly ITrackStore trackStore;
 
@@ -81,12 +82,13 @@ namespace osu.Game.Beatmaps
         [CanBeNull]
         private readonly BeatmapOnlineLookupQueue onlineLookupQueue;
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, GameHost host = null,
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
             : base(storage, contextFactory, api, new BeatmapStore(contextFactory), host)
         {
             this.rulesets = rulesets;
             this.audioManager = audioManager;
+            this.resources = resources;
             this.host = host;
 
             DefaultBeatmap = defaultBeatmap;
@@ -240,7 +242,7 @@ namespace osu.Game.Beatmaps
         /// <param name="info">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        public void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null)
+        public virtual void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null)
         {
             var setInfo = info.BeatmapSet;
 
@@ -280,23 +282,17 @@ namespace osu.Game.Beatmaps
         /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
         /// </summary>
         /// <param name="beatmapInfo">The beatmap to lookup.</param>
-        /// <param name="previous">The currently loaded <see cref="WorkingBeatmap"/>. Allows for optimisation where elements are shared with the new beatmap. May be returned if beatmapInfo requested matches</param>
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
-        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
+        public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
         {
-            if (beatmapInfo?.ID > 0 && previous != null && previous.BeatmapInfo?.ID == beatmapInfo.ID)
-                return previous;
-
-            if (beatmapInfo?.BeatmapSet == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
-                return DefaultBeatmap;
-
-            if (beatmapInfo.BeatmapSet.Files == null)
+            // if there are no files, presume the full beatmap info has not yet been fetched from the database.
+            if (beatmapInfo?.BeatmapSet?.Files.Count == 0)
             {
-                var info = beatmapInfo;
-                beatmapInfo = QueryBeatmap(b => b.ID == info.ID);
+                int lookupId = beatmapInfo.ID;
+                beatmapInfo = QueryBeatmap(b => b.ID == lookupId);
             }
 
-            if (beatmapInfo == null)
+            if (beatmapInfo?.BeatmapSet == null)
                 return DefaultBeatmap;
 
             lock (workingCache)
@@ -506,6 +502,7 @@ namespace osu.Game.Beatmaps
         ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
         AudioManager IStorageResourceProvider.AudioManager => audioManager;
         IResourceStore<byte[]> IStorageResourceProvider.Files => Files.Store;
+        IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host?.CreateTextureLoaderStore(underlyingStore);
 
         #endregion
@@ -526,6 +523,8 @@ namespace osu.Game.Beatmaps
             protected override IBeatmap GetBeatmap() => beatmap;
             protected override Texture GetBackground() => null;
             protected override Track GetBeatmapTrack() => null;
+            protected override ISkin GetSkin() => null;
+            public override Stream GetStream(string storagePath) => null;
         }
     }
 

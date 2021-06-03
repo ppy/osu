@@ -18,6 +18,9 @@ namespace osu.Game.Screens.Play
     {
         private readonly Score score;
 
+        [Resolved]
+        private SpectatorClient spectatorClient { get; set; }
+
         protected override bool CheckModsAllowFailure() => false; // todo: better support starting mid-way through beatmap
 
         public SpectatorPlayer(Score score)
@@ -25,18 +28,15 @@ namespace osu.Game.Screens.Play
             this.score = score;
         }
 
-        protected override ResultsScreen CreateResults(ScoreInfo score)
-        {
-            return new SpectatorResultsScreen(score);
-        }
+        protected override Score CreateScore() => score;
 
-        [Resolved]
-        private SpectatorStreamingClient spectatorStreaming { get; set; }
+        protected override ResultsScreen CreateResults(ScoreInfo score)
+            => new SpectatorResultsScreen(score);
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            spectatorStreaming.OnUserBeganPlaying += userBeganPlaying;
+            spectatorClient.OnUserBeganPlaying += userBeganPlaying;
 
             AddInternal(new OsuSpriteText
             {
@@ -61,12 +61,12 @@ namespace osu.Game.Screens.Play
             if (firstFrameTime == null || firstFrameTime <= gameplayStart + 5000)
                 return base.CreateGameplayClockContainer(beatmap, gameplayStart);
 
-            return new GameplayClockContainer(beatmap, firstFrameTime.Value, true);
+            return new MasterGameplayClockContainer(beatmap, firstFrameTime.Value, true);
         }
 
         public override bool OnExiting(IScreen next)
         {
-            spectatorStreaming.OnUserBeganPlaying -= userBeganPlaying;
+            spectatorClient.OnUserBeganPlaying -= userBeganPlaying;
             return base.OnExiting(next);
         }
 
@@ -84,8 +84,8 @@ namespace osu.Game.Screens.Play
         {
             base.Dispose(isDisposing);
 
-            if (spectatorStreaming != null)
-                spectatorStreaming.OnUserBeganPlaying -= userBeganPlaying;
+            if (spectatorClient != null)
+                spectatorClient.OnUserBeganPlaying -= userBeganPlaying;
         }
     }
 }

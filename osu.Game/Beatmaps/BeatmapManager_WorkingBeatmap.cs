@@ -3,7 +3,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+using System.IO;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
@@ -36,7 +36,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    using (var stream = new LineBufferedReader(resources.Files.GetStream(getPathForFile(BeatmapInfo.Path))))
+                    using (var stream = new LineBufferedReader(GetStream(BeatmapSetInfo.GetPathForFile(BeatmapInfo.Path))))
                         return Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
                 }
                 catch (Exception e)
@@ -45,8 +45,6 @@ namespace osu.Game.Beatmaps
                     return null;
                 }
             }
-
-            private string getPathForFile(string filename) => BeatmapSetInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
             protected override bool BackgroundStillValid(Texture b) => false; // bypass lazy logic. we want to return a new background each time for refcounting purposes.
 
@@ -57,7 +55,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    return resources.LargeTextureStore.Get(getPathForFile(Metadata.BackgroundFile));
+                    return resources.LargeTextureStore.Get(BeatmapSetInfo.GetPathForFile(Metadata.BackgroundFile));
                 }
                 catch (Exception e)
                 {
@@ -73,7 +71,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    return resources.Tracks.Get(getPathForFile(Metadata.AudioFile));
+                    return resources.Tracks.Get(BeatmapSetInfo.GetPathForFile(Metadata.AudioFile));
                 }
                 catch (Exception e)
                 {
@@ -89,7 +87,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    var trackData = resources.Files.GetStream(getPathForFile(Metadata.AudioFile));
+                    var trackData = GetStream(BeatmapSetInfo.GetPathForFile(Metadata.AudioFile));
                     return trackData == null ? null : new Waveform(trackData);
                 }
                 catch (Exception e)
@@ -105,7 +103,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    using (var stream = new LineBufferedReader(resources.Files.GetStream(getPathForFile(BeatmapInfo.Path))))
+                    using (var stream = new LineBufferedReader(GetStream(BeatmapSetInfo.GetPathForFile(BeatmapInfo.Path))))
                     {
                         var decoder = Decoder.GetDecoder<Storyboard>(stream);
 
@@ -114,7 +112,7 @@ namespace osu.Game.Beatmaps
                             storyboard = decoder.Decode(stream);
                         else
                         {
-                            using (var secondaryStream = new LineBufferedReader(resources.Files.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
+                            using (var secondaryStream = new LineBufferedReader(GetStream(BeatmapSetInfo.GetPathForFile(BeatmapSetInfo.StoryboardFile))))
                                 storyboard = decoder.Decode(stream, secondaryStream);
                         }
                     }
@@ -142,6 +140,8 @@ namespace osu.Game.Beatmaps
                     return null;
                 }
             }
+
+            public override Stream GetStream(string storagePath) => resources.Files.GetStream(storagePath);
         }
     }
 }

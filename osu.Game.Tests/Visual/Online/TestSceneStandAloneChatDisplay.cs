@@ -84,6 +84,28 @@ namespace osu.Game.Tests.Visual.Online
         });
 
         [Test]
+        public void TestSystemMessageOrdering()
+        {
+            var standardMessage = new Message(messageIdSequence++)
+            {
+                Sender = admin,
+                Content = "I am a wang!"
+            };
+
+            var infoMessage1 = new InfoMessage($"the system is calling {messageIdSequence++}");
+            var infoMessage2 = new InfoMessage($"the system is calling {messageIdSequence++}");
+
+            AddStep("message from admin", () => testChannel.AddNewMessages(standardMessage));
+            AddStep("message from system", () => testChannel.AddNewMessages(infoMessage1));
+            AddStep("message from system", () => testChannel.AddNewMessages(infoMessage2));
+
+            AddAssert("message order is correct", () => testChannel.Messages.Count == 3
+                                                        && testChannel.Messages[0] == standardMessage
+                                                        && testChannel.Messages[1] == infoMessage1
+                                                        && testChannel.Messages[2] == infoMessage2);
+        }
+
+        [Test]
         public void TestManyMessages()
         {
             AddStep("message from admin", () => testChannel.AddNewMessages(new Message(messageIdSequence++)

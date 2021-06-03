@@ -17,8 +17,18 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.UI
 {
-    public class HitObjectContainer : LifetimeManagementContainer, IHitObjectContainer
+    public class HitObjectContainer : CompositeDrawable, IHitObjectContainer
     {
+        /// <summary>
+        /// All entries in this <see cref="HitObjectContainer"/> including dead entries.
+        /// </summary>
+        public IEnumerable<HitObjectLifetimeEntry> Entries => allEntries;
+
+        /// <summary>
+        /// All alive entries and <see cref="DrawableHitObject"/>s used by the entries.
+        /// </summary>
+        public IEnumerable<(HitObjectLifetimeEntry Entry, DrawableHitObject Drawable)> AliveEntries => aliveDrawableMap.Select(x => (x.Key, x.Value));
+
         public IEnumerable<DrawableHitObject> Objects => InternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
 
         public IEnumerable<DrawableHitObject> AliveObjects => AliveInternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
@@ -60,8 +70,12 @@ namespace osu.Game.Rulesets.UI
         internal double FutureLifetimeExtension { get; set; }
 
         private readonly Dictionary<DrawableHitObject, IBindable> startTimeMap = new Dictionary<DrawableHitObject, IBindable>();
-        private readonly Dictionary<HitObjectLifetimeEntry, DrawableHitObject> drawableMap = new Dictionary<HitObjectLifetimeEntry, DrawableHitObject>();
+
+        private readonly Dictionary<HitObjectLifetimeEntry, DrawableHitObject> aliveDrawableMap = new Dictionary<HitObjectLifetimeEntry, DrawableHitObject>();
+        private readonly Dictionary<HitObjectLifetimeEntry, DrawableHitObject> nonPooledDrawableMap = new Dictionary<HitObjectLifetimeEntry, DrawableHitObject>();
+
         private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
+        private readonly HashSet<HitObjectLifetimeEntry> allEntries = new HashSet<HitObjectLifetimeEntry>();
 
         [Resolved(CanBeNull = true)]
         private IPooledHitObjectProvider pooledObjectProvider { get; set; }
@@ -72,6 +86,7 @@ namespace osu.Game.Rulesets.UI
 
             lifetimeManager.EntryBecameAlive += entryBecameAlive;
             lifetimeManager.EntryBecameDead += entryBecameDead;
+            lifetimeManager.EntryCrossedBoundary += entryCrossedBoundary;
         }
 
         protected override void LoadAsyncComplete()
@@ -84,123 +99,142 @@ namespace osu.Game.Rulesets.UI
 
         #region Pooling support
 
-        public void Add(HitObjectLifetimeEntry entry) => lifetimeManager.AddEntry(entry);
-
-        public bool Remove(HitObjectLifetimeEntry entry) => lifetimeManager.RemoveEntry(entry);
-
-        private void entryBecameAlive(LifetimeEntry entry) => addDrawable((HitObjectLifetimeEntry)entry);
-
-        private void entryBecameDead(LifetimeEntry entry) => removeDrawable((HitObjectLifetimeEntry)entry);
-
-        private void addDrawable(HitObjectLifetimeEntry entry)
+        public void Add(HitObjectLifetimeEntry entry)
         {
-            Debug.Assert(!drawableMap.ContainsKey(entry));
+            allEntries.Add(entry);
+            lifetimeManager.AddEntry(entry);
+        }
 
-            var drawable = pooledObjectProvider?.GetPooledDrawableRepresentation(entry.HitObject, null);
+        public bool Remove(HitObjectLifetimeEntry entry)
+        {
+            if (!lifetimeManager.RemoveEntry(entry)) return false;
+
+            // This logic is not in `Remove(DrawableHitObject)` because a non-pooled drawable may be removed by specifying its entry.
+            if (nonPooledDrawableMap.Remove(entry, out var drawable))
+                removeDrawable(drawable);
+
+            allEntries.Remove(entry);
+            return true;
+        }
+
+        private void entryBecameAlive(LifetimeEntry lifetimeEntry)
+        {
+            var entry = (HitObjectLifetimeEntry)lifetimeEntry;
+            Debug.Assert(!aliveDrawableMap.ContainsKey(entry));
+
+            bool isPooled = !nonPooledDrawableMap.TryGetValue(entry, out var drawable);
+            drawable ??= pooledObjectProvider?.GetPooledDrawableRepresentation(entry.HitObject, null);
             if (drawable == null)
                 throw new InvalidOperationException($"A drawable representation could not be retrieved for hitobject type: {entry.HitObject.GetType().ReadableName()}.");
 
+            aliveDrawableMap[entry] = drawable;
+
+            if (isPooled)
+            {
+                addDrawable(drawable);
+                HitObjectUsageBegan?.Invoke(entry.HitObject);
+            }
+
+            OnAdd(drawable);
+        }
+
+        private void entryBecameDead(LifetimeEntry lifetimeEntry)
+        {
+            var entry = (HitObjectLifetimeEntry)lifetimeEntry;
+            Debug.Assert(aliveDrawableMap.ContainsKey(entry));
+
+            var drawable = aliveDrawableMap[entry];
+            bool isPooled = !nonPooledDrawableMap.ContainsKey(entry);
+
+            drawable.OnKilled();
+            aliveDrawableMap.Remove(entry);
+
+            if (isPooled)
+            {
+                removeDrawable(drawable);
+                HitObjectUsageFinished?.Invoke(entry.HitObject);
+            }
+
+            OnRemove(drawable);
+        }
+
+        private void addDrawable(DrawableHitObject drawable)
+        {
             drawable.OnNewResult += onNewResult;
             drawable.OnRevertResult += onRevertResult;
 
             bindStartTime(drawable);
-            AddInternal(drawableMap[entry] = drawable, false);
-            OnAdd(drawable);
-
-            HitObjectUsageBegan?.Invoke(entry.HitObject);
+            AddInternal(drawable);
         }
 
-        private void removeDrawable(HitObjectLifetimeEntry entry)
+        private void removeDrawable(DrawableHitObject drawable)
         {
-            Debug.Assert(drawableMap.ContainsKey(entry));
-
-            var drawable = drawableMap[entry];
-
-            // OnKilled can potentially change the hitobject's result, so it needs to run first before unbinding.
-            drawable.OnKilled();
             drawable.OnNewResult -= onNewResult;
             drawable.OnRevertResult -= onRevertResult;
 
-            drawableMap.Remove(entry);
-
-            OnRemove(drawable);
             unbindStartTime(drawable);
-            RemoveInternal(drawable);
 
-            HitObjectUsageFinished?.Invoke(entry.HitObject);
+            RemoveInternal(drawable);
         }
 
         #endregion
 
         #region Non-pooling support
 
-        public virtual void Add(DrawableHitObject hitObject)
+        public virtual void Add(DrawableHitObject drawable)
         {
-            bindStartTime(hitObject);
+            if (drawable.Entry == null)
+                throw new InvalidOperationException($"May not add a {nameof(DrawableHitObject)} without {nameof(HitObject)} associated");
 
-            hitObject.OnNewResult += onNewResult;
-            hitObject.OnRevertResult += onRevertResult;
-
-            AddInternal(hitObject);
-            OnAdd(hitObject);
+            nonPooledDrawableMap.Add(drawable.Entry, drawable);
+            addDrawable(drawable);
+            Add(drawable.Entry);
         }
 
-        public virtual bool Remove(DrawableHitObject hitObject)
+        public virtual bool Remove(DrawableHitObject drawable)
         {
-            OnRemove(hitObject);
-            if (!RemoveInternal(hitObject))
+            if (drawable.Entry == null)
                 return false;
 
-            hitObject.OnNewResult -= onNewResult;
-            hitObject.OnRevertResult -= onRevertResult;
-
-            unbindStartTime(hitObject);
-
-            return true;
+            return Remove(drawable.Entry);
         }
 
         public int IndexOf(DrawableHitObject hitObject) => IndexOfInternal(hitObject);
 
-        protected override void OnChildLifetimeBoundaryCrossed(LifetimeBoundaryCrossedEvent e)
+        private void entryCrossedBoundary(LifetimeEntry entry, LifetimeBoundaryKind kind, LifetimeBoundaryCrossingDirection direction)
         {
-            if (!(e.Child is DrawableHitObject hitObject))
-                return;
+            if (nonPooledDrawableMap.TryGetValue((HitObjectLifetimeEntry)entry, out var drawable))
+                OnChildLifetimeBoundaryCrossed(new LifetimeBoundaryCrossedEvent(drawable, kind, direction));
+        }
 
-            if ((e.Kind == LifetimeBoundaryKind.End && e.Direction == LifetimeBoundaryCrossingDirection.Forward)
-                || (e.Kind == LifetimeBoundaryKind.Start && e.Direction == LifetimeBoundaryCrossingDirection.Backward))
-            {
-                hitObject.OnKilled();
-            }
+        protected virtual void OnChildLifetimeBoundaryCrossed(LifetimeBoundaryCrossedEvent e)
+        {
         }
 
         #endregion
 
         /// <summary>
-        /// Invoked when a <see cref="DrawableHitObject"/> is added to this container.
+        /// Invoked after a <see cref="DrawableHitObject"/> is added to this container.
         /// </summary>
-        /// <remarks>
-        /// This method is not invoked for nested <see cref="DrawableHitObject"/>s.
-        /// </remarks>
         protected virtual void OnAdd(DrawableHitObject drawableHitObject)
         {
+            Debug.Assert(drawableHitObject.LoadState >= LoadState.Ready);
         }
 
         /// <summary>
-        /// Invoked when a <see cref="DrawableHitObject"/> is removed from this container.
+        /// Invoked after a <see cref="DrawableHitObject"/> is removed from this container.
         /// </summary>
-        /// <remarks>
-        /// This method is not invoked for nested <see cref="DrawableHitObject"/>s.
-        /// </remarks>
         protected virtual void OnRemove(DrawableHitObject drawableHitObject)
         {
         }
 
-        public virtual void Clear(bool disposeChildren = true)
+        public virtual void Clear()
         {
             lifetimeManager.ClearEntries();
-
-            ClearInternal(disposeChildren);
-            unbindAllStartTimes();
+            foreach (var drawable in nonPooledDrawableMap.Values)
+                removeDrawable(drawable);
+            nonPooledDrawableMap.Clear();
+            Debug.Assert(InternalChildren.Count == 0 && startTimeMap.Count == 0 && aliveDrawableMap.Count == 0, "All hit objects should have been removed");
         }
 
         protected override bool CheckChildrenLife()

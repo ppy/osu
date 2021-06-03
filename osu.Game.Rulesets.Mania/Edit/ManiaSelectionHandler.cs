@@ -5,14 +5,14 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class ManiaSelectionHandler : SelectionHandler
+    public class ManiaSelectionHandler : EditorSelectionHandler
     {
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
@@ -20,21 +20,21 @@ namespace osu.Game.Rulesets.Mania.Edit
         [Resolved]
         private HitObjectComposer composer { get; set; }
 
-        public override bool HandleMovement(MoveSelectionEvent moveEvent)
+        public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent)
         {
-            var maniaBlueprint = (ManiaSelectionBlueprint)moveEvent.Blueprint;
-            int lastColumn = maniaBlueprint.DrawableObject.HitObject.Column;
+            var hitObjectBlueprint = (HitObjectSelectionBlueprint)moveEvent.Blueprint;
+            int lastColumn = ((ManiaHitObject)hitObjectBlueprint.Item).Column;
 
             performColumnMovement(lastColumn, moveEvent);
 
             return true;
         }
 
-        private void performColumnMovement(int lastColumn, MoveSelectionEvent moveEvent)
+        private void performColumnMovement(int lastColumn, MoveSelectionEvent<HitObject> moveEvent)
         {
             var maniaPlayfield = ((ManiaHitObjectComposer)composer).Playfield;
 
-            var currentColumn = maniaPlayfield.GetColumnByPosition(moveEvent.ScreenSpacePosition);
+            var currentColumn = maniaPlayfield.GetColumnByPosition(moveEvent.Blueprint.ScreenSpaceSelectionPoint + moveEvent.ScreenSpaceDelta);
             if (currentColumn == null)
                 return;
 
@@ -58,8 +58,9 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             EditorBeatmap.PerformOnSelection(h =>
             {
-                if (h is ManiaHitObject maniaObj)
-                    maniaObj.Column += columnDelta;
+                maniaPlayfield.Remove(h);
+                ((ManiaHitObject)h).Column += columnDelta;
+                maniaPlayfield.Add(h);
             });
         }
     }
