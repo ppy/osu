@@ -471,29 +471,29 @@ namespace osu.Game.Online.Chat
                 ClosedChannel lastClosedChannel = closedChannels.Last();
                 closedChannels.RemoveAt(closedChannels.Count - 1);
 
-                // If the user hasn't already joined the channel, try to join it
-                if (joinedChannels.FirstOrDefault(lastClosedChannel.IsEqual) == null)
+                // If the user has already joined the channel, try the next one
+                if (joinedChannels.FirstOrDefault(lastClosedChannel.IsEqual) != null)
+                    continue;
+
+                Channel lastChannel = AvailableChannels.FirstOrDefault(lastClosedChannel.IsEqual);
+
+                if (lastChannel != null)
                 {
-                    Channel lastChannel = AvailableChannels.FirstOrDefault(lastClosedChannel.IsEqual);
-
-                    if (lastChannel != null)
-                    {
-                        // Channel exists as an availaable channel, directly join it
-                        CurrentChannel.Value = JoinChannel(lastChannel);
-                    }
-                    else if (lastClosedChannel.Type == ChannelType.PM)
-                    {
-                        // Try to get User to open PM chat
-                        users.GetUserAsync((int)lastClosedChannel.Id).ContinueWith(u =>
-                        {
-                            if (u.Result == null) return;
-
-                            Schedule(() => CurrentChannel.Value = JoinChannel(new Channel(u.Result)));
-                        });
-                    }
-
-                    return;
+                    // Channel exists as an availaable channel, directly join it
+                    CurrentChannel.Value = JoinChannel(lastChannel);
                 }
+                else if (lastClosedChannel.Type == ChannelType.PM)
+                {
+                    // Try to get User to open PM chat
+                    users.GetUserAsync((int)lastClosedChannel.Id).ContinueWith(u =>
+                    {
+                        if (u.Result == null) return;
+
+                        Schedule(() => CurrentChannel.Value = JoinChannel(new Channel(u.Result)));
+                    });
+                }
+
+                return;
             }
         }
 
