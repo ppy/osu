@@ -97,8 +97,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateHitStateTransforms(state);
 
-            (CirclePiece.Drawable as IMainCirclePiece)?.Animate(state);
-
             switch (state)
             {
                 case ArmedState.Idle:

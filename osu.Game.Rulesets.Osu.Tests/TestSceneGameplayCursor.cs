@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void loadContent(bool automated = true, Func<SkinProvidingContainer> skinProvider = null)
         {
-            SetContents(() =>
+            SetContents(_ =>
             {
                 var inputManager = automated ? (InputManager)new MovingCursorInputManager() : new OsuInputManager(new OsuRuleset().RulesetInfo);
                 var skinContainer = skinProvider?.Invoke() ?? new SkinProvidingContainer(null);
