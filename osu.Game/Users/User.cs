@@ -72,9 +72,6 @@ namespace osu.Game.Users
         [JsonProperty(@"support_level")]
         public int SupportLevel;
 
-        [JsonProperty(@"current_mode_rank")]
-        public int? CurrentModeRank;
-
         [JsonProperty(@"is_gmt")]
         public bool IsGMT;
 
@@ -114,9 +111,6 @@ namespace osu.Game.Users
         [JsonProperty(@"twitter")]
         public string Twitter;
 
-        [JsonProperty(@"skype")]
-        public string Skype;
-
         [JsonProperty(@"discord")]
         public string Discord;
 
@@ -125,6 +119,9 @@ namespace osu.Game.Users
 
         [JsonProperty(@"post_count")]
         public int PostCount;
+
+        [JsonProperty(@"comments_count")]
+        public int CommentsCount;
 
         [JsonProperty(@"follower_count")]
         public int FollowerCount;
@@ -147,8 +144,14 @@ namespace osu.Game.Users
         [JsonProperty(@"unranked_beatmapset_count")]
         public int UnrankedBeatmapsetCount;
 
+        [JsonProperty(@"scores_best_count")]
+        public int ScoresBestCount;
+
         [JsonProperty(@"scores_first_count")]
         public int ScoresFirstCount;
+
+        [JsonProperty(@"scores_recent_count")]
+        public int ScoresRecentCount;
 
         [JsonProperty(@"beatmap_playcounts_count")]
         public int BeatmapPlaycountsCount;
@@ -182,7 +185,7 @@ namespace osu.Game.Users
         private UserStatistics statistics;
 
         /// <summary>
-        /// User statistics for the requested ruleset (in the case of a <see cref="GetUserRequest"/> response).
+        /// User statistics for the requested ruleset (in the case of a <see cref="GetUserRequest"/> or <see cref="GetFriendsRequest"/> response).
         /// Otherwise empty.
         /// </summary>
         [JsonProperty(@"statistics")]

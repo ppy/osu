@@ -29,6 +29,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public Bindable<string> Query => textBox.Current;
 
+        public BindableList<SearchGeneral> General => generalFilter.Current;
+
         public Bindable<RulesetInfo> Ruleset => modeFilter.Current;
 
         public Bindable<SearchCategory> Category => categoryFilter.Current;
@@ -61,6 +63,7 @@ namespace osu.Game.Overlays.BeatmapListing
         }
 
         private readonly BeatmapSearchTextBox textBox;
+        private readonly BeatmapSearchMultipleSelectionFilterRow<SearchGeneral> generalFilter;
         private readonly BeatmapSearchRulesetFilterRow modeFilter;
         private readonly BeatmapSearchFilterRow<SearchCategory> categoryFilter;
         private readonly BeatmapSearchFilterRow<SearchGenre> genreFilter;
@@ -87,7 +90,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
-                    Child = beatmapCover = new UpdateableBeatmapSetCover
+                    Child = beatmapCover = new TopSearchBeatmapSetCover
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
@@ -123,6 +126,7 @@ namespace osu.Game.Overlays.BeatmapListing
                                 Padding = new MarginPadding { Horizontal = 10 },
                                 Children = new Drawable[]
                                 {
+                                    generalFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchGeneral>(@"General"),
                                     modeFilter = new BeatmapSearchRulesetFilterRow(),
                                     categoryFilter = new BeatmapSearchFilterRow<SearchCategory>(@"Categories"),
                                     genreFilter = new BeatmapSearchFilterRow<SearchGenre>(@"Genre"),
@@ -179,6 +183,11 @@ namespace osu.Game.Overlays.BeatmapListing
                 TypingStarted?.Invoke();
                 return true;
             }
+        }
+
+        private class TopSearchBeatmapSetCover : UpdateableBeatmapSetCover
+        {
+            protected override bool TransformImmediately => true;
         }
     }
 }

@@ -37,13 +37,23 @@ namespace osu.Game.Storyboards
         public double? EarliestEventTime => Layers.SelectMany(l => l.Elements).OrderBy(e => e.StartTime).FirstOrDefault()?.StartTime;
 
         /// <summary>
+        /// Across all layers, find the latest point in time that a storyboard element ends at.
+        /// Will return null if there are no elements.
+        /// </summary>
+        /// <remarks>
+        /// This iterates all elements and as such should be used sparingly or stored locally.
+        /// Videos and samples return StartTime as their EndTIme.
+        /// </remarks>
+        public double? LatestEventTime => Layers.SelectMany(l => l.Elements).OrderBy(e => e.GetEndTime()).LastOrDefault()?.GetEndTime();
+
+        /// <summary>
         /// Depth of the currently front-most storyboard layer, excluding the overlay layer.
         /// </summary>
         private int minimumLayerDepth;
 
         public Storyboard()
         {
-            layers.Add("Video", new StoryboardLayer("Video", 4, false));
+            layers.Add("Video", new StoryboardVideoLayer("Video", 4, false));
             layers.Add("Background", new StoryboardLayer("Background", 3));
             layers.Add("Fail", new StoryboardLayer("Fail", 2) { VisibleWhenPassing = false, });
             layers.Add("Pass", new StoryboardLayer("Pass", 1) { VisibleWhenFailing = false, });
@@ -75,17 +85,13 @@ namespace osu.Game.Storyboards
             }
         }
 
-        public DrawableStoryboard CreateDrawable(WorkingBeatmap working = null)
-        {
-            var drawable = new DrawableStoryboard(this);
-            drawable.Width = drawable.Height * (BeatmapInfo.WidescreenStoryboard ? 16 / 9f : 4 / 3f);
-            return drawable;
-        }
+        public DrawableStoryboard CreateDrawable(WorkingBeatmap working = null) =>
+            new DrawableStoryboard(this);
 
         public Drawable CreateSpriteFromResourcePath(string path, TextureStore textureStore)
         {
             Drawable drawable = null;
-            var storyboardPath = BeatmapInfo.BeatmapSet?.Files?.Find(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+            var storyboardPath = BeatmapInfo.BeatmapSet?.Files.Find(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
             if (storyboardPath != null)
                 drawable = new Sprite { Texture = textureStore.Get(storyboardPath) };

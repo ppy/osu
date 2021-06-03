@@ -42,6 +42,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public OsuPlayfield()
         {
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+
             InternalChildren = new Drawable[]
             {
                 playfieldBorder = new PlayfieldBorder { RelativeSizeAxes = Axes.Both },
@@ -57,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             var hitWindows = new OsuHitWindows();
             foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
-                poolDictionary.Add(result, new DrawableJudgementPool(result, onJudgmentLoaded));
+                poolDictionary.Add(result, new DrawableJudgementPool(result, onJudgementLoaded));
 
             AddRangeInternal(poolDictionary.Values);
 
@@ -99,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.UI
             }
         }
 
-        private void onJudgmentLoaded(DrawableOsuJudgement judgement)
+        private void onJudgementLoaded(DrawableOsuJudgement judgement)
         {
             judgementAboveHitObjectLayer.Add(judgement.GetProxyAboveHitObjectsContent());
         }

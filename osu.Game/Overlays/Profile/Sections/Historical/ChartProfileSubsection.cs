@@ -15,6 +15,11 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
     {
         private ProfileLineChart chart;
 
+        /// <summary>
+        /// Text describing the value being plotted on the graph, which will be displayed as a prefix to the value in the history graph tooltip.
+        /// </summary>
+        protected abstract string GraphCounterName { get; }
+
         protected ChartProfileSubsection(Bindable<User> user, string headerText)
             : base(user, headerText)
         {
@@ -30,7 +35,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 Left = 20,
                 Right = 40
             },
-            Child = chart = new ProfileLineChart()
+            Child = chart = new ProfileLineChart(GraphCounterName)
         };
 
         protected override void LoadComplete()

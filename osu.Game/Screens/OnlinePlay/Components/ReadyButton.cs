@@ -16,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         private IBindable<BeatmapAvailability> availability;
 
         [BackgroundDependencyLoader]
-        private void load(OnlinePlayBeatmapAvailablilityTracker beatmapTracker)
+        private void load(OnlinePlayBeatmapAvailabilityTracker beatmapTracker)
         {
             availability = beatmapTracker.Availability.GetBoundCopy();
 

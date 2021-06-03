@@ -51,8 +51,11 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 droppedObjectContainer,
                 CatcherArea.MovableCatcher.CreateProxiedContent(),
-                HitObjectContainer,
+                HitObjectContainer.CreateProxy(),
+                // This ordering (`CatcherArea` before `HitObjectContainer`) is important to
+                // make sure the up-to-date catcher position is used for the catcher catching logic of hit objects.
                 CatcherArea,
+                HitObjectContainer,
             };
         }
 

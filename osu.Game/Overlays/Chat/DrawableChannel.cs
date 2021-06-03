@@ -275,7 +275,8 @@ namespace osu.Game.Overlays.Chat
                     {
                         if (!UserScrolling)
                         {
-                            ScrollToEnd();
+                            if (Current < ScrollableExtent)
+                                ScrollToEnd();
                             lastExtent = ScrollableExtent;
                         }
                     });

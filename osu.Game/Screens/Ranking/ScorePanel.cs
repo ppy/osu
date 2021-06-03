@@ -54,12 +54,12 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Duration for the panel to resize into its expanded/contracted size.
         /// </summary>
-        private const double resize_duration = 200;
+        public const double RESIZE_DURATION = 200;
 
         /// <summary>
-        /// Delay after <see cref="resize_duration"/> before the top layer is expanded.
+        /// Delay after <see cref="RESIZE_DURATION"/> before the top layer is expanded.
         /// </summary>
-        private const double top_layer_expand_delay = 100;
+        public const double TOP_LAYER_EXPAND_DELAY = 100;
 
         /// <summary>
         /// Duration for the top layer expansion.
@@ -208,8 +208,8 @@ namespace osu.Game.Screens.Ranking
                 case PanelState.Expanded:
                     Size = new Vector2(EXPANDED_WIDTH, expanded_height);
 
-                    topLayerBackground.FadeColour(expanded_top_layer_colour, resize_duration, Easing.OutQuint);
-                    middleLayerBackground.FadeColour(expanded_middle_layer_colour, resize_duration, Easing.OutQuint);
+                    topLayerBackground.FadeColour(expanded_top_layer_colour, RESIZE_DURATION, Easing.OutQuint);
+                    middleLayerBackground.FadeColour(expanded_middle_layer_colour, RESIZE_DURATION, Easing.OutQuint);
 
                     topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(Score.User).With(d => d.Alpha = 0));
                     middleLayerContentContainer.Add(middleLayerContent = new ExpandedPanelMiddleContent(Score, displayWithFlair).With(d => d.Alpha = 0));
@@ -221,20 +221,20 @@ namespace osu.Game.Screens.Ranking
                 case PanelState.Contracted:
                     Size = new Vector2(CONTRACTED_WIDTH, contracted_height);
 
-                    topLayerBackground.FadeColour(contracted_top_layer_colour, resize_duration, Easing.OutQuint);
-                    middleLayerBackground.FadeColour(contracted_middle_layer_colour, resize_duration, Easing.OutQuint);
+                    topLayerBackground.FadeColour(contracted_top_layer_colour, RESIZE_DURATION, Easing.OutQuint);
+                    middleLayerBackground.FadeColour(contracted_middle_layer_colour, RESIZE_DURATION, Easing.OutQuint);
 
                     topLayerContentContainer.Add(topLayerContent = new ContractedPanelTopContent(Score).With(d => d.Alpha = 0));
                     middleLayerContentContainer.Add(middleLayerContent = new ContractedPanelMiddleContent(Score).With(d => d.Alpha = 0));
                     break;
             }
 
-            content.ResizeTo(Size, resize_duration, Easing.OutQuint);
+            content.ResizeTo(Size, RESIZE_DURATION, Easing.OutQuint);
 
             bool topLayerExpanded = topLayerContainer.Y < 0;
 
             // If the top layer was already expanded, then we don't need to wait for the resize and can instead transform immediately. This looks better when changing the panel state.
-            using (BeginDelayedSequence(topLayerExpanded ? 0 : resize_duration + top_layer_expand_delay, true))
+            using (BeginDelayedSequence(topLayerExpanded ? 0 : RESIZE_DURATION + TOP_LAYER_EXPAND_DELAY, true))
             {
                 topLayerContainer.FadeIn();
 

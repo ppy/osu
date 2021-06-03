@@ -14,15 +14,20 @@ using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play
 {
-    public class SongProgress : OverlayContainer
+    public class SongProgress : OverlayContainer, ISkinnableDrawable
     {
-        private const int info_height = 20;
-        private const int bottom_bar_height = 5;
+        public const float MAX_HEIGHT = info_height + bottom_bar_height + graph_height + handle_height;
+
+        private const float info_height = 20;
+        private const float bottom_bar_height = 5;
         private const float graph_height = SquareGraph.Column.WIDTH * 6;
-        private static readonly Vector2 handle_size = new Vector2(10, 18);
+        private const float handle_height = 18;
+
+        private static readonly Vector2 handle_size = new Vector2(10, handle_height);
 
         private const float transition_duration = 200;
 
@@ -39,13 +44,15 @@ namespace osu.Game.Screens.Play
 
         public readonly Bindable<bool> ShowGraph = new Bindable<bool>();
 
-        //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
-        private double lastHitTime => objects.Last().GetEndTime() + 1;
-
         public override bool HandleNonPositionalInput => AllowSeeking.Value;
         public override bool HandlePositionalInput => AllowSeeking.Value;
 
+        protected override bool BlockScrollInput => false;
+
         private double firstHitTime => objects.First().StartTime;
+
+        //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
+        private double lastHitTime => objects.Last().GetEndTime() + 1;
 
         private IEnumerable<HitObject> objects;
 
@@ -63,13 +70,19 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public IClock ReferenceClock;
+        [Resolved(canBeNull: true)]
+        private Player player { get; set; }
 
-        private IClock gameplayClock;
+        [Resolved(canBeNull: true)]
+        private GameplayClock gameplayClock { get; set; }
+
+        private IClock referenceClock;
 
         public SongProgress()
         {
-            Masking = true;
+            RelativeSizeAxes = Axes.X;
+            Anchor = Anchor.BottomRight;
+            Origin = Anchor.BottomRight;
 
             Children = new Drawable[]
             {
@@ -92,18 +105,23 @@ namespace osu.Game.Screens.Play
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    OnSeek = time => RequestSeek?.Invoke(time),
+                    OnSeek = time => player?.Seek(time),
                 },
             };
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, GameplayClock clock, OsuConfigManager config)
+        private void load(OsuColour colours, OsuConfigManager config, DrawableRuleset drawableRuleset)
         {
             base.LoadComplete();
 
-            if (clock != null)
-                gameplayClock = clock;
+            if (drawableRuleset != null)
+            {
+                AllowSeeking.BindTo(drawableRuleset.HasReplayLoaded);
+
+                referenceClock = drawableRuleset.FrameStableClock;
+                Objects = drawableRuleset.Objects;
+            }
 
             config.BindWith(OsuSetting.ShowProgressGraph, ShowGraph);
 
@@ -116,11 +134,6 @@ namespace osu.Game.Screens.Play
 
             AllowSeeking.BindValueChanged(_ => updateBarVisibility(), true);
             ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
-        }
-
-        public void BindDrawableRuleset(DrawableRuleset drawableRuleset)
-        {
-            AllowSeeking.BindTo(drawableRuleset.HasReplayLoaded);
         }
 
         protected override void PopIn()
@@ -141,7 +154,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             double gameplayTime = gameplayClock?.CurrentTime ?? Time.Current;
-            double frameStableTime = ReferenceClock?.CurrentTime ?? gameplayTime;
+            double frameStableTime = referenceClock?.CurrentTime ?? gameplayTime;
 
             double progress = Math.Min(1, (frameStableTime - firstHitTime) / (lastHitTime - firstHitTime));
 

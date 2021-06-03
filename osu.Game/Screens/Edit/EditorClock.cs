@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Edit
 
         private readonly DecoupleableInterpolatingFramedClock underlyingClock;
 
+        private bool playbackFinished;
+
         public IBindable<bool> SeekingOrStopped => seekingOrStopped;
 
         private readonly Bindable<bool> seekingOrStopped = new Bindable<bool>(true);
@@ -40,12 +42,12 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public bool IsSeeking { get; private set; }
 
-        public EditorClock(WorkingBeatmap beatmap, BindableBeatDivisor beatDivisor)
-            : this(beatmap.Beatmap.ControlPointInfo, beatmap.Track.Length, beatDivisor)
+        public EditorClock(IBeatmap beatmap, BindableBeatDivisor beatDivisor)
+            : this(beatmap.ControlPointInfo, beatDivisor)
         {
         }
 
-        public EditorClock(ControlPointInfo controlPointInfo, double trackLength, BindableBeatDivisor beatDivisor)
+        public EditorClock(ControlPointInfo controlPointInfo, BindableBeatDivisor beatDivisor)
         {
             this.beatDivisor = beatDivisor;
 
@@ -55,7 +57,7 @@ namespace osu.Game.Screens.Edit
         }
 
         public EditorClock()
-            : this(new ControlPointInfo(), 1000, new BindableBeatDivisor())
+            : this(new ControlPointInfo(), new BindableBeatDivisor())
         {
         }
 
@@ -170,6 +172,10 @@ namespace osu.Game.Screens.Edit
         public void Start()
         {
             ClearTransforms();
+
+            if (playbackFinished)
+                underlyingClock.Seek(0);
+
             underlyingClock.Start();
         }
 
@@ -216,7 +222,21 @@ namespace osu.Game.Screens.Edit
 
         public bool IsRunning => underlyingClock.IsRunning;
 
-        public void ProcessFrame() => underlyingClock.ProcessFrame();
+        public void ProcessFrame()
+        {
+            underlyingClock.ProcessFrame();
+
+            playbackFinished = CurrentTime >= TrackLength;
+
+            if (playbackFinished)
+            {
+                if (IsRunning)
+                    underlyingClock.Stop();
+
+                if (CurrentTime > TrackLength)
+                    underlyingClock.Seek(TrackLength);
+            }
+        }
 
         public double ElapsedFrameTime => underlyingClock.ElapsedFrameTime;
 

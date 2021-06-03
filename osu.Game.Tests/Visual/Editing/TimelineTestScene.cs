@@ -53,15 +53,19 @@ namespace osu.Game.Tests.Visual.Editing
                         new AudioVisualiser(),
                     }
                 },
-                TimelineArea = new TimelineArea
+                TimelineArea = new TimelineArea(CreateTestComponent())
                 {
-                    Child = CreateTestComponent(),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.X,
-                    Size = new Vector2(0.8f, 100),
                 }
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Clock.Seek(2500);
         }
 
         public abstract Drawable CreateTestComponent();
@@ -110,8 +114,6 @@ namespace osu.Game.Tests.Visual.Editing
             [Resolved]
             private EditorClock editorClock { get; set; }
 
-            private bool started;
-
             public StartStopButton()
             {
                 BackgroundColour = Color4.SlateGray;
@@ -123,18 +125,17 @@ namespace osu.Game.Tests.Visual.Editing
 
             private void onClick()
             {
-                if (started)
-                {
+                if (editorClock.IsRunning)
                     editorClock.Stop();
-                    Text = "Start";
-                }
                 else
-                {
                     editorClock.Start();
-                    Text = "Stop";
-                }
+            }
 
-                started = !started;
+            protected override void Update()
+            {
+                base.Update();
+
+                Text = editorClock.IsRunning ? "Stop" : "Start";
             }
         }
     }

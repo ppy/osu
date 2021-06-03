@@ -94,6 +94,18 @@ namespace osu.Game.Graphics
             }
         }
 
+        /// <summary>
+        /// Returns a foreground text colour that is supposed to contrast well with
+        /// the supplied <paramref name="backgroundColour"/>.
+        /// </summary>
+        public static Color4 ForegroundTextColourFor(Color4 backgroundColour)
+        {
+            // formula taken from the RGB->YIQ conversions: https://en.wikipedia.org/wiki/YIQ
+            // brightness here is equivalent to the Y component in the above colour model, which is a rough estimate of lightness.
+            float brightness = 0.299f * backgroundColour.R + 0.587f * backgroundColour.G + 0.114f * backgroundColour.B;
+            return Gray(brightness > 0.5f ? 0.2f : 0.9f);
+        }
+
         // See https://github.com/ppy/osu-web/blob/master/resources/assets/less/colors.less
         public readonly Color4 PurpleLighter = Color4Extensions.FromHex(@"eeeeff");
         public readonly Color4 PurpleLight = Color4Extensions.FromHex(@"aa88ff");
@@ -185,6 +197,13 @@ namespace osu.Game.Graphics
         public readonly Color4 GrayD = Color4Extensions.FromHex(@"ddd");
         public readonly Color4 GrayE = Color4Extensions.FromHex(@"eee");
         public readonly Color4 GrayF = Color4Extensions.FromHex(@"fff");
+
+        // in latest editor design logic, need to figure out where these sit...
+        public readonly Color4 Lime1 = Color4Extensions.FromHex(@"b2ff66");
+        public readonly Color4 Orange1 = Color4Extensions.FromHex(@"ffd966");
+
+        // Content Background
+        public readonly Color4 B5 = Color4Extensions.FromHex(@"222a28");
 
         public readonly Color4 RedLighter = Color4Extensions.FromHex(@"ffeded");
         public readonly Color4 RedLight = Color4Extensions.FromHex(@"ed7787");

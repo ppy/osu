@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             Entry = null;
         }
 
-        private void onEntryInvalidated() => refreshPoints();
+        private void onEntryInvalidated() => Scheduler.AddOnce(refreshPoints);
 
         private void refreshPoints()
         {

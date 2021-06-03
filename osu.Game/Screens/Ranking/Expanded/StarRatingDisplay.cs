@@ -3,12 +3,14 @@
 
 using System.Globalization;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -20,9 +22,21 @@ namespace osu.Game.Screens.Ranking.Expanded
     /// <summary>
     /// A pill that displays the star rating of a <see cref="BeatmapInfo"/>.
     /// </summary>
-    public class StarRatingDisplay : CompositeDrawable
+    public class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty>
     {
-        private readonly StarDifficulty difficulty;
+        private Box background;
+        private OsuTextFlowContainer textFlow;
+
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        private readonly BindableWithCurrent<StarDifficulty> current = new BindableWithCurrent<StarDifficulty>();
+
+        public Bindable<StarDifficulty> Current
+        {
+            get => current.Current;
+            set => current.Current = value;
+        }
 
         /// <summary>
         /// Creates a new <see cref="StarRatingDisplay"/> using an already computed <see cref="StarDifficulty"/>.
@@ -30,22 +44,13 @@ namespace osu.Game.Screens.Ranking.Expanded
         /// <param name="starDifficulty">The already computed <see cref="StarDifficulty"/> to display the star difficulty of.</param>
         public StarRatingDisplay(StarDifficulty starDifficulty)
         {
-            difficulty = starDifficulty;
+            Current.Value = starDifficulty;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, BeatmapDifficultyCache difficultyCache)
         {
             AutoSizeAxes = Axes.Both;
-
-            var starRatingParts = difficulty.Stars.ToString("0.00", CultureInfo.InvariantCulture).Split('.');
-            string wholePart = starRatingParts[0];
-            string fractionPart = starRatingParts[1];
-            string separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-
-            ColourInfo backgroundColour = difficulty.DifficultyRating == DifficultyRating.ExpertPlus
-                ? ColourInfo.GradientVertical(Color4Extensions.FromHex("#C1C1C1"), Color4Extensions.FromHex("#595959"))
-                : (ColourInfo)colours.ForDifficultyRating(difficulty.DifficultyRating);
 
             InternalChildren = new Drawable[]
             {
@@ -55,10 +60,9 @@ namespace osu.Game.Screens.Ranking.Expanded
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        new Box
+                        background = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = backgroundColour
                         },
                     }
                 },
@@ -78,32 +82,54 @@ namespace osu.Game.Screens.Ranking.Expanded
                             Icon = FontAwesome.Solid.Star,
                             Colour = Color4.Black
                         },
-                        new OsuTextFlowContainer(s => s.Font = OsuFont.Numeric.With(weight: FontWeight.Black))
+                        textFlow = new OsuTextFlowContainer(s => s.Font = OsuFont.Numeric.With(weight: FontWeight.Black))
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
                             TextAnchor = Anchor.BottomLeft,
-                        }.With(t =>
-                        {
-                            t.AddText($"{wholePart}", s =>
-                            {
-                                s.Colour = Color4.Black;
-                                s.Font = s.Font.With(size: 14);
-                                s.UseFullGlyphHeight = false;
-                            });
-
-                            t.AddText($"{separator}{fractionPart}", s =>
-                            {
-                                s.Colour = Color4.Black;
-                                s.Font = s.Font.With(size: 7);
-                                s.UseFullGlyphHeight = false;
-                            });
-                        })
+                        }
                     }
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindValueChanged(_ => updateDisplay(), true);
+        }
+
+        private void updateDisplay()
+        {
+            var starRatingParts = Current.Value.Stars.ToString("0.00", CultureInfo.InvariantCulture).Split('.');
+            string wholePart = starRatingParts[0];
+            string fractionPart = starRatingParts[1];
+            string separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+
+            var rating = Current.Value.DifficultyRating;
+
+            background.Colour = rating == DifficultyRating.ExpertPlus
+                ? ColourInfo.GradientVertical(Color4Extensions.FromHex("#C1C1C1"), Color4Extensions.FromHex("#595959"))
+                : (ColourInfo)colours.ForDifficultyRating(rating);
+
+            textFlow.Clear();
+
+            textFlow.AddText($"{wholePart}", s =>
+            {
+                s.Colour = Color4.Black;
+                s.Font = s.Font.With(size: 14);
+                s.UseFullGlyphHeight = false;
+            });
+
+            textFlow.AddText($"{separator}{fractionPart}", s =>
+            {
+                s.Colour = Color4.Black;
+                s.Font = s.Font.With(size: 7);
+                s.UseFullGlyphHeight = false;
+            });
         }
     }
 }

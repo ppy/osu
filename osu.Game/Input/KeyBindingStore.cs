@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
@@ -15,6 +16,17 @@ namespace osu.Game.Input
     public class KeyBindingStore : DatabaseBackedStore
     {
         public event Action KeyBindingChanged;
+
+        /// <summary>
+        /// Keys which should not be allowed for gameplay input purposes.
+        /// </summary>
+        private static readonly IEnumerable<InputKey> banned_keys = new[]
+        {
+            InputKey.MouseWheelDown,
+            InputKey.MouseWheelLeft,
+            InputKey.MouseWheelUp,
+            InputKey.MouseWheelRight
+        };
 
         public KeyBindingStore(DatabaseContextFactory contextFactory, RulesetStore rulesets, Storage storage = null)
             : base(contextFactory, storage)
@@ -85,7 +97,6 @@ namespace osu.Game.Input
         /// </summary>
         /// <param name="rulesetId">The ruleset's internal ID.</param>
         /// <param name="variant">An optional variant.</param>
-        /// <returns></returns>
         public List<DatabasedKeyBinding> Query(int? rulesetId = null, int? variant = null) =>
             ContextFactory.Get().DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
 
@@ -94,6 +105,9 @@ namespace osu.Game.Input
             using (ContextFactory.GetForWrite())
             {
                 var dbKeyBinding = (DatabasedKeyBinding)keyBinding;
+
+                Debug.Assert(dbKeyBinding.RulesetID == null || CheckValidForGameplay(keyBinding.KeyCombination));
+
                 Refresh(ref dbKeyBinding);
 
                 if (dbKeyBinding.KeyCombination.Equals(keyBinding.KeyCombination))
@@ -103,6 +117,17 @@ namespace osu.Game.Input
             }
 
             KeyBindingChanged?.Invoke();
+        }
+
+        public static bool CheckValidForGameplay(KeyCombination combination)
+        {
+            foreach (var key in banned_keys)
+            {
+                if (combination.Keys.Contains(key))
+                    return false;
+            }
+
+            return true;
         }
     }
 }
