@@ -37,7 +37,7 @@ namespace osu.Game.Online.Chat
         /// <summary>
         /// Keeps a stack of recently closed channels
         /// </summary>
-        private readonly BindableList<ClosedChannel> closedChannels = new BindableList<ClosedChannel>();
+        private readonly List<ClosedChannel> closedChannels = new List<ClosedChannel>();
 
         // For efficiency purposes, this constant bounds the number of closed channels we store.
         // This number is somewhat arbitrary; future developers are free to modify it.
