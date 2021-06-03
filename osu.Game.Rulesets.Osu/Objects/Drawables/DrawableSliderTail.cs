@@ -87,8 +87,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Debug.Assert(HitObject.HitWindows != null);
 
-            (CirclePiece.Drawable as IMainCirclePiece)?.Animate(state);
-
             switch (state)
             {
                 case ArmedState.Idle:

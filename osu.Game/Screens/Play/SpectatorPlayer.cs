@@ -88,10 +88,10 @@ namespace osu.Game.Screens.Play
             seekedToGameplay = true;
         }
 
+        protected override Score CreateScore() => score;
+
         protected override ResultsScreen CreateResults(ScoreInfo score)
-        {
-            return new SpectatorResultsScreen(score);
-        }
+            => new SpectatorResultsScreen(score);
 
         protected override void PrepareReplay()
         {

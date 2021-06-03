@@ -505,12 +505,13 @@ namespace osu.Game.Screens.Select
                 {
                     Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
 
-                    WorkingBeatmap previous = Beatmap.Value;
-                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, previous);
+                    int? lastSetID = Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
+
+                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
 
                     if (beatmap != null)
                     {
-                        if (beatmap.BeatmapSetInfoID == previous?.BeatmapInfo.BeatmapSetInfoID)
+                        if (beatmap.BeatmapSetInfoID == lastSetID)
                             sampleChangeDifficulty.Play();
                         else
                             sampleChangeBeatmap.Play();
