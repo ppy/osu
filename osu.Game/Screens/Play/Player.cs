@@ -592,7 +592,7 @@ namespace osu.Game.Screens.Play
         /// Intermediate hitobject judgements may not be applied or reverted correctly during this seek.
         /// </remarks>
         /// <param name="time">The destination time to seek to.</param>
-        public void NonFrameStableSeek(double time)
+        internal void NonFrameStableSeek(double time)
         {
             if (frameStablePlaybackResetDelegate?.Cancelled == false && !frameStablePlaybackResetDelegate.Completed)
                 frameStablePlaybackResetDelegate.RunTask();
