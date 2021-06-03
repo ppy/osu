@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -52,6 +53,8 @@ namespace osu.Game.Tests.Visual.Spectator
                 RulesetID = 0,
             });
         }
+
+        public new void Schedule(Action action) => base.Schedule(action);
 
         /// <summary>
         /// Sends frames for an arbitrary user.

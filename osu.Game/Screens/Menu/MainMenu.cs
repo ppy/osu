@@ -1,9 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -24,6 +21,8 @@ using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Import;
 using osu.Game.Screens.Mvis;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
@@ -124,7 +123,7 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.TopRight,
                     Margin = new MarginPadding { Right = 15, Top = 5 }
                 },
-                exitConfirmOverlay?.CreateProxy() ?? Drawable.Empty()
+                exitConfirmOverlay?.CreateProxy() ?? Empty()
             });
 
             buttons.StateChanged += state =>
@@ -279,15 +278,11 @@ namespace osu.Game.Screens.Menu
             if (!exitConfirmed && dialogOverlay != null)
             {
                 if (dialogOverlay.CurrentDialog is ConfirmExitDialog exitDialog)
-                {
-                    exitConfirmed = true;
-                    exitDialog.Buttons.First().Click();
-                }
+                    exitDialog.PerformOkAction();
                 else
-                {
                     dialogOverlay.Push(new ConfirmExitDialog(confirmAndExit, () => exitConfirmOverlay.Abort()));
-                    return true;
-                }
+
+                return true;
             }
 
             buttons.State = ButtonSystemState.Exit;

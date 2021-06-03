@@ -3,26 +3,26 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Testing;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinnableAccuracyCounter : SkinnableTestScene
+    public class TestSceneSkinnableAccuracyCounter : SkinnableHUDComponentTestScene
     {
-        protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
-
         [Cached]
         private ScoreProcessor scoreProcessor = new ScoreProcessor();
+
+        protected override Drawable CreateDefaultImplementation() => new DefaultAccuracyCounter();
+        protected override Drawable CreateLegacyImplementation() => new LegacyAccuracyCounter();
 
         [SetUpSteps]
         public void SetUpSteps()
         {
             AddStep("Set initial accuracy", () => scoreProcessor.Accuracy.Value = 1);
-            AddStep("Create accuracy counters", () => SetContents(() => new SkinnableDrawable(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter))));
         }
 
         [Test]

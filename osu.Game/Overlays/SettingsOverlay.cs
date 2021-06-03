@@ -10,14 +10,16 @@ using osuTK.Graphics;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays
 {
     public class SettingsOverlay : SettingsPanel, INamedOverlayComponent
     {
         public string IconTexture => "Icons/Hexacons/settings";
-        public string Title => "设置";
-        public string Description => "在这里更改osu!的设置";
+        public LocalisableString Title => SettingsStrings.HeaderTitle;
+        public LocalisableString Description => SettingsStrings.HeaderDescription;
 
         protected override IEnumerable<SettingsSection> CreateSections() => new SettingsSection[]
         {

@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            SetContents(() =>
+            SetContents(_ =>
             {
                 var pool = new DrawablePool<PoolableHitExplosion>(5);
                 hitExplosionPools.Add(pool);
