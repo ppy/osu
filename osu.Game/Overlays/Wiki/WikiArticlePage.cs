@@ -1,14 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using Markdig.Syntax;
+using Markdig.Syntax.Inlines;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Containers.Markdown;
 using osu.Game.Overlays.Wiki.Markdown;
 
 namespace osu.Game.Overlays.Wiki
 {
     public class WikiArticlePage : GridContainer
     {
+        private readonly WikiSidebar sidebar;
         public Container SidebarContainer { get; }
 
         public WikiArticlePage(string currentPath, string markdown)
@@ -31,9 +36,9 @@ namespace osu.Game.Overlays.Wiki
                     SidebarContainer = new Container
                     {
                         AutoSizeAxes = Axes.X,
-                        Child = new WikiSidebar(),
+                        Child = sidebar = new WikiSidebar(),
                     },
-                    new WikiMarkdownContainer
+                    new ArticleMarkdownContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -46,9 +51,25 @@ namespace osu.Game.Overlays.Wiki
                             Left = 30,
                             Right = 50,
                         },
+                        OnAddHeading = sidebar.AddToc,
                     }
                 },
             };
+        }
+
+        private class ArticleMarkdownContainer : WikiMarkdownContainer
+        {
+            public Action<string, MarkdownHeading, int> OnAddHeading;
+
+            protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock)
+            {
+                var heading = base.CreateHeading(headingBlock);
+                var title = ((LiteralInline)headingBlock.Inline.FirstChild).Content.ToString();
+
+                OnAddHeading(title, heading, headingBlock.Level);
+
+                return heading;
+            }
         }
     }
 }
