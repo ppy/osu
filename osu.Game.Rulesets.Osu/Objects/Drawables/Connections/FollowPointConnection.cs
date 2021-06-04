@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Objects;
@@ -26,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             base.OnApply(entry);
 
             entry.Invalidated += refreshPoints;
-            refreshPoints();
+            refreshPoints(entry);
         }
 
         protected override void OnFree(FollowPointLifetimeEntry entry)
@@ -38,12 +39,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             ClearInternal(false);
         }
 
-        private void refreshPoints()
+        private void refreshPoints(FollowPointLifetimeEntry entry)
         {
             ClearInternal(false);
 
-            OsuHitObject start = Entry.Start;
-            OsuHitObject end = Entry.End;
+            OsuHitObject start = entry.Start;
+            OsuHitObject end = entry.End;
+            Debug.Assert(end != null, $"{nameof(FollowPointLifetimeEntry)} without end hit object should never be alive");
 
             double startTime = start.GetEndTime();
 
@@ -88,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             }
 
             // todo: use Expire() on FollowPoints and take lifetime from them when https://github.com/ppy/osu-framework/issues/3300 is fixed.
-            Entry.LifetimeEnd = finalTransformEndTime;
+            entry.LifetimeEnd = finalTransformEndTime;
         }
 
         /// <summary>
