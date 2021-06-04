@@ -74,6 +74,9 @@ namespace osu.Game.Overlays.Wiki
             [Resolved]
             private OverlayScrollContainer scrollContainer { get; set; }
 
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; }
+
             private readonly MarkdownHeading target;
 
             private readonly OsuTextFlowContainer textFlow;
@@ -100,7 +103,7 @@ namespace osu.Game.Overlays.Wiki
             protected override IEnumerable<Drawable> EffectTargets => new Drawable[] { textFlow };
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
+            private void load()
             {
                 IdleColour = colourProvider.Light2;
                 HoverColour = colourProvider.Light1;
@@ -108,6 +111,7 @@ namespace osu.Game.Overlays.Wiki
 
             protected override bool OnClick(ClickEvent e)
             {
+                IdleColour = colourProvider.Light1;
                 scrollContainer.ScrollTo(target);
                 return base.OnClick(e);
             }
