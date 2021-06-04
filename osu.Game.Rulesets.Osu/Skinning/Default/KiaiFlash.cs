@@ -12,7 +12,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public class KiaiFlash : BeatSyncedContainer
     {
-        public float FlashOpacity = 1f;
+        private const double fade_length = 80;
+
+        private const float flash_opacity = 0.25f;
 
         public KiaiFlash()
         {
@@ -30,14 +32,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             if (!effectPoint.KiaiMode)
-            {
                 return;
-            }
 
             Child
-                .FadeTo(FlashOpacity, EarlyActivationMilliseconds, Easing.OutQuint)
+                .FadeTo(flash_opacity, EarlyActivationMilliseconds, Easing.OutQuint)
                 .Then()
-                .FadeOut(timingPoint.BeatLength - 80, Easing.OutSine);
+                .FadeOut(timingPoint.BeatLength - fade_length, Easing.OutSine);
         }
     }
 }
