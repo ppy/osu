@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Wiki
                 case 2:
                 case 3:
                     string title = getTitle(headingBlock.Inline);
-                    tableOfContents.Add(new TocTitle(title, heading, headingBlock.Level == 3));
+                    tableOfContents.Add(new TableOfContentsEntry(title, heading, headingBlock.Level == 3));
                     break;
             }
         }
@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.Wiki
             return string.Empty;
         }
 
-        private class TocTitle : OsuHoverContainer
+        private class TableOfContentsEntry : OsuHoverContainer
         {
             [Resolved]
             private OverlayScrollContainer scrollContainer { get; set; }
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Wiki
 
             private readonly OsuTextFlowContainer textFlow;
 
-            public TocTitle(string text, MarkdownHeading target, bool subtitle = false)
+            public TableOfContentsEntry(string text, MarkdownHeading target, bool subtitle = false)
             {
                 this.target = target;
 
