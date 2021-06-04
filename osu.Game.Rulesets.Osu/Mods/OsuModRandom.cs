@@ -173,6 +173,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             pos = slider.Path.PositionAt(1);
             updateMargin();
 
+            minMargin.Left = Math.Min(minMargin.Left, OsuPlayfield.BASE_SIZE.X - minMargin.Right);
+            minMargin.Top = Math.Min(minMargin.Top, OsuPlayfield.BASE_SIZE.Y - minMargin.Bottom);
+
             return minMargin;
 
             void updateMargin()
