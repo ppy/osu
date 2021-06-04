@@ -156,9 +156,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             var minMargin = new MarginPadding();
             Vector2 pos;
 
-            for (double j = 0; j <= 1; j += 1 / (slider_path_checking_rate / 1000 * (slider.EndTime - slider.StartTime)))
+            for (double i = 0; i <= 1; i += 1 / (slider_path_checking_rate / 1000 * (slider.EndTime - slider.StartTime)))
             {
-                pos = slider.Path.PositionAt(j);
+                pos = slider.Path.PositionAt(i);
                 updateMargin();
             }
 
