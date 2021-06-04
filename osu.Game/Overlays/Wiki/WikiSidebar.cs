@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Wiki
             },
         };
 
-        public void AddToc(HeadingBlock headingBlock, MarkdownHeading heading)
+        public void AddEntry(HeadingBlock headingBlock, MarkdownHeading heading)
         {
             switch (headingBlock.Level)
             {
