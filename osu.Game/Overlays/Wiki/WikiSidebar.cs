@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using Markdig.Syntax;
+using Markdig.Syntax.Inlines;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -38,15 +40,33 @@ namespace osu.Game.Overlays.Wiki
             },
         };
 
-        public void AddToc(string title, MarkdownHeading heading, int level)
+        public void AddToc(HeadingBlock headingBlock, MarkdownHeading heading)
         {
-            switch (level)
+            switch (headingBlock.Level)
             {
                 case 2:
                 case 3:
-                    tableOfContents.Add(new TocTitle(title, heading, level == 3));
+                    string title = getTitle(headingBlock.Inline);
+                    tableOfContents.Add(new TocTitle(title, heading, headingBlock.Level == 3));
                     break;
             }
+        }
+
+        private string getTitle(ContainerInline containerInline)
+        {
+            foreach (var inline in containerInline)
+            {
+                switch (inline)
+                {
+                    case LiteralInline literalInline:
+                        return literalInline.Content.ToString();
+
+                    case LinkInline { IsImage: false } linkInline:
+                        return getTitle(linkInline);
+                }
+            }
+
+            return string.Empty;
         }
 
         private class TocTitle : OsuHoverContainer

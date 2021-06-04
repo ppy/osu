@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using Markdig.Syntax;
-using Markdig.Syntax.Inlines;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
@@ -62,14 +60,13 @@ namespace osu.Game.Overlays.Wiki
 
         private class ArticleMarkdownContainer : WikiMarkdownContainer
         {
-            public Action<string, MarkdownHeading, int> OnAddHeading;
+            public Action<HeadingBlock, MarkdownHeading> OnAddHeading;
 
             protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock)
             {
                 var heading = base.CreateHeading(headingBlock);
-                var title = ((LiteralInline)headingBlock.Inline.First(i => i is LiteralInline)).Content.ToString();
 
-                OnAddHeading(title, heading, headingBlock.Level);
+                OnAddHeading(headingBlock, heading);
 
                 return heading;
             }
