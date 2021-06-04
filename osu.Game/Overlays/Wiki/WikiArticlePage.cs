@@ -10,7 +10,7 @@ using osu.Game.Overlays.Wiki.Markdown;
 
 namespace osu.Game.Overlays.Wiki
 {
-    public class WikiArticlePage : GridContainer
+    public class WikiArticlePage : CompositeDrawable
     {
         public Container SidebarContainer { get; }
 
@@ -18,42 +18,47 @@ namespace osu.Game.Overlays.Wiki
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            RowDimensions = new[]
-            {
-                new Dimension(GridSizeMode.AutoSize),
-            };
-            ColumnDimensions = new[]
-            {
-                new Dimension(GridSizeMode.AutoSize),
-                new Dimension(),
-            };
 
             WikiSidebar sidebar;
 
-            Content = new[]
+            InternalChild = new GridContainer
             {
-                new Drawable[]
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                RowDimensions = new[]
                 {
-                    SidebarContainer = new Container
+                    new Dimension(GridSizeMode.AutoSize),
+                },
+                ColumnDimensions = new[]
+                {
+                    new Dimension(GridSizeMode.AutoSize),
+                    new Dimension(),
+                },
+                Content = new[]
+                {
+                    new Drawable[]
                     {
-                        AutoSizeAxes = Axes.X,
-                        Child = sidebar = new WikiSidebar(),
-                    },
-                    new ArticleMarkdownContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        CurrentPath = currentPath,
-                        Text = markdown,
-                        DocumentMargin = new MarginPadding(0),
-                        DocumentPadding = new MarginPadding
+                        SidebarContainer = new Container
                         {
-                            Vertical = 20,
-                            Left = 30,
-                            Right = 50,
+                            AutoSizeAxes = Axes.X,
+                            Child = sidebar = new WikiSidebar(),
                         },
-                        OnAddHeading = sidebar.AddEntry,
-                    }
+                        new ArticleMarkdownContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            CurrentPath = currentPath,
+                            Text = markdown,
+                            DocumentMargin = new MarginPadding(0),
+                            DocumentPadding = new MarginPadding
+                            {
+                                Vertical = 20,
+                                Left = 30,
+                                Right = 50,
+                            },
+                            OnAddHeading = sidebar.AddEntry,
+                        }
+                    },
                 },
             };
         }
