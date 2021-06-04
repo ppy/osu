@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Pooling;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
@@ -12,37 +13,30 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     /// <summary>
     /// Visualises the <see cref="FollowPoint"/>s between two <see cref="DrawableOsuHitObject"/>s.
     /// </summary>
-    public class FollowPointConnection : PoolableDrawable
+    public class FollowPointConnection : PoolableDrawableWithLifetime<FollowPointLifetimeEntry>
     {
         // Todo: These shouldn't be constants
         public const int SPACING = 32;
         public const double PREEMPT = 800;
 
-        public FollowPointLifetimeEntry Entry;
         public DrawablePool<FollowPoint> Pool;
 
-        protected override void PrepareForUse()
+        protected override void OnApply(FollowPointLifetimeEntry entry)
         {
-            base.PrepareForUse();
+            base.OnApply(entry);
 
-            Entry.Invalidated += onEntryInvalidated;
-
+            entry.Invalidated += refreshPoints;
             refreshPoints();
         }
 
-        protected override void FreeAfterUse()
+        protected override void OnFree(FollowPointLifetimeEntry entry)
         {
-            base.FreeAfterUse();
+            base.OnFree(entry);
 
-            Entry.Invalidated -= onEntryInvalidated;
-
+            entry.Invalidated -= refreshPoints;
             // Return points to the pool.
             ClearInternal(false);
-
-            Entry = null;
         }
-
-        private void onEntryInvalidated() => Scheduler.AddOnce(refreshPoints);
 
         private void refreshPoints()
         {
