@@ -26,6 +26,9 @@ namespace osu.Game.Overlays
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Cached]
+        private readonly OverlayScrollContainer scrollContainer;
+
         private GetWikiRequest request;
 
         private CancellationTokenSource cancellationToken;
@@ -37,6 +40,7 @@ namespace osu.Game.Overlays
         public WikiOverlay()
             : base(OverlayColourScheme.Orange, false)
         {
+            scrollContainer = ScrollFlow;
         }
 
         public void ShowPage(string pagePath = index_path)
