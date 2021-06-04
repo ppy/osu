@@ -44,6 +44,10 @@ namespace osu.Game.Overlays.Wiki
                 case 2:
                     tableOfContents.Add(new TocTitle(title));
                     break;
+
+                case 3:
+                    tableOfContents.Add(new TocTitle(title, true));
+                    break;
             }
         }
 
@@ -51,14 +55,14 @@ namespace osu.Game.Overlays.Wiki
         {
             private readonly OsuSpriteText spriteText;
 
-            public TocTitle(string text)
+            public TocTitle(string text, bool subtitle = false)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
                 Child = spriteText = new OsuSpriteText
                 {
                     Text = text,
-                    Font = OsuFont.GetFont(size: 15),
+                    Font = OsuFont.GetFont(size: subtitle ? 12 : 15),
                 };
             }
 
