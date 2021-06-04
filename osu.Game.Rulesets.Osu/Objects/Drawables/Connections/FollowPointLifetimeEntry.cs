@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
     public class FollowPointLifetimeEntry : LifetimeEntry
     {
-        public event Action<FollowPointLifetimeEntry>? Invalidated;
+        public event Action? Invalidated;
         public readonly OsuHitObject Start;
 
         public FollowPointLifetimeEntry(OsuHitObject start)
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             LifetimeStart = fadeInTime;
             LifetimeEnd = double.MaxValue; // This will be set by the connection.
 
-            Invalidated?.Invoke(this);
+            Invalidated?.Invoke();
         }
     }
 }

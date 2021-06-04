@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Objects;
@@ -26,26 +25,30 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         {
             base.OnApply(entry);
 
-            entry.Invalidated += refreshPoints;
-            refreshPoints(entry);
+            entry.Invalidated += onEntryInvalidated;
+            refreshPoints();
         }
 
         protected override void OnFree(FollowPointLifetimeEntry entry)
         {
             base.OnFree(entry);
 
-            entry.Invalidated -= refreshPoints;
+            entry.Invalidated -= onEntryInvalidated;
             // Return points to the pool.
             ClearInternal(false);
         }
 
-        private void refreshPoints(FollowPointLifetimeEntry entry)
+        private void onEntryInvalidated() => Scheduler.AddOnce(refreshPoints);
+
+        private void refreshPoints()
         {
             ClearInternal(false);
 
+            var entry = Entry;
+            if (entry?.End == null) return;
+
             OsuHitObject start = entry.Start;
             OsuHitObject end = entry.End;
-            Debug.Assert(end != null, $"{nameof(FollowPointLifetimeEntry)} without end hit object should never be alive");
 
             double startTime = start.GetEndTime();
 
