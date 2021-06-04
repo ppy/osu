@@ -126,8 +126,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private float hyperDashTargetPosition;
         private Bindable<bool> hitLighting;
 
-        private readonly DrawablePool<HitExplosion> hitExplosionPool;
-        private readonly Container<HitExplosion> hitExplosionContainer;
+        private readonly HitExplosionContainer hitExplosionContainer;
 
         private readonly DrawablePool<CaughtFruit> caughtFruitPool;
         private readonly DrawablePool<CaughtBanana> caughtBananaPool;
@@ -148,7 +147,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
             InternalChildren = new Drawable[]
             {
-                hitExplosionPool = new DrawablePool<HitExplosion>(10),
                 caughtFruitPool = new DrawablePool<CaughtFruit>(50),
                 caughtBananaPool = new DrawablePool<CaughtBanana>(100),
                 // less capacity is needed compared to fruit because droplet is not stacked
@@ -173,7 +171,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     Anchor = Anchor.TopCentre,
                     Alpha = 0,
                 },
-                hitExplosionContainer = new Container<HitExplosion>
+                hitExplosionContainer = new HitExplosionContainer
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.BottomCentre,
@@ -297,7 +295,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
             caughtObjectContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
             droppedObjectTarget.RemoveAll(d => d.HitObject == drawableObject.HitObject);
-            hitExplosionContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
         }
 
         /// <summary>
@@ -508,15 +505,8 @@ namespace osu.Game.Rulesets.Catch.UI
             return position;
         }
 
-        private void addLighting(CatchHitObject hitObject, float x, Color4 colour)
-        {
-            HitExplosion hitExplosion = hitExplosionPool.Get();
-            hitExplosion.HitObject = hitObject;
-            hitExplosion.X = x;
-            hitExplosion.Scale = new Vector2(hitObject.Scale);
-            hitExplosion.ObjectColour = colour;
-            hitExplosionContainer.Add(hitExplosion);
-        }
+        private void addLighting(CatchHitObject hitObject, float x, Color4 colour) =>
+            hitExplosionContainer.Add(new HitExplosionEntry(Time.Current, x, hitObject.Scale, colour));
 
         private CaughtObject getCaughtObject(PalpableCatchHitObject source)
         {
