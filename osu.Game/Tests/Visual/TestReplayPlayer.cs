@@ -3,12 +3,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
@@ -16,7 +15,7 @@ namespace osu.Game.Tests.Visual
     /// <summary>
     /// A player that exposes many components that would otherwise not be available, for testing purposes.
     /// </summary>
-    public class TestPlayer : Player
+    public class TestReplayPlayer : ReplayPlayer
     {
         protected override bool PauseOnFocusLost { get; }
 
@@ -37,10 +36,11 @@ namespace osu.Game.Tests.Visual
 
         public new bool PauseCooldownActive => base.PauseCooldownActive;
 
-        public readonly List<JudgementResult> Results = new List<JudgementResult>();
-
-        public TestPlayer(bool allowPause = true, bool showResults = true, bool pauseOnFocusLost = false)
-            : base(new PlayerConfiguration
+        /// <summary>
+        /// Instantiate a replay player that renders an autoplay mod.
+        /// </summary>
+        public TestReplayPlayer(bool allowPause = true, bool showResults = true, bool pauseOnFocusLost = false)
+            : base((beatmap, mods) => mods.OfType<ModAutoplay>().First().CreateReplayScore(beatmap, mods), new PlayerConfiguration
             {
                 AllowPause = allowPause,
                 ShowResults = showResults
@@ -49,30 +49,17 @@ namespace osu.Game.Tests.Visual
             PauseOnFocusLost = pauseOnFocusLost;
         }
 
-        protected override void PrepareReplay()
-        {
-            // Generally, replay generation is handled by whatever is constructing the player.
-            // This is implemented locally here to ease migration of test scenes that have some executions
-            // running with autoplay and some not, but are not written in a way that lends to instantiating
-            // different `Player` types.
-            //
-            // Eventually we will want to remove this and update all test usages which rely on autoplay to use
-            // a `TestReplayPlayer`.
-            var autoplayMod = Mods.Value.OfType<ModAutoplay>().FirstOrDefault();
-
-            if (autoplayMod != null)
+        /// <summary>
+        /// Instantiate a replay player that renders the provided replay.
+        /// </summary>
+        public TestReplayPlayer(Score score, bool allowPause = true, bool showResults = true, bool pauseOnFocusLost = false)
+            : base(score, new PlayerConfiguration
             {
-                DrawableRuleset?.SetReplayScore(autoplayMod.CreateReplayScore(GameplayBeatmap.PlayableBeatmap, Mods.Value));
-                return;
-            }
-
-            base.PrepareReplay();
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
+                AllowPause = allowPause,
+                ShowResults = showResults
+            })
         {
-            ScoreProcessor.NewJudgement += r => Results.Add(r);
+            PauseOnFocusLost = pauseOnFocusLost;
         }
     }
 }
