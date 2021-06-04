@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Pooling;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -74,10 +75,10 @@ namespace osu.Game.Rulesets.Catch.UI
             setColour(entry.ObjectColour);
 
             using (BeginAbsoluteSequence(entry.LifetimeStart))
-                applyTransforms();
+                applyTransforms(entry.RNGSeed);
         }
 
-        private void applyTransforms()
+        private void applyTransforms(int randomSeed)
         {
             ClearTransforms(true);
 
@@ -90,8 +91,8 @@ namespace osu.Game.Rulesets.Catch.UI
                 .FadeOut(duration * 2);
 
             const float angle_variangle = 15; // should be less than 45
-            directionalGlow1.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
-            directionalGlow2.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
+            directionalGlow1.Rotation = StatelessRNG.NextSingle(-angle_variangle, angle_variangle, randomSeed, 4);
+            directionalGlow2.Rotation = StatelessRNG.NextSingle(-angle_variangle, angle_variangle, randomSeed, 5);
 
             this.FadeInFromZero(50).Then().FadeOut(duration, Easing.Out).Expire();
         }

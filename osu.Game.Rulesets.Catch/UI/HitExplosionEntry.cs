@@ -11,13 +11,15 @@ namespace osu.Game.Rulesets.Catch.UI
         public readonly float Position;
         public readonly float Scale;
         public readonly Color4 ObjectColour;
+        public readonly int RNGSeed;
 
-        public HitExplosionEntry(double startTime, float position, float scale, Color4 objectColour)
+        public HitExplosionEntry(double startTime, float position, float scale, Color4 objectColour, int rngSeed)
         {
             LifetimeStart = startTime;
             Position = position;
             Scale = scale;
             ObjectColour = objectColour;
+            RNGSeed = rngSeed;
         }
     }
 }
