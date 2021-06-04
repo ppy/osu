@@ -13,7 +13,6 @@ namespace osu.Game.Overlays.Wiki
 {
     public class WikiArticlePage : GridContainer
     {
-        private readonly WikiSidebar sidebar;
         public Container SidebarContainer { get; }
 
         public WikiArticlePage(string currentPath, string markdown)
@@ -29,6 +28,9 @@ namespace osu.Game.Overlays.Wiki
                 new Dimension(GridSizeMode.AutoSize),
                 new Dimension(),
             };
+
+            WikiSidebar sidebar;
+
             Content = new[]
             {
                 new Drawable[]
