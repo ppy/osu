@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Backgrounds
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
 
+        protected virtual bool AllowStoryboardBackground => true;
+
         public BackgroundScreenDefault(bool animateOnEnter = true)
             : base(animateOnEnter)
         {
@@ -108,6 +110,12 @@ namespace osu.Game.Screens.Backgrounds
                 {
                     case BackgroundSource.Beatmap:
                         newBackground = new BeatmapBackground(beatmap.Value, backgroundName);
+                        break;
+
+                    case BackgroundSource.BeatmapWithStoryboard:
+                        newBackground = AllowStoryboardBackground
+                            ? new BeatmapBackgroundWithStoryboard(beatmap.Value, backgroundName)
+                            : new BeatmapBackground(beatmap.Value, backgroundName);
                         break;
 
                     default:
