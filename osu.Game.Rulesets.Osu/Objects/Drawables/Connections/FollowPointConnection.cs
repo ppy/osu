@@ -83,13 +83,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                     fp.FadeIn(end.TimeFadeIn);
                     fp.ScaleTo(end.Scale, end.TimeFadeIn, Easing.Out);
                     fp.MoveTo(pointEndPosition, end.TimeFadeIn, Easing.Out);
-                    fp.Delay(fadeOutTime - fadeInTime).FadeOut(end.TimeFadeIn);
+                    fp.Delay(fadeOutTime - fadeInTime).FadeOut(end.TimeFadeIn).Expire();
 
-                    finalTransformEndTime = fadeOutTime + end.TimeFadeIn;
+                    finalTransformEndTime = fp.LifetimeEnd;
                 }
             }
 
-            // todo: use Expire() on FollowPoints and take lifetime from them when https://github.com/ppy/osu-framework/issues/3300 is fixed.
             entry.LifetimeEnd = finalTransformEndTime;
         }
 
