@@ -61,6 +61,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             },
             new IconButton
             {
+                Icon = FontAwesome.Solid.AngleDown,
+                Size = new Vector2(45),
+                TooltipText = "滚动到当前歌词",
+                Action = ScrollToCurrent
+            },
+            new IconButton
+            {
                 Icon = FontAwesome.Solid.Edit,
                 Size = new Vector2(45),
                 TooltipText = "编辑",
@@ -102,12 +109,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         }
 
         private readonly BindableFloat followCooldown = new BindableFloat();
-
-        protected override void Update()
-        {
-            //if (followCooldown.Value == 0) ScrollToCurrent();
-            base.Update();
-        }
 
         protected override bool OnHover(HoverEvent e)
         {

@@ -26,7 +26,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         private MvisScreen mvisScreen { get; set; }
 
         protected readonly OsuScrollContainer<DrawableLyric> LyricScroll;
-        private DrawablePool<T> lyricPool = new DrawablePool<T>(100);
+        private readonly DrawablePool<T> lyricPool = new DrawablePool<T>(100);
 
         private readonly List<DrawableLyric> visibleLyrics = new List<DrawableLyric>();
         protected readonly List<DrawableLyric> AvaliableDrawableLyrics = new List<DrawableLyric>();
@@ -42,7 +42,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
                 LyricScroll = new OsuScrollContainer<DrawableLyric>
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ScrollContent = { AutoSizeAxes = Axes.None }
+                    ScrollContent = { AutoSizeAxes = Axes.None },
+                    Padding = new MarginPadding(5)
                 }
             };
         }
@@ -76,7 +77,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             return (first, last);
         }
 
-        private (int first, int last) currentRange;
+        protected (int first, int last) CurrentRange;
 
         protected override void Update()
         {
@@ -97,7 +98,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             //获取显示范围
             var range = getRange();
 
-            if (range != currentRange)
+            if (range != CurrentRange)
                 updateFromRange(range);
 
             base.Update();
@@ -106,7 +107,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         private void updateFromRange((int first, int last) range)
         {
             //赋值
-            currentRange = range;
+            CurrentRange = range;
 
             //如果可用歌词>0
             if (visibleLyrics.Count > 0)
@@ -120,18 +121,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
                     //如果已经在显示了，则从toDisplay里去掉
                     if (toDisplay.Remove(toDisplay.Find(d => d.Value.Equals(drawableLyric.Value)))) continue;
 
-                    // panel loaded as drawable but not required by visible range.
-                    // remove but only if too far off-screen
+                    //如果面板不在显示区，则直接Expire
                     if (drawableLyric.Y + drawableLyric.DrawHeight < visibleTop - distanceLoadUnload
                         || drawableLyric.Y > visibleBottom + distanceLoadUnload)
-                    {
-                        // may want a fade effect here (could be seen if a huge change happens, like a set with 20 difficulties becomes selected).
-                        drawableLyric.ClearTransforms();
                         drawableLyric.Expire();
-                    }
                 }
 
-                // Add those items within the previously found index range that should be displayed.
+                //添加要显示的面板
                 foreach (var item in toDisplay)
                 {
                     var panel = lyricPool.Get(p => p.Value = item.Value);
@@ -175,7 +171,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             var pos = AvaliableDrawableLyrics.FirstOrDefault(p =>
                 p.Value.Equals(plugin.CurrentLine))?.CurrentY ?? 0;
 
-            if (pos > LyricScroll.ScrollContent.Height)
+            if (pos + DrawHeight > LyricScroll.ScrollContent.Height)
                 LyricScroll.ScrollToEnd();
             else
                 LyricScroll.ScrollTo(pos);
@@ -184,18 +180,16 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         protected virtual void RefreshLrcInfo(List<Lyric> lyrics)
         {
             LyricScroll.Clear();
-            LyricScroll.ScrollToStart();
             AvaliableDrawableLyrics.Clear();
+            lyricPool.Clear();
 
-            lyricPool.Expire();
-            lyricPool = new DrawablePool<T>(100);
-            AddInternal(lyricPool);
+            LyricScroll.ScrollToStart();
 
             foreach (var t in lyrics)
                 AvaliableDrawableLyrics.Add(CreateDrawableLyric(t));
 
             //workaround: 恢复后歌词不显示
-            currentRange.first = currentRange.last = 0;
+            CurrentRange.first = CurrentRange.last = 0;
         }
     }
 }
