@@ -26,11 +26,12 @@ namespace osu.Game.Graphics.Backgrounds
             if (Beatmap.Storyboard.ReplacesBackground)
                 Sprite.Alpha = 0;
 
-            var audio = new AudioContainer { RelativeSizeAxes = Axes.Both };
-            audio.Volume.Value = 0;
-
-            AddInternal(audio);
-            LoadComponentAsync(new DrawableStoryboard(Beatmap.Storyboard) { Clock = new InterpolatingFramedClock(Beatmap.Track) }, audio.Add);
+            LoadComponentAsync(new AudioContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Volume = { Value = 0 },
+                Child = new DrawableStoryboard(Beatmap.Storyboard) { Clock = new InterpolatingFramedClock(Beatmap.Track) }
+            }, AddInternal);
         }
     }
 }
