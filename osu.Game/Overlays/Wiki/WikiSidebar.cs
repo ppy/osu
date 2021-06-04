@@ -42,21 +42,25 @@ namespace osu.Game.Overlays.Wiki
             switch (level)
             {
                 case 2:
-                    tableOfContents.Add(new TocTitle(title));
-                    break;
-
                 case 3:
-                    tableOfContents.Add(new TocTitle(title, true));
+                    tableOfContents.Add(new TocTitle(title, heading, level == 3));
                     break;
             }
         }
 
         private class TocTitle : OsuHoverContainer
         {
+            [Resolved]
+            private OverlayScrollContainer scrollContainer { get; set; }
+
             private readonly OsuSpriteText spriteText;
 
-            public TocTitle(string text, bool subtitle = false)
+            private readonly MarkdownHeading target;
+
+            public TocTitle(string text, MarkdownHeading target, bool subtitle = false)
             {
+                this.target = target;
+
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
                 Child = spriteText = new OsuSpriteText
