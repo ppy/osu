@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using osu.Framework.Graphics;
@@ -66,7 +67,7 @@ namespace osu.Game.Overlays.Wiki
             protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock)
             {
                 var heading = base.CreateHeading(headingBlock);
-                var title = ((LiteralInline)headingBlock.Inline.FirstChild).Content.ToString();
+                var title = ((LiteralInline)headingBlock.Inline.First(i => i is LiteralInline)).Content.ToString();
 
                 OnAddHeading(title, heading, headingBlock.Level);
 
