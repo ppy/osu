@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -32,9 +31,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
         }
 
-        private Container<Sprite> circleSprites;
-        private Sprite hitCircleSprite;
-        private Sprite hitCircleOverlay;
+        private Container circleSprites;
+        private Drawable hitCircleSprite;
+        private Drawable hitCircleOverlay;
 
         private SkinnableSpriteText hitCircleText;
 
@@ -72,20 +71,20 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             InternalChildren = new Drawable[]
             {
-                circleSprites = new Container<Sprite>
+                circleSprites = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        hitCircleSprite = new Sprite
+                        hitCircleSprite = new KiaiFlashingSprite
                         {
                             Texture = baseTexture,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
-                        hitCircleOverlay = new Sprite
+                        hitCircleOverlay = new KiaiFlashingSprite
                         {
                             Texture = overlayTexture,
                             Anchor = Anchor.Centre,
