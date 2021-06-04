@@ -6,7 +6,6 @@ using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Containers.Markdown;
 using osu.Game.Graphics.Containers.Markdown;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Wiki;
@@ -54,16 +53,13 @@ namespace osu.Game.Tests.Visual.Online
 
         private void addTitle(string text, bool subtitle = false)
         {
-            var headingBlock = createHeadingBlock(text, subtitle ? 3 : 2);
-            sidebar.AddToc(headingBlock, createHeading(headingBlock));
+            var headingBlock = new HeadingBlock(new HeadingBlockParser())
+            {
+                Inline = new ContainerInline().AppendChild(new LiteralInline(text)),
+                Level = subtitle ? 3 : 2,
+            };
+            var heading = new OsuMarkdownHeading(headingBlock);
+            sidebar.AddToc(headingBlock, heading);
         }
-
-        private HeadingBlock createHeadingBlock(string text, int level = 2) => new HeadingBlock(new HeadingBlockParser())
-        {
-            Inline = new ContainerInline().AppendChild(new LiteralInline(text)),
-            Level = level,
-        };
-
-        private MarkdownHeading createHeading(HeadingBlock headingBlock) => new OsuMarkdownHeading(headingBlock);
     }
 }
