@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
         {
-            drawableRuleset.SetReplayScore(CreateReplayScore(drawableRuleset.Beatmap));
+            drawableRuleset.SetReplayScore(CreateReplayScore(drawableRuleset.Beatmap, drawableRuleset.Mods));
 
             // AlwaysPresent required for hitsounds
             drawableRuleset.Playfield.AlwaysPresent = true;
@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Cinema";
         public override string Acronym => "CN";
-        public override IconUsage Icon => OsuIcon.ModCinema;
+        public override IconUsage? Icon => OsuIcon.ModCinema;
         public override string Description => "Watch the video without visual distractions.";
 
         public void ApplyToHUD(HUDOverlay overlay)
@@ -37,9 +37,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToPlayer(Player player)
         {
-            player.Background.EnableUserDim.Value = false;
-
-            player.DimmableVideo.IgnoreUserSettings.Value = true;
+            player.ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
             player.DimmableStoryboard.IgnoreUserSettings.Value = true;
 
             player.BreakOverlay.Hide();

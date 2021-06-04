@@ -4,9 +4,12 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
+using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Testing;
 
 namespace osu.Game.Rulesets
 {
+    [ExcludeFromDynamicCompile]
     public class RulesetInfo : IEquatable<RulesetInfo>
     {
         public int? ID { get; set; }
@@ -20,11 +23,17 @@ namespace osu.Game.Rulesets
         [JsonIgnore]
         public bool Available { get; set; }
 
+        // TODO: this should probably be moved to RulesetStore.
         public virtual Ruleset CreateInstance()
         {
             if (!Available) return null;
 
-            return (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo));
+            var ruleset = (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo).AsNonNull());
+
+            // overwrite the pre-populated RulesetInfo with a potentially database attached copy.
+            ruleset.RulesetInfo = this;
+
+            return ruleset;
         }
 
         public bool Equals(RulesetInfo other) => other != null && ID == other.ID && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;
@@ -44,6 +53,6 @@ namespace osu.Game.Rulesets
             }
         }
 
-        public override string ToString() => $"{Name} ({ShortName}) ID: {ID}";
+        public override string ToString() => Name ?? $"{Name} ({ShortName}) ID: {ID}";
     }
 }

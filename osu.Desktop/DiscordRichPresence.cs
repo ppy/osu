@@ -1,12 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Text;
 using DiscordRPC;
 using DiscordRPC.Message;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Users;
@@ -24,10 +27,12 @@ namespace osu.Desktop
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
-        private Bindable<User> user;
+        private IBindable<User> user;
 
         private readonly IBindable<UserStatus> status = new Bindable<UserStatus>();
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
+
+        private readonly Bindable<DiscordRichPresenceMode> privacyMode = new Bindable<DiscordRichPresenceMode>();
 
         private readonly RichPresence presence = new RichPresence
         {
@@ -35,7 +40,7 @@ namespace osu.Desktop
         };
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider provider)
+        private void load(IAPIProvider provider, OsuConfigManager config)
         {
             client = new DiscordRpcClient(client_id)
             {
@@ -43,7 +48,13 @@ namespace osu.Desktop
             };
 
             client.OnReady += onReady;
+
+            // safety measure for now, until we performance test / improve backoff for failed connections.
+            client.OnConnectionFailed += (_, __) => client.Deinitialize();
+
             client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Code} {e.Message}", LoggingTarget.Network);
+
+            config.BindWith(OsuSetting.DiscordRichPresence, privacyMode);
 
             (user = provider.LocalUser.GetBoundCopy()).BindValueChanged(u =>
             {
@@ -57,6 +68,7 @@ namespace osu.Desktop
             ruleset.BindValueChanged(_ => updateStatus());
             status.BindValueChanged(_ => updateStatus());
             activity.BindValueChanged(_ => updateStatus());
+            privacyMode.BindValueChanged(_ => updateStatus());
 
             client.Initialize();
         }
@@ -69,7 +81,10 @@ namespace osu.Desktop
 
         private void updateStatus()
         {
-            if (status.Value is UserStatusOffline)
+            if (!client.IsInitialized)
+                return;
+
+            if (status.Value is UserStatusOffline || privacyMode.Value == DiscordRichPresenceMode.Off)
             {
                 client.ClearPresence();
                 return;
@@ -77,8 +92,8 @@ namespace osu.Desktop
 
             if (status.Value is UserStatusOnline && activity.Value != null)
             {
-                presence.State = activity.Value.Status;
-                presence.Details = getDetails(activity.Value);
+                presence.State = truncate(activity.Value.Status);
+                presence.Details = truncate(getDetails(activity.Value));
             }
             else
             {
@@ -87,13 +102,37 @@ namespace osu.Desktop
             }
 
             // update user information
-            presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.Ranks.Global > 0 ? $" (rank #{user.Value.Statistics.Ranks.Global:N0})" : string.Empty);
+            if (privacyMode.Value == DiscordRichPresenceMode.Limited)
+                presence.Assets.LargeImageText = string.Empty;
+            else
+                presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.GlobalRank > 0 ? $" (rank #{user.Value.Statistics.GlobalRank:N0})" : string.Empty);
 
             // update ruleset
             presence.Assets.SmallImageKey = ruleset.Value.ID <= 3 ? $"mode_{ruleset.Value.ID}" : "mode_custom";
             presence.Assets.SmallImageText = ruleset.Value.Name;
 
             client.SetPresence(presence);
+        }
+
+        private static readonly int ellipsis_length = Encoding.UTF8.GetByteCount(new[] { '…' });
+
+        private string truncate(string str)
+        {
+            if (Encoding.UTF8.GetByteCount(str) <= 128)
+                return str;
+
+            ReadOnlyMemory<char> strMem = str.AsMemory();
+
+            do
+            {
+                strMem = strMem[..^1];
+            } while (Encoding.UTF8.GetByteCount(strMem.Span) + ellipsis_length > 128);
+
+            return string.Create(strMem.Length + 1, strMem, (span, mem) =>
+            {
+                mem.Span.CopyTo(span);
+                span[^1] = '…';
+            });
         }
 
         private string getDetails(UserActivity activity)
@@ -105,6 +144,9 @@ namespace osu.Desktop
 
                 case UserActivity.Editing edit:
                     return edit.Beatmap.ToString();
+
+                case UserActivity.InLobby lobby:
+                    return privacyMode.Value == DiscordRichPresenceMode.Limited ? string.Empty : lobby.Room.Name.Value;
             }
 
             return string.Empty;

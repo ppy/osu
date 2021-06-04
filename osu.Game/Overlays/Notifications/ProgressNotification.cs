@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Notifications
         {
             base.LoadComplete();
 
-            //we may have received changes before we were displayed.
+            // we may have received changes before we were displayed.
             updateState();
         }
 
@@ -150,12 +150,12 @@ namespace osu.Game.Overlays.Notifications
             colourCancelled = colours.Red;
         }
 
-        public override void Close()
+        public override void Close(bool playSound = true)
         {
             switch (State)
             {
                 case ProgressNotificationState.Cancelled:
-                    base.Close();
+                    base.Close(playSound);
                     break;
 
                 case ProgressNotificationState.Active:

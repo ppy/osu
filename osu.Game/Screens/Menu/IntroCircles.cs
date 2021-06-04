@@ -18,13 +18,13 @@ namespace osu.Game.Screens.Menu
         private const double delay_step_one = 2300;
         private const double delay_step_two = 600;
 
-        private SampleChannel welcome;
+        private Sample welcome;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
             if (MenuVoice.Value)
-                welcome = audio.Samples.Get(@"welcome");
+                welcome = audio.Samples.Get(@"Intro/welcome");
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)

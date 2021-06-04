@@ -14,4 +14,10 @@ namespace osu.Game.Beatmaps
         Qualified = 3,
         Loved = 4,
     }
+
+    public static class BeatmapSetOnlineStatusExtensions
+    {
+        public static bool GrantsPerformancePoints(this BeatmapSetOnlineStatus status)
+            => status == BeatmapSetOnlineStatus.Ranked || status == BeatmapSetOnlineStatus.Approved;
+    }
 }

@@ -22,13 +22,18 @@ namespace osu.Game.Overlays.AccountCreation
     {
         private OsuTextFlowContainer multiAccountExplanationText;
         private LinkFlowContainer furtherAssistance;
-        private IAPIProvider api;
+
+        [Resolved(canBeNull: true)]
+        private IAPIProvider api { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private OsuGame game { get; set; }
 
         private const string help_centre_url = "/help/wiki/Help_Centre#login";
 
         public override void OnEntering(IScreen last)
         {
-            if (string.IsNullOrEmpty(api.ProvidedUsername))
+            if (string.IsNullOrEmpty(api?.ProvidedUsername) || game?.UseDevelopmentServer == true)
             {
                 this.FadeOut();
                 this.Push(new ScreenEntry());
@@ -39,11 +44,9 @@ namespace osu.Game.Overlays.AccountCreation
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, IAPIProvider api, OsuGame game, TextureStore textures)
+        private void load(OsuColour colours, TextureStore textures)
         {
-            this.api = api;
-
-            if (string.IsNullOrEmpty(api.ProvidedUsername))
+            if (string.IsNullOrEmpty(api?.ProvidedUsername))
                 return;
 
             InternalChildren = new Drawable[]

@@ -4,7 +4,9 @@
 using System;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Filter;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Tests.NonVisual.Filtering
 {
@@ -60,9 +62,23 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
-        public void TestApplyDrainRateQueries()
+        public void TestApplyDrainRateQueriesByDrKeyword()
         {
             const string query = "dr>2 quite specific dr<:6";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("quite specific", filterCriteria.SearchText.Trim());
+            Assert.AreEqual(2, filterCriteria.SearchTerms.Length);
+            Assert.Greater(filterCriteria.DrainRate.Min, 2.0f);
+            Assert.Less(filterCriteria.DrainRate.Min, 2.1f);
+            Assert.Greater(filterCriteria.DrainRate.Max, 6.0f);
+            Assert.Less(filterCriteria.DrainRate.Min, 6.1f);
+        }
+
+        [Test]
+        public void TestApplyDrainRateQueriesByHpKeyword()
+        {
+            const string query = "hp>2 quite specific hp<=6";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("quite specific", filterCriteria.SearchText.Trim());
@@ -179,6 +195,64 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual("weird", filterCriteria.SearchText.Trim());
             Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
             Assert.AreEqual("double\"quote", filterCriteria.Artist.SearchTerm);
+        }
+
+        [Test]
+        public void TestOperatorParsing()
+        {
+            const string query = "artist=><something";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("><something", filterCriteria.Artist.SearchTerm);
+        }
+
+        [Test]
+        public void TestUnrecognisedKeywordIsIgnored()
+        {
+            const string query = "unrecognised=keyword";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("unrecognised=keyword", filterCriteria.SearchText);
+        }
+
+        [TestCase("cs=nope")]
+        [TestCase("bpm>=bad")]
+        [TestCase("divisor<nah")]
+        [TestCase("status=noidea")]
+        public void TestInvalidKeywordValueIsIgnored(string query)
+        {
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(query, filterCriteria.SearchText);
+        }
+
+        [Test]
+        public void TestCustomKeywordIsParsed()
+        {
+            var customCriteria = new CustomFilterCriteria();
+            const string query = "custom=readme unrecognised=keyword";
+            var filterCriteria = new FilterCriteria { RulesetCriteria = customCriteria };
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("readme", customCriteria.CustomValue);
+            Assert.AreEqual("unrecognised=keyword", filterCriteria.SearchText.Trim());
+        }
+
+        private class CustomFilterCriteria : IRulesetFilterCriteria
+        {
+            public string CustomValue { get; set; }
+
+            public bool Matches(BeatmapInfo beatmap) => true;
+
+            public bool TryParseCustomKeywordCriteria(string key, Operator op, string value)
+            {
+                if (key == "custom" && op == Operator.Equal)
+                {
+                    CustomValue = value;
+                    return true;
+                }
+
+                return false;
+            }
         }
     }
 }

@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -12,21 +11,19 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
     public class PreviewButton : OsuClickableContainer
     {
-        private const float transition_duration = 500;
-
-        private readonly Box bg, progress;
+        private readonly Box background, progress;
         private readonly PlayButton playButton;
 
         private PreviewTrack preview => playButton.Preview;
-        public Bindable<bool> Playing => playButton.Playing;
+
+        public IBindable<bool> Playing => playButton.Playing;
 
         public BeatmapSetInfo BeatmapSet
         {
@@ -40,10 +37,10 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
             Children = new Drawable[]
             {
-                bg = new Box
+                background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(0.25f),
+                    Alpha = 0.5f
                 },
                 new Container
                 {
@@ -71,9 +68,10 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OverlayColourProvider colourProvider)
         {
             progress.Colour = colours.Yellow;
+            background.Colour = colourProvider.Background6;
         }
 
         protected override void Update()
@@ -91,13 +89,13 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         protected override bool OnHover(HoverEvent e)
         {
-            bg.FadeColour(Color4.Black.Opacity(0.5f), 100);
+            background.FadeTo(0.75f, 80);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            bg.FadeColour(Color4.Black.Opacity(0.25f), 100);
+            background.FadeTo(0.5f, 80);
             base.OnHoverLost(e);
         }
     }

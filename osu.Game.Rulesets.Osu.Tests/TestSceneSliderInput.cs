@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -13,8 +12,6 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
@@ -27,26 +24,27 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneSliderInput : RateAdjustedBeatmapTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(SliderBall),
-            typeof(DrawableSlider),
-            typeof(DrawableSliderTick),
-            typeof(DrawableRepeatPoint),
-            typeof(DrawableOsuHitObject),
-            typeof(DrawableSliderHead),
-            typeof(DrawableSliderTail),
-        };
-
         private const double time_before_slider = 250;
         private const double time_slider_start = 1500;
         private const double time_during_slide_1 = 2500;
         private const double time_during_slide_2 = 3000;
         private const double time_during_slide_3 = 3500;
         private const double time_during_slide_4 = 3800;
+        private const double time_slider_end = 4000;
 
         private List<JudgementResult> judgementResults;
-        private bool allJudgedFired;
+
+        [Test]
+        public void TestPressBothKeysSimultaneouslyAndReleaseOne()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Position = Vector2.Zero, Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start },
+                new OsuReplayFrame { Position = Vector2.Zero, Actions = { OsuAction.RightButton }, Time = time_during_slide_1 },
+            });
+
+            AddAssert("Tracking retained", assertMaxJudge);
+        }
 
         /// <summary>
         /// Scenario:
@@ -87,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_2 },
             });
 
-            AddAssert("Tracking retained", assertGreatJudge);
+            AddAssert("Tracking retained", assertMaxJudge);
         }
 
         /// <summary>
@@ -108,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_1 },
             });
 
-            AddAssert("Tracking retained", assertGreatJudge);
+            AddAssert("Tracking retained", assertMaxJudge);
         }
 
         /// <summary>
@@ -129,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_1 },
             });
 
-            AddAssert("Tracking retained", assertGreatJudge);
+            AddAssert("Tracking retained", assertMaxJudge);
         }
 
         /// <summary>
@@ -284,15 +282,59 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tracking acquired", assertMidSliderJudgements);
         }
 
-        private bool assertGreatJudge() => judgementResults.Last().Type == HitResult.Great;
+        /// <summary>
+        /// Scenario:
+        /// - Press a key on the slider head
+        /// - While holding the key, move cursor close to the edge of tracking area
+        /// - Keep the cursor on the edge of tracking area until the slider ends
+        /// Expected Result:
+        /// A passing test case will have the slider track the cursor throughout the whole test.
+        /// </summary>
+        [Test]
+        public void TestTrackingAreaEdge()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_slider_start },
+                new OsuReplayFrame { Position = new Vector2(0, OsuHitObject.OBJECT_RADIUS * 1.19f), Actions = { OsuAction.LeftButton }, Time = time_slider_start + 250 },
+                new OsuReplayFrame { Position = new Vector2(slider_path_length, OsuHitObject.OBJECT_RADIUS * 1.199f), Actions = { OsuAction.LeftButton }, Time = time_slider_end },
+            });
 
-        private bool assertHeadMissTailTracked() => judgementResults[^2].Type == HitResult.Great && judgementResults.First().Type == HitResult.Miss;
+            AddAssert("Tracking kept", assertMaxJudge);
+        }
 
-        private bool assertMidSliderJudgements() => judgementResults[^2].Type == HitResult.Great;
+        /// <summary>
+        /// Scenario:
+        /// - Press a key on the slider head
+        /// - While holding the key, move cursor just outside the tracking area
+        /// - Keep the cursor just outside the tracking area until the slider ends
+        /// Expected Result:
+        /// A passing test case will have the slider drop the tracking on frame 2.
+        /// </summary>
+        [Test]
+        public void TestTrackingAreaOutsideEdge()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_slider_start },
+                new OsuReplayFrame { Position = new Vector2(0, OsuHitObject.OBJECT_RADIUS * 1.21f), Actions = { OsuAction.LeftButton }, Time = time_slider_start + 250 },
+                new OsuReplayFrame { Position = new Vector2(slider_path_length, OsuHitObject.OBJECT_RADIUS * 1.201f), Actions = { OsuAction.LeftButton }, Time = time_slider_end },
+            });
 
-        private bool assertMidSliderJudgementFail() => judgementResults[^2].Type == HitResult.Miss;
+            AddAssert("Tracking dropped", assertMidSliderJudgementFail);
+        }
+
+        private bool assertMaxJudge() => judgementResults.Any() && judgementResults.All(t => t.Type == t.Judgement.MaxResult);
+
+        private bool assertHeadMissTailTracked() => judgementResults[^2].Type == HitResult.SmallTickHit && !judgementResults.First().IsHit;
+
+        private bool assertMidSliderJudgements() => judgementResults[^2].Type == HitResult.SmallTickHit;
+
+        private bool assertMidSliderJudgementFail() => judgementResults[^2].Type == HitResult.SmallTickMiss;
 
         private ScoreAccessibleReplayPlayer currentPlayer;
+
+        private const float slider_path_length = 25;
 
         private void performTest(List<ReplayFrame> frames)
         {
@@ -309,8 +351,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                             Path = new SliderPath(PathType.PerfectCurve, new[]
                             {
                                 Vector2.Zero,
-                                new Vector2(25, 0),
-                            }, 25),
+                                new Vector2(slider_path_length, 0),
+                            }, slider_path_length),
                         }
                     },
                     BeatmapInfo =
@@ -330,20 +372,15 @@ namespace osu.Game.Rulesets.Osu.Tests
                     {
                         if (currentPlayer == p) judgementResults.Add(result);
                     };
-                    p.ScoreProcessor.AllJudged += () =>
-                    {
-                        if (currentPlayer == p) allJudgedFired = true;
-                    };
                 };
 
                 LoadScreen(currentPlayer = p);
-                allJudgedFired = false;
                 judgementResults = new List<JudgementResult>();
             });
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);
             AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
-            AddUntilStep("Wait for all judged", () => allJudgedFired);
+            AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
         }
 
         private class ScoreAccessibleReplayPlayer : ReplayPlayer
@@ -353,7 +390,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             protected override bool PauseOnFocusLost => false;
 
             public ScoreAccessibleReplayPlayer(Score score)
-                : base(score, false, false)
+                : base(score, new PlayerConfiguration
+                {
+                    AllowPause = false,
+                    ShowResults = false,
+                })
             {
             }
         }

@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Profile
                             {
                                 Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
                                 Top = 15,
-                                Bottom = 10,
+                                Bottom = 20,
                             },
                             Children = new Drawable[]
                             {
@@ -95,10 +95,10 @@ namespace osu.Game.Overlays.Profile
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            background.Colour = colours.GreySeafoamDarker;
-            underscore.Colour = colours.Seafoam;
+            background.Colour = colourProvider.Background5;
+            underscore.Colour = colourProvider.Highlight1;
         }
 
         private class SectionTriangles : Container
@@ -128,11 +128,11 @@ namespace osu.Game.Overlays.Profile
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider)
             {
-                triangles.ColourLight = colours.GreySeafoamDark;
-                triangles.ColourDark = colours.GreySeafoamDarker.Darken(0.2f);
-                foreground.Colour = ColourInfo.GradientVertical(colours.GreySeafoamDarker, colours.GreySeafoamDarker.Opacity(0));
+                triangles.ColourLight = colourProvider.Background4;
+                triangles.ColourDark = colourProvider.Background5.Darken(0.2f);
+                foreground.Colour = ColourInfo.GradientVertical(colourProvider.Background5, colourProvider.Background5.Opacity(0));
             }
         }
     }

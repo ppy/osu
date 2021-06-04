@@ -14,8 +14,6 @@
 	<string>0.1.0</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>LSSupportsOpeningDocumentsInPlace</key>
-	<true/>
 	<key>MinimumOSVersion</key>
 	<string>10.0</string>
 	<key>UIDeviceFamily</key>
@@ -23,6 +21,8 @@
 		<integer>1</integer>
 		<integer>2</integer>
 	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -51,7 +51,7 @@
 		<dict>
 			<key>UTTypeConformsTo</key>
 			<array>
-				<string></string>
+				<string>public.data</string>
 			</array>
 			<key>UTTypeIdentifier</key>
 			<string>sh.ppy.osu.items</string>
@@ -105,6 +105,8 @@
 			<string>Owner</string>
 			<key>CFBundleTypeName</key>
 			<string>Supported osu! files</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>sh.ppy.osu.items</string>

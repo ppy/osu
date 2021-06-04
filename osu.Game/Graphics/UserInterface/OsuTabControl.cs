@@ -10,26 +10,42 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTabControl<T> : TabControl<T>
     {
+        private Color4 accentColour;
+
+        public const float HORIZONTAL_SPACING = 10;
+
+        public virtual Color4 AccentColour
+        {
+            get => accentColour;
+            set
+            {
+                accentColour = value;
+
+                if (Dropdown is IHasAccentColour dropdown)
+                    dropdown.AccentColour = value;
+                foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
+                    i.AccentColour = value;
+            }
+        }
+
         private readonly Box strip;
 
-        protected override Dropdown<T> CreateDropdown() => new OsuTabDropdown();
+        protected override Dropdown<T> CreateDropdown() => new OsuTabDropdown<T>();
 
         protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem(value);
 
-        protected virtual float StripWidth() => TabContainer.Children.Sum(c => c.IsPresent ? c.DrawWidth + TabContainer.Spacing.X : 0) - TabContainer.Spacing.X;
-        protected virtual float StripHeight() => 1;
+        protected virtual float StripWidth => TabContainer.Children.Sum(c => c.IsPresent ? c.DrawWidth + TabContainer.Spacing.X : 0) - TabContainer.Spacing.X;
 
         /// <summary>
         /// Whether entries should be automatically populated if <typeparamref name="T"/> is an <see cref="Enum"/> type.
@@ -40,13 +56,13 @@ namespace osu.Game.Graphics.UserInterface
 
         public OsuTabControl()
         {
-            TabContainer.Spacing = new Vector2(10f, 0f);
+            TabContainer.Spacing = new Vector2(HORIZONTAL_SPACING, 0f);
 
             AddInternal(strip = new Box
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
-                Height = StripHeight(),
+                Height = 1,
                 Colour = Color4.White.Opacity(0),
             });
 
@@ -64,34 +80,11 @@ namespace osu.Game.Graphics.UserInterface
                 AccentColour = colours.Blue;
         }
 
-        private Color4 accentColour;
-
-        public Color4 AccentColour
-        {
-            get => accentColour;
-            set
-            {
-                accentColour = value;
-                if (Dropdown is IHasAccentColour dropdown)
-                    dropdown.AccentColour = value;
-                foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
-                    i.AccentColour = value;
-            }
-        }
-
         public Color4 StripColour
         {
             get => strip.Colour;
             set => strip.Colour = value;
         }
-
-        protected override TabFillFlowContainer CreateTabFlow() => new OsuTabFillFlowContainer
-        {
-            Direction = FillDirection.Full,
-            RelativeSizeAxes = Axes.Both,
-            Depth = -1,
-            Masking = true
-        };
 
         protected override void UpdateAfterChildren()
         {
@@ -99,7 +92,7 @@ namespace osu.Game.Graphics.UserInterface
 
             // dont bother calculating if the strip is invisible
             if (strip.Colour.MaxAlpha > 0)
-                strip.Width = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 1000), strip.Width, StripWidth(), 0, 500, Easing.OutQuint);
+                strip.Width = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 1000), strip.Width, StripWidth, 0, 500, Easing.OutQuint);
         }
 
         public class OsuTabItem : TabItem<T>, IHasAccentColour
@@ -122,29 +115,29 @@ namespace osu.Game.Graphics.UserInterface
 
             private const float transition_length = 500;
 
-            private void fadeActive()
+            protected void FadeHovered()
             {
                 Bar.FadeIn(transition_length, Easing.OutQuint);
                 Text.FadeColour(Color4.White, transition_length, Easing.OutQuint);
             }
 
-            private void fadeInactive()
+            protected void FadeUnhovered()
             {
-                Bar.FadeOut(transition_length, Easing.OutQuint);
-                Text.FadeColour(AccentColour, transition_length, Easing.OutQuint);
+                Bar.FadeTo(IsHovered ? 1 : 0, transition_length, Easing.OutQuint);
+                Text.FadeColour(IsHovered ? Color4.White : AccentColour, transition_length, Easing.OutQuint);
             }
 
             protected override bool OnHover(HoverEvent e)
             {
                 if (!Active.Value)
-                    fadeActive();
+                    FadeHovered();
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
                 if (!Active.Value)
-                    fadeInactive();
+                    FadeUnhovered();
             }
 
             [BackgroundDependencyLoader]
@@ -181,113 +174,19 @@ namespace osu.Game.Graphics.UserInterface
                     },
                     new HoverClickSounds()
                 };
-
-                Active.BindValueChanged(active => Text.Font = Text.Font.With(Typeface.Exo, weight: active.NewValue ? FontWeight.Bold : FontWeight.Medium), true);
             }
 
-            protected override void OnActivated() => fadeActive();
-
-            protected override void OnDeactivated() => fadeInactive();
-        }
-
-        // todo: this needs to go
-        private class OsuTabDropdown : OsuDropdown<T>
-        {
-            public OsuTabDropdown()
+            protected override void OnActivated()
             {
-                RelativeSizeAxes = Axes.X;
+                Text.Font = Text.Font.With(weight: FontWeight.Bold);
+                FadeHovered();
             }
 
-            protected override DropdownMenu CreateMenu() => new OsuTabDropdownMenu();
-
-            protected override DropdownHeader CreateHeader() => new OsuTabDropdownHeader
+            protected override void OnDeactivated()
             {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight
-            };
-
-            private class OsuTabDropdownMenu : OsuDropdownMenu
-            {
-                public OsuTabDropdownMenu()
-                {
-                    Anchor = Anchor.TopRight;
-                    Origin = Anchor.TopRight;
-
-                    BackgroundColour = Color4.Black.Opacity(0.7f);
-                    MaxHeight = 400;
-                }
-
-                protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableOsuTabDropdownMenuItem(item) { AccentColour = AccentColour };
-
-                private class DrawableOsuTabDropdownMenuItem : DrawableOsuDropdownMenuItem
-                {
-                    public DrawableOsuTabDropdownMenuItem(MenuItem item)
-                        : base(item)
-                    {
-                        ForegroundColourHover = Color4.Black;
-                    }
-                }
+                Text.Font = Text.Font.With(weight: FontWeight.Medium);
+                FadeUnhovered();
             }
-
-            protected class OsuTabDropdownHeader : OsuDropdownHeader
-            {
-                public override Color4 AccentColour
-                {
-                    get => base.AccentColour;
-                    set
-                    {
-                        base.AccentColour = value;
-                        Foreground.Colour = value;
-                    }
-                }
-
-                public OsuTabDropdownHeader()
-                {
-                    RelativeSizeAxes = Axes.None;
-                    AutoSizeAxes = Axes.X;
-
-                    BackgroundColour = Color4.Black.Opacity(0.5f);
-
-                    Background.Height = 0.5f;
-                    Background.CornerRadius = 5;
-                    Background.Masking = true;
-
-                    Foreground.RelativeSizeAxes = Axes.None;
-                    Foreground.AutoSizeAxes = Axes.X;
-                    Foreground.RelativeSizeAxes = Axes.Y;
-                    Foreground.Margin = new MarginPadding(5);
-
-                    Foreground.Children = new Drawable[]
-                    {
-                        new SpriteIcon
-                        {
-                            Icon = FontAwesome.Solid.EllipsisH,
-                            Size = new Vector2(14),
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
-                        }
-                    };
-
-                    Padding = new MarginPadding { Left = 5, Right = 5 };
-                }
-
-                protected override bool OnHover(HoverEvent e)
-                {
-                    Foreground.Colour = BackgroundColour;
-                    return base.OnHover(e);
-                }
-
-                protected override void OnHoverLost(HoverLostEvent e)
-                {
-                    Foreground.Colour = BackgroundColourHover;
-                    base.OnHoverLost(e);
-                }
-            }
-        }
-
-        private class OsuTabFillFlowContainer : TabFillFlowContainer
-        {
-            protected override int Compare(Drawable x, Drawable y) => CompareReverseChildID(x, y);
         }
     }
 }

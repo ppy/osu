@@ -3,242 +3,275 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Drawables;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Collections;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Rulesets;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Carousel
 {
     public class DrawableCarouselBeatmapSet : DrawableCarouselItem, IHasContextMenu
     {
+        public const float HEIGHT = MAX_HEIGHT;
+
         private Action<BeatmapSetInfo> restoreHiddenRequested;
         private Action<int> viewDetails;
 
-        private DialogOverlay dialogOverlay;
-        private readonly BeatmapSetInfo beatmapSet;
+        [Resolved(CanBeNull = true)]
+        private DialogOverlay dialogOverlay { get; set; }
 
-        public DrawableCarouselBeatmapSet(CarouselBeatmapSet set)
-            : base(set)
+        [Resolved(CanBeNull = true)]
+        private CollectionManager collectionManager { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private ManageCollectionsDialog manageCollectionsDialog { get; set; }
+
+        public IEnumerable<DrawableCarouselItem> DrawableBeatmaps => beatmapContainer?.IsLoaded != true ? Enumerable.Empty<DrawableCarouselItem>() : beatmapContainer.AliveChildren;
+
+        [CanBeNull]
+        private Container<DrawableCarouselItem> beatmapContainer;
+
+        private BeatmapSetInfo beatmapSet;
+
+        [CanBeNull]
+        private Task beatmapsLoadTask;
+
+        [Resolved]
+        private BeatmapManager manager { get; set; }
+
+        protected override void FreeAfterUse()
         {
-            beatmapSet = set.BeatmapSet;
+            base.FreeAfterUse();
+
+            Item = null;
+
+            ClearTransforms();
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager manager, BeatmapSetOverlay beatmapOverlay, DialogOverlay overlay)
+        private void load(BeatmapSetOverlay beatmapOverlay)
         {
             restoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
-            dialogOverlay = overlay;
+
             if (beatmapOverlay != null)
                 viewDetails = beatmapOverlay.FetchAndShowBeatmapSet;
-
-            Children = new Drawable[]
-            {
-                new DelayedLoadUnloadWrapper(() =>
-                    {
-                        var background = new PanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        };
-
-                        background.OnLoadComplete += d => d.FadeInFromZero(1000, Easing.OutQuint);
-
-                        return background;
-                    }, 300, 5000
-                ),
-                new FillFlowContainer
-                {
-                    Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
-                    AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Text = new LocalisedString((beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title)),
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22, italics: true),
-                            Shadow = true,
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = new LocalisedString((beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist)),
-                            Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 17, italics: true),
-                            Shadow = true,
-                        },
-                        new FillFlowContainer
-                        {
-                            Direction = FillDirection.Horizontal,
-                            AutoSizeAxes = Axes.Both,
-                            Margin = new MarginPadding { Top = 5 },
-                            Children = new Drawable[]
-                            {
-                                new BeatmapSetOnlineStatusPill
-                                {
-                                    Origin = Anchor.CentreLeft,
-                                    Anchor = Anchor.CentreLeft,
-                                    Margin = new MarginPadding { Right = 5 },
-                                    TextSize = 11,
-                                    TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
-                                    Status = beatmapSet.Status
-                                },
-                                new FillFlowContainer<DifficultyIcon>
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Spacing = new Vector2(3),
-                                    ChildrenEnumerable = getDifficultyIcons(),
-                                },
-                            }
-                        }
-                    }
-                }
-            };
         }
 
-        private const int maximum_difficulty_icons = 18;
-
-        private IEnumerable<DifficultyIcon> getDifficultyIcons()
+        protected override void Update()
         {
-            var beatmaps = ((CarouselBeatmapSet)Item).Beatmaps.ToList();
+            base.Update();
 
-            return beatmaps.Count > maximum_difficulty_icons
-                ? (IEnumerable<DifficultyIcon>)beatmaps.GroupBy(b => b.Beatmap.Ruleset).Select(group => new FilterableGroupedDifficultyIcon(group.ToList(), group.Key))
-                : beatmaps.Select(b => new FilterableDifficultyIcon(b));
+            // position updates should not occur if the item is filtered away.
+            // this avoids panels flying across the screen only to be eventually off-screen or faded out.
+            if (!Item.Visible)
+                return;
+
+            float targetY = Item.CarouselYPosition;
+
+            if (Precision.AlmostEquals(targetY, Y))
+                Y = targetY;
+            else
+                // algorithm for this is taken from ScrollContainer.
+                // while it doesn't necessarily need to match 1:1, as we are emulating scroll in some cases this feels most correct.
+                Y = (float)Interpolation.Lerp(targetY, Y, Math.Exp(-0.01 * Time.Elapsed));
+        }
+
+        protected override void UpdateItem()
+        {
+            base.UpdateItem();
+
+            Content.Clear();
+
+            beatmapContainer = null;
+            beatmapsLoadTask = null;
+
+            if (Item == null)
+                return;
+
+            beatmapSet = ((CarouselBeatmapSet)Item).BeatmapSet;
+
+            DelayedLoadWrapper background;
+            DelayedLoadWrapper mainFlow;
+
+            Header.Children = new Drawable[]
+            {
+                background = new DelayedLoadWrapper(() => new SetPanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
+                {
+                    RelativeSizeAxes = Axes.Both,
+                }, 300)
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
+                mainFlow = new DelayedLoadWrapper(() => new SetPanelContent((CarouselBeatmapSet)Item), 100)
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
+            };
+
+            background.DelayedLoadComplete += fadeContentIn;
+            mainFlow.DelayedLoadComplete += fadeContentIn;
+        }
+
+        private void fadeContentIn(Drawable d) => d.FadeInFromZero(750, Easing.OutQuint);
+
+        protected override void Deselected()
+        {
+            base.Deselected();
+
+            MovementContainer.MoveToX(0, 500, Easing.OutExpo);
+
+            updateBeatmapYPositions();
+        }
+
+        protected override void Selected()
+        {
+            base.Selected();
+
+            MovementContainer.MoveToX(-100, 500, Easing.OutExpo);
+
+            updateBeatmapDifficulties();
+        }
+
+        private void updateBeatmapDifficulties()
+        {
+            var carouselBeatmapSet = (CarouselBeatmapSet)Item;
+
+            var visibleBeatmaps = carouselBeatmapSet.Children.Where(c => c.Visible).ToArray();
+
+            // if we are already displaying all the correct beatmaps, only run animation updates.
+            // note that the displayed beatmaps may change due to the applied filter.
+            // a future optimisation could add/remove only changed difficulties rather than reinitialise.
+            if (beatmapContainer != null && visibleBeatmaps.Length == beatmapContainer.Count && visibleBeatmaps.All(b => beatmapContainer.Any(c => c.Item == b)))
+            {
+                updateBeatmapYPositions();
+            }
+            else
+            {
+                // on selection we show our child beatmaps.
+                // for now this is a simple drawable construction each selection.
+                // can be improved in the future.
+                beatmapContainer = new Container<DrawableCarouselItem>
+                {
+                    X = 100,
+                    RelativeSizeAxes = Axes.Both,
+                    ChildrenEnumerable = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation())
+                };
+
+                beatmapsLoadTask = LoadComponentAsync(beatmapContainer, loaded =>
+                {
+                    // make sure the pooled target hasn't changed.
+                    if (beatmapContainer != loaded)
+                        return;
+
+                    Content.Child = loaded;
+                    updateBeatmapYPositions();
+                });
+            }
+        }
+
+        private void updateBeatmapYPositions()
+        {
+            if (beatmapContainer == null)
+                return;
+
+            if (beatmapsLoadTask == null || !beatmapsLoadTask.IsCompleted)
+                return;
+
+            float yPos = DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
+
+            bool isSelected = Item.State.Value == CarouselItemState.Selected;
+
+            foreach (var panel in beatmapContainer.Children)
+            {
+                if (isSelected)
+                {
+                    panel.MoveToY(yPos, 800, Easing.OutQuint);
+                    yPos += panel.Item.TotalHeight;
+                }
+                else
+                    panel.MoveToY(0, 800, Easing.OutQuint);
+            }
         }
 
         public MenuItem[] ContextMenuItems
         {
             get
             {
+                Debug.Assert(beatmapSet != null);
+
                 List<MenuItem> items = new List<MenuItem>();
 
                 if (Item.State.Value == CarouselItemState.NotSelected)
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
 
-                if (beatmapSet.OnlineBeatmapSetID != null)
-                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails?.Invoke(beatmapSet.OnlineBeatmapSetID.Value)));
+                if (beatmapSet.OnlineBeatmapSetID != null && viewDetails != null)
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineBeatmapSetID.Value)));
+
+                if (collectionManager != null)
+                {
+                    var collectionItems = collectionManager.Collections.Select(createCollectionMenuItem).ToList();
+                    if (manageCollectionsDialog != null)
+                        collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+
+                    items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+                }
 
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
-                    items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => restoreHiddenRequested?.Invoke(beatmapSet)));
+                    items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => restoreHiddenRequested(beatmapSet)));
 
-                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet))));
-
+                if (dialogOverlay != null)
+                    items.Add(new OsuMenuItem("Delete...", MenuItemType.Destructive, () => dialogOverlay.Push(new BeatmapDeleteDialog(beatmapSet))));
                 return items.ToArray();
             }
         }
 
-        private class PanelBackground : BufferedContainer
+        private MenuItem createCollectionMenuItem(BeatmapCollection collection)
         {
-            public PanelBackground(WorkingBeatmap working)
-            {
-                CacheDrawnFrameBuffer = true;
-                RedrawOnScale = false;
+            Debug.Assert(beatmapSet != null);
 
-                Children = new Drawable[]
+            TernaryState state;
+
+            var countExisting = beatmapSet.Beatmaps.Count(b => collection.Beatmaps.Contains(b));
+
+            if (countExisting == beatmapSet.Beatmaps.Count)
+                state = TernaryState.True;
+            else if (countExisting > 0)
+                state = TernaryState.Indeterminate;
+            else
+                state = TernaryState.False;
+
+            return new TernaryStateToggleMenuItem(collection.Name.Value, MenuItemType.Standard, s =>
+            {
+                foreach (var b in beatmapSet.Beatmaps)
                 {
-                    new BeatmapBackgroundSprite(working)
+                    switch (s)
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        FillMode = FillMode.Fill,
-                    },
-                    // Todo: This should be a fill flow, but has invalidation issues (see https://github.com/ppy/osu-framework/issues/223)
-                    new Container
-                    {
-                        Depth = -1,
-                        RelativeSizeAxes = Axes.Both,
-                        // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
-                        Shear = new Vector2(0.8f, 0),
-                        Alpha = 0.5f,
-                        Children = new[]
-                        {
-                            // The left half with no gradient applied
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                RelativePositionAxes = Axes.Both,
-                                Colour = Color4.Black,
-                                Width = 0.4f,
-                            },
-                            // Piecewise-linear gradient with 3 segments to make it appear smoother
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                RelativePositionAxes = Axes.Both,
-                                Colour = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
-                                Width = 0.05f,
-                                X = 0.4f,
-                            },
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                RelativePositionAxes = Axes.Both,
-                                Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
-                                Width = 0.2f,
-                                X = 0.45f,
-                            },
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                RelativePositionAxes = Axes.Both,
-                                Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
-                                Width = 0.05f,
-                                X = 0.65f,
-                            },
-                        }
-                    },
-                };
-            }
-        }
+                        case TernaryState.True:
+                            if (collection.Beatmaps.Contains(b))
+                                continue;
 
-        public class FilterableDifficultyIcon : DifficultyIcon
-        {
-            private readonly BindableBool filtered = new BindableBool();
+                            collection.Beatmaps.Add(b);
+                            break;
 
-            public FilterableDifficultyIcon(CarouselBeatmap item)
-                : base(item.Beatmap)
+                        case TernaryState.False:
+                            collection.Beatmaps.Remove(b);
+                            break;
+                    }
+                }
+            })
             {
-                filtered.BindTo(item.Filtered);
-                filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));
-                filtered.TriggerChange();
-            }
-        }
-
-        public class FilterableGroupedDifficultyIcon : GroupedDifficultyIcon
-        {
-            private readonly List<CarouselBeatmap> items;
-
-            public FilterableGroupedDifficultyIcon(List<CarouselBeatmap> items, RulesetInfo ruleset)
-                : base(items.Select(i => i.Beatmap).ToList(), ruleset, Color4.White)
-            {
-                this.items = items;
-
-                foreach (var item in items)
-                    item.Filtered.BindValueChanged(_ => Scheduler.AddOnce(updateFilteredDisplay));
-
-                updateFilteredDisplay();
-            }
-
-            private void updateFilteredDisplay()
-            {
-                // for now, fade the whole group based on the ratio of hidden items.
-                this.FadeTo(1 - 0.9f * ((float)items.Count(i => i.Filtered.Value) / items.Count), 100);
-            }
+                State = { Value = state }
+            };
         }
     }
 }

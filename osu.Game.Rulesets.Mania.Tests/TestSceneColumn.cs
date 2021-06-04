@@ -12,7 +12,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
-using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
@@ -24,14 +23,6 @@ namespace osu.Game.Rulesets.Mania.Tests
     [TestFixture]
     public class TestSceneColumn : ManiaInputTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(Column),
-            typeof(ColumnBackground),
-            typeof(ColumnKeyArea),
-            typeof(ColumnHitObjectArea)
-        };
-
         [Cached(typeof(IReadOnlyList<Mod>))]
         private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
 

@@ -15,6 +15,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -180,9 +181,9 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private string text;
+        private LocalisableString text;
 
-        public string Text
+        public LocalisableString Text
         {
             get => text;
             set
@@ -232,11 +233,11 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             if (Selected.Value)
                 colourContainer.ResizeWidthTo(hover_width, click_duration, Easing.In);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override bool OnHover(HoverEvent e)

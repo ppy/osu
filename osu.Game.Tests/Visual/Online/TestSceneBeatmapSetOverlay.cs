@@ -6,8 +6,6 @@ using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
-using osu.Game.Overlays.BeatmapSet.Buttons;
-using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 using System;
@@ -20,30 +18,6 @@ namespace osu.Game.Tests.Visual.Online
     public class TestSceneBeatmapSetOverlay : OsuTestScene
     {
         private readonly TestBeatmapSetOverlay overlay;
-
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(Header),
-            typeof(ScoreTable),
-            typeof(ScoreTableRowBackground),
-            typeof(DrawableTopScore),
-            typeof(ScoresContainer),
-            typeof(AuthorInfo),
-            typeof(BasicStats),
-            typeof(BeatmapPicker),
-            typeof(Details),
-            typeof(HeaderDownloadButton),
-            typeof(FavouriteButton),
-            typeof(Header),
-            typeof(HeaderButton),
-            typeof(Info),
-            typeof(PreviewButton),
-            typeof(SuccessRate),
-            typeof(BeatmapAvailability),
-            typeof(BeatmapRulesetSelector),
-            typeof(BeatmapRulesetTabItem),
-            typeof(NotSupporterPlaceholder)
-        };
 
         protected override bool UseOnlineAPI => true;
 
@@ -257,8 +231,19 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
 
-            AddAssert("shown beatmaps of current ruleset", () => overlay.Header.Picker.Difficulties.All(b => b.Beatmap.Ruleset.Equals(overlay.Header.RulesetSelector.Current.Value)));
-            AddAssert("left-most beatmap selected", () => overlay.Header.Picker.Difficulties.First().State == BeatmapPicker.DifficultySelectorState.Selected);
+            AddAssert("shown beatmaps of current ruleset", () => overlay.Header.HeaderContent.Picker.Difficulties.All(b => b.Beatmap.Ruleset.Equals(overlay.Header.RulesetSelector.Current.Value)));
+            AddAssert("left-most beatmap selected", () => overlay.Header.HeaderContent.Picker.Difficulties.First().State == BeatmapPicker.DifficultySelectorState.Selected);
+        }
+
+        [Test]
+        public void TestExplicitBeatmap()
+        {
+            AddStep("show explicit map", () =>
+            {
+                var beatmapSet = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet;
+                beatmapSet.OnlineInfo.HasExplicitContent = true;
+                overlay.ShowBeatmapSet(beatmapSet);
+            });
         }
 
         [Test]
@@ -325,12 +310,12 @@ namespace osu.Game.Tests.Visual.Online
 
         private void downloadAssert(bool shown)
         {
-            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.Header.DownloadButtonsVisible == shown);
+            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.Header.HeaderContent.DownloadButtonsVisible == shown);
         }
 
         private class TestBeatmapSetOverlay : BeatmapSetOverlay
         {
-            public new Header Header => base.Header;
+            public new BeatmapSetHeader Header => base.Header;
         }
     }
 }

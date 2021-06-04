@@ -45,10 +45,10 @@ namespace osu.Game.Screens.Play
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             if (e.Button == Button) IsLit = false;
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
     }
 }

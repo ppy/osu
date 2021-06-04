@@ -2,13 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Tournament.Components;
@@ -19,8 +19,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
     public class LadderEditorSettings : PlayerSettingsGroup
     {
         private const int padding = 10;
-
-        protected override string Title => @"ladder";
 
         private SettingsDropdown<TournamentRound> roundDropdown;
         private PlayerCheckbox losersCheckbox;
@@ -33,6 +31,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         [Resolved]
         private LadderInfo ladderInfo { get; set; }
+
+        public LadderEditorSettings()
+            : base("ladder")
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -48,15 +51,15 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             editorInfo.Selected.ValueChanged += selection =>
             {
-                roundDropdown.Bindable = selection.NewValue?.Round;
+                roundDropdown.Current = selection.NewValue?.Round;
                 losersCheckbox.Current = selection.NewValue?.Losers;
-                dateTimeBox.Bindable = selection.NewValue?.Date;
+                dateTimeBox.Current = selection.NewValue?.Date;
 
-                team1Dropdown.Bindable = selection.NewValue?.Team1;
-                team2Dropdown.Bindable = selection.NewValue?.Team2;
+                team1Dropdown.Current = selection.NewValue?.Team1;
+                team2Dropdown.Current = selection.NewValue?.Team2;
             };
 
-            roundDropdown.Bindable.ValueChanged += round =>
+            roundDropdown.Current.ValueChanged += round =>
             {
                 if (editorInfo.Selected.Value?.Date.Value < round.NewValue?.StartDate.Value)
                 {
@@ -81,17 +84,28 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
         }
 
-        private class SettingsRoundDropdown : LadderSettingsDropdown<TournamentRound>
+        private class SettingsRoundDropdown : SettingsDropdown<TournamentRound>
         {
             public SettingsRoundDropdown(BindableList<TournamentRound> rounds)
             {
-                Bindable = new Bindable<TournamentRound>();
+                Current = new Bindable<TournamentRound>();
 
                 foreach (var r in rounds.Prepend(new TournamentRound()))
                     add(r);
 
-                rounds.ItemsRemoved += items => items.ForEach(i => Control.RemoveDropdownItem(i));
-                rounds.ItemsAdded += items => items.ForEach(add);
+                rounds.CollectionChanged += (_, args) =>
+                {
+                    switch (args.Action)
+                    {
+                        case NotifyCollectionChangedAction.Add:
+                            args.NewItems.Cast<TournamentRound>().ForEach(add);
+                            break;
+
+                        case NotifyCollectionChangedAction.Remove:
+                            args.OldItems.Cast<TournamentRound>().ForEach(i => Control.RemoveDropdownItem(i));
+                            break;
+                    }
+                };
             }
 
             private readonly List<IUnbindable> refBindables = new List<IUnbindable>();
@@ -112,56 +126,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Control.RemoveDropdownItem(round);
                     Control.AddDropdownItem(round);
                 });
-            }
-        }
-
-        private class SettingsTeamDropdown : LadderSettingsDropdown<TournamentTeam>
-        {
-            public SettingsTeamDropdown(BindableList<TournamentTeam> teams)
-            {
-                foreach (var t in teams.Prepend(new TournamentTeam()))
-                    add(t);
-
-                teams.ItemsRemoved += items => items.ForEach(i => Control.RemoveDropdownItem(i));
-                teams.ItemsAdded += items => items.ForEach(add);
-            }
-
-            private readonly List<IUnbindable> refBindables = new List<IUnbindable>();
-
-            private T boundReference<T>(T obj)
-                where T : IBindable
-            {
-                obj = (T)obj.GetBoundCopy();
-                refBindables.Add(obj);
-                return obj;
-            }
-
-            private void add(TournamentTeam team)
-            {
-                Control.AddDropdownItem(team);
-                boundReference(team.FullName).BindValueChanged(_ =>
-                {
-                    Control.RemoveDropdownItem(team);
-                    Control.AddDropdownItem(team);
-                });
-            }
-        }
-
-        private class LadderSettingsDropdown<T> : SettingsDropdown<T>
-        {
-            protected override OsuDropdown<T> CreateDropdown() => new DropdownControl();
-
-            private new class DropdownControl : SettingsDropdown<T>.DropdownControl
-            {
-                protected override DropdownMenu CreateMenu() => new Menu();
-
-                private new class Menu : OsuDropdownMenu
-                {
-                    public Menu()
-                    {
-                        MaxHeight = 200;
-                    }
-                }
             }
         }
     }

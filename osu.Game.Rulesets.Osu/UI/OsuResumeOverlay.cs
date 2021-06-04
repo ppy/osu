@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.UI
         private OsuClickToResumeCursor clickToResumeCursor;
 
         private OsuCursorContainer localCursorContainer;
-        private Bindable<float> localCursorScale;
+        private IBindable<float> localCursorScale;
 
         public override CursorContainer LocalCursor => State.Value == Visibility.Visible ? localCursorContainer : null;
 
@@ -33,7 +33,6 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             Add(cursorScaleContainer = new Container
             {
-                RelativePositionAxes = Axes.Both,
                 Child = clickToResumeCursor = new OsuClickToResumeCursor { ResumeRequested = Resume }
             });
         }
@@ -43,14 +42,14 @@ namespace osu.Game.Rulesets.Osu.UI
             base.PopIn();
 
             GameplayCursor.ActiveCursor.Hide();
-            cursorScaleContainer.MoveTo(GameplayCursor.ActiveCursor.Position);
+            cursorScaleContainer.Position = ToLocalSpace(GameplayCursor.ActiveCursor.ScreenSpaceDrawQuad.Centre);
             clickToResumeCursor.Appear();
 
             if (localCursorContainer == null)
             {
                 Add(localCursorContainer = new OsuCursorContainer());
 
-                localCursorScale = new Bindable<float>();
+                localCursorScale = new BindableFloat();
                 localCursorScale.BindTo(localCursorContainer.CursorScale);
                 localCursorScale.BindValueChanged(scale => cursorScaleContainer.Scale = new Vector2(scale.NewValue), true);
             }
@@ -107,7 +106,9 @@ namespace osu.Game.Rulesets.Osu.UI
                 return false;
             }
 
-            public bool OnReleased(OsuAction action) => false;
+            public void OnReleased(OsuAction action)
+            {
+            }
 
             public void Appear() => Schedule(() =>
             {

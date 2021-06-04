@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             if (value.Type != ChannelType.PM)
                 throw new ArgumentException("Argument value needs to have the targettype user!");
 
-            DrawableAvatar avatar;
+            ClickableAvatar avatar;
 
             AddRange(new Drawable[]
             {
@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Masking = true,
-                            Child = new DelayedLoadWrapper(avatar = new DrawableAvatar(value.Users.First())
+                            Child = new DelayedLoadWrapper(avatar = new ClickableAvatar(value.Users.First())
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 OpenOnClick = { Value = false },
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Chat.Tabs
         {
             var user = Value.Users.First();
 
-            BackgroundActive = user.Colour != null ? OsuColour.FromHex(user.Colour) : colours.BlueDark;
+            BackgroundActive = user.Colour != null ? Color4Extensions.FromHex(user.Colour) : colours.BlueDark;
             BackgroundInactive = BackgroundActive.Darken(0.5f);
         }
     }

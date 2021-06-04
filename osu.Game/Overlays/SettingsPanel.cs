@@ -10,8 +10,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -26,7 +28,7 @@ namespace osu.Game.Overlays
 
         private const float sidebar_width = Sidebar.DEFAULT_WIDTH;
 
-        protected const float WIDTH = 400;
+        public const float WIDTH = 400;
 
         protected Container<Drawable> ContentContainer;
 
@@ -39,14 +41,14 @@ namespace osu.Game.Overlays
 
         private SeekLimitedSearchTextBox searchTextBox;
 
+        protected override string PopInSampleName => "UI/settings-pop-in";
+
         /// <summary>
         /// Provide a source for the toolbar height.
         /// </summary>
         public Func<float> GetToolbarHeight;
 
         private readonly bool showSidebar;
-
-        protected Box Background;
 
         protected SettingsPanel(bool showSidebar)
         {
@@ -60,20 +62,20 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = ContentContainer = new Container
+            InternalChild = ContentContainer = new NonMaskedContent
             {
                 Width = WIDTH,
                 RelativeSizeAxes = Axes.Y,
                 Children = new Drawable[]
                 {
-                    Background = new Box
+                    new Box
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
                         Scale = new Vector2(2, 1), // over-extend to the left for transitions
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                        Alpha = 0.6f,
+                        Colour = OsuColour.Gray(0.05f),
+                        Alpha = 1,
                     },
                     SectionsContainer = new SettingsSectionsContainer
                     {
@@ -162,7 +164,7 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            ContentContainer.MoveToX(-WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
+            ContentContainer.MoveToX(-WIDTH + ExpandedPosition, TRANSITION_LENGTH, Easing.OutQuint);
 
             Sidebar?.MoveToX(-sidebar_width, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
@@ -188,7 +190,13 @@ namespace osu.Game.Overlays
             Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
 
-        protected class SettingsSectionsContainer : SectionsContainer<SettingsSection>
+        private class NonMaskedContent : Container<Drawable>
+        {
+            // masking breaks the pan-out transform with nested sub-settings panels.
+            protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
+        }
+
+        public class SettingsSectionsContainer : SectionsContainer<SettingsSection>
         {
             public SearchContainer<SettingsSection> SearchContainer;
 
@@ -214,7 +222,7 @@ namespace osu.Game.Overlays
                 base.UpdateAfterChildren();
 
                 // no null check because the usage of this class is strict
-                HeaderBackground.Alpha = -ExpandableHeader.Y / ExpandableHeader.LayoutSize.Y * 0.5f;
+                HeaderBackground.Alpha = -ExpandableHeader.Y / ExpandableHeader.LayoutSize.Y;
             }
         }
     }
