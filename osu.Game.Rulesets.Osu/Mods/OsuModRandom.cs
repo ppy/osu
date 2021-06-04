@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "It never gets boring!";
         public override bool Ranked => false;
 
+        private const float slider_path_checking_rate = 10;
+
         // The relative distance to the edge of the playfield before objects' positions should start to "turn around" and curve towards the middle.
         // The closer the hit objects draw to the border, the sharper the turn
         private const float playfield_edge_ratio = 0.375f;
@@ -74,22 +76,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                 // update end position as it may have changed as a result of the position update.
                 current.EndPositionRandomised = current.PositionRandomised;
 
-                switch (hitObject)
-                {
-                    case Slider slider:
-                        // Shift nested objects the same distance as the slider got shifted in the randomisation process
-                        // so that moveSliderIntoPlayfield() can determine their relative distances to slider.Position and thus minMargin
-                        shiftNestedObjects(slider, Vector2.Subtract(slider.Position, current.PositionOriginal));
-
-                        var oldPos = new Vector2(slider.Position.X, slider.Position.Y);
-
-                        moveSliderIntoPlayfield(slider, current);
-
-                        // Shift them again to move them to their final position after the slider got moved into the playfield
-                        shiftNestedObjects(slider, Vector2.Subtract(slider.Position, oldPos));
-
-                        break;
-                }
+                if (hitObject is Slider slider)
+                    moveSliderIntoPlayfield(slider, current);
 
                 previous = current;
             }
@@ -146,34 +134,53 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// </summary>
         private void moveSliderIntoPlayfield(Slider slider, RandomObjectInfo currentObjectInfo)
         {
-            // Min. distances from the slider's position to the playfield border
-            var minMargin = new MarginPadding();
+            var minMargin = getMinSliderMargin(slider);
 
-            foreach (var hitObject in slider.NestedHitObjects.Where(o => o is SliderTick || o is SliderEndCircle))
-            {
-                if (!(hitObject is OsuHitObject osuHitObject))
-                    continue;
-
-                var relativePos = Vector2.Subtract(osuHitObject.Position, slider.Position);
-
-                minMargin.Left = Math.Max(minMargin.Left, -relativePos.X);
-                minMargin.Right = Math.Max(minMargin.Right, relativePos.X);
-                minMargin.Top = Math.Max(minMargin.Top, -relativePos.Y);
-                minMargin.Bottom = Math.Max(minMargin.Bottom, relativePos.Y);
-            }
-
-            if (slider.Position.X < minMargin.Left)
-                slider.Position = new Vector2(minMargin.Left, slider.Position.Y);
-            else if (slider.Position.X + minMargin.Right > OsuPlayfield.BASE_SIZE.X)
-                slider.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - minMargin.Right, slider.Position.Y);
-
-            if (slider.Position.Y < minMargin.Top)
-                slider.Position = new Vector2(slider.Position.X, minMargin.Top);
-            else if (slider.Position.Y + minMargin.Bottom > OsuPlayfield.BASE_SIZE.Y)
-                slider.Position = new Vector2(slider.Position.X, OsuPlayfield.BASE_SIZE.Y - minMargin.Bottom);
+            slider.Position = new Vector2(
+                Math.Clamp(slider.Position.X, minMargin.Left, OsuPlayfield.BASE_SIZE.X - minMargin.Right),
+                Math.Clamp(slider.Position.Y, minMargin.Top, OsuPlayfield.BASE_SIZE.Y - minMargin.Bottom)
+            );
 
             currentObjectInfo.PositionRandomised = slider.Position;
             currentObjectInfo.EndPositionRandomised = slider.EndPosition;
+
+            shiftNestedObjects(slider, Vector2.Subtract(currentObjectInfo.PositionRandomised, currentObjectInfo.PositionOriginal));
+        }
+
+        /// <summary>
+        /// Calculates the min. distances from the <see cref="Slider"/>'s position to the playfield border for the slider to be fully inside of the playfield.
+        /// </summary>
+        private MarginPadding getMinSliderMargin(Slider slider)
+        {
+            var minMargin = new MarginPadding();
+            Vector2 pos;
+
+            for (double j = 0; j <= 1; j += 1 / (slider_path_checking_rate / 1000 * (slider.EndTime - slider.StartTime)))
+            {
+                pos = slider.Path.PositionAt(j);
+                updateMargin();
+            }
+
+            var repeat = (SliderRepeat)slider.NestedHitObjects.FirstOrDefault(o => o is SliderRepeat);
+
+            if (repeat != null)
+            {
+                pos = repeat.Position - slider.Position;
+                updateMargin();
+            }
+
+            pos = slider.Path.PositionAt(1);
+            updateMargin();
+
+            return minMargin;
+
+            void updateMargin()
+            {
+                minMargin.Left = Math.Max(minMargin.Left, -pos.X);
+                minMargin.Right = Math.Max(minMargin.Right, pos.X);
+                minMargin.Top = Math.Max(minMargin.Top, -pos.Y);
+                minMargin.Bottom = Math.Max(minMargin.Bottom, pos.Y);
+            }
         }
 
         /// <summary>
