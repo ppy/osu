@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private static readonly float border_distance_x = OsuPlayfield.BASE_SIZE.X * playfield_edge_ratio;
         private static readonly float border_distance_y = OsuPlayfield.BASE_SIZE.Y * playfield_edge_ratio;
 
-        private static readonly Vector2 playfield_middle = Vector2.Divide(OsuPlayfield.BASE_SIZE, 2);
+        private static readonly Vector2 playfield_middle = OsuPlayfield.BASE_SIZE / 2;
 
         private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
 
@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             current.AngleRad = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
 
-            var position = Vector2.Add(previous.EndPositionRandomised, posRelativeToPrev);
+            var position = previous.EndPositionRandomised + posRelativeToPrev;
 
             // Move hit objects back into the playfield if they are outside of it,
             // which would sometimes happen during big jumps otherwise.
@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             currentObjectInfo.PositionRandomised = slider.Position;
             currentObjectInfo.EndPositionRandomised = slider.EndPosition;
 
-            shiftNestedObjects(slider, Vector2.Subtract(currentObjectInfo.PositionRandomised, currentObjectInfo.PositionOriginal));
+            shiftNestedObjects(slider, currentObjectInfo.PositionRandomised - currentObjectInfo.PositionOriginal);
         }
 
         /// <summary>
@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (!(hitObject is OsuHitObject osuHitObject))
                     continue;
 
-                osuHitObject.Position = Vector2.Add(osuHitObject.Position, shift);
+                osuHitObject.Position += shift;
             }
         }
 
