@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "It never gets boring!";
         public override bool Ranked => false;
 
+        // How often per second getMinSliderMargin() checks if the slider is outside of the playfield
         private const float slider_path_checking_rate = 10;
 
         // The relative distance to the edge of the playfield before objects' positions should start to "turn around" and curve towards the middle.
