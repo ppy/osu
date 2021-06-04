@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Select
     public class PlaySongSelect : SongSelect
     {
         private bool removeAutoModOnResume;
-        private OsuScreen player;
+        private OsuScreen playerLoader;
 
         [Resolved(CanBeNull = true)]
         private NotificationOverlay notifications { get; set; }
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Select
         {
             base.OnResuming(last);
 
-            player = null;
+            playerLoader = null;
 
             if (removeAutoModOnResume)
             {
@@ -79,14 +79,14 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnStart()
         {
-            if (player != null) return false;
+            if (playerLoader != null) return false;
 
             // Ctrl+Enter should start map with autoplay enabled.
             if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
             {
-                var autoplayMod = getAutoplayMod();
+                var autoInstance = getAutoplayMod();
 
-                if (autoplayMod == null)
+                if (autoInstance == null)
                 {
                     notifications?.Post(new SimpleNotification
                     {
@@ -97,18 +97,26 @@ namespace osu.Game.Screens.Select
 
                 var mods = Mods.Value;
 
-                if (mods.All(m => m.GetType() != autoplayMod.GetType()))
+                if (mods.All(m => m.GetType() != autoInstance.GetType()))
                 {
-                    Mods.Value = mods.Append(autoplayMod).ToArray();
+                    Mods.Value = mods.Append(autoInstance).ToArray();
                     removeAutoModOnResume = true;
                 }
             }
 
             SampleConfirm?.Play();
 
-            this.Push(player = new PlayerLoader(() => new SoloPlayer()));
-
+            this.Push(playerLoader = new PlayerLoader(createPlayer));
             return true;
+
+            Player createPlayer()
+            {
+                var replayGeneratingMod = Mods.Value.OfType<ICreateReplay>().FirstOrDefault();
+                if (replayGeneratingMod != null)
+                    return new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateReplayScore(beatmap, mods));
+
+                return new SoloPlayer();
+            }
         }
     }
 }
