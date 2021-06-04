@@ -81,8 +81,10 @@ namespace osu.Game.Overlays.Chat.Tabs
             RemoveItem(channel);
 
             if (SelectedTab == null)
-                SelectTab(selectorTab);
+                SelectChannelSelectorTab();
         }
+
+        public void SelectChannelSelectorTab() => SelectTab(selectorTab);
 
         protected override void SelectTab(TabItem<Channel> tab)
         {
