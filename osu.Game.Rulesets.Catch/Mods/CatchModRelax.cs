@@ -9,22 +9,31 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModRelax : ModRelax, IApplicableToDrawableRuleset<CatchHitObject>
+    public class CatchModRelax : ModRelax, IApplicableToDrawableRuleset<CatchHitObject>, IApplicableToPlayer
     {
         public override string Description => @"Use the mouse to control the catcher.";
 
+        private DrawableRuleset<CatchHitObject> drawableRuleset;
+
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
-            drawableRuleset.Cursor.Add(new MouseInputHelper((CatchPlayfield)drawableRuleset.Playfield));
+            this.drawableRuleset = drawableRuleset;
+        }
+
+        public void ApplyToPlayer(Player player)
+        {
+            if (!drawableRuleset.HasReplayLoaded.Value)
+                drawableRuleset.Cursor.Add(new MouseInputHelper((CatchPlayfield)drawableRuleset.Playfield));
         }
 
         private class MouseInputHelper : Drawable, IKeyBindingHandler<CatchAction>, IRequireHighFrequencyMousePosition
         {
-            private readonly CatcherArea.Catcher catcher;
+            private readonly Catcher catcher;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -34,13 +43,16 @@ namespace osu.Game.Rulesets.Catch.Mods
                 RelativeSizeAxes = Axes.Both;
             }
 
-            //disable keyboard controls
+            // disable keyboard controls
             public bool OnPressed(CatchAction action) => true;
-            public bool OnReleased(CatchAction action) => true;
+
+            public void OnReleased(CatchAction action)
+            {
+            }
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                catcher.UpdatePosition(e.MousePosition.X / DrawSize.X);
+                catcher.UpdatePosition(e.MousePosition.X / DrawSize.X * CatchPlayfield.WIDTH);
                 return base.OnMouseMove(e);
             }
         }

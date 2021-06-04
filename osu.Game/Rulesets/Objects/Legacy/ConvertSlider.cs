@@ -3,13 +3,14 @@
 
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
-    internal abstract class ConvertSlider : HitObject, IHasCurve, IHasLegacyLastTickOffset
+    internal abstract class ConvertSlider : ConvertHitObject, IHasPathWithRepeats, IHasLegacyLastTickOffset
     {
         /// <summary>
         /// Scoring distance with a speed-adjusted beat length of 1 second.
@@ -26,8 +27,14 @@ namespace osu.Game.Rulesets.Objects.Legacy
         public List<IList<HitSampleInfo>> NodeSamples { get; set; }
         public int RepeatCount { get; set; }
 
-        public double EndTime => StartTime + this.SpanCount() * Distance / Velocity;
-        public double Duration => EndTime - StartTime;
+        [JsonIgnore]
+        public double Duration
+        {
+            get => this.SpanCount() * Distance / Velocity;
+            set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
+        }
+
+        public double EndTime => StartTime + Duration;
 
         public double Velocity = 1;
 

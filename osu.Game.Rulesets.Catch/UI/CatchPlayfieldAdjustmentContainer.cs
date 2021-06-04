@@ -10,15 +10,21 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatchPlayfieldAdjustmentContainer : PlayfieldAdjustmentContainer
     {
+        private const float playfield_size_adjust = 0.8f;
+
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
         public CatchPlayfieldAdjustmentContainer()
         {
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.TopCentre;
+            // because we are using centre anchor/origin, we will need to limit visibility in the future
+            // to ensure tall windows do not get a readability advantage.
+            // it may be possible to bake the catch-specific offsets (-100..340 mentioned below) into new values
+            // which are compatible with TopCentre alignment.
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
 
-            Size = new Vector2(0.86f); // matches stable's vertical offset for catcher plate
+            Size = new Vector2(playfield_size_adjust);
 
             InternalChild = new Container
             {
@@ -27,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 RelativeSizeAxes = Axes.Both,
                 FillMode = FillMode.Fit,
                 FillAspectRatio = 4f / 3,
-                Child = content = new ScalingContainer { RelativeSizeAxes = Axes.Both }
+                Child = content = new ScalingContainer { RelativeSizeAxes = Axes.Both, }
             };
         }
 
@@ -40,8 +46,14 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 base.Update();
 
-                Scale = new Vector2(Parent.ChildSize.X / CatchPlayfield.BASE_WIDTH);
-                Size = Vector2.Divide(Vector2.One, Scale);
+                // in stable, fruit fall vertically from -100 to 340.
+                // to emulate this, we want to make our playfield 440 gameplay pixels high.
+                // we then offset it -100 vertically in the position set below.
+                const float stable_v_offset_ratio = 440 / 384f;
+
+                Scale = new Vector2(Parent.ChildSize.X / CatchPlayfield.WIDTH);
+                Position = new Vector2(0, -100 * stable_v_offset_ratio + Scale.X);
+                Size = Vector2.Divide(new Vector2(1, stable_v_offset_ratio), Scale);
             }
         }
     }

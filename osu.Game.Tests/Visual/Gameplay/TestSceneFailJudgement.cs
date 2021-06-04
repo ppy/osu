@@ -6,11 +6,12 @@ using System.Linq;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneFailJudgement : AllPlayersTestScene
+    public class TestSceneFailJudgement : TestSceneAllRulesetPlayers
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
@@ -21,13 +22,19 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override void AddCheckSteps()
         {
             AddUntilStep("wait for fail", () => Player.HasFailed);
-            AddUntilStep("wait for multiple judged objects", () => ((FailPlayer)Player).DrawableRuleset.Playfield.AllHitObjects.Count(h => h.AllJudged) > 1);
-            AddAssert("total judgements == 1", () => ((FailPlayer)Player).ScoreProcessor.JudgedHits == 1);
+            AddUntilStep("wait for multiple judgements", () => ((FailPlayer)Player).ScoreProcessor.JudgedHits > 1);
+            AddAssert("total number of results == 1", () =>
+            {
+                var score = new ScoreInfo();
+                ((FailPlayer)Player).ScoreProcessor.PopulateScore(score);
+
+                return score.Statistics.Values.Sum() == 1;
+            });
         }
 
         private class FailPlayer : TestPlayer
         {
-            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
+            public new HealthProcessor HealthProcessor => base.HealthProcessor;
 
             public FailPlayer()
                 : base(false, false)
@@ -37,7 +44,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                ScoreProcessor.FailConditions += (_, __) => true;
+                HealthProcessor.FailConditions += (_, __) => true;
             }
         }
     }

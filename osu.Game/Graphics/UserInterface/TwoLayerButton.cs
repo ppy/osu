@@ -12,6 +12,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Audio.Track;
 using System;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
@@ -56,15 +57,15 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 base.Origin = value;
-                c1.Origin = c1.Anchor = value.HasFlag(Anchor.x2) ? Anchor.TopLeft : Anchor.TopRight;
-                c2.Origin = c2.Anchor = value.HasFlag(Anchor.x2) ? Anchor.TopRight : Anchor.TopLeft;
+                c1.Origin = c1.Anchor = value.HasFlagFast(Anchor.x2) ? Anchor.TopLeft : Anchor.TopRight;
+                c2.Origin = c2.Anchor = value.HasFlagFast(Anchor.x2) ? Anchor.TopRight : Anchor.TopLeft;
 
-                X = value.HasFlag(Anchor.x2) ? SIZE_RETRACTED.X * shear.X * 0.5f : 0;
+                X = value.HasFlagFast(Anchor.x2) ? SIZE_RETRACTED.X * shear.X * 0.5f : 0;
 
                 Remove(c1);
                 Remove(c2);
-                c1.Depth = value.HasFlag(Anchor.x2) ? 0 : 1;
-                c2.Depth = value.HasFlag(Anchor.x2) ? 1 : 0;
+                c1.Depth = value.HasFlagFast(Anchor.x2) ? 0 : 1;
+                c2.Depth = value.HasFlagFast(Anchor.x2) ? 1 : 0;
                 Add(c1);
                 Add(c2);
             }
@@ -230,7 +231,7 @@ namespace osu.Game.Graphics.UserInterface
                 };
             }
 
-            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 

@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         public LevelBadge()
         {
-            TooltipText = "Level";
+            TooltipText = "level";
         }
 
         [BackgroundDependencyLoader]

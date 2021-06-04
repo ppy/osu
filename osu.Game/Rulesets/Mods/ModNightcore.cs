@@ -18,14 +18,17 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModNightcore<TObject> : ModDoubleTime, IApplicableToDrawableRuleset<TObject>
-        where TObject : HitObject
+    public abstract class ModNightcore : ModDoubleTime
     {
         public override string Name => "Nightcore";
         public override string Acronym => "NC";
-        public override IconUsage Icon => OsuIcon.ModNightcore;
+        public override IconUsage? Icon => OsuIcon.ModNightcore;
         public override string Description => "Uguuuuuuuu...";
+    }
 
+    public abstract class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
+        where TObject : HitObject
+    {
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
@@ -38,7 +41,7 @@ namespace osu.Game.Rulesets.Mods
             }, true);
         }
 
-        public override void ApplyToTrack(Track track)
+        public override void ApplyToTrack(ITrack track)
         {
             // base.ApplyToTrack() intentionally not called (different tempo adjustment is applied)
             track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
@@ -52,10 +55,10 @@ namespace osu.Game.Rulesets.Mods
 
         public class NightcoreBeatContainer : BeatSyncedContainer
         {
-            private SkinnableSound hatSample;
-            private SkinnableSound clapSample;
-            private SkinnableSound kickSample;
-            private SkinnableSound finishSample;
+            private PausableSkinnableSound hatSample;
+            private PausableSkinnableSound clapSample;
+            private PausableSkinnableSound kickSample;
+            private PausableSkinnableSound finishSample;
 
             private int? firstBeat;
 
@@ -69,16 +72,16 @@ namespace osu.Game.Rulesets.Mods
             {
                 InternalChildren = new Drawable[]
                 {
-                    hatSample = new SkinnableSound(new SampleInfo("nightcore-hat")),
-                    clapSample = new SkinnableSound(new SampleInfo("nightcore-clap")),
-                    kickSample = new SkinnableSound(new SampleInfo("nightcore-kick")),
-                    finishSample = new SkinnableSound(new SampleInfo("nightcore-finish")),
+                    hatSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-hat")),
+                    clapSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-clap")),
+                    kickSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-kick")),
+                    finishSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-finish")),
                 };
             }
 
             private const int bars_per_segment = 4;
 
-            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 

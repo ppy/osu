@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -10,12 +9,18 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using System;
 using osu.Game.Beatmaps;
 using osu.Framework.Bindables;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using osu.Framework.Localisation;
+using osu.Framework.Threading;
+using osu.Framework.Utils;
+using osu.Game.Configuration;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select.Details
 {
@@ -24,7 +29,14 @@ namespace osu.Game.Screens.Select.Details
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; }
 
-        private readonly StatisticRow firstValue, hpDrain, accuracy, approachRate, starDifficulty;
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
+
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; }
+
+        protected readonly StatisticRow FirstValue, HpDrain, Accuracy, ApproachRate;
+        private readonly StatisticRow starDifficulty;
 
         private BeatmapInfo beatmap;
 
@@ -47,13 +59,12 @@ namespace osu.Game.Screens.Select.Details
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(4f),
                 Children = new[]
                 {
-                    firstValue = new StatisticRow(), //circle size/key amount
-                    hpDrain = new StatisticRow { Title = "HP Drain" },
-                    accuracy = new StatisticRow { Title = "Accuracy" },
-                    approachRate = new StatisticRow { Title = "Approach Rate" },
+                    FirstValue = new StatisticRow(), // circle size/key amount
+                    HpDrain = new StatisticRow { Title = "HP Drain" },
+                    Accuracy = new StatisticRow { Title = "Accuracy" },
+                    ApproachRate = new StatisticRow { Title = "Approach Rate" },
                     starDifficulty = new StatisticRow(10, true) { Title = "Star Difficulty" },
                 },
             };
@@ -69,7 +80,28 @@ namespace osu.Game.Screens.Select.Details
         {
             base.LoadComplete();
 
-            mods.BindValueChanged(_ => updateStatistics(), true);
+            ruleset.BindValueChanged(_ => updateStatistics());
+            mods.BindValueChanged(modsChanged, true);
+        }
+
+        private ModSettingChangeTracker modSettingChangeTracker;
+        private ScheduledDelegate debouncedStatisticsUpdate;
+
+        private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
+        {
+            modSettingChangeTracker?.Dispose();
+
+            modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
+            modSettingChangeTracker.SettingChanged += m =>
+            {
+                if (!(m is IApplicableToDifficulty))
+                    return;
+
+                debouncedStatisticsUpdate?.Cancel();
+                debouncedStatisticsUpdate = Scheduler.AddDelayed(updateStatistics, 100);
+            };
+
+            updateStatistics();
         }
 
         private void updateStatistics()
@@ -85,26 +117,56 @@ namespace osu.Game.Screens.Select.Details
                     mod.ApplyToDifficulty(adjustedDifficulty);
             }
 
-            //mania specific
-            if ((Beatmap?.Ruleset?.ID ?? 0) == 3)
+            switch (Beatmap?.Ruleset?.ID ?? 0)
             {
-                firstValue.Title = "Key Amount";
-                firstValue.Value = ((int)MathF.Round(baseDifficulty?.CircleSize ?? 0), (int)MathF.Round(adjustedDifficulty?.CircleSize ?? 0));
-            }
-            else
-            {
-                firstValue.Title = "Circle Size";
-                firstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
+                case 3:
+                    // Account for mania differences locally for now
+                    // Eventually this should be handled in a more modular way, allowing rulesets to return arbitrary difficulty attributes
+                    FirstValue.Title = "Key Count";
+                    FirstValue.Value = (baseDifficulty?.CircleSize ?? 0, null);
+                    break;
+
+                default:
+                    FirstValue.Title = "Circle Size";
+                    FirstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
+                    break;
             }
 
-            starDifficulty.Value = ((float)(Beatmap?.StarDifficulty ?? 0), null);
+            HpDrain.Value = (baseDifficulty?.DrainRate ?? 0, adjustedDifficulty?.DrainRate);
+            Accuracy.Value = (baseDifficulty?.OverallDifficulty ?? 0, adjustedDifficulty?.OverallDifficulty);
+            ApproachRate.Value = (baseDifficulty?.ApproachRate ?? 0, adjustedDifficulty?.ApproachRate);
 
-            hpDrain.Value = (baseDifficulty?.DrainRate ?? 0, adjustedDifficulty?.DrainRate);
-            accuracy.Value = (baseDifficulty?.OverallDifficulty ?? 0, adjustedDifficulty?.OverallDifficulty);
-            approachRate.Value = (baseDifficulty?.ApproachRate ?? 0, adjustedDifficulty?.ApproachRate);
+            updateStarDifficulty();
         }
 
-        private class StatisticRow : Container, IHasAccentColour
+        private CancellationTokenSource starDifficultyCancellationSource;
+
+        private void updateStarDifficulty()
+        {
+            starDifficultyCancellationSource?.Cancel();
+
+            if (Beatmap == null)
+                return;
+
+            starDifficultyCancellationSource = new CancellationTokenSource();
+
+            var normalStarDifficulty = difficultyCache.GetDifficultyAsync(Beatmap, ruleset.Value, null, starDifficultyCancellationSource.Token);
+            var moddedStarDifficulty = difficultyCache.GetDifficultyAsync(Beatmap, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
+
+            Task.WhenAll(normalStarDifficulty, moddedStarDifficulty).ContinueWith(_ => Schedule(() =>
+            {
+                starDifficulty.Value = ((float)normalStarDifficulty.Result.Stars, (float)moddedStarDifficulty.Result.Stars);
+            }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            modSettingChangeTracker?.Dispose();
+            starDifficultyCancellationSource?.Cancel();
+        }
+
+        public class StatisticRow : Container, IHasAccentColour
         {
             private const float value_width = 25;
             private const float name_width = 70;
@@ -112,22 +174,23 @@ namespace osu.Game.Screens.Select.Details
             private readonly float maxValue;
             private readonly bool forceDecimalPlaces;
             private readonly OsuSpriteText name, valueText;
-            private readonly Bar bar, modBar;
+            private readonly Bar bar;
+            public readonly Bar ModBar;
 
             [Resolved]
             private OsuColour colours { get; set; }
 
-            public string Title
+            public LocalisableString Title
             {
                 get => name.Text;
                 set => name.Text = value;
             }
 
-            private (float baseValue, float? adjustedValue) value;
+            private (float baseValue, float? adjustedValue)? value;
 
             public (float baseValue, float? adjustedValue) Value
             {
-                get => value;
+                get => value ?? (0, null);
                 set
                 {
                     if (value == this.value)
@@ -138,14 +201,14 @@ namespace osu.Game.Screens.Select.Details
                     bar.Length = value.baseValue / maxValue;
 
                     valueText.Text = (value.adjustedValue ?? value.baseValue).ToString(forceDecimalPlaces ? "0.00" : "0.##");
-                    modBar.Length = (value.adjustedValue ?? 0) / maxValue;
+                    ModBar.Length = (value.adjustedValue ?? 0) / maxValue;
 
-                    if (value.adjustedValue > value.baseValue)
-                        modBar.AccentColour = valueText.Colour = colours.Red;
+                    if (Precision.AlmostEquals(value.baseValue, value.adjustedValue ?? value.baseValue, 0.05f))
+                        ModBar.AccentColour = valueText.Colour = Color4.White;
+                    else if (value.adjustedValue > value.baseValue)
+                        ModBar.AccentColour = valueText.Colour = colours.Red;
                     else if (value.adjustedValue < value.baseValue)
-                        modBar.AccentColour = valueText.Colour = colours.BlueDark;
-                    else
-                        modBar.AccentColour = valueText.Colour = Color4.White;
+                        ModBar.AccentColour = valueText.Colour = colours.BlueDark;
                 }
             }
 
@@ -161,6 +224,7 @@ namespace osu.Game.Screens.Select.Details
                 this.forceDecimalPlaces = forceDecimalPlaces;
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
+                Padding = new MarginPadding { Vertical = 2.5f };
 
                 Children = new Drawable[]
                 {
@@ -168,9 +232,11 @@ namespace osu.Game.Screens.Select.Details
                     {
                         Width = name_width,
                         AutoSizeAxes = Axes.Y,
+                        // osu-web uses 1.25 line-height, which at 12px font size makes the element 14px tall - this compentates that difference
+                        Padding = new MarginPadding { Vertical = 1 },
                         Child = name = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: 13)
+                            Font = OsuFont.GetFont(size: 12)
                         },
                     },
                     bar = new Bar
@@ -182,7 +248,7 @@ namespace osu.Game.Screens.Select.Details
                         BackgroundColour = Color4.White.Opacity(0.5f),
                         Padding = new MarginPadding { Left = name_width + 10, Right = value_width + 10 },
                     },
-                    modBar = new Bar
+                    ModBar = new Bar
                     {
                         Origin = Anchor.CentreLeft,
                         Anchor = Anchor.CentreLeft,
@@ -201,7 +267,7 @@ namespace osu.Game.Screens.Select.Details
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 13)
+                            Font = OsuFont.GetFont(size: 12)
                         },
                     },
                 };

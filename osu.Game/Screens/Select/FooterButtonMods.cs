@@ -3,7 +3,6 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Rulesets.Mods;
 using System.Collections.Generic;
@@ -15,7 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Select
 {
@@ -28,37 +27,25 @@ namespace osu.Game.Screens.Select
         }
 
         protected readonly OsuSpriteText MultiplierText;
-        private readonly FooterModDisplay modDisplay;
+        private readonly ModDisplay modDisplay;
         private Color4 lowMultiplierColour;
         private Color4 highMultiplierColour;
 
         public FooterButtonMods()
         {
-            Add(new FillFlowContainer
+            ButtonContentContainer.Add(modDisplay = new ModDisplay
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                Direction = FillDirection.Horizontal,
-                Shear = -SHEAR,
-                Children = new Drawable[]
-                {
-                    modDisplay = new FooterModDisplay
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        DisplayUnrankedText = false,
-                        Scale = new Vector2(0.8f)
-                    },
-                    MultiplierText = new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                        Margin = new MarginPadding { Right = 10 }
-                    }
-                },
-                AutoSizeAxes = Axes.Both,
-                Margin = new MarginPadding { Left = 70 }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                DisplayUnrankedText = false,
+                Scale = new Vector2(0.8f),
+                ExpansionMode = ExpansionMode.AlwaysContracted,
+            });
+            ButtonContentContainer.Add(MultiplierText = new OsuSpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Font = OsuFont.GetFont(weight: FontWeight.Bold),
             });
         }
 
@@ -70,7 +57,7 @@ namespace osu.Game.Screens.Select
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;
             Text = @"mods";
-            Hotkey = Key.F1;
+            Hotkey = GlobalAction.ToggleModSelection;
         }
 
         protected override void LoadComplete()
@@ -92,16 +79,11 @@ namespace osu.Game.Screens.Select
                 MultiplierText.FadeColour(lowMultiplierColour, 200);
             else
                 MultiplierText.FadeColour(Color4.White, 200);
-        }
 
-        private class FooterModDisplay : ModDisplay
-        {
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent?.Parent?.ReceivePositionalInputAt(screenSpacePos) ?? false;
-
-            public FooterModDisplay()
-            {
-                AllowExpand = false;
-            }
+            if (Current.Value?.Count > 0)
+                modDisplay.FadeIn();
+            else
+                modDisplay.FadeOut();
         }
     }
 }

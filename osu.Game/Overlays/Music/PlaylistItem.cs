@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -14,105 +14,74 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistItem : Container, IFilterable, IDraggable
+    public class PlaylistItem : OsuRearrangeableListItem<BeatmapSetInfo>, IFilterable
     {
-        private const float fade_duration = 100;
+        public readonly Bindable<BeatmapSetInfo> SelectedSet = new Bindable<BeatmapSetInfo>();
 
-        private Color4 hoverColour;
-        private Color4 artistColour;
+        public Action<BeatmapSetInfo> RequestSelection;
 
-        private SpriteIcon handle;
         private TextFlowContainer text;
         private IEnumerable<Drawable> titleSprites;
-        private ILocalisedBindableString titleBind;
-        private ILocalisedBindableString artistBind;
 
-        public readonly BeatmapSetInfo BeatmapSetInfo;
+        private ILocalisedBindableString title;
+        private ILocalisedBindableString artist;
 
-        public Action<BeatmapSetInfo> OnSelect;
+        private Color4 selectedColour;
+        private Color4 artistColour;
 
-        public bool IsDraggable { get; private set; }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
+        public PlaylistItem(BeatmapSetInfo item)
+            : base(item)
         {
-            IsDraggable = handle.IsHovered;
-            return base.OnMouseDown(e);
-        }
+            Padding = new MarginPadding { Left = 5 };
 
-        protected override bool OnMouseUp(MouseUpEvent e)
-        {
-            IsDraggable = false;
-            return base.OnMouseUp(e);
-        }
-
-        private bool selected;
-
-        public bool Selected
-        {
-            get => selected;
-            set
-            {
-                if (value == selected) return;
-
-                selected = value;
-
-                FinishTransforms(true);
-                foreach (Drawable s in titleSprites)
-                    s.FadeColour(Selected ? hoverColour : Color4.White, fade_duration);
-            }
-        }
-
-        public PlaylistItem(BeatmapSetInfo setInfo)
-        {
-            BeatmapSetInfo = setInfo;
-
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            Padding = new MarginPadding { Top = 3, Bottom = 3 };
+            FilterTerms = item.Metadata.SearchableTerms;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, LocalisationManager localisation)
         {
-            hoverColour = colours.Yellow;
+            selectedColour = colours.Yellow;
             artistColour = colours.Gray9;
+            HandleColour = colours.Gray5;
 
-            var metadata = BeatmapSetInfo.Metadata;
-            FilterTerms = metadata.SearchableTerms;
-
-            Children = new Drawable[]
-            {
-                handle = new PlaylistItemHandle
-                {
-                    Colour = colours.Gray5
-                },
-                text = new OsuTextFlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = 20 },
-                    ContentIndent = 10f,
-                },
-            };
-
-            titleBind = localisation.GetLocalisedString(new LocalisedString((metadata.TitleUnicode, metadata.Title)));
-            artistBind = localisation.GetLocalisedString(new LocalisedString((metadata.ArtistUnicode, metadata.Artist)));
-
-            artistBind.BindValueChanged(_ => recreateText(), true);
+            title = localisation.GetLocalisedString(new RomanisableString(Model.Metadata.TitleUnicode, Model.Metadata.Title));
+            artist = localisation.GetLocalisedString(new RomanisableString(Model.Metadata.ArtistUnicode, Model.Metadata.Artist));
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            artist.BindValueChanged(_ => recreateText(), true);
+
+            SelectedSet.BindValueChanged(set =>
+            {
+                if (set.OldValue?.Equals(Model) != true && set.NewValue?.Equals(Model) != true)
+                    return;
+
+                foreach (Drawable s in titleSprites)
+                    s.FadeColour(set.NewValue.Equals(Model) ? selectedColour : Color4.White, FADE_DURATION);
+            }, true);
+        }
+
+        protected override Drawable CreateContent() => text = new OsuTextFlowContainer
+        {
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+        };
 
         private void recreateText()
         {
             text.Clear();
 
-            //space after the title to put a space between the title and artist
-            titleSprites = text.AddText(titleBind.Value + @"  ", sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular)).OfType<SpriteText>();
+            // space after the title to put a space between the title and artist
+            titleSprites = text.AddText(title.Value + @"  ", sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular)).OfType<SpriteText>();
 
-            text.AddText(artistBind.Value, sprite =>
+            text.AddText(artist.Value, sprite =>
             {
                 sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
                 sprite.Colour = artistColour;
@@ -120,64 +89,46 @@ namespace osu.Game.Overlays.Music
             });
         }
 
-        protected override bool OnHover(HoverEvent e)
-        {
-            handle.FadeIn(fade_duration);
-
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            handle.FadeOut(fade_duration);
-        }
-
         protected override bool OnClick(ClickEvent e)
         {
-            OnSelect?.Invoke(BeatmapSetInfo);
+            RequestSelection?.Invoke(Model);
             return true;
         }
 
-        public IEnumerable<string> FilterTerms { get; private set; }
+        private bool inSelectedCollection = true;
 
-        private bool matching = true;
+        public bool InSelectedCollection
+        {
+            get => inSelectedCollection;
+            set
+            {
+                if (inSelectedCollection == value)
+                    return;
+
+                inSelectedCollection = value;
+                updateFilter();
+            }
+        }
+
+        public IEnumerable<string> FilterTerms { get; }
+
+        private bool matchingFilter = true;
 
         public bool MatchingFilter
         {
-            get => matching;
+            get => matchingFilter && inSelectedCollection;
             set
             {
-                if (matching == value) return;
+                if (matchingFilter == value)
+                    return;
 
-                matching = value;
-
-                this.FadeTo(matching ? 1 : 0, 200);
+                matchingFilter = value;
+                updateFilter();
             }
         }
+
+        private void updateFilter() => this.FadeTo(MatchingFilter ? 1 : 0, 200);
 
         public bool FilteringActive { get; set; }
-
-        private class PlaylistItemHandle : SpriteIcon
-        {
-            public PlaylistItemHandle()
-            {
-                Anchor = Anchor.CentreLeft;
-                Origin = Anchor.CentreLeft;
-                Size = new Vector2(12);
-                Icon = FontAwesome.Solid.Bars;
-                Alpha = 0f;
-                Margin = new MarginPadding { Left = 5 };
-            }
-
-            public override bool HandlePositionalInput => IsPresent;
-        }
-    }
-
-    public interface IDraggable : IDrawable
-    {
-        /// <summary>
-        /// Whether this <see cref="IDraggable"/> can be dragged in its current state.
-        /// </summary>
-        bool IsDraggable { get; }
     }
 }

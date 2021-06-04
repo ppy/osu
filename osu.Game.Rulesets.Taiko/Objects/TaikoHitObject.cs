@@ -16,30 +16,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         public const float DEFAULT_SIZE = 0.45f;
 
-        /// <summary>
-        /// Scale multiplier for a strong drawable taiko hit object.
-        /// </summary>
-        public const float STRONG_SCALE = 1.4f;
-
-        /// <summary>
-        /// Default size of a strong drawable taiko hit object.
-        /// </summary>
-        public const float DEFAULT_STRONG_SIZE = DEFAULT_SIZE * STRONG_SCALE;
-
-        /// <summary>
-        /// Whether this HitObject is a "strong" type.
-        /// Strong hit objects give more points for hitting the hit object with both keys.
-        /// </summary>
-        public virtual bool IsStrong { get; set; }
-
-        protected override void CreateNestedHitObjects()
-        {
-            base.CreateNestedHitObjects();
-
-            if (IsStrong)
-                AddNested(new StrongHitObject { StartTime = this.GetEndTime() });
-        }
-
         public override Judgement CreateJudgement() => new TaikoJudgement();
 
         protected override HitWindows CreateHitWindows() => new TaikoHitWindows();

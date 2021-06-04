@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,6 +13,8 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Users;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -49,8 +52,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
             fields.Children = new Drawable[]
             {
-                new Field("mapped by", BeatmapSet.Metadata.Author.Username, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
-                new Field("submitted on", online.Submitted.ToString(@"MMMM d, yyyy"), OsuFont.GetFont(weight: FontWeight.Bold))
+                new Field("mapped by", BeatmapSet.Metadata.Author, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
+                new Field("submitted", online.Submitted, OsuFont.GetFont(weight: FontWeight.Bold))
                 {
                     Margin = new MarginPadding { Top = 5 },
                 },
@@ -58,11 +61,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (online.Ranked.HasValue)
             {
-                fields.Add(new Field("ranked on", online.Ranked.Value.ToString(@"MMMM d, yyyy"), OsuFont.GetFont(weight: FontWeight.Bold)));
+                fields.Add(new Field(online.Status.ToString().ToLowerInvariant(), online.Ranked.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
             }
             else if (online.LastUpdated.HasValue)
             {
-                fields.Add(new Field("last updated on", online.LastUpdated.Value.ToString(@"MMMM d, yyyy"), OsuFont.GetFont(weight: FontWeight.Bold)));
+                fields.Add(new Field("last updated", online.LastUpdated.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
             }
         }
 
@@ -76,7 +79,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 new Container
                 {
                     AutoSizeAxes = Axes.Both,
-                    CornerRadius = 3,
+                    CornerRadius = 4,
                     Masking = true,
                     Child = avatar = new UpdateableAvatar
                     {
@@ -87,7 +90,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         Colour = Color4.Black.Opacity(0.25f),
                         Type = EdgeEffectType.Shadow,
-                        Radius = 3,
+                        Radius = 4,
                         Offset = new Vector2(0f, 1f),
                     },
                 },
@@ -117,13 +120,51 @@ namespace osu.Game.Overlays.BeatmapSet
                     new OsuSpriteText
                     {
                         Text = $"{first} ",
-                        Font = OsuFont.GetFont(size: 13)
+                        Font = OsuFont.GetFont(size: 11)
                     },
                     new OsuSpriteText
                     {
                         Text = second,
-                        Font = secondFont.With(size: 13)
+                        Font = secondFont.With(size: 11)
                     },
+                };
+            }
+
+            public Field(string first, DateTimeOffset second, FontUsage secondFont)
+            {
+                AutoSizeAxes = Axes.Both;
+                Direction = FillDirection.Horizontal;
+
+                Children = new[]
+                {
+                    new OsuSpriteText
+                    {
+                        Text = $"{first} ",
+                        Font = OsuFont.GetFont(size: 13)
+                    },
+                    new DrawableDate(second)
+                    {
+                        Font = secondFont.With(size: 13)
+                    }
+                };
+            }
+
+            public Field(string first, User second, FontUsage secondFont)
+            {
+                AutoSizeAxes = Axes.Both;
+                Direction = FillDirection.Horizontal;
+
+                Children = new[]
+                {
+                    new LinkFlowContainer(s =>
+                    {
+                        s.Font = OsuFont.GetFont(size: 11);
+                    }).With(d =>
+                    {
+                        d.AutoSizeAxes = Axes.Both;
+                        d.AddText($"{first} ");
+                        d.AddUserLink(second, s => s.Font = secondFont.With(size: 11));
+                    }),
                 };
             }
         }

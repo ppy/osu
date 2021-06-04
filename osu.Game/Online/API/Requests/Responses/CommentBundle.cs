@@ -9,31 +9,8 @@ namespace osu.Game.Online.API.Requests.Responses
 {
     public class CommentBundle
     {
-        private List<Comment> comments;
-
         [JsonProperty(@"comments")]
-        public List<Comment> Comments
-        {
-            get => comments;
-            set
-            {
-                comments = value;
-                comments.ForEach(child =>
-                {
-                    if (child.ParentId != null)
-                    {
-                        comments.ForEach(parent =>
-                        {
-                            if (parent.Id == child.ParentId)
-                            {
-                                parent.ChildComments.Add(child);
-                                child.ParentComment = parent;
-                            }
-                        });
-                    }
-                });
-            }
-        }
+        public List<Comment> Comments { get; set; }
 
         [JsonProperty(@"has_more")]
         public bool HasMore { get; set; }
@@ -47,17 +24,19 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"included_comments")]
         public List<Comment> IncludedComments { get; set; }
 
+        private List<long> userVotes;
+
         [JsonProperty(@"user_votes")]
-        private List<long> userVotes
+        public List<long> UserVotes
         {
-            set => value.ForEach(v =>
+            get => userVotes;
+            set
             {
-                Comments.ForEach(c =>
-                {
-                    if (v == c.Id)
-                        c.IsVoted = true;
-                });
-            });
+                userVotes = value;
+
+                Comments.ForEach(c => c.IsVoted = value.Contains(c.Id));
+                IncludedComments.ForEach(c => c.IsVoted = value.Contains(c.Id));
+            }
         }
 
         private List<User> users;
@@ -73,6 +52,15 @@ namespace osu.Game.Online.API.Requests.Responses
                 value.ForEach(u =>
                 {
                     Comments.ForEach(c =>
+                    {
+                        if (c.UserId == u.Id)
+                            c.User = u;
+
+                        if (c.EditedById == u.Id)
+                            c.EditedUser = u;
+                    });
+
+                    IncludedComments.ForEach(c =>
                     {
                         if (c.UserId == u.Id)
                             c.User = u;

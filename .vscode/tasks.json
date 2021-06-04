@@ -2,17 +2,17 @@
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
     "version": "2.0.0",
-    "tasks": [{
+    "tasks": [
+        {
             "label": "Build osu! (Debug)",
             "type": "shell",
             "command": "dotnet",
             "args": [
                 "build",
-                "--no-restore",
                 "osu.Desktop",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
             ],
             "group": "build",
             "problemMatcher": "$msCompile"
@@ -23,12 +23,11 @@
             "command": "dotnet",
             "args": [
                 "build",
-                "--no-restore",
                 "osu.Desktop",
-                "/p:Configuration=Release",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
+                "-p:Configuration=Release",
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
             ],
             "group": "build",
             "problemMatcher": "$msCompile"
@@ -39,11 +38,10 @@
             "command": "dotnet",
             "args": [
                 "build",
-                "--no-restore",
                 "osu.Game.Tests",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
             ],
             "group": "build",
             "problemMatcher": "$msCompile"
@@ -54,12 +52,11 @@
             "command": "dotnet",
             "args": [
                 "build",
-                "--no-restore",
                 "osu.Game.Tests",
-                "/p:Configuration=Release",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
+                "-p:Configuration=Release",
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
             ],
             "group": "build",
             "problemMatcher": "$msCompile"
@@ -70,39 +67,43 @@
             "command": "dotnet",
             "args": [
                 "build",
-                "--no-restore",
                 "osu.Game.Tournament.Tests",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
-            ],
-            "group": "build",
-            "problemMatcher": "$msCompile"
-        }, {
-            "label": "Build tournament tests (Release)",
-            "type": "shell",
-            "command": "dotnet",
-            "args": [
-                "build",
-                "--no-restore",
-                "osu.Game.Tournament.Tests",
-                "/p:Configuration=Release",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
             ],
             "group": "build",
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Restore (netcoreapp3.1)",
+            "label": "Build tournament tests (Release)",
             "type": "shell",
             "command": "dotnet",
             "args": [
-                "restore",
-                "build/Desktop.proj"
+                "build",
+                "osu.Game.Tournament.Tests",
+                "-p:Configuration=Release",
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
             ],
-            "problemMatcher": []
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build benchmarks",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "osu.Game.Benchmarks",
+                "-p:Configuration=Release",
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
         }
     ]
 }

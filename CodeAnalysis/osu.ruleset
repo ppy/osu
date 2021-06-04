@@ -30,7 +30,7 @@
     <Rule Id="CA1819" Action="None" />
     <Rule Id="CA1822" Action="None" />
     <Rule Id="CA1823" Action="None" />
-    <Rule Id="CA2007" Action="None" />
+    <Rule Id="CA2007" Action="Warning" />
     <Rule Id="CA2214" Action="None" />
     <Rule Id="CA2227" Action="None" />
   </Rules>

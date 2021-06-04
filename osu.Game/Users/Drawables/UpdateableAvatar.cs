@@ -43,6 +43,8 @@ namespace osu.Game.Users.Drawables
             set => base.EdgeEffect = value;
         }
 
+        protected override double LoadDelay => 200;
+
         /// <summary>
         /// Whether to show a default guest representation on null user (as opposed to nothing).
         /// </summary>
@@ -63,12 +65,11 @@ namespace osu.Game.Users.Drawables
             if (user == null && !ShowGuestOnNull)
                 return null;
 
-            var avatar = new DrawableAvatar(user)
+            var avatar = new ClickableAvatar(user)
             {
                 RelativeSizeAxes = Axes.Both,
             };
 
-            avatar.OnLoadComplete += d => d.FadeInFromZero(300, Easing.OutQuint);
             avatar.OpenOnClick.BindTo(OpenOnClick);
 
             return avatar;

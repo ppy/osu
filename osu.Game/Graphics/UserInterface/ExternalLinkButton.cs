@@ -18,7 +18,9 @@ namespace osu.Game.Graphics.UserInterface
         public string Link { get; set; }
 
         private Color4 hoverColour;
-        private GameHost host;
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         public ExternalLinkButton(string link = null)
         {
@@ -32,10 +34,9 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, GameHost host)
+        private void load(OsuColour colours)
         {
             hoverColour = colours.Yellow;
-            this.host = host;
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -57,6 +58,6 @@ namespace osu.Game.Graphics.UserInterface
             return true;
         }
 
-        public string TooltipText => "View in browser";
+        public string TooltipText => "view in browser";
     }
 }

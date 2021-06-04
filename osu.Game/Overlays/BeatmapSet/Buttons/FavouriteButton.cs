@@ -5,7 +5,6 @@ using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
@@ -25,9 +24,9 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private readonly BindableBool favourited = new BindableBool();
 
         private PostBeatmapFavouriteRequest request;
-        private DimmedLoadingLayer loading;
+        private LoadingLayer loading;
 
-        private readonly Bindable<User> localUser = new Bindable<User>();
+        private readonly IBindable<User> localUser = new Bindable<User>();
 
         public string TooltipText
         {
@@ -54,14 +53,11 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     Size = new Vector2(18),
                     Shadow = false,
                 },
-                loading = new DimmedLoadingLayer(0.8f, 0.5f),
+                loading = new LoadingLayer(true, false),
             });
 
             Action = () =>
             {
-                if (loading.State.Value == Visibility.Visible)
-                    return;
-
                 // guaranteed by disabled state above.
                 Debug.Assert(BeatmapSet.Value.OnlineBeatmapSetID != null);
 

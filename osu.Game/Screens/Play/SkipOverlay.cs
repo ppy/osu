@@ -8,29 +8,30 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using osu.Game.Screens.Ranking;
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics.Containers;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
-using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
 {
-    public class SkipOverlay : VisibilityContainer, IKeyBindingHandler<GlobalAction>
+    public class SkipOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         private readonly double startTime;
 
         public Action RequestSkip;
 
         private Button button;
+        private ButtonContainer buttonContainer;
         private Box remainingTimeBox;
 
         private FadeContainer fadeContainer;
@@ -61,9 +62,10 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours)
         {
-            Children = new Drawable[]
+            InternalChild = buttonContainer = new ButtonContainer
             {
-                fadeContainer = new FadeContainer
+                RelativeSizeAxes = Axes.Both,
+                Child = fadeContainer = new FadeContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -88,7 +90,19 @@ namespace osu.Game.Screens.Play
 
         private const double fade_time = 300;
 
-        private double fadeOutBeginTime => startTime - GameplayClockContainer.MINIMUM_SKIP_TIME;
+        private double fadeOutBeginTime => startTime - MasterGameplayClockContainer.MINIMUM_SKIP_TIME;
+
+        public override void Hide()
+        {
+            base.Hide();
+            fadeContainer.Hide();
+        }
+
+        public override void Show()
+        {
+            base.Show();
+            fadeContainer.Show();
+        }
 
         protected override void LoadComplete()
         {
@@ -104,30 +118,25 @@ namespace osu.Game.Screens.Play
 
             button.Action = () => RequestSkip?.Invoke();
             displayTime = gameplayClock.CurrentTime;
-
-            Show();
         }
-
-        protected override void PopIn() => this.FadeIn(fade_time);
-
-        protected override void PopOut() => this.FadeOut(fade_time);
 
         protected override void Update()
         {
             base.Update();
 
-            var progress = Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
+            var progress = fadeOutBeginTime <= displayTime ? 1 : Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
 
             remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
             button.Enabled.Value = progress > 0;
-            State.Value = progress > 0 ? Visibility.Visible : Visibility.Hidden;
+            buttonContainer.State.Value = progress > 0 ? Visibility.Visible : Visibility.Hidden;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             if (!e.HasAnyButtonPressed)
                 fadeContainer.Show();
+
             return base.OnMouseMove(e);
         }
 
@@ -136,6 +145,9 @@ namespace osu.Game.Screens.Play
             switch (action)
             {
                 case GlobalAction.SkipCutscene:
+                    if (!button.Enabled.Value)
+                        return false;
+
                     button.Click();
                     return true;
             }
@@ -143,9 +155,11 @@ namespace osu.Game.Screens.Play
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
-        private class FadeContainer : Container, IStateful<Visibility>
+        public class FadeContainer : Container, IStateful<Visibility>
         {
             public event Action<Visibility> StateChanged;
 
@@ -168,7 +182,7 @@ namespace osu.Game.Screens.Play
                     switch (state)
                     {
                         case Visibility.Visible:
-                            // we may be triggered to become visible mnultiple times but we only want to transform once.
+                            // we may be triggered to become visible multiple times but we only want to transform once.
                             if (stateChanged)
                                 this.FadeIn(500, Easing.OutExpo);
 
@@ -202,15 +216,21 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
                 Show();
-                return true;
             }
 
             public override void Hide() => State = Visibility.Hidden;
 
             public override void Show() => State = Visibility.Visible;
+        }
+
+        private class ButtonContainer : VisibilityContainer
+        {
+            protected override void PopIn() => this.FadeIn(fade_time);
+
+            protected override void PopOut() => this.FadeOut(fade_time);
         }
 
         private class Button : OsuClickableContainer
@@ -222,7 +242,7 @@ namespace osu.Game.Screens.Play
             private Box background;
             private AspectContainer aspect;
 
-            private SampleChannel sampleConfirm;
+            private Sample sampleConfirm;
 
             public Button()
             {
@@ -311,10 +331,10 @@ namespace osu.Game.Screens.Play
                 return base.OnMouseDown(e);
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
                 aspect.ScaleTo(1, 1000, Easing.OutElastic);
-                return base.OnMouseUp(e);
+                base.OnMouseUp(e);
             }
 
             protected override bool OnClick(ClickEvent e)

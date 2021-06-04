@@ -27,10 +27,10 @@ namespace osu.Game.Screens.Play
             return base.OnKeyDown(e);
         }
 
-        protected override bool OnKeyUp(KeyUpEvent e)
+        protected override void OnKeyUp(KeyUpEvent e)
         {
             if (e.Key == Key) IsLit = false;
-            return base.OnKeyUp(e);
+            base.OnKeyUp(e);
         }
     }
 }

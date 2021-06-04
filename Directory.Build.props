@@ -16,9 +16,9 @@
     <EmbeddedResource Include="Resources\**\*.*" />
   </ItemGroup>
   <ItemGroup Label="Code Analysis">
-    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="2.9.8" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.2" PrivateAssets="All" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)CodeAnalysis\BannedSymbols.txt" />
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.0.3" PrivateAssets="All" />
   </ItemGroup>
   <PropertyGroup Label="Code Analysis">
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodeAnalysis\osu.ruleset</CodeAnalysisRuleSet>
@@ -28,9 +28,17 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Label="Project">
-    <!-- DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway.
-    This is required due to https://github.com/NuGet/Home/issues/5740 -->
-    <NoWarn>$(NoWarn);NU1701</NoWarn>
+    <!--
+    NU1701:
+      DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway.
+      This is required due to https://github.com/NuGet/Home/issues/5740
+
+    CA9998:
+      Microsoft.CodeAnalysis.FxCopAnalyzers has been deprecated.
+      The entire package will be able to be removed after migrating to .NET 5,
+      as analysers are shipped as part of the .NET 5 SDK anyway.
+    -->
+    <NoWarn>$(NoWarn);NU1701;CA9998</NoWarn>
   </PropertyGroup>
   <PropertyGroup Label="Nuget">
     <IsPackable>false</IsPackable>
@@ -40,7 +48,7 @@
     <RepositoryUrl>https://github.com/ppy/osu</RepositoryUrl>
     <PackageReleaseNotes>Automated release.</PackageReleaseNotes>
     <Company>ppy Pty Ltd</Company>
-    <Copyright>Copyright (c) 2019 ppy Pty Ltd</Copyright>
+    <Copyright>Copyright (c) 2021 ppy Pty Ltd</Copyright>
     <PackageTags>osu game</PackageTags>
   </PropertyGroup>
 </Project>

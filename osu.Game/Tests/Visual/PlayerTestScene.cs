@@ -1,27 +1,26 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
     public abstract class PlayerTestScene : RateAdjustedBeatmapTestScene
     {
-        private readonly Ruleset ruleset;
+        /// <summary>
+        /// Whether custom test steps are provided. Custom tests should invoke <see cref="CreateTest"/> to create the test steps.
+        /// </summary>
+        protected virtual bool HasCustomSteps => false;
 
-        protected Player Player;
-
-        protected PlayerTestScene(Ruleset ruleset)
-        {
-            this.ruleset = ruleset;
-        }
+        protected TestPlayer Player;
 
         protected OsuConfigManager LocalConfig;
 
@@ -33,9 +32,22 @@ namespace osu.Game.Tests.Visual
         }
 
         [SetUpSteps]
-        public virtual void SetUpSteps()
+        public override void SetUpSteps()
         {
-            AddStep(ruleset.RulesetInfo.Name, loadPlayer);
+            base.SetUpSteps();
+
+            if (!HasCustomSteps)
+                CreateTest(null);
+        }
+
+        protected void CreateTest(Action action)
+        {
+            if (action != null && !HasCustomSteps)
+                throw new InvalidOperationException($"Cannot add custom test steps without {nameof(HasCustomSteps)} being set.");
+
+            action?.Invoke();
+
+            AddStep(CreatePlayerRuleset().Description, LoadPlayer);
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
         }
 
@@ -43,11 +55,13 @@ namespace osu.Game.Tests.Visual
 
         protected virtual bool Autoplay => false;
 
-        private void loadPlayer()
+        protected void LoadPlayer()
         {
+            var ruleset = Ruleset.Value.CreateInstance();
             var beatmap = CreateBeatmap(ruleset.RulesetInfo);
 
             Beatmap.Value = CreateWorkingBeatmap(beatmap);
+            SelectedMods.Value = Array.Empty<Mod>();
 
             if (!AllowFail)
             {
@@ -67,6 +81,20 @@ namespace osu.Game.Tests.Visual
             LoadScreen(Player);
         }
 
-        protected virtual Player CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false);
+        protected override void Dispose(bool isDisposing)
+        {
+            LocalConfig?.Dispose();
+            base.Dispose(isDisposing);
+        }
+
+        /// <summary>
+        /// Creates the ruleset for setting up the <see cref="Player"/> component.
+        /// </summary>
+        [NotNull]
+        protected abstract Ruleset CreatePlayerRuleset();
+
+        protected sealed override Ruleset CreateRuleset() => CreatePlayerRuleset();
+
+        protected virtual TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false, false);
     }
 }

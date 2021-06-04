@@ -11,6 +11,8 @@ using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Input.Events;
+using System.Linq;
 
 namespace osu.Game.Screens.Select.Options
 {
@@ -26,33 +28,6 @@ namespace osu.Game.Screens.Select.Options
         private readonly FillFlowContainer<BeatmapOptionsButton> buttonsContainer;
 
         public override bool BlockScreenWideMouse => false;
-
-        protected override void PopIn()
-        {
-            base.PopIn();
-
-            this.FadeIn(transition_duration, Easing.OutQuint);
-
-            if (buttonsContainer.Position.X == 1 || Alpha == 0)
-                buttonsContainer.MoveToX(x_position - x_movement);
-
-            holder.ScaleTo(new Vector2(1, 1), transition_duration / 2, Easing.OutQuint);
-
-            buttonsContainer.MoveToX(x_position, transition_duration, Easing.OutQuint);
-            buttonsContainer.TransformSpacingTo(Vector2.Zero, transition_duration, Easing.OutQuint);
-        }
-
-        protected override void PopOut()
-        {
-            base.PopOut();
-
-            holder.ScaleTo(new Vector2(1, 0), transition_duration / 2, Easing.InSine);
-
-            buttonsContainer.MoveToX(x_position + x_movement, transition_duration, Easing.InSine);
-            buttonsContainer.TransformSpacingTo(new Vector2(200f, 0f), transition_duration, Easing.InSine);
-
-            this.FadeOut(transition_duration, Easing.InQuint);
-        }
 
         public BeatmapOptionsOverlay()
         {
@@ -87,9 +62,8 @@ namespace osu.Game.Screens.Select.Options
         /// <param name="secondLine">Text in the second line.</param>
         /// <param name="colour">Colour of the button.</param>
         /// <param name="icon">Icon of the button.</param>
-        /// <param name="hotkey">Hotkey of the button.</param>
         /// <param name="action">Binding the button does.</param>
-        public void AddButton(string firstLine, string secondLine, IconUsage icon, Color4 colour, Action action, Key? hotkey = null)
+        public void AddButton(string firstLine, string secondLine, IconUsage icon, Color4 colour, Action action)
         {
             var button = new BeatmapOptionsButton
             {
@@ -102,10 +76,58 @@ namespace osu.Game.Screens.Select.Options
                     Hide();
                     action?.Invoke();
                 },
-                HotKey = hotkey
             };
 
             buttonsContainer.Add(button);
+        }
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+
+            this.FadeIn(transition_duration, Easing.OutQuint);
+
+            if (buttonsContainer.Position.X == 1 || Alpha == 0)
+                buttonsContainer.MoveToX(x_position - x_movement);
+
+            holder.ScaleTo(new Vector2(1, 1), transition_duration / 2, Easing.OutQuint);
+
+            buttonsContainer.MoveToX(x_position, transition_duration, Easing.OutQuint);
+            buttonsContainer.TransformSpacingTo(Vector2.Zero, transition_duration, Easing.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            base.PopOut();
+
+            holder.ScaleTo(new Vector2(1, 0), transition_duration / 2, Easing.InSine);
+
+            buttonsContainer.MoveToX(x_position + x_movement, transition_duration, Easing.InSine);
+            buttonsContainer.TransformSpacingTo(new Vector2(200f, 0f), transition_duration, Easing.InSine);
+
+            this.FadeOut(transition_duration, Easing.InQuint);
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            // don't absorb control as ToolbarRulesetSelector uses control + number to navigate
+            if (e.ControlPressed) return false;
+
+            if (!e.Repeat && e.Key >= Key.Number1 && e.Key <= Key.Number9)
+            {
+                int requested = e.Key - Key.Number1;
+
+                // go reverse as buttonsContainer is a ReverseChildIDFillFlowContainer
+                BeatmapOptionsButton found = buttonsContainer.Children.ElementAtOrDefault((buttonsContainer.Children.Count - 1) - requested);
+
+                if (found != null)
+                {
+                    found.Click();
+                    return true;
+                }
+            }
+
+            return base.OnKeyDown(e);
         }
     }
 }
