@@ -54,9 +54,9 @@ namespace osu.Game.Overlays.Wiki
             [Resolved]
             private OverlayScrollContainer scrollContainer { get; set; }
 
-            private readonly OsuSpriteText spriteText;
-
             private readonly MarkdownHeading target;
+
+            private readonly OsuTextFlowContainer textFlow;
 
             public TocTitle(string text, MarkdownHeading target, bool subtitle = false)
             {
@@ -64,16 +64,20 @@ namespace osu.Game.Overlays.Wiki
 
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                Child = spriteText = new OsuSpriteText
+                Child = textFlow = new OsuTextFlowContainer(t =>
                 {
-                    Text = text,
-                    Font = OsuFont.GetFont(size: subtitle ? 12 : 15),
-                };
+                    t.Font = OsuFont.GetFont(size: subtitle ? 12 : 15);
+                }).With(f =>
+                {
+                    f.AddText(text);
+                    f.RelativeSizeAxes = Axes.X;
+                    f.AutoSizeAxes = Axes.Y;
+                });
                 Margin = new MarginPadding { Top = subtitle ? 5 : 10 };
                 Padding = new MarginPadding { Left = subtitle ? 10 : 0 };
             }
 
-            protected override IEnumerable<Drawable> EffectTargets => new Drawable[] { spriteText };
+            protected override IEnumerable<Drawable> EffectTargets => new Drawable[] { textFlow };
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
