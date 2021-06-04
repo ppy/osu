@@ -45,7 +45,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 new KiaiFlash
                 {
                     RelativeSizeAxes = Axes.Both,
-                    FlashOpacity = 0.25f,
                 },
                 triangles = new TrianglesPiece
                 {
