@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Wiki
                             Left = 30,
                             Right = 50,
                         },
-                        OnAddHeading = sidebar.AddToc,
+                        OnAddHeading = sidebar.AddEntry,
                     }
                 },
             };

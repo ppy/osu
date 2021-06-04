@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Online
                 Level = subtitle ? 3 : 2,
             };
             var heading = new OsuMarkdownHeading(headingBlock);
-            sidebar.AddToc(headingBlock, heading);
+            sidebar.AddEntry(headingBlock, heading);
         }
     }
 }
