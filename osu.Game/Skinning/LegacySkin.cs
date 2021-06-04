@@ -425,7 +425,7 @@ namespace osu.Game.Skinning
                         case GameplaySkinSamples.ResultApplause_SS:
                             if (applause != null)
                                 // Legacy skins don't have sounds for the result screen, but may instead have an 'applause' sound.
-                                // This lets a legacy skin's applause sound play instead of  result screen sounds (as to not play over each other)
+                                // This lets a legacy skin's applause sound play instead of result screen sounds (as to not play over each other)
                                 return Drawable.Empty();
 
                             break;
