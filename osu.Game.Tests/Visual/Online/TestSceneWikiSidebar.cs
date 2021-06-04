@@ -3,9 +3,11 @@
 
 using Markdig.Parsers;
 using Markdig.Syntax;
+using Markdig.Syntax.Inlines;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Game.Graphics.Containers.Markdown;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Wiki;
 
@@ -20,8 +22,6 @@ namespace osu.Game.Tests.Visual.Online
         private readonly OverlayScrollContainer scrollContainer = new OverlayScrollContainer();
 
         private WikiSidebar sidebar;
-
-        private readonly MarkdownHeading dummyHeading = new MarkdownHeading(new HeadingBlock(new HeadingBlockParser()));
 
         [SetUp]
         public void SetUp() => Schedule(() => Child = sidebar = new WikiSidebar());
@@ -38,9 +38,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Add TOC", () =>
             {
                 for (var i = 0; i < 10; i++)
-                {
-                    sidebar.AddToc($"This is a very long title {i + 1}", dummyHeading, 2);
-                }
+                    addTitle($"This is a very long title {i + 1}");
             });
         }
 
@@ -49,11 +47,23 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Add TOC", () =>
             {
-                for (var i = 0; i < 20; i++)
-                {
-                    sidebar.AddToc($"This is a very long title {i + 1}", dummyHeading, i % 4 == 0 ? 2 : 3);
-                }
+                for (var i = 0; i < 10; i++)
+                    addTitle($"This is a very long title {i + 1}", i % 4 != 0);
             });
         }
+
+        private void addTitle(string text, bool subtitle = false)
+        {
+            var headingBlock = createHeadingBlock(text, subtitle ? 3 : 2);
+            sidebar.AddToc(headingBlock, createHeading(headingBlock));
+        }
+
+        private HeadingBlock createHeadingBlock(string text, int level = 2) => new HeadingBlock(new HeadingBlockParser())
+        {
+            Inline = new ContainerInline().AppendChild(new LiteralInline(text)),
+            Level = level,
+        };
+
+        private MarkdownHeading createHeading(HeadingBlock headingBlock) => new OsuMarkdownHeading(headingBlock);
     }
 }
