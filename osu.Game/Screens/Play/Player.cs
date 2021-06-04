@@ -657,6 +657,9 @@ namespace osu.Game.Screens.Play
 
             ValidForResume = false;
 
+            // ensure we are not writing to the replay any more, as we are about to consume and store the score.
+            DrawableRuleset.SetRecordTarget(null);
+
             if (!Configuration.ShowResults) return;
 
             prepareScoreForDisplayTask ??= Task.Run(async () =>
