@@ -64,6 +64,8 @@ namespace osu.Game.Overlays.Wiki
                     Text = text,
                     Font = OsuFont.GetFont(size: subtitle ? 12 : 15),
                 };
+                Margin = new MarginPadding { Top = subtitle ? 5 : 10 };
+                Padding = new MarginPadding { Left = subtitle ? 10 : 0 };
             }
 
             protected override IEnumerable<Drawable> EffectTargets => new Drawable[] { spriteText };
