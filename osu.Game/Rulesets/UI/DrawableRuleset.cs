@@ -68,10 +68,7 @@ namespace osu.Game.Rulesets.UI
 
         private bool frameStablePlayback = true;
 
-        /// <summary>
-        /// Whether to enable frame-stable playback.
-        /// </summary>
-        internal bool FrameStablePlayback
+        internal override bool FrameStablePlayback
         {
             get => frameStablePlayback;
             set
@@ -430,6 +427,11 @@ namespace osu.Game.Rulesets.UI
         /// The frame-stable clock which is being used for playfield display.
         /// </summary>
         public abstract IFrameStableClock FrameStableClock { get; }
+
+        /// <summary>
+        /// Whether to enable frame-stable playback.
+        /// </summary>
+        internal abstract bool FrameStablePlayback { get; set; }
 
         /// <summary>
         /// The mods which are to be applied.
