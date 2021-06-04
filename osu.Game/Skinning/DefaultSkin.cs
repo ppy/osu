@@ -25,6 +25,27 @@ namespace osu.Game.Skinning
     {
         private readonly IStorageResourceProvider resources;
 
+        private static readonly IReadOnlyDictionary<GameplaySkinSamples, string> sample_mapping
+            = new Dictionary<GameplaySkinSamples, string>
+            {
+                { GameplaySkinSamples.ResultScoreTick, @"Results/score-tick" },
+                { GameplaySkinSamples.ResultBadgeTick, @"Results/badge-dink" },
+                { GameplaySkinSamples.ResultBadgeTickMax, @"Results/badge-dink-max" },
+                { GameplaySkinSamples.ResultSwooshUp, @"Results/swoosh-up" },
+                { GameplaySkinSamples.ResultRank_D, @"Results/rank-impact-fail-d" },
+                { GameplaySkinSamples.ResultRank_B, @"Results/rank-impact-fail" },
+                { GameplaySkinSamples.ResultRank_C, @"Results/rank-impact-fail" },
+                { GameplaySkinSamples.ResultRank_A, @"Results/rank-impact-pass" },
+                { GameplaySkinSamples.ResultRank_S, @"Results/rank-impact-pass" },
+                { GameplaySkinSamples.ResultRank_SS, @"Results/rank-impact-pass-ss" },
+                { GameplaySkinSamples.ResultApplause_D, @"Results/applause-d" },
+                { GameplaySkinSamples.ResultApplause_B, @"Results/applause-b" },
+                { GameplaySkinSamples.ResultApplause_C, @"Results/applause-c" },
+                { GameplaySkinSamples.ResultApplause_A, @"Results/applause-a" },
+                { GameplaySkinSamples.ResultApplause_S, @"Results/applause-s" },
+                { GameplaySkinSamples.ResultApplause_SS, @"Results/applause-s" }
+            };
+
         public DefaultSkin(IStorageResourceProvider resources)
             : this(SkinInfo.Default, resources)
         {
@@ -60,56 +81,8 @@ namespace osu.Game.Skinning
             switch (component)
             {
                 case GameplaySkinComponent<GameplaySkinSamples> sample:
-                    switch (sample.Component)
-                    {
-                        case GameplaySkinSamples.ResultScoreTick:
-                            return new DrawableSample(GetSample(new SampleInfo("Results/score-tick")));
-
-                        case GameplaySkinSamples.ResultBadgeTick:
-                            return new DrawableSample(GetSample(new SampleInfo("Results/badge-dink")));
-
-                        case GameplaySkinSamples.ResultBadgeTickMax:
-                            return new DrawableSample(GetSample(new SampleInfo("Results/badge-dink-max")));
-
-                        case GameplaySkinSamples.ResultSwooshUp:
-                            return new DrawableSample(GetSample(new SampleInfo("Results/swoosh-up")));
-
-                        case GameplaySkinSamples.ResultRank_D:
-                            return new DrawableSample(GetSample(new SampleInfo("Results/rank-impact-fail-d")));
-
-                        case GameplaySkinSamples.ResultRank_B:
-                            return new DrawableSample(GetSample(new SampleInfo("Results/rank-impact-fail")));
-
-                        case GameplaySkinSamples.ResultRank_C:
-                            return new DrawableSample(GetSample(new SampleInfo("Results/rank-impact-fail")));
-
-                        case GameplaySkinSamples.ResultRank_A:
-                            return new DrawableSample(GetSample(new SampleInfo("Results/rank-impact-pass")));
-
-                        case GameplaySkinSamples.ResultRank_S:
-                            return new DrawableSample(GetSample(new SampleInfo("Results/rank-impact-pass")));
-
-                        case GameplaySkinSamples.ResultRank_SS:
-                            return new DrawableSample(GetSample(new SampleInfo("Results/rank-impact-pass-ss")));
-
-                        case GameplaySkinSamples.ResultApplause_D:
-                            return new DrawableSample(GetSample(new SampleInfo("Results/applause-d")));
-
-                        case GameplaySkinSamples.ResultApplause_B:
-                            return new DrawableSample(GetSample(new SampleInfo("Results/applause-b")));
-
-                        case GameplaySkinSamples.ResultApplause_C:
-                            return new DrawableSample(GetSample(new SampleInfo("Results/applause-c")));
-
-                        case GameplaySkinSamples.ResultApplause_A:
-                            return new DrawableSample(GetSample(new SampleInfo("Results/applause-a")));
-
-                        case GameplaySkinSamples.ResultApplause_S:
-                            return new DrawableSample(GetSample(new SampleInfo("Results/applause-s")));
-
-                        case GameplaySkinSamples.ResultApplause_SS:
-                            return new DrawableSample(GetSample(new SampleInfo("Results/applause-s")));
-                    }
+                    if (sample_mapping.ContainsKey(sample.Component))
+                        return new DrawableSample(GetSample(new SampleInfo(sample_mapping[sample.Component])));
 
                     break;
 
