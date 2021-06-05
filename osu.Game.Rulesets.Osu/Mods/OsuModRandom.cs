@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
@@ -22,9 +23,6 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Description => "It never gets boring!";
         public override bool Ranked => false;
-
-        // How often per second getMinSliderMargin() checks if the slider is outside of the playfield
-        private const float slider_path_checking_rate = 10;
 
         // The relative distance to the edge of the playfield before objects' positions should start to "turn around" and curve towards the middle.
         // The closer the hit objects draw to the border, the sharper the turn
@@ -154,31 +152,24 @@ namespace osu.Game.Rulesets.Osu.Mods
         private MarginPadding getMinSliderMargin(Slider slider)
         {
             var minMargin = new MarginPadding();
-            Vector2 pos;
 
-            for (double i = 0; i <= 1; i += 1 / (slider_path_checking_rate / 1000 * (slider.EndTime - slider.StartTime)))
-            {
-                pos = slider.Path.PositionAt(i);
-                updateMargin();
-            }
+            var pathPositions = new List<Vector2>();
+            slider.Path.GetPathToProgress(pathPositions, 0, 1);
+
+            foreach (var pos in pathPositions)
+                updateMargin(pos);
 
             var repeat = (SliderRepeat)slider.NestedHitObjects.FirstOrDefault(o => o is SliderRepeat);
 
             if (repeat != null)
-            {
-                pos = repeat.Position - slider.Position;
-                updateMargin();
-            }
-
-            pos = slider.Path.PositionAt(1);
-            updateMargin();
+                updateMargin(repeat.Position - slider.Position);
 
             minMargin.Left = Math.Min(minMargin.Left, OsuPlayfield.BASE_SIZE.X - minMargin.Right);
             minMargin.Top = Math.Min(minMargin.Top, OsuPlayfield.BASE_SIZE.Y - minMargin.Bottom);
 
             return minMargin;
 
-            void updateMargin()
+            void updateMargin(Vector2 pos)
             {
                 minMargin.Left = Math.Max(minMargin.Left, -pos.X);
                 minMargin.Right = Math.Max(minMargin.Right, pos.X);
