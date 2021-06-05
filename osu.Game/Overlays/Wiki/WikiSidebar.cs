@@ -61,8 +61,11 @@ namespace osu.Game.Overlays.Wiki
                     case LiteralInline literalInline:
                         return literalInline.Content.ToString();
 
-                    case LinkInline { IsImage: false } linkInline:
-                        return getTitle(linkInline);
+                    case LinkInline linkInline:
+                        if (!linkInline.IsImage)
+                            return getTitle(linkInline);
+
+                        break;
                 }
             }
 
