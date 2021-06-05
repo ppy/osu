@@ -36,19 +36,18 @@ namespace osu.Game.Online.Chat
         private Bindable<bool> notifyOnMention;
         private Bindable<bool> notifyOnPM;
         private readonly IBindable<User> localUser = new Bindable<User>();
-        private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
+        private readonly IBindableList<Channel> joinedChannels = new BindableList<Channel>();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, IAPIProvider api)
         {
             notifyOnMention = config.GetBindable<bool>(OsuSetting.ChatHighlightName);
             notifyOnPM = config.GetBindable<bool>(OsuSetting.ChatMessageNotification);
-            api.LocalUser.BindTo(localUser);
+            localUser.BindTo(api.LocalUser);
 
             // Listen for new messages
             joinedChannels.CollectionChanged += channelsChanged;
-
-            channelManager.JoinedChannels.BindTo(joinedChannels);
+            joinedChannels.BindTo(channelManager.JoinedChannels);
         }
 
         private void channelsChanged(object sender, NotifyCollectionChangedEventArgs e)
