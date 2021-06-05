@@ -11,11 +11,11 @@ namespace osu.Game.Online.API.Requests
 {
     public class CreateChannelRequest : APIRequest<APIChatChannel>
     {
-        private readonly Channel channel;
+        public readonly Channel Channel;
 
         public CreateChannelRequest(Channel channel)
         {
-            this.channel = channel;
+            Channel = channel;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -24,7 +24,7 @@ namespace osu.Game.Online.API.Requests
             req.Method = HttpMethod.Post;
 
             req.AddParameter("type", $"{ChannelType.PM}");
-            req.AddParameter("target_id", $"{channel.Users.First().Id}");
+            req.AddParameter("target_id", $"{Channel.Users.First().Id}");
 
             return req;
         }
