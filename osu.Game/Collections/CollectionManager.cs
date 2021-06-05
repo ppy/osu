@@ -58,8 +58,13 @@ namespace osu.Game.Collections
 
             if (storage.Exists(database_name))
             {
+                List<BeatmapCollection> beatmapCollections;
+
                 using (var stream = storage.GetStream(database_name))
-                    importCollections(readCollections(stream));
+                    beatmapCollections = readCollections(stream);
+
+                // intentionally fire-and-forget async.
+                importCollections(beatmapCollections);
             }
         }
 

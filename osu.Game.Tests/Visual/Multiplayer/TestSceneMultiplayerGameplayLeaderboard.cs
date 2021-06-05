@@ -73,8 +73,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 for (int i = 0; i < users; i++)
                     spectatorClient.StartPlay(i, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
 
-                Client.CurrentMatchPlayingUserIds.Clear();
-                Client.CurrentMatchPlayingUserIds.AddRange(spectatorClient.PlayingUsers);
+                spectatorClient.Schedule(() =>
+                {
+                    Client.CurrentMatchPlayingUserIds.Clear();
+                    Client.CurrentMatchPlayingUserIds.AddRange(spectatorClient.PlayingUsers);
+                });
 
                 Children = new Drawable[]
                 {
@@ -91,6 +94,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for load", () => leaderboard.IsLoaded);
+            AddUntilStep("wait for user population", () => Client.CurrentMatchPlayingUserIds.Count > 0);
         }
 
         [Test]

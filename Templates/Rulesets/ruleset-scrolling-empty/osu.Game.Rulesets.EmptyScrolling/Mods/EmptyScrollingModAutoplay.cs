@@ -3,7 +3,6 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.EmptyScrolling.Objects;
 using osu.Game.Rulesets.EmptyScrolling.Replays;
 using osu.Game.Scoring;
 using osu.Game.Users;
@@ -11,7 +10,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.EmptyScrolling.Mods
 {
-    public class EmptyScrollingModAutoplay : ModAutoplay<EmptyScrollingHitObject>
+    public class EmptyScrollingModAutoplay : ModAutoplay
     {
         public override Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score
         {

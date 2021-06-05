@@ -4,14 +4,13 @@
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Pippidon.Objects;
 using osu.Game.Rulesets.Pippidon.Replays;
 using osu.Game.Scoring;
 using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Pippidon.Mods
 {
-    public class PippidonModAutoplay : ModAutoplay<PippidonHitObject>
+    public class PippidonModAutoplay : ModAutoplay
     {
         public override Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score
         {
