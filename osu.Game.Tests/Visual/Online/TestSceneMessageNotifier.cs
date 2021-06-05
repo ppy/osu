@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -9,6 +10,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -29,12 +32,9 @@ namespace osu.Game.Tests.Visual.Online
         [SetUp]
         public void Setup()
         {
-            // We blindly mark every request as success so that ChannelManager doesn't remove our channel again.
             if (API is DummyAPIAccess daa)
             {
-                daa.HandleRequest = (request) => {
-                    return true;
-                };
+                daa.HandleRequest = dummyAPIHandleRequest;
             }
 
             friend = new User { Id = 0, Username = "Friend" };
@@ -50,6 +50,32 @@ namespace osu.Game.Tests.Visual.Online
 
                 testContainer.ChatOverlay.Show();
             });
+        }
+
+        private bool dummyAPIHandleRequest(APIRequest request)
+        {
+            switch (request)
+            {
+                case GetMessagesRequest messagesRequest:
+                    messagesRequest.TriggerSuccess(new List<Message>(0));
+                    return true;
+
+                case CreateChannelRequest createChannelRequest:
+                    var apiChatChannel = new APIChatChannel
+                    {
+                        RecentMessages = new List<Message>(0),
+                        ChannelID = (int)createChannelRequest.Channel.Id
+                    };
+                    createChannelRequest.TriggerSuccess(apiChatChannel);
+                    return true;
+
+                case ListChannelsRequest listChannelsRequest:
+                    listChannelsRequest.TriggerSuccess(new List<Channel>(1) { publicChannel });
+                    return true;
+
+                default:
+                    return false;
+            }
         }
 
         [Test]
