@@ -151,31 +151,23 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// </summary>
         private MarginPadding getMinSliderMargin(Slider slider)
         {
-            var minMargin = new MarginPadding();
-
             var pathPositions = new List<Vector2>();
             slider.Path.GetPathToProgress(pathPositions, 0, 1);
 
+            var minMargin = new MarginPadding();
+
             foreach (var pos in pathPositions)
-                updateMargin(pos);
-
-            var repeat = (SliderRepeat)slider.NestedHitObjects.FirstOrDefault(o => o is SliderRepeat);
-
-            if (repeat != null)
-                updateMargin(repeat.Position - slider.Position);
-
-            minMargin.Left = Math.Min(minMargin.Left, OsuPlayfield.BASE_SIZE.X - minMargin.Right);
-            minMargin.Top = Math.Min(minMargin.Top, OsuPlayfield.BASE_SIZE.Y - minMargin.Bottom);
-
-            return minMargin;
-
-            void updateMargin(Vector2 pos)
             {
                 minMargin.Left = Math.Max(minMargin.Left, -pos.X);
                 minMargin.Right = Math.Max(minMargin.Right, pos.X);
                 minMargin.Top = Math.Max(minMargin.Top, -pos.Y);
                 minMargin.Bottom = Math.Max(minMargin.Bottom, pos.Y);
             }
+
+            minMargin.Left = Math.Min(minMargin.Left, OsuPlayfield.BASE_SIZE.X - minMargin.Right);
+            minMargin.Top = Math.Min(minMargin.Top, OsuPlayfield.BASE_SIZE.Y - minMargin.Bottom);
+
+            return minMargin;
         }
 
         /// <summary>
