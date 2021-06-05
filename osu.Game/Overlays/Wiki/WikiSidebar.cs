@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -108,12 +107,6 @@ namespace osu.Game.Overlays.Wiki
                 IdleColour = colourProvider.Light2;
                 HoverColour = colourProvider.Light1;
                 Action = () => scrollContainer.ScrollTo(target);
-            }
-
-            protected override bool OnClick(ClickEvent e)
-            {
-                IdleColour = colourProvider.Light1;
-                return base.OnClick(e);
             }
         }
     }
