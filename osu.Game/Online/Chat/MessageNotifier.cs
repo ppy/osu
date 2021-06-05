@@ -76,9 +76,18 @@ namespace osu.Game.Online.Chat
             HandleMessages(messages.First().ChannelId, messages);
         }
 
+        /// <summary>
+        /// Searches for a channel with the matching <paramref name="channelId"/>, returns <see langword="null"/> when none found.
+        /// </summary>
+        private Channel fetchJoinedChannel(long channelId)
+        {
+            return channelManager.JoinedChannels.SingleOrDefault(c => c.Id == channelId);
+        }
+
         public void HandleMessages(long channelId, IEnumerable<Message> messages)
         {
-            var channel = channelManager.JoinedChannels.SingleOrDefault(c => c.Id == channelId);
+            // Fetch channel object
+            var channel = fetchJoinedChannel(channelId);
 
             if (channel == null)
             {
@@ -86,11 +95,6 @@ namespace osu.Game.Online.Chat
                 return;
             }
 
-            HandleMessages(channel, messages);
-        }
-
-        public void HandleMessages(Channel channel, IEnumerable<Message> messages)
-        {
             // Only send notifications, if ChatOverlay and the target channel aren't visible.
             if (chatOverlay?.IsPresent == true && channelManager.CurrentChannel.Value == channel)
                 return;
