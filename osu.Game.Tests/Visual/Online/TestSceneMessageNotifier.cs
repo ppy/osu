@@ -73,6 +73,18 @@ namespace osu.Game.Tests.Visual.Online
                     listChannelsRequest.TriggerSuccess(new List<Channel>(1) { publicChannel });
                     return true;
 
+                case GetUpdatesRequest updatesRequest:
+                    updatesRequest.TriggerSuccess(new GetUpdatesResponse
+                    {
+                        Messages = new List<Message>(0),
+                        Presence = new List<Channel>(0)
+                    });
+                    return true;
+
+                case JoinChannelRequest joinChannelRequest:
+                    joinChannelRequest.TriggerSuccess();
+                    return true;
+
                 default:
                     return false;
             }
