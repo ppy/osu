@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -28,6 +29,14 @@ namespace osu.Game.Tests.Visual.Online
         [SetUp]
         public void Setup()
         {
+            // We blindly mark every request as success so that ChannelManager doesn't remove our channel again.
+            if (API is DummyAPIAccess daa)
+            {
+                daa.HandleRequest = (request) => {
+                    return true;
+                };
+            }
+
             friend = new User { Id = 0, Username = "Friend" };
             publicChannel = new Channel { Id = 1, Name = "osu" };
             privateMessageChannel = new Channel(friend) { Id = 2, Name = friend.Username, Type = ChannelType.PM };
