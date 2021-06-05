@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -25,9 +26,9 @@ using osu.Game.Users;
 namespace osu.Game.Tests.Beatmaps
 {
     [HeadlessTest]
-    public abstract class HitObjectSampleTest : PlayerTestScene
+    public abstract class HitObjectSampleTest : PlayerTestScene, IStorageResourceProvider
     {
-        protected abstract IResourceStore<byte[]> Resources { get; }
+        protected abstract IResourceStore<byte[]> RulesetResources { get; }
         protected LegacySkin Skin { get; private set; }
 
         [Resolved]
@@ -58,7 +59,7 @@ namespace osu.Game.Tests.Beatmaps
         protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => currentTestBeatmap;
 
         protected sealed override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
-            => new TestWorkingBeatmap(beatmapInfo, beatmapSkinResourceStore, beatmap, storyboard, Clock, Audio);
+            => new TestWorkingBeatmap(beatmapInfo, beatmapSkinResourceStore, beatmap, storyboard, Clock, this);
 
         protected override TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false);
 
@@ -74,7 +75,7 @@ namespace osu.Game.Tests.Beatmaps
 
                 AddStep($"load {filename}", () =>
                 {
-                    using (var reader = new LineBufferedReader(Resources.GetStream($"Resources/SampleLookups/{filename}")))
+                    using (var reader = new LineBufferedReader(RulesetResources.GetStream($"Resources/SampleLookups/{filename}")))
                         currentTestBeatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
 
                     // populate ruleset for beatmap converters that require it to be present.
@@ -109,7 +110,7 @@ namespace osu.Game.Tests.Beatmaps
                 };
 
                 // Need to refresh the cached skin source to refresh the skin resource store.
-                dependencies.SkinSource = new SkinProvidingContainer(Skin = new LegacySkin(userSkinInfo, userSkinResourceStore, Audio));
+                dependencies.SkinSource = new SkinProvidingContainer(Skin = new LegacySkin(userSkinInfo, this));
             });
         }
 
@@ -121,6 +122,15 @@ namespace osu.Game.Tests.Beatmaps
 
         protected void AssertNoLookup(string name) => AddAssert($"\"{name}\" not looked up",
             () => !beatmapSkinResourceStore.PerformedLookups.Contains(name) && !userSkinResourceStore.PerformedLookups.Contains(name));
+
+        #region IResourceStorageProvider
+
+        public AudioManager AudioManager => Audio;
+        public IResourceStore<byte[]> Files => userSkinResourceStore;
+        public new IResourceStore<byte[]> Resources => base.Resources;
+        public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
+
+        #endregion
 
         private class SkinSourceDependencyContainer : IReadOnlyDependencyContainer
         {
@@ -191,14 +201,17 @@ namespace osu.Game.Tests.Beatmaps
             private readonly BeatmapInfo skinBeatmapInfo;
             private readonly IResourceStore<byte[]> resourceStore;
 
-            public TestWorkingBeatmap(BeatmapInfo skinBeatmapInfo, IResourceStore<byte[]> resourceStore, IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio)
-                : base(beatmap, storyboard, referenceClock, audio)
+            private readonly IStorageResourceProvider resources;
+
+            public TestWorkingBeatmap(BeatmapInfo skinBeatmapInfo, IResourceStore<byte[]> resourceStore, IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, IStorageResourceProvider resources)
+                : base(beatmap, storyboard, referenceClock, resources.AudioManager)
             {
                 this.skinBeatmapInfo = skinBeatmapInfo;
                 this.resourceStore = resourceStore;
+                this.resources = resources;
             }
 
-            protected override ISkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, resourceStore, AudioManager);
+            protected override ISkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, resourceStore, resources);
         }
     }
 }

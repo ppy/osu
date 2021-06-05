@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -17,6 +19,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -37,6 +40,9 @@ namespace osu.Game.Rulesets.Taiko.UI
         private ScrollingHitObjectContainer drumRollHitContainer;
         internal Drawable HitTarget;
         private SkinnableDrawable mascot;
+
+        private readonly IDictionary<HitResult, DrawablePool<DrawableTaikoJudgement>> judgementPools = new Dictionary<HitResult, DrawablePool<DrawableTaikoJudgement>>();
+        private readonly IDictionary<HitResult, HitExplosionPool> explosionPools = new Dictionary<HitResult, HitExplosionPool>();
 
         private ProxyContainer topLevelHitContainer;
         private Container rightArea;
@@ -147,6 +153,43 @@ namespace osu.Game.Rulesets.Taiko.UI
                 },
                 drumRollHitContainer.CreateProxy(),
             };
+
+            RegisterPool<Hit, DrawableHit>(50);
+            RegisterPool<Hit.StrongNestedHit, DrawableHit.StrongNestedHit>(50);
+
+            RegisterPool<DrumRoll, DrawableDrumRoll>(5);
+            RegisterPool<DrumRoll.StrongNestedHit, DrawableDrumRoll.StrongNestedHit>(5);
+
+            RegisterPool<DrumRollTick, DrawableDrumRollTick>(100);
+            RegisterPool<DrumRollTick.StrongNestedHit, DrawableDrumRollTick.StrongNestedHit>(100);
+
+            RegisterPool<Swell, DrawableSwell>(5);
+            RegisterPool<SwellTick, DrawableSwellTick>(100);
+
+            var hitWindows = new TaikoHitWindows();
+
+            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => hitWindows.IsHitResultAllowed(r)))
+            {
+                judgementPools.Add(result, new DrawablePool<DrawableTaikoJudgement>(15));
+                explosionPools.Add(result, new HitExplosionPool(result));
+            }
+
+            AddRangeInternal(judgementPools.Values);
+            AddRangeInternal(explosionPools.Values);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            NewResult += OnNewResult;
+        }
+
+        protected override void OnNewDrawableHitObject(DrawableHitObject drawableHitObject)
+        {
+            base.OnNewDrawableHitObject(drawableHitObject);
+
+            var taikoObject = (DrawableTaikoHitObject)drawableHitObject;
+            topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
         }
 
         protected override void Update()
@@ -207,9 +250,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     barLinePlayfield.Add(barLine);
                     break;
 
-                case DrawableTaikoHitObject taikoObject:
-                    h.OnNewResult += OnNewResult;
-                    topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
+                case DrawableTaikoHitObject _:
                     base.Add(h);
                     break;
 
@@ -226,8 +267,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                     return barLinePlayfield.Remove(barLine);
 
                 case DrawableTaikoHitObject _:
-                    h.OnNewResult -= OnNewResult;
-                    // todo: consider tidying of proxied content if required.
                     return base.Remove(h);
 
                 default:
@@ -248,7 +287,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 case TaikoStrongJudgement _:
                     if (result.IsHit)
-                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).MainObject)?.VisualiseSecondHit();
+                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).ParentHitObject)?.VisualiseSecondHit(result);
                     break;
 
                 case TaikoDrumRollTickJudgement _:
@@ -261,13 +300,15 @@ namespace osu.Game.Rulesets.Taiko.UI
                     break;
 
                 default:
-                    judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)
+                    judgementContainer.Add(judgementPools[result.Type].Get(j =>
                     {
-                        Anchor = result.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
-                        Origin = result.IsHit ? Anchor.BottomCentre : Anchor.Centre,
-                        RelativePositionAxes = Axes.X,
-                        X = result.IsHit ? judgedObject.Position.X : 0,
-                    });
+                        j.Apply(result, judgedObject);
+
+                        j.Anchor = result.IsHit ? Anchor.TopLeft : Anchor.CentreLeft;
+                        j.Origin = result.IsHit ? Anchor.BottomCentre : Anchor.Centre;
+                        j.RelativePositionAxes = Axes.X;
+                        j.X = result.IsHit ? judgedObject.Position.X : 0;
+                    }));
 
                     var type = (judgedObject.HitObject as Hit)?.Type ?? HitType.Centre;
                     addExplosion(judgedObject, result.Type, type);
@@ -280,7 +321,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private void addExplosion(DrawableHitObject drawableObject, HitResult result, HitType type)
         {
-            hitExplosionContainer.Add(new HitExplosion(drawableObject, result));
+            hitExplosionContainer.Add(explosionPools[result]
+                .Get(explosion => explosion.Apply(drawableObject)));
             if (drawableObject.HitObject.Kiai)
                 kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
         }

@@ -11,7 +11,7 @@ using osu.Framework.Screens;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
-using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK;
@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Dashboard
         private FillFlowContainer<PlayingUserPanel> userFlow;
 
         [Resolved]
-        private SpectatorStreamingClient spectatorStreaming { get; set; }
+        private SpectatorClient spectatorClient { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Dashboard
         {
             base.LoadComplete();
 
-            playingUsers.BindTo(spectatorStreaming.PlayingUsers);
+            playingUsers.BindTo(spectatorClient.PlayingUsers);
             playingUsers.BindCollectionChanged(onUsersChanged, true);
         }
 
@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.Dashboard
                                 Text = "Watch",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Action = () => game?.PerformFromScreen(s => s.Push(new Spectator(User))),
+                                Action = () => game?.PerformFromScreen(s => s.Push(new SoloSpectator(User))),
                                 Enabled = { Value = User.Id != api.LocalUser.Value.Id }
                             }
                         }

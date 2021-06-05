@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osuTK;
 
 namespace osu.Game.Graphics.Sprites
@@ -14,7 +15,7 @@ namespace osu.Game.Graphics.Sprites
     {
         private readonly OsuSpriteText spriteText, blurredText;
 
-        public string Text
+        public LocalisableString Text
         {
             get => spriteText.Text;
             set => blurredText.Text = spriteText.Text = value;

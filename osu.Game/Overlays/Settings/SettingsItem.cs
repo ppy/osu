@@ -5,23 +5,19 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osuTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osuTK;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Settings
 {
-    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem, IHasCurrentValue<T>
+    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem, IHasCurrentValue<T>, IHasTooltip
     {
         protected abstract Drawable CreateControl();
 
@@ -35,9 +31,16 @@ namespace osu.Game.Overlays.Settings
 
         private SpriteText labelText;
 
+        private OsuTextFlowContainer warningText;
+
         public bool ShowsDefaultIndicator = true;
 
-        public virtual string LabelText
+        public string TooltipText { get; set; }
+
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        public virtual LocalisableString LabelText
         {
             get => labelText?.Text ?? string.Empty;
             set
@@ -54,11 +57,29 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        [Obsolete("Use Current instead")] // Can be removed 20210406
-        public Bindable<T> Bindable
+        /// <summary>
+        /// Text to be displayed at the bottom of this <see cref="SettingsItem{T}"/>.
+        /// Generally used to recommend the user change their setting as the current one is considered sub-optimal.
+        /// </summary>
+        public string WarningText
         {
-            get => Current;
-            set => Current = value;
+            set
+            {
+                if (warningText == null)
+                {
+                    // construct lazily for cases where the label is not needed (may be provided by the Control).
+                    FlowContent.Add(warningText = new OsuTextFlowContainer
+                    {
+                        Colour = colours.Yellow,
+                        Margin = new MarginPadding { Bottom = 5 },
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                    });
+                }
+
+                warningText.Alpha = string.IsNullOrWhiteSpace(value) ? 0 : 1;
+                warningText.Text = value;
+            }
         }
 
         public virtual Bindable<T> Current
@@ -67,7 +88,7 @@ namespace osu.Game.Overlays.Settings
             set => controlWithCurrent.Current = value;
         }
 
-        public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText } : new List<string>(Keywords) { LabelText }.ToArray();
+        public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText.ToString() } : new List<string>(Keywords) { LabelText.ToString() }.ToArray();
 
         public IEnumerable<string> Keywords { get; set; }
 
@@ -82,7 +103,7 @@ namespace osu.Game.Overlays.Settings
 
         protected SettingsItem()
         {
-            RestoreDefaultValueButton restoreDefaultButton;
+            RestoreDefaultValueButton<T> restoreDefaultButton;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -90,13 +111,16 @@ namespace osu.Game.Overlays.Settings
 
             InternalChildren = new Drawable[]
             {
-                restoreDefaultButton = new RestoreDefaultValueButton(),
+                restoreDefaultButton = new RestoreDefaultValueButton<T>(),
                 FlowContent = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
-                    Child = Control = CreateControl()
+                    Children = new[]
+                    {
+                        Control = CreateControl(),
+                    },
                 },
             };
 
@@ -108,7 +132,7 @@ namespace osu.Game.Overlays.Settings
                 controlWithCurrent.Current.DisabledChanged += _ => updateDisabled();
 
                 if (ShowsDefaultIndicator)
-                    restoreDefaultButton.Bindable = controlWithCurrent.Current;
+                    restoreDefaultButton.Current = controlWithCurrent.Current;
             }
         }
 
@@ -116,103 +140,6 @@ namespace osu.Game.Overlays.Settings
         {
             if (labelText != null)
                 labelText.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
-        }
-
-        private class RestoreDefaultValueButton : Container, IHasTooltip
-        {
-            private Bindable<T> bindable;
-
-            public Bindable<T> Bindable
-            {
-                get => bindable;
-                set
-                {
-                    bindable = value;
-                    bindable.ValueChanged += _ => UpdateState();
-                    bindable.DisabledChanged += _ => UpdateState();
-                    bindable.DefaultChanged += _ => UpdateState();
-                    UpdateState();
-                }
-            }
-
-            private Color4 buttonColour;
-
-            private bool hovering;
-
-            public RestoreDefaultValueButton()
-            {
-                RelativeSizeAxes = Axes.Y;
-                Width = SettingsPanel.CONTENT_MARGINS;
-                Alpha = 0f;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colour)
-            {
-                buttonColour = colour.Yellow;
-
-                Child = new Container
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    CornerRadius = 3,
-                    Masking = true,
-                    Colour = buttonColour,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Colour = buttonColour.Opacity(0.1f),
-                        Type = EdgeEffectType.Glow,
-                        Radius = 2,
-                    },
-                    Size = new Vector2(0.33f, 0.8f),
-                    Child = new Box { RelativeSizeAxes = Axes.Both },
-                };
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                UpdateState();
-            }
-
-            public string TooltipText => "revert to default";
-
-            protected override bool OnClick(ClickEvent e)
-            {
-                if (bindable != null && !bindable.Disabled)
-                    bindable.SetDefault();
-                return true;
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                hovering = true;
-                UpdateState();
-                return false;
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                hovering = false;
-                UpdateState();
-            }
-
-            public void SetButtonColour(Color4 buttonColour)
-            {
-                this.buttonColour = buttonColour;
-                UpdateState();
-            }
-
-            public void UpdateState()
-            {
-                if (bindable == null)
-                    return;
-
-                this.FadeTo(bindable.IsDefault ? 0f :
-                    hovering && !bindable.Disabled ? 1f : 0.65f, 200, Easing.OutQuint);
-                this.FadeColour(bindable.Disabled ? Color4.Gray : buttonColour, 200, Easing.OutQuint);
-            }
         }
     }
 }

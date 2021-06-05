@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -30,6 +31,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             get => ball.Colour;
             set => ball.Colour = value;
         }
+
+        /// <summary>
+        /// Whether to track accurately to the visual size of this <see cref="SliderBall"/>.
+        /// If <c>false</c>, tracking will be performed at the final scale at all times.
+        /// </summary>
+        public bool InputTracksVisualSize = true;
 
         private readonly Drawable followCircle;
         private readonly DrawableSlider drawableSlider;
@@ -94,7 +101,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
                 tracking = value;
 
-                followCircle.ScaleTo(tracking ? 2.4f : 1f, 300, Easing.OutQuint);
+                if (InputTracksVisualSize)
+                    followCircle.ScaleTo(tracking ? 2.4f : 1f, 300, Easing.OutQuint);
+                else
+                {
+                    // We need to always be tracking the final size, at both endpoints. For now, this is achieved by removing the scale duration.
+                    followCircle.ScaleTo(tracking ? 2.4f : 1f);
+                }
+
                 followCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
             }
         }
@@ -121,6 +135,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         /// </summary>
         private double? timeToAcceptAnyKeyAfter;
 
+        /// <summary>
+        /// The actions that were pressed in the previous frame.
+        /// </summary>
+        private readonly List<OsuAction> lastPressedActions = new List<OsuAction>();
+
         protected override void Update()
         {
             base.Update();
@@ -139,8 +158,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             {
                 var otherKey = headCircleHitAction == OsuAction.RightButton ? OsuAction.LeftButton : OsuAction.RightButton;
 
-                // we can return to accepting all keys if the initial head circle key is the *only* key pressed, or all keys have been released.
-                if (actions?.Contains(otherKey) != true)
+                // we can start accepting any key once all other keys have been released in the previous frame.
+                if (!lastPressedActions.Contains(otherKey))
                     timeToAcceptAnyKeyAfter = Time.Current;
             }
 
@@ -151,6 +170,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 lastScreenSpaceMousePosition.HasValue && followCircle.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
                 // valid action
                 (actions?.Any(isValidTrackingAction) ?? false);
+
+            lastPressedActions.Clear();
+            if (actions != null)
+                lastPressedActions.AddRange(actions);
         }
 
         /// <summary>

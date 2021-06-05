@@ -12,6 +12,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "No Mod";
         public override string Acronym => "NM";
+        public override string Description => "No mods applied.";
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon => FontAwesome.Solid.Ban;
         public override ModType Type => ModType.System;

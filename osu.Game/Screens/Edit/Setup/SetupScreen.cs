@@ -3,76 +3,41 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public class SetupScreen : EditorScreen
+    public class SetupScreen : EditorRoundedScreen
     {
-        [Resolved]
-        private OsuColour colours { get; set; }
+        [Cached]
+        private SectionsContainer<SetupSection> sections = new SectionsContainer<SetupSection>();
 
         [Cached]
-        protected readonly OverlayColourProvider ColourProvider;
+        private SetupScreenHeader header = new SetupScreenHeader();
 
         public SetupScreen()
             : base(EditorScreenMode.SongSetup)
         {
-            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = new Container
+            AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding(50),
-                Child = new Container
+                sections = new SectionsContainer<SetupSection>
                 {
+                    FixedHeader = header,
                     RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    CornerRadius = 10,
-                    Children = new Drawable[]
+                    Children = new SetupSection[]
                     {
-                        new Box
-                        {
-                            Colour = colours.GreySeafoamDark,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new SectionsContainer<SetupSection>
-                        {
-                            FixedHeader = new SetupScreenHeader(),
-                            RelativeSizeAxes = Axes.Both,
-                            Children = new SetupSection[]
-                            {
-                                new ResourcesSection(),
-                                new MetadataSection(),
-                                new DifficultySection(),
-                            }
-                        },
+                        new ResourcesSection(),
+                        new MetadataSection(),
+                        new DifficultySection(),
+                        new ColoursSection()
                     }
-                }
-            };
-        }
-    }
-
-    internal class SetupScreenHeader : OverlayHeader
-    {
-        protected override OverlayTitle CreateTitle() => new SetupScreenTitle();
-
-        private class SetupScreenTitle : OverlayTitle
-        {
-            public SetupScreenTitle()
-            {
-                Title = "beatmap setup";
-                Description = "change general settings of your beatmap";
-                IconTexture = "Icons/Hexacons/social";
-            }
+                },
+            });
         }
     }
 }

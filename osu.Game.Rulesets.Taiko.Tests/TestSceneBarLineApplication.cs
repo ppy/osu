@@ -12,12 +12,13 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [Test]
         public void TestApplyNewBarLine()
         {
-            DrawableBarLine barLine = new DrawableBarLine(PrepareObject(new BarLine
+            DrawableBarLine barLine = new DrawableBarLine();
+
+            AddStep("apply new bar line", () => barLine.Apply(PrepareObject(new BarLine
             {
                 StartTime = 400,
                 Major = true
-            }));
-
+            })));
             AddHitObject(barLine);
             RemoveHitObject(barLine);
 
@@ -25,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 StartTime = 200,
                 Major = false
-            }), null));
+            })));
             AddHitObject(barLine);
         }
     }

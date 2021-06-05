@@ -7,3 +7,4 @@ M:osu.Framework.Graphics.Sprites.SpriteText.#ctor;Use OsuSpriteText.
 M:osu.Framework.Bindables.IBindableList`1.GetBoundCopy();Fails on iOS. Use manual ctor + BindTo instead. (see https://github.com/mono/mono/issues/19900)
 T:Microsoft.EntityFrameworkCore.Internal.EnumerableExtensions;Don't use internal extension methods.
 T:Microsoft.EntityFrameworkCore.Internal.TypeExtensions;Don't use internal extension methods.
+M:System.Enum.HasFlag(System.Enum);Use osu.Framework.Extensions.EnumExtensions.HasFlagFast<T>() instead.

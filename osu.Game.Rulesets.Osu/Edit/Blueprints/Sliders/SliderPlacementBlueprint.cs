@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private InputManager inputManager;
 
-        private PlacementState state;
+        private SliderPlacementState state;
         private PathControlPoint segmentStart;
         private PathControlPoint cursor;
         private int currentSegmentLength;
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 controlPointVisualiser = new PathControlPointVisualiser(HitObject, false)
             };
 
-            setState(PlacementState.Initial);
+            setState(SliderPlacementState.Initial);
         }
 
         protected override void LoadComplete()
@@ -73,12 +73,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             switch (state)
             {
-                case PlacementState.Initial:
+                case SliderPlacementState.Initial:
                     BeginPlacement();
                     HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
                     break;
 
-                case PlacementState.Body:
+                case SliderPlacementState.Body:
                     updateCursor();
                     break;
             }
@@ -91,11 +91,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             switch (state)
             {
-                case PlacementState.Initial:
+                case SliderPlacementState.Initial:
                     beginCurve();
                     break;
 
-                case PlacementState.Body:
+                case SliderPlacementState.Body:
                     if (canPlaceNewControlPoint(out var lastPoint))
                     {
                         // Place a new point by detatching the current cursor.
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (state == PlacementState.Body && e.Button == MouseButton.Right)
+            if (state == SliderPlacementState.Body && e.Button == MouseButton.Right)
                 endCurve();
             base.OnMouseUp(e);
         }
@@ -129,19 +129,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private void beginCurve()
         {
             BeginPlacement(commitStart: true);
-            setState(PlacementState.Body);
+            setState(SliderPlacementState.Body);
         }
 
         private void endCurve()
         {
             updateSlider();
-            EndPlacement(true);
+            EndPlacement(HitObject.Path.HasValidLength);
         }
 
         protected override void Update()
         {
             base.Update();
             updateSlider();
+
+            // Maintain the path type in case it got defaulted to bezier at some point during the drag.
+            updatePathType();
         }
 
         private void updatePathType()
@@ -204,7 +207,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             var lastPiece = controlPointVisualiser.Pieces.Single(p => p.ControlPoint == last);
 
             lastPoint = last;
-            return lastPiece?.IsHovered != true;
+            return lastPiece.IsHovered != true;
         }
 
         private void updateSlider()
@@ -216,12 +219,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             tailCirclePiece.UpdateFrom(HitObject.TailCircle);
         }
 
-        private void setState(PlacementState newState)
+        private void setState(SliderPlacementState newState)
         {
             state = newState;
         }
 
-        private enum PlacementState
+        private enum SliderPlacementState
         {
             Initial,
             Body,

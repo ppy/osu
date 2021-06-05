@@ -13,8 +13,10 @@ using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
+using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using osuTK;
@@ -22,12 +24,15 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class SkinnableTestScene : OsuGridTestScene
+    public abstract class SkinnableTestScene : OsuGridTestScene, IStorageResourceProvider
     {
         private Skin metricsSkin;
         private Skin defaultSkin;
         private Skin specialSkin;
         private Skin oldSkin;
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         protected SkinnableTestScene()
             : base(2, 3)
@@ -35,19 +40,19 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, SkinManager skinManager, OsuGameBase game)
+        private void load(AudioManager audio, SkinManager skinManager)
         {
             var dllStore = new DllResourceStore(DynamicCompilationOriginal.GetType().Assembly);
 
-            metricsSkin = new TestLegacySkin(new SkinInfo { Name = "metrics-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), audio, true);
-            defaultSkin = new DefaultLegacySkin(new NamespacedResourceStore<byte[]>(game.Resources, "Skins/Legacy"), audio);
-            specialSkin = new TestLegacySkin(new SkinInfo { Name = "special-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/special_skin"), audio, true);
-            oldSkin = new TestLegacySkin(new SkinInfo { Name = "old-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/old_skin"), audio, true);
+            metricsSkin = new TestLegacySkin(new SkinInfo { Name = "metrics-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), this, true);
+            defaultSkin = new DefaultLegacySkin(this);
+            specialSkin = new TestLegacySkin(new SkinInfo { Name = "special-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/special_skin"), this, true);
+            oldSkin = new TestLegacySkin(new SkinInfo { Name = "old-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/old_skin"), this, true);
         }
 
         private readonly List<Drawable> createdDrawables = new List<Drawable>();
 
-        public void SetContents(Func<Drawable> creationFunction)
+        protected void SetContents(Func<ISkin, Drawable> creationFunction)
         {
             createdDrawables.Clear();
 
@@ -62,9 +67,9 @@ namespace osu.Game.Tests.Visual
 
         protected IEnumerable<Drawable> CreatedDrawables => createdDrawables;
 
-        private Drawable createProvider(Skin skin, Func<Drawable> creationFunction, IBeatmap beatmap)
+        private Drawable createProvider(Skin skin, Func<ISkin, Drawable> creationFunction, IBeatmap beatmap)
         {
-            var created = creationFunction();
+            var created = creationFunction(skin);
 
             createdDrawables.Add(created);
 
@@ -147,6 +152,15 @@ namespace osu.Game.Tests.Visual
 
         protected virtual IBeatmap CreateBeatmapForSkinProvider() => CreateWorkingBeatmap(Ruleset.Value).GetPlayableBeatmap(Ruleset.Value);
 
+        #region IResourceStorageProvider
+
+        public AudioManager AudioManager => Audio;
+        public IResourceStore<byte[]> Files => null;
+        public new IResourceStore<byte[]> Resources => base.Resources;
+        public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
+
+        #endregion
+
         private class OutlineBox : CompositeDrawable
         {
             public OutlineBox()
@@ -170,8 +184,8 @@ namespace osu.Game.Tests.Visual
         {
             private readonly bool extrapolateAnimations;
 
-            public TestLegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, bool extrapolateAnimations)
-                : base(skin, storage, audioManager, "skin.ini")
+            public TestLegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, IStorageResourceProvider resources, bool extrapolateAnimations)
+                : base(skin, storage, resources, "skin.ini")
             {
                 this.extrapolateAnimations = extrapolateAnimations;
             }

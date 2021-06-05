@@ -8,7 +8,6 @@ using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
@@ -20,6 +19,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
 using osuTK;
 using System.Diagnostics;
+using osu.Framework.Audio.Sample;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.UI
 
                 var enumerable = HitObjectContainer.Objects;
 
-                if (nestedPlayfields.IsValueCreated)
+                if (nestedPlayfields.Count != 0)
                     enumerable = enumerable.Concat(NestedPlayfields.SelectMany(p => p.AllHitObjects));
 
                 return enumerable;
@@ -76,9 +76,9 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// All <see cref="Playfield"/>s nested inside this <see cref="Playfield"/>.
         /// </summary>
-        public IEnumerable<Playfield> NestedPlayfields => nestedPlayfields.IsValueCreated ? nestedPlayfields.Value : Enumerable.Empty<Playfield>();
+        public IEnumerable<Playfield> NestedPlayfields => nestedPlayfields;
 
-        private readonly Lazy<List<Playfield>> nestedPlayfields = new Lazy<List<Playfield>>();
+        private readonly List<Playfield> nestedPlayfields = new List<Playfield>();
 
         /// <summary>
         /// Whether judgements should be displayed by this and and all nested <see cref="Playfield"/>s.
@@ -217,7 +217,7 @@ namespace osu.Game.Rulesets.UI
             otherPlayfield.HitObjectUsageBegan += h => HitObjectUsageBegan?.Invoke(h);
             otherPlayfield.HitObjectUsageFinished += h => HitObjectUsageFinished?.Invoke(h);
 
-            nestedPlayfields.Value.Add(otherPlayfield);
+            nestedPlayfields.Add(otherPlayfield);
         }
 
         protected override void LoadComplete()
@@ -279,12 +279,7 @@ namespace osu.Game.Rulesets.UI
                 return true;
             }
 
-            bool removedFromNested = false;
-
-            if (nestedPlayfields.IsValueCreated)
-                removedFromNested = nestedPlayfields.Value.Any(p => p.Remove(hitObject));
-
-            return removedFromNested;
+            return nestedPlayfields.Any(p => p.Remove(hitObject));
         }
 
         /// <summary>
@@ -359,15 +354,18 @@ namespace osu.Game.Rulesets.UI
 
                     // If this is the first time this DHO is being used, then apply the DHO mods.
                     // This is done before Apply() so that the state is updated once when the hitobject is applied.
-                    foreach (var m in mods.OfType<IApplicableToDrawableHitObjects>())
-                        m.ApplyToDrawableHitObjects(dho.Yield());
+                    if (mods != null)
+                    {
+                        foreach (var m in mods.OfType<IApplicableToDrawableHitObjects>())
+                            m.ApplyToDrawableHitObjects(dho.Yield());
+                    }
                 }
 
                 if (!lifetimeEntryMap.TryGetValue(hitObject, out var entry))
                     lifetimeEntryMap[hitObject] = entry = CreateLifetimeEntry(hitObject);
 
                 dho.ParentHitObject = parent;
-                dho.Apply(hitObject, entry);
+                dho.Apply(entry);
             });
         }
 
@@ -429,10 +427,7 @@ namespace osu.Game.Rulesets.UI
                 return;
             }
 
-            if (!nestedPlayfields.IsValueCreated)
-                return;
-
-            foreach (var p in nestedPlayfields.Value)
+            foreach (var p in nestedPlayfields)
                 p.SetKeepAlive(hitObject, keepAlive);
         }
 
@@ -444,10 +439,7 @@ namespace osu.Game.Rulesets.UI
             foreach (var (_, entry) in lifetimeEntryMap)
                 entry.KeepAlive = true;
 
-            if (!nestedPlayfields.IsValueCreated)
-                return;
-
-            foreach (var p in nestedPlayfields.Value)
+            foreach (var p in nestedPlayfields)
                 p.KeepAllAlive();
         }
 
@@ -461,10 +453,7 @@ namespace osu.Game.Rulesets.UI
             {
                 HitObjectContainer.PastLifetimeExtension = value;
 
-                if (!nestedPlayfields.IsValueCreated)
-                    return;
-
-                foreach (var nested in nestedPlayfields.Value)
+                foreach (var nested in nestedPlayfields)
                     nested.PastLifetimeExtension = value;
             }
         }
@@ -479,10 +468,7 @@ namespace osu.Game.Rulesets.UI
             {
                 HitObjectContainer.FutureLifetimeExtension = value;
 
-                if (!nestedPlayfields.IsValueCreated)
-                    return;
-
-                foreach (var nested in nestedPlayfields.Value)
+                foreach (var nested in nestedPlayfields)
                     nested.FutureLifetimeExtension = value;
             }
         }

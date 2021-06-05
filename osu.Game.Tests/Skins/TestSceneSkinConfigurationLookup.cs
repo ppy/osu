@@ -219,7 +219,7 @@ namespace osu.Game.Tests.Skins
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => skin.GetTexture(componentName, wrapModeS, wrapModeT);
 
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => skin.GetSample(sampleInfo);
+            public ISample GetSample(ISampleInfo sampleInfo) => skin.GetSample(sampleInfo);
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => skin.GetConfig<TLookup, TValue>(lookup);
         }

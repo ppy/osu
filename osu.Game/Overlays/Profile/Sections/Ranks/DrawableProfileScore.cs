@@ -256,16 +256,16 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Text = new LocalisedString((
+                    Text = new RomanisableString(
                         $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} ",
-                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} ")),
+                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} "),
                     Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true)
                 },
                 new OsuSpriteText
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Text = "by " + new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
+                    Text = "by " + new RomanisableString(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist),
                     Font = OsuFont.GetFont(size: 12, italics: true)
                 },
             };

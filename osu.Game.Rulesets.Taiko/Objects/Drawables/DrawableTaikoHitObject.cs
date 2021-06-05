@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private readonly Container nonProxiedContent;
 
-        protected DrawableTaikoHitObject(TaikoHitObject hitObject)
+        protected DrawableTaikoHitObject([CanBeNull] TaikoHitObject hitObject)
             : base(hitObject)
         {
             AddRangeInternal(new[]
@@ -113,25 +113,23 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     {
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
 
-        public new TObject HitObject;
+        public new TObject HitObject => (TObject)base.HitObject;
 
         protected Vector2 BaseSize;
         protected SkinnableDrawable MainPiece;
 
-        protected DrawableTaikoHitObject(TObject hitObject)
+        protected DrawableTaikoHitObject([CanBeNull] TObject hitObject)
             : base(hitObject)
         {
-            HitObject = hitObject;
-
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.Custom;
 
             RelativeSizeAxes = Axes.Both;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void OnApply()
         {
+            base.OnApply();
             RecreatePieces();
         }
 
@@ -139,7 +137,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             Size = BaseSize = new Vector2(TaikoHitObject.DEFAULT_SIZE);
 
-            MainPiece?.Expire();
+            if (MainPiece != null)
+                Content.Remove(MainPiece);
+
             Content.Add(MainPiece = CreateMainPiece());
         }
 

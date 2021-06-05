@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Judgements;
@@ -34,12 +35,38 @@ namespace osu.Game.Tests.Visual
 
         public new HealthProcessor HealthProcessor => base.HealthProcessor;
 
+        public new bool PauseCooldownActive => base.PauseCooldownActive;
+
         public readonly List<JudgementResult> Results = new List<JudgementResult>();
 
         public TestPlayer(bool allowPause = true, bool showResults = true, bool pauseOnFocusLost = false)
-            : base(allowPause, showResults)
+            : base(new PlayerConfiguration
+            {
+                AllowPause = allowPause,
+                ShowResults = showResults
+            })
         {
             PauseOnFocusLost = pauseOnFocusLost;
+        }
+
+        protected override void PrepareReplay()
+        {
+            // Generally, replay generation is handled by whatever is constructing the player.
+            // This is implemented locally here to ease migration of test scenes that have some executions
+            // running with autoplay and some not, but are not written in a way that lends to instantiating
+            // different `Player` types.
+            //
+            // Eventually we will want to remove this and update all test usages which rely on autoplay to use
+            // a `TestReplayPlayer`.
+            var autoplayMod = Mods.Value.OfType<ModAutoplay>().FirstOrDefault();
+
+            if (autoplayMod != null)
+            {
+                DrawableRuleset?.SetReplayScore(autoplayMod.CreateReplayScore(GameplayBeatmap.PlayableBeatmap, Mods.Value));
+                return;
+            }
+
+            base.PrepareReplay();
         }
 
         [BackgroundDependencyLoader]

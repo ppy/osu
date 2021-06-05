@@ -16,7 +16,7 @@ namespace osu.Game.Skinning
     {
         public double Length => !DrawableSamples.Any() ? 0 : DrawableSamples.Max(sample => sample.Length);
 
-        protected bool RequestedPlaying { get; private set; }
+        public bool RequestedPlaying { get; private set; }
 
         public PausableSkinnableSound()
         {
@@ -43,26 +43,28 @@ namespace osu.Game.Skinning
             if (samplePlaybackDisabler != null)
             {
                 samplePlaybackDisabled.BindTo(samplePlaybackDisabler.SamplePlaybackDisabled);
-                samplePlaybackDisabled.BindValueChanged(disabled =>
+                samplePlaybackDisabled.BindValueChanged(SamplePlaybackDisabledChanged);
+            }
+        }
+
+        protected virtual void SamplePlaybackDisabledChanged(ValueChangedEvent<bool> disabled)
+        {
+            if (!RequestedPlaying) return;
+
+            // let non-looping samples that have already been started play out to completion (sounds better than abruptly cutting off).
+            if (!Looping) return;
+
+            cancelPendingStart();
+
+            if (disabled.NewValue)
+                base.Stop();
+            else
+            {
+                // schedule so we don't start playing a sample which is no longer alive.
+                scheduledStart = Schedule(() =>
                 {
-                    if (!RequestedPlaying) return;
-
-                    // let non-looping samples that have already been started play out to completion (sounds better than abruptly cutting off).
-                    if (!Looping) return;
-
-                    cancelPendingStart();
-
-                    if (disabled.NewValue)
-                        base.Stop();
-                    else
-                    {
-                        // schedule so we don't start playing a sample which is no longer alive.
-                        scheduledStart = Schedule(() =>
-                        {
-                            if (RequestedPlaying)
-                                base.Play();
-                        });
-                    }
+                    if (RequestedPlaying)
+                        base.Play();
                 });
             }
         }

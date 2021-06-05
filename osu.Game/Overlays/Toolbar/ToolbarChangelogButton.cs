@@ -2,11 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarChangelogButton : ToolbarOverlayToggleButton
     {
+        protected override Anchor TooltipAnchor => Anchor.TopRight;
+
         [BackgroundDependencyLoader(true)]
         private void load(ChangelogOverlay changelog)
         {

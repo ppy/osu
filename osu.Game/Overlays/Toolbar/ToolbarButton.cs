@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -12,6 +13,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -43,19 +45,19 @@ namespace osu.Game.Overlays.Toolbar
                 Texture = textures.Get(texture),
             });
 
-        public string Text
+        public LocalisableString Text
         {
             get => DrawableText.Text;
             set => DrawableText.Text = value;
         }
 
-        public string TooltipMain
+        public LocalisableString TooltipMain
         {
             get => tooltip1.Text;
             set => tooltip1.Text = value;
         }
 
-        public string TooltipSub
+        public LocalisableString TooltipSub
         {
             get => tooltip2.Text;
             set => tooltip2.Text = value;
@@ -77,7 +79,7 @@ namespace osu.Game.Overlays.Toolbar
         private KeyBindingStore keyBindings { get; set; }
 
         protected ToolbarButton()
-            : base(HoverSampleSet.Loud)
+            : base(HoverSampleSet.Toolbar)
         {
             Width = Toolbar.HEIGHT;
             RelativeSizeAxes = Axes.Y;
@@ -127,9 +129,9 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.Both, // stops us being considered in parent's autosize
-                    Anchor = TooltipAnchor.HasFlag(Anchor.x0) ? Anchor.BottomLeft : Anchor.BottomRight,
+                    Anchor = TooltipAnchor.HasFlagFast(Anchor.x0) ? Anchor.BottomLeft : Anchor.BottomRight,
                     Origin = TooltipAnchor,
-                    Position = new Vector2(TooltipAnchor.HasFlag(Anchor.x0) ? 5 : -5, 5),
+                    Position = new Vector2(TooltipAnchor.HasFlagFast(Anchor.x0) ? 5 : -5, 5),
                     Alpha = 0,
                     Children = new Drawable[]
                     {

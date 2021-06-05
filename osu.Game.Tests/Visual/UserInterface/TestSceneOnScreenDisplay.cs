@@ -44,22 +44,22 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             protected override void InitialiseDefaults()
             {
-                Set(TestConfigSetting.ToggleSettingNoKeybind, false);
-                Set(TestConfigSetting.EnumSettingNoKeybind, EnumSetting.Setting1);
-                Set(TestConfigSetting.ToggleSettingWithKeybind, false);
-                Set(TestConfigSetting.EnumSettingWithKeybind, EnumSetting.Setting1);
+                SetDefault(TestConfigSetting.ToggleSettingNoKeybind, false);
+                SetDefault(TestConfigSetting.EnumSettingNoKeybind, EnumSetting.Setting1);
+                SetDefault(TestConfigSetting.ToggleSettingWithKeybind, false);
+                SetDefault(TestConfigSetting.EnumSettingWithKeybind, EnumSetting.Setting1);
 
                 base.InitialiseDefaults();
             }
 
-            public void ToggleSetting(TestConfigSetting setting) => Set(setting, !Get<bool>(setting));
+            public void ToggleSetting(TestConfigSetting setting) => SetValue(setting, !Get<bool>(setting));
 
             public void IncrementEnumSetting(TestConfigSetting setting)
             {
                 var nextValue = Get<EnumSetting>(setting) + 1;
                 if (nextValue > EnumSetting.Setting4)
                     nextValue = EnumSetting.Setting1;
-                Set(setting, nextValue);
+                SetValue(setting, nextValue);
             }
 
             public override TrackedSettings CreateTrackedSettings() => new TrackedSettings

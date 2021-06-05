@@ -6,7 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -15,9 +15,9 @@ namespace osu.Game.Screens.Play.HUD
     /// <summary>
     /// Uses the 'x' symbol and has a pop-out effect while rolling over.
     /// </summary>
-    public class LegacyComboCounter : CompositeDrawable, IComboCounter
+    public class LegacyComboCounter : CompositeDrawable, ISkinnableDrawable
     {
-        public Bindable<int> Current { get; } = new BindableInt { MinValue = 0, };
+        public Bindable<int> Current { get; } = new BindableInt { MinValue = 0 };
 
         private uint scheduledPopOutCurrentId;
 
@@ -32,9 +32,9 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         private const double rolling_duration = 20;
 
-        private Drawable popOutCount;
+        private readonly Drawable popOutCount;
 
-        private Drawable displayedCountSpriteText;
+        private readonly Drawable displayedCountSpriteText;
 
         private int previousValue;
 
@@ -44,6 +44,20 @@ namespace osu.Game.Screens.Play.HUD
 
         [Resolved]
         private ISkinSource skin { get; set; }
+
+        private readonly Container counterContainer;
+
+        /// <summary>
+        /// Hides the combo counter internally without affecting its <see cref="SkinnableInfo"/>.
+        /// </summary>
+        /// <remarks>
+        /// This is used for rulesets that provide their own combo counter and don't want this HUD one to be visible,
+        /// without potentially affecting the user's selected skin.
+        /// </remarks>
+        public bool HiddenByRulesetImplementation
+        {
+            set => counterContainer.Alpha = value ? 1 : 0;
+        }
 
         public LegacyComboCounter()
         {
@@ -55,6 +69,25 @@ namespace osu.Game.Screens.Play.HUD
             Margin = new MarginPadding(10);
 
             Scale = new Vector2(1.2f);
+
+            InternalChild = counterContainer = new Container
+            {
+                AutoSizeAxes = Axes.Both,
+                AlwaysPresent = true,
+                Children = new[]
+                {
+                    popOutCount = new LegacySpriteText(LegacyFont.Combo)
+                    {
+                        Alpha = 0,
+                        Margin = new MarginPadding(0.05f),
+                        Blending = BlendingParameters.Additive,
+                    },
+                    displayedCountSpriteText = new LegacySpriteText(LegacyFont.Combo)
+                    {
+                        Alpha = 0,
+                    },
+                }
+            };
         }
 
         /// <summary>
@@ -80,22 +113,9 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ScoreProcessor scoreProcessor)
         {
-            InternalChildren = new[]
-            {
-                displayedCountSpriteText = createSpriteText().With(s =>
-                {
-                    s.Alpha = 0;
-                }),
-                popOutCount = createSpriteText().With(s =>
-                {
-                    s.Alpha = 0;
-                    s.Margin = new MarginPadding(0.05f);
-                })
-            };
-
-            Current.ValueChanged += combo => updateCount(combo.NewValue == 0);
+            Current.BindTo(scoreProcessor.Combo);
         }
 
         protected override void LoadComplete()
@@ -104,12 +124,14 @@ namespace osu.Game.Screens.Play.HUD
 
             ((IHasText)displayedCountSpriteText).Text = formatCount(Current.Value);
 
+            counterContainer.Anchor = Anchor;
+            counterContainer.Origin = Origin;
             displayedCountSpriteText.Anchor = Anchor;
             displayedCountSpriteText.Origin = Origin;
-            popOutCount.Origin = Origin;
             popOutCount.Anchor = Anchor;
+            popOutCount.Origin = Origin;
 
-            updateCount(false);
+            Current.BindValueChanged(combo => updateCount(combo.NewValue == 0), true);
         }
 
         private void updateCount(bool rolling)
@@ -246,7 +268,5 @@ namespace osu.Game.Screens.Play.HUD
             double difference = currentValue > newValue ? currentValue - newValue : newValue - currentValue;
             return difference * rolling_duration;
         }
-
-        private OsuSpriteText createSpriteText() => (OsuSpriteText)skin.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ComboText));
     }
 }

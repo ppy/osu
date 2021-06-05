@@ -18,10 +18,14 @@ using osu.Game.IO;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Skinning;
 using osu.Game.Tests.Resources;
+using osuTK;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -43,6 +47,33 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             Assert.That(decodedAfterEncode.beatmap.Serialize(), Is.EqualTo(decoded.beatmap.Serialize()));
             Assert.IsTrue(areComboColoursEqual(decodedAfterEncode.beatmapSkin.Configuration, decoded.beatmapSkin.Configuration));
+        }
+
+        [Test]
+        public void TestEncodeMultiSegmentSliderWithFloatingPointError()
+        {
+            var beatmap = new Beatmap
+            {
+                HitObjects =
+                {
+                    new Slider
+                    {
+                        Position = new Vector2(0.6f),
+                        Path = new SliderPath(new[]
+                        {
+                            new PathControlPoint(Vector2.Zero, PathType.Bezier),
+                            new PathControlPoint(new Vector2(0.5f)),
+                            new PathControlPoint(new Vector2(0.51f)), // This is actually on the same position as the previous one in legacy beatmaps (truncated to int).
+                            new PathControlPoint(new Vector2(1f), PathType.Bezier),
+                            new PathControlPoint(new Vector2(2f))
+                        })
+                    },
+                }
+            };
+
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy((beatmap, new TestLegacySkin(beatmaps_resource_store, string.Empty))), string.Empty);
+            var decodedSlider = (Slider)decodedAfterEncode.beatmap.HitObjects[0];
+            Assert.That(decodedSlider.Path.ControlPoints.Count, Is.EqualTo(5));
         }
 
         private bool areComboColoursEqual(IHasComboColours a, IHasComboColours b)
@@ -137,6 +168,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
             protected override Texture GetBackground() => throw new NotImplementedException();
 
             protected override Track GetBeatmapTrack() => throw new NotImplementedException();
+
+            protected override ISkin GetSkin() => throw new NotImplementedException();
+
+            public override Stream GetStream(string storagePath) => throw new NotImplementedException();
         }
     }
 }

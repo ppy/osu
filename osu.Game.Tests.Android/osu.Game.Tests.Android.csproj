@@ -20,6 +20,14 @@
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CA2007</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <AndroidLinkMode>None</AndroidLinkMode>
+    <MandroidI18n>cjk;mideast;other;rare;west</MandroidI18n>
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\osu.Game.Tests\**\Beatmaps\**\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
@@ -68,6 +76,13 @@
       <Project>{2a66dd92-adb1-4994-89e2-c94e04acda0d}</Project>
       <Name>osu.Game</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup Label="Package References">
+    <PackageReference Include="DeepEqual" Version="2.0.0" />
+    <PackageReference Include="Moq" Version="4.16.1" />
+    <PackageReference Include="System.Formats.Asn1">
+      <Version>5.0.0</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>
