@@ -172,11 +172,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             if (layoutCache.IsValid) return;
 
-            foreach (var hitObject in Objects)
-            {
-                if (hitObject.HitObject != null)
-                    invalidateHitObject(hitObject);
-            }
+            layoutComputed.Clear();
+
+            // Reset lifetime to the conservative estimation.
+            // If a drawable becomes alive by this lifetime, its lifetime will be updated to a more precise lifetime in the next update.
+            foreach (var entry in Entries)
+                entry.SetInitialLifetime();
 
             scrollingInfo.Algorithm.Reset();
 

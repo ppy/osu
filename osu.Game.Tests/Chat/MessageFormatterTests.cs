@@ -493,5 +493,23 @@ namespace osu.Game.Tests.Chat
             Assert.AreEqual(result.Links[2].Url, "\uD83D\uDE00");
             Assert.AreEqual(result.Links[3].Url, "\uD83D\uDE20");
         }
+
+        [Test]
+        public void TestAbsoluteExternalLinks()
+        {
+            LinkDetails result = MessageFormatter.GetLinkDetails("https://google.com");
+
+            Assert.AreEqual(LinkAction.External, result.Action);
+            Assert.AreEqual("https://google.com", result.Argument);
+        }
+
+        [Test]
+        public void TestRelativeExternalLinks()
+        {
+            LinkDetails result = MessageFormatter.GetLinkDetails("/relative");
+
+            Assert.AreEqual(LinkAction.External, result.Action);
+            Assert.AreEqual("/relative", result.Argument);
+        }
     }
 }
