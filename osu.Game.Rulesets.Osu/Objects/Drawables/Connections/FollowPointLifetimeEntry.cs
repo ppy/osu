@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Performance;
@@ -11,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
     public class FollowPointLifetimeEntry : LifetimeEntry
     {
-        public event Action Invalidated;
+        public event Action? Invalidated;
         public readonly OsuHitObject Start;
 
         public FollowPointLifetimeEntry(OsuHitObject start)
@@ -22,9 +24,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             bindEvents();
         }
 
-        private OsuHitObject end;
+        private OsuHitObject? end;
 
-        public OsuHitObject End
+        public OsuHitObject? End
         {
             get => end;
             set
@@ -56,11 +58,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
         public void UnbindEvents()
         {
-            if (Start != null)
-            {
-                Start.DefaultsApplied -= onDefaultsApplied;
-                Start.PositionBindable.ValueChanged -= onPositionChanged;
-            }
+            Start.DefaultsApplied -= onDefaultsApplied;
+            Start.PositionBindable.ValueChanged -= onPositionChanged;
 
             if (End != null)
             {

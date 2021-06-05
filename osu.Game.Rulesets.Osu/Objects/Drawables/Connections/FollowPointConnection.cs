@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Pooling;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
@@ -12,34 +13,29 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     /// <summary>
     /// Visualises the <see cref="FollowPoint"/>s between two <see cref="DrawableOsuHitObject"/>s.
     /// </summary>
-    public class FollowPointConnection : PoolableDrawable
+    public class FollowPointConnection : PoolableDrawableWithLifetime<FollowPointLifetimeEntry>
     {
         // Todo: These shouldn't be constants
         public const int SPACING = 32;
         public const double PREEMPT = 800;
 
-        public FollowPointLifetimeEntry Entry;
         public DrawablePool<FollowPoint> Pool;
 
-        protected override void PrepareForUse()
+        protected override void OnApply(FollowPointLifetimeEntry entry)
         {
-            base.PrepareForUse();
+            base.OnApply(entry);
 
-            Entry.Invalidated += onEntryInvalidated;
-
+            entry.Invalidated += onEntryInvalidated;
             refreshPoints();
         }
 
-        protected override void FreeAfterUse()
+        protected override void OnFree(FollowPointLifetimeEntry entry)
         {
-            base.FreeAfterUse();
+            base.OnFree(entry);
 
-            Entry.Invalidated -= onEntryInvalidated;
-
+            entry.Invalidated -= onEntryInvalidated;
             // Return points to the pool.
             ClearInternal(false);
-
-            Entry = null;
         }
 
         private void onEntryInvalidated() => Scheduler.AddOnce(refreshPoints);
@@ -48,8 +44,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         {
             ClearInternal(false);
 
-            OsuHitObject start = Entry.Start;
-            OsuHitObject end = Entry.End;
+            var entry = Entry;
+            if (entry?.End == null) return;
+
+            OsuHitObject start = entry.Start;
+            OsuHitObject end = entry.End;
 
             double startTime = start.GetEndTime();
 
@@ -87,14 +86,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                     fp.FadeIn(end.TimeFadeIn);
                     fp.ScaleTo(end.Scale, end.TimeFadeIn, Easing.Out);
                     fp.MoveTo(pointEndPosition, end.TimeFadeIn, Easing.Out);
-                    fp.Delay(fadeOutTime - fadeInTime).FadeOut(end.TimeFadeIn);
+                    fp.Delay(fadeOutTime - fadeInTime).FadeOut(end.TimeFadeIn).Expire();
 
-                    finalTransformEndTime = fadeOutTime + end.TimeFadeIn;
+                    finalTransformEndTime = fp.LifetimeEnd;
                 }
             }
 
-            // todo: use Expire() on FollowPoints and take lifetime from them when https://github.com/ppy/osu-framework/issues/3300 is fixed.
-            Entry.LifetimeEnd = finalTransformEndTime;
+            entry.LifetimeEnd = finalTransformEndTime;
         }
 
         /// <summary>

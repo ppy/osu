@@ -54,12 +54,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Logger.Log($"Polling adjusted (listing: {multiplayerRoomManager.TimeBetweenListingPolls.Value}, selection: {multiplayerRoomManager.TimeBetweenSelectionPolls.Value})");
         }
 
-        protected override Room CreateNewRoom()
-        {
-            var room = new Room { Name = { Value = $"{API.LocalUser}'s awesome room" } };
-            room.Category.Value = RoomCategory.Realtime;
-            return room;
-        }
+        protected override Room CreateNewRoom() =>
+            new Room
+            {
+                Name = { Value = $"{API.LocalUser}'s awesome room" },
+                Category = { Value = RoomCategory.Realtime }
+            };
 
         protected override string ScreenTitle => "Multiplayer";
 
