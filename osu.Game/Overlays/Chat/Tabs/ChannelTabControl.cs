@@ -60,6 +60,7 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         /// <summary>
         /// Adds a channel to the ChannelTabControl.
+        /// The first channel added will automaticly selected.
         /// </summary>
         /// <param name="channel">The channel that is going to be added.</param>
         public void AddChannel(Channel channel)
