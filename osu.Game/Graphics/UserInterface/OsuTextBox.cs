@@ -23,11 +23,11 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTextBox : BasicTextBox
     {
-        private readonly SampleChannel[] textAddedSamples = new SampleChannel[4];
-        private SampleChannel capsTextAddedSample;
-        private SampleChannel textRemovedSample;
-        private SampleChannel textCommittedSample;
-        private SampleChannel caretMovedSample;
+        private readonly Sample[] textAddedSamples = new Sample[4];
+        private Sample capsTextAddedSample;
+        private Sample textRemovedSample;
+        private Sample textCommittedSample;
+        private Sample caretMovedSample;
 
         /// <summary>
         /// Whether to allow playing a different samples based on the type of character.

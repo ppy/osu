@@ -5,11 +5,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
@@ -56,31 +56,30 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
             (animation as IFramedAnimation)?.GotoFrame(0);
 
+            this.FadeInFromZero(20, Easing.Out)
+                .Then().Delay(160)
+                .FadeOutFromOne(40, Easing.In);
+
             switch (result)
             {
                 case HitResult.None:
                     break;
 
                 case HitResult.Miss:
-                    animation.ScaleTo(1.6f);
-                    animation.ScaleTo(1, 100, Easing.In);
-
-                    animation.MoveTo(Vector2.Zero);
-                    animation.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
+                    animation.ScaleTo(1.2f).Then().ScaleTo(1, 100, Easing.Out);
 
                     animation.RotateTo(0);
-                    animation.RotateTo(40, 800, Easing.InQuint);
-
-                    this.FadeOutFromOne(800);
+                    animation.RotateTo(RNG.NextSingle(-5.73f, 5.73f), 100, Easing.Out);
                     break;
 
                 default:
-                    animation.ScaleTo(0.8f);
-                    animation.ScaleTo(1, 250, Easing.OutElastic);
-
-                    animation.Delay(50).ScaleTo(0.75f, 250);
-
-                    this.Delay(50).FadeOut(200);
+                    animation.ScaleTo(0.8f)
+                             .Then().ScaleTo(1, 40)
+                             // this is actually correct to match stable; there were overlapping transforms.
+                             .Then().ScaleTo(0.85f)
+                             .Then().ScaleTo(0.7f, 40)
+                             .Then().Delay(100)
+                             .Then().ScaleTo(0.4f, 40, Easing.In);
                     break;
             }
         }

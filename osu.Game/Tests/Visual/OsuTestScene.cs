@@ -14,6 +14,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -49,6 +50,8 @@ namespace osu.Game.Tests.Visual
 
         private Lazy<DatabaseContextFactory> contextFactory;
 
+        protected IResourceStore<byte[]> Resources;
+
         protected IAPIProvider API
         {
             get
@@ -80,6 +83,8 @@ namespace osu.Game.Tests.Visual
         {
             if (!UseFreshStoragePerRun)
                 isolatedHostStorage = (parent.Get<GameHost>() as HeadlessGameHost)?.Storage;
+
+            Resources = parent.Get<OsuGameBase>().Resources;
 
             contextFactory = new Lazy<DatabaseContextFactory>(() =>
             {

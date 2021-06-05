@@ -72,5 +72,13 @@ namespace osu.Game.Beatmaps.ControlPoints
             => existing is SampleControlPoint existingSample
                && SampleBank == existingSample.SampleBank
                && SampleVolume == existingSample.SampleVolume;
+
+        public override void CopyFrom(ControlPoint other)
+        {
+            SampleVolume = ((SampleControlPoint)other).SampleVolume;
+            SampleBank = ((SampleControlPoint)other).SampleBank;
+
+            base.CopyFrom(other);
+        }
     }
 }

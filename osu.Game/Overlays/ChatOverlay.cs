@@ -24,14 +24,19 @@ using osu.Game.Overlays.Chat.Tabs;
 using osuTK.Input;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
+using osu.Game.Online;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
+    public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, IKeyBindingHandler<PlatformAction>
     {
         public string IconTexture => "Icons/Hexacons/messaging";
-        public string Title => "chat";
-        public string Description => "join the real-time discussion";
+        public LocalisableString Title => ChatStrings.HeaderTitle;
+        public LocalisableString Description => ChatStrings.HeaderDescription;
 
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;
@@ -118,40 +123,47 @@ namespace osu.Game.Overlays
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                currentChannelContainer = new Container<DrawableChannel>
+                                new OnlineViewContainer("Sign in to chat")
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding
-                                    {
-                                        Bottom = textbox_height
-                                    },
-                                },
-                                new Container
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = textbox_height,
-                                    Padding = new MarginPadding
-                                    {
-                                        Top = padding * 2,
-                                        Bottom = padding * 2,
-                                        Left = ChatLine.LEFT_PADDING + padding * 2,
-                                        Right = padding * 2,
-                                    },
                                     Children = new Drawable[]
                                     {
-                                        textbox = new FocusedTextBox
+                                        currentChannelContainer = new Container<DrawableChannel>
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Height = 1,
-                                            PlaceholderText = "type your message",
-                                            ReleaseFocusOnCommit = false,
-                                            HoldFocus = true,
-                                        }
-                                    }
-                                },
-                                loading = new LoadingSpinner(),
+                                            Padding = new MarginPadding
+                                            {
+                                                Bottom = textbox_height
+                                            },
+                                        },
+                                        new Container
+                                        {
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            RelativeSizeAxes = Axes.X,
+                                            Height = textbox_height,
+                                            Padding = new MarginPadding
+                                            {
+                                                Top = padding * 2,
+                                                Bottom = padding * 2,
+                                                Left = ChatLine.LEFT_PADDING + padding * 2,
+                                                Right = padding * 2,
+                                            },
+                                            Children = new Drawable[]
+                                            {
+                                                textbox = new FocusedTextBox
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Height = 1,
+                                                    PlaceholderText = "type your message",
+                                                    ReleaseFocusOnCommit = false,
+                                                    HoldFocus = true,
+                                                }
+                                            }
+                                        },
+                                        loading = new LoadingSpinner(),
+                                    },
+                                }
                             }
                         },
                         tabsArea = new TabsArea
@@ -358,6 +370,30 @@ namespace osu.Game.Overlays
             }
 
             return base.OnKeyDown(e);
+        }
+
+        public bool OnPressed(PlatformAction action)
+        {
+            switch (action.ActionType)
+            {
+                case PlatformActionType.TabNew:
+                    ChannelTabControl.SelectChannelSelectorTab();
+                    return true;
+
+                case PlatformActionType.TabRestore:
+                    channelManager.JoinLastClosedChannel();
+                    return true;
+
+                case PlatformActionType.DocumentClose:
+                    channelManager.LeaveChannel(channelManager.CurrentChannel.Value);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(PlatformAction action)
+        {
         }
 
         public override bool AcceptsFocus => true;

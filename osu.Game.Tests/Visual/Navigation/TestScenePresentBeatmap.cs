@@ -55,7 +55,13 @@ namespace osu.Game.Tests.Visual.Navigation
             var secondimport = importBeatmap(3);
             presentAndConfirm(secondimport);
 
+            // Test presenting same beatmap more than once
+            presentAndConfirm(secondimport);
+
             presentSecondDifficultyAndConfirm(firstImport, 1);
+            presentSecondDifficultyAndConfirm(secondimport, 3);
+
+            // Test presenting same beatmap more than once
             presentSecondDifficultyAndConfirm(secondimport, 3);
         }
 

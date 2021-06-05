@@ -346,7 +346,6 @@ namespace osu.Game.Graphics.Backgrounds
             /// such that the smaller triangles appear on top.
             /// </summary>
             /// <param name="other"></param>
-            /// <returns></returns>
             public int CompareTo(TriangleParticle other) => other.Scale.CompareTo(Scale);
         }
     }

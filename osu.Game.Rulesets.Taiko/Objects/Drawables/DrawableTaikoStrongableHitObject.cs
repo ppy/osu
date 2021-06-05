@@ -1,11 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
-using osu.Framework.Allocation;
+using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Audio;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
@@ -16,52 +14,32 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         where TObject : TaikoStrongableHitObject
         where TStrongNestedObject : StrongNestedHitObject
     {
-        private readonly Bindable<bool> isStrong;
+        private readonly Bindable<bool> isStrong = new BindableBool();
 
         private readonly Container<DrawableStrongNestedHit> strongHitContainer;
 
-        protected DrawableTaikoStrongableHitObject(TObject hitObject)
+        protected DrawableTaikoStrongableHitObject([CanBeNull] TObject hitObject)
             : base(hitObject)
         {
-            isStrong = HitObject.IsStrongBindable.GetBoundCopy();
-
             AddInternal(strongHitContainer = new Container<DrawableStrongNestedHit>());
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void OnApply()
         {
-            isStrong.BindValueChanged(_ =>
-            {
-                // will overwrite samples, should only be called on change.
-                updateSamplesFromStrong();
+            isStrong.BindTo(HitObject.IsStrongBindable);
+            // this doesn't need to be run inline as RecreatePieces is called by the base call below.
+            isStrong.BindValueChanged(_ => Scheduler.AddOnce(RecreatePieces));
 
-                RecreatePieces();
-            });
+            base.OnApply();
         }
 
-        private HitSampleInfo[] getStrongSamples() => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_FINISH).ToArray();
-
-        protected override void LoadSamples()
+        protected override void OnFree()
         {
-            base.LoadSamples();
-            isStrong.Value = getStrongSamples().Any();
-        }
+            base.OnFree();
 
-        private void updateSamplesFromStrong()
-        {
-            var strongSamples = getStrongSamples();
-
-            if (isStrong.Value != strongSamples.Any())
-            {
-                if (isStrong.Value)
-                    HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_FINISH));
-                else
-                {
-                    foreach (var sample in strongSamples)
-                        HitObject.Samples.Remove(sample);
-                }
-            }
+            isStrong.UnbindFrom(HitObject.IsStrongBindable);
+            // ensure the next application does not accidentally overwrite samples.
+            isStrong.UnbindEvents();
         }
 
         protected override void RecreatePieces()
@@ -86,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void ClearNestedHitObjects()
         {
             base.ClearNestedHitObjects();
-            strongHitContainer.Clear();
+            strongHitContainer.Clear(false);
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)

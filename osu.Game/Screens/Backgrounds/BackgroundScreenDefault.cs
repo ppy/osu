@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Backgrounds
 
         private int currentDisplay;
         private const int background_count = 7;
-        private Bindable<User> user;
+        private IBindable<User> user;
         private Bindable<Skin> skin;
         private Bindable<BackgroundSource> mode;
         private Bindable<IntroSequence> introSequence;
@@ -30,6 +30,8 @@ namespace osu.Game.Screens.Backgrounds
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+        protected virtual bool AllowStoryboardBackground => true;
 
         public BackgroundScreenDefault(bool animateOnEnter = true)
             : base(animateOnEnter)
@@ -108,6 +110,12 @@ namespace osu.Game.Screens.Backgrounds
                 {
                     case BackgroundSource.Beatmap:
                         newBackground = new BeatmapBackground(beatmap.Value, backgroundName);
+                        break;
+
+                    case BackgroundSource.BeatmapWithStoryboard:
+                        newBackground = AllowStoryboardBackground
+                            ? new BeatmapBackgroundWithStoryboard(beatmap.Value, backgroundName)
+                            : new BeatmapBackground(beatmap.Value, backgroundName);
                         break;
 
                     default:

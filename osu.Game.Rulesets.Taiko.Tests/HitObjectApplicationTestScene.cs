@@ -25,16 +25,22 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         private ScrollingHitObjectContainer hitObjectContainer;
 
-        [SetUpSteps]
-        public void SetUp()
-            => AddStep("create SHOC", () => Child = hitObjectContainer = new ScrollingHitObjectContainer
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Child = hitObjectContainer = new ScrollingHitObjectContainer
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 200,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Clock = new FramedClock(new StopwatchClock())
-            });
+            };
+        }
+
+        [SetUpSteps]
+        public void SetUp()
+            => AddStep("clear SHOC", () => hitObjectContainer.Clear());
 
         protected void AddHitObject(DrawableHitObject hitObject)
             => AddStep("add to SHOC", () => hitObjectContainer.Add(hitObject));

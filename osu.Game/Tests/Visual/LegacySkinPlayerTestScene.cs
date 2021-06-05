@@ -3,8 +3,8 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.IO.Stores;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
 
@@ -13,15 +13,40 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public abstract class LegacySkinPlayerTestScene : PlayerTestScene
     {
+        protected LegacySkin LegacySkin { get; private set; }
+
         private ISkinSource legacySkinSource;
 
         protected override TestPlayer CreatePlayer(Ruleset ruleset) => new SkinProvidingPlayer(legacySkinSource);
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuGameBase game)
+        private void load(SkinManager skins)
         {
-            var legacySkin = new DefaultLegacySkin(new NamespacedResourceStore<byte[]>(game.Resources, "Skins/Legacy"), audio);
-            legacySkinSource = new SkinProvidingContainer(legacySkin);
+            LegacySkin = new DefaultLegacySkin(skins);
+            legacySkinSource = new SkinProvidingContainer(LegacySkin);
+        }
+
+        [SetUpSteps]
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+            addResetTargetsStep();
+        }
+
+        [TearDownSteps]
+        public override void TearDownSteps()
+        {
+            addResetTargetsStep();
+            base.TearDownSteps();
+        }
+
+        private void addResetTargetsStep()
+        {
+            AddStep("reset targets", () => this.ChildrenOfType<SkinnableTargetContainer>().ForEach(t =>
+            {
+                LegacySkin.ResetDrawableTarget(t);
+                t.Reload();
+            }));
         }
 
         public class SkinProvidingPlayer : TestPlayer

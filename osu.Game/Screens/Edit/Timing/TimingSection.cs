@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         protected override TimingControlPoint CreatePoint()
         {
-            var reference = Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(SelectedGroup.Value.Time);
+            var reference = Beatmap.ControlPointInfo.TimingPointAt(SelectedGroup.Value.Time);
 
             return new TimingControlPoint
             {
