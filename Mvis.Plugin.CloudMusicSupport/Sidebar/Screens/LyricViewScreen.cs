@@ -110,6 +110,12 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
         private readonly BindableFloat followCooldown = new BindableFloat();
 
+        protected override void Update()
+        {
+            if (followCooldown.Value == 0) ScrollToCurrent();
+            base.Update();
+        }
+
         protected override bool OnHover(HoverEvent e)
         {
             followCooldown.Value = 1;
