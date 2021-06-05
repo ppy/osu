@@ -113,30 +113,47 @@ namespace osu.Game.Online.Chat
                 if (checkForPMs(channel, message))
                     continue;
 
-                // change output to bool again if another "message processor" is added.
-                checkForMentions(channel, message, localUser.Value.Username);
+                _ = checkForMentions(channel, message, localUser.Value.Username);
             }
         }
 
+        /// <summary>
+        /// Checks whether the user enabled private message notifications and whether specified <paramref name="message"/> is a direct message.
+        /// </summary>
+        /// <param name="channel">The channel associated to the <paramref name="message"/></param>
+        /// <param name="message">The message to be checked</param>
         private bool checkForPMs(Channel channel, Message message)
         {
             if (!notifyOnPM.Value || channel.Type != ChannelType.PM)
                 return false;
 
-            var notification = new PrivateMessageNotification(message.Sender.Username, channel);
+            if (channel.Id != message.ChannelId)
+                throw new ArgumentException("The provided channel doesn't match with the channel id provided by the message parameter.", nameof(channel));
 
+            var notification = new PrivateMessageNotification(message.Sender.Username, channel);
             notificationOverlay?.Post(notification);
 
             return true;
         }
 
-        private void checkForMentions(Channel channel, Message message, string username)
+        /// <summary>
+        /// Checks whether the user enabled mention notifications and whether specified <paramref name="message"/> mentions the provided <paramref name="username"/>.
+        /// </summary>
+        /// <param name="channel">The channel associated to the <paramref name="message"/></param>
+        /// <param name="message">The message to be checked</param>
+        /// <param name="username">The username that will be checked for</param>
+        private bool checkForMentions(Channel channel, Message message, string username)
         {
             if (!notifyOnMention.Value || !isMentioning(message.Content, username))
-                return;
+                return false;
+
+            if (channel.Id != message.ChannelId)
+                throw new ArgumentException("The provided channel doesn't match with the channel id provided by the message parameter.", nameof(channel));
 
             var notification = new MentionNotification(message.Sender.Username, channel);
             notificationOverlay?.Post(notification);
+
+            return true;
         }
 
         /// <summary>
