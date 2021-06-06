@@ -15,9 +15,9 @@ namespace osu.Game.Overlays.Wiki
     {
         private readonly FillFlowContainer content;
 
-        private Container lastMainTitle;
+        private TableOfContentsEntry lastMainTitle;
 
-        private Container lastSubTitle;
+        private TableOfContentsEntry lastSubTitle;
 
         public WikiTableOfContents()
         {
@@ -42,26 +42,14 @@ namespace osu.Game.Overlays.Wiki
                 if (lastSubTitle != null)
                     lastSubTitle.Margin = new MarginPadding(0);
 
-                content.Add(lastSubTitle = new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Margin = new MarginPadding { Bottom = 10 },
-                    Child = entry,
-                });
+                content.Add(lastSubTitle = entry.With(d => d.Margin = new MarginPadding { Bottom = 10 }));
 
                 return;
             }
 
             lastSubTitle = null;
 
-            content.Add(lastMainTitle = new Container
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Margin = new MarginPadding { Bottom = 5 },
-                Child = entry,
-            });
+            content.Add(lastMainTitle = entry.With(d => d.Margin = new MarginPadding { Bottom = 5 }));
         }
 
         private class TableOfContentsEntry : OsuHoverContainer
@@ -87,8 +75,8 @@ namespace osu.Game.Overlays.Wiki
                     f.AddText(text);
                     f.RelativeSizeAxes = Axes.X;
                     f.AutoSizeAxes = Axes.Y;
+                    f.Margin = new MarginPadding { Bottom = 2 };
                 });
-                Margin = new MarginPadding { Bottom = 2 };
                 Padding = new MarginPadding { Left = subtitle ? 10 : 0 };
             }
 
