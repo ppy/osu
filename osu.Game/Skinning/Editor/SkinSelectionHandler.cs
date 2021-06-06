@@ -331,7 +331,7 @@ namespace osu.Game.Skinning.Editor
             {
                 var drawable = (Drawable)item;
 
-                var anchor = getAnchorFromHashAndDrawableAndRecordWhetherUsingClosestAnchor(hash, drawable);
+                var anchor = mapHashToAnchorSettings(hash, drawable);
 
                 updateDrawableAnchor(drawable, anchor);
             }
@@ -344,7 +344,7 @@ namespace osu.Game.Skinning.Editor
             drawable.Position -= drawable.AnchorPosition - previousAnchor;
         }
 
-        private Anchor getAnchorFromHashAndDrawableAndRecordWhetherUsingClosestAnchor(int hash, Drawable drawable)
+        private Anchor mapHashToAnchorSettings(int hash, Drawable drawable)
         {
             var isUsingClosestAnchor = drawable.UsingClosestAnchor();
 
