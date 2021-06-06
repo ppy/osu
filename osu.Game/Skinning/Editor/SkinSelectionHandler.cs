@@ -61,8 +61,6 @@ namespace osu.Game.Skinning.Editor
             if (parent == null)
                 return drawable.Anchor;
 
-            // If there is a better way to get this information, let me know. Was taken from LogoTrackingContainer.ComputeLogoTrackingPosition
-            // I tried a lot of different things, such as just using Position / ChildSize, but none of them worked properly.
             var screenPosition = getOriginPositionFromQuad(drawable.ScreenSpaceDrawQuad, drawable.Origin);
             var absolutePosition = parent.ToLocalSpace(screenPosition);
             var factor = parent.RelativeToAbsoluteFactor;
