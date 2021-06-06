@@ -11,15 +11,12 @@ using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
-using Humanizer;
-using osu.Game.Localisation;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -28,7 +25,7 @@ namespace osu.Game.Skinning.Editor
         /// <summary>
         /// <p>Keeps track of whether a <see cref="Drawable"/> is using the closest <see cref="Drawable.Anchor">anchor point</see> within its <see cref="Drawable.Parent">parent</see>,
         /// or whether the user is overriding its anchor point.</p>
-        /// <p>Each <see cref="KeyValuePair{TKey,TValue}.Key">key</see> is either a direct cast of an Anchor value, or it is equal to <see cref="hash_of_closest_anchor_menu_item"/>. This is done
+        /// <p>Each <see cref="KeyValuePair{TKey,TValue}.Key">key</see> is either a direct cast of an Anchor value, or it is equal to <see cref="closest_text_hash"/>. This is done
         /// because the "Closest" menu item is not a valid anchor, so something other than an anchor must be used.</p>
         /// <p>Each <see cref="KeyValuePair{TKey,TValue}.Value">value</see> is a <see cref="BindableBool"/>. If the <see cref="Bindable{T}.Value"/> is <see langword="false"/>, the user has
         /// overridden the anchor point.
@@ -42,62 +39,39 @@ namespace osu.Game.Skinning.Editor
         /// </remarks>
         private readonly ConditionalWeakTable<Drawable, BindableBool> isDrawableUsingClosestAnchorLookup = new ConditionalWeakTable<Drawable, BindableBool>();
 
+        private const string closest_text = @"Closest";
+
         /// <summary>
         /// The hash code of the "Closest" menu item in the anchor point context menu.
         /// </summary>
-        /// <remarks>This does not need to change with locale; it need only be constant and distinct from any <see cref="Anchor"/> values.</remarks>
-        private static readonly int hash_of_closest_anchor_menu_item = @"Closest".GetHashCode();
+        /// <remarks>Needs only be constant and distinct from any <see cref="Anchor"/> values.</remarks>
+        private static readonly int closest_text_hash = closest_text.GetHashCode();
 
-        /// <remarks>Used by <see cref="load"/> to populate <see cref="localisedAnchorMenuItems"/> and <see cref="localisedOriginMenuItems"/>.</remarks>
-        private static readonly LocalisableString[] unbound_anchor_menu_items =
+        private static readonly Dictionary<int, string> anchor_menu_items;
+        private static readonly Dictionary<int, string> origin_menu_items;
+
+        static SkinSelectionHandler()
         {
-            SkinEditorStrings.Closest,
-            SkinEditorStrings.TopLeft,
-            SkinEditorStrings.TopCentre,
-            SkinEditorStrings.TopRight,
-            SkinEditorStrings.CentreLeft,
-            SkinEditorStrings.Centre,
-            SkinEditorStrings.CentreRight,
-            SkinEditorStrings.BottomLeft,
-            SkinEditorStrings.BottomCentre,
-            SkinEditorStrings.BottomRight,
-        };
+            var anchorMenuSubset = new[]
+            {
+                Anchor.TopLeft,
+                Anchor.TopCentre,
+                Anchor.TopRight,
+                Anchor.CentreLeft,
+                Anchor.Centre,
+                Anchor.CentreRight,
+                Anchor.BottomLeft,
+                Anchor.BottomCentre,
+                Anchor.BottomRight,
+            };
 
-        /// <remarks>Used by <see cref="load"/> to populate <see cref="localisedAnchorMenuItems"/> and <see cref="localisedOriginMenuItems"/>.</remarks>
-        private static readonly int[] anchor_menu_hashes =
-            new[]
-                {
-                    Anchor.TopLeft,
-                    Anchor.TopCentre,
-                    Anchor.TopRight,
-                    Anchor.CentreLeft,
-                    Anchor.Centre,
-                    Anchor.CentreRight,
-                    Anchor.BottomLeft,
-                    Anchor.BottomCentre,
-                    Anchor.BottomRight,
-                }
-                .Cast<int>()
-                .Prepend(hash_of_closest_anchor_menu_item)
-                .ToArray();
+            var texts = anchorMenuSubset.Select(a => a.ToString()).Prepend(closest_text).ToArray();
+            var hashes = anchorMenuSubset.Cast<int>().Prepend(closest_text_hash).ToArray();
 
-        private Dictionary<int, ILocalisedBindableString> localisedAnchorMenuItems;
-        private Dictionary<int, ILocalisedBindableString> localisedOriginMenuItems;
-        private ILocalisedBindableString localisedAnchor;
-        private ILocalisedBindableString localisedOrigin;
-
-        [BackgroundDependencyLoader]
-        private void load(LocalisationManager localisation)
-        {
-            localisedAnchor = localisation.GetLocalisedString(SkinEditorStrings.Anchor);
-            localisedOrigin = localisation.GetLocalisedString(SkinEditorStrings.Origin);
-
-            var boundAnchorMenuItems = unbound_anchor_menu_items.Select(localisation.GetLocalisedString).ToArray();
-
-            var anchorPairs = anchor_menu_hashes.Zip(boundAnchorMenuItems, (k, v) => new KeyValuePair<int, ILocalisedBindableString>(k, v)).ToArray();
-            localisedAnchorMenuItems = new Dictionary<int, ILocalisedBindableString>(anchorPairs);
-            var originPairs = anchorPairs.Where(pair => pair.Key != hash_of_closest_anchor_menu_item);
-            localisedOriginMenuItems = new Dictionary<int, ILocalisedBindableString>(originPairs);
+            var anchorPairs = hashes.Zip(texts, (k, v) => new KeyValuePair<int, string>(k, v)).ToArray();
+            anchor_menu_items = new Dictionary<int, string>(anchorPairs);
+            var originPairs = anchorPairs.Where(pair => pair.Key != closest_text_hash);
+            origin_menu_items = new Dictionary<int, string>(originPairs);
         }
 
         private Anchor getClosestAnchorForDrawable(Drawable drawable)
@@ -146,9 +120,6 @@ namespace osu.Game.Skinning.Editor
 
         /// <remarks>Defaults to <see langword="true"/>, meaning anchors are closest by default.</remarks>
         private BindableBool isDrawableUsingClosestAnchor(Drawable drawable) => isDrawableUsingClosestAnchorLookup.GetValue(drawable, _ => new BindableBool(true));
-
-        // There may be a more generalised form of this somewhere in the codebase. If so, use that.
-        private static string getSentenceCaseLocalisedString(ILocalisedBindableString ls) => ls.Value.Transform(To.SentenceCase);
 
         [Resolved]
         private SkinEditor skinEditor { get; set; }
@@ -316,29 +287,29 @@ namespace osu.Game.Skinning.Editor
         {
             int checkAnchor(Drawable drawable) =>
                 isDrawableUsingClosestAnchor(drawable).Value
-                    ? hash_of_closest_anchor_menu_item
+                    ? closest_text_hash
                     : (int)drawable.Anchor;
 
-            yield return new OsuMenuItem(getSentenceCaseLocalisedString(localisedAnchor))
+            yield return new OsuMenuItem(nameof(Anchor))
             {
-                Items = createAnchorItems(localisedAnchorMenuItems, checkAnchor, applyAnchor).ToArray()
+                Items = createAnchorItems(anchor_menu_items, checkAnchor, applyAnchor).ToArray()
             };
 
-            yield return new OsuMenuItem(getSentenceCaseLocalisedString(localisedOrigin))
+            yield return new OsuMenuItem(nameof(Origin))
             {
                 // Origins can't be "closest" so we just cast to int
-                Items = createAnchorItems(localisedOriginMenuItems, d => (int)d.Origin, applyOrigin).ToArray()
+                Items = createAnchorItems(origin_menu_items, d => (int)d.Origin, applyOrigin).ToArray()
             };
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            IEnumerable<TernaryStateMenuItem> createAnchorItems(IDictionary<int, ILocalisedBindableString> items, Func<Drawable, int> checkFunction, Action<int> applyFunction) =>
+            IEnumerable<TernaryStateMenuItem> createAnchorItems(IDictionary<int, string> items, Func<Drawable, int> checkFunction, Action<int> applyFunction) =>
                 items.Select(pair =>
                 {
-                    var (hash, ls) = pair;
+                    var (hash, text) = pair;
 
-                    return new TernaryStateRadioMenuItem(getSentenceCaseLocalisedString(ls), MenuItemType.Standard, _ => applyFunction(hash))
+                    return new TernaryStateRadioMenuItem(text, MenuItemType.Standard, _ => applyFunction(hash))
                     {
                         State = { Value = GetStateFromSelection(selection, c => checkFunction((Drawable)c.Item) == hash) }
                     };
@@ -397,7 +368,7 @@ namespace osu.Game.Skinning.Editor
         {
             var isUsingClosestAnchor = isDrawableUsingClosestAnchor(drawable);
 
-            if (hash == hash_of_closest_anchor_menu_item)
+            if (hash == closest_text_hash)
             {
                 isUsingClosestAnchor.Value = true;
                 return getClosestAnchorForDrawable(drawable);
