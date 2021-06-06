@@ -33,11 +33,11 @@ namespace osu.Game.Screens.Play.HUD
         public Anchor Origin { get; set; }
 
         /// <summary>
-        /// <see langword="false"/> if this <see cref="ISkinnableDrawable"/>'s <see cref="Drawable.Anchor"/> is
-        /// automatically determined by proximity, <see langword="true"/> if the user has overridden it.
+        /// <p><see langword="true"/> if this <see cref="ISkinnableDrawable"/>'s <see cref="Drawable.Anchor"/> is
+        /// automatically determined by proximity, <see langword="false"/> if the user has overridden it.</p>
+        /// <p>Corresponds to <see cref="osu.Game.Extensions.DrawableExtensions.UsingClosestAnchor"/> at runtime.</p>
         /// </summary>
-        /// <remarks>Stored this way because <c>default(bool)</c> is <see langword="false"/> and we want the default behaviour to be "closest".</remarks>
-        public bool IsNotUsingClosestAnchor { get; set; }
+        public bool UsingClosestAnchor { get; set; } = true;
 
         public List<SkinnableInfo> Children { get; } = new List<SkinnableInfo>();
 
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Play.HUD
             Scale = component.Scale;
             Anchor = component.Anchor;
             Origin = component.Origin;
-            IsNotUsingClosestAnchor = !component.IsUsingClosestAnchor().Value;
+            UsingClosestAnchor = component.UsingClosestAnchor().Value;
 
             if (component is Container<Drawable> container)
             {

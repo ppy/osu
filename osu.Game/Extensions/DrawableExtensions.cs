@@ -60,7 +60,7 @@ namespace osu.Game.Extensions
             component.Scale = info.Scale;
             component.Anchor = info.Anchor;
             component.Origin = info.Origin;
-            component.IsUsingClosestAnchor().Value = !info.IsNotUsingClosestAnchor;
+            component.UsingClosestAnchor().Value = info.UsingClosestAnchor;
 
             if (component is Container container)
             {
@@ -87,7 +87,7 @@ namespace osu.Game.Extensions
         /// </summary>
         /// <returns>A <see cref="BindableBool"/> whose <see cref="Bindable{T}.Value"/> is <see langword="true"/> if the <see cref="IDrawable"/> is using the closest anchor point,
         /// otherwise <see langword="false"/>.</returns>
-        public static BindableBool IsUsingClosestAnchor(this IDrawable drawable) =>
+        public static BindableBool UsingClosestAnchor(this IDrawable drawable) =>
             is_drawable_using_closest_anchor_lookup.GetValue(drawable, _ => new BindableBool(true));
     }
 }
