@@ -60,6 +60,7 @@ namespace osu.Game.Extensions
             component.Scale = info.Scale;
             component.Anchor = info.Anchor;
             component.Origin = info.Origin;
+            component.IsUsingClosestAnchor().Value = !info.IsNotUsingClosestAnchor;
 
             if (component is Container container)
             {
