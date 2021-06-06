@@ -212,7 +212,7 @@ namespace osu.Game.Skinning
 
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => CurrentSkin.Value.GetConfig<TLookup, TValue>(lookup);
 
-        public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => CurrentSkin.Value.FindProvider(lookupFunction);
+        public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(CurrentSkin.Value) ? CurrentSkin.Value : null;
 
         #region IResourceStorageProvider
 

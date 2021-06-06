@@ -35,8 +35,6 @@ namespace osu.Game.Skinning
 
         public abstract IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
 
-        public virtual ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(this) ? this : null;
-
         protected Skin(SkinInfo skin, IStorageResourceProvider resources)
         {
             SkinInfo = skin;
