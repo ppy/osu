@@ -204,15 +204,33 @@ namespace osu.Game.Skinning
 
         public event Action SourceChanged;
 
-        public Drawable GetDrawableComponent(ISkinComponent component) => CurrentSkin.Value.GetDrawableComponent(component);
+        public Drawable GetDrawableComponent(ISkinComponent component) => lookupWithFallback(s => s.GetDrawableComponent(component));
 
-        public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => CurrentSkin.Value.GetTexture(componentName, wrapModeS, wrapModeT);
+        public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => lookupWithFallback(s => s.GetTexture(componentName, wrapModeS, wrapModeT));
 
-        public ISample GetSample(ISampleInfo sampleInfo) => CurrentSkin.Value.GetSample(sampleInfo);
+        public ISample GetSample(ISampleInfo sampleInfo) => lookupWithFallback(s => s.GetSample(sampleInfo));
 
-        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => CurrentSkin.Value.GetConfig<TLookup, TValue>(lookup);
+        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => lookupWithFallback(s => s.GetConfig<TLookup, TValue>(lookup));
 
         public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(CurrentSkin.Value) ? CurrentSkin.Value : null;
+
+        private Skin defaultLegacySkin;
+
+        private T lookupWithFallback<T>(Func<ISkin, T> func)
+            where T : class
+        {
+            var selectedSkin = func(CurrentSkin.Value);
+
+            if (selectedSkin != null)
+                return selectedSkin;
+
+            defaultLegacySkin ??= new DefaultLegacySkin(this);
+
+            if (CurrentSkin.Value is LegacySkin)
+                return func(defaultLegacySkin);
+
+            return null;
+        }
 
         #region IResourceStorageProvider
 
