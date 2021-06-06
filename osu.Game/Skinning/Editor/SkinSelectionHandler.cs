@@ -243,7 +243,7 @@ namespace osu.Game.Skinning.Editor
 
         private void updateDrawableAnchorIfUsingClosest(Drawable drawable)
         {
-            if (!drawable.IsUsingClosestAnchor().Value) return;
+            if (!drawable.UsingClosestAnchor().Value) return;
 
             var closestAnchor = getClosestAnchorForDrawable(drawable);
 
@@ -268,7 +268,7 @@ namespace osu.Game.Skinning.Editor
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
         {
             int checkAnchor(Drawable drawable) =>
-                drawable.IsUsingClosestAnchor().Value
+                drawable.UsingClosestAnchor().Value
                     ? closest_text_hash
                     : (int)drawable.Anchor;
 
@@ -348,7 +348,7 @@ namespace osu.Game.Skinning.Editor
 
         private Anchor getAnchorFromHashAndDrawableAndRecordWhetherUsingClosestAnchor(int hash, Drawable drawable)
         {
-            var isUsingClosestAnchor = drawable.IsUsingClosestAnchor();
+            var isUsingClosestAnchor = drawable.UsingClosestAnchor();
 
             if (hash == closest_text_hash)
             {
