@@ -15,9 +15,9 @@ namespace osu.Game.Overlays.Wiki
     {
         private readonly FillFlowContainer content;
 
-        private FillFlowContainer lastItem;
+        private Container lastMainTitle;
 
-        private FillFlowContainer lastSubsection;
+        private Container lastSubTitle;
 
         public WikiTableOfContents()
         {
@@ -37,29 +37,26 @@ namespace osu.Game.Overlays.Wiki
 
             if (subtitle)
             {
-                lastSubsection ??= new FillFlowContainer
+                lastMainTitle.Margin = new MarginPadding(0);
+
+                if (lastSubTitle != null)
+                    lastSubTitle.Margin = new MarginPadding(0);
+
+                content.Add(lastSubTitle = new Container
                 {
-                    Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = 10 },
-                };
-
-                lastSubsection.Add(entry);
+                    Margin = new MarginPadding { Bottom = 10 },
+                    Child = entry,
+                });
 
                 return;
             }
 
-            if (lastSubsection != null)
-            {
-                lastItem.Add(lastSubsection);
-                lastItem.Margin = new MarginPadding { Bottom = 10 };
-                lastSubsection = null;
-            }
+            lastSubTitle = null;
 
-            content.Add(lastItem = new FillFlowContainer
+            content.Add(lastMainTitle = new Container
             {
-                Direction = FillDirection.Vertical,
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Margin = new MarginPadding { Bottom = 5 },
@@ -92,6 +89,7 @@ namespace osu.Game.Overlays.Wiki
                     f.AutoSizeAxes = Axes.Y;
                 });
                 Margin = new MarginPadding { Bottom = 2 };
+                Padding = new MarginPadding { Left = subtitle ? 10 : 0 };
             }
 
             protected override IEnumerable<Drawable> EffectTargets => new Drawable[] { textFlow };
