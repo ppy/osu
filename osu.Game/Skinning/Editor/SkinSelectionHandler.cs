@@ -4,9 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
@@ -22,23 +20,6 @@ namespace osu.Game.Skinning.Editor
 {
     public class SkinSelectionHandler : SelectionHandler<ISkinnableDrawable>
     {
-        /// <summary>
-        /// <p>Keeps track of whether a <see cref="Drawable"/> is using the closest <see cref="Drawable.Anchor">anchor point</see> within its <see cref="Drawable.Parent">parent</see>,
-        /// or whether the user is overriding its anchor point.</p>
-        /// <p>Each <see cref="KeyValuePair{TKey,TValue}.Key">key</see> is either a direct cast of an Anchor value, or it is equal to <see cref="closest_text_hash"/>. This is done
-        /// because the "Closest" menu item is not a valid anchor, so something other than an anchor must be used.</p>
-        /// <p>Each <see cref="KeyValuePair{TKey,TValue}.Value">value</see> is a <see cref="BindableBool"/>. If the <see cref="Bindable{T}.Value"/> is <see langword="false"/>, the user has
-        /// overridden the anchor point.
-        /// If <see langword="true"/>, the closest anchor point is assigned to the Drawable when it is either dragged by the user via <see cref="HandleMovement"/>, or when "Closest" is assigned from
-        /// the anchor context menu via <see cref="applyAnchor"/>.</p>
-        /// </summary>
-        /// <remarks>
-        /// <p>A <see cref="ConditionalWeakTable{TKey,TValue}">ConditionalWeakTable</see> is preferable to a <see cref="Dictionary{TKey,TValue}">Dictionary</see> because a Dictionary will keep
-        /// orphaned references to a Drawable forever, unless manually pruned</p>
-        /// <p><see cref="BindableBool"/> is used as a thin wrapper around <see cref="Boolean">bool</see> because ConditionalWeakTable requires a reference type as both a key and a value.</p>
-        /// </remarks>
-        private readonly ConditionalWeakTable<Drawable, BindableBool> isDrawableUsingClosestAnchorLookup = new ConditionalWeakTable<Drawable, BindableBool>();
-
         private const string closest_text = @"Closest";
 
         /// <summary>
@@ -117,9 +98,6 @@ namespace osu.Game.Skinning.Editor
 
             return result;
         }
-
-        /// <remarks>Defaults to <see langword="true"/>, meaning anchors are closest by default.</remarks>
-        private BindableBool isDrawableUsingClosestAnchor(Drawable drawable) => isDrawableUsingClosestAnchorLookup.GetValue(drawable, _ => new BindableBool(true));
 
         [Resolved]
         private SkinEditor skinEditor { get; set; }
@@ -261,7 +239,7 @@ namespace osu.Game.Skinning.Editor
 
         private void updateDrawableAnchorIfUsingClosest(Drawable drawable)
         {
-            if (!isDrawableUsingClosestAnchor(drawable).Value) return;
+            if (!drawable.IsUsingClosestAnchor().Value) return;
 
             var closestAnchor = getClosestAnchorForDrawable(drawable);
 
@@ -286,7 +264,7 @@ namespace osu.Game.Skinning.Editor
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
         {
             int checkAnchor(Drawable drawable) =>
-                isDrawableUsingClosestAnchor(drawable).Value
+                drawable.IsUsingClosestAnchor().Value
                     ? closest_text_hash
                     : (int)drawable.Anchor;
 
@@ -366,7 +344,7 @@ namespace osu.Game.Skinning.Editor
 
         private Anchor getAnchorFromHashAndDrawableAndRecordWhetherUsingClosestAnchor(int hash, Drawable drawable)
         {
-            var isUsingClosestAnchor = isDrawableUsingClosestAnchor(drawable);
+            var isUsingClosestAnchor = drawable.IsUsingClosestAnchor();
 
             if (hash == closest_text_hash)
             {
