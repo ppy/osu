@@ -417,12 +417,7 @@ namespace osu.Game.Skinning
                     break;
             }
 
-            var animation = this.GetAnimation(component.LookupName, false, false);
-
-            if (animation != null)
-                return animation;
-
-            return null;
+            return this.GetAnimation(component.LookupName, false, false);
         }
 
         private Texture getParticleTexture(HitResult result)
