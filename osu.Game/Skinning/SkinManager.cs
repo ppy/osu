@@ -48,12 +48,16 @@ namespace osu.Game.Skinning
 
         protected override string ImportFromStablePath => "Skins";
 
+        private readonly Skin defaultLegacySkin;
+
         public SkinManager(Storage storage, DatabaseContextFactory contextFactory, GameHost host, IResourceStore<byte[]> resources, AudioManager audio)
             : base(storage, contextFactory, new SkinStore(contextFactory, storage), host)
         {
             this.audio = audio;
             this.host = host;
             this.resources = resources;
+
+            defaultLegacySkin = new DefaultLegacySkin(this);
 
             CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = GetSkin(skin.NewValue);
             CurrentSkin.ValueChanged += skin =>
@@ -212,9 +216,16 @@ namespace osu.Game.Skinning
 
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => lookupWithFallback(s => s.GetConfig<TLookup, TValue>(lookup));
 
-        public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(CurrentSkin.Value) ? CurrentSkin.Value : null;
+        public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
+        {
+            if (lookupFunction(CurrentSkin.Value))
+                return CurrentSkin.Value;
 
-        private Skin defaultLegacySkin;
+            if (CurrentSkin.Value is LegacySkin && lookupFunction(defaultLegacySkin))
+                return defaultLegacySkin;
+
+            return null;
+        }
 
         private T lookupWithFallback<T>(Func<ISkin, T> func)
             where T : class
@@ -223,8 +234,6 @@ namespace osu.Game.Skinning
 
             if (selectedSkin != null)
                 return selectedSkin;
-
-            defaultLegacySkin ??= new DefaultLegacySkin(this);
 
             if (CurrentSkin.Value is LegacySkin)
                 return func(defaultLegacySkin);
