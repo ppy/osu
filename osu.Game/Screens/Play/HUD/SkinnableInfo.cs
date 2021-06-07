@@ -56,7 +56,8 @@ namespace osu.Game.Screens.Play.HUD
             Anchor = component.Anchor;
             Origin = component.Origin;
 
-            OverridesClosestAnchor = component is ISkinnableDrawable { OverridesClosestAnchor: true };
+            if (component is ISkinnableDrawable skinnable)
+                OverridesClosestAnchor = skinnable.OverridesClosestAnchor;
 
             if (component is Container<Drawable> container)
             {
