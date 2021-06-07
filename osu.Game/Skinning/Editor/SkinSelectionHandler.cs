@@ -241,7 +241,7 @@ namespace osu.Game.Skinning.Editor
 
         private void updateDrawableAnchorIfUsingClosest(Drawable drawable)
         {
-            if (!(drawable is ISkinnableDrawable { UsingClosestAnchor: true })) return;
+            if (drawable is ISkinnableDrawable { OverridesClosestAnchor: true }) return;
 
             var closestAnchor = getClosestAnchorForDrawable(drawable);
 
@@ -266,9 +266,9 @@ namespace osu.Game.Skinning.Editor
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
         {
             static int checkAnchor(Drawable drawable) =>
-                drawable is ISkinnableDrawable { UsingClosestAnchor: true }
-                    ? closest_text_hash
-                    : (int)drawable.Anchor;
+                drawable is ISkinnableDrawable { OverridesClosestAnchor: true }
+                    ? (int)drawable.Anchor
+                    : closest_text_hash;
 
             yield return new OsuMenuItem(nameof(Anchor))
             {
@@ -331,12 +331,12 @@ namespace osu.Game.Skinning.Editor
             {
                 var drawable = (Drawable)item;
 
-                var (usingClosest, anchor) =
+                var (overridesClosest, anchor) =
                     hash == closest_text_hash
-                        ? (true, getClosestAnchorForDrawable(drawable))
-                        : (false, (Anchor)hash);
+                        ? (false, getClosestAnchorForDrawable(drawable))
+                        : (true, (Anchor)hash);
 
-                item.UsingClosestAnchor = usingClosest;
+                item.OverridesClosestAnchor = overridesClosest;
                 updateDrawableAnchor(drawable, anchor);
             }
         }

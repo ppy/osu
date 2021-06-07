@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public bool UsingClosestAnchor { get; set; } = true;
+        public bool OverridesClosestAnchor { get; set; }
 
         [BackgroundDependencyLoader(true)]
         private void load(DrawableRuleset drawableRuleset)
