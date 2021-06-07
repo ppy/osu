@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
@@ -43,13 +45,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             direction.ValueChanged += _ => layoutCache.Invalidate();
             timeRange.ValueChanged += _ => layoutCache.Invalidate();
-        }
-
-        public override void Clear()
-        {
-            base.Clear();
-
-            layoutComputed.Clear();
         }
 
         /// <summary>
@@ -147,17 +142,20 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
         }
 
-        protected override void OnAdd(DrawableHitObject drawableHitObject)
+        protected override void AddDrawable(HitObjectLifetimeEntry entry, DrawableHitObject drawable)
         {
-            invalidateHitObject(drawableHitObject);
-            drawableHitObject.DefaultsApplied += invalidateHitObject;
+            base.AddDrawable(entry, drawable);
+
+            invalidateHitObject(drawable);
+            drawable.DefaultsApplied += invalidateHitObject;
         }
 
-        protected override void OnRemove(DrawableHitObject drawableHitObject)
+        protected override void RemoveDrawable(HitObjectLifetimeEntry entry, DrawableHitObject drawable)
         {
-            layoutComputed.Remove(drawableHitObject);
+            base.RemoveDrawable(entry, drawable);
 
-            drawableHitObject.DefaultsApplied -= invalidateHitObject;
+            drawable.DefaultsApplied -= invalidateHitObject;
+            layoutComputed.Remove(drawable);
         }
 
         private void invalidateHitObject(DrawableHitObject hitObject)
@@ -206,6 +204,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private double computeOriginAdjustedLifetimeStart(DrawableHitObject hitObject)
         {
+            // Origin position may be relative to the parent size
+            Debug.Assert(hitObject.Parent != null);
+
             float originAdjustment = 0.0f;
 
             // calculate the dimension of the part of the hitobject that should already be visible
