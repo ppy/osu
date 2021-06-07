@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
-        private class HitErrorCircle : Container
+        internal class HitErrorCircle : Container
         {
             public bool IsRemoved { get; private set; }
 
