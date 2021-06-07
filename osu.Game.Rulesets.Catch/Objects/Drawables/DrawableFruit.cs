@@ -44,12 +44,4 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             ScalingContainer.RotateTo((RandomSingle(1) - 0.5f) * 40);
         }
     }
-
-    public enum FruitVisualRepresentation
-    {
-        Pear,
-        Grape,
-        Pineapple,
-        Raspberry,
-    }
 }
