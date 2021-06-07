@@ -108,15 +108,16 @@ namespace osu.Game.Screens.Backgrounds
                     case BackgroundSource.Beatmap:
                     case BackgroundSource.BeatmapWithStoryboard:
                     {
-                        // this method is called in many cases where the beatmap hasn't changed (ie. on screen transitions).
-                        // if a background is already displayed for the requested beatmap, we don't want to load it again.
-                        if ((background as BeatmapBackground)?.Beatmap == beatmap.Value)
-                            return background;
-
                         if (mode.Value == BackgroundSource.BeatmapWithStoryboard && AllowStoryboardBackground)
                             newBackground = new BeatmapBackgroundWithStoryboard(beatmap.Value, getBackgroundTextureName());
-
                         newBackground ??= new BeatmapBackground(beatmap.Value, getBackgroundTextureName());
+
+                        // this method is called in many cases where the beatmap hasn't changed (ie. on screen transitions).
+                        // if a background is already displayed for the requested beatmap, we don't want to load it again.
+                        if (background?.GetType() == newBackground.GetType() &&
+                            (background as BeatmapBackground)?.Beatmap == beatmap.Value)
+                            return background;
+
                         break;
                     }
                 }
