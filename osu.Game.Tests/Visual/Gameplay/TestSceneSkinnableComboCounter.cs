@@ -3,26 +3,19 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Testing;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.Osu;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Skinning;
+using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneComboCounter : SkinnableTestScene
+    public class TestSceneSkinnableComboCounter : SkinnableHUDComponentTestScene
     {
-        protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
-
         [Cached]
         private ScoreProcessor scoreProcessor = new ScoreProcessor();
 
-        [SetUpSteps]
-        public void SetUpSteps()
-        {
-            AddStep("Create combo counters", () => SetContents(() => new SkinnableDrawable(new HUDSkinComponent(HUDSkinComponents.ComboCounter))));
-        }
+        protected override Drawable CreateDefaultImplementation() => new DefaultComboCounter();
+        protected override Drawable CreateLegacyImplementation() => new LegacyComboCounter();
 
         [Test]
         public void TestComboCounterIncrementing()

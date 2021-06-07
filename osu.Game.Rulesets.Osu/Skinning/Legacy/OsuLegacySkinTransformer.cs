@@ -84,14 +84,18 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return null;
 
                     case OsuSkinComponents.Cursor:
-                        if (Source.GetTexture("cursor") != null)
-                            return new LegacyCursor();
+                        var cursorProvider = Source.FindProvider(s => s.GetTexture("cursor") != null);
+
+                        if (cursorProvider != null)
+                            return new LegacyCursor(cursorProvider);
 
                         return null;
 
                     case OsuSkinComponents.CursorTrail:
-                        if (Source.GetTexture("cursortrail") != null)
-                            return new LegacyCursorTrail();
+                        var trailProvider = Source.FindProvider(s => s.GetTexture("cursortrail") != null);
+
+                        if (trailProvider != null)
+                            return new LegacyCursorTrail(trailProvider);
 
                         return null;
 
