@@ -27,7 +27,9 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
             Origin = Anchor.TopRight
         };
 
-        private readonly List<FillFlowContainer> containers = new List<FillFlowContainer>();
+        protected readonly List<FillFlowContainer> Containers = new List<FillFlowContainer>();
+
+        protected virtual float PieceWidth => 160;
 
         protected FillFlowContainer CreateFillFlowContainer()
         {
@@ -40,8 +42,8 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
                 Origin = Anchor.TopRight
             };
 
-            containers.Add(target);
-            target.Margin = new MarginPadding { Top = 40, Right = 160 * containers.IndexOf(target) + 5 * containers.IndexOf(target) };
+            Containers.Add(target);
+            target.Margin = new MarginPadding { Top = 40, Right = (PieceWidth * Containers.IndexOf(target)) + (5 * Containers.IndexOf(target)) };
 
             return target;
         }
@@ -50,16 +52,11 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
         {
             AutoSizeAxes = Axes.Both;
             Anchor = Origin = Anchor.TopRight;
-            InternalChildren = new Drawable[]
-            {
-                title
-            };
+            InternalChild = title;
             Padding = new MarginPadding(10);
 
             for (int i = 0; i <= Columns; i++)
-            {
                 AddInternal(CreateFillFlowContainer());
-            }
         }
 
         private int index;
@@ -68,9 +65,14 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
         {
             foreach (var drawable in drawables)
             {
-                containers[index % Columns].Add(drawable);
-                index++;
+                Add(drawable);
             }
+        }
+
+        protected void Add(Drawable drawable)
+        {
+            Containers[index % Columns].Add(drawable);
+            index++;
         }
     }
 }
