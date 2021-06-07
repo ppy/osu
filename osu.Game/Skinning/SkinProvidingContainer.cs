@@ -46,8 +46,16 @@ namespace osu.Game.Skinning
 
         public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
         {
-            if (skin != null && lookupFunction(skin))
-                return skin;
+            if (skin is ISkinSource source)
+            {
+                if (source.FindProvider(lookupFunction) is ISkin found)
+                    return found;
+            }
+            else if (skin != null)
+            {
+                if (lookupFunction(skin))
+                    return skin;
+            }
 
             return fallbackSource?.FindProvider(lookupFunction);
         }
