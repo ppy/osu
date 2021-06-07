@@ -214,7 +214,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         protected override void OnNewJudgement(JudgementResult judgement)
         {
-            if (!judgement.IsHit)
+            if (!judgement.IsHit || judgement.HitObject.HitWindows?.WindowFor(HitResult.Miss) == 0)
                 return;
 
             if (judgementsContainer.Count > max_concurrent_judgements)
