@@ -1,9 +1,10 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Mvis.Skinning;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.SideBar.Header
@@ -19,19 +20,24 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
 
+        private Color4 activeColor => colourProvider.Highlight1;
+        private Color4 inActiveColor => colourProvider.Dark4;
+
         public HeaderTabItem(ISidebarContent content)
         {
             AutoSizeAxes = Axes.X;
-            RelativeSizeAxes = Axes.Y;
+            Height = 40;
             Anchor = Anchor.TopRight;
             Origin = Anchor.TopRight;
             Value = content;
+            Masking = true;
+            CornerRadius = 5;
+            Margin = new MarginPadding { Vertical = 10, Horizontal = 5 };
             Children = new Drawable[]
             {
                 activeBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Height = 0,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft
                 },
@@ -41,6 +47,10 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Margin = new MarginPadding { Horizontal = 5 }
+                },
+                new PlaceHolder
+                {
+                    Size = new Vector2(40)
                 }
             };
         }
@@ -49,40 +59,25 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
         {
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                activeBox.Colour = colourProvider.Highlight1;
-                title.Colour = isActive ? Color4.White : colourProvider.Highlight1;
+                activeBox.Colour = isActive ? activeColor : inActiveColor;
+                title.Colour = isActive ? Color4.Black : activeColor;//
             }, true);
 
             base.LoadComplete();
         }
 
-        protected override bool OnHover(HoverEvent e)
-        {
-            if (!isActive)
-                activeBox.ResizeHeightTo(0.15f, 300, Easing.OutQuint);
-
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            if (!isActive)
-                activeBox.ResizeHeightTo(0, 300, Easing.OutQuint);
-
-            base.OnHoverLost(e);
-        }
-
         public void MakeActive()
         {
             isActive = true;
-            activeBox.ResizeHeightTo(0.2f, 300, Easing.OutQuint);
-            title.Colour = Color4.White;
+            activeBox.FadeColour(activeColor, 300, Easing.OutQuint);
+            title.Colour = Color4.Black;
         }
 
         public void MakeInActive()
         {
             isActive = false;
-            activeBox.ResizeHeightTo(IsHovered ? 0.15f : 0, 300, Easing.OutQuint);
+            activeBox.FadeColour(inActiveColor, 300, Easing.OutQuint);
+            title.Colour = Color4.White;
             title.Colour = colourProvider.Highlight1;
         }
     }

@@ -8,14 +8,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Mvis.SideBar.Header;
-using osu.Game.Screens.Mvis.Skinning;
-using osu.Game.Skinning;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.SideBar
@@ -25,16 +21,14 @@ namespace osu.Game.Screens.Mvis.SideBar
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
 
-        [Resolved]
+        [CanBeNull]
+        [Resolved(CanBeNull = true)]
         private MvisScreen mvisScreen { get; set; }
 
         public readonly List<ISidebarContent> Components = new List<ISidebarContent>();
         private readonly TabHeader header;
         private const float duration = 400;
         private HeaderTabItem prevTab;
-
-        [CanBeNull]
-        private Box sidebarBg;
 
         public BindableBool IsVisible = new BindableBool();
         public Bindable<Drawable> CurrentDisplay = new Bindable<Drawable>();
@@ -66,33 +60,22 @@ namespace osu.Game.Screens.Mvis.SideBar
                             Hide();
                     }
                 },
+                header = new TabHeader
+                {
+                    Depth = float.MinValue
+                },
                 content = new BlockClickContainer
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(0.3f, 1f),
                     Masking = true,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Radius = 5,
-                        Colour = Color4.Black.Opacity(0.5f)
-                    },
                     Children = new Drawable[]
                     {
-                        header = new TabHeader
-                        {
-                            Depth = float.MinValue
-                        },
                         contentContainer = new Container
                         {
                             Name = "Content",
                             RelativeSizeAxes = Axes.Both
-                        },
-                        new Footer.Footer
-                        {
-                            Depth = float.MinValue
                         }
                     }
                 }
@@ -105,32 +88,6 @@ namespace osu.Game.Screens.Mvis.SideBar
             sampleToggle = audio.Samples.Get("UI/overlay-pop-in");
             samplePopIn = audio.Samples.Get("UI/overlay-pop-in");
             samplePopOut = audio.Samples.Get("UI/overlay-pop-out");
-
-            content.Add(new SkinnableComponent(
-                "MSidebar-background",
-                confineMode: ConfineMode.ScaleToFill,
-                defaultImplementation: _ => sidebarBg = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Dark5,
-                    Depth = float.MaxValue
-                })
-            {
-                Name = "侧边栏背景",
-                Depth = float.MaxValue,
-                Anchor = Anchor.BottomRight,
-                Origin = Anchor.BottomRight,
-                ChildAnchor = Anchor.BottomRight,
-                ChildOrigin = Anchor.BottomRight,
-                RelativeSizeAxes = Axes.Both,
-                CentreComponent = false,
-                OverrideChildAnchor = true,
-            });
-
-            colourProvider.HueColour.BindValueChanged(_ =>
-            {
-                sidebarBg?.FadeColour(colourProvider.Dark5);
-            }, true);
         }
 
         protected override void LoadComplete()
@@ -164,7 +121,7 @@ namespace osu.Game.Screens.Mvis.SideBar
             contentContainer.Padding = new MarginPadding
             {
                 Top = header.Height + header.DrawPosition.Y,
-                Bottom = mvisScreen.BottombarHeight
+                Bottom = mvisScreen?.BottombarHeight ?? 0
             };
 
             base.UpdateAfterChildren();
@@ -177,9 +134,6 @@ namespace osu.Game.Screens.Mvis.SideBar
 
             if (!Components.Contains(c))
                 throw new InvalidOperationException($"组成部分中不包含{c}");
-
-            if (c.ResizeWidth < 0.3f || c.ResizeHeight < 0.3f)
-                throw new InvalidOperationException("组件过小, 缩放大小不能小于30%(0.3)");
 
             startFromHiddenState = State.Value == Visibility.Hidden;
 
@@ -206,7 +160,7 @@ namespace osu.Game.Screens.Mvis.SideBar
 
             CurrentDisplay.Value = d;
 
-            content.ResizeTo(new Vector2(c.ResizeWidth, c.ResizeHeight), resizeDuration, Easing.OutQuint);
+            //content.ResizeWidthTo(c.ResizeWidth, resizeDuration, Easing.OutQuint);
         }
 
         private void addDrawableToList(Drawable d)

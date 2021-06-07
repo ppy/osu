@@ -11,7 +11,6 @@ using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.SideBar;
-using osuTK;
 
 namespace osu.Game.Tests.Visual.Mvis
 {
@@ -46,6 +45,7 @@ namespace osu.Game.Tests.Visual.Mvis
                     addRandom(false);
                 }
             });
+            AddStep("Very Long Tab", () => sidebar.Add(new VoidSidebarContent(1, $"OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOH")));
         }
 
         private void resize()
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Mvis
             {
                 ReWidth = reWidth;
                 TabTitle = tabTitle;
-                Size = new Vector2(200, 100);
+                RelativeSizeAxes = Axes.Both;
                 Child = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,

@@ -16,7 +16,10 @@ namespace osu.Game.Screens.Mvis
     ///</summary>
     public class CustomColourProvider : Component
     {
+        public Color4 ActiveColor => Highlight2;
+        public Color4 InActiveColor => Dark4;
         public Color4 Highlight1 => getColour(1, 0.7f);
+        public Color4 Highlight2 => getColour(0.7f, 0.7f);
         public Color4 Content1 => getColour(0.4f, 1);
         public Color4 Content2 => getColour(0.4f, 0.9f);
         public Color4 Light1 => getColour(0.4f, 0.8f);
