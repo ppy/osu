@@ -120,5 +120,6 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public float ResizeWidth { get; }
         public string Title { get; }
+        public IconUsage Icon { get; } = FontAwesome.Solid.Plug;
     }
 }

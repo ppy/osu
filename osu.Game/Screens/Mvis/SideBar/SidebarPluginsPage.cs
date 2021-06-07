@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Mvis.SideBar
     {
         public float ResizeWidth => 0.35f;
         public string Title => "插件";
+        public IconUsage Icon { get; } = FontAwesome.Solid.Boxes;
 
         private MvisPluginManager manager;
         private FillFlowContainer<PluginPiece> flow;

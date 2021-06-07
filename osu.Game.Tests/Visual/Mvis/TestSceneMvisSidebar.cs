@@ -6,6 +6,7 @@ using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
@@ -36,7 +37,7 @@ namespace osu.Game.Tests.Visual.Mvis
 
             AddStep("Toggle Sidebar ", sidebar.ToggleVisibility);
             AddStep("Clear Sidebar", sidebar.Clear);
-            AddStep("Random Resize", () => addRandom(true)); //
+            AddStep("Random Resize", () => addRandom());
             AddStep("Try Resize to 20%x20%", resize);
             AddStep("Add Tabs", () =>
             {
@@ -116,6 +117,7 @@ namespace osu.Game.Tests.Visual.Mvis
 
             public float ResizeWidth => ReWidth;
             public string Title => TabTitle;
+            public IconUsage Icon { get; } = FontAwesome.Regular.Bell;
             public float ResizeHeight => 0.8f;
         }
     }

@@ -62,7 +62,9 @@ namespace osu.Game.Screens.Mvis.SideBar
                 },
                 header = new TabHeader
                 {
-                    Depth = float.MinValue
+                    Depth = float.MinValue,
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight
                 },
                 content = new BlockClickContainer
                 {
@@ -120,7 +122,7 @@ namespace osu.Game.Screens.Mvis.SideBar
         {
             contentContainer.Padding = new MarginPadding
             {
-                Top = header.Height + header.DrawPosition.Y,
+                Right = header.Width + header.Margin.Right + header.Margin.Left + 5,
                 Bottom = mvisScreen?.BottombarHeight ?? 0
             };
 

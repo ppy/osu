@@ -1,8 +1,10 @@
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Mvis.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -12,27 +14,28 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
     public class HeaderTabItem : OsuClickableContainer
     {
         private readonly Box activeBox;
-        private readonly OsuSpriteText title;
+        private readonly SpriteIcon icon;
         private bool isActive;
 
         public ISidebarContent Value;
+        private readonly Box flashBox;
 
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
 
         private Color4 activeColor => colourProvider.Highlight1;
-        private Color4 inActiveColor => colourProvider.Dark4;
+        private Color4 inActiveColor => colourProvider.Dark4.Opacity(0);
 
         public HeaderTabItem(ISidebarContent content)
         {
-            AutoSizeAxes = Axes.X;
-            Height = 40;
+            Value = content;
+            TooltipText = Value.Title;
+
+            Size = new Vector2(45);
             Anchor = Anchor.TopRight;
             Origin = Anchor.TopRight;
-            Value = content;
             Masking = true;
             CornerRadius = 5;
-            Margin = new MarginPadding { Vertical = 10, Horizontal = 5 };
             Children = new Drawable[]
             {
                 activeBox = new Box
@@ -41,16 +44,22 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft
                 },
-                title = new OsuSpriteText
+                icon = new SpriteIcon
                 {
-                    Text = content.Title,
+                    Icon = content.Icon,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Margin = new MarginPadding { Horizontal = 5 }
+                    Size = new Vector2(18)
                 },
                 new PlaceHolder
                 {
                     Size = new Vector2(40)
+                },
+                flashBox = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.White,
+                    Alpha = 0,
                 }
             };
         }
@@ -60,25 +69,36 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
             colourProvider.HueColour.BindValueChanged(_ =>
             {
                 activeBox.Colour = isActive ? activeColor : inActiveColor;
-                title.Colour = isActive ? Color4.Black : activeColor;//
+                icon.Colour = isActive ? Color4.Black : Color4.White;
             }, true);
 
             base.LoadComplete();
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            flashBox.FadeTo(0.2f, 300);
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            base.OnHoverLost(e);
+            flashBox.FadeTo(0f, 300);
         }
 
         public void MakeActive()
         {
             isActive = true;
             activeBox.FadeColour(activeColor, 300, Easing.OutQuint);
-            title.Colour = Color4.Black;
+            icon.Colour = Color4.Black;
         }
 
         public void MakeInActive()
         {
             isActive = false;
             activeBox.FadeColour(inActiveColor, 300, Easing.OutQuint);
-            title.Colour = Color4.White;
-            title.Colour = colourProvider.Highlight1;
+            icon.Colour = Color4.White;
         }
     }
 }
