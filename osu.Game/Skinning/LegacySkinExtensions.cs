@@ -54,9 +54,16 @@ namespace osu.Game.Skinning
 
             IEnumerable<Texture> getTextures()
             {
+                ISkin lookupSource = null;
+
                 for (int i = 0; true; i++)
                 {
-                    if ((texture = source.GetTexture($"{componentName}{animationSeparator}{i}", wrapModeS, wrapModeT)) == null)
+                    string frameName = $"{componentName}{animationSeparator}{i}";
+
+                    // ensure all textures are retrieved from the same skin source.
+                    lookupSource ??= (source as ISkinSource)?.FindProvider(s => s.GetTexture(frameName, wrapModeS, wrapModeT) != null) ?? source;
+
+                    if ((texture = lookupSource?.GetTexture(frameName, wrapModeS, wrapModeT)) == null)
                         break;
 
                     yield return texture;
