@@ -30,15 +30,22 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneHitErrorMeter : OsuTestScene
     {
-        [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor();
+        [Cached(typeof(ScoreProcessor))]
+        private TestScoreProcessor scoreProcessor = new TestScoreProcessor();
 
         [Cached(typeof(DrawableRuleset))]
         private TestDrawableRuleset drawableRuleset = new TestDrawableRuleset();
 
-        public TestSceneHitErrorMeter()
+        [SetUpSteps]
+        public void SetUp()
         {
-            recreateDisplay(new OsuHitWindows(), 5);
+            AddStep("reset score processor", () => scoreProcessor.Reset());
+        }
+
+        [Test]
+        public void TestBasic()
+        {
+            AddStep("create display", () => recreateDisplay(new OsuHitWindows(), 5));
 
             AddRepeatStep("New random judgement", () => newJudgement(), 40);
 
@@ -46,11 +53,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep("New max positive", () => newJudgement(drawableRuleset.HitWindows.WindowFor(HitResult.Meh)), 20);
             AddStep("New fixed judgement (50ms)", () => newJudgement(50));
 
+            ScheduledDelegate del = null;
             AddStep("Judgement barrage", () =>
             {
                 int runCount = 0;
-
-                ScheduledDelegate del = null;
 
                 del = Scheduler.AddDelayed(() =>
                 {
@@ -61,6 +67,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         del?.Cancel();
                 }, 10, true);
             });
+            AddUntilStep("wait for barrage", () => del.Cancelled);
         }
 
         [Test]
@@ -210,6 +217,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override void RequestResume(Action continueResume) => throw new NotImplementedException();
 
             public override void CancelResume() => throw new NotImplementedException();
+        }
+
+        private class TestScoreProcessor : ScoreProcessor
+        {
+            public void Reset() => base.Reset(false);
         }
     }
 }
