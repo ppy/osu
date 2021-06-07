@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mods;
@@ -84,10 +83,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestCatch()
+        public void TestEmpty()
         {
-            AddStep("OD 1", () => recreateDisplay(new CatchHitWindows(), 1));
-            AddStep("OD 10", () => recreateDisplay(new CatchHitWindows(), 10));
+            AddStep("empty windows", () => recreateDisplay(HitWindows.Empty, 5));
         }
 
         private void recreateDisplay(HitWindows hitWindows, float overallDifficulty)
