@@ -182,16 +182,9 @@ namespace osu.Game.Rulesets.UI
                         .WithChild(ResumeOverlay)));
             }
 
-            RegenerateAutoplay();
+            applyRulesetMods(Mods, config);
 
             loadObjects(cancellationToken ?? default);
-        }
-
-        public void RegenerateAutoplay()
-        {
-            // for now this is applying mods which aren't just autoplay.
-            // we'll need to reconsider this flow in the future.
-            applyRulesetMods(Mods, config);
         }
 
         /// <summary>
@@ -273,6 +266,12 @@ namespace osu.Game.Rulesets.UI
         {
             if (!(KeyBindingInputManager is IHasRecordingHandler recordingInputManager))
                 throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports recording is not available");
+
+            if (score == null)
+            {
+                recordingInputManager.Recorder = null;
+                return;
+            }
 
             var recorder = CreateReplayRecorder(score);
 
@@ -518,7 +517,7 @@ namespace osu.Game.Rulesets.UI
         /// Sets a replay to be used to record gameplay.
         /// </summary>
         /// <param name="score">The target to be recorded to.</param>
-        public abstract void SetRecordTarget(Score score);
+        public abstract void SetRecordTarget([CanBeNull] Score score);
 
         /// <summary>
         /// Invoked when the interactive user requests resuming from a paused state.

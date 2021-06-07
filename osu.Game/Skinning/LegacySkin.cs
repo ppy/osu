@@ -54,9 +54,6 @@ namespace osu.Game.Skinning
 
         private readonly Dictionary<int, LegacyManiaSkinConfiguration> maniaConfigurations = new Dictionary<int, LegacyManiaSkinConfiguration>();
 
-        [CanBeNull]
-        private readonly DefaultLegacySkin legacyDefaultFallback;
-
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public LegacySkin(SkinInfo skin, IStorageResourceProvider resources)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, resources.Files), resources, "skin.ini")
@@ -73,9 +70,6 @@ namespace osu.Game.Skinning
         protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename)
             : base(skin, resources)
         {
-            if (resources != null)
-                legacyDefaultFallback = CreateFallbackSkin(storage, resources);
-
             using (var stream = storage?.GetStream(configurationFilename))
             {
                 if (stream != null)
@@ -158,7 +152,7 @@ namespace osu.Game.Skinning
                     return genericLookup<TLookup, TValue>(lookup);
             }
 
-            return legacyDefaultFallback?.GetConfig<TLookup, TValue>(lookup);
+            return null;
         }
 
         private IBindable<TValue> lookupForMania<TValue>(LegacyManiaSkinConfigurationLookup maniaLookup)
@@ -335,7 +329,7 @@ namespace osu.Game.Skinning
             {
             }
 
-            return legacyDefaultFallback?.GetConfig<TLookup, TValue>(lookup);
+            return null;
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
@@ -378,16 +372,26 @@ namespace osu.Game.Skinning
                                 }
                             })
                             {
-                                Children = new[]
-                                {
-                                    // TODO: these should fallback to the osu!classic skin.
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ComboCounter)) ?? new DefaultComboCounter(),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreCounter)) ?? new DefaultScoreCounter(),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter)) ?? new DefaultAccuracyCounter(),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.HealthDisplay)) ?? new DefaultHealthDisplay(),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.SongProgress)) ?? new SongProgress(),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.BarHitErrorMeter)) ?? new BarHitErrorMeter(),
-                                }
+                                Children = this.HasFont(LegacyFont.Score)
+                                    ? new Drawable[]
+                                    {
+                                        new LegacyComboCounter(),
+                                        new LegacyScoreCounter(),
+                                        new LegacyAccuracyCounter(),
+                                        new LegacyHealthDisplay(),
+                                        new SongProgress(),
+                                        new BarHitErrorMeter(),
+                                    }
+                                    : new Drawable[]
+                                    {
+                                        // TODO: these should fallback to using osu!classic skin textures, rather than doing this.
+                                        new DefaultComboCounter(),
+                                        new DefaultScoreCounter(),
+                                        new DefaultAccuracyCounter(),
+                                        new DefaultHealthDisplay(),
+                                        new SongProgress(),
+                                        new BarHitErrorMeter(),
+                                    }
                             };
 
                             return skinnableTargetWrapper;
@@ -395,30 +399,8 @@ namespace osu.Game.Skinning
 
                     return null;
 
-                case HUDSkinComponent hudComponent:
-                {
-                    if (!this.HasFont(LegacyFont.Score))
-                        return null;
-
-                    switch (hudComponent.Component)
-                    {
-                        case HUDSkinComponents.ComboCounter:
-                            return new LegacyComboCounter();
-
-                        case HUDSkinComponents.ScoreCounter:
-                            return new LegacyScoreCounter();
-
-                        case HUDSkinComponents.AccuracyCounter:
-                            return new LegacyAccuracyCounter();
-
-                        case HUDSkinComponents.HealthDisplay:
-                            return new LegacyHealthDisplay();
-                    }
-
-                    return null;
-                }
-
                 case GameplaySkinComponent<HitResult> resultComponent:
+                    // TODO: this should be inside the judgement pieces.
                     Func<Drawable> createDrawable = () => getJudgementAnimation(resultComponent.Component);
 
                     // kind of wasteful that we throw this away, but should do for now.
@@ -435,12 +417,7 @@ namespace osu.Game.Skinning
                     break;
             }
 
-            var animation = this.GetAnimation(component.LookupName, false, false);
-
-            if (animation != null)
-                return animation;
-
-            return legacyDefaultFallback?.GetDrawableComponent(component);
+            return this.GetAnimation(component.LookupName, false, false);
         }
 
         private Texture getParticleTexture(HitResult result)
@@ -500,7 +477,7 @@ namespace osu.Game.Skinning
                 return texture;
             }
 
-            return legacyDefaultFallback?.GetTexture(componentName, wrapModeS, wrapModeT);
+            return null;
         }
 
         public override ISample GetSample(ISampleInfo sampleInfo)
@@ -519,20 +496,12 @@ namespace osu.Game.Skinning
                 var sample = Samples?.Get(lookup);
 
                 if (sample != null)
+                {
                     return sample;
+                }
             }
 
-            return legacyDefaultFallback?.GetSample(sampleInfo);
-        }
-
-        public override ISkin FindProvider(Func<ISkin, bool> lookupFunction)
-        {
-            var source = base.FindProvider(lookupFunction);
-
-            if (source != null)
-                return source;
-
-            return legacyDefaultFallback?.FindProvider(lookupFunction);
+            return null;
         }
 
         private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)

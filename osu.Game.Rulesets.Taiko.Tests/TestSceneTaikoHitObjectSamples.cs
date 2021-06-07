@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         [TestCase("taiko-normal-hitnormal")]
         [TestCase("normal-hitnormal")]
-        // [TestCase("hitnormal")] intentionally broken (will play classic default instead).
+        [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromBeatmap(string expectedSample)
         {
             SetupSkins(expectedSample, expectedSample);
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         [TestCase("taiko-normal-hitnormal")]
         [TestCase("normal-hitnormal")]
-        // [TestCase("hitnormal")] intentionally broken (will play classic default instead).
+        [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromUserSkinFallback(string expectedSample)
         {
             SetupSkins(string.Empty, expectedSample);

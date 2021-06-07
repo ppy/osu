@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create overlay", () =>
             {
-                SetContents(() =>
+                SetContents(_ =>
                 {
                     hudOverlay = new HUDOverlay(null, Array.Empty<Mod>());
 

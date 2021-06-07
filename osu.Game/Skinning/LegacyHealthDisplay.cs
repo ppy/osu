@@ -35,7 +35,10 @@ namespace osu.Game.Skinning
         {
             AutoSizeAxes = Axes.Both;
 
-            isNewStyle = getTexture(skin, "marker") != null;
+            var backgroundSource = skin.FindProvider(s => getTexture(s, "bg") != null);
+
+            // the marker lookup to decide which display style must be performed on the source of the bg, which is the most common element.
+            isNewStyle = getTexture(backgroundSource, "marker") != null;
 
             // background implementation is the same for both versions.
             AddInternal(new Sprite { Texture = getTexture(skin, "bg") });
@@ -76,7 +79,7 @@ namespace osu.Game.Skinning
 
         protected override void Flash(JudgementResult result) => marker.Flash(result);
 
-        private static Texture getTexture(ISkinSource skin, string name) => skin.GetTexture($"scorebar-{name}");
+        private static Texture getTexture(ISkin skin, string name) => skin?.GetTexture($"scorebar-{name}");
 
         private static Color4 getFillColour(double hp)
         {
