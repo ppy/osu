@@ -16,9 +16,9 @@ namespace osu.Game.Skinning
         bool IsEditable => true;
 
         /// <summary>
-        /// <see langword="true"/> if this <see cref="ISkinnableDrawable"/>'s <see cref="Drawable.Anchor"/> is automatically determined by proximity,
-        /// <see langword="false"/> if the user has overridden it.
+        /// <see langword="false"/> if this <see cref="ISkinnableDrawable"/>'s <see cref="Drawable.Anchor"/> is automatically determined by proximity,
+        /// <see langword="true"/> if the user has overridden it.
         /// </summary>
-        bool UsingClosestAnchor { get; set; }
+        bool OverridesClosestAnchor { get; set; }
     }
 }

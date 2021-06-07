@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Play.HUD
             set => counterContainer.Alpha = value ? 1 : 0;
         }
 
-        public bool UsingClosestAnchor { get; set; } = true;
+        public bool OverridesClosestAnchor { get; set; }
 
         public LegacyComboCounter()
         {

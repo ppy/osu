@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Play
 
         private IClock referenceClock;
 
-        public bool UsingClosestAnchor { get; set; } = true;
+        public bool OverridesClosestAnchor { get; set; }
 
         public SongProgress()
         {
