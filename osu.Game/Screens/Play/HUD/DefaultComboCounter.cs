@@ -17,6 +17,8 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved(canBeNull: true)]
         private HUDOverlay hud { get; set; }
 
+        public bool UsingClosestAnchor { get; set; } = true;
+
         public DefaultComboCounter()
         {
             Current.Value = DisplayedCount = 0;
