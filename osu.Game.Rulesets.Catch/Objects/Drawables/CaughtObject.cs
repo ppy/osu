@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         public PalpableCatchHitObject HitObject { get; private set; }
         public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();
         public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
+        public Bindable<int> IndexInBeatmap { get; } = new Bindable<int>();
 
         public Vector2 DisplaySize => Size * Scale;
 
@@ -51,6 +52,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             Rotation = objectState.DisplayRotation;
             AccentColour.Value = objectState.AccentColour.Value;
             HyperDash.Value = objectState.HyperDash.Value;
+            IndexInBeatmap.Value = objectState.IndexInBeatmap.Value;
         }
 
         protected override void FreeAfterUse()
