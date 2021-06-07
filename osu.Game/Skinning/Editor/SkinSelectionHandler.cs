@@ -241,7 +241,7 @@ namespace osu.Game.Skinning.Editor
 
         private void updateDrawableAnchorIfUsingClosest(Drawable drawable)
         {
-            if (!drawable.UsingClosestAnchor().Value) return;
+            if (!(drawable is ISkinnableDrawable { UsingClosestAnchor: true })) return;
 
             var closestAnchor = getClosestAnchorForDrawable(drawable);
 
@@ -265,8 +265,8 @@ namespace osu.Game.Skinning.Editor
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
         {
-            int checkAnchor(Drawable drawable) =>
-                drawable.UsingClosestAnchor().Value
+            static int checkAnchor(Drawable drawable) =>
+                drawable is ISkinnableDrawable { UsingClosestAnchor: true }
                     ? closest_text_hash
                     : (int)drawable.Anchor;
 
@@ -331,8 +331,12 @@ namespace osu.Game.Skinning.Editor
             {
                 var drawable = (Drawable)item;
 
-                var anchor = mapHashToAnchorSettings(hash, drawable);
+                var (usingClosest, anchor) =
+                    hash == closest_text_hash
+                        ? (true, getClosestAnchorForDrawable(drawable))
+                        : (false, (Anchor)hash);
 
+                item.UsingClosestAnchor = usingClosest;
                 updateDrawableAnchor(drawable, anchor);
             }
         }
@@ -342,20 +346,6 @@ namespace osu.Game.Skinning.Editor
             var previousAnchor = drawable.AnchorPosition;
             drawable.Anchor = anchor;
             drawable.Position -= drawable.AnchorPosition - previousAnchor;
-        }
-
-        private Anchor mapHashToAnchorSettings(int hash, Drawable drawable)
-        {
-            var isUsingClosestAnchor = drawable.UsingClosestAnchor();
-
-            if (hash == closest_text_hash)
-            {
-                isUsingClosestAnchor.Value = true;
-                return getClosestAnchorForDrawable(drawable);
-            }
-
-            isUsingClosestAnchor.Value = false;
-            return (Anchor)hash;
         }
 
         private static void adjustScaleFromAnchor(ref Vector2 scale, Anchor reference)
