@@ -55,7 +55,10 @@ namespace osu.Game.Screens.Play.HUD
             Scale = component.Scale;
             Anchor = component.Anchor;
             Origin = component.Origin;
-            UsingClosestAnchor = component.UsingClosestAnchor().Value;
+
+            UsingClosestAnchor =
+                // true if it's not an ISkinnableDrawable
+                !(component is ISkinnableDrawable skinnable) || skinnable.UsingClosestAnchor;
 
             if (component is Container<Drawable> container)
             {
