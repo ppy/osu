@@ -32,11 +32,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public Anchor Origin { get; set; }
 
-        /// <summary>
-        /// <p><see langword="true"/> if this <see cref="ISkinnableDrawable"/>'s <see cref="Drawable.Anchor"/> is
-        /// automatically determined by proximity, <see langword="false"/> if the user has overridden it.</p>
-        /// <p>Corresponds to <see cref="osu.Game.Extensions.DrawableExtensions.UsingClosestAnchor"/> at runtime.</p>
-        /// </summary>
+        /// <inheritdoc cref="ISkinnableDrawable.UsingClosestAnchor"/>
         public bool UsingClosestAnchor { get; set; } = true;
 
         public List<SkinnableInfo> Children { get; } = new List<SkinnableInfo>();

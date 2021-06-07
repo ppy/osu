@@ -14,5 +14,11 @@ namespace osu.Game.Skinning
         /// Whether this component should be editable by an end user.
         /// </summary>
         bool IsEditable => true;
+
+        /// <summary>
+        /// <see langword="true"/> if this <see cref="ISkinnableDrawable"/>'s <see cref="Drawable.Anchor"/> is automatically determined by proximity,
+        /// <see langword="false"/> if the user has overridden it.
+        /// </summary>
+        bool UsingClosestAnchor { get; set; }
     }
 }

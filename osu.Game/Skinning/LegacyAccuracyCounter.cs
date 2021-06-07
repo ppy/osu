@@ -12,6 +12,8 @@ namespace osu.Game.Skinning
 {
     public class LegacyAccuracyCounter : GameplayAccuracyCounter, ISkinnableDrawable
     {
+        public bool UsingClosestAnchor { get; set; } = true;
+
         public LegacyAccuracyCounter()
         {
             Anchor = Anchor.TopRight;
