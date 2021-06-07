@@ -4,10 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
@@ -86,6 +88,18 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestEmpty()
         {
             AddStep("empty windows", () => recreateDisplay(HitWindows.Empty, 5));
+
+            AddStep("hit", () => newJudgement());
+            AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddAssert("circle added", () =>
+                this.ChildrenOfType<ColourHitErrorMeter>().All(
+                    meter => meter.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Count() == 1));
+
+            AddStep("miss", () => newJudgement(50, HitResult.Miss));
+            AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddAssert("circle added", () =>
+                this.ChildrenOfType<ColourHitErrorMeter>().All(
+                    meter => meter.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Count() == 2));
         }
 
         private void recreateDisplay(HitWindows hitWindows, float overallDifficulty)
@@ -152,12 +166,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private void newJudgement(double offset = 0)
+        private void newJudgement(double offset = 0, HitResult result = HitResult.Perfect)
         {
             scoreProcessor.ApplyResult(new JudgementResult(new HitCircle { HitWindows = drawableRuleset.HitWindows }, new Judgement())
             {
                 TimeOffset = offset == 0 ? RNG.Next(-150, 150) : offset,
-                Type = HitResult.Perfect,
+                Type = result,
             });
         }
 
