@@ -233,15 +233,17 @@ namespace osu.Game.Skinning.Editor
                 Drawable drawable = (Drawable)c.Item;
                 drawable.Position += drawable.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
 
-                updateDrawableAnchorIfUsingClosest(drawable);
+                updateDrawableAnchorIfUsingClosest(c.Item);
             }
 
             return true;
         }
 
-        private void updateDrawableAnchorIfUsingClosest(Drawable drawable)
+        private void updateDrawableAnchorIfUsingClosest(ISkinnableDrawable item)
         {
-            if (drawable is ISkinnableDrawable { OverridesClosestAnchor: true }) return;
+            if (item.OverridesClosestAnchor) return;
+
+            var drawable = (Drawable)item;
 
             var closestAnchor = getClosestAnchorForDrawable(drawable);
 
@@ -265,10 +267,16 @@ namespace osu.Game.Skinning.Editor
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
         {
-            static int checkAnchor(Drawable drawable) =>
-                drawable is ISkinnableDrawable { OverridesClosestAnchor: true }
-                    ? (int)drawable.Anchor
-                    : closest_text_hash;
+            static int checkAnchor(ISkinnableDrawable item)
+            {
+                if (item.OverridesClosestAnchor)
+                {
+                    var drawable = (Drawable)item;
+                    return (int)drawable.Anchor;
+                }
+
+                return closest_text_hash;
+            }
 
             yield return new OsuMenuItem(nameof(Anchor))
             {
@@ -278,20 +286,20 @@ namespace osu.Game.Skinning.Editor
             yield return new OsuMenuItem(nameof(Origin))
             {
                 // Origins can't be "closest" so we just cast to int
-                Items = createAnchorItems(origin_menu_items, d => (int)d.Origin, applyOrigin).ToArray()
+                Items = createAnchorItems(origin_menu_items, d => (int)((Drawable)d).Origin, applyOrigin).ToArray()
             };
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            IEnumerable<TernaryStateMenuItem> createAnchorItems(IDictionary<int, string> items, Func<Drawable, int> checkFunction, Action<int> applyFunction) =>
+            IEnumerable<TernaryStateMenuItem> createAnchorItems(IDictionary<int, string> items, Func<ISkinnableDrawable, int> checkFunction, Action<int> applyFunction) =>
                 items.Select(pair =>
                 {
                     var (hash, text) = pair;
 
                     return new TernaryStateRadioMenuItem(text, MenuItemType.Standard, _ => applyFunction(hash))
                     {
-                        State = { Value = GetStateFromSelection(selection, c => checkFunction((Drawable)c.Item) == hash) }
+                        State = { Value = GetStateFromSelection(selection, c => checkFunction(c.Item) == hash) }
                     };
                 });
         }
@@ -314,7 +322,7 @@ namespace osu.Game.Skinning.Editor
                 drawable.Origin = anchor;
                 drawable.Position += drawable.OriginPosition - previousOrigin;
 
-                updateDrawableAnchorIfUsingClosest(drawable);
+                updateDrawableAnchorIfUsingClosest(item);
             }
         }
 
