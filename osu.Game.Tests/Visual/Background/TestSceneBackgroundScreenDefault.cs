@@ -35,6 +35,33 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         [Test]
+        public void TestTogglingStoryboardSwitchesBackgroundType()
+        {
+            setSupporter(true);
+
+            setSourceMode(BackgroundSource.Beatmap);
+            AddUntilStep("is beatmap background", () => getCurrentBackground() is BeatmapBackground);
+
+            setSourceMode(BackgroundSource.BeatmapWithStoryboard);
+            AddUntilStep("is storyboard background", () => getCurrentBackground() is BeatmapBackgroundWithStoryboard);
+        }
+
+        [Test]
+        public void TestTogglingSupporterTogglesBeatmapBackground()
+        {
+            setSourceMode(BackgroundSource.Beatmap);
+
+            setSupporter(true);
+            AddUntilStep("is beatmap background", () => getCurrentBackground() is BeatmapBackground);
+
+            setSupporter(false);
+            AddUntilStep("is default background", () => !(getCurrentBackground() is BeatmapBackground));
+
+            setSupporter(true);
+            AddUntilStep("is beatmap background", () => getCurrentBackground() is BeatmapBackground);
+        }
+
+        [Test]
         public void TestBeatmapDoesntReloadOnNoChange()
         {
             BeatmapBackground last = null;
@@ -54,6 +81,10 @@ namespace osu.Game.Tests.Visual.Background
             AddStep("set background mode to beatmap", () => config.SetValue(OsuSetting.MenuBackgroundSource, source));
 
         private void setSupporter(bool isSupporter) =>
-            AddStep("set supporter", () => ((DummyAPIAccess)API).LocalUser.Value = new User { IsSupporter = isSupporter });
+            AddStep($"set supporter {isSupporter}", () => ((DummyAPIAccess)API).LocalUser.Value = new User
+            {
+                IsSupporter = isSupporter,
+                Id = API.LocalUser.Value.Id + 1,
+            });
     }
 }
