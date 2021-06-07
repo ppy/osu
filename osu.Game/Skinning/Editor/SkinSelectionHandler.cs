@@ -20,87 +20,6 @@ namespace osu.Game.Skinning.Editor
 {
     public class SkinSelectionHandler : SelectionHandler<ISkinnableDrawable>
     {
-        private const string closest_text = @"Closest";
-
-        /// <summary>
-        /// The hash code of the "Closest" menu item in the anchor point context menu.
-        /// </summary>
-        /// <remarks>Needs only be constant and distinct from any <see cref="Anchor"/> values.</remarks>
-        private static readonly int closest_text_hash = closest_text.GetHashCode();
-
-        private static readonly Dictionary<int, string> anchor_menu_items;
-        private static readonly Dictionary<int, string> origin_menu_items;
-
-        static SkinSelectionHandler()
-        {
-            var anchorMenuSubset = new[]
-            {
-                Anchor.TopLeft,
-                Anchor.TopCentre,
-                Anchor.TopRight,
-                Anchor.CentreLeft,
-                Anchor.Centre,
-                Anchor.CentreRight,
-                Anchor.BottomLeft,
-                Anchor.BottomCentre,
-                Anchor.BottomRight,
-            };
-
-            var texts = anchorMenuSubset.Select(a => a.ToString()).Prepend(closest_text).ToArray();
-            var hashes = anchorMenuSubset.Cast<int>().Prepend(closest_text_hash).ToArray();
-
-            var anchorPairs = hashes.Zip(texts, (k, v) => new KeyValuePair<int, string>(k, v)).ToArray();
-            anchor_menu_items = new Dictionary<int, string>(anchorPairs);
-            var originPairs = anchorPairs.Where(pair => pair.Key != closest_text_hash);
-            origin_menu_items = new Dictionary<int, string>(originPairs);
-        }
-
-        private Anchor getClosestAnchorForDrawable(Drawable drawable)
-        {
-            var parent = drawable.Parent;
-            if (parent == null)
-                return drawable.Anchor;
-
-            var screenPosition = getOriginPositionFromQuad(drawable.ScreenSpaceDrawQuad, drawable.Origin);
-            var absolutePosition = parent.ToLocalSpace(screenPosition);
-            var factor = parent.RelativeToAbsoluteFactor;
-
-            var result = default(Anchor);
-
-            result |= getTieredComponent(absolutePosition.X / factor.X, Anchor.x0, Anchor.x1, Anchor.x2);
-            result |= getTieredComponent(absolutePosition.Y / factor.Y, Anchor.y0, Anchor.y1, Anchor.y2);
-
-            return result;
-        }
-
-        private static Anchor getTieredComponent(float component, Anchor tier0, Anchor tier1, Anchor tier2)
-        {
-            if (component >= 2 / 3f)
-                return tier2;
-
-            if (component >= 1 / 3f)
-                return tier1;
-
-            return tier0;
-        }
-
-        private Vector2 getOriginPositionFromQuad(in Quad quad, Anchor origin)
-        {
-            var result = quad.TopLeft;
-
-            if (origin.HasFlagFast(Anchor.x2))
-                result.X += quad.Width;
-            else if (origin.HasFlagFast(Anchor.x1))
-                result.X += quad.Width / 2f;
-
-            if (origin.HasFlagFast(Anchor.y2))
-                result.Y += quad.Height;
-            else if (origin.HasFlagFast(Anchor.y1))
-                result.Y += quad.Height / 2f;
-
-            return result;
-        }
-
         [Resolved]
         private SkinEditor skinEditor { get; set; }
 
@@ -267,41 +186,48 @@ namespace osu.Game.Skinning.Editor
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
         {
-            static int checkAnchor(ISkinnableDrawable item)
+            var closestItem = new TernaryStateRadioMenuItem("Closest", MenuItemType.Standard, _ => applyClosestAnchor())
             {
-                if (item.OverridesClosestAnchor)
-                {
-                    var drawable = (Drawable)item;
-                    return (int)drawable.Anchor;
-                }
-
-                return closest_text_hash;
-            }
-
-            yield return new OsuMenuItem(nameof(Anchor))
-            {
-                Items = createAnchorItems(anchor_menu_items, checkAnchor, applyAnchor).ToArray()
+                State = { Value = GetStateFromSelection(selection, c => !c.Item.OverridesClosestAnchor) }
             };
 
-            yield return new OsuMenuItem(nameof(Origin))
+            yield return new OsuMenuItem("Anchor")
             {
-                // Origins can't be "closest" so we just cast to int
-                Items = createAnchorItems(origin_menu_items, d => (int)((Drawable)d).Origin, applyOrigin).ToArray()
+                Items = createAnchorItems((i, a) => i.OverridesClosestAnchor && ((Drawable)i).Anchor == a, applyAnchor)
+                        .Prepend(closestItem)
+                        .ToArray()
+            };
+
+            yield return new OsuMenuItem("Origin")
+            {
+                Items = createAnchorItems((i, o) => ((Drawable)i).Origin == o, applyOrigin).ToArray()
             };
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            IEnumerable<TernaryStateMenuItem> createAnchorItems(IDictionary<int, string> items, Func<ISkinnableDrawable, int> checkFunction, Action<int> applyFunction) =>
-                items.Select(pair =>
+            IEnumerable<TernaryStateMenuItem> createAnchorItems(Func<ISkinnableDrawable, Anchor, bool> checkFunction, Action<Anchor> applyFunction)
+            {
+                var displayableAnchors = new[]
                 {
-                    var (hash, text) = pair;
-
-                    return new TernaryStateRadioMenuItem(text, MenuItemType.Standard, _ => applyFunction(hash))
+                    Anchor.TopLeft,
+                    Anchor.TopCentre,
+                    Anchor.TopRight,
+                    Anchor.CentreLeft,
+                    Anchor.Centre,
+                    Anchor.CentreRight,
+                    Anchor.BottomLeft,
+                    Anchor.BottomCentre,
+                    Anchor.BottomRight,
+                };
+                return displayableAnchors.Select(a =>
+                {
+                    return new TernaryStateRadioMenuItem(a.ToString(), MenuItemType.Standard, _ => applyFunction(a))
                     {
-                        State = { Value = GetStateFromSelection(selection, c => checkFunction(c.Item) == hash) }
+                        State = { Value = GetStateFromSelection(selection, c => checkFunction(c.Item, a)) }
                     };
                 });
+            }
         }
 
         private static void updateDrawablePosition(Drawable drawable, Vector2 screenSpacePosition)
@@ -310,10 +236,8 @@ namespace osu.Game.Skinning.Editor
                 drawable.Parent.ToLocalSpace(screenSpacePosition) - drawable.AnchorPosition;
         }
 
-        private void applyOrigin(int hash)
+        private void applyOrigin(Anchor anchor)
         {
-            var anchor = (Anchor)hash;
-
             foreach (var item in SelectedItems)
             {
                 var drawable = (Drawable)item;
@@ -321,8 +245,6 @@ namespace osu.Game.Skinning.Editor
                 var previousOrigin = drawable.OriginPosition;
                 drawable.Origin = anchor;
                 drawable.Position += drawable.OriginPosition - previousOrigin;
-
-                updateDrawableAnchorIfUsingClosest(item);
             }
         }
 
@@ -333,20 +255,73 @@ namespace osu.Game.Skinning.Editor
         private Quad getSelectionQuad() =>
             GetSurroundingQuad(SelectedBlueprints.SelectMany(b => b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
 
-        private void applyAnchor(int hash)
+        private void applyAnchor(Anchor anchor)
         {
             foreach (var item in SelectedItems)
             {
                 var drawable = (Drawable)item;
 
-                var (overridesClosest, anchor) =
-                    hash == closest_text_hash
-                        ? (false, getClosestAnchorForDrawable(drawable))
-                        : (true, (Anchor)hash);
-
-                item.OverridesClosestAnchor = overridesClosest;
+                item.OverridesClosestAnchor = true;
                 updateDrawableAnchor(drawable, anchor);
             }
+        }
+
+        private void applyClosestAnchor()
+        {
+            foreach (var item in SelectedItems)
+            {
+                var drawable = (Drawable)item;
+
+                item.OverridesClosestAnchor = false;
+                updateDrawableAnchor(drawable, getClosestAnchorForDrawable(drawable));
+            }
+        }
+
+        private static Anchor getClosestAnchorForDrawable(Drawable drawable)
+        {
+            var parent = drawable.Parent;
+
+            if (parent == null)
+                return drawable.Anchor;
+
+            var screenPosition = getOriginPositionFromQuad(drawable.ScreenSpaceDrawQuad, drawable.Origin);
+            var absolutePosition = parent.ToLocalSpace(screenPosition);
+            var factor = parent.RelativeToAbsoluteFactor;
+
+            var result = default(Anchor);
+
+            result |= getTieredComponent(absolutePosition.X / factor.X, Anchor.x0, Anchor.x1, Anchor.x2);
+            result |= getTieredComponent(absolutePosition.Y / factor.Y, Anchor.y0, Anchor.y1, Anchor.y2);
+
+            return result;
+        }
+
+        private static Vector2 getOriginPositionFromQuad(in Quad quad, Anchor origin)
+        {
+            var result = quad.TopLeft;
+
+            if (origin.HasFlagFast(Anchor.x2))
+                result.X += quad.Width;
+            else if (origin.HasFlagFast(Anchor.x1))
+                result.X += quad.Width / 2f;
+
+            if (origin.HasFlagFast(Anchor.y2))
+                result.Y += quad.Height;
+            else if (origin.HasFlagFast(Anchor.y1))
+                result.Y += quad.Height / 2f;
+
+            return result;
+        }
+
+        private static Anchor getTieredComponent(float component, Anchor tier0, Anchor tier1, Anchor tier2)
+        {
+            if (component >= 2 / 3f)
+                return tier2;
+
+            if (component >= 1 / 3f)
+                return tier1;
+
+            return tier0;
         }
 
         private static void updateDrawableAnchor(Drawable drawable, Anchor anchor)
