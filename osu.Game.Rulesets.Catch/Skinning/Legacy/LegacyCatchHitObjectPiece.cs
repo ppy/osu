@@ -13,7 +13,7 @@ using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Catch.Skinning
+namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
     public abstract class LegacyCatchHitObjectPiece : PoolableDrawable
     {
