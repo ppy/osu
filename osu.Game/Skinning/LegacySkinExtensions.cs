@@ -27,6 +27,18 @@ namespace osu.Game.Skinning
         {
             Texture texture;
 
+            // find the first source which provides either the animated or non-animated version.
+            ISkin skin = (source as ISkinSource)?.FindProvider(s =>
+            {
+                if (animatable && s.GetTexture(getFrameName(0)) != null)
+                    return true;
+
+                return s.GetTexture(componentName, wrapModeS, wrapModeT) != null;
+            }) ?? source;
+
+            if (skin == null)
+                return null;
+
             if (animatable)
             {
                 var textures = getTextures().ToArray();
@@ -35,7 +47,7 @@ namespace osu.Game.Skinning
                 {
                     var animation = new SkinnableTextureAnimation(startAtCurrentTime)
                     {
-                        DefaultFrameLength = frameLength ?? getFrameLength(source, applyConfigFrameRate, textures),
+                        DefaultFrameLength = frameLength ?? getFrameLength(skin, applyConfigFrameRate, textures),
                         Loop = looping,
                     };
 
@@ -47,28 +59,23 @@ namespace osu.Game.Skinning
             }
 
             // if an animation was not allowed or not found, fall back to a sprite retrieval.
-            if ((texture = source.GetTexture(componentName, wrapModeS, wrapModeT)) != null)
+            if ((texture = skin.GetTexture(componentName, wrapModeS, wrapModeT)) != null)
                 return new Sprite { Texture = texture };
 
             return null;
 
             IEnumerable<Texture> getTextures()
             {
-                ISkin lookupSource = null;
-
                 for (int i = 0; true; i++)
                 {
-                    string frameName = $"{componentName}{animationSeparator}{i}";
-
-                    // ensure all textures are retrieved from the same skin source.
-                    lookupSource ??= (source as ISkinSource)?.FindProvider(s => s.GetTexture(frameName, wrapModeS, wrapModeT) != null) ?? source;
-
-                    if ((texture = lookupSource?.GetTexture(frameName, wrapModeS, wrapModeT)) == null)
+                    if ((texture = skin.GetTexture(getFrameName(i), wrapModeS, wrapModeT)) == null)
                         break;
 
                     yield return texture;
                 }
             }
+
+            string getFrameName(int frameIndex) => $"{componentName}{animationSeparator}{frameIndex}";
         }
 
         public static bool HasFont(this ISkin source, LegacyFont font)
