@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
+using osu.Game.Screens.Mvis.SideBar.Settings.Items;
 
 namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
 {
@@ -20,23 +21,24 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
         {
             AddRange(new Drawable[]
             {
-                new SliderSettingsPiece<double>
+                new SettingsSliderPiece<double>
                 {
                     Icon = FontAwesome.Solid.Forward,
                     Description = "播放速度",
                     Bindable = config.GetBindable<double>(MSetting.MvisMusicSpeed),
-                    DisplayAsPercentage = true
+                    DisplayAsPercentage = true,
+                    TransferValueOnCommit = true
                 },
-                new SettingsToggleablePiece
+                new SettingsTogglePiece
                 {
                     Icon = FontAwesome.Solid.PeopleCarry,
                     Description = "调整音调",
                     Bindable = config.GetBindable<bool>(MSetting.MvisAdjustMusicWithFreq),
                     TooltipText = "暂不支持调整故事版的音调"
                 },
-                new SettingsToggleablePiece
+                new SettingsTogglePiece
                 {
-                    Icon = FontAwesome.Solid.Headphones,
+                    Icon = FontAwesome.Solid.HeadphonesAlt,
                     Description = "夜核节拍器",
                     Bindable = config.GetBindable<bool>(MSetting.MvisEnableNightcoreBeat),
                     TooltipText = "动次打次动次打次"

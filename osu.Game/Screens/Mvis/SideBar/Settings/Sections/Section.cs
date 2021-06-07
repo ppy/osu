@@ -9,6 +9,8 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
 {
     public abstract class Section : CompositeDrawable, ISidebarContent
     {
+        public virtual int Columns => 3;
+
         public string Title
         {
             get => title.Text.ToString();
@@ -49,11 +51,13 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
             Anchor = Origin = Anchor.TopRight;
             InternalChildren = new Drawable[]
             {
-                title,
-                CreateFillFlowContainer(),
-                CreateFillFlowContainer(),
-                CreateFillFlowContainer(),
+                title
             };
+
+            for (int i = 0; i <= Columns; i++)
+            {
+                AddInternal(CreateFillFlowContainer());
+            }
         }
 
         private int index;
@@ -62,7 +66,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
         {
             foreach (var drawable in drawables)
             {
-                containers[index % 3].Add(drawable);
+                containers[index % Columns].Add(drawable);
                 index++;
             }
         }

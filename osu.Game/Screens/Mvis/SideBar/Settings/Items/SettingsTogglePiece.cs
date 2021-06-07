@@ -12,9 +12,9 @@ using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Mvis.SideBar.Settings
+namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
 {
-    public class SettingsToggleablePiece : CompositeDrawable, ISettingsItem<bool>
+    public class SettingsTogglePiece : CompositeDrawable, ISettingsItem<bool>
     {
         public Bindable<bool> Bindable { get; set; }
 
@@ -27,7 +27,8 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings
 
         private readonly SpriteIcon spriteIcon = new SpriteIcon
         {
-            Size = new Vector2(25)
+            Size = new Vector2(25),
+            Icon = FontAwesome.Solid.ToggleOn
         };
 
         public LocalisableString Description

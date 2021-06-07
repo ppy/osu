@@ -269,6 +269,7 @@ namespace osu.Game.Screens.Mvis
         private IProvideAudioControlPlugin audioControlProvider;
         private readonly OsuMusicControllerWrapper musicControllerWrapper = new OsuMusicControllerWrapper();
         private SettingsButton songSelectButton;
+        private PlayerSettings settingsScroll;
 
         public float BottombarHeight => (bottomBar?.Height - bottomBar?.Y ?? 0) + 10 + 5;
 
@@ -292,7 +293,6 @@ namespace osu.Game.Screens.Mvis
             dependencies.Cache(this);
 
             //向侧边栏添加内容
-            PlayerSettings settingsScroll;
             SidebarPluginsPage pluginsPage;
             sidebar.AddRange(new Drawable[]
             {

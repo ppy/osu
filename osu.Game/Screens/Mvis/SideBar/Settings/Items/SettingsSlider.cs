@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
-namespace osu.Game.Screens.Mvis.SideBar.Settings
+namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
 {
     public class SettingsSlider<T> : OsuSliderBar<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings
             Child = circle = new Circle
             {
                 RelativePositionAxes = Axes.X,
-                Size = new Vector2(55),
+                Size = new Vector2(25),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
             };
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings
         protected override void UpdateValue(float value)
         {
             circle.MoveToX(value - 0.5f, 250, Easing.OutExpo);
-            circle.ScaleTo(value + 0.1f, 250, Easing.OutBack);
+            circle.ScaleTo(value + 0.2f, 250, Easing.OutBack);
         }
     }
 }

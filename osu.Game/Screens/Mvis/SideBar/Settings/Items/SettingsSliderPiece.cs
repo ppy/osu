@@ -13,14 +13,14 @@ using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Mvis.SideBar.Settings
+namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
 {
-    public class SliderSettingsPiece<T> : CompositeDrawable, ISettingsItem<T>
+    public class SettingsSliderPiece<T> : CompositeDrawable, ISettingsItem<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         public Bindable<T> Bindable { get; set; }
 
-        public string TooltipText => "点此还原";
+        public string TooltipText { get; set; }
 
         private readonly OsuSpriteText text = new OsuSpriteText
         {
@@ -29,7 +29,8 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings
 
         private readonly SpriteIcon spriteIcon = new SpriteIcon
         {
-            Size = new Vector2(25)
+            Size = new Vector2(25),
+            Icon = FontAwesome.Solid.SlidersH
         };
 
         public LocalisableString Description
@@ -53,6 +54,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings
         }
 
         public bool DisplayAsPercentage;
+        public bool TransferValueOnCommit;
 
         private LocalisableString description;
         private IconUsage icon;
@@ -62,6 +64,11 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings
         private CustomColourProvider colourProvider { get; set; }
 
         private Box flashBox;
+
+        public SettingsSliderPiece()
+        {
+            TooltipText = TooltipText + "点击重置";
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -76,6 +83,20 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings
                 {
                     RelativeSizeAxes = Axes.Both
                 },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 25,
+                    Margin = new MarginPadding { Top = 10 },
+                    Padding = new MarginPadding { Left = 10 + 25 + 5 },
+                    Child = new SettingsSlider<T>
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Current = Bindable,
+                        DisplayAsPercentage = DisplayAsPercentage,
+                        TransferValueOnCommit = TransferValueOnCommit,
+                    }
+                },
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
@@ -87,15 +108,6 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings
                         spriteIcon,
                         text,
                     }
-                },
-                new SettingsSlider<T>
-                {
-                    Width = 0.5f,
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
-                    Current = Bindable,
-                    DisplayAsPercentage = DisplayAsPercentage
                 },
                 flashBox = new Box
                 {

@@ -3,6 +3,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
+using osu.Game.Screens.Mvis.SideBar.Settings.Items;
 
 namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
 {
@@ -26,46 +27,43 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
 
             AddRange(new Drawable[]
             {
-                new SliderSettingsPiece<float>
+                new SettingsSliderPiece<float>
                 {
-                    Icon = FontAwesome.Solid.WineGlass,
+                    Description = "界面主题色(红)",
+                    Bindable = iR
+                },
+                new SettingsSliderPiece<float>
+                {
+                    Description = "界面主题色(绿)",
+                    Bindable = iG
+                },
+                new SettingsSliderPiece<float>
+                {
+                    Description = "界面主题色(蓝)",
+                    Bindable = iB
+                },
+                new SettingsSliderPiece<float>
+                {
+                    Icon = FontAwesome.Solid.SolarPanel,
                     Description = "背景模糊",
                     Bindable = config.GetBindable<float>(MSetting.MvisBgBlur),
                     DisplayAsPercentage = true
                 },
-                new SliderSettingsPiece<float>
+                new SettingsSliderPiece<float>
                 {
                     Icon = FontAwesome.Regular.Sun,
                     Description = "空闲时的背景亮度",
                     Bindable = config.GetBindable<float>(MSetting.MvisIdleBgDim),
                     DisplayAsPercentage = true
                 },
-                new SliderSettingsPiece<float>
-                {
-                    Icon = FontAwesome.Solid.Adjust,
-                    Description = "界面主题色(红)",
-                    Bindable = iR
-                },
-                new SliderSettingsPiece<float>
-                {
-                    Icon = FontAwesome.Solid.Adjust,
-                    Description = "界面主题色(绿)",
-                    Bindable = iG
-                },
-                new SliderSettingsPiece<float>
-                {
-                    Icon = FontAwesome.Solid.Adjust,
-                    Description = "界面主题色(蓝)",
-                    Bindable = iB
-                },
-                new SettingsToggleablePiece
+                new SettingsTogglePiece
                 {
                     Icon = FontAwesome.Regular.ArrowAltCircleUp,
                     Description = "置顶Proxy",
                     Bindable = config.GetBindable<bool>(MSetting.MvisStoryboardProxy),
                     TooltipText = "让所有Proxy显示在前景上方"
                 },
-                new SettingsToggleablePiece
+                new SettingsTogglePiece
                 {
                     Icon = FontAwesome.Solid.Clock,
                     Description = "启用背景动画",
