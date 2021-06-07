@@ -4,7 +4,6 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Catch.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
@@ -40,8 +39,10 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
         {
             base.LoadComplete();
 
-            var fruitState = (IHasFruitState)ObjectState;
-            VisualRepresentation.BindTo(fruitState.VisualRepresentation);
+            IndexInBeatmap.BindValueChanged(index =>
+            {
+                VisualRepresentation.Value = Fruit.GetVisualRepresentation(index.NewValue);
+            }, true);
         }
     }
 }
