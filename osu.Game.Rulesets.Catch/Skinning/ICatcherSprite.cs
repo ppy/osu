@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Rulesets.Catch.Skinning
 {
-    public interface ICatcherPiece
+    public interface ICatcherSprite
     {
         Texture CurrentTexture { get; }
     }

@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         public const float ALLOWED_CATCH_RANGE = 0.8f;
 
-        internal Texture CurrentTexture => currentCatcherPiece.CurrentTexture;
+        internal Texture CurrentTexture => ((ICatcherSprite)currentCatcher.Drawable).CurrentTexture;
 
         private bool dashing;
 
@@ -112,8 +112,6 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly float catchWidth;
 
         private readonly SkinnableDrawable currentCatcher;
-
-        private ICatcherPiece currentCatcherPiece => (ICatcherPiece)currentCatcher.Drawable;
 
         private Color4 hyperDashColour = DEFAULT_HYPER_DASH_COLOUR;
         private Color4 hyperDashEndGlowColour = DEFAULT_HYPER_DASH_COLOUR;

@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public class LegacyCatcherOld : CompositeDrawable, ICatcherPiece
+    public class LegacyCatcherOld : CompositeDrawable, ICatcherSprite
     {
         public Texture CurrentTexture => (InternalChild as TextureAnimation)?.CurrentFrame ?? (InternalChild as Sprite)?.Texture;
 
