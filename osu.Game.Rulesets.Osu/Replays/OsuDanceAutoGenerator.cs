@@ -30,11 +30,12 @@ namespace osu.Game.Rulesets.Osu.Replays
             };
 
         public new OsuBeatmap Beatmap => (OsuBeatmap)base.Beatmap;
-        private readonly bool sliderDance;
         private readonly bool[] objectsDuring;
         private readonly DanceMover mover;
         private readonly float spinRadiusStart;
         private readonly float spinRadiusEnd;
+        private readonly bool sliderDance;
+        private const float slider_mult = 1;
         private readonly OsuRulesetConfigManager config;
         private readonly double frameDelay;
         private int buttonIndex;
@@ -61,33 +62,34 @@ namespace osu.Game.Rulesets.Osu.Replays
             config = OsuRulesetConfigManager.Instance;
             frameDelay = 1000.0 / config.Get<float>(OsuRulesetSetting.ReplayFramerate);
             spinRadiusStart = config.Get<float>(OsuRulesetSetting.SpinnerRadiusStart);
-            sliderDance = config.Get<bool>(OsuRulesetSetting.SliderDance);
             spinRadiusEnd = config.Get<float>(OsuRulesetSetting.SpinnerRadiusEnd);
+            sliderDance = config.Get<bool>(OsuRulesetSetting.SliderDance);
+            //sliderMult = config.Get<float>(OsuRulesetSetting.SliderDanceMult);
             mover = GetMover(config.Get<OsuDanceMover>(OsuRulesetSetting.DanceMover));
 
             mover.Beatmap = Beatmap;
 
-            var moverObjectsDuring = new bool[Beatmap.HitObjects.Count];
+            var during = new bool[Beatmap.HitObjects.Count];
 
             for (int i = 0; i < Beatmap.HitObjects.Count - 1; ++i)
             {
                 var e = Beatmap.HitObjects[i].GetEndTime();
-                moverObjectsDuring[i] = false;
+                during[i] = false;
 
                 for (int j = i + 1; j < Beatmap.HitObjects.Count; ++j)
                 {
                     if (Beatmap.HitObjects[j].StartTime + 1 > e) continue;
 
-                    moverObjectsDuring[i] = true;
+                    during[i] = true;
                     break;
                 }
             }
 
-            objectsDuring = moverObjectsDuring;
-            mover.ObjectsDuring = moverObjectsDuring;
+            objectsDuring = during;
+            mover.ObjectsDuring = during;
         }
 
-        private void moveToHitObject(OsuHitObject h, int idx, bool sliderDance)
+        private void moveToHitObject(OsuHitObject h, int idx)
         {
             OsuHitObject last = Beatmap.HitObjects[idx == 0 ? idx : idx - 1];
             OsuAction action = getAction(h, last);
@@ -103,14 +105,16 @@ namespace osu.Game.Rulesets.Osu.Replays
 
                     if (objectsDuring[idx]) break;
 
-                    double speed = slider.Distance / slider.Duration;
-
                     for (double j = GetFrameDelay(slider.StartTime); j < slider.Duration; j += GetFrameDelay(slider.StartTime + j))
                     {
-                        bool canDance = sliderDance && slider.Duration > 350;
+                        var scaleFactor = j / slider.Duration * slider_mult;
                         Vector2 pos = slider.StackedPositionAt(j / slider.Duration);
-                        Vector2 pos2 = pos + CirclePosition(ApplyModsToTimeDelta(last.GetEndTime(), h.StartTime) / 12 * speed + angle, 20);
-                        AddFrameToReplay(new OsuReplayFrame((int)h.StartTime + j, canDance ? pos2 : pos, action));
+                        var rad = OsuHitObject.OBJECT_RADIUS * 1.2f * h.Scale;
+                        var v = Vector2.Add(slider.StackedPosition, Vector2.Multiply((pos - slider.StackedPosition), (float)scaleFactor));
+                        v.X = Math.Clamp(v.X, pos.X - rad, pos.X + rad);
+                        v.Y = Math.Clamp(v.Y, pos.Y - rad, pos.Y + rad);
+                        AddFrameToReplay(new OsuReplayFrame((int)h.StartTime + j, sliderDance ? v : pos, action));
+                        mover.LastPos = v;
                     }
 
                     break;
@@ -119,15 +123,14 @@ namespace osu.Game.Rulesets.Osu.Replays
                     if (spinner.SpinsRequired == 0) return;
 
                     double r = spinner.SpinsRequired > 3 ? spinRadiusStart : spinRadiusEnd;
-                    double r1;
-                    double rEndTime = spinner.StartTime + spinner.Duration * 0.6;
+                    double rEndTime = spinner.StartTime + spinner.Duration * 0.7;
                     double previousFrame = h.StartTime;
 
                     for (double nextFrame = h.StartTime + GetFrameDelay(h.StartTime); nextFrame < spinner.EndTime; nextFrame += GetFrameDelay(nextFrame))
                     {
                         var t = ApplyModsToTimeDelta(previousFrame, nextFrame) * -1;
                         angle += (float)t / 20;
-                        r1 = nextFrame > rEndTime ? spinRadiusEnd : Interpolation.ValueAt(nextFrame, r, spinRadiusEnd, spinner.StartTime, rEndTime, Easing.In);
+                        var r1 = nextFrame > rEndTime ? spinRadiusEnd : Interpolation.ValueAt(nextFrame, r, spinRadiusEnd, spinner.StartTime, rEndTime, Easing.In);
                         Vector2 pos = SPINNER_CENTRE + CirclePosition(angle, r1);
                         AddFrameToReplay(new OsuReplayFrame((int)nextFrame, new Vector2(pos.X, pos.Y), action));
 
@@ -144,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
-        public Replay GenerateReplay(bool sliderDance)
+        public override Replay Generate()
         {
             OsuHitObject hitObject = Beatmap.HitObjects[0];
             AddFrameToReplay(new OsuReplayFrame(-10000, hitObject.StackedPosition));
@@ -164,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             {
                 OsuReplayFrame lastFrame = (OsuReplayFrame)Frames[^1];
                 hitObject = Beatmap.HitObjects[i];
-                moveToHitObject(hitObject, i, sliderDance);
+                moveToHitObject(hitObject, i);
 
                 mover.ObjectIndex = i;
                 mover.OnObjChange();
@@ -212,16 +215,11 @@ namespace osu.Game.Rulesets.Osu.Replays
                 }
             }
 
-            moveToHitObject(Beatmap.HitObjects[^1], Beatmap.HitObjects.Count - 1, sliderDance);
+            moveToHitObject(Beatmap.HitObjects[^1], Beatmap.HitObjects.Count - 1);
 
             AddFrameToReplay(new OsuReplayFrame(Beatmap.HitObjects[^1].GetEndTime(), Beatmap.HitObjects[^1].StackedEndPosition));
 
             return Replay;
-        }
-
-        public override Replay Generate()
-        {
-            return GenerateReplay(sliderDance);
         }
     }
 
@@ -231,7 +229,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         protected double EndTime => End.StartTime;
         protected double Duration => EndTime - StartTime;
 
-        protected Vector2 StartPos => ObjectsDuring[ObjectIndex] ? Start.StackedPosition : Start.StackedEndPosition;
+        protected Vector2 StartPos => ObjectsDuring[ObjectIndex] ? Start.StackedPosition : Start is Slider ? LastPos : Start.StackedEndPosition;
         protected Vector2 EndPos => End.StackedPosition;
         protected float StartX => StartPos.X;
         protected float StartY => StartPos.Y;
@@ -245,11 +243,13 @@ namespace osu.Game.Rulesets.Osu.Replays
         public int ObjectIndex { set; protected get; }
         public OsuBeatmap Beatmap { set; protected get; }
 
+        public Vector2 LastPos;
+
         public OsuHitObject Start
         {
             get
             {
-                if (Beatmap.HitObjects[ObjectIndex] is Spinner spinner && spinner.SpinsRequired == 0) return Beatmap.HitObjects[ObjectIndex == 0 ? ObjectIndex : ObjectIndex - 1];
+                if (Beatmap.HitObjects[ObjectIndex] is Spinner { SpinsRequired: 0 }) return Beatmap.HitObjects[ObjectIndex == 0 ? ObjectIndex : ObjectIndex - 1];
 
                 return Beatmap.HitObjects[ObjectIndex];
             }
@@ -259,7 +259,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         {
             get
             {
-                if (Beatmap.HitObjects[ObjectIndex + 1] is Spinner spinner && spinner.SpinsRequired == 0) return Beatmap.HitObjects[ObjectIndex == Beatmap.HitObjects.Count ? ObjectIndex - 1 : ObjectIndex];
+                if (Beatmap.HitObjects[ObjectIndex + 1] is Spinner { SpinsRequired: 0 }) return Beatmap.HitObjects[ObjectIndex == Beatmap.HitObjects.Count ? ObjectIndex - 1 : ObjectIndex];
 
                 return Beatmap.HitObjects[ObjectIndex + 1];
             }

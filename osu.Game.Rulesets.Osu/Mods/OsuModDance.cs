@@ -13,11 +13,12 @@ using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModDance : ModAutoplay<OsuHitObject>
+    public class OsuModDance : ModDance<OsuHitObject>
     {
         public override string Name => "Cusordance";
         public override string Acronym => "CD";
         public override string Description => "Watch lazer!dance";
+        public override double ScoreMultiplier => 1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).Append(typeof(OsuModSpunOut)).ToArray();
 

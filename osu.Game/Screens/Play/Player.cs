@@ -647,7 +647,8 @@ namespace osu.Game.Screens.Play
 
                 try
                 {
-                    await ImportScore(score).ConfigureAwait(false);
+                    var danceMod = (ModDance)Mods.Value.FirstOrDefault(m => m is ModDance);
+                    await ImportScore(score, danceMod?.SaveScore.Value ?? false).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -942,11 +943,12 @@ namespace osu.Game.Screens.Play
         /// Imports the player's <see cref="Score"/> to the local database.
         /// </summary>
         /// <param name="score">The <see cref="Score"/> to import.</param>
+        /// <param name="bypassCheck">是否绕过replayScore检测</param>
         /// <returns>The imported score.</returns>
-        protected virtual async Task ImportScore(Score score)
+        protected virtual async Task ImportScore(Score score, bool bypassCheck = false)
         {
             // Replays are already populated and present in the game's database, so should not be re-imported.
-            if (DrawableRuleset.ReplayScore != null)
+            if (DrawableRuleset.ReplayScore != null && !bypassCheck)
                 return;
 
             LegacyByteArrayReader replayReader;
