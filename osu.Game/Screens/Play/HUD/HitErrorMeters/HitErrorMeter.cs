@@ -32,15 +32,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             base.LoadComplete();
 
-            processor.NewJudgement += onNewJudgement;
-        }
-
-        private void onNewJudgement(JudgementResult result)
-        {
-            if (result.HitObject.HitWindows?.WindowFor(HitResult.Miss) == 0)
-                return;
-
-            OnNewJudgement(result);
+            processor.NewJudgement += OnNewJudgement;
         }
 
         protected abstract void OnNewJudgement(JudgementResult judgement);
@@ -74,7 +66,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             base.Dispose(isDisposing);
 
             if (processor != null)
-                processor.NewJudgement -= onNewJudgement;
+                processor.NewJudgement -= OnNewJudgement;
         }
     }
 }
