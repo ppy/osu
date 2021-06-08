@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private void sourceChanged()
         {
-            hasHitCircle = new Lazy<bool>(() => Source.GetTexture("hitcircle") != null);
+            hasHitCircle = new Lazy<bool>(() => FindProvider(s => s.GetTexture("hitcircle") != null) != null);
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
@@ -49,13 +49,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return followCircle;
 
                     case OsuSkinComponents.SliderBall:
-                        var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "");
+                        // specular and nd layers must come from the same source as the ball texure.
+                        var ballProvider = Source.FindProvider(s => s.GetTexture("sliderb") != null || s.GetTexture("sliderb0") != null);
+
+                        var sliderBallContent = ballProvider.GetAnimation("sliderb", true, true, animationSeparator: "");
 
                         // todo: slider ball has a custom frame delay based on velocity
                         // Math.Max((150 / Velocity) * GameBase.SIXTY_FRAME_TIME, GameBase.SIXTY_FRAME_TIME);
 
                         if (sliderBallContent != null)
-                            return new LegacySliderBall(sliderBallContent);
+                            return new LegacySliderBall(sliderBallContent, ballProvider);
 
                         return null;
 
@@ -84,14 +87,18 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return null;
 
                     case OsuSkinComponents.Cursor:
-                        if (Source.GetTexture("cursor") != null)
-                            return new LegacyCursor();
+                        var cursorProvider = Source.FindProvider(s => s.GetTexture("cursor") != null);
+
+                        if (cursorProvider != null)
+                            return new LegacyCursor(cursorProvider);
 
                         return null;
 
                     case OsuSkinComponents.CursorTrail:
-                        if (Source.GetTexture("cursortrail") != null)
-                            return new LegacyCursorTrail();
+                        var trailProvider = Source.FindProvider(s => s.GetTexture("cursortrail") != null);
+
+                        if (trailProvider != null)
+                            return new LegacyCursorTrail(trailProvider);
 
                         return null;
 
