@@ -32,8 +32,8 @@ namespace osu.Game.Screens.Play.HUD
 
         public Anchor Origin { get; set; }
 
-        /// <inheritdoc cref="ISkinnableDrawable.OverridesClosestAnchor"/>
-        public bool OverridesClosestAnchor { get; set; }
+        /// <inheritdoc cref="ISkinnableDrawable.UsesFixedAnchor"/>
+        public bool UsesFixedAnchor { get; set; }
 
         public List<SkinnableInfo> Children { get; } = new List<SkinnableInfo>();
 
@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play.HUD
             Origin = component.Origin;
 
             if (component is ISkinnableDrawable skinnable)
-                OverridesClosestAnchor = skinnable.OverridesClosestAnchor;
+                UsesFixedAnchor = skinnable.UsesFixedAnchor;
 
             if (component is Container<Drawable> container)
             {

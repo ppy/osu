@@ -17,8 +17,8 @@ namespace osu.Game.Skinning
 
         /// <summary>
         /// <see langword="false"/> if this <see cref="ISkinnableDrawable"/>'s <see cref="Drawable.Anchor"/> is automatically determined by proximity,
-        /// <see langword="true"/> if the user has overridden it.
+        /// <see langword="true"/> if the user has chosen a fixed anchor point.
         /// </summary>
-        bool OverridesClosestAnchor { get; set; }
+        bool UsesFixedAnchor { get; set; }
     }
 }

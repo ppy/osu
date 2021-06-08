@@ -30,7 +30,7 @@ namespace osu.Game.Skinning
 
         private bool isNewStyle;
 
-        public bool OverridesClosestAnchor { get; set; }
+        public bool UsesFixedAnchor { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()

@@ -12,7 +12,7 @@ namespace osu.Game.Skinning
 {
     public class LegacyAccuracyCounter : GameplayAccuracyCounter, ISkinnableDrawable
     {
-        public bool OverridesClosestAnchor { get; set; }
+        public bool UsesFixedAnchor { get; set; }
 
         public LegacyAccuracyCounter()
         {
