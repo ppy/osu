@@ -81,10 +81,6 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private ScoreManager scoreManager { get; set; }
 
-        private RulesetInfo rulesetInfo;
-
-        private Ruleset ruleset;
-
         [Resolved]
         private IAPIProvider api { get; set; }
 
@@ -93,6 +89,10 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
+
+        protected Ruleset GameplayRuleset { get; private set; }
+
+        protected GameplayBeatmap GameplayBeatmap { get; private set; }
 
         private Sample sampleRestart;
 
@@ -144,8 +144,6 @@ namespace osu.Game.Screens.Play
             Configuration = configuration ?? new PlayerConfiguration();
         }
 
-        protected GameplayBeatmap GameplayBeatmap { get; private set; }
-
         private ScreenSuspensionHandler screenSuspension;
 
         private DependencyContainer dependencies;
@@ -164,7 +162,7 @@ namespace osu.Game.Screens.Play
 
             // ensure the score is in a consistent state with the current player.
             Score.ScoreInfo.Beatmap = Beatmap.Value.BeatmapInfo;
-            Score.ScoreInfo.Ruleset = rulesetInfo;
+            Score.ScoreInfo.Ruleset = GameplayRuleset.RulesetInfo;
             Score.ScoreInfo.Mods = Mods.Value.ToArray();
 
             PrepareReplay();
@@ -211,16 +209,16 @@ namespace osu.Game.Screens.Play
             if (game is OsuGame osuGame)
                 LocalUserPlaying.BindTo(osuGame.LocalUserPlaying);
 
-            DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
+            DrawableRuleset = GameplayRuleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
             dependencies.CacheAs(DrawableRuleset);
 
-            ScoreProcessor = ruleset.CreateScoreProcessor();
+            ScoreProcessor = GameplayRuleset.CreateScoreProcessor();
             ScoreProcessor.ApplyBeatmap(playableBeatmap);
             ScoreProcessor.Mods.BindTo(Mods);
 
             dependencies.CacheAs(ScoreProcessor);
 
-            HealthProcessor = ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
+            HealthProcessor = GameplayRuleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
             HealthProcessor.ApplyBeatmap(playableBeatmap);
 
             dependencies.CacheAs(HealthProcessor);
@@ -239,7 +237,7 @@ namespace osu.Game.Screens.Play
 
             // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
             // full access to all skin sources.
-            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
+            var rulesetSkinProvider = new SkinProvidingContainer(GameplayRuleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
 
             // load the skinning hierarchy first.
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
@@ -254,7 +252,7 @@ namespace osu.Game.Screens.Play
 
             // also give the HUD a ruleset container to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
             // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
-            var hudRulesetContainer = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
+            var hudRulesetContainer = new SkinProvidingContainer(GameplayRuleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
 
             // add the overlay components as a separate step as they proxy some elements from the above underlay/gameplay components.
             GameplayClockContainer.Add(hudRulesetContainer.WithChild(createOverlayComponents(Beatmap.Value)));
@@ -480,18 +478,18 @@ namespace osu.Game.Screens.Play
                 if (Beatmap.Value.Beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
 
-                rulesetInfo = Ruleset.Value ?? Beatmap.Value.BeatmapInfo.Ruleset;
-                ruleset = rulesetInfo.CreateInstance();
+                var rulesetInfo = Ruleset.Value ?? Beatmap.Value.BeatmapInfo.Ruleset;
+                GameplayRuleset = rulesetInfo.CreateInstance();
 
                 try
                 {
-                    playable = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, Mods.Value);
+                    playable = Beatmap.Value.GetPlayableBeatmap(GameplayRuleset.RulesetInfo, Mods.Value);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
                     // A playable beatmap may not be creatable with the user's preferred ruleset, so try using the beatmap's default ruleset
                     rulesetInfo = Beatmap.Value.BeatmapInfo.Ruleset;
-                    ruleset = rulesetInfo.CreateInstance();
+                    GameplayRuleset = rulesetInfo.CreateInstance();
 
                     playable = Beatmap.Value.GetPlayableBeatmap(rulesetInfo, Mods.Value);
                 }
@@ -584,6 +582,29 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="time">The destination time to seek to.</param>
         public void Seek(double time) => GameplayClockContainer.Seek(time);
+
+        private ScheduledDelegate frameStablePlaybackResetDelegate;
+
+        /// <summary>
+        /// Seeks to a specific time in gameplay, bypassing frame stability.
+        /// </summary>
+        /// <remarks>
+        /// Intermediate hitobject judgements may not be applied or reverted correctly during this seek.
+        /// </remarks>
+        /// <param name="time">The destination time to seek to.</param>
+        internal void NonFrameStableSeek(double time)
+        {
+            if (frameStablePlaybackResetDelegate?.Cancelled == false && !frameStablePlaybackResetDelegate.Completed)
+                frameStablePlaybackResetDelegate.RunTask();
+
+            bool wasFrameStable = DrawableRuleset.FrameStablePlayback;
+            DrawableRuleset.FrameStablePlayback = false;
+
+            Seek(time);
+
+            // Delay resetting frame-stable playback for one frame to give the FrameStabilityContainer a chance to seek.
+            frameStablePlaybackResetDelegate = ScheduleAfterChildren(() => DrawableRuleset.FrameStablePlayback = wasFrameStable);
+        }
 
         /// <summary>
         /// Restart gameplay via a parent <see cref="PlayerLoader"/>.
@@ -918,11 +939,10 @@ namespace osu.Game.Screens.Play
         /// Creates the player's <see cref="Scoring.Score"/>.
         /// </summary>
         /// <returns>The <see cref="Scoring.Score"/>.</returns>
-        protected virtual Score CreateScore() =>
-            new Score
-            {
-                ScoreInfo = new ScoreInfo { User = api.LocalUser.Value },
-            };
+        protected virtual Score CreateScore() => new Score
+        {
+            ScoreInfo = new ScoreInfo { User = api.LocalUser.Value },
+        };
 
         /// <summary>
         /// Imports the player's <see cref="Scoring.Score"/> to the local database.
