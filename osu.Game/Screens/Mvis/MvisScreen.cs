@@ -752,16 +752,7 @@ namespace osu.Game.Screens.Mvis
             if (d == null) sidebar.Hide(); //如果d是null, 则隐藏侧边栏
             if (!(d is ISidebarContent)) return; //如果d不是ISidebarContent, 则忽略这次调用
 
-            var sc = (ISidebarContent)d;
-
-            //如果sc是上一个显示(mvis)或sc是侧边栏的当前显示并且侧边栏未隐藏
-            if (sc == sidebar.CurrentDisplay.Value && sidebar.IsVisible.Value)
-            {
-                sidebar.Hide();
-                return;
-            }
-
-            sidebar.ShowComponent(d);
+            sidebar.ShowComponent(d, true);
         }
 
         #region override事件

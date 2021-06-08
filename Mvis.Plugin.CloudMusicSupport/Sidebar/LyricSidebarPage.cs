@@ -29,8 +29,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
         private LoadingSpinner loading;
         private OsuSpriteText idText;
 
-        public LyricSidebarSectionContainer(MvisPlugin plugin, float resizeWidth)
-            : base(plugin, resizeWidth)
+        public LyricSidebarSectionContainer(MvisPlugin plugin)
+            : base(plugin)
         {
             Icon = FontAwesome.Solid.Music;
         }

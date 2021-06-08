@@ -1,8 +1,8 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Logging;
 using osu.Game.Online.Placeholders;
 using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.SideBar;
@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 {
     public abstract class PluginSidebarPage : Container, ISidebarContent
     {
-        private readonly Container placeholder;
+        private readonly ClickablePlaceholder placeholder;
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;
@@ -33,9 +33,8 @@ namespace osu.Game.Screens.Mvis.Plugins
         [Resolved]
         private MvisPluginManager pluginManager { get; set; }
 
-        protected PluginSidebarPage(MvisPlugin plugin, float resizeWidth)
+        protected PluginSidebarPage(MvisPlugin plugin, float resizeWidth = -1)
         {
-            ResizeWidth = resizeWidth;
             Plugin = plugin;
             Title = plugin.Name;
             RelativeSizeAxes = Axes.Both;
@@ -47,32 +46,19 @@ namespace osu.Game.Screens.Mvis.Plugins
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0
                 },
-                placeholder = new Container
+                placeholder = new ClickablePlaceholder("请先启用该插件!", FontAwesome.Solid.Plug)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    RelativePositionAxes = Axes.Both,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Children = new Drawable[]
-                    {
-                        bgBox = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre
-                        },
-                        new ClickablePlaceholder("请先启用该插件!", FontAwesome.Solid.Plug)
-                        {
-                            Action = () => pluginManager?.ActivePlugin(Plugin),
-                            Scale = new Vector2(1.25f)
-                        }
-                    }
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Action = () => pluginManager?.ActivePlugin(Plugin),
+                    Scale = new Vector2(1.25f)
                 }
             };
+
+            if (resizeWidth != -1) Logger.Log("resizeWidth已废弃", level: LogLevel.Important);
         }
 
         private DependencyContainer dependencies;
-        private readonly Box bgBox;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -92,12 +78,12 @@ namespace osu.Game.Screens.Mvis.Plugins
                 if (v.NewValue)
                 {
                     content.FadeOut();
-                    placeholder.MoveToY(0, 500, Easing.OutQuint);
+                    placeholder.MoveToY(0, 200, Easing.OutQuint).FadeIn(200, Easing.OutQuint);
                 }
                 else
                 {
                     content.FadeIn(200, Easing.OutQuint);
-                    placeholder.MoveToY(1, 500, Easing.OutQuint);
+                    placeholder.MoveToY(30, 200, Easing.OutQuint).FadeOut(200, Easing.OutQuint);
                 }
 
                 if (!v.NewValue && !contentInit)
@@ -108,17 +94,6 @@ namespace osu.Game.Screens.Mvis.Plugins
             }, true);
         }
 
-        protected override void LoadComplete()
-        {
-            colourProvider.HueColour.BindValueChanged(_ =>
-            {
-                bgBox.Colour = colourProvider.Background7;
-            }, true);
-
-            base.LoadComplete();
-        }
-
-        public float ResizeWidth { get; }
         public string Title { get; }
         public IconUsage Icon { get; set; } = FontAwesome.Solid.Plug;
     }

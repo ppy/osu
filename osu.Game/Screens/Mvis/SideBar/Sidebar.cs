@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Mvis.SideBar
             base.UpdateAfterChildren();
         }
 
-        public void ShowComponent(Drawable d)
+        public void ShowComponent(Drawable d, bool allowHide = false)
         {
             if (!(d is ISidebarContent c))
                 throw new InvalidOperationException($"{d}不是{typeof(ISidebarContent)}");
@@ -144,6 +144,8 @@ namespace osu.Game.Screens.Mvis.SideBar
             //如果要显示的是当前正在显示的内容，则中断
             if (CurrentDisplay.Value == d)
             {
+                if (allowHide) Hide();
+
                 return;
             }
 
@@ -161,8 +163,6 @@ namespace osu.Game.Screens.Mvis.SideBar
              .Delay(resizeDuration / 2).FadeIn(resizeDuration / 2);
 
             CurrentDisplay.Value = d;
-
-            //content.ResizeWidthTo(c.ResizeWidth, resizeDuration, Easing.OutQuint);
         }
 
         private void addDrawableToList(Drawable d)
@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 Components.Add(s);
                 header.Tabs.Add(new HeaderTabItem(s)
                 {
-                    Action = () => ShowComponent(d)
+                    Action = () => ShowComponent(d, true)
                 });
             }
         }

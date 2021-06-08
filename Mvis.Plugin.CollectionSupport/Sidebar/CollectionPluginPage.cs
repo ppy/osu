@@ -9,6 +9,8 @@ using osu.Game.Collections;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.Mvis.Skinning;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Input;
 
@@ -34,7 +36,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         private CollectionInfo info;
 
         public CollectionPluginPage(MvisPlugin plugin)
-            : base(plugin, 0.8f)
+            : base(plugin)
         {
             Icon = FontAwesome.Solid.Check;
             RelativeSizeAxes = Axes.Both;
@@ -56,6 +58,20 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
 
             Children = new Drawable[]
             {
+                new SkinnableComponent(
+                    "MSidebar-Collection-background",
+                    confineMode: ConfineMode.ScaleToFill,
+                    defaultImplementation: _ => new PlaceHolder())
+                {
+                    Name = "收藏夹背景",
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    ChildAnchor = Anchor.BottomRight,
+                    ChildOrigin = Anchor.BottomRight,
+                    RelativeSizeAxes = Axes.Both,
+                    CentreComponent = false,
+                    OverrideChildAnchor = true,
+                },
                 new Container
                 {
                     Name = "收藏夹选择界面",
