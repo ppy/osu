@@ -65,17 +65,12 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
                         return null;
 
-                    case CatchSkinComponents.CatcherIdle:
-                        return this.GetAnimation("fruit-catcher-idle", true, true, true) ??
-                               this.GetAnimation("fruit-ryuuta", true, true, true);
+                    case CatchSkinComponents.Catcher:
+                        if (this.GetAnimation(@"fruit-ryuuta", true, true) != null ||
+                            this.GetAnimation(@"fruit-catcher-idle", true, true) != null)
+                            return new LegacyCatcher();
 
-                    case CatchSkinComponents.CatcherFail:
-                        return this.GetAnimation("fruit-catcher-fail", true, true, true) ??
-                               this.GetAnimation("fruit-ryuuta", true, true, true);
-
-                    case CatchSkinComponents.CatcherKiai:
-                        return this.GetAnimation("fruit-catcher-kiai", true, true, true) ??
-                               this.GetAnimation("fruit-ryuuta", true, true, true);
+                        return null;
 
                     case CatchSkinComponents.CatchComboCounter:
                         if (providesComboCounter)
