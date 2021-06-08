@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly Container<CaughtObject> droppedObjectTarget;
 
         [Cached]
-        public readonly Bindable<CatcherAnimationState> CurrentStateBindable = new Bindable<CatcherAnimationState>();
+        protected readonly Bindable<CatcherAnimationState> CurrentStateBindable = new Bindable<CatcherAnimationState>();
 
         public CatcherAnimationState CurrentState => CurrentStateBindable.Value;
 
