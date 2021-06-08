@@ -157,7 +157,7 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             AddStep("push song select", () => Game.ScreenStack.Push(new TestPlaySongSelect()));
             AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
-            AddWaitStep("wait two frame", 2);
+            AddWaitStep("wait two frames", 2);
         }
 
         [Test]
