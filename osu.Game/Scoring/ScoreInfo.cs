@@ -76,9 +76,6 @@ namespace osu.Game.Scoring
                 else if (localAPIMods != null)
                     scoreMods = apiMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
 
-                if (IsLegacyScore)
-                    scoreMods = scoreMods.Append(rulesetInstance.GetAllMods().OfType<ModClassic>().Single()).ToArray();
-
                 return scoreMods;
             }
             set
