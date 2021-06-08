@@ -55,9 +55,6 @@ namespace osu.Game.Skinning
 
         private readonly Dictionary<int, LegacyManiaSkinConfiguration> maniaConfigurations = new Dictionary<int, LegacyManiaSkinConfiguration>();
 
-        [CanBeNull]
-        private readonly DefaultLegacySkin legacyDefaultFallback;
-
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public LegacySkin(SkinInfo skin, IStorageResourceProvider resources)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, resources.Files), resources, "skin.ini")
@@ -74,9 +71,6 @@ namespace osu.Game.Skinning
         protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename)
             : base(skin, resources)
         {
-            if (resources != null)
-                legacyDefaultFallback = CreateFallbackSkin(storage, resources);
-
             using (var stream = storage?.GetStream(configurationFilename))
             {
                 if (stream != null)
@@ -115,9 +109,6 @@ namespace osu.Game.Skinning
                 lookupForMania<string>(new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value ?? "mania-key1", true,
                 true) != null);
         }
-
-        [CanBeNull]
-        protected virtual DefaultLegacySkin CreateFallbackSkin(IResourceStore<byte[]> storage, IStorageResourceProvider resources) => new DefaultLegacySkin(resources);
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
@@ -159,7 +150,7 @@ namespace osu.Game.Skinning
                     return genericLookup<TLookup, TValue>(lookup);
             }
 
-            return legacyDefaultFallback?.GetConfig<TLookup, TValue>(lookup);
+            return null;
         }
 
         private IBindable<TValue> lookupForMania<TValue>(LegacyManiaSkinConfigurationLookup maniaLookup)
@@ -336,7 +327,7 @@ namespace osu.Game.Skinning
             {
             }
 
-            return legacyDefaultFallback?.GetConfig<TLookup, TValue>(lookup);
+            return null;
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
@@ -444,6 +435,7 @@ namespace osu.Game.Skinning
                     break;
 
                 case GameplaySkinComponent<HitResult> resultComponent:
+                    // TODO: this should be inside the judgement pieces.
                     Func<Drawable> createDrawable = () => getJudgementAnimation(resultComponent.Component);
 
                     // kind of wasteful that we throw this away, but should do for now.
@@ -460,12 +452,7 @@ namespace osu.Game.Skinning
                     break;
             }
 
-            var animation = this.GetAnimation(component.LookupName, false, false);
-
-            if (animation != null)
-                return animation;
-
-            return legacyDefaultFallback?.GetDrawableComponent(component);
+            return this.GetAnimation(component.LookupName, false, false);
         }
 
         private Texture getParticleTexture(HitResult result)
@@ -525,7 +512,7 @@ namespace osu.Game.Skinning
                 return texture;
             }
 
-            return legacyDefaultFallback?.GetTexture(componentName, wrapModeS, wrapModeT);
+            return null;
         }
 
         public override ISample GetSample(ISampleInfo sampleInfo)
@@ -544,20 +531,12 @@ namespace osu.Game.Skinning
                 var sample = Samples?.Get(lookup);
 
                 if (sample != null)
+                {
                     return sample;
+                }
             }
 
-            return legacyDefaultFallback?.GetSample(sampleInfo);
-        }
-
-        public override ISkin FindProvider(Func<ISkin, bool> lookupFunction)
-        {
-            var source = base.FindProvider(lookupFunction);
-
-            if (source != null)
-                return source;
-
-            return legacyDefaultFallback?.FindProvider(lookupFunction);
+            return null;
         }
 
         private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)

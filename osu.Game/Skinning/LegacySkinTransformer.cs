@@ -16,7 +16,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// Transformer used to handle support of legacy features for individual rulesets.
     /// </summary>
-    public abstract class LegacySkinTransformer : ISkin
+    public abstract class LegacySkinTransformer : ISkinSource
     {
         /// <summary>
         /// Source of the <see cref="ISkin"/> which is being transformed.
@@ -50,5 +50,11 @@ namespace osu.Game.Skinning
         public abstract IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
 
         public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => Source.FindProvider(lookupFunction);
+
+        public event Action SourceChanged
+        {
+            add { throw new NotSupportedException(); }
+            remove { }
+        }
     }
 }
