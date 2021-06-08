@@ -109,9 +109,6 @@ namespace osu.Game.Skinning
                 true) != null);
         }
 
-        [CanBeNull]
-        protected virtual DefaultLegacySkin CreateFallbackSkin(IResourceStore<byte[]> storage, IStorageResourceProvider resources) => new DefaultLegacySkin(resources);
-
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
             switch (lookup)

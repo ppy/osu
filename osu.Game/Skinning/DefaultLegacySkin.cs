@@ -31,8 +31,6 @@ namespace osu.Game.Skinning
             Configuration.LegacyVersion = 2.7m;
         }
 
-        protected override DefaultLegacySkin CreateFallbackSkin(IResourceStore<byte[]> storage, IStorageResourceProvider resources) => null;
-
         public static SkinInfo Info { get; } = new SkinInfo
         {
             ID = SkinInfo.CLASSIC_SKIN, // this is temporary until database storage is decided upon.
