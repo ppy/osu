@@ -59,7 +59,7 @@ namespace osu.Game.Extensions
             component.Origin = info.Origin;
 
             if (component is ISkinnableDrawable skinnable)
-                skinnable.OverridesClosestAnchor = info.OverridesClosestAnchor;
+                skinnable.UsesFixedAnchor = info.UsesFixedAnchor;
 
             if (component is Container container)
             {

@@ -160,7 +160,7 @@ namespace osu.Game.Skinning.Editor
 
         private void updateDrawableAnchorIfUsingClosest(ISkinnableDrawable item)
         {
-            if (item.OverridesClosestAnchor) return;
+            if (item.UsesFixedAnchor) return;
 
             var drawable = (Drawable)item;
 
@@ -188,12 +188,12 @@ namespace osu.Game.Skinning.Editor
         {
             var closestItem = new TernaryStateRadioMenuItem("Closest", MenuItemType.Standard, _ => applyClosestAnchor())
             {
-                State = { Value = GetStateFromSelection(selection, c => !c.Item.OverridesClosestAnchor) }
+                State = { Value = GetStateFromSelection(selection, c => !c.Item.UsesFixedAnchor) }
             };
 
             yield return new OsuMenuItem("Anchor")
             {
-                Items = createAnchorItems((i, a) => i.OverridesClosestAnchor && ((Drawable)i).Anchor == a, applyCustomAnchor)
+                Items = createAnchorItems((i, a) => i.UsesFixedAnchor && ((Drawable)i).Anchor == a, applyCustomAnchor)
                         .Prepend(closestItem)
                         .ToArray()
             };
@@ -261,7 +261,7 @@ namespace osu.Game.Skinning.Editor
             {
                 var drawable = (Drawable)item;
 
-                item.OverridesClosestAnchor = true;
+                item.UsesFixedAnchor = true;
                 updateDrawableAnchor(drawable, anchor);
             }
         }
@@ -272,7 +272,7 @@ namespace osu.Game.Skinning.Editor
             {
                 var drawable = (Drawable)item;
 
-                item.OverridesClosestAnchor = false;
+                item.UsesFixedAnchor = false;
                 updateDrawableAnchor(drawable, getClosestAnchorForDrawable(drawable));
             }
         }

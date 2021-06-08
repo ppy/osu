@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        public bool OverridesClosestAnchor { get; set; }
+        public bool UsesFixedAnchor { get; set; }
 
         public DefaultHealthDisplay()
         {

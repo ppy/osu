@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved(canBeNull: true)]
         private HUDOverlay hud { get; set; }
 
-        public bool OverridesClosestAnchor { get; set; }
+        public bool UsesFixedAnchor { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
