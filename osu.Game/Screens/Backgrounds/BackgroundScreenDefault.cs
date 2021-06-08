@@ -140,22 +140,5 @@ namespace osu.Game.Screens.Backgrounds
                     return $@"Menu/menu-background-{currentDisplay % background_count + 1}";
             }
         }
-
-        private class SkinnedBackground : Background
-        {
-            private readonly Skin skin;
-
-            public SkinnedBackground(Skin skin, string fallbackTextureName)
-                : base(fallbackTextureName)
-            {
-                this.skin = skin;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                Sprite.Texture = skin.GetTexture("menu-background") ?? Sprite.Texture;
-            }
-        }
     }
 }
