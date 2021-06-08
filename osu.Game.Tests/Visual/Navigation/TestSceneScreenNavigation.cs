@@ -153,6 +153,14 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestPushSongSelectAndPressBackButtonImmediately()
+        {
+            AddStep("push song select", () => Game.ScreenStack.Push(new TestPlaySongSelect()));
+            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
+            AddWaitStep("wait two frame", 2);
+        }
+
+        [Test]
         public void TestExitSongSelectWithClick()
         {
             TestPlaySongSelect songSelect = null;
