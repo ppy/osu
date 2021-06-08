@@ -217,6 +217,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             if (!judgement.IsHit || judgement.HitObject.HitWindows?.WindowFor(HitResult.Miss) == 0)
                 return;
 
+            if (!judgement.Type.IsScorable() || judgement.Type.IsBonus())
+                return;
+
             if (judgementsContainer.Count > max_concurrent_judgements)
             {
                 const double quick_fade_time = 100;
