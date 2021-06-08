@@ -15,8 +15,6 @@ using osu.Game.Database;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Replays;
-using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Scoring;
 using osu.Game.Users;
 
@@ -70,8 +68,6 @@ namespace osu.Game.Screens.Spectate
 
                 playingUserStates.BindTo(spectatorClient.PlayingUserStates);
                 playingUserStates.BindCollectionChanged(onPlayingUserStatesChanged, true);
-
-                spectatorClient.OnNewFrames += userSentFrames;
 
                 managerUpdated = beatmaps.ItemUpdated.GetBoundCopy();
                 managerUpdated.BindValueChanged(beatmapUpdated);
@@ -197,29 +193,6 @@ namespace osu.Game.Screens.Spectate
             Schedule(() => StartGameplay(userId, gameplayState));
         }
 
-        private void userSentFrames(int userId, FrameDataBundle bundle)
-        {
-            if (!userMap.ContainsKey(userId))
-                return;
-
-            if (!gameplayStates.TryGetValue(userId, out var gameplayState))
-                return;
-
-            // The ruleset instance should be guaranteed to be in sync with the score via ScoreLock.
-            Debug.Assert(gameplayState.Ruleset != null && gameplayState.Ruleset.RulesetInfo.Equals(gameplayState.Score.ScoreInfo.Ruleset));
-
-            foreach (var frame in bundle.Frames)
-            {
-                IConvertibleReplayFrame convertibleFrame = gameplayState.Ruleset.CreateConvertibleReplayFrame();
-                convertibleFrame.FromLegacy(frame, gameplayState.Beatmap.Beatmap);
-
-                var convertedFrame = (ReplayFrame)convertibleFrame;
-                convertedFrame.Time = frame.Time;
-
-                gameplayState.Score.Replay.Frames.Add(convertedFrame);
-            }
-        }
-
         /// <summary>
         /// Invoked when a spectated user's state has changed.
         /// </summary>
@@ -260,8 +233,6 @@ namespace osu.Game.Screens.Spectate
 
             if (spectatorClient != null)
             {
-                spectatorClient.OnNewFrames -= userSentFrames;
-
                 foreach (var (userId, _) in userMap)
                     spectatorClient.StopWatchingUser(userId);
             }
