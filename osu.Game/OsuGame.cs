@@ -654,7 +654,7 @@ namespace osu.Game
                                         if (!(ScreenStack.CurrentScreen is IOsuScreen currentScreen))
                                             return;
 
-                                        if (!((Drawable)currentScreen).IsLoaded || currentScreen.AllowBackButton && !currentScreen.OnBackButton())
+                                        if (!((Drawable)currentScreen).IsLoaded || (currentScreen.AllowBackButton && !currentScreen.OnBackButton()))
                                             ScreenStack.Exit();
                                     }
                                 },
