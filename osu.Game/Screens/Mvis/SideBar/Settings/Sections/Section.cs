@@ -29,14 +29,14 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
 
         protected readonly List<FillFlowContainer> Containers = new List<FillFlowContainer>();
 
-        protected virtual float PieceWidth => 160;
+        protected virtual float PieceWidth => 150;
 
         protected FillFlowContainer CreateFillFlowContainer()
         {
             var target = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
-                Spacing = new Vector2(10),
+                Spacing = new Vector2(5),
                 Direction = FillDirection.Vertical,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight

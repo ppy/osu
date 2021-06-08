@@ -32,6 +32,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
         public LyricSidebarSectionContainer(MvisPlugin plugin, float resizeWidth)
             : base(plugin, resizeWidth)
         {
+            Icon = FontAwesome.Solid.Music;
         }
 
         public override PluginBottomBarButton CreateBottomBarButton()

@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 new ClickToCloseBox
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(0.7f),
+                    Colour = Color4.Black.Opacity(0.6f),
                     Action = () =>
                     {
                         if (!content.IsHovered)

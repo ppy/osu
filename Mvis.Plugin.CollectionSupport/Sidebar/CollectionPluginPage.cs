@@ -4,6 +4,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Collections;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Mvis;
@@ -35,6 +36,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         public CollectionPluginPage(MvisPlugin plugin)
             : base(plugin, 0.8f)
         {
+            Icon = FontAwesome.Solid.Check;
             RelativeSizeAxes = Axes.Both;
             collectionHelper = (CollectionHelper)plugin;
         }

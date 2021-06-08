@@ -31,7 +31,7 @@ namespace Mvis.Plugin.RulesetPanel.UI
                 },
                 new SettingsSliderPiece<float>
                 {
-                    Description = "空闲时面板的不透明度",
+                    Description = "面板不透明度(空闲)",
                     Bindable = config.GetBindable<float>(RulesetPanelSetting.IdleAlpha),
                     DisplayAsPercentage = true,
                 },
