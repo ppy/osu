@@ -848,10 +848,13 @@ namespace osu.Game.Screens.Mvis
             return base.OnExiting(next);
         }
 
+        private WorkingBeatmap suspendBeatmap;
+
         public override void OnSuspending(IScreen next)
         {
             CurrentTrack.ResetSpeedAdjustments();
             Beatmap.Disabled = false;
+            suspendBeatmap = Beatmap.Value;
 
             //恢复mods
             Mods.Value = originalMods;
@@ -880,9 +883,10 @@ namespace osu.Game.Screens.Mvis
 
             CurrentTrack.ResetSpeedAdjustments();
             applyTrackAdjustments();
-            updateBackground(Beatmap.Value);
 
-            Beatmap.BindValueChanged(onBeatmapChanged, true);
+            Beatmap.BindValueChanged(onBeatmapChanged);
+            if (Beatmap.Value != suspendBeatmap) Beatmap.TriggerChange();
+            else updateBackground(Beatmap.Value);
 
             //背景层的动画
             background.FadeOut().Then().Delay(duration * 0.6f).FadeIn(duration / 2);
