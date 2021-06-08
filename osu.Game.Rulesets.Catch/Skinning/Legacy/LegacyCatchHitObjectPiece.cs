@@ -13,12 +13,13 @@ using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Catch.Skinning
+namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
     public abstract class LegacyCatchHitObjectPiece : PoolableDrawable
     {
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
         public readonly Bindable<bool> HyperDash = new Bindable<bool>();
+        public readonly Bindable<int> IndexInBeatmap = new Bindable<int>();
 
         private readonly Sprite colouredSprite;
         private readonly Sprite overlaySprite;
@@ -64,6 +65,7 @@ namespace osu.Game.Rulesets.Catch.Skinning
 
             AccentColour.BindTo(ObjectState.AccentColour);
             HyperDash.BindTo(ObjectState.HyperDash);
+            IndexInBeatmap.BindTo(ObjectState.IndexInBeatmap);
 
             hyperSprite.Colour = Skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashFruit)?.Value ??
                                  Skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??
