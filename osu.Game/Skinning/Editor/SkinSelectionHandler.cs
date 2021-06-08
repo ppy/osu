@@ -149,19 +149,27 @@ namespace osu.Game.Skinning.Editor
         {
             foreach (var c in SelectedBlueprints)
             {
-                Drawable drawable = (Drawable)c.Item;
+                var skinnableDrawable = c.Item;
+                Drawable drawable = (Drawable)skinnableDrawable;
                 drawable.Position += drawable.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
 
-                if (c.Item.UsesFixedAnchor) continue;
-
-                var closestAnchor = getClosestAnchorForDrawable(drawable);
-
-                if (closestAnchor == drawable.Anchor) continue;
-
-                updateDrawableAnchor(drawable, closestAnchor);
+                checkAndApplyClosestAnchor(skinnableDrawable);
             }
 
             return true;
+        }
+
+        private static void checkAndApplyClosestAnchor(ISkinnableDrawable item)
+        {
+            if (item.UsesFixedAnchor) return;
+
+            var drawable = (Drawable)item;
+
+            var closestAnchor = getClosestAnchorForDrawable(drawable);
+
+            if (closestAnchor == drawable.Anchor) return;
+
+            updateDrawableAnchor(drawable, closestAnchor);
         }
 
         protected override void OnSelectionChanged()
@@ -263,10 +271,8 @@ namespace osu.Game.Skinning.Editor
         {
             foreach (var item in SelectedItems)
             {
-                var drawable = (Drawable)item;
-
                 item.UsesFixedAnchor = false;
-                updateDrawableAnchor(drawable, getClosestAnchorForDrawable(drawable));
+                checkAndApplyClosestAnchor(item);
             }
         }
 
