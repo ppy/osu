@@ -665,7 +665,7 @@ namespace osu.Game.Screens.Select
 
         public override bool OnBackButton()
         {
-            if (ModSelect?.State.Value == Visibility.Visible)
+            if (ModSelect.State.Value == Visibility.Visible)
             {
                 ModSelect.Hide();
                 return true;
