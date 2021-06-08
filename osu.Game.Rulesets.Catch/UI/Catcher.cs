@@ -7,9 +7,9 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Skinning;
+using osu.Game.Rulesets.Catch.Skinning.Default;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Skinning;
 using osuTK;
@@ -78,17 +79,17 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         private readonly Container<CaughtObject> droppedObjectTarget;
 
-        public CatcherAnimationState CurrentState { get; private set; }
+        [Cached]
+        public readonly Bindable<CatcherAnimationState> CurrentStateBindable = new Bindable<CatcherAnimationState>();
+
+        public CatcherAnimationState CurrentState => CurrentStateBindable.Value;
 
         /// <summary>
         /// The width of the catcher which can receive fruit. Equivalent to "catchMargin" in osu-stable.
         /// </summary>
         public const float ALLOWED_CATCH_RANGE = 0.8f;
 
-        /// <summary>
-        /// The drawable catcher for <see cref="CurrentState"/>.
-        /// </summary>
-        internal Drawable CurrentDrawableCatcher => currentCatcher.Drawable;
+        internal Texture CurrentTexture => currentCatcherPiece.CurrentTexture;
 
         private bool dashing;
 
@@ -110,11 +111,9 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         private readonly float catchWidth;
 
-        private readonly CatcherSprite catcherIdle;
-        private readonly CatcherSprite catcherKiai;
-        private readonly CatcherSprite catcherFail;
+        private readonly SkinnableDrawable currentCatcher;
 
-        private CatcherSprite currentCatcher;
+        private ICatcherPiece currentCatcherPiece => (ICatcherPiece)currentCatcher.Drawable;
 
         private Color4 hyperDashColour = DEFAULT_HYPER_DASH_COLOUR;
         private Color4 hyperDashEndGlowColour = DEFAULT_HYPER_DASH_COLOUR;
@@ -156,20 +155,12 @@ namespace osu.Game.Rulesets.Catch.UI
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.BottomCentre,
                 },
-                catcherIdle = new CatcherSprite(CatcherAnimationState.Idle)
+                currentCatcher = new SkinnableDrawable(
+                    new CatchSkinComponent(CatchSkinComponents.Catcher),
+                    _ => new DefaultCatcher())
                 {
                     Anchor = Anchor.TopCentre,
-                    Alpha = 0,
-                },
-                catcherKiai = new CatcherSprite(CatcherAnimationState.Kiai)
-                {
-                    Anchor = Anchor.TopCentre,
-                    Alpha = 0,
-                },
-                catcherFail = new CatcherSprite(CatcherAnimationState.Fail)
-                {
-                    Anchor = Anchor.TopCentre,
-                    Alpha = 0,
+                    OriginPosition = new Vector2(0.5f, 0.06f) * CatcherArea.CATCHER_SIZE
                 },
                 hitExplosionContainer = new HitExplosionContainer
                 {
@@ -184,8 +175,6 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             hitLighting = config.GetBindable<bool>(OsuSetting.HitLighting);
             trails = new CatcherTrailDisplay(this);
-
-            updateCatcher();
         }
 
         protected override void LoadComplete()
@@ -436,36 +425,12 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        private void updateCatcher()
-        {
-            currentCatcher?.Hide();
-
-            switch (CurrentState)
-            {
-                default:
-                    currentCatcher = catcherIdle;
-                    break;
-
-                case CatcherAnimationState.Fail:
-                    currentCatcher = catcherFail;
-                    break;
-
-                case CatcherAnimationState.Kiai:
-                    currentCatcher = catcherKiai;
-                    break;
-            }
-
-            currentCatcher.Show();
-            (currentCatcher.Drawable as IFramedAnimation)?.GotoFrame(0);
-        }
-
         private void updateState(CatcherAnimationState state)
         {
             if (CurrentState == state)
                 return;
 
-            CurrentState = state;
-            updateCatcher();
+            CurrentStateBindable.Value = state;
         }
 
         private void placeCaughtObject(DrawablePalpableCatchHitObject drawableObject, Vector2 position)
