@@ -651,9 +651,10 @@ namespace osu.Game
                                     Origin = Anchor.BottomLeft,
                                     Action = () =>
                                     {
-                                        var currentScreen = ScreenStack.CurrentScreen as IOsuScreen;
+                                        if (!(ScreenStack.CurrentScreen is IOsuScreen currentScreen))
+                                            return;
 
-                                        if (currentScreen?.AllowBackButton == true && !currentScreen.OnBackButton())
+                                        if (!((Drawable)currentScreen).IsLoaded || currentScreen.AllowBackButton && !currentScreen.OnBackButton())
                                             ScreenStack.Exit();
                                     }
                                 },
