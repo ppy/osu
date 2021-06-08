@@ -14,14 +14,20 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class LegacyCursorTrail : CursorTrail
     {
+        private readonly ISkin skin;
         private const double disjoint_trail_time_separation = 1000 / 60.0;
 
         private bool disjointTrail;
         private double lastTrailTime;
         private IBindable<float> cursorSize;
 
+        public LegacyCursorTrail(ISkin skin)
+        {
+            this.skin = skin;
+        }
+
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, OsuConfigManager config)
+        private void load(OsuConfigManager config)
         {
             Texture = skin.GetTexture("cursortrail");
             disjointTrail = skin.GetTexture("cursormiddle") == null;
