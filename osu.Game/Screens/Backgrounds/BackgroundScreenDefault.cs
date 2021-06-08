@@ -120,6 +120,10 @@ namespace osu.Game.Screens.Backgrounds
 
                         break;
                     }
+
+                    case BackgroundSource.Skin:
+                        newBackground = new SkinBackground(skin.Value, getBackgroundTextureName());
+                        break;
                 }
             }
 
