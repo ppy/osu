@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public class LegacyCatcher : CompositeDrawable, ICatcherPiece
+    public class LegacyCatcherNew : CompositeDrawable, ICatcherPiece
     {
         public Bindable<CatcherAnimationState> CurrentState { get; } = new Bindable<CatcherAnimationState>();
 
@@ -25,7 +27,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         private Drawable currentDrawable;
 
-        public LegacyCatcher()
+        public LegacyCatcherNew()
         {
             RelativeSizeAxes = Axes.Both;
         }
@@ -35,27 +37,22 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
             CurrentState.BindTo(currentState);
 
-            AddRangeInternal(new[]
+            foreach (var state in Enum.GetValues(typeof(CatcherAnimationState)).Cast<CatcherAnimationState>())
             {
-                drawables[CatcherAnimationState.Idle] = getDrawableFor(@"fruit-catcher-idle"),
-                drawables[CatcherAnimationState.Fail] = getDrawableFor(@"fruit-catcher-fail"),
-                drawables[CatcherAnimationState.Kiai] = getDrawableFor(@"fruit-catcher-kiai"),
-            });
-            currentDrawable = drawables[CatcherAnimationState.Idle];
-
-            foreach (var d in drawables.Values)
-            {
+                var d = getDrawableFor(state);
                 d.Anchor = Anchor.TopCentre;
                 d.Origin = Anchor.TopCentre;
                 d.RelativeSizeAxes = Axes.Both;
                 d.Size = Vector2.One;
                 d.FillMode = FillMode.Fit;
                 d.Alpha = 0;
+                AddInternal(drawables[state] = d);
             }
 
-            Drawable getDrawableFor(string name) =>
-                skin.GetAnimation(name, true, true, true) ??
-                skin.GetAnimation(@"fruit-ryuuta", true, true, true) ??
+            currentDrawable = drawables[CatcherAnimationState.Idle];
+
+            Drawable getDrawableFor(CatcherAnimationState state) =>
+                skin.GetAnimation(@$"fruit-catcher-{state.ToString().ToLowerInvariant()}", true, true, true) ??
                 skin.GetAnimation(@"fruit-catcher-idle", true, true, true);
         }
 

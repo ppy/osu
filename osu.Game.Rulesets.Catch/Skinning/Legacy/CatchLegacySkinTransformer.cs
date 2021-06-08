@@ -66,9 +66,14 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                         return null;
 
                     case CatchSkinComponents.Catcher:
-                        if (this.GetAnimation(@"fruit-ryuuta", true, true) != null ||
-                            this.GetAnimation(@"fruit-catcher-idle", true, true) != null)
-                            return new LegacyCatcher();
+                        // New elements will be ignored when the old element exists.
+                        if (GetTexture(@"fruit-ryuuta") != null ||
+                            GetTexture(@"fruit-ryuuta-0") != null)
+                            return new LegacyCatcherOld();
+
+                        if (GetTexture(@"fruit-catcher-idle") != null ||
+                            GetTexture(@"fruit-catcher-idle-0") != null)
+                            return new LegacyCatcherNew();
 
                         return null;
 
