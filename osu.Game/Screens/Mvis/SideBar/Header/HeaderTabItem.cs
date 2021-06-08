@@ -5,7 +5,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
-using osu.Game.Screens.Mvis.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -50,10 +49,6 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(18)
-                },
-                new PlaceHolder
-                {
-                    Size = new Vector2(40)
                 },
                 flashBox = new Box
                 {

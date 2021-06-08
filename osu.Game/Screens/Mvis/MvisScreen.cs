@@ -31,6 +31,7 @@ using osu.Game.Screens.Mvis.Misc;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osu.Game.Screens.Mvis.SideBar;
+using osu.Game.Screens.Mvis.SideBar.Header;
 using osu.Game.Screens.Mvis.SideBar.Settings;
 using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Screens.Play;
@@ -53,6 +54,7 @@ namespace osu.Game.Screens.Mvis
 
         public override bool CursorVisible => !OverlaysHidden
                                               || sidebar.State.Value == Visibility.Visible
+                                              || tabHeader.IsVisible.Value //TabHeader可见
                                               || IsHovered == false; //隐藏界面或侧边栏可见，显示光标
 
         public override bool AllowRateAdjustments => true;
@@ -189,6 +191,8 @@ namespace osu.Game.Screens.Mvis
 
         private readonly Sidebar sidebar = new Sidebar();
 
+        private readonly TabHeader tabHeader = new TabHeader();
+
         #endregion
 
         #region 设置
@@ -294,6 +298,8 @@ namespace osu.Game.Screens.Mvis
 
             //向侧边栏添加内容
             SidebarPluginsPage pluginsPage;
+            sidebar.Header = tabHeader;
+
             sidebar.AddRange(new Drawable[]
             {
                 settingsScroll = new PlayerSettings(),
@@ -372,6 +378,7 @@ namespace osu.Game.Screens.Mvis
                             OverrideChildAnchor = true
                         },
                         sidebar,
+                        tabHeader,
                         loadingSpinner = new LoadingSpinner(true, true)
                         {
                             Anchor = Anchor.BottomCentre,

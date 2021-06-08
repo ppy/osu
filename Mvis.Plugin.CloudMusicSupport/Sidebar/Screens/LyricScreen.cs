@@ -4,16 +4,11 @@ using Mvis.Plugin.CloudMusicSupport.Misc;
 using Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Mvis;
 using osuTK;
-using osuTK.Graphics;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 {
@@ -31,6 +26,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
         protected readonly OsuScrollContainer LyricScroll;
         protected readonly FillFlowContainer<DrawableLyric> LyricFlow;
+
         //private readonly FillFlowContainer placeholder;
 
         protected LyricScreen()
@@ -48,33 +44,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
                         Spacing = new Vector2(5),
                         Padding = new MarginPadding(5)
                     }
-                },
-                //placeholder = new FillFlowContainer
-                //{
-                //    AutoSizeAxes = Axes.Both,
-                //    Direction = FillDirection.Vertical,
-                //    Anchor = Anchor.TopRight,
-                //    Origin = Anchor.TopRight,
-                //    Colour = Color4.White.Opacity(0.6f),
-                //    Margin = new MarginPadding(40),
-                //    Children = new Drawable[]
-                //    {
-                //        new SpriteIcon
-                //        {
-                //            Icon = FontAwesome.Solid.HorseHead,
-                //            Size = new Vector2(60),
-                //            Anchor = Anchor.Centre,
-                //            Origin = Anchor.Centre,
-                //        },
-                //        new OsuSpriteText
-                //        {
-                //            Text = "没有歌词",
-                //            Font = OsuFont.GetFont(size: 45, weight: FontWeight.Bold),
-                //            Anchor = Anchor.Centre,
-                //            Origin = Anchor.Centre,
-                //        }
-                //    }
-                //}
+                }
             };
         }
 
