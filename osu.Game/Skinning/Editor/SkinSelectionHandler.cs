@@ -165,11 +165,7 @@ namespace osu.Game.Skinning.Editor
 
             var drawable = (Drawable)item;
 
-            var closestAnchor = getClosestAnchor(drawable);
-
-            if (closestAnchor == drawable.Anchor) return;
-
-            applyAnchor(drawable, closestAnchor);
+            applyAnchor(drawable, getClosestAnchor(drawable));
         }
 
         protected override void OnSelectionChanged()
@@ -325,6 +321,8 @@ namespace osu.Game.Skinning.Editor
 
         private static void applyAnchor(Drawable drawable, Anchor anchor)
         {
+            if (anchor == drawable.Anchor) return;
+
             var previousAnchor = drawable.AnchorPosition;
             drawable.Anchor = anchor;
             drawable.Position -= drawable.AnchorPosition - previousAnchor;
