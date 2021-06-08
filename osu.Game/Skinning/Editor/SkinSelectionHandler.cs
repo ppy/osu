@@ -186,7 +186,7 @@ namespace osu.Game.Skinning.Editor
 
             yield return new OsuMenuItem("Anchor")
             {
-                Items = createAnchorItems((i, a) => i.UsesFixedAnchor && ((Drawable)i).Anchor == a, applyCustomAnchors)
+                Items = createAnchorItems((i, a) => i.UsesFixedAnchor && ((Drawable)i).Anchor == a, applyFixedAnchors)
                         .Prepend(closestItem)
                         .ToArray()
             };
@@ -248,7 +248,7 @@ namespace osu.Game.Skinning.Editor
         private Quad getSelectionQuad() =>
             GetSurroundingQuad(SelectedBlueprints.SelectMany(b => b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
 
-        private void applyCustomAnchors(Anchor anchor)
+        private void applyFixedAnchors(Anchor anchor)
         {
             foreach (var item in SelectedItems)
             {
