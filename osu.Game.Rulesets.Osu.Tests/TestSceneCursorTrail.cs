@@ -39,18 +39,28 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestLegacySmoothCursorTrail()
         {
-            createTest(() => new LegacySkinContainer(false)
+            createTest(() =>
             {
-                Child = new LegacyCursorTrail()
+                var skinContainer = new LegacySkinContainer(false);
+                var legacyCursorTrail = new LegacyCursorTrail(skinContainer);
+
+                skinContainer.Child = legacyCursorTrail;
+
+                return skinContainer;
             });
         }
 
         [Test]
         public void TestLegacyDisjointCursorTrail()
         {
-            createTest(() => new LegacySkinContainer(true)
+            createTest(() =>
             {
-                Child = new LegacyCursorTrail()
+                var skinContainer = new LegacySkinContainer(true);
+                var legacyCursorTrail = new LegacyCursorTrail(skinContainer);
+
+                skinContainer.Child = legacyCursorTrail;
+
+                return skinContainer;
             });
         }
 

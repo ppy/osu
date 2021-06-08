@@ -6,45 +6,42 @@ using NUnit.Framework;
 using osu.Framework.IO.Stores;
 using osu.Game.Tests.Beatmaps;
 
-namespace osu.Game.Rulesets.Taiko.Tests
+namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneTaikoHitObjectSamples : HitObjectSampleTest
+    public class TestSceneOsuHitObjectSamples : HitObjectSampleTest
     {
-        protected override Ruleset CreatePlayerRuleset() => new TaikoRuleset();
+        protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 
-        protected override IResourceStore<byte[]> RulesetResources => new DllResourceStore(Assembly.GetAssembly(typeof(TestSceneTaikoHitObjectSamples)));
+        protected override IResourceStore<byte[]> RulesetResources => new DllResourceStore(Assembly.GetAssembly(typeof(TestSceneOsuHitObjectSamples)));
 
-        [TestCase("taiko-normal-hitnormal")]
         [TestCase("normal-hitnormal")]
         [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromBeatmap(string expectedSample)
         {
             SetupSkins(expectedSample, expectedSample);
 
-            CreateTestWithBeatmap("taiko-hitobject-beatmap-custom-sample-bank.osu");
+            CreateTestWithBeatmap("osu-hitobject-beatmap-custom-sample-bank.osu");
 
             AssertBeatmapLookup(expectedSample);
         }
 
-        [TestCase("taiko-normal-hitnormal")]
         [TestCase("normal-hitnormal")]
         [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromUserSkinFallback(string expectedSample)
         {
             SetupSkins(string.Empty, expectedSample);
 
-            CreateTestWithBeatmap("taiko-hitobject-beatmap-custom-sample-bank.osu");
+            CreateTestWithBeatmap("osu-hitobject-beatmap-custom-sample-bank.osu");
 
             AssertUserLookup(expectedSample);
         }
 
-        [TestCase("taiko-normal-hitnormal2")]
         [TestCase("normal-hitnormal2")]
         public void TestUserSkinLookupIgnoresSampleBank(string unwantedSample)
         {
             SetupSkins(string.Empty, unwantedSample);
 
-            CreateTestWithBeatmap("taiko-hitobject-beatmap-custom-sample-bank.osu");
+            CreateTestWithBeatmap("osu-hitobject-beatmap-custom-sample-bank.osu");
 
             AssertNoLookup(unwantedSample);
         }
