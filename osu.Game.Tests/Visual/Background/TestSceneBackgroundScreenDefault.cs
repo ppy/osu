@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -64,15 +65,17 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("is beatmap background", () => getCurrentBackground() is BeatmapBackground);
         }
 
-        [Test]
-        public void TestBeatmapDoesntReloadOnNoChange()
+        [TestCase(BackgroundSource.Beatmap, typeof(BeatmapBackground))]
+        [TestCase(BackgroundSource.BeatmapWithStoryboard, typeof(BeatmapBackgroundWithStoryboard))]
+        [TestCase(BackgroundSource.Skin, typeof(SkinBackground))]
+        public void TestBackgroundDoesntReloadOnNoChange(BackgroundSource source, Type backgroundType)
         {
-            BeatmapBackground last = null;
+            Graphics.Backgrounds.Background last = null;
 
-            setSourceMode(BackgroundSource.Beatmap);
+            setSourceMode(source);
             setSupporter(true);
 
-            AddUntilStep("wait for beatmap background to be loaded", () => (last = getCurrentBackground() as BeatmapBackground) != null);
+            AddUntilStep("wait for beatmap background to be loaded", () => (last = getCurrentBackground())?.GetType() == backgroundType);
             AddAssert("next doesn't load new background", () => screen.Next() == false);
 
             // doesn't really need to be checked but might as well.
