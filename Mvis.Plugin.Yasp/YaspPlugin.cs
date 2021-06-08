@@ -36,7 +36,10 @@ namespace Mvis.Plugin.Yasp
         public override PluginSettingsSubSection CreateSettingsSubSection()
             => new YaspSettingsSubSection(this);
 
-        public override int Version => 4;
+        public override PluginSidebarSettingsSection CreateSidebarSettingsSection()
+            => new YaspSidebarSection(this);
+
+        public override int Version => 5;
 
         public YaspPlugin()
         {

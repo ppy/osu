@@ -1,6 +1,7 @@
 using Mvis.Plugin.CloudMusicSupport.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.SideBar.Settings.Items;
@@ -23,12 +24,14 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                 },
                 new SettingsTogglePiece
                 {
+                    Icon = FontAwesome.Solid.Save,
                     Description = "自动保存歌词到本地",
                     Bindable = config.GetBindable<bool>(LyricSettings.SaveLrcWhenFetchFinish),
                     TooltipText = "歌词将保存在\"custom/lyrics/beatmap-{ID}.json\"中"
                 },
                 new SettingsTogglePiece
                 {
+                    Icon = FontAwesome.Solid.FillDrip,
                     Description = "禁用额外阴影",
                     Bindable = config.GetBindable<bool>(LyricSettings.NoExtraShadow),
                     TooltipText = "不要给歌词文本添加额外的阴影效果"
