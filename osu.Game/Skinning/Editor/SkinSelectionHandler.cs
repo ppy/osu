@@ -152,23 +152,16 @@ namespace osu.Game.Skinning.Editor
                 Drawable drawable = (Drawable)c.Item;
                 drawable.Position += drawable.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
 
-                updateDrawableAnchorIfUsingClosest(c.Item);
+                if (c.Item.UsesFixedAnchor) continue;
+
+                var closestAnchor = getClosestAnchorForDrawable(drawable);
+
+                if (closestAnchor == drawable.Anchor) continue;
+
+                updateDrawableAnchor(drawable, closestAnchor);
             }
 
             return true;
-        }
-
-        private void updateDrawableAnchorIfUsingClosest(ISkinnableDrawable item)
-        {
-            if (item.UsesFixedAnchor) return;
-
-            var drawable = (Drawable)item;
-
-            var closestAnchor = getClosestAnchorForDrawable(drawable);
-
-            if (closestAnchor == drawable.Anchor) return;
-
-            updateDrawableAnchor(drawable, closestAnchor);
         }
 
         protected override void OnSelectionChanged()
