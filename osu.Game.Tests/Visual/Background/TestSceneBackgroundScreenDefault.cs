@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         [Test]
-        public void TestTogglingStoryboardSwitchesBackgroundType()
+        public void TestBackgroundTypeSwitch()
         {
             setSupporter(true);
 
@@ -44,6 +44,9 @@ namespace osu.Game.Tests.Visual.Background
 
             setSourceMode(BackgroundSource.BeatmapWithStoryboard);
             AddUntilStep("is storyboard background", () => getCurrentBackground() is BeatmapBackgroundWithStoryboard);
+
+            setSourceMode(BackgroundSource.Skin);
+            AddUntilStep("is skin background", () => getCurrentBackground() is SkinBackground);
         }
 
         [Test]
@@ -78,7 +81,7 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         private void setSourceMode(BackgroundSource source) =>
-            AddStep("set background mode to beatmap", () => config.SetValue(OsuSetting.MenuBackgroundSource, source));
+            AddStep($"set background mode to {source}", () => config.SetValue(OsuSetting.MenuBackgroundSource, source));
 
         private void setSupporter(bool isSupporter) =>
             AddStep($"set supporter {isSupporter}", () => ((DummyAPIAccess)API).LocalUser.Value = new User
