@@ -165,11 +165,11 @@ namespace osu.Game.Skinning.Editor
 
             var drawable = (Drawable)item;
 
-            var closestAnchor = getClosestAnchorForDrawable(drawable);
+            var closestAnchor = getClosestAnchor(drawable);
 
             if (closestAnchor == drawable.Anchor) return;
 
-            updateDrawableAnchor(drawable, closestAnchor);
+            applyAnchor(drawable, closestAnchor);
         }
 
         protected override void OnSelectionChanged()
@@ -187,21 +187,21 @@ namespace osu.Game.Skinning.Editor
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
         {
-            var closestItem = new TernaryStateRadioMenuItem("Closest", MenuItemType.Standard, _ => applyClosestAnchor())
+            var closestItem = new TernaryStateRadioMenuItem("Closest", MenuItemType.Standard, _ => applyClosestAnchors())
             {
                 State = { Value = GetStateFromSelection(selection, c => !c.Item.UsesFixedAnchor) }
             };
 
             yield return new OsuMenuItem("Anchor")
             {
-                Items = createAnchorItems((i, a) => i.UsesFixedAnchor && ((Drawable)i).Anchor == a, applyCustomAnchor)
+                Items = createAnchorItems((i, a) => i.UsesFixedAnchor && ((Drawable)i).Anchor == a, applyCustomAnchors)
                         .Prepend(closestItem)
                         .ToArray()
             };
 
             yield return new OsuMenuItem("Origin")
             {
-                Items = createAnchorItems((i, o) => ((Drawable)i).Origin == o, applyOrigin).ToArray()
+                Items = createAnchorItems((i, o) => ((Drawable)i).Origin == o, applyOrigins).ToArray()
             };
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
@@ -237,7 +237,7 @@ namespace osu.Game.Skinning.Editor
                 drawable.Parent.ToLocalSpace(screenSpacePosition) - drawable.AnchorPosition;
         }
 
-        private void applyOrigin(Anchor anchor)
+        private void applyOrigins(Anchor anchor)
         {
             foreach (var item in SelectedItems)
             {
@@ -256,18 +256,18 @@ namespace osu.Game.Skinning.Editor
         private Quad getSelectionQuad() =>
             GetSurroundingQuad(SelectedBlueprints.SelectMany(b => b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
 
-        private void applyCustomAnchor(Anchor anchor)
+        private void applyCustomAnchors(Anchor anchor)
         {
             foreach (var item in SelectedItems)
             {
                 var drawable = (Drawable)item;
 
                 item.UsesFixedAnchor = true;
-                updateDrawableAnchor(drawable, anchor);
+                applyAnchor(drawable, anchor);
             }
         }
 
-        private void applyClosestAnchor()
+        private void applyClosestAnchors()
         {
             foreach (var item in SelectedItems)
             {
@@ -276,7 +276,7 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        private static Anchor getClosestAnchorForDrawable(Drawable drawable)
+        private static Anchor getClosestAnchor(Drawable drawable)
         {
             var parent = drawable.Parent;
 
@@ -323,7 +323,7 @@ namespace osu.Game.Skinning.Editor
             return tier0;
         }
 
-        private static void updateDrawableAnchor(Drawable drawable, Anchor anchor)
+        private static void applyAnchor(Drawable drawable, Anchor anchor)
         {
             var previousAnchor = drawable.AnchorPosition;
             drawable.Anchor = anchor;
