@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Net;
 using NUnit.Framework;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -32,7 +33,14 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Show Article Page", () => wiki.ShowPage("Interface"));
         }
 
-        private void setUpWikiResponse(APIWikiPage r)
+        [Test]
+        public void TestErrorPage()
+        {
+            setUpWikiResponse(null, true);
+            AddStep("Show Error Page", () => wiki.ShowPage("Error"));
+        }
+
+        private void setUpWikiResponse(APIWikiPage r, bool isFailed = false)
             => AddStep("set up response", () =>
             {
                 dummyAPI.HandleRequest = request =>
@@ -40,7 +48,11 @@ namespace osu.Game.Tests.Visual.Online
                     if (!(request is GetWikiRequest getWikiRequest))
                         return false;
 
-                    getWikiRequest.TriggerSuccess(r);
+                    if (isFailed)
+                        getWikiRequest.TriggerFailure(new WebException());
+                    else
+                        getWikiRequest.TriggerSuccess(r);
+
                     return true;
                 };
             });

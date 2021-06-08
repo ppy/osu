@@ -30,9 +30,12 @@ namespace osu.Game.Graphics.Containers.Markdown
                     break;
 
                 case ListItemBlock listItemBlock:
-                    var isOrdered = ((ListBlock)listItemBlock.Parent).IsOrdered;
-                    var childContainer = CreateListItem(listItemBlock, level, isOrdered);
+                    bool isOrdered = ((ListBlock)listItemBlock.Parent)?.IsOrdered == true;
+
+                    OsuMarkdownListItem childContainer = CreateListItem(listItemBlock, level, isOrdered);
+
                     container.Add(childContainer);
+
                     foreach (var single in listItemBlock)
                         base.AddMarkdownComponent(single, childContainer.Content, level);
                     break;

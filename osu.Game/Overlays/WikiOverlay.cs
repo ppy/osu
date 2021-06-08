@@ -92,7 +92,7 @@ namespace osu.Game.Overlays
             Loading.Show();
 
             request.Success += response => Schedule(() => onSuccess(response));
-            request.Failure += _ => Schedule(() => LoadDisplay(Empty()));
+            request.Failure += _ => Schedule(onFail);
 
             api.PerformAsync(request);
         }
@@ -130,6 +130,24 @@ namespace osu.Game.Overlays
                     },
                 });
             }
+        }
+
+        private void onFail()
+        {
+            LoadDisplay(new WikiMarkdownContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                CurrentPath = $@"{api.WebsiteRootUrl}/wiki/",
+                Text = $"Something went wrong when trying to fetch page \"{path.Value}\".\n\n[Return to the main page](Main_Page).",
+                DocumentMargin = new MarginPadding(0),
+                DocumentPadding = new MarginPadding
+                {
+                    Vertical = 20,
+                    Left = 30,
+                    Right = 50,
+                },
+            });
         }
 
         private void showParentPage()

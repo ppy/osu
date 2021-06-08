@@ -9,7 +9,11 @@ namespace osu.Game.Configuration
     {
         [Description("皮肤")]
         Skin,
+
         [Description("谱面")]
-        Beatmap
+        Beatmap,
+
+        [Description("谱面 (带故事版)")]
+        BeatmapWithStoryboard,
     }
 }
