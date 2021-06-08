@@ -49,13 +49,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return followCircle;
 
                     case OsuSkinComponents.SliderBall:
-                        var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "");
+                        // specular and nd layers must come from the same source as the ball texure.
+                        var ballProvider = Source.FindProvider(s => s.GetTexture("sliderb") != null || s.GetTexture("sliderb0") != null);
+
+                        var sliderBallContent = ballProvider.GetAnimation("sliderb", true, true, animationSeparator: "");
 
                         // todo: slider ball has a custom frame delay based on velocity
                         // Math.Max((150 / Velocity) * GameBase.SIXTY_FRAME_TIME, GameBase.SIXTY_FRAME_TIME);
 
                         if (sliderBallContent != null)
-                            return new LegacySliderBall(sliderBallContent);
+                            return new LegacySliderBall(sliderBallContent, ballProvider);
 
                         return null;
 
