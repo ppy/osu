@@ -325,6 +325,7 @@ namespace osu.Game.Beatmaps
         public ISkin Skin => skin.Value;
 
         protected abstract ISkin GetSkin();
+
         private readonly RecyclableLazy<ISkin> skin;
 
         public abstract Stream GetStream(string storagePath);

@@ -39,7 +39,7 @@ namespace osu.Game.Skinning
 
         private readonly IResourceStore<byte[]> resources;
 
-        public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>(new DefaultSkin(null));
+        public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>();
         public readonly Bindable<SkinInfo> CurrentSkinInfo = new Bindable<SkinInfo>(SkinInfo.Default) { Default = SkinInfo.Default };
 
         public override IEnumerable<string> HandledExtensions => new[] { ".osk" };
@@ -60,6 +60,8 @@ namespace osu.Game.Skinning
             defaultLegacySkin = new DefaultLegacySkin(this);
 
             CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = GetSkin(skin.NewValue);
+
+            CurrentSkin.Value = new DefaultSkin(this);
             CurrentSkin.ValueChanged += skin =>
             {
                 if (skin.NewValue.SkinInfo != CurrentSkinInfo.Value)

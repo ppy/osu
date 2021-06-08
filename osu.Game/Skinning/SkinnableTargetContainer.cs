@@ -73,9 +73,9 @@ namespace osu.Game.Skinning
             components.Remove(component);
         }
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected override void SkinChanged(ISkinSource skin)
         {
-            base.SkinChanged(skin, allowFallback);
+            base.SkinChanged(skin);
 
             Reload();
         }
