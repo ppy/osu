@@ -112,12 +112,6 @@ namespace osu.Game.Screens.Backgrounds
                             newBackground = new BeatmapBackgroundWithStoryboard(beatmap.Value, getBackgroundTextureName());
                         newBackground ??= new BeatmapBackground(beatmap.Value, getBackgroundTextureName());
 
-                        // this method is called in many cases where the beatmap hasn't changed (ie. on screen transitions).
-                        // if a background is already displayed for the requested beatmap, we don't want to load it again.
-                        if (background?.GetType() == newBackground.GetType() &&
-                            (background as BeatmapBackground)?.Beatmap == beatmap.Value)
-                            return background;
-
                         break;
                     }
 
@@ -126,6 +120,11 @@ namespace osu.Game.Screens.Backgrounds
                         break;
                 }
             }
+
+            // this method is called in many cases where the background might not necessarily need to change.
+            // if an equivalent background is currently being shown, we don't want to load it again.
+            if (newBackground?.Equals(background) == true)
+                return background;
 
             newBackground ??= new Background(getBackgroundTextureName());
             newBackground.Depth = currentDisplay;

@@ -21,5 +21,14 @@ namespace osu.Game.Graphics.Backgrounds
         {
             Sprite.Texture = skin.GetTexture("menu-background") ?? Sprite.Texture;
         }
+
+        public override bool Equals(Background other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return other.GetType() == GetType()
+                   && ((SkinBackground)other).skin.SkinInfo.Equals(skin.SkinInfo);
+        }
     }
 }
