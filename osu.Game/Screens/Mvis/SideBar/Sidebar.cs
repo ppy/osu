@@ -139,15 +139,15 @@ namespace osu.Game.Screens.Mvis.SideBar
 
             startFromHiddenState = State.Value == Visibility.Hidden;
 
-            Show();
-
             //如果要显示的是当前正在显示的内容，则中断
-            if (CurrentDisplay.Value == d)
+            if (CurrentDisplay.Value == d && IsVisible.Value)
             {
                 if (allowHide) Hide();
 
                 return;
             }
+
+            Show();
 
             var resizeDuration = startFromHiddenState ? 0 : duration;
 
