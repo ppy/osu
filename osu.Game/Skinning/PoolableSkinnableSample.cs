@@ -186,7 +186,8 @@ namespace osu.Game.Skinning
         {
             base.Dispose(isDisposing);
 
-            CurrentSkin.SourceChanged -= skinChangedImmediate;
+            if (CurrentSkin != null)
+                CurrentSkin.SourceChanged -= skinChangedImmediate;
         }
 
         #region Re-expose AudioContainer
