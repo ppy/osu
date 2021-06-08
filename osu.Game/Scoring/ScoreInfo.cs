@@ -203,7 +203,7 @@ namespace osu.Game.Scoring
         /// </summary>
         [JsonIgnore]
         [NotMapped]
-        public bool IsLegacyScore => mods.OfType<ModClassic>().Any();
+        public bool IsLegacyScore => Mods.OfType<ModClassic>().Any();
 
         public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
         {
