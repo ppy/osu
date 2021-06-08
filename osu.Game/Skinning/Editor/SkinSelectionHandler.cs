@@ -229,14 +229,16 @@ namespace osu.Game.Skinning.Editor
                 drawable.Parent.ToLocalSpace(screenSpacePosition) - drawable.AnchorPosition;
         }
 
-        private void applyOrigins(Anchor anchor)
+        private void applyOrigins(Anchor origin)
         {
             foreach (var item in SelectedItems)
             {
                 var drawable = (Drawable)item;
 
+                if (origin == drawable.Origin) continue;
+
                 var previousOrigin = drawable.OriginPosition;
-                drawable.Origin = anchor;
+                drawable.Origin = origin;
                 drawable.Position += drawable.OriginPosition - previousOrigin;
             }
         }
