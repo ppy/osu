@@ -1,7 +1,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osuTK;
 
@@ -9,9 +8,6 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
 {
     public class TabHeader : CompositeDrawable
     {
-        private readonly Box highLightBox;
-        private readonly Box bgBox;
-
         public FillFlowContainer<HeaderTabItem> Tabs;
 
         [Resolved]
@@ -20,55 +16,34 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
         public TabHeader()
         {
             Name = "Header";
-            Height = 40;
-            RelativeSizeAxes = Axes.X;
+            Width = 45;
+            RelativeSizeAxes = Axes.Y;
+
+            Margin = new MarginPadding { Right = 5 };
 
             InternalChildren = new Drawable[]
             {
-                bgBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = float.MaxValue
-                },
-                new OsuScrollContainer(Direction.Horizontal)
+                new OsuScrollContainer(Direction.Vertical)
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollContent =
                     {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight
                     },
                     Child = Tabs = new FillFlowContainer<HeaderTabItem>
                     {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        AutoSizeAxes = Axes.X,
-                        RelativeSizeAxes = Axes.Y,
-                        Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(10, 0),
-                        Margin = new MarginPadding { Horizontal = 25 }
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Direction = FillDirection.Vertical,
+                        Margin = new MarginPadding { Vertical = 25 },
+                        Spacing = new Vector2(5)
                     },
                     ScrollbarVisible = false
-                },
-                highLightBox = new Box
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 3,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft
                 }
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            colourProvider.HueColour.BindValueChanged(_ =>
-            {
-                bgBox.Colour = colourProvider.Dark5;
-                highLightBox.Colour = colourProvider.Highlight1;
-            }, true);
-
-            base.LoadComplete();
         }
     }
 }

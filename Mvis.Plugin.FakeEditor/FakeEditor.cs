@@ -84,6 +84,9 @@ namespace Mvis.Plugin.FakeEditor
         public override PluginSettingsSubSection CreateSettingsSubSection()
             => new FakeEditorSettings(this);
 
+        public override PluginSidebarSettingsSection CreateSidebarSettingsSection()
+            => new FakeEditorSidebarSection(this);
+
         public override void UnLoad()
         {
             if (MvisScreen != null)

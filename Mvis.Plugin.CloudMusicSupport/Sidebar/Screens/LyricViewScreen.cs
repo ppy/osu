@@ -38,7 +38,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         protected override LyricPiece CreateDrawableLyric(Lyric lyric)
             => new LyricPiece(lyric);
 
-        public override Drawable[] Entries => new Drawable[]
+        public override IconButton[] Entries => new[]
         {
             saveButton,
             new IconButton
@@ -109,12 +109,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         }
 
         private readonly BindableFloat followCooldown = new BindableFloat();
-
-        protected override void Update()
-        {
-            if (followCooldown.Value == 0) ScrollToCurrent();
-            base.Update();
-        }
 
         protected override bool OnHover(HoverEvent e)
         {

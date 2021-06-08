@@ -193,7 +193,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 HealthProcessor.FailConditions += failConditions;
             }
 
-            protected override Task ImportScore(Score score)
+            protected override Task ImportScore(Score score, bool bypass = false)
             {
                 return Task.CompletedTask;
             }

@@ -24,7 +24,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Settings;
-using osu.Game.Overlays.Settings.Sections.Mf;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Mvis.BottomBar;
 using osu.Game.Screens.Mvis.BottomBar.Buttons;
@@ -32,6 +31,7 @@ using osu.Game.Screens.Mvis.Misc;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osu.Game.Screens.Mvis.SideBar;
+using osu.Game.Screens.Mvis.SideBar.Settings;
 using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
@@ -269,6 +269,7 @@ namespace osu.Game.Screens.Mvis
         private IProvideAudioControlPlugin audioControlProvider;
         private readonly OsuMusicControllerWrapper musicControllerWrapper = new OsuMusicControllerWrapper();
         private SettingsButton songSelectButton;
+        private PlayerSettings settingsScroll;
 
         public float BottombarHeight => (bottomBar?.Height - bottomBar?.Y ?? 0) + 10 + 5;
 
@@ -292,42 +293,17 @@ namespace osu.Game.Screens.Mvis
             dependencies.Cache(this);
 
             //向侧边栏添加内容
-            SidebarSettingsScrollContainer settingsScroll;
             SidebarPluginsPage pluginsPage;
             sidebar.AddRange(new Drawable[]
             {
-                settingsScroll = new SidebarSettingsScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Y,
-                        RelativeSizeAxes = Axes.X,
-                        Spacing = new Vector2(20),
-                        Padding = new MarginPadding { Top = 10, Left = 5, Right = 5 },
-                        Margin = new MarginPadding { Bottom = 10 },
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
-                        {
-                            new MfMvisSection
-                            {
-                                Margin = new MarginPadding { Top = -15 },
-                                Padding = new MarginPadding(0)
-                            },
-                            new MfMvisPluginSection
-                            {
-                                Padding = new MarginPadding(0)
-                            },
-                            songSelectButton = new SettingsButton
-                            {
-                                Text = "歌曲选择",
-                                Action = () => this.Push(new MvisSongSelect())
-                            }
-                        }
-                    }
-                },
+                settingsScroll = new PlayerSettings(),
                 pluginsPage = new SidebarPluginsPage()
             });
+            songSelectButton = new SettingsButton
+            {
+                Text = "歌曲选择",
+                Action = () => this.Push(new MvisSongSelect())
+            };
 
             //配置绑定/设置
             isIdle.BindTo(idleTracker.IsIdle);
@@ -776,16 +752,7 @@ namespace osu.Game.Screens.Mvis
             if (d == null) sidebar.Hide(); //如果d是null, 则隐藏侧边栏
             if (!(d is ISidebarContent)) return; //如果d不是ISidebarContent, 则忽略这次调用
 
-            var sc = (ISidebarContent)d;
-
-            //如果sc是上一个显示(mvis)或sc是侧边栏的当前显示并且侧边栏未隐藏
-            if (sc == sidebar.CurrentDisplay.Value && sidebar.IsVisible.Value)
-            {
-                sidebar.Hide();
-                return;
-            }
-
-            sidebar.ShowComponent(d);
+            sidebar.ShowComponent(d, true);
         }
 
         #region override事件
