@@ -15,7 +15,10 @@ namespace osu.Game.Scoring.Legacy
 {
     public class LegacyScoreEncoder
     {
-        public const int LATEST_VERSION = 128;
+        /// <summary>
+        /// Database version in stable-compatible YYYYMMDD format.
+        /// </summary>
+        public const int LATEST_VERSION = 30000000;
 
         private readonly Score score;
         private readonly IBeatmap beatmap;
