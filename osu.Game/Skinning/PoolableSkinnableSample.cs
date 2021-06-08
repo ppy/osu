@@ -85,9 +85,9 @@ namespace osu.Game.Skinning
             clearPreviousSamples();
         }
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected override void SkinChanged(ISkinSource skin)
         {
-            base.SkinChanged(skin, allowFallback);
+            base.SkinChanged(skin);
             updateSample();
         }
 
@@ -114,15 +114,6 @@ namespace osu.Game.Skinning
                 return;
 
             var sample = CurrentSkin.GetSample(sampleInfo);
-
-            if (sample == null && AllowDefaultFallback)
-            {
-                foreach (var lookup in sampleInfo.LookupNames)
-                {
-                    if ((sample = sampleStore.Get(lookup)) != null)
-                        break;
-                }
-            }
 
             if (sample == null)
                 return;
