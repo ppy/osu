@@ -121,12 +121,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private double lastTickPlaybackTime;
         private bool isTicking;
 
-        private readonly bool sfxEnabled;
+        private readonly bool withFlair;
 
-        public AccuracyCircle(ScoreInfo score, bool sfxEnabled = false)
+        public AccuracyCircle(ScoreInfo score, bool withFlair = false)
         {
             this.score = score;
-            this.sfxEnabled = sfxEnabled;
+            this.withFlair = withFlair;
         }
 
         [BackgroundDependencyLoader]
@@ -250,7 +250,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 rankText = new RankText(score.Rank)
             };
 
-            if (sfxEnabled)
+            if (withFlair)
             {
                 tickPlaybackRate = new Bindable<double>(sfx_score_tick_debounce_rate_start);
 
@@ -329,7 +329,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
             this.ScaleTo(0).Then().ScaleTo(1, APPEAR_DURATION, Easing.OutQuint);
 
-            if (sfxEnabled)
+            if (withFlair)
             {
                 this.Delay(sfx_swoosh_pre_delay).Schedule(() =>
                 {
@@ -347,7 +347,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
                 accuracyCircle.FillTo(targetAccuracy, ACCURACY_TRANSFORM_DURATION, ACCURACY_TRANSFORM_EASING);
 
-                if (sfxEnabled)
+                if (withFlair)
                 {
                     Schedule(() =>
                     {
@@ -370,7 +370,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     {
                         badge.Appear();
 
-                        if (sfxEnabled)
+                        if (withFlair)
                         {
                             Schedule(() =>
                             {
@@ -388,7 +388,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 {
                     rankText.Appear();
 
-                    if (!sfxEnabled) return;
+                    if (!withFlair) return;
 
                     Schedule(() =>
                     {
