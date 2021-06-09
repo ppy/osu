@@ -54,11 +54,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             return new PlaylistsResultsScreen(score, RoomId.Value.Value, PlaylistItem, true);
         }
 
-        protected override Score CreateScore()
+        protected override void PrepareScoreForResults()
         {
-            var score = base.CreateScore();
-            score.ScoreInfo.TotalScore = (int)Math.Round(ScoreProcessor.GetStandardisedScore());
-            return score;
+            base.PrepareScoreForResults();
+
+            Score.ScoreInfo.TotalScore = (int)Math.Round(ScoreProcessor.GetStandardisedScore());
         }
 
         protected override void Dispose(bool isDisposing)

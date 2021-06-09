@@ -24,8 +24,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
         /// </summary>
         public readonly double StrainTime;
 
-        public readonly double ClockRate;
-
         public CatchDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, float halfCatcherWidth)
             : base(hitObject, lastObject, clockRate)
         {
@@ -37,7 +35,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
 
             // Every strain interval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure
             StrainTime = Math.Max(40, DeltaTime);
-            ClockRate = clockRate;
         }
     }
 }

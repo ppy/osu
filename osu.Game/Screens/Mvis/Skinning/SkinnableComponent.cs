@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Mvis.Skinning
                                   Func<ISkinSource, bool> allowFallback = null,
                                   ConfineMode confineMode = ConfineMode.NoScaling,
                                   bool masking = false)
-            : base(new SkinComponent(textureName), defaultImplementation, allowFallback, confineMode)
+            : base(new SkinComponent(textureName), defaultImplementation, confineMode)
         {
             CentreComponent = false;
             OverrideChildAnchor = true;

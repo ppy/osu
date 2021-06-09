@@ -216,7 +216,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("enable hit lighting", () => config.SetValue(OsuSetting.HitLighting, true));
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
             AddAssert("correct hit lighting colour", () =>
-                catcher.ChildrenOfType<HitExplosion>().First()?.ObjectColour == fruitColour);
+                catcher.ChildrenOfType<HitExplosion>().First()?.Entry?.ObjectColour == fruitColour);
         }
 
         [Test]
