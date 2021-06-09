@@ -46,6 +46,9 @@ namespace osu.Game.Skinning
             RelativeSizeAxes = Axes.Both;
 
             noFallbackLookupProxy = new NoFallbackProxy(this);
+
+            if (skin is ISkinSource source)
+                source.SourceChanged += TriggerSourceChanged;
         }
 
         public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
@@ -168,6 +171,9 @@ namespace osu.Game.Skinning
 
             if (fallbackSource != null)
                 fallbackSource.SourceChanged -= TriggerSourceChanged;
+
+            if (skin is ISkinSource source)
+                source.SourceChanged -= TriggerSourceChanged;
         }
 
         private class NoFallbackProxy : ISkinSource
