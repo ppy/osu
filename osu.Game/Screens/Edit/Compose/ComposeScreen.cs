@@ -73,15 +73,7 @@ namespace osu.Game.Screens.Edit.Compose
         {
             Debug.Assert(ruleset != null);
 
-            var beatmapSkinProvider = new BeatmapSkinProvidingContainer(beatmap.Value.Skin);
-
-            // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
-            // full access to all skin sources.
-            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, EditorBeatmap.PlayableBeatmap));
-
-            // load the skinning hierarchy first.
-            // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
-            return beatmapSkinProvider.WithChild(rulesetSkinProvider.WithChild(content));
+            return new RulesetSkinProvidingContainer(ruleset, EditorBeatmap.PlayableBeatmap, beatmap.Value.Skin).WithChild(content);
         }
 
         #region Input Handling
