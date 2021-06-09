@@ -192,7 +192,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Applies a hit object to be represented by this <see cref="DrawableHitObject"/>.
         /// </summary>
-        [Obsolete("Use either overload of Apply that takes a single argument of type HitObject or HitObjectLifetimeEntry")]
+        [Obsolete("Use either overload of Apply that takes a single argument of type HitObject or HitObjectLifetimeEntry")] // Can be removed 20211021.
         public void Apply([NotNull] HitObject hitObject, [CanBeNull] HitObjectLifetimeEntry lifetimeEntry)
         {
             if (lifetimeEntry != null)
