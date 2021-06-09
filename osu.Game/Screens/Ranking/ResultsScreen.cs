@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
 using osu.Game.Audio;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
@@ -257,7 +258,7 @@ namespace osu.Game.Screens.Ranking
             ApplyToBackground(b =>
             {
                 b.BlurAmount.Value = BACKGROUND_BLUR;
-                b.FadeTo(0.5f, 250);
+                b.FadeColour(OsuColour.Gray(0.5f), 250);
             });
 
             bottomPanel.FadeTo(1, 250);
@@ -265,7 +266,6 @@ namespace osu.Game.Screens.Ranking
 
         public override bool OnExiting(IScreen next)
         {
-            ApplyToBackground(b => b.FadeTo(1, 250));
 
             return base.OnExiting(next);
         }
