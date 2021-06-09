@@ -31,7 +31,6 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModFlashlight;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Restricted view area.";
-        public override bool Ranked => true;
 
         internal ModFlashlight()
         {
