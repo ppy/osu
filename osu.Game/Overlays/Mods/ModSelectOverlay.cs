@@ -96,7 +96,8 @@ namespace osu.Game.Overlays.Mods
             Waves.ThirdWaveColour = Color4Extensions.FromHex(@"005774");
             Waves.FourthWaveColour = Color4Extensions.FromHex(@"003a4e");
 
-            RelativeSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
+            Height = HEIGHT;
 
             Padding = new MarginPadding { Horizontal = -OsuScreen.HORIZONTAL_OVERFLOW_PADDING };
 
@@ -245,15 +246,21 @@ namespace osu.Game.Overlays.Mods
                                             },
                                         }
                                     },
-                                    ModSettingsContainer = new ModSettingsContainer
+                                    new Container
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Anchor = Anchor.BottomRight,
                                         Origin = Anchor.BottomRight,
-                                        Width = 0.3f,
-                                        Alpha = 0,
                                         Padding = new MarginPadding(30),
-                                        SelectedMods = { BindTarget = SelectedMods },
+                                        Width = 0.3f,
+                                        Children = new Drawable[]
+                                        {
+                                            ModSettingsContainer = new ModSettingsContainer
+                                            {
+                                                Alpha = 0,
+                                                SelectedMods = { BindTarget = SelectedMods },
+                                            },
+                                        }
                                     },
                                 }
                             },
@@ -456,6 +463,7 @@ namespace osu.Game.Overlays.Mods
             }
 
             updateSelectedButtons();
+            OnAvailableModsChanged();
         }
 
         /// <summary>
@@ -532,6 +540,13 @@ namespace osu.Game.Overlays.Mods
 
         private void playSelectedSound() => sampleOn?.Play();
         private void playDeselectedSound() => sampleOff?.Play();
+
+        /// <summary>
+        /// Invoked after <see cref="availableMods"/> has changed.
+        /// </summary>
+        protected virtual void OnAvailableModsChanged()
+        {
+        }
 
         /// <summary>
         /// Invoked when a new <see cref="Mod"/> has been selected.

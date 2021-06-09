@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved(CanBeNull = true)]
         private ManageCollectionsDialog manageCollectionsDialog { get; set; }
 
-        public IEnumerable<DrawableCarouselItem> DrawableBeatmaps => beatmapContainer?.Children ?? Enumerable.Empty<DrawableCarouselItem>();
+        public IEnumerable<DrawableCarouselItem> DrawableBeatmaps => beatmapContainer?.IsLoaded != true ? Enumerable.Empty<DrawableCarouselItem>() : beatmapContainer.AliveChildren;
 
         [CanBeNull]
         private Container<DrawableCarouselItem> beatmapContainer;
@@ -250,7 +250,7 @@ namespace osu.Game.Screens.Select.Carousel
             else
                 state = TernaryState.False;
 
-            return new TernaryStateMenuItem(collection.Name.Value, MenuItemType.Standard, s =>
+            return new TernaryStateToggleMenuItem(collection.Name.Value, MenuItemType.Standard, s =>
             {
                 foreach (var b in beatmapSet.Beatmaps)
                 {

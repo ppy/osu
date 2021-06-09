@@ -22,9 +22,8 @@ namespace osu.Desktop
         {
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
-            bool useOsuTK = args.Contains("--tk");
 
-            using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true, useOsuTK: useOsuTK))
+            using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true))
             {
                 host.ExceptionThrown += handleException;
 
@@ -70,7 +69,6 @@ namespace osu.Desktop
         /// Allow a maximum of one unhandled exception, per second of execution.
         /// </summary>
         /// <param name="arg"></param>
-        /// <returns></returns>
         private static bool handleException(Exception arg)
         {
             bool continueExecution = Interlocked.Decrement(ref allowableExceptions) >= 0;

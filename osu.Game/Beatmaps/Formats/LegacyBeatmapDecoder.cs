@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
@@ -66,16 +67,14 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line)
         {
-            var strippedLine = StripComments(line);
-
             switch (section)
             {
                 case Section.General:
-                    handleGeneral(strippedLine);
+                    handleGeneral(line);
                     return;
 
                 case Section.Editor:
-                    handleEditor(strippedLine);
+                    handleEditor(line);
                     return;
 
                 case Section.Metadata:
@@ -83,19 +82,19 @@ namespace osu.Game.Beatmaps.Formats
                     return;
 
                 case Section.Difficulty:
-                    handleDifficulty(strippedLine);
+                    handleDifficulty(line);
                     return;
 
                 case Section.Events:
-                    handleEvent(strippedLine);
+                    handleEvent(line);
                     return;
 
                 case Section.TimingPoints:
-                    handleTimingPoint(strippedLine);
+                    handleTimingPoint(line);
                     return;
 
                 case Section.HitObjects:
-                    handleHitObject(strippedLine);
+                    handleHitObject(line);
                     return;
             }
 
@@ -348,8 +347,8 @@ namespace osu.Game.Beatmaps.Formats
             if (split.Length >= 8)
             {
                 LegacyEffectFlags effectFlags = (LegacyEffectFlags)Parsing.ParseInt(split[7]);
-                kiaiMode = effectFlags.HasFlag(LegacyEffectFlags.Kiai);
-                omitFirstBarSignature = effectFlags.HasFlag(LegacyEffectFlags.OmitFirstBarLine);
+                kiaiMode = effectFlags.HasFlagFast(LegacyEffectFlags.Kiai);
+                omitFirstBarSignature = effectFlags.HasFlagFast(LegacyEffectFlags.OmitFirstBarLine);
             }
 
             string stringSampleSet = sampleSet.ToString().ToLowerInvariant();

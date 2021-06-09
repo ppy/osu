@@ -11,11 +11,13 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Playlists;
+using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
 using osuTK.Input;
@@ -24,8 +26,6 @@ namespace osu.Game.Tests.Visual.Playlists
 {
     public class TestScenePlaylistsRoomSubScreen : RoomTestScene
     {
-        protected override bool UseOnlineAPI => true;
-
         [Cached(typeof(IRoomManager))]
         private readonly TestRoomManager roomManager = new TestRoomManager();
 
@@ -38,9 +38,21 @@ namespace osu.Game.Tests.Visual.Playlists
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, Beatmap.Default));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
 
             manager.Import(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Wait();
+
+            ((DummyAPIAccess)API).HandleRequest = req =>
+            {
+                switch (req)
+                {
+                    case CreateRoomScoreRequest createRoomScoreRequest:
+                        createRoomScoreRequest.TriggerSuccess(new APIScoreToken { ID = 1 });
+                        return true;
+                }
+
+                return false;
+            };
         }
 
         [SetUpSteps]
@@ -59,12 +71,16 @@ namespace osu.Game.Tests.Visual.Playlists
                 Room.Name.Value = "my awesome room";
                 Room.Host.Value = new User { Id = 2, Username = "peppy" };
                 Room.RecentParticipants.Add(Room.Host.Value);
+                Room.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
                 Room.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                     Ruleset = { Value = new OsuRuleset().RulesetInfo }
                 });
             });
+
+            AddStep("start match", () => match.ChildrenOfType<PlaylistsReadyButton>().First().Click());
+            AddUntilStep("player loader loaded", () => Stack.CurrentScreen is PlayerLoader);
         }
 
         [Test]

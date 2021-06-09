@@ -4,9 +4,11 @@
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 
@@ -15,9 +17,26 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public class MultiplayerMatchSongSelect : OnlinePlaySongSelect
     {
         [Resolved]
-        private StatefulMultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; }
 
         private LoadingLayer loadingLayer;
+
+        /// <summary>
+        /// Construct a new instance of multiplayer song select.
+        /// </summary>
+        /// <param name="beatmap">An optional initial beatmap selection to perform.</param>
+        /// <param name="ruleset">An optional initial ruleset selection to perform.</param>
+        public MultiplayerMatchSongSelect(WorkingBeatmap beatmap = null, RulesetInfo ruleset = null)
+        {
+            if (beatmap != null || ruleset != null)
+            {
+                Schedule(() =>
+                {
+                    if (beatmap != null) Beatmap.Value = beatmap;
+                    if (ruleset != null) Ruleset.Value = ruleset;
+                });
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load()

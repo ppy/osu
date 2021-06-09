@@ -59,7 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private IRoomManager manager { get; set; }
 
             [Resolved]
-            private StatefulMultiplayerClient client { get; set; }
+            private MultiplayerClient client { get; set; }
 
             [Resolved]
             private Bindable<Room> currentRoom { get; set; }

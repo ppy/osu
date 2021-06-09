@@ -44,9 +44,24 @@ namespace osu.Game.Rulesets.Catch.UI
         public bool HyperDashing => hyperDashModifier != 1;
 
         /// <summary>
+        /// Whether <see cref="DrawablePalpableCatchHitObject"/> fruit should appear on the plate.
+        /// </summary>
+        public bool CatchFruitOnPlate { get; set; } = true;
+
+        /// <summary>
         /// The relative space to cover in 1 millisecond. based on 1 game pixel per millisecond as in osu-stable.
         /// </summary>
         public const double BASE_SPEED = 1.0;
+
+        /// <summary>
+        /// The amount by which caught fruit should be offset from the plate surface to make them look visually "caught".
+        /// </summary>
+        public const float CAUGHT_FRUIT_VERTICAL_OFFSET = -5;
+
+        /// <summary>
+        /// The amount by which caught fruit should be scaled down to fit on the plate.
+        /// </summary>
+        private const float caught_fruit_scale_adjust = 0.5f;
 
         [NotNull]
         private readonly Container trailsTarget;
@@ -111,8 +126,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private float hyperDashTargetPosition;
         private Bindable<bool> hitLighting;
 
-        private readonly DrawablePool<HitExplosion> hitExplosionPool;
-        private readonly Container<HitExplosion> hitExplosionContainer;
+        private readonly HitExplosionContainer hitExplosionContainer;
 
         private readonly DrawablePool<CaughtFruit> caughtFruitPool;
         private readonly DrawablePool<CaughtBanana> caughtBananaPool;
@@ -133,7 +147,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
             InternalChildren = new Drawable[]
             {
-                hitExplosionPool = new DrawablePool<HitExplosion>(10),
                 caughtFruitPool = new DrawablePool<CaughtFruit>(50),
                 caughtBananaPool = new DrawablePool<CaughtBanana>(100),
                 // less capacity is needed compared to fruit because droplet is not stacked
@@ -158,7 +171,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     Anchor = Anchor.TopCentre,
                     Alpha = 0,
                 },
-                hitExplosionContainer = new Container<HitExplosion>
+                hitExplosionContainer = new HitExplosionContainer
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.BottomCentre,
@@ -197,13 +210,13 @@ namespace osu.Game.Rulesets.Catch.UI
         /// Calculates the width of the area used for attempting catches in gameplay.
         /// </summary>
         /// <param name="scale">The scale of the catcher.</param>
-        internal static float CalculateCatchWidth(Vector2 scale) => CatcherArea.CATCHER_SIZE * Math.Abs(scale.X) * ALLOWED_CATCH_RANGE;
+        public static float CalculateCatchWidth(Vector2 scale) => CatcherArea.CATCHER_SIZE * Math.Abs(scale.X) * ALLOWED_CATCH_RANGE;
 
         /// <summary>
         /// Calculates the width of the area used for attempting catches in gameplay.
         /// </summary>
         /// <param name="difficulty">The beatmap difficulty.</param>
-        internal static float CalculateCatchWidth(BeatmapDifficulty difficulty) => CalculateCatchWidth(calculateScale(difficulty));
+        public static float CalculateCatchWidth(BeatmapDifficulty difficulty) => CalculateCatchWidth(calculateScale(difficulty));
 
         /// <summary>
         /// Determine if this catcher can catch a <see cref="CatchHitObject"/> in the current position.
@@ -235,9 +248,10 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (result.IsHit)
             {
-                var positionInStack = computePositionInStack(new Vector2(palpableObject.X - X, 0), palpableObject.DisplaySize.X / 2);
+                var positionInStack = computePositionInStack(new Vector2(palpableObject.X - X, 0), palpableObject.DisplaySize.X);
 
-                placeCaughtObject(palpableObject, positionInStack);
+                if (CatchFruitOnPlate)
+                    placeCaughtObject(palpableObject, positionInStack);
 
                 if (hitLighting.Value)
                     addLighting(hitObject, positionInStack.X, drawableObject.AccentColour.Value);
@@ -281,7 +295,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
             caughtObjectContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
             droppedObjectTarget.RemoveAll(d => d.HitObject == drawableObject.HitObject);
-            hitExplosionContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
         }
 
         /// <summary>
@@ -378,23 +391,14 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             updateTrailVisibility();
 
-            if (hyperDashing)
-            {
-                this.FadeColour(hyperDashColour, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
-                this.FadeTo(0.2f, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
-            }
-            else
-            {
-                this.FadeColour(Color4.White, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
-                this.FadeTo(1f, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
-            }
+            this.FadeColour(hyperDashing ? hyperDashColour : Color4.White, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
         }
 
         private void updateTrailVisibility() => trails.DisplayTrail = Dashing || HyperDashing;
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected override void SkinChanged(ISkinSource skin)
         {
-            base.SkinChanged(skin, allowFallback);
+            base.SkinChanged(skin);
 
             hyperDashColour =
                 skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??
@@ -473,7 +477,7 @@ namespace osu.Game.Rulesets.Catch.UI
             caughtObject.CopyStateFrom(drawableObject);
             caughtObject.Anchor = Anchor.TopCentre;
             caughtObject.Position = position;
-            caughtObject.Scale /= 2;
+            caughtObject.Scale *= caught_fruit_scale_adjust;
 
             caughtObjectContainer.Add(caughtObject);
 
@@ -483,31 +487,26 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private Vector2 computePositionInStack(Vector2 position, float displayRadius)
         {
-            const float radius_div_2 = CatchHitObject.OBJECT_RADIUS / 2;
-            const float allowance = 10;
+            // this is taken from osu-stable (lenience should be 10 * 10 at standard scale).
+            const float lenience_adjust = 10 / CatchHitObject.OBJECT_RADIUS;
 
-            while (caughtObjectContainer.Any(f => Vector2Extensions.Distance(f.Position, position) < (displayRadius + radius_div_2) / (allowance / 2)))
+            float adjustedRadius = displayRadius * lenience_adjust;
+            float checkDistance = MathF.Pow(adjustedRadius, 2);
+
+            // offset fruit vertically to better place "above" the plate.
+            position.Y += CAUGHT_FRUIT_VERTICAL_OFFSET;
+
+            while (caughtObjectContainer.Any(f => Vector2Extensions.DistanceSquared(f.Position, position) < checkDistance))
             {
-                float diff = (displayRadius + radius_div_2) / allowance;
-
-                position.X += (RNG.NextSingle() - 0.5f) * diff * 2;
-                position.Y -= RNG.NextSingle() * diff;
+                position.X += RNG.NextSingle(-adjustedRadius, adjustedRadius);
+                position.Y -= RNG.NextSingle(0, 5);
             }
-
-            position.X = Math.Clamp(position.X, -CatcherArea.CATCHER_SIZE / 2, CatcherArea.CATCHER_SIZE / 2);
 
             return position;
         }
 
-        private void addLighting(CatchHitObject hitObject, float x, Color4 colour)
-        {
-            HitExplosion hitExplosion = hitExplosionPool.Get();
-            hitExplosion.HitObject = hitObject;
-            hitExplosion.X = x;
-            hitExplosion.Scale = new Vector2(hitObject.Scale);
-            hitExplosion.ObjectColour = colour;
-            hitExplosionContainer.Add(hitExplosion);
-        }
+        private void addLighting(CatchHitObject hitObject, float x, Color4 colour) =>
+            hitExplosionContainer.Add(new HitExplosionEntry(Time.Current, x, hitObject.Scale, colour, hitObject.RandomSeed));
 
         private CaughtObject getCaughtObject(PalpableCatchHitObject source)
         {

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -70,10 +71,41 @@ namespace osu.Game.Skinning
                 updateSample();
         }
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected override void LoadComplete()
         {
-            base.SkinChanged(skin, allowFallback);
+            base.LoadComplete();
+
+            CurrentSkin.SourceChanged += skinChangedImmediate;
+        }
+
+        private void skinChangedImmediate()
+        {
+            // Clean up the previous sample immediately on a source change.
+            // This avoids a potential call to Play() of an already disposed sample (samples are disposed along with the skin, but SkinChanged is scheduled).
+            clearPreviousSamples();
+        }
+
+        protected override void SkinChanged(ISkinSource skin)
+        {
+            base.SkinChanged(skin);
             updateSample();
+        }
+
+        /// <summary>
+        /// Whether this sample was playing before a skin source change.
+        /// </summary>
+        private bool wasPlaying;
+
+        private void clearPreviousSamples()
+        {
+            // only run if the samples aren't already cleared.
+            // this ensures the "wasPlaying" state is stored correctly even if multiple clear calls are executed.
+            if (!sampleContainer.Any()) return;
+
+            wasPlaying = Playing;
+
+            sampleContainer.Clear();
+            Sample = null;
         }
 
         private void updateSample()
@@ -81,26 +113,12 @@ namespace osu.Game.Skinning
             if (sampleInfo == null)
                 return;
 
-            bool wasPlaying = Playing;
+            var sample = CurrentSkin.GetSample(sampleInfo);
 
-            sampleContainer.Clear();
-            Sample = null;
-
-            var ch = CurrentSkin.GetSample(sampleInfo);
-
-            if (ch == null && AllowDefaultFallback)
-            {
-                foreach (var lookup in sampleInfo.LookupNames)
-                {
-                    if ((ch = sampleStore.Get(lookup)) != null)
-                        break;
-                }
-            }
-
-            if (ch == null)
+            if (sample == null)
                 return;
 
-            sampleContainer.Add(Sample = new DrawableSample(ch));
+            sampleContainer.Add(Sample = new DrawableSample(sample));
 
             // Start playback internally for the new sample if the previous one was playing beforehand.
             if (wasPlaying && Looping)
@@ -153,6 +171,14 @@ namespace osu.Game.Skinning
                 if (activeChannel != null)
                     activeChannel.Looping = value;
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (CurrentSkin != null)
+                CurrentSkin.SourceChanged -= skinChangedImmediate;
         }
 
         #region Re-expose AudioContainer

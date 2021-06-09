@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osuTK.Graphics;
@@ -18,8 +19,8 @@ namespace osu.Game.Overlays
         where T : OverlayHeader
     {
         public virtual string IconTexture => Header.Title.IconTexture ?? string.Empty;
-        public virtual string Title => Header.Title.Title ?? string.Empty;
-        public virtual string Description => Header.Title.Description ?? string.Empty;
+        public virtual LocalisableString Title => Header.Title.Title;
+        public virtual LocalisableString Description => Header.Title.Description;
 
         public T Header { get; }
 

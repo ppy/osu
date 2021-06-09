@@ -16,11 +16,10 @@ using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyHealthDisplay : CompositeDrawable, IHealthDisplay
+    public class LegacyHealthDisplay : HealthDisplay, ISkinnableDrawable
     {
         private const double epic_cutoff = 0.5;
 
-        private readonly Skin skin;
         private LegacyHealthPiece fill;
         private LegacyHealthPiece marker;
 
@@ -28,22 +27,14 @@ namespace osu.Game.Skinning
 
         private bool isNewStyle;
 
-        public Bindable<double> Current { get; } = new BindableDouble(1)
-        {
-            MinValue = 0,
-            MaxValue = 1
-        };
-
-        public LegacyHealthDisplay(Skin skin)
-        {
-            this.skin = skin;
-        }
-
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ISkinSource source)
         {
             AutoSizeAxes = Axes.Both;
 
+            var skin = source.FindProvider(s => getTexture(s, "bg") != null);
+
+            // the marker lookup to decide which display style must be performed on the source of the bg, which is the most common element.
             isNewStyle = getTexture(skin, "marker") != null;
 
             // background implementation is the same for both versions.
@@ -83,9 +74,9 @@ namespace osu.Game.Skinning
             marker.Position = fill.Position + new Vector2(fill.DrawWidth, isNewStyle ? fill.DrawHeight / 2 : 0);
         }
 
-        public void Flash(JudgementResult result) => marker.Flash(result);
+        protected override void Flash(JudgementResult result) => marker.Flash(result);
 
-        private static Texture getTexture(Skin skin, string name) => skin.GetTexture($"scorebar-{name}");
+        private static Texture getTexture(ISkin skin, string name) => skin?.GetTexture($"scorebar-{name}");
 
         private static Color4 getFillColour(double hp)
         {
@@ -104,7 +95,7 @@ namespace osu.Game.Skinning
             private readonly Texture dangerTexture;
             private readonly Texture superDangerTexture;
 
-            public LegacyOldStyleMarker(Skin skin)
+            public LegacyOldStyleMarker(ISkin skin)
             {
                 normalTexture = getTexture(skin, "ki");
                 dangerTexture = getTexture(skin, "kidanger");
@@ -135,9 +126,9 @@ namespace osu.Game.Skinning
 
         public class LegacyNewStyleMarker : LegacyMarker
         {
-            private readonly Skin skin;
+            private readonly ISkin skin;
 
-            public LegacyNewStyleMarker(Skin skin)
+            public LegacyNewStyleMarker(ISkin skin)
             {
                 this.skin = skin;
             }
@@ -159,7 +150,7 @@ namespace osu.Game.Skinning
 
         internal class LegacyOldStyleFill : LegacyHealthPiece
         {
-            public LegacyOldStyleFill(Skin skin)
+            public LegacyOldStyleFill(ISkin skin)
             {
                 // required for sizing correctly..
                 var firstFrame = getTexture(skin, "colour-0");
@@ -182,7 +173,7 @@ namespace osu.Game.Skinning
 
         internal class LegacyNewStyleFill : LegacyHealthPiece
         {
-            public LegacyNewStyleFill(Skin skin)
+            public LegacyNewStyleFill(ISkin skin)
             {
                 InternalChild = new Sprite
                 {
@@ -254,7 +245,7 @@ namespace osu.Game.Skinning
                 Main.ScaleTo(1.4f).Then().ScaleTo(1, 200, Easing.Out);
         }
 
-        public class LegacyHealthPiece : CompositeDrawable, IHealthDisplay
+        public class LegacyHealthPiece : CompositeDrawable
         {
             public Bindable<double> Current { get; } = new Bindable<double>();
 

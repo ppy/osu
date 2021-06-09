@@ -37,9 +37,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             AddInternal(scaleContainer = new Container
             {
                 Scale = new Vector2(SPRITE_SCALE),
-                Anchor = Anchor.Centre,
+                Anchor = Anchor.TopCentre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
+                Y = SPINNER_Y_CENTRE,
                 Children = new Drawable[]
                 {
                     glow = new Sprite

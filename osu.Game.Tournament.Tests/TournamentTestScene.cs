@@ -10,6 +10,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Tests.Visual;
+using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Users;
@@ -28,7 +29,7 @@ namespace osu.Game.Tournament.Tests
         protected MatchIPCInfo IPCInfo { get; private set; } = new MatchIPCInfo();
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage)
+        private void load(TournamentStorage storage)
         {
             Ladder.Ruleset.Value ??= rulesetStore.AvailableRulesets.First();
 

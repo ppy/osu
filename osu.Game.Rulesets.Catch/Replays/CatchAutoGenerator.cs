@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Replays;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
@@ -13,26 +12,19 @@ using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Catch.Replays
 {
-    internal class CatchAutoGenerator : AutoGenerator
+    internal class CatchAutoGenerator : AutoGenerator<CatchReplayFrame>
     {
-        public const double RELEASE_DELAY = 20;
-
         public new CatchBeatmap Beatmap => (CatchBeatmap)base.Beatmap;
 
         public CatchAutoGenerator(IBeatmap beatmap)
             : base(beatmap)
         {
-            Replay = new Replay();
         }
 
-        protected Replay Replay;
-
-        private CatchReplayFrame currentFrame;
-
-        public override Replay Generate()
+        protected override void GenerateFrames()
         {
             if (Beatmap.HitObjects.Count == 0)
-                return Replay;
+                return;
 
             // todo: add support for HT DT
             const double dash_speed = Catcher.BASE_SPEED;
@@ -119,19 +111,11 @@ namespace osu.Game.Rulesets.Catch.Replays
                     }
                 }
             }
-
-            return Replay;
         }
 
         private void addFrame(double time, float? position = null, bool dashing = false)
         {
-            // todo: can be removed once FramedReplayInputHandler correctly handles rewinding before first frame.
-            if (Replay.Frames.Count == 0)
-                Replay.Frames.Add(new CatchReplayFrame(time - 1, position, false, null));
-
-            var last = currentFrame;
-            currentFrame = new CatchReplayFrame(time, position, dashing, last);
-            Replay.Frames.Add(currentFrame);
+            Frames.Add(new CatchReplayFrame(time, position, dashing, LastFrame));
         }
     }
 }

@@ -15,13 +15,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public class Multiplayer : OnlinePlayScreen
     {
         [Resolved]
-        private StatefulMultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; }
 
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
 
-            if (client.Room != null)
+            if (client.Room != null && client.LocalUser?.State != MultiplayerUserState.Spectating)
                 client.ChangeState(MultiplayerUserState.Idle);
         }
 
@@ -54,12 +54,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Logger.Log($"Polling adjusted (listing: {multiplayerRoomManager.TimeBetweenListingPolls.Value}, selection: {multiplayerRoomManager.TimeBetweenSelectionPolls.Value})");
         }
 
-        protected override Room CreateNewRoom()
-        {
-            var room = new Room { Name = { Value = $"{API.LocalUser}'s awesome room" } };
-            room.Category.Value = RoomCategory.Realtime;
-            return room;
-        }
+        protected override Room CreateNewRoom() =>
+            new Room
+            {
+                Name = { Value = $"{API.LocalUser}'s awesome room" },
+                Category = { Value = RoomCategory.Realtime }
+            };
 
         protected override string ScreenTitle => "Multiplayer";
 
