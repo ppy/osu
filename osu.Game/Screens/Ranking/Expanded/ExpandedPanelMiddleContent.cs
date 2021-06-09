@@ -242,7 +242,6 @@ namespace osu.Game.Screens.Ranking.Expanded
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    DisplayUnrankedText = false,
                     ExpansionMode = ExpansionMode.AlwaysExpanded,
                     Scale = new Vector2(0.5f),
                     Current = { Value = score.Mods }
