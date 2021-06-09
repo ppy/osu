@@ -66,10 +66,14 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                         return null;
 
                     case CatchSkinComponents.Catcher:
-                        // New elements will be ignored when the old element exists.
-                        if (GetTexture(@"fruit-ryuuta") != null ||
-                            GetTexture(@"fruit-ryuuta-0") != null)
-                            return new LegacyCatcherOld();
+                        var version = Source.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value ?? 1;
+
+                        if (version < 2.3m)
+                        {
+                            if (GetTexture(@"fruit-ryuuta") != null ||
+                                GetTexture(@"fruit-ryuuta-0") != null)
+                                return new LegacyCatcherOld();
+                        }
 
                         if (GetTexture(@"fruit-catcher-idle") != null ||
                             GetTexture(@"fruit-catcher-idle-0") != null)
