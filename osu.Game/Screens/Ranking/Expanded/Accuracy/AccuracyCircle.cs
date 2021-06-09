@@ -8,11 +8,11 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -110,20 +110,18 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private Container<RankBadge> badges;
         private RankText rankText;
 
-        private DrawableSample scoreTickSound;
-        private DrawableSample badgeTickSound;
-        private DrawableSample badgeMaxSound;
-        private DrawableSample swooshUpSound;
-        private DrawableSample rankImpactSound;
-        private DrawableSample rankApplauseSound;
-        private DrawableSample legacySkinApplauseSound;
+        private PoolableSkinnableSample scoreTickSound;
+        private PoolableSkinnableSample badgeTickSound;
+        private PoolableSkinnableSample badgeMaxSound;
+        private PoolableSkinnableSample swooshUpSound;
+        private PoolableSkinnableSample rankImpactSound;
+        private PoolableSkinnableSample rankApplauseSound;
 
         private Bindable<double> tickPlaybackRate = new Bindable<double>();
         private double lastTickPlaybackTime;
         private bool isTicking;
 
         private readonly bool sfxEnabled;
-        private bool legacySkin => legacySkinApplauseSound != null;
 
         public AccuracyCircle(ScoreInfo score, bool sfxEnabled = false)
         {
@@ -254,62 +252,52 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
             if (sfxEnabled)
             {
-                Drawable legacySkinApplause = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.Applause));
+                tickPlaybackRate = new Bindable<double>(sfx_score_tick_debounce_rate_start);
 
-                if (legacySkinApplause != null)
+                switch (score.Rank)
                 {
-                    AddInternal(legacySkinApplause);
-                    legacySkinApplauseSound = legacySkinApplause as DrawableSample;
+                    case ScoreRank.D:
+                        rankImpactSound = new PoolableSkinnableSample(new SampleInfo(@"Results/rank-impact-fail-d"));
+                        rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", @"Results/applause-d"));
+                        break;
+
+                    case ScoreRank.C:
+                        rankImpactSound = new PoolableSkinnableSample(new SampleInfo(@"Results/rank-impact-fail"));
+                        rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", @"Results/applause-c"));
+                        break;
+
+                    case ScoreRank.B:
+                        rankImpactSound = new PoolableSkinnableSample(new SampleInfo(@"Results/rank-impact-fail"));
+                        rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", @"Results/applause-b"));
+                        break;
+
+                    case ScoreRank.A:
+                        rankImpactSound = new PoolableSkinnableSample(new SampleInfo(@"Results/rank-impact-pass"));
+                        rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", @"Results/applause-a"));
+                        break;
+
+                    case ScoreRank.S:
+                    case ScoreRank.SH:
+                        rankImpactSound = new PoolableSkinnableSample(new SampleInfo(@"Results/rank-impact-pass"));
+                        rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", @"Results/applause-s"));
+                        break;
+
+                    case ScoreRank.X:
+                    case ScoreRank.XH:
+                        rankImpactSound = new PoolableSkinnableSample(new SampleInfo(@"Results/rank-impact-pass-ss"));
+                        rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", @"Results/applause-s"));
+                        break;
                 }
-                else
+
+                AddRangeInternal(new Drawable[]
                 {
-                    tickPlaybackRate = new Bindable<double>(sfx_score_tick_debounce_rate_start);
-
-                    switch (score.Rank)
-                    {
-                        case ScoreRank.D:
-                            rankImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_D)) as DrawableSample;
-                            rankApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_D)) as DrawableSample;
-                            break;
-
-                        case ScoreRank.C:
-                            rankImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_C)) as DrawableSample;
-                            rankApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_C)) as DrawableSample;
-                            break;
-
-                        case ScoreRank.B:
-                            rankImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_B)) as DrawableSample;
-                            rankApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_B)) as DrawableSample;
-                            break;
-
-                        case ScoreRank.A:
-                            rankImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_A)) as DrawableSample;
-                            rankApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_A)) as DrawableSample;
-                            break;
-
-                        case ScoreRank.S:
-                        case ScoreRank.SH:
-                            rankImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_S)) as DrawableSample;
-                            rankApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_S)) as DrawableSample;
-                            break;
-
-                        case ScoreRank.X:
-                        case ScoreRank.XH:
-                            rankImpactSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultRank_SS)) as DrawableSample;
-                            rankApplauseSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultApplause_SS)) as DrawableSample;
-                            break;
-                    }
-
-                    AddRangeInternal(new Drawable[]
-                    {
-                        rankImpactSound,
-                        rankApplauseSound,
-                        scoreTickSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultScoreTick)) as DrawableSample,
-                        badgeTickSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultBadgeTick)) as DrawableSample,
-                        badgeMaxSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultBadgeTickMax)) as DrawableSample,
-                        swooshUpSound = skin.GetDrawableComponent(new GameplaySkinComponent<GameplaySkinSamples>(GameplaySkinSamples.ResultSwooshUp)) as DrawableSample
-                    });
-                }
+                    rankImpactSound,
+                    rankApplauseSound,
+                    scoreTickSound = new PoolableSkinnableSample(new SampleInfo(@"Results/score-tick")),
+                    badgeTickSound = new PoolableSkinnableSample(new SampleInfo(@"Results/badge-dink")),
+                    badgeMaxSound = new PoolableSkinnableSample(new SampleInfo(@"Results/badge-dink-max")),
+                    swooshUpSound = new PoolableSkinnableSample(new SampleInfo(@"Results/swoosh-up")),
+                });
             }
         }
 
@@ -341,7 +329,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
             this.ScaleTo(0).Then().ScaleTo(1, APPEAR_DURATION, Easing.OutQuint);
 
-            if (sfxEnabled && !legacySkin)
+            if (sfxEnabled)
             {
                 this.Delay(sfx_swoosh_pre_delay).Schedule(() =>
                 {
@@ -359,7 +347,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
                 accuracyCircle.FillTo(targetAccuracy, ACCURACY_TRANSFORM_DURATION, ACCURACY_TRANSFORM_EASING);
 
-                if (sfxEnabled && !legacySkin)
+                if (sfxEnabled)
                 {
                     Schedule(() =>
                     {
@@ -382,11 +370,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     {
                         badge.Appear();
 
-                        if (sfxEnabled && !legacySkin)
+                        if (sfxEnabled)
                         {
                             Schedule(() =>
                             {
-                                DrawableSample dink = badgeNum < badges.Count - 1 ? badgeTickSound : badgeMaxSound;
+                                var dink = badgeNum < badges.Count - 1 ? badgeTickSound : badgeMaxSound;
+
                                 dink.FrequencyTo(1 + badgeNum++ * 0.05);
                                 dink.VolumeTo(sfx_badge_dink_volume);
                                 dink.Play();
@@ -400,10 +389,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     rankText.Appear();
 
                     if (!sfxEnabled) return;
-
-                    legacySkinApplauseSound?.Play();
-
-                    if (legacySkin) return;
 
                     Schedule(() =>
                     {
