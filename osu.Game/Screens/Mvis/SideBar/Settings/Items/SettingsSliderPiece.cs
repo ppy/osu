@@ -11,15 +11,16 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
     {
         public Bindable<T> Bindable { get; set; }
 
-        public string TooltipText { get; set; }
+        public string TooltipText
+        {
+            get => tooltip;
+            set => tooltip = value + " (点击重置)";
+        }
+
+        private string tooltip = "点击重置";
 
         public bool DisplayAsPercentage;
         public bool TransferValueOnCommit;
-
-        public SettingsSliderPiece()
-        {
-            TooltipText = TooltipText + "点击重置";
-        }
 
         protected override IconUsage DefaultIcon => FontAwesome.Solid.SlidersH;
 

@@ -71,6 +71,7 @@ namespace Mvis.Plugin.RulesetPanel.UI
                 },
                 new SettingsSliderPiece<int>
                 {
+                    Icon = FontAwesome.Solid.DotCircle,
                     Description = "半径",
                     Bindable = config.GetBindable<int>(RulesetPanelSetting.Radius)
                 },
