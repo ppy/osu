@@ -254,45 +254,10 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
             {
                 tickPlaybackRate = new Bindable<double>(sfx_score_tick_debounce_rate_start);
 
-                switch (score.Rank)
-                {
-                    case ScoreRank.D:
-                        rankImpactSound = new PoolableSkinnableSample(new SampleInfo(@"Results/rank-impact-fail-d"));
-                        rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", @"Results/applause-d"));
-                        break;
-
-                    case ScoreRank.C:
-                        rankImpactSound = new PoolableSkinnableSample(new SampleInfo(@"Results/rank-impact-fail"));
-                        rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", @"Results/applause-c"));
-                        break;
-
-                    case ScoreRank.B:
-                        rankImpactSound = new PoolableSkinnableSample(new SampleInfo(@"Results/rank-impact-fail"));
-                        rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", @"Results/applause-b"));
-                        break;
-
-                    case ScoreRank.A:
-                        rankImpactSound = new PoolableSkinnableSample(new SampleInfo(@"Results/rank-impact-pass"));
-                        rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", @"Results/applause-a"));
-                        break;
-
-                    case ScoreRank.S:
-                    case ScoreRank.SH:
-                        rankImpactSound = new PoolableSkinnableSample(new SampleInfo(@"Results/rank-impact-pass"));
-                        rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", @"Results/applause-s"));
-                        break;
-
-                    case ScoreRank.X:
-                    case ScoreRank.XH:
-                        rankImpactSound = new PoolableSkinnableSample(new SampleInfo(@"Results/rank-impact-pass-ss"));
-                        rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", @"Results/applause-s"));
-                        break;
-                }
-
                 AddRangeInternal(new Drawable[]
                 {
-                    rankImpactSound,
-                    rankApplauseSound,
+                    rankImpactSound = new PoolableSkinnableSample(new SampleInfo(impactSampleName)),
+                    rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", applauseSampleName)),
                     scoreTickSound = new PoolableSkinnableSample(new SampleInfo(@"Results/score-tick")),
                     badgeTickSound = new PoolableSkinnableSample(new SampleInfo(@"Results/badge-dink")),
                     badgeMaxSound = new PoolableSkinnableSample(new SampleInfo(@"Results/badge-dink-max")),
@@ -301,12 +266,32 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
             }
         }
 
-        private ScoreRank getRank(ScoreRank rank)
+        private string applauseSampleName
         {
-            foreach (var mod in score.Mods.OfType<IApplicableToScoreProcessor>())
-                rank = mod.AdjustRank(rank, score.Accuracy);
+            get
+            {
+                switch (score.Rank)
+                {
+                    default:
+                    case ScoreRank.D:
+                        return @"Results/rank-applause-d";
 
-            return rank;
+                    case ScoreRank.C:
+                        return @"Results/rank-applause-c";
+
+                    case ScoreRank.B:
+                        return @"Results/rank-applause-b";
+
+                    case ScoreRank.A:
+                        return @"Results/rank-applause-a";
+
+                    case ScoreRank.S:
+                    case ScoreRank.SH:
+                    case ScoreRank.X:
+                    case ScoreRank.XH:
+                        return @"Results/rank-applause-s";
+                }
+            }
         }
 
         protected override void Update()
@@ -407,6 +392,44 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     }
                 }
             }
+        }
+
+        private string impactSampleName
+        {
+            get
+            {
+                switch (score.Rank)
+                {
+                    default:
+                    case ScoreRank.D:
+                        return @"Results/rank-impact-fail-d";
+
+                    case ScoreRank.C:
+                        return @"Results/rank-impact-fail";
+
+                    case ScoreRank.B:
+                        return @"Results/rank-impact-fail";
+
+                    case ScoreRank.A:
+                        return @"Results/rank-impact-pass";
+
+                    case ScoreRank.S:
+                    case ScoreRank.SH:
+                        return @"Results/rank-impact-pass";
+
+                    case ScoreRank.X:
+                    case ScoreRank.XH:
+                        return @"Results/rank-impact-pass-ss";
+                }
+            }
+        }
+
+        private ScoreRank getRank(ScoreRank rank)
+        {
+            foreach (var mod in score.Mods.OfType<IApplicableToScoreProcessor>())
+                rank = mod.AdjustRank(rank, score.Accuracy);
+
+            return rank;
         }
 
         private double inverseEasing(Easing easing, double targetValue)
