@@ -2,7 +2,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
@@ -43,10 +42,16 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
             }
         }
 
-        protected override bool OnClick(ClickEvent e)
+        protected override void OnLeftClick()
         {
             Bindable.Value = !Bindable.Value;
-            return base.OnClick(e);
+        }
+
+        protected override void OnRightClick() => OnLeftClick();
+
+        protected override void OnMiddleClick()
+        {
+            Bindable.Value = Bindable.Default;
         }
     }
 }

@@ -123,12 +123,17 @@ namespace osu.Game.Screens.Mvis.SideBar
 
             startFromHiddenState = State.Value == Visibility.Hidden;
 
-            //如果要显示的是当前正在显示的内容，则中断
-            if (CurrentDisplay.Value == d && IsVisible.Value)
+            if (CurrentDisplay.Value == d)
             {
-                if (allowHide) Hide();
+                //如果要显示的是当前正在显示的内容，则中断
+                if (IsVisible.Value)
+                {
+                    if (allowHide) Hide();
 
-                return;
+                    return;
+                }
+                else
+                    prevTab?.MakeActive();
             }
 
             Show();
@@ -197,10 +202,10 @@ namespace osu.Game.Screens.Mvis.SideBar
 
             Header.SidebarActive = false;
             Header.Hide();
-            bgBox.FadeOut(duration + 100, Easing.OutQuint);
+            bgBox.FadeOut(duration, Easing.OutQuint);
 
-            contentContainer.FadeOut(duration + 100, Easing.OutQuint)
-                            .MoveToY(100, duration + 100, Easing.OutQuint);
+            contentContainer.FadeOut(duration, Easing.OutQuint)
+                            .MoveToY(70, duration, Easing.OutQuint);
 
             prevTab?.MakeInActive();
 
@@ -213,10 +218,10 @@ namespace osu.Game.Screens.Mvis.SideBar
 
             Header.SidebarActive = true;
             Header.Show();
-            bgBox.FadeIn(duration + 100, Easing.OutQuint);
+            bgBox.FadeIn(duration, Easing.OutQuint);
 
-            contentContainer.FadeIn(duration + 100, Easing.OutQuint)
-                            .MoveToY(0, duration + 100, Easing.OutQuint);
+            contentContainer.FadeIn(duration, Easing.OutQuint)
+                            .MoveToY(0, duration, Easing.OutQuint);
 
             IsVisible.Value = true;
         }

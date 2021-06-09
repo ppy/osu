@@ -11,6 +11,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Mvis.Skinning;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
 {
@@ -118,6 +119,10 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
             FillFlow.Colour = Color4.White;
         }
 
+        protected virtual void OnLeftClick() { }
+        protected virtual void OnRightClick() { }
+        protected virtual void OnMiddleClick() { }
+
         protected override bool OnHover(HoverEvent e)
         {
             flashBox.FadeTo(0.1f, 300);
@@ -128,6 +133,26 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
         {
             base.OnHoverLost(e);
             flashBox.FadeTo(0f, 300);
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            switch (e.Button)
+            {
+                case MouseButton.Left:
+                    OnLeftClick();
+                    break;
+
+                case MouseButton.Right:
+                    OnRightClick();
+                    break;
+
+                case MouseButton.Middle:
+                    OnMiddleClick();
+                    break;
+            }
+
+            return base.OnMouseDown(e);
         }
     }
 }
