@@ -148,8 +148,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             const double legacy_fade_duration = 240;
 
-            ClearTransforms(true);
-
             using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
             {
                 switch (state)
