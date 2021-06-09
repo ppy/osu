@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public void Disable()
             {
                 allow = false;
-                TriggerSourceChanged();
+                OnSourceChanged();
             }
 
             public SwitchableSkinProvidingContainer(ISkin skin)
