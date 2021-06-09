@@ -116,6 +116,10 @@ namespace osu.Game.Screens.Backgrounds
                     }
 
                     case BackgroundSource.Skin:
+                        // default skins should use the default background rotation, which won't be the case if a SkinBackground is created for them.
+                        if (skin.Value is DefaultSkin || skin.Value is DefaultLegacySkin)
+                            break;
+
                         newBackground = new SkinBackground(skin.Value, getBackgroundTextureName());
                         break;
                 }
