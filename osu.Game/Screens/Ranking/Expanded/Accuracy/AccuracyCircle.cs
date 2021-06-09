@@ -117,7 +117,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private PoolableSkinnableSample rankImpactSound;
         private PoolableSkinnableSample rankApplauseSound;
 
-        private Bindable<double> tickPlaybackRate = new Bindable<double>();
+        private readonly Bindable<double> tickPlaybackRate = new Bindable<double>(sfx_score_tick_debounce_rate_start);
+
         private double lastTickPlaybackTime;
         private bool isTicking;
 
@@ -252,8 +253,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
             if (withFlair)
             {
-                tickPlaybackRate = new Bindable<double>(sfx_score_tick_debounce_rate_start);
-
                 AddRangeInternal(new Drawable[]
                 {
                     rankImpactSound = new PoolableSkinnableSample(new SampleInfo(impactSampleName)),
