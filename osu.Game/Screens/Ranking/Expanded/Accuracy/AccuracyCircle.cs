@@ -76,33 +76,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         /// </summary>
         public static readonly Easing ACCURACY_TRANSFORM_EASING = Easing.OutPow10;
 
-        #region Sound Effect Playback Parameters
-
-        // swoosh-up
-        private const double sfx_swoosh_pre_delay = 443f;
-        private const double sfx_swoosh_volume = 0.4f;
-
-        // score ticks
-        private const double sfx_score_tick_debounce_rate_start = 18f;
-        private const double sfx_score_tick_debounce_rate_end = 300f;
-        private const Easing sfx_score_tick_debounce_rate_easing = Easing.OutSine;
-        private const double sfx_score_tick_volume_start = 0.6f;
-        private const double sfx_score_tick_volume_end = 1.0f;
-        private const Easing sfx_score_tick_volume_easing = Easing.OutSine;
-        private const Easing sfx_score_tick_pitch_easing = Easing.OutSine;
-
-        // badge dinks
-        private const double sfx_badge_dink_volume = 1f;
-
-        // impact
-        private const double sfx_rank_impact_volume = 1.0f;
-
-        // applause
-        private const double sfx_applause_pre_delay = 545f;
-        private const double sfx_applause_volume = 0.8f;
-
-        #endregion
-
         private readonly ScoreInfo score;
 
         private SmoothCircularProgress accuracyCircle;
@@ -117,7 +90,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private PoolableSkinnableSample rankImpactSound;
         private PoolableSkinnableSample rankApplauseSound;
 
-        private readonly Bindable<double> tickPlaybackRate = new Bindable<double>(sfx_score_tick_debounce_rate_start);
+        private readonly Bindable<double> tickPlaybackRate = new Bindable<double>();
 
         private double lastTickPlaybackTime;
         private bool isTicking;
@@ -287,9 +260,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
             if (withFlair)
             {
-                this.Delay(sfx_swoosh_pre_delay).Schedule(() =>
+                const double swoosh_pre_delay = 443f;
+                const double swoosh_volume = 0.4f;
+
+                this.Delay(swoosh_pre_delay).Schedule(() =>
                 {
-                    swooshUpSound.VolumeTo(sfx_swoosh_volume);
+                    swooshUpSound.VolumeTo(swoosh_volume);
                     swooshUpSound.Play();
                 });
             }
@@ -307,9 +283,16 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 {
                     Schedule(() =>
                     {
-                        scoreTickSound.FrequencyTo(1 + targetAccuracy, ACCURACY_TRANSFORM_DURATION, sfx_score_tick_pitch_easing);
-                        scoreTickSound.VolumeTo(sfx_score_tick_volume_start).Then().VolumeTo(sfx_score_tick_volume_end, ACCURACY_TRANSFORM_DURATION, sfx_score_tick_volume_easing);
-                        this.TransformBindableTo(tickPlaybackRate, sfx_score_tick_debounce_rate_end, ACCURACY_TRANSFORM_DURATION, sfx_score_tick_debounce_rate_easing);
+                        const double score_tick_debounce_rate_start = 18f;
+                        const double score_tick_debounce_rate_end = 300f;
+                        const double score_tick_volume_start = 0.6f;
+                        const double score_tick_volume_end = 1.0f;
+
+                        this.TransformBindableTo(tickPlaybackRate, score_tick_debounce_rate_start);
+                        this.TransformBindableTo(tickPlaybackRate, score_tick_debounce_rate_end, ACCURACY_TRANSFORM_DURATION, Easing.OutSine);
+
+                        scoreTickSound.FrequencyTo(1 + targetAccuracy, ACCURACY_TRANSFORM_DURATION, Easing.OutSine);
+                        scoreTickSound.VolumeTo(score_tick_volume_start).Then().VolumeTo(score_tick_volume_end, ACCURACY_TRANSFORM_DURATION, Easing.OutSine);
 
                         isTicking = true;
                     });
@@ -333,7 +316,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                                 var dink = badgeNum < badges.Count - 1 ? badgeTickSound : badgeMaxSound;
 
                                 dink.FrequencyTo(1 + badgeNum++ * 0.05);
-                                dink.VolumeTo(sfx_badge_dink_volume);
                                 dink.Play();
                             });
                         }
@@ -349,15 +331,17 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Schedule(() =>
                     {
                         isTicking = false;
-                        rankImpactSound.VolumeTo(sfx_rank_impact_volume);
                         rankImpactSound.Play();
                     });
 
-                    using (BeginDelayedSequence(sfx_applause_pre_delay))
+                    const double applause_pre_delay = 545f;
+                    const double applause_volume = 0.8f;
+
+                    using (BeginDelayedSequence(applause_pre_delay))
                     {
                         Schedule(() =>
                         {
-                            rankApplauseSound.VolumeTo(sfx_applause_volume);
+                            rankApplauseSound.VolumeTo(applause_volume);
                             rankApplauseSound.Play();
                         });
                     }
