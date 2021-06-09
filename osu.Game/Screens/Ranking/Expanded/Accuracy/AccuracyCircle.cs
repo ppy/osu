@@ -238,20 +238,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
             }
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!isTicking) return;
-
-            bool enoughTimePassedSinceLastPlayback = Clock.CurrentTime - lastTickPlaybackTime >= tickPlaybackRate.Value;
-
-            if (!enoughTimePassedSinceLastPlayback) return;
-
-            Schedule(() => scoreTickSound?.Play());
-            lastTickPlaybackTime = Clock.CurrentTime;
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -346,6 +332,17 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                         });
                     }
                 }
+            }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (isTicking && Clock.CurrentTime - lastTickPlaybackTime >= tickPlaybackRate.Value)
+            {
+                scoreTickSound?.Play();
+                lastTickPlaybackTime = Clock.CurrentTime;
             }
         }
 
