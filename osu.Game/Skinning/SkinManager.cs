@@ -42,6 +42,24 @@ namespace osu.Game.Skinning
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>();
         public readonly Bindable<SkinInfo> CurrentSkinInfo = new Bindable<SkinInfo>(SkinInfo.Default) { Default = SkinInfo.Default };
 
+        /// <summary>
+        /// The skin layers of the currently selected user skin for performing lookups on,
+        /// in order of preference (user skin first, then fallback skins).
+        /// </summary>
+        public IEnumerable<ISkin> CurrentSkinLayers
+        {
+            get
+            {
+                yield return CurrentSkin.Value;
+
+                // TODO: we also want to return a DefaultLegacySkin here if the current *beatmap* is providing any skinned elements.
+                // When attempting to address this, we may want to move the full DefaultLegacySkin fallback logic to within Player itself (to better allow
+                // for beatmap skin visibility).
+                if (CurrentSkin.Value is LegacySkin)
+                    yield return defaultLegacySkin;
+            }
+        }
+
         public override IEnumerable<string> HandledExtensions => new[] { ".osk" };
 
         protected override string[] HashableFileTypes => new[] { ".ini" };
@@ -220,11 +238,11 @@ namespace osu.Game.Skinning
 
         public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
         {
-            if (lookupFunction(CurrentSkin.Value))
-                return CurrentSkin.Value;
-
-            if (CurrentSkin.Value is LegacySkin && lookupFunction(defaultLegacySkin))
-                return defaultLegacySkin;
+            foreach (var skin in CurrentSkinLayers)
+            {
+                if (lookupFunction(skin))
+                    return skin;
+            }
 
             return null;
         }
@@ -232,16 +250,12 @@ namespace osu.Game.Skinning
         private T lookupWithFallback<T>(Func<ISkin, T> func)
             where T : class
         {
-            var selectedSkin = func(CurrentSkin.Value);
-
-            if (selectedSkin != null)
-                return selectedSkin;
-
-            // TODO: we also want to return a DefaultLegacySkin here if the current *beatmap* is providing any skinned elements.
-            // When attempting to address this, we may want to move the full DefaultLegacySkin fallback logic to within Player itself (to better allow
-            // for beatmap skin visibility).
-            if (CurrentSkin.Value is LegacySkin)
-                return func(defaultLegacySkin);
+            foreach (var skin in CurrentSkinLayers)
+            {
+                var result = func(skin);
+                if (result != null)
+                    return result;
+            }
 
             return null;
         }
