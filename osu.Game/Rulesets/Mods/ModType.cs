@@ -7,10 +7,10 @@ namespace osu.Game.Rulesets.Mods
 {
     public enum ModType
     {
-        [Description("增加难度")]
+        [Description("降低难度")]
         DifficultyReduction,
 
-        [Description("降低难度")]
+        [Description("增加难度")]
         DifficultyIncrease,
 
         [Description("自定义")]
