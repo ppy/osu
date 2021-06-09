@@ -17,8 +17,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         /// </summary>
         private bool providesComboCounter => this.HasFont(LegacyFont.Combo);
 
-        public CatchLegacySkinTransformer(ISkinSource source)
-            : base(source)
+        public CatchLegacySkinTransformer(ISkin skin)
+            : base(skin)
         {
         }
 
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 switch (targetComponent.Target)
                 {
                     case SkinnableTarget.MainHUDComponents:
-                        var components = Source.GetDrawableComponent(component) as SkinnableTargetComponentsContainer;
+                        var components = Skin.GetDrawableComponent(component) as SkinnableTargetComponentsContainer;
 
                         if (providesComboCounter && components != null)
                         {
@@ -79,13 +79,13 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
                     case CatchSkinComponents.CatchComboCounter:
                         if (providesComboCounter)
-                            return new LegacyCatchComboCounter(Source);
+                            return new LegacyCatchComboCounter(Skin);
 
                         return null;
                 }
             }
 
-            return Source.GetDrawableComponent(component);
+            return Skin.GetDrawableComponent(component);
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             switch (lookup)
             {
                 case CatchSkinColour colour:
-                    var result = (Bindable<Color4>)Source.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
+                    var result = (Bindable<Color4>)Skin.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
                     if (result == null)
                         return null;
 
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     return (IBindable<TValue>)result;
             }
 
-            return Source.GetConfig<TLookup, TValue>(lookup);
+            return Skin.GetConfig<TLookup, TValue>(lookup);
         }
     }
 }

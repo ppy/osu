@@ -15,18 +15,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     public class TaikoLegacySkinTransformer : LegacySkinTransformer
     {
-        private Lazy<bool> hasExplosion;
+        private readonly Lazy<bool> hasExplosion;
 
-        public TaikoLegacySkinTransformer(ISkinSource source)
-            : base(source)
+        public TaikoLegacySkinTransformer(ISkin skin)
+            : base(skin)
         {
-            Source.SourceChanged += sourceChanged;
-            sourceChanged();
-        }
-
-        private void sourceChanged()
-        {
-            hasExplosion = new Lazy<bool>(() => Source.GetTexture(getHitName(TaikoSkinComponents.TaikoExplosionGreat)) != null);
+            hasExplosion = new Lazy<bool>(() => Skin.GetTexture(getHitName(TaikoSkinComponents.TaikoExplosionGreat)) != null);
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
@@ -132,7 +126,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 }
             }
 
-            return Source.GetDrawableComponent(component);
+            return Skin.GetDrawableComponent(component);
         }
 
         private string getHitName(TaikoSkinComponents component)
@@ -155,12 +149,12 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         public override ISample GetSample(ISampleInfo sampleInfo)
         {
             if (sampleInfo is HitSampleInfo hitSampleInfo)
-                return Source.GetSample(new LegacyTaikoSampleInfo(hitSampleInfo));
+                return Skin.GetSample(new LegacyTaikoSampleInfo(hitSampleInfo));
 
             return base.GetSample(sampleInfo);
         }
 
-        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => Source.GetConfig<TLookup, TValue>(lookup);
+        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => Skin.GetConfig<TLookup, TValue>(lookup);
 
         private class LegacyTaikoSampleInfo : HitSampleInfo
         {
