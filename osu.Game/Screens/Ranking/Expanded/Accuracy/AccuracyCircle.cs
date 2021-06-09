@@ -354,22 +354,22 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 {
                     default:
                     case ScoreRank.D:
-                        return @"Results/rank-applause-d";
+                        return @"Results/applause-d";
 
                     case ScoreRank.C:
-                        return @"Results/rank-applause-c";
+                        return @"Results/applause-c";
 
                     case ScoreRank.B:
-                        return @"Results/rank-applause-b";
+                        return @"Results/applause-b";
 
                     case ScoreRank.A:
-                        return @"Results/rank-applause-a";
+                        return @"Results/applause-a";
 
                     case ScoreRank.S:
                     case ScoreRank.SH:
                     case ScoreRank.X:
                     case ScoreRank.XH:
-                        return @"Results/rank-applause-s";
+                        return @"Results/applause-s";
                 }
             }
         }
