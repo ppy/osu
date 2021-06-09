@@ -7,7 +7,6 @@ using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
@@ -24,27 +23,6 @@ namespace osu.Game.Skinning
     public class DefaultSkin : Skin
     {
         private readonly IStorageResourceProvider resources;
-
-        private static readonly IReadOnlyDictionary<GameplaySkinSamples, string> sample_mapping
-            = new Dictionary<GameplaySkinSamples, string>
-            {
-                { GameplaySkinSamples.ResultScoreTick, @"Results/score-tick" },
-                { GameplaySkinSamples.ResultBadgeTick, @"Results/badge-dink" },
-                { GameplaySkinSamples.ResultBadgeTickMax, @"Results/badge-dink-max" },
-                { GameplaySkinSamples.ResultSwooshUp, @"Results/swoosh-up" },
-                { GameplaySkinSamples.ResultRank_D, @"Results/rank-impact-fail-d" },
-                { GameplaySkinSamples.ResultRank_B, @"Results/rank-impact-fail" },
-                { GameplaySkinSamples.ResultRank_C, @"Results/rank-impact-fail" },
-                { GameplaySkinSamples.ResultRank_A, @"Results/rank-impact-pass" },
-                { GameplaySkinSamples.ResultRank_S, @"Results/rank-impact-pass" },
-                { GameplaySkinSamples.ResultRank_SS, @"Results/rank-impact-pass-ss" },
-                { GameplaySkinSamples.ResultApplause_D, @"Results/applause-d" },
-                { GameplaySkinSamples.ResultApplause_B, @"Results/applause-b" },
-                { GameplaySkinSamples.ResultApplause_C, @"Results/applause-c" },
-                { GameplaySkinSamples.ResultApplause_A, @"Results/applause-a" },
-                { GameplaySkinSamples.ResultApplause_S, @"Results/applause-s" },
-                { GameplaySkinSamples.ResultApplause_SS, @"Results/applause-s" }
-            };
 
         public DefaultSkin(IStorageResourceProvider resources)
             : this(SkinInfo.Default, resources)
@@ -80,12 +58,6 @@ namespace osu.Game.Skinning
 
             switch (component)
             {
-                case GameplaySkinComponent<GameplaySkinSamples> sample:
-                    if (sample_mapping.ContainsKey(sample.Component))
-                        return new DrawableSample(GetSample(new SampleInfo(sample_mapping[sample.Component])));
-
-                    break;
-
                 case SkinnableTargetComponent target:
                     switch (target.Target)
                     {
