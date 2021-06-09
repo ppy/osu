@@ -253,7 +253,10 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override bool OnBackButton()
         {
-            if ((screenStack.CurrentScreen as IOnlinePlaySubScreen)?.OnBackButton() == true)
+            if (!(screenStack.CurrentScreen is IOnlinePlaySubScreen onlineSubScreen))
+                return false;
+
+            if (((Drawable)onlineSubScreen).IsLoaded && onlineSubScreen.AllowBackButton && onlineSubScreen.OnBackButton())
                 return true;
 
             if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
