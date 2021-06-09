@@ -14,6 +14,5 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override ModType Type => ModType.System;
 
-        public override bool Ranked => true;
     }
 }

@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             misses = Score.Statistics.GetOrDefault(HitResult.Miss);
 
             // Don't count scores made with supposedly unranked mods
-            if (mods.Any(m => !m.Ranked))
+            if (mods.Any(m => !m.UserPlayable))
                 return 0;
 
             // We are heavily relying on aim in catch the beat

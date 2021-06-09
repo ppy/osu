@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
 
             // Don't count scores made with supposedly unranked mods
-            if (mods.Any(m => !m.Ranked))
+            if (mods.Any(m => !m.UserPlayable))
                 return 0;
 
             // Custom multipliers for NoFail and SpunOut.
