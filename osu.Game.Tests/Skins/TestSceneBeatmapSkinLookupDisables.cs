@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Skins
 
             ISkin expected() => allowBeatmapLookups ? (ISkin)beatmapSource : userSource;
 
-            AddAssert($"Check lookup is from correct source", () => requester.FindProvider(s => s.GetDrawableComponent(new TestSkinComponent()) != null) == expected());
+            AddAssert("Check lookup is from correct source", () => requester.FindProvider(s => s.GetDrawableComponent(new TestSkinComponent()) != null) == expected());
         }
 
         public class UserSkinSource : LegacySkin
