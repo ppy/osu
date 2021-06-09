@@ -265,34 +265,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
             }
         }
 
-        private string applauseSampleName
-        {
-            get
-            {
-                switch (score.Rank)
-                {
-                    default:
-                    case ScoreRank.D:
-                        return @"Results/rank-applause-d";
-
-                    case ScoreRank.C:
-                        return @"Results/rank-applause-c";
-
-                    case ScoreRank.B:
-                        return @"Results/rank-applause-b";
-
-                    case ScoreRank.A:
-                        return @"Results/rank-applause-a";
-
-                    case ScoreRank.S:
-                    case ScoreRank.SH:
-                    case ScoreRank.X:
-                    case ScoreRank.XH:
-                        return @"Results/rank-applause-s";
-                }
-            }
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -389,6 +361,34 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             rankApplauseSound.Play();
                         });
                     }
+                }
+            }
+        }
+
+        private string applauseSampleName
+        {
+            get
+            {
+                switch (score.Rank)
+                {
+                    default:
+                    case ScoreRank.D:
+                        return @"Results/rank-applause-d";
+
+                    case ScoreRank.C:
+                        return @"Results/rank-applause-c";
+
+                    case ScoreRank.B:
+                        return @"Results/rank-applause-b";
+
+                    case ScoreRank.A:
+                        return @"Results/rank-applause-a";
+
+                    case ScoreRank.S:
+                    case ScoreRank.SH:
+                    case ScoreRank.X:
+                    case ScoreRank.XH:
+                        return @"Results/rank-applause-s";
                 }
             }
         }
