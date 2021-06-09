@@ -1,16 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
 
-namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
+namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public class KiaiFlash : BeatSyncedContainer
     {
-        public float FlashOpacity = 1f;
+        private const double fade_length = 80;
+
+        private const float flash_opacity = 0.25f;
 
         public KiaiFlash()
         {
@@ -25,17 +29,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             };
         }
 
-        protected override void OnNewBeat(int beatIndex, Game.Beatmaps.ControlPoints.TimingControlPoint timingPoint, Game.Beatmaps.ControlPoints.EffectControlPoint effectPoint, Framework.Audio.Track.ChannelAmplitudes amplitudes)
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             if (!effectPoint.KiaiMode)
-            {
                 return;
-            }
 
             Child
-                .FadeTo(FlashOpacity, EarlyActivationMilliseconds, Easing.OutQuint)
+                .FadeTo(flash_opacity, EarlyActivationMilliseconds, Easing.OutQuint)
                 .Then()
-                .FadeOut(timingPoint.BeatLength - 80, Easing.OutSine);
+                .FadeOut(timingPoint.BeatLength - fade_length, Easing.OutSine);
         }
     }
 }
