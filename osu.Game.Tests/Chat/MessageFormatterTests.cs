@@ -24,10 +24,10 @@ namespace osu.Game.Tests.Chat
         [TestCase(LinkAction.OpenBeatmap, "456", "https://dev.ppy.sh/beatmapsets/123#osu/456")]
         [TestCase(LinkAction.OpenBeatmap, "456", "https://dev.ppy.sh/beatmapsets/123#osu/456?whatever")]
         [TestCase(LinkAction.OpenBeatmap, "456", "https://dev.ppy.sh/beatmapsets/123/456")]
-        [TestCase(LinkAction.External, null, "https://dev.ppy.sh/beatmapsets/abc/def")]
+        [TestCase(LinkAction.External, "https://dev.ppy.sh/beatmapsets/abc/def", "https://dev.ppy.sh/beatmapsets/abc/def")]
         [TestCase(LinkAction.OpenBeatmapSet, "123", "https://dev.ppy.sh/beatmapsets/123")]
         [TestCase(LinkAction.OpenBeatmapSet, "123", "https://dev.ppy.sh/beatmapsets/123/whatever")]
-        [TestCase(LinkAction.External, null, "https://dev.ppy.sh/beatmapsets/abc")]
+        [TestCase(LinkAction.External, "https://dev.ppy.sh/beatmapsets/abc", "https://dev.ppy.sh/beatmapsets/abc")]
         public void TestBeatmapLinks(LinkAction expectedAction, string expectedArg, string link)
         {
             MessageFormatter.WebsiteRootUrl = "dev.ppy.sh";
@@ -488,6 +488,24 @@ namespace osu.Game.Tests.Chat
             Assert.AreEqual(result.Links[1].Url, "\uD83D\uDE10");
             Assert.AreEqual(result.Links[2].Url, "\uD83D\uDE00");
             Assert.AreEqual(result.Links[3].Url, "\uD83D\uDE20");
+        }
+
+        [Test]
+        public void TestAbsoluteExternalLinks()
+        {
+            LinkDetails result = MessageFormatter.GetLinkDetails("https://google.com");
+
+            Assert.AreEqual(LinkAction.External, result.Action);
+            Assert.AreEqual("https://google.com", result.Argument);
+        }
+
+        [Test]
+        public void TestRelativeExternalLinks()
+        {
+            LinkDetails result = MessageFormatter.GetLinkDetails("/relative");
+
+            Assert.AreEqual(LinkAction.External, result.Action);
+            Assert.AreEqual("/relative", result.Argument);
         }
     }
 }

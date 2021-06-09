@@ -29,98 +29,102 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private void sourceChanged()
         {
-            hasHitCircle = new Lazy<bool>(() => Source.GetTexture("hitcircle") != null);
+            hasHitCircle = new Lazy<bool>(() => FindProvider(s => s.GetTexture("hitcircle") != null) != null);
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
-            if (!(component is OsuSkinComponent osuComponent))
-                return null;
-
-            switch (osuComponent.Component)
+            if (component is OsuSkinComponent osuComponent)
             {
-                case OsuSkinComponents.FollowPoint:
-                    return this.GetAnimation(component.LookupName, true, false, true, startAtCurrentTime: false);
+                switch (osuComponent.Component)
+                {
+                    case OsuSkinComponents.FollowPoint:
+                        return this.GetAnimation(component.LookupName, true, false, true, startAtCurrentTime: false);
 
-                case OsuSkinComponents.SliderFollowCircle:
-                    var followCircle = this.GetAnimation("sliderfollowcircle", true, true, true);
-                    if (followCircle != null)
-                        // follow circles are 2x the hitcircle resolution in legacy skins (since they are scaled down from >1x
-                        followCircle.Scale *= 0.5f;
-                    return followCircle;
+                    case OsuSkinComponents.SliderFollowCircle:
+                        var followCircle = this.GetAnimation("sliderfollowcircle", true, true, true);
+                        if (followCircle != null)
+                            // follow circles are 2x the hitcircle resolution in legacy skins (since they are scaled down from >1x
+                            followCircle.Scale *= 0.5f;
+                        return followCircle;
 
-                case OsuSkinComponents.SliderBall:
-                    var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "");
+                    case OsuSkinComponents.SliderBall:
+                        // specular and nd layers must come from the same source as the ball texure.
+                        var ballProvider = Source.FindProvider(s => s.GetTexture("sliderb") != null || s.GetTexture("sliderb0") != null);
 
-                    // todo: slider ball has a custom frame delay based on velocity
-                    // Math.Max((150 / Velocity) * GameBase.SIXTY_FRAME_TIME, GameBase.SIXTY_FRAME_TIME);
+                        var sliderBallContent = ballProvider.GetAnimation("sliderb", true, true, animationSeparator: "");
 
-                    if (sliderBallContent != null)
-                        return new LegacySliderBall(sliderBallContent);
+                        // todo: slider ball has a custom frame delay based on velocity
+                        // Math.Max((150 / Velocity) * GameBase.SIXTY_FRAME_TIME, GameBase.SIXTY_FRAME_TIME);
 
-                    return null;
+                        if (sliderBallContent != null)
+                            return new LegacySliderBall(sliderBallContent, ballProvider);
 
-                case OsuSkinComponents.SliderBody:
-                    if (hasHitCircle.Value)
-                        return new LegacySliderBody();
+                        return null;
 
-                    return null;
+                    case OsuSkinComponents.SliderBody:
+                        if (hasHitCircle.Value)
+                            return new LegacySliderBody();
 
-                case OsuSkinComponents.SliderTailHitCircle:
-                    if (hasHitCircle.Value)
-                        return new LegacyMainCirclePiece("sliderendcircle", false);
+                        return null;
 
-                    return null;
+                    case OsuSkinComponents.SliderTailHitCircle:
+                        if (hasHitCircle.Value)
+                            return new LegacyMainCirclePiece("sliderendcircle", false);
 
-                case OsuSkinComponents.SliderHeadHitCircle:
-                    if (hasHitCircle.Value)
-                        return new LegacyMainCirclePiece("sliderstartcircle");
+                        return null;
 
-                    return null;
+                    case OsuSkinComponents.SliderHeadHitCircle:
+                        if (hasHitCircle.Value)
+                            return new LegacyMainCirclePiece("sliderstartcircle");
 
-                case OsuSkinComponents.HitCircle:
-                    if (hasHitCircle.Value)
-                        return new LegacyMainCirclePiece();
+                        return null;
 
-                    return null;
+                    case OsuSkinComponents.HitCircle:
+                        if (hasHitCircle.Value)
+                            return new LegacyMainCirclePiece();
 
-                case OsuSkinComponents.Cursor:
-                    if (Source.GetTexture("cursor") != null)
-                        return new LegacyCursor();
+                        return null;
 
-                    return null;
+                    case OsuSkinComponents.Cursor:
+                        var cursorProvider = Source.FindProvider(s => s.GetTexture("cursor") != null);
 
-                case OsuSkinComponents.CursorTrail:
-                    if (Source.GetTexture("cursortrail") != null)
-                        return new LegacyCursorTrail();
+                        if (cursorProvider != null)
+                            return new LegacyCursor(cursorProvider);
 
-                    return null;
+                        return null;
 
-                case OsuSkinComponents.HitCircleText:
-                    var font = GetConfig<OsuSkinConfiguration, string>(OsuSkinConfiguration.HitCirclePrefix)?.Value ?? "default";
-                    var overlap = GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.HitCircleOverlap)?.Value ?? -2;
+                    case OsuSkinComponents.CursorTrail:
+                        var trailProvider = Source.FindProvider(s => s.GetTexture("cursortrail") != null);
 
-                    return !this.HasFont(font)
-                        ? null
-                        : new LegacySpriteText(Source, font)
+                        if (trailProvider != null)
+                            return new LegacyCursorTrail(trailProvider);
+
+                        return null;
+
+                    case OsuSkinComponents.HitCircleText:
+                        if (!this.HasFont(LegacyFont.HitCircle))
+                            return null;
+
+                        return new LegacySpriteText(LegacyFont.HitCircle)
                         {
                             // stable applies a blanket 0.8x scale to hitcircle fonts
                             Scale = new Vector2(0.8f),
-                            Spacing = new Vector2(-overlap, 0)
                         };
 
-                case OsuSkinComponents.SpinnerBody:
-                    bool hasBackground = Source.GetTexture("spinner-background") != null;
+                    case OsuSkinComponents.SpinnerBody:
+                        bool hasBackground = Source.GetTexture("spinner-background") != null;
 
-                    if (Source.GetTexture("spinner-top") != null && !hasBackground)
-                        return new LegacyNewStyleSpinner();
-                    else if (hasBackground)
-                        return new LegacyOldStyleSpinner();
+                        if (Source.GetTexture("spinner-top") != null && !hasBackground)
+                            return new LegacyNewStyleSpinner();
+                        else if (hasBackground)
+                            return new LegacyOldStyleSpinner();
 
-                    return null;
+                        return null;
+                }
             }
 
-            return null;
+            return Source.GetDrawableComponent(component);
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)

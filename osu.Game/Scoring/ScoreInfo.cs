@@ -10,6 +10,7 @@ using Newtonsoft.Json.Converters;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -30,7 +31,7 @@ namespace osu.Game.Scoring
         public long TotalScore { get; set; }
 
         [JsonProperty("accuracy")]
-        [Column(TypeName = "DECIMAL(1,4)")]
+        [Column(TypeName = "DECIMAL(1,4)")] // TODO: This data type is wrong (should contain more precision). But at the same time, we probably don't need to be storing this in the database.
         public double Accuracy { get; set; }
 
         [JsonIgnore]
@@ -55,54 +56,66 @@ namespace osu.Game.Scoring
         [JsonIgnore]
         public virtual RulesetInfo Ruleset { get; set; }
 
+        private APIMod[] localAPIMods;
         private Mod[] mods;
 
-        [JsonProperty("mods")]
+        [JsonIgnore]
         [NotMapped]
         public Mod[] Mods
         {
             get
             {
+                var rulesetInstance = Ruleset?.CreateInstance();
+                if (rulesetInstance == null)
+                    return mods ?? Array.Empty<Mod>();
+
+                Mod[] scoreMods = Array.Empty<Mod>();
+
                 if (mods != null)
-                    return mods;
+                    scoreMods = mods;
+                else if (localAPIMods != null)
+                    scoreMods = apiMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
 
-                if (modsJson == null)
-                    return Array.Empty<Mod>();
-
-                return getModsFromRuleset(JsonConvert.DeserializeObject<DeserializedMod[]>(modsJson));
+                return scoreMods;
             }
             set
             {
-                modsJson = null;
+                localAPIMods = null;
                 mods = value;
             }
         }
 
-        private Mod[] getModsFromRuleset(DeserializedMod[] mods) => Ruleset.CreateInstance().GetAllMods().Where(mod => mods.Any(d => d.Acronym == mod.Acronym)).ToArray();
+        // Used for API serialisation/deserialisation.
+        [JsonProperty("mods")]
+        [NotMapped]
+        private APIMod[] apiMods
+        {
+            get
+            {
+                if (localAPIMods != null)
+                    return localAPIMods;
 
-        private string modsJson;
+                if (mods == null)
+                    return Array.Empty<APIMod>();
 
+                return localAPIMods = mods.Select(m => new APIMod(m)).ToArray();
+            }
+            set
+            {
+                localAPIMods = value;
+
+                // We potentially can't update this yet due to Ruleset being late-bound, so instead update on read as necessary.
+                mods = null;
+            }
+        }
+
+        // Used for database serialisation/deserialisation.
         [JsonIgnore]
         [Column("Mods")]
         public string ModsJson
         {
-            get
-            {
-                if (modsJson != null)
-                    return modsJson;
-
-                if (mods == null)
-                    return null;
-
-                return modsJson = JsonConvert.SerializeObject(mods.Select(m => new DeserializedMod { Acronym = m.Acronym }));
-            }
-            set
-            {
-                modsJson = value;
-
-                // we potentially can't update this yet due to Ruleset being late-bound, so instead update on read as necessary.
-                mods = null;
-            }
+            get => JsonConvert.SerializeObject(apiMods);
+            set => apiMods = JsonConvert.DeserializeObject<APIMod[]>(value);
         }
 
         [NotMapped]
@@ -185,33 +198,12 @@ namespace osu.Game.Scoring
         [JsonProperty("position")]
         public int? Position { get; set; }
 
-        private bool isLegacyScore;
-
         /// <summary>
         /// Whether this <see cref="ScoreInfo"/> represents a legacy (osu!stable) score.
         /// </summary>
         [JsonIgnore]
         [NotMapped]
-        public bool IsLegacyScore
-        {
-            get
-            {
-                if (isLegacyScore)
-                    return true;
-
-                // The above check will catch legacy online scores that have an appropriate UserString + UserId.
-                // For non-online scores such as those imported in, a heuristic is used based on the following table:
-                //
-                //       Mode      | UserString | UserId
-                // --------------- | ---------- | ---------
-                // stable          | <username> | 1
-                // lazer           | <username> | <userid>
-                // lazer (offline) | Guest      | 1
-
-                return ID > 0 && UserID == 1 && UserString != "Guest";
-            }
-            set => isLegacyScore = value;
-        }
+        public bool IsLegacyScore => Mods.OfType<ModClassic>().Any();
 
         public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
         {
@@ -249,14 +241,6 @@ namespace osu.Game.Scoring
                         break;
                 }
             }
-        }
-
-        [Serializable]
-        protected class DeserializedMod : IMod
-        {
-            public string Acronym { get; set; }
-
-            public bool Equals(IMod other) => Acronym == other?.Acronym;
         }
 
         public override string ToString() => $"{User} playing {Beatmap}";

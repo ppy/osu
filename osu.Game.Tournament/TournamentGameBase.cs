@@ -141,7 +141,6 @@ namespace osu.Game.Tournament
         /// <summary>
         /// Add missing player info based on user IDs.
         /// </summary>
-        /// <returns></returns>
         private bool addPlayers()
         {
             bool addedInfo = false;
@@ -150,7 +149,9 @@ namespace osu.Game.Tournament
             {
                 foreach (var p in t.Players)
                 {
-                    if (string.IsNullOrEmpty(p.Username) || p.Statistics?.GlobalRank == null)
+                    if (string.IsNullOrEmpty(p.Username)
+                        || p.Statistics?.GlobalRank == null
+                        || p.Statistics?.CountryRank == null)
                     {
                         PopulateUser(p, immediate: true);
                         addedInfo = true;

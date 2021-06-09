@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             var working = CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
             working.LoadTrack();
 
-            Child = gameplayClockContainer = new GameplayClockContainer(working, 0)
+            Child = gameplayClockContainer = new MasterGameplayClockContainer(working, 0)
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
             AddStep("click", () =>
             {
-                increment = skip_time - gameplayClock.CurrentTime - GameplayClockContainer.MINIMUM_SKIP_TIME / 2;
+                increment = skip_time - gameplayClock.CurrentTime - MasterGameplayClockContainer.MINIMUM_SKIP_TIME / 2;
                 InputManager.Click(MouseButton.Left);
             });
             AddStep("click", () => InputManager.Click(MouseButton.Left));

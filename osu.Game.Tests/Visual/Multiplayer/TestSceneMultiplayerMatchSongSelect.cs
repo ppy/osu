@@ -7,17 +7,23 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.Mods;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Select;
 
@@ -36,7 +42,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, Beatmap.Default));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
 
             beatmaps = new List<BeatmapInfo>();
 
@@ -137,8 +143,30 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("mods not changed", () => SelectedMods.Value.Single() is TaikoModDoubleTime);
         }
 
+        [TestCase(typeof(OsuModHidden), typeof(OsuModHidden))] // Same mod.
+        [TestCase(typeof(OsuModHidden), typeof(OsuModTraceable))] // Incompatible.
+        public void TestAllowedModDeselectedWhenRequired(Type allowedMod, Type requiredMod)
+        {
+            AddStep($"select {allowedMod.ReadableName()} as allowed", () => songSelect.FreeMods.Value = new[] { (Mod)Activator.CreateInstance(allowedMod) });
+            AddStep($"select {requiredMod.ReadableName()} as required", () => songSelect.Mods.Value = new[] { (Mod)Activator.CreateInstance(requiredMod) });
+
+            AddAssert("freemods empty", () => songSelect.FreeMods.Value.Count == 0);
+            assertHasFreeModButton(allowedMod, false);
+            assertHasFreeModButton(requiredMod, false);
+        }
+
+        private void assertHasFreeModButton(Type type, bool hasButton = true)
+        {
+            AddAssert($"{type.ReadableName()} {(hasButton ? "displayed" : "not displayed")} in freemod overlay",
+                () => songSelect.ChildrenOfType<FreeModSelectOverlay>().Single().ChildrenOfType<ModButton>().All(b => b.Mod.GetType() != type));
+        }
+
         private class TestMultiplayerMatchSongSelect : MultiplayerMatchSongSelect
         {
+            public new Bindable<IReadOnlyList<Mod>> Mods => base.Mods;
+
+            public new Bindable<IReadOnlyList<Mod>> FreeMods => base.FreeMods;
+
             public new BeatmapCarousel Carousel => base.Carousel;
         }
     }

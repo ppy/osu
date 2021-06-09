@@ -4,8 +4,10 @@
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Filter;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Tests.NonVisual.Filtering
 {
@@ -213,6 +215,32 @@ namespace osu.Game.Tests.NonVisual.Filtering
             carouselItem.Filter(criteria);
 
             Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        public void TestCustomRulesetCriteria([Values(null, true, false)] bool? matchCustomCriteria)
+        {
+            var beatmap = getExampleBeatmap();
+
+            var customCriteria = matchCustomCriteria is bool match ? new CustomCriteria(match) : null;
+            var criteria = new FilterCriteria { RulesetCriteria = customCriteria };
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.AreEqual(matchCustomCriteria == false, carouselItem.Filtered.Value);
+        }
+
+        private class CustomCriteria : IRulesetFilterCriteria
+        {
+            private readonly bool match;
+
+            public CustomCriteria(bool shouldMatch)
+            {
+                match = shouldMatch;
+            }
+
+            public bool Matches(BeatmapInfo beatmap) => match;
+            public bool TryParseCustomKeywordCriteria(string key, Operator op, string value) => false;
         }
     }
 }

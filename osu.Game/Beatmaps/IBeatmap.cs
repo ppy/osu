@@ -44,7 +44,6 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Returns statistics for the <see cref="HitObjects"/> contained in this beatmap.
         /// </summary>
-        /// <returns></returns>
         IEnumerable<BeatmapStatistic> GetStatistics();
 
         /// <summary>

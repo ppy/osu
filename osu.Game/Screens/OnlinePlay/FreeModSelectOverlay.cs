@@ -75,6 +75,14 @@ namespace osu.Game.Screens.OnlinePlay
                 section.DeselectAll();
         }
 
+        protected override void OnAvailableModsChanged()
+        {
+            base.OnAvailableModsChanged();
+
+            foreach (var section in ModSectionsContainer.Children)
+                ((FreeModSection)section).UpdateCheckboxState();
+        }
+
         protected override ModSection CreateModSection(ModType type) => new FreeModSection(type);
 
         private class FreeModSection : ModSection
@@ -108,10 +116,14 @@ namespace osu.Game.Screens.OnlinePlay
             protected override void ModButtonStateChanged(Mod mod)
             {
                 base.ModButtonStateChanged(mod);
+                UpdateCheckboxState();
+            }
 
+            public void UpdateCheckboxState()
+            {
                 if (!SelectionAnimationRunning)
                 {
-                    var validButtons = ButtonsContainer.OfType<ModButton>().Where(b => b.Mod.HasImplementation);
+                    var validButtons = Buttons.Where(b => b.Mod.HasImplementation);
                     checkbox.Current.Value = validButtons.All(b => b.Selected);
                 }
             }

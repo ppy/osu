@@ -16,6 +16,8 @@ environment:
       job_depends_on: osu-game
     - job_name: mania-ruleset
       job_depends_on: osu-game
+    - job_name: templates
+      job_depends_on: osu-game
 
 nuget:
   project_feed: true
@@ -59,6 +61,22 @@ for:
       - cmd: dotnet remove osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj reference osu.Game\osu.Game.csproj
       - cmd: dotnet add osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
       - cmd: dotnet pack osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj /p:Version=%APPVEYOR_REPO_TAG_NAME%
+  -
+    matrix:
+      only:
+        - job_name: templates
+    build_script:
+      - cmd: dotnet remove Templates\Rulesets\ruleset-empty\osu.Game.Rulesets.EmptyFreeform\osu.Game.Rulesets.EmptyFreeform.csproj reference osu.Game\osu.Game.csproj
+      - cmd: dotnet remove Templates\Rulesets\ruleset-example\osu.Game.Rulesets.Pippidon\osu.Game.Rulesets.Pippidon.csproj reference osu.Game\osu.Game.csproj
+      - cmd: dotnet remove Templates\Rulesets\ruleset-scrolling-empty\osu.Game.Rulesets.EmptyScrolling\osu.Game.Rulesets.EmptyScrolling.csproj reference osu.Game\osu.Game.csproj
+      - cmd: dotnet remove Templates\Rulesets\ruleset-scrolling-example\osu.Game.Rulesets.Pippidon\osu.Game.Rulesets.Pippidon.csproj reference osu.Game\osu.Game.csproj
+
+      - cmd: dotnet add Templates\Rulesets\ruleset-empty\osu.Game.Rulesets.EmptyFreeform\osu.Game.Rulesets.EmptyFreeform.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
+      - cmd: dotnet add Templates\Rulesets\ruleset-example\osu.Game.Rulesets.Pippidon\osu.Game.Rulesets.Pippidon.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
+      - cmd: dotnet add Templates\Rulesets\ruleset-scrolling-empty\osu.Game.Rulesets.EmptyScrolling\osu.Game.Rulesets.EmptyScrolling.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
+      - cmd: dotnet add Templates\Rulesets\ruleset-scrolling-example\osu.Game.Rulesets.Pippidon\osu.Game.Rulesets.Pippidon.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
+
+      - cmd: dotnet pack Templates\osu.Game.Templates.csproj /p:Version=%APPVEYOR_REPO_TAG_NAME%
 
 artifacts:
   - path: '**\*.nupkg'

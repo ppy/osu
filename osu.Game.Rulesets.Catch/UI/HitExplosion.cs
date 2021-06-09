@@ -5,31 +5,16 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Pooling;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Objects.Pooling;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class HitExplosion : PoolableDrawable
+    public class HitExplosion : PoolableDrawableWithLifetime<HitExplosionEntry>
     {
-        private Color4 objectColour;
-        public CatchHitObject HitObject;
-
-        public Color4 ObjectColour
-        {
-            get => objectColour;
-            set
-            {
-                if (objectColour == value) return;
-
-                objectColour = value;
-                onColourChanged();
-            }
-        }
-
         private readonly CircularContainer largeFaint;
         private readonly CircularContainer smallFaint;
         private readonly CircularContainer directionalGlow1;
@@ -83,9 +68,19 @@ namespace osu.Game.Rulesets.Catch.UI
             };
         }
 
-        protected override void PrepareForUse()
+        protected override void OnApply(HitExplosionEntry entry)
         {
-            base.PrepareForUse();
+            X = entry.Position;
+            Scale = new Vector2(entry.Scale);
+            setColour(entry.ObjectColour);
+
+            using (BeginAbsoluteSequence(entry.LifetimeStart))
+                applyTransforms(entry.RNGSeed);
+        }
+
+        private void applyTransforms(int randomSeed)
+        {
+            ClearTransforms(true);
 
             const double duration = 400;
 
@@ -96,14 +91,13 @@ namespace osu.Game.Rulesets.Catch.UI
                 .FadeOut(duration * 2);
 
             const float angle_variangle = 15; // should be less than 45
-            directionalGlow1.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
-            directionalGlow2.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
+            directionalGlow1.Rotation = StatelessRNG.NextSingle(-angle_variangle, angle_variangle, randomSeed, 4);
+            directionalGlow2.Rotation = StatelessRNG.NextSingle(-angle_variangle, angle_variangle, randomSeed, 5);
 
-            this.FadeInFromZero(50).Then().FadeOut(duration, Easing.Out);
-            Expire(true);
+            this.FadeInFromZero(50).Then().FadeOut(duration, Easing.Out).Expire();
         }
 
-        private void onColourChanged()
+        private void setColour(Color4 objectColour)
         {
             const float roundness = 100;
 

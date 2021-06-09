@@ -5,7 +5,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osuTK;
@@ -16,18 +15,28 @@ namespace osu.Game.Tests.Visual.Editing
     public class TestSceneEditorSummaryTimeline : EditorClockTestScene
     {
         [Cached(typeof(EditorBeatmap))]
-        private readonly EditorBeatmap editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+        private readonly EditorBeatmap editorBeatmap;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public TestSceneEditorSummaryTimeline()
         {
-            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+            editorBeatmap = new EditorBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
+        }
 
-            Add(new SummaryTimeline
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AddStep("create timeline", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(500, 50)
+                // required for track
+                Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
+
+                Add(new SummaryTimeline
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(500, 50)
+                });
             });
         }
     }

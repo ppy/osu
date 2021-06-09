@@ -19,6 +19,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Music;
 using osuTK;
 using osuTK.Graphics;
@@ -28,8 +29,8 @@ namespace osu.Game.Overlays
     public class NowPlayingOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
         public string IconTexture => "Icons/Hexacons/music";
-        public string Title => "now playing";
-        public string Description => "manage the currently playing track";
+        public LocalisableString Title => NowPlayingStrings.HeaderTitle;
+        public LocalisableString Description => NowPlayingStrings.HeaderDescription;
 
         private const float player_height = 130;
         private const float transition_length = 800;
@@ -293,8 +294,8 @@ namespace osu.Game.Overlays
                     else
                     {
                         BeatmapMetadata metadata = beatmap.Metadata;
-                        title.Text = new LocalisedString((metadata.TitleUnicode, metadata.Title));
-                        artist.Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist));
+                        title.Text = new RomanisableString(metadata.TitleUnicode, metadata.Title);
+                        artist.Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
                     }
                 });
 

@@ -25,6 +25,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Utils;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -47,6 +48,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Cached]
         private readonly VolumeOverlay volumeOverlay;
+
+        [Cached(typeof(BatteryInfo))]
+        private readonly LocalBatteryInfo batteryInfo = new LocalBatteryInfo();
 
         private readonly ChangelogOverlay changelogOverlay;
 
@@ -84,13 +88,18 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             beforeLoadAction?.Invoke();
 
+            prepareBeatmap();
+
+            LoadScreen(loader = new TestPlayerLoader(() => player = new TestPlayer(interactive, interactive)));
+        }
+
+        private void prepareBeatmap()
+        {
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
             Beatmap.Value.BeatmapInfo.EpilepsyWarning = epilepsyWarning;
 
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(Beatmap.Value.Track);
-
-            LoadScreen(loader = new TestPlayerLoader(() => player = new TestPlayer(interactive, interactive)));
         }
 
         [Test]
@@ -174,9 +183,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("load slow dummy beatmap", () =>
             {
-                LoadScreen(loader = new TestPlayerLoader(() => slowPlayer = new SlowLoadPlayer(false, false)));
-                Scheduler.AddDelayed(() => slowPlayer.AllowLoad.Set(), 5000);
+                prepareBeatmap();
+                slowPlayer = new SlowLoadPlayer(false, false);
+                LoadScreen(loader = new TestPlayerLoader(() => slowPlayer));
             });
+
+            AddStep("schedule slow load", () => Scheduler.AddDelayed(() => slowPlayer.AllowLoad.Set(), 5000));
 
             AddUntilStep("wait for player to be current", () => slowPlayer.IsCurrentScreen());
         }
@@ -288,6 +300,33 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
+        [TestCase(false, 1.0, false)] // not charging, above cutoff --> no warning
+        [TestCase(true, 0.1, false)] // charging, below cutoff --> no warning
+        [TestCase(false, 0.25, true)] // not charging, at cutoff --> warning
+        public void TestLowBatteryNotification(bool isCharging, double chargeLevel, bool shouldWarn)
+        {
+            AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce).Value = false);
+
+            // set charge status and level
+            AddStep("load player", () => resetPlayer(false, () =>
+            {
+                batteryInfo.SetCharging(isCharging);
+                batteryInfo.SetChargeLevel(chargeLevel);
+            }));
+            AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
+            AddAssert($"notification {(shouldWarn ? "triggered" : "not triggered")}", () => notificationOverlay.UnreadCount.Value == (shouldWarn ? 1 : 0));
+            AddStep("click notification", () =>
+            {
+                var scrollContainer = (OsuScrollContainer)notificationOverlay.Children.Last();
+                var flowContainer = scrollContainer.Children.OfType<FillFlowContainer<NotificationSection>>().First();
+                var notification = flowContainer.First();
+
+                InputManager.MoveMouseTo(notification);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("wait for player load", () => player.IsLoaded);
+        }
+
         [Test]
         public void TestEpilepsyWarningEarlyExit()
         {
@@ -321,6 +360,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override string Name => string.Empty;
             public override string Acronym => string.Empty;
             public override double ScoreMultiplier => 1;
+            public override string Description => string.Empty;
 
             public bool Applied { get; private set; }
 
@@ -346,6 +386,30 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 if (!AllowLoad.Wait(TimeSpan.FromSeconds(10)))
                     throw new TimeoutException();
+            }
+        }
+
+        /// <summary>
+        /// Mutable dummy BatteryInfo class for <see cref="TestScenePlayerLoader.TestLowBatteryNotification"/>
+        /// </summary>
+        /// <inheritdoc/>
+        private class LocalBatteryInfo : BatteryInfo
+        {
+            private bool isCharging = true;
+            private double chargeLevel = 1;
+
+            public override bool IsCharging => isCharging;
+
+            public override double ChargeLevel => chargeLevel;
+
+            public void SetCharging(bool value)
+            {
+                isCharging = value;
+            }
+
+            public void SetChargeLevel(double value)
+            {
+                chargeLevel = value;
             }
         }
     }

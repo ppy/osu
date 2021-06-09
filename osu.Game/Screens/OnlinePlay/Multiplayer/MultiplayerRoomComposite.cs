@@ -13,7 +13,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected MultiplayerRoom Room => Client.Room;
 
         [Resolved]
-        protected StatefulMultiplayerClient Client { get; private set; }
+        protected MultiplayerClient Client { get; private set; }
 
         protected override void LoadComplete()
         {

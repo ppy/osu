@@ -7,7 +7,10 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 
 namespace osu.Game.Graphics.Containers
@@ -40,7 +43,7 @@ namespace osu.Game.Graphics.Containers
                 AddText(text[previousLinkEnd..link.Index]);
 
                 string displayText = text.Substring(link.Index, link.Length);
-                string linkArgument = link.Argument ?? link.Url;
+                string linkArgument = link.Argument;
                 string tooltip = displayText == link.Url ? null : link.Url;
 
                 AddLink(displayText, link.Action, linkArgument, tooltip);
@@ -54,12 +57,20 @@ namespace osu.Game.Graphics.Containers
             createLink(AddText(text, creationParameters), new LinkDetails(LinkAction.External, url), url);
 
         public void AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(text, creationParameters), new LinkDetails(LinkAction.Custom, null), tooltipText, action);
+            => createLink(AddText(text, creationParameters), new LinkDetails(LinkAction.Custom, string.Empty), tooltipText, action);
 
         public void AddLink(string text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
             => createLink(AddText(text, creationParameters), new LinkDetails(action, argument), tooltipText);
 
-        public void AddLink(IEnumerable<SpriteText> text, LinkAction action = LinkAction.External, string linkArgument = null, string tooltipText = null)
+        public void AddLink(LocalisableString text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
+        {
+            var spriteText = new OsuSpriteText { Text = text };
+
+            AddText(spriteText, creationParameters);
+            createLink(spriteText.Yield(), new LinkDetails(action, argument), tooltipText);
+        }
+
+        public void AddLink(IEnumerable<SpriteText> text, LinkAction action, string linkArgument, string tooltipText = null)
         {
             foreach (var t in text)
                 AddArbitraryDrawable(t);

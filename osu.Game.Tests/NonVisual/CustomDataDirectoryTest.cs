@@ -47,7 +47,7 @@ namespace osu.Game.Tests.NonVisual
             using (var host = new CustomTestHeadlessGameHost())
             {
                 using (var storageConfig = new StorageConfigManager(host.InitialStorage))
-                    storageConfig.Set(StorageConfig.FullPath, customPath);
+                    storageConfig.SetValue(StorageConfig.FullPath, customPath);
 
                 try
                 {
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.NonVisual
             using (var host = new CustomTestHeadlessGameHost())
             {
                 using (var storageConfig = new StorageConfigManager(host.InitialStorage))
-                    storageConfig.Set(StorageConfig.FullPath, customPath);
+                    storageConfig.SetValue(StorageConfig.FullPath, customPath);
 
                 try
                 {

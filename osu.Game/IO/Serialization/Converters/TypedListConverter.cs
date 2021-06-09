@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using osu.Framework.Extensions.ObjectExtensions;
 
 namespace osu.Game.IO.Serialization.Converters
 {
@@ -60,7 +61,7 @@ namespace osu.Game.IO.Serialization.Converters
                     throw new JsonException("Expected $type token.");
 
                 var typeName = lookupTable[(int)tok["$type"]];
-                var instance = (T)Activator.CreateInstance(Type.GetType(typeName));
+                var instance = (T)Activator.CreateInstance(Type.GetType(typeName).AsNonNull());
                 serializer.Populate(itemReader, instance);
 
                 list.Add(instance);

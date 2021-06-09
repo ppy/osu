@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -16,22 +15,8 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModClassic : Mod, IApplicableToHitObject, IApplicableToDrawableHitObjects, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModClassic : ModClassic, IApplicableToHitObject, IApplicableToDrawableHitObjects, IApplicableToDrawableRuleset<OsuHitObject>
     {
-        public override string Name => "Classic";
-
-        public override string Acronym => "CL";
-
-        public override double ScoreMultiplier => 1;
-
-        public override IconUsage? Icon => FontAwesome.Solid.History;
-
-        public override string Description => "Feeling nostalgic?";
-
-        public override bool Ranked => false;
-
-        public override ModType Type => ModType.Conversion;
-
         [SettingSource("No slider head accuracy requirement", "Scores sliders proportionally to the number of ticks hit.")]
         public Bindable<bool> NoSliderHeadAccuracy { get; } = new BindableBool(true);
 
@@ -43,6 +28,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         [SettingSource("Use fixed slider follow circle hit area", "Makes the slider follow circle track its final size at all times.")]
         public Bindable<bool> FixedFollowCircleHitArea { get; } = new BindableBool(true);
+
+        [SettingSource("Always play a slider's tail sample", "Always plays a slider's tail sample regardless of whether it was hit or not.")]
+        public Bindable<bool> AlwaysPlayTailSample { get; } = new BindableBool(true);
 
         public void ApplyToHitObject(HitObject hitObject)
         {
@@ -78,6 +66,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     case DrawableSliderHead head:
                         head.TrackFollowCircle = !NoSliderHeadMovement.Value;
+                        break;
+
+                    case DrawableSliderTail tail:
+                        tail.SamplePlaysOnlyOnHit = !AlwaysPlayTailSample.Value;
                         break;
                 }
             }

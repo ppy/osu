@@ -17,7 +17,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Match
 {
@@ -56,15 +55,15 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 
         [Cached]
-        protected OnlinePlayBeatmapAvailablilityTracker BeatmapAvailablilityTracker { get; }
+        protected OnlinePlayBeatmapAvailabilityTracker BeatmapAvailabilityTracker { get; }
 
-        protected IBindable<BeatmapAvailability> BeatmapAvailability => BeatmapAvailablilityTracker.Availability;
+        protected IBindable<BeatmapAvailability> BeatmapAvailability => BeatmapAvailabilityTracker.Availability;
 
         protected RoomSubScreen()
         {
             AddRangeInternal(new Drawable[]
             {
-                BeatmapAvailablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
+                BeatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
                 {
                     SelectedItem = { BindTarget = SelectedItem }
                 },
@@ -73,8 +72,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Depth = float.MinValue,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.5f,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
                     Child = userModsSelectOverlay = new UserModSelectOverlay
                     {
@@ -148,11 +147,21 @@ namespace osu.Game.Screens.OnlinePlay.Match
             return base.OnExiting(next);
         }
 
-        protected void StartPlay(Func<Player> player)
+        protected void StartPlay()
         {
             sampleStart?.Play();
-            ParentScreen?.Push(new PlayerLoader(player));
+
+            // fallback is to allow this class to operate when there is no parent OnlineScreen (testing purposes).
+            var targetScreen = (Screen)ParentScreen ?? this;
+
+            targetScreen.Push(CreateGameplayScreen());
         }
+
+        /// <summary>
+        /// Creates the gameplay screen to be entered.
+        /// </summary>
+        /// <returns>The screen to enter.</returns>
+        protected abstract Screen CreateGameplayScreen();
 
         private void selectedItemChanged()
         {

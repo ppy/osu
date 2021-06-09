@@ -131,18 +131,21 @@ namespace osu.Game.Skinning
             });
         }
 
+        protected override void LoadAsyncComplete()
+        {
+            // ensure samples are constructed before SkinChanged() is called via base.LoadAsyncComplete().
+            if (!samplesContainer.Any())
+                updateSamples();
+
+            base.LoadAsyncComplete();
+        }
+
         /// <summary>
         /// Stops the samples.
         /// </summary>
         public virtual void Stop()
         {
             samplesContainer.ForEach(c => c.Stop());
-        }
-
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
-        {
-            base.SkinChanged(skin, allowFallback);
-            updateSamples();
         }
 
         private void updateSamples()
@@ -176,24 +179,15 @@ namespace osu.Game.Skinning
 
         public BindableNumber<double> Tempo => samplesContainer.Tempo;
 
-        public void BindAdjustments(IAggregateAudioAdjustment component)
-        {
-            samplesContainer.BindAdjustments(component);
-        }
+        public void BindAdjustments(IAggregateAudioAdjustment component) => samplesContainer.BindAdjustments(component);
 
-        public void UnbindAdjustments(IAggregateAudioAdjustment component)
-        {
-            samplesContainer.UnbindAdjustments(component);
-        }
+        public void UnbindAdjustments(IAggregateAudioAdjustment component) => samplesContainer.UnbindAdjustments(component);
 
-        public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
-            => samplesContainer.AddAdjustment(type, adjustBindable);
+        public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => samplesContainer.AddAdjustment(type, adjustBindable);
 
-        public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
-            => samplesContainer.RemoveAdjustment(type, adjustBindable);
+        public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => samplesContainer.RemoveAdjustment(type, adjustBindable);
 
-        public void RemoveAllAdjustments(AdjustableProperty type)
-            => samplesContainer.RemoveAllAdjustments(type);
+        public void RemoveAllAdjustments(AdjustableProperty type) => samplesContainer.RemoveAllAdjustments(type);
 
         /// <summary>
         /// Whether any samples are currently playing.

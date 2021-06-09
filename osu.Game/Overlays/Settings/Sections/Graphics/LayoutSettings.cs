@@ -11,6 +11,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -140,7 +141,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             scalingSettings.ForEach(s => bindPreviewEvent(s.Current));
 
-            windowModeDropdown.Current.ValueChanged += _ => updateResolutionDropdown();
+            windowModeDropdown.Current.BindValueChanged(mode =>
+            {
+                updateResolutionDropdown();
+
+                const string not_fullscreen_note = "Running without fullscreen mode will increase your input latency!";
+
+                windowModeDropdown.WarningText = mode.NewValue != WindowMode.Fullscreen ? not_fullscreen_note : string.Empty;
+            }, true);
 
             windowModes.BindCollectionChanged((sender, args) =>
             {
@@ -234,7 +242,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             private class ResolutionDropdownControl : DropdownControl
             {
-                protected override string GenerateItemText(Size item)
+                protected override LocalisableString GenerateItemText(Size item)
                 {
                     if (item == new Size(9999, 9999))
                         return "Default";

@@ -73,6 +73,9 @@ namespace osu.Game.Screens.Select.Carousel
             if (match)
                 match &= criteria.Collection?.Beatmaps.Contains(Beatmap) ?? true;
 
+            if (match && criteria.RulesetCriteria != null)
+                match &= criteria.RulesetCriteria.Matches(Beatmap);
+
             Filtered.Value = !match;
         }
 

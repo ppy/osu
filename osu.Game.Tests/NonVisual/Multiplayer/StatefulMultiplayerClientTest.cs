@@ -4,6 +4,7 @@
 using System.Linq;
 using Humanizer;
 using NUnit.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Tests.Visual.Multiplayer;
@@ -34,11 +35,37 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
             changeState(6, MultiplayerUserState.WaitingForLoad);
             checkPlayingUserCount(6);
 
-            AddStep("another user left", () => Client.RemoveUser(Client.Room?.Users.Last().User));
+            AddStep("another user left", () => Client.RemoveUser((Client.Room?.Users.Last().User).AsNonNull()));
             checkPlayingUserCount(5);
 
             AddStep("leave room", () => Client.LeaveRoom());
             checkPlayingUserCount(0);
+        }
+
+        [Test]
+        public void TestPlayingUsersUpdatedOnJoin()
+        {
+            AddStep("leave room", () => Client.LeaveRoom());
+            AddUntilStep("wait for room part", () => Client.Room == null);
+
+            AddStep("create room initially in gameplay", () =>
+            {
+                Room.RoomID.Value = null;
+                Client.RoomSetupAction = room =>
+                {
+                    room.State = MultiplayerRoomState.Playing;
+                    room.Users.Add(new MultiplayerRoomUser(PLAYER_1_ID)
+                    {
+                        User = new User { Id = PLAYER_1_ID },
+                        State = MultiplayerUserState.Playing
+                    });
+                };
+
+                RoomManager.CreateRoom(Room);
+            });
+
+            AddUntilStep("wait for room join", () => Client.Room != null);
+            checkPlayingUserCount(1);
         }
 
         private void checkPlayingUserCount(int expectedCount)

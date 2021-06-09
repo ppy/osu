@@ -170,6 +170,17 @@ namespace osu.Game.Tests.Visual.Playlists
 
         private void bindHandler(bool delayed = false, ScoreInfo userScore = null, bool failRequests = false) => ((DummyAPIAccess)API).HandleRequest = request =>
         {
+            // pre-check for requests we should be handling (as they are scheduled below).
+            switch (request)
+            {
+                case ShowPlaylistUserScoreRequest _:
+                case IndexPlaylistScoresRequest _:
+                    break;
+
+                default:
+                    return false;
+            }
+
             requestComplete = false;
 
             double delay = delayed ? 3000 : 0;
@@ -196,6 +207,8 @@ namespace osu.Game.Tests.Visual.Playlists
                         break;
                 }
             }, delay);
+
+            return true;
         };
 
         private void triggerSuccess<T>(APIRequest<T> req, T result)
