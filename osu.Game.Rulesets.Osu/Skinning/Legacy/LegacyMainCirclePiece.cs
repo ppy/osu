@@ -41,7 +41,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
-        private readonly IBindable<ArmedState> armedState = new Bindable<ArmedState>();
 
         [Resolved]
         private DrawableHitObject drawableObject { get; set; }
@@ -116,7 +115,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             accentColour.BindTo(drawableObject.AccentColour);
             indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
-            armedState.BindTo(drawableObject.State);
 
             Texture getTextureWithFallback(string name)
             {
@@ -142,10 +140,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (hasNumber)
                 indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
 
-            armedState.BindValueChanged(animate, true);
+            drawableObject.ApplyCustomUpdateState += updateStateTransforms;
+            updateStateTransforms(drawableObject, drawableObject.State.Value);
         }
 
-        private void animate(ValueChangedEvent<ArmedState> state)
+        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
             const double legacy_fade_duration = 240;
 
@@ -153,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
             {
-                switch (state.NewValue)
+                switch (state)
                 {
                     case ArmedState.Hit:
                         circleSprites.FadeOut(legacy_fade_duration, Easing.Out);
@@ -177,6 +176,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         break;
                 }
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableObject != null)
+                drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }
