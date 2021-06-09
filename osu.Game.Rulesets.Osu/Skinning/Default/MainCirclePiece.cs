@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
     public class MainCirclePiece : CompositeDrawable
     {
+        public override bool RemoveCompletedTransforms => false;
+
         private readonly CirclePiece circle;
         private readonly RingPiece ring;
         private readonly FlashPiece flash;
