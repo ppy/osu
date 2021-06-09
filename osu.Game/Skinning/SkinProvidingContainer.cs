@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
@@ -21,8 +22,10 @@ namespace osu.Game.Skinning
     {
         public event Action SourceChanged;
 
-        [CanBeNull]
-        private readonly ISkin skin;
+        /// <summary>
+        /// The list of skins provided by this <see cref="SkinProvidingContainer"/>.
+        /// </summary>
+        protected readonly List<ISkin> SkinLayers = new List<ISkin>();
 
         [CanBeNull]
         private ISkinSource fallbackSource;
@@ -38,23 +41,30 @@ namespace osu.Game.Skinning
         protected virtual bool AllowColourLookup => true;
 
         public SkinProvidingContainer(ISkin skin)
+            : this()
         {
-            this.skin = skin;
+            SkinLayers.Add(skin);
+        }
 
+        protected SkinProvidingContainer()
+        {
             RelativeSizeAxes = Axes.Both;
         }
 
         public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
         {
-            if (skin is ISkinSource source)
+            foreach (var skin in SkinLayers)
             {
-                if (source.FindProvider(lookupFunction) is ISkin found)
-                    return found;
-            }
-            else if (skin != null)
-            {
-                if (lookupFunction(skin))
-                    return skin;
+                if (skin is ISkinSource source)
+                {
+                    if (source.FindProvider(lookupFunction) is ISkin found)
+                        return found;
+                }
+                else if (skin != null)
+                {
+                    if (lookupFunction(skin))
+                        return skin;
+                }
             }
 
             return fallbackSource?.FindProvider(lookupFunction);
@@ -62,57 +72,73 @@ namespace osu.Game.Skinning
 
         public Drawable GetDrawableComponent(ISkinComponent component)
         {
-            Drawable sourceDrawable;
-            if (AllowDrawableLookup(component) && (sourceDrawable = skin?.GetDrawableComponent(component)) != null)
-                return sourceDrawable;
+            if (AllowDrawableLookup(component))
+            {
+                foreach (var skin in SkinLayers)
+                {
+                    Drawable sourceDrawable;
+                    if ((sourceDrawable = skin?.GetDrawableComponent(component)) != null)
+                        return sourceDrawable;
+                }
+            }
 
             return fallbackSource?.GetDrawableComponent(component);
         }
 
         public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
         {
-            Texture sourceTexture;
-            if (AllowTextureLookup(componentName) && (sourceTexture = skin?.GetTexture(componentName, wrapModeS, wrapModeT)) != null)
-                return sourceTexture;
+            if (AllowTextureLookup(componentName))
+            {
+                foreach (var skin in SkinLayers)
+                {
+                    Texture sourceTexture;
+                    if ((sourceTexture = skin?.GetTexture(componentName, wrapModeS, wrapModeT)) != null)
+                        return sourceTexture;
+                }
+            }
 
             return fallbackSource?.GetTexture(componentName, wrapModeS, wrapModeT);
         }
 
         public ISample GetSample(ISampleInfo sampleInfo)
         {
-            ISample sourceChannel;
-            if (AllowSampleLookup(sampleInfo) && (sourceChannel = skin?.GetSample(sampleInfo)) != null)
-                return sourceChannel;
+            if (AllowSampleLookup(sampleInfo))
+            {
+                foreach (var skin in SkinLayers)
+                {
+                    ISample sourceSample;
+                    if ((sourceSample = skin?.GetSample(sampleInfo)) != null)
+                        return sourceSample;
+                }
+            }
 
             return fallbackSource?.GetSample(sampleInfo);
         }
 
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
-            if (skin != null)
-            {
-                if (lookup is GlobalSkinColours || lookup is SkinCustomColourLookup)
-                    return lookupWithFallback<TLookup, TValue>(lookup, AllowColourLookup);
+            if (lookup is GlobalSkinColours || lookup is SkinCustomColourLookup)
+                return lookupWithFallback<TLookup, TValue>(lookup, AllowColourLookup);
 
-                return lookupWithFallback<TLookup, TValue>(lookup, AllowConfigurationLookup);
-            }
-
-            return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
+            return lookupWithFallback<TLookup, TValue>(lookup, AllowConfigurationLookup);
         }
 
         private IBindable<TValue> lookupWithFallback<TLookup, TValue>(TLookup lookup, bool canUseSkinLookup)
         {
             if (canUseSkinLookup)
             {
-                var bindable = skin?.GetConfig<TLookup, TValue>(lookup);
-                if (bindable != null)
-                    return bindable;
+                foreach (var skin in SkinLayers)
+                {
+                    IBindable<TValue> bindable;
+                    if ((bindable = skin?.GetConfig<TLookup, TValue>(lookup)) != null)
+                        return bindable;
+                }
             }
 
             return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
         }
 
-        protected virtual void TriggerSourceChanged() => SourceChanged?.Invoke();
+        protected virtual void OnSourceChanged() => SourceChanged?.Invoke();
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -120,7 +146,7 @@ namespace osu.Game.Skinning
 
             fallbackSource = dependencies.Get<ISkinSource>();
             if (fallbackSource != null)
-                fallbackSource.SourceChanged += TriggerSourceChanged;
+                fallbackSource.SourceChanged += OnSourceChanged;
 
             dependencies.CacheAs<ISkinSource>(this);
 
@@ -135,7 +161,7 @@ namespace osu.Game.Skinning
             base.Dispose(isDisposing);
 
             if (fallbackSource != null)
-                fallbackSource.SourceChanged -= TriggerSourceChanged;
+                fallbackSource.SourceChanged -= OnSourceChanged;
         }
     }
 }
