@@ -20,6 +20,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class LegacyMainCirclePiece : CompositeDrawable
     {
+        public override bool RemoveCompletedTransforms => false;
+
         private readonly string priorityLookup;
         private readonly bool hasNumber;
 
