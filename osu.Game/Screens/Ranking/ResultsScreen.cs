@@ -266,8 +266,11 @@ namespace osu.Game.Screens.Ranking
 
         public override bool OnExiting(IScreen next)
         {
+            if (base.OnExiting(next))
+                return true;
 
-            return base.OnExiting(next);
+            this.FadeOut(100);
+            return false;
         }
 
         public override bool OnBackButton()
