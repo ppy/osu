@@ -25,6 +25,7 @@ namespace osu.Game.Screens.Edit.Setup
                 comboColours = new LabelledColourPalette
                 {
                     Label = "Hitcircle / Slider Combos",
+                    FixedLabelWidth = LABEL_WIDTH,
                     ColourNamePrefix = "Combo"
                 }
             };
