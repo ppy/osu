@@ -21,6 +21,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public bool ReadOnly
         {
+            get => Component.ReadOnly;
             set => Component.ReadOnly = value;
         }
 
