@@ -210,7 +210,8 @@ namespace osu.Game.Skinning
             if (fallbackSource != null)
                 fallbackSource.SourceChanged -= OnSourceChanged;
 
-            SkinSources.Clear();
+            foreach (var source in SkinSources.OfType<ISkinSource>())
+                source.SourceChanged -= OnSourceChanged;
         }
 
         private class NoFallbackProxy : ISkinSource
