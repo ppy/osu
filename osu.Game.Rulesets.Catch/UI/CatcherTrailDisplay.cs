@@ -4,10 +4,8 @@
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
-using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
@@ -120,11 +118,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private CatcherTrailSprite createTrailSprite(Container<CatcherTrailSprite> target)
         {
-            var texture = (catcher.CurrentDrawableCatcher as TextureAnimation)?.CurrentFrame ?? ((Sprite)catcher.CurrentDrawableCatcher).Texture;
-
             CatcherTrailSprite sprite = trailPool.Get();
 
-            sprite.Texture = texture;
+            sprite.Texture = catcher.CurrentTexture;
             sprite.Anchor = catcher.Anchor;
             sprite.Scale = catcher.Scale;
             sprite.Blending = BlendingParameters.Additive;

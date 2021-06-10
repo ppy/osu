@@ -25,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay
         public new Func<Mod, bool> IsValidMod
         {
             get => base.IsValidMod;
-            set => base.IsValidMod = m => m.HasImplementation && !(m is ModAutoplay) && value(m);
+            set => base.IsValidMod = m => m.HasImplementation && m.UserPlayable && value(m);
         }
 
         public FreeModSelectOverlay()

@@ -30,6 +30,8 @@ namespace osu.Game.Skinning
         [CanBeNull]
         private ISkinSource fallbackSource;
 
+        private readonly NoFallbackProxy noFallbackLookupProxy;
+
         protected virtual bool AllowDrawableLookup(ISkinComponent component) => true;
 
         protected virtual bool AllowTextureLookup(string componentName) => true;
@@ -56,28 +58,29 @@ namespace osu.Game.Skinning
         protected SkinProvidingContainer()
         {
             RelativeSizeAxes = Axes.Both;
+
+            noFallbackLookupProxy = new NoFallbackProxy(this);
+
+            if (skin is ISkinSource source)
+                source.SourceChanged += TriggerSourceChanged;
         }
 
         public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
         {
             foreach (var skin in SkinSources)
             {
-                if (skin is ISkinSource source)
-                {
-                    if (source.FindProvider(lookupFunction) is ISkin found)
-                        return found;
-                }
-                else if (skin != null)
-                {
-                    if (lookupFunction(skin))
-                        return skin;
-                }
+                // a proxy must be used here to correctly pass through the "Allow" checks without implicitly falling back to the fallbackSource.
+                if (lookupFunction(noFallbackLookupProxy))
+                    return skin;
             }
 
             return fallbackSource?.FindProvider(lookupFunction);
         }
 
         public Drawable GetDrawableComponent(ISkinComponent component)
+            => GetDrawableComponent(component, true);
+
+        public Drawable GetDrawableComponent(ISkinComponent component, bool fallback)
         {
             if (AllowDrawableLookup(component))
             {
@@ -89,10 +92,16 @@ namespace osu.Game.Skinning
                 }
             }
 
+            if (!fallback)
+                return null;
+
             return fallbackSource?.GetDrawableComponent(component);
         }
 
         public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
+            => GetTexture(componentName, wrapModeS, wrapModeT, true);
+
+        public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT, bool fallback)
         {
             if (AllowTextureLookup(componentName))
             {
@@ -104,10 +113,16 @@ namespace osu.Game.Skinning
                 }
             }
 
+            if (!fallback)
+                return null;
+
             return fallbackSource?.GetTexture(componentName, wrapModeS, wrapModeT);
         }
 
         public ISample GetSample(ISampleInfo sampleInfo)
+            => GetSample(sampleInfo, true);
+
+        public ISample GetSample(ISampleInfo sampleInfo, bool fallback)
         {
             if (AllowSampleLookup(sampleInfo))
             {
@@ -119,18 +134,36 @@ namespace osu.Game.Skinning
                 }
             }
 
+            if (!fallback)
+                return null;
+
             return fallbackSource?.GetSample(sampleInfo);
         }
 
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+            => GetConfig<TLookup, TValue>(lookup, true);
+
+        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup, bool fallback)
         {
             if (lookup is GlobalSkinColours || lookup is SkinCustomColourLookup)
                 return lookupWithFallback<TLookup, TValue>(lookup, AllowColourLookup);
 
             return lookupWithFallback<TLookup, TValue>(lookup, AllowConfigurationLookup);
+            if (skin != null)
+            {
+                if (lookup is GlobalSkinColours || lookup is SkinCustomColourLookup)
+                    return lookupWithFallback<TLookup, TValue>(lookup, AllowColourLookup, fallback);
+
+                return lookupWithFallback<TLookup, TValue>(lookup, AllowConfigurationLookup, fallback);
+            }
+
+            if (!fallback)
+                return null;
+
+            return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
         }
 
-        private IBindable<TValue> lookupWithFallback<TLookup, TValue>(TLookup lookup, bool canUseSkinLookup)
+        private IBindable<TValue> lookupWithFallback<TLookup, TValue>(TLookup lookup, bool canUseSkinLookup, bool canUseFallback)
         {
             if (canUseSkinLookup)
             {
@@ -141,6 +174,9 @@ namespace osu.Game.Skinning
                         return bindable;
                 }
             }
+
+            if (!canUseFallback)
+                return null;
 
             return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
         }
@@ -169,6 +205,41 @@ namespace osu.Game.Skinning
 
             if (fallbackSource != null)
                 fallbackSource.SourceChanged -= OnSourceChanged;
+                fallbackSource.SourceChanged -= TriggerSourceChanged;
+
+            if (skin is ISkinSource source)
+                source.SourceChanged -= TriggerSourceChanged;
+        }
+
+        private class NoFallbackProxy : ISkinSource
+        {
+            private readonly SkinProvidingContainer provider;
+
+            public NoFallbackProxy(SkinProvidingContainer provider)
+            {
+                this.provider = provider;
+            }
+
+            public Drawable GetDrawableComponent(ISkinComponent component)
+                => provider.GetDrawableComponent(component, false);
+
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
+                => provider.GetTexture(componentName, wrapModeS, wrapModeT, false);
+
+            public ISample GetSample(ISampleInfo sampleInfo)
+                => provider.GetSample(sampleInfo, false);
+
+            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+                => provider.GetConfig<TLookup, TValue>(lookup, false);
+
+            public event Action SourceChanged
+            {
+                add => provider.SourceChanged += value;
+                remove => provider.SourceChanged -= value;
+            }
+
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) =>
+                provider.FindProvider(lookupFunction);
         }
     }
 }
