@@ -3,8 +3,10 @@
 
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 
@@ -36,6 +38,12 @@ namespace osu.Game.Skinning
         }
 
         [Resolved]
+        private GameHost host { get; set; }
+
+        [Resolved]
+        private AudioManager audio { get; set; }
+
+        [Resolved]
         private SkinManager skinManager { get; set; }
 
         [BackgroundDependencyLoader]
@@ -60,6 +68,8 @@ namespace osu.Game.Skinning
                 SkinSources.Add(Ruleset.CreateLegacySkinProvider(skinManager.DefaultLegacySkin, Beatmap));
 
             SkinSources.Add(Ruleset.CreateLegacySkinProvider(skinManager.DefaultSkin, Beatmap));
+
+            SkinSources.Add(new RulesetResourcesSkin(Ruleset, host, audio));
         }
     }
 }
