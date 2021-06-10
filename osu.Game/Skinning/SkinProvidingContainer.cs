@@ -25,7 +25,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// The list of skins provided by this <see cref="SkinProvidingContainer"/>.
         /// </summary>
-        protected readonly List<ISkin> SkinLayers = new List<ISkin>();
+        protected readonly List<ISkin> SkinSources = new List<ISkin>();
 
         [CanBeNull]
         private ISkinSource fallbackSource;
@@ -43,7 +43,7 @@ namespace osu.Game.Skinning
         public SkinProvidingContainer(ISkin skin)
             : this()
         {
-            SkinLayers.Add(skin);
+            SkinSources.Add(skin);
         }
 
         protected SkinProvidingContainer()
@@ -53,7 +53,7 @@ namespace osu.Game.Skinning
 
         public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
         {
-            foreach (var skin in SkinLayers)
+            foreach (var skin in SkinSources)
             {
                 if (skin is ISkinSource source)
                 {
@@ -74,7 +74,7 @@ namespace osu.Game.Skinning
         {
             if (AllowDrawableLookup(component))
             {
-                foreach (var skin in SkinLayers)
+                foreach (var skin in SkinSources)
                 {
                     Drawable sourceDrawable;
                     if ((sourceDrawable = skin?.GetDrawableComponent(component)) != null)
@@ -89,7 +89,7 @@ namespace osu.Game.Skinning
         {
             if (AllowTextureLookup(componentName))
             {
-                foreach (var skin in SkinLayers)
+                foreach (var skin in SkinSources)
                 {
                     Texture sourceTexture;
                     if ((sourceTexture = skin?.GetTexture(componentName, wrapModeS, wrapModeT)) != null)
@@ -104,7 +104,7 @@ namespace osu.Game.Skinning
         {
             if (AllowSampleLookup(sampleInfo))
             {
-                foreach (var skin in SkinLayers)
+                foreach (var skin in SkinSources)
                 {
                     ISample sourceSample;
                     if ((sourceSample = skin?.GetSample(sampleInfo)) != null)
@@ -127,7 +127,7 @@ namespace osu.Game.Skinning
         {
             if (canUseSkinLookup)
             {
-                foreach (var skin in SkinLayers)
+                foreach (var skin in SkinSources)
                 {
                     IBindable<TValue> bindable;
                     if ((bindable = skin?.GetConfig<TLookup, TValue>(lookup)) != null)
