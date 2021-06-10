@@ -164,7 +164,8 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new OsuModTarget(),
                         new OsuModDifficultyAdjust(),
-                        new OsuModClassic()
+                        new OsuModClassic(),
+                        new OsuModRandom(),
                     };
 
                 case ModType.Automation:

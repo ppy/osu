@@ -60,10 +60,17 @@ namespace osu.Game.Skinning
         {
         }
 
-        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string filename)
+        /// <summary>
+        /// Construct a new legacy skin instance.
+        /// </summary>
+        /// <param name="skin">The model for this skin.</param>
+        /// <param name="storage">A storage for looking up files within this skin using user-facing filenames.</param>
+        /// <param name="resources">Access to raw game resources.</param>
+        /// <param name="configurationFilename">The user-facing filename of the configuration file to be parsed. Can accept an .osu or skin.ini file.</param>
+        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename)
             : base(skin, resources)
         {
-            using (var stream = storage?.GetStream(filename))
+            using (var stream = storage?.GetStream(configurationFilename))
             {
                 if (stream != null)
                 {
@@ -127,7 +134,7 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookup maniaLookup:
                     if (!AllowManiaSkin)
-                        return null;
+                        break;
 
                     var result = lookupForMania<TValue>(maniaLookup);
                     if (result != null)
@@ -333,7 +340,6 @@ namespace osu.Game.Skinning
                     switch (target.Target)
                     {
                         case SkinnableTarget.MainHUDComponents:
-
                             var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
@@ -363,16 +369,26 @@ namespace osu.Game.Skinning
                                 }
                             })
                             {
-                                Children = new[]
-                                {
-                                    // TODO: these should fallback to the osu!classic skin.
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ComboCounter)) ?? new DefaultComboCounter(),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreCounter)) ?? new DefaultScoreCounter(),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter)) ?? new DefaultAccuracyCounter(),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.HealthDisplay)) ?? new DefaultHealthDisplay(),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.SongProgress)) ?? new SongProgress(),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.BarHitErrorMeter)) ?? new BarHitErrorMeter(),
-                                }
+                                Children = this.HasFont(LegacyFont.Score)
+                                    ? new Drawable[]
+                                    {
+                                        new LegacyComboCounter(),
+                                        new LegacyScoreCounter(),
+                                        new LegacyAccuracyCounter(),
+                                        new LegacyHealthDisplay(),
+                                        new SongProgress(),
+                                        new BarHitErrorMeter(),
+                                    }
+                                    : new Drawable[]
+                                    {
+                                        // TODO: these should fallback to using osu!classic skin textures, rather than doing this.
+                                        new DefaultComboCounter(),
+                                        new DefaultScoreCounter(),
+                                        new DefaultAccuracyCounter(),
+                                        new DefaultHealthDisplay(),
+                                        new SongProgress(),
+                                        new BarHitErrorMeter(),
+                                    }
                             };
 
                             return skinnableTargetWrapper;
@@ -380,30 +396,8 @@ namespace osu.Game.Skinning
 
                     return null;
 
-                case HUDSkinComponent hudComponent:
-                {
-                    if (!this.HasFont(LegacyFont.Score))
-                        return null;
-
-                    switch (hudComponent.Component)
-                    {
-                        case HUDSkinComponents.ComboCounter:
-                            return new LegacyComboCounter();
-
-                        case HUDSkinComponents.ScoreCounter:
-                            return new LegacyScoreCounter();
-
-                        case HUDSkinComponents.AccuracyCounter:
-                            return new LegacyAccuracyCounter();
-
-                        case HUDSkinComponents.HealthDisplay:
-                            return new LegacyHealthDisplay();
-                    }
-
-                    return null;
-                }
-
                 case GameplaySkinComponent<HitResult> resultComponent:
+                    // TODO: this should be inside the judgement pieces.
                     Func<Drawable> createDrawable = () => getJudgementAnimation(resultComponent.Component);
 
                     // kind of wasteful that we throw this away, but should do for now.
@@ -499,7 +493,9 @@ namespace osu.Game.Skinning
                 var sample = Samples?.Get(lookup);
 
                 if (sample != null)
+                {
                     return sample;
+                }
             }
 
             return null;
@@ -532,8 +528,7 @@ namespace osu.Game.Skinning
             yield return componentName;
 
             // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
-            string lastPiece = componentName.Split('/').Last();
-            yield return componentName.StartsWith("Gameplay/taiko/", StringComparison.Ordinal) ? "taiko-" + lastPiece : lastPiece;
+            yield return componentName.Split('/').Last();
         }
 
         protected override void Dispose(bool isDisposing)

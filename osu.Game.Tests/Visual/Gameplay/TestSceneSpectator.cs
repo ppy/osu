@@ -76,9 +76,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("screen hasn't changed", () => Stack.CurrentScreen is SoloSpectator);
 
             start();
-            sendFrames();
-
             waitForPlayer();
+
+            sendFrames();
             AddAssert("ensure frames arrived", () => replayHandler.HasFrames);
 
             AddUntilStep("wait for frame starvation", () => replayHandler.WaitingForFrame);
@@ -116,11 +116,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             start();
 
             loadSpectatingScreen();
+            waitForPlayer();
 
             AddStep("advance frame count", () => nextFrame = 300);
             sendFrames();
-
-            waitForPlayer();
 
             AddUntilStep("playing from correct point in time", () => player.ChildrenOfType<DrawableRuleset>().First().FrameStableClock.CurrentTime > 30000);
         }
@@ -210,7 +209,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private double currentFrameStableTime
             => player.ChildrenOfType<FrameStabilityContainer>().First().FrameStableClock.CurrentTime;
 
-        private void waitForPlayer() => AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
+        private void waitForPlayer() => AddUntilStep("wait for player", () => (Stack.CurrentScreen as Player)?.IsLoaded == true);
 
         private void start(int? beatmapId = null) => AddStep("start play", () => testSpectatorClient.StartPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
 

@@ -58,8 +58,13 @@ namespace osu.Game.Collections
 
             if (storage.Exists(database_name))
             {
+                List<BeatmapCollection> beatmapCollections;
+
                 using (var stream = storage.GetStream(database_name))
-                    importCollections(readCollections(stream));
+                    beatmapCollections = readCollections(stream);
+
+                // intentionally fire-and-forget async.
+                importCollections(beatmapCollections);
             }
         }
 
@@ -259,14 +264,18 @@ namespace osu.Game.Collections
                     using (var sw = new SerializationWriter(storage.GetStream(database_name, FileAccess.Write)))
                     {
                         sw.Write(database_version);
-                        sw.Write(Collections.Count);
 
-                        foreach (var c in Collections)
+                        var collectionsCopy = Collections.ToArray();
+                        sw.Write(collectionsCopy.Length);
+
+                        foreach (var c in collectionsCopy)
                         {
                             sw.Write(c.Name.Value);
-                            sw.Write(c.Beatmaps.Count);
 
-                            foreach (var b in c.Beatmaps)
+                            var beatmapsCopy = c.Beatmaps.ToArray();
+                            sw.Write(beatmapsCopy.Length);
+
+                            foreach (var b in beatmapsCopy)
                                 sw.Write(b.MD5Hash);
                         }
                     }
