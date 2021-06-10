@@ -48,9 +48,19 @@ namespace osu.Game.Skinning
 
         protected override string ImportFromStablePath => "Skins";
 
+        private readonly Skin defaultSkin;
+
+        /// <summary>
+        /// An <see cref="ISkin"/> providing the resources of the default skin.
+        /// </summary>
+        public ISkin DefaultSkin => defaultSkin;
+
         private readonly Skin defaultLegacySkin;
 
-        private readonly Skin defaultSkin;
+        /// <summary>
+        /// An <see cref="ISkin"/> providing the resources of the default legacy skin.
+        /// </summary>
+        public ISkin DefaultLegacySkin => defaultLegacySkin;
 
         public SkinManager(Storage storage, DatabaseContextFactory contextFactory, GameHost host, IResourceStore<byte[]> resources, AudioManager audio)
             : base(storage, contextFactory, new SkinStore(contextFactory, storage), host)
@@ -84,7 +94,7 @@ namespace osu.Game.Skinning
         {
             var userSkins = GetAllUserSkins();
             userSkins.Insert(0, SkinInfo.Default);
-            userSkins.Insert(1, DefaultLegacySkin.Info);
+            userSkins.Insert(1, Skinning.DefaultLegacySkin.Info);
             return userSkins;
         }
 
