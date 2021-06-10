@@ -385,14 +385,10 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                         return @"Results/rank-impact-fail-d";
 
                     case ScoreRank.C:
-                        return @"Results/rank-impact-fail";
-
                     case ScoreRank.B:
                         return @"Results/rank-impact-fail";
 
                     case ScoreRank.A:
-                        return @"Results/rank-impact-pass";
-
                     case ScoreRank.S:
                     case ScoreRank.SH:
                         return @"Results/rank-impact-pass";
