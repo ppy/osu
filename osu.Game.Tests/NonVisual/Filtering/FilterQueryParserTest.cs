@@ -33,10 +33,11 @@ namespace osu.Game.Tests.NonVisual.Filtering
          * outside of the range.
          */
 
-        [Test]
-        public void TestApplyStarQueries()
+        [TestCase("star")]
+        [TestCase("stars")]
+        public void TestApplyStarQueries(string variant)
         {
-            const string query = "stars<4 easy";
+            string query = $"{variant}<4 easy";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("easy", filterCriteria.SearchText.Trim());
