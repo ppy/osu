@@ -16,15 +16,15 @@ namespace osu.Game.Skinning
     /// </summary>
     public class RulesetSkinProvidingContainer : SkinProvidingContainer
     {
-        private readonly Ruleset ruleset;
-        private readonly IBeatmap beatmap;
+        protected readonly Ruleset Ruleset;
+        protected readonly IBeatmap Beatmap;
 
         protected override Container<Drawable> Content { get; }
 
         public RulesetSkinProvidingContainer(Ruleset ruleset, IBeatmap beatmap, [CanBeNull] ISkin beatmapSkin)
         {
-            this.ruleset = ruleset;
-            this.beatmap = beatmap;
+            Ruleset = ruleset;
+            Beatmap = beatmap;
 
             InternalChild = new BeatmapSkinProvidingContainer(beatmapSkin == null ? null : ruleset.CreateLegacySkinProvider(beatmapSkin, beatmap))
             {
@@ -41,25 +41,25 @@ namespace osu.Game.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            updateSkins();
+            UpdateSkins();
         }
 
         protected override void OnSourceChanged()
         {
-            updateSkins();
+            UpdateSkins();
             base.OnSourceChanged();
         }
 
-        private void updateSkins()
+        protected virtual void UpdateSkins()
         {
             SkinSources.Clear();
 
-            SkinSources.Add(ruleset.CreateLegacySkinProvider(skinManager.CurrentSkin.Value, beatmap));
+            SkinSources.Add(Ruleset.CreateLegacySkinProvider(skinManager.CurrentSkin.Value, Beatmap));
 
             if (skinManager.CurrentSkin.Value is LegacySkin)
-                SkinSources.Add(ruleset.CreateLegacySkinProvider(skinManager.DefaultLegacySkin, beatmap));
+                SkinSources.Add(Ruleset.CreateLegacySkinProvider(skinManager.DefaultLegacySkin, Beatmap));
 
-            SkinSources.Add(ruleset.CreateLegacySkinProvider(skinManager.DefaultSkin, beatmap));
+            SkinSources.Add(Ruleset.CreateLegacySkinProvider(skinManager.DefaultSkin, Beatmap));
         }
     }
 }
