@@ -63,6 +63,8 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
+            bool isFirstBundle = score.Replay.Frames.Count == 0;
+
             foreach (var frame in bundle.Frames)
             {
                 IConvertibleReplayFrame convertibleFrame = GameplayRuleset.CreateConvertibleReplayFrame();
@@ -74,19 +76,8 @@ namespace osu.Game.Screens.Play
                 score.Replay.Frames.Add(convertedFrame);
             }
 
-            seekToGameplay();
-        }
-
-        private bool seekedToGameplay;
-
-        private void seekToGameplay()
-        {
-            if (seekedToGameplay || score.Replay.Frames.Count == 0)
-                return;
-
-            NonFrameStableSeek(score.Replay.Frames[0].Time);
-
-            seekedToGameplay = true;
+            if (isFirstBundle && score.Replay.Frames.Count > 0)
+                NonFrameStableSeek(score.Replay.Frames[0].Time);
         }
 
         protected override Score CreateScore() => score;
