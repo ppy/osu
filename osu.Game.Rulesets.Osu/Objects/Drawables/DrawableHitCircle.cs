@@ -182,8 +182,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // todo: temporary / arbitrary, used for lifetime optimisation.
             this.Delay(800).FadeOut();
 
-            (CirclePiece.Drawable as IMainCirclePiece)?.Animate(state);
-
             switch (state)
             {
                 case ArmedState.Idle:

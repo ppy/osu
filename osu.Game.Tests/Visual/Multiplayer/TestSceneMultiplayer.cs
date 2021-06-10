@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, Beatmap.Default));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
         }
 
         [SetUp]
@@ -195,7 +195,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
         {
-            [Cached(typeof(StatefulMultiplayerClient))]
+            [Cached(typeof(MultiplayerClient))]
             public readonly TestMultiplayerClient Client;
 
             public TestMultiplayer()

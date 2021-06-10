@@ -5,14 +5,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -20,8 +18,10 @@ using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyMainCirclePiece : CompositeDrawable, IMainCirclePiece
+    public class LegacyMainCirclePiece : CompositeDrawable
     {
+        public override bool RemoveCompletedTransforms => false;
+
         private readonly string priorityLookup;
         private readonly bool hasNumber;
 
@@ -33,9 +33,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
         }
 
-        private Container<Sprite> circleSprites;
-        private Sprite hitCircleSprite;
-        private Sprite hitCircleOverlay;
+        private Container circleSprites;
+        private Drawable hitCircleSprite;
+        private Drawable hitCircleOverlay;
 
         private SkinnableSpriteText hitCircleText;
 
@@ -72,20 +72,20 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             InternalChildren = new Drawable[]
             {
-                circleSprites = new Container<Sprite>
+                circleSprites = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        hitCircleSprite = new Sprite
+                        hitCircleSprite = new KiaiFlashingSprite
                         {
                             Texture = baseTexture,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
-                        hitCircleOverlay = new Sprite
+                        hitCircleOverlay = new KiaiFlashingSprite
                         {
                             Texture = overlayTexture,
                             Anchor = Anchor.Centre,
@@ -139,13 +139,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             accentColour.BindValueChanged(colour => hitCircleSprite.Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue), true);
             if (hasNumber)
                 indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
+
+            drawableObject.ApplyCustomUpdateState += updateStateTransforms;
+            updateStateTransforms(drawableObject, drawableObject.State.Value);
         }
 
-        public void Animate(ArmedState state)
+        private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
             const double legacy_fade_duration = 240;
 
-            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime, true))
+            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
             {
                 switch (state)
                 {
@@ -171,6 +174,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         break;
                 }
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableObject != null)
+                drawableObject.ApplyCustomUpdateState -= updateStateTransforms;
         }
     }
 }

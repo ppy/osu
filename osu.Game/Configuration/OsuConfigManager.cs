@@ -104,7 +104,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.KeyOverlay, false);
             SetDefault(OsuSetting.PositionalHitSounds, true);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
-            SetDefault(OsuSetting.ScoreMeter, ScoreMeterType.HitErrorBoth);
 
             SetDefault(OsuSetting.FloatingComments, false);
 
@@ -213,7 +212,6 @@ namespace osu.Game.Configuration
         KeyOverlay,
         PositionalHitSounds,
         AlwaysPlayFirstComboBreak,
-        ScoreMeter,
         FloatingComments,
         HUDVisibilityMode,
         ShowProgressGraph,

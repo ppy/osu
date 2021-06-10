@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void loadContent(bool automated = true, Func<SkinProvidingContainer> skinProvider = null)
         {
-            SetContents(() =>
+            SetContents(_ =>
             {
                 var inputManager = automated ? (InputManager)new MovingCursorInputManager() : new OsuInputManager(new OsuRuleset().RulesetInfo);
                 var skinContainer = skinProvider?.Invoke() ?? new SkinProvidingContainer(null);
@@ -113,6 +113,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             public Drawable GetDrawableComponent(ISkinComponent component) => null;
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
             public ISample GetSample(ISampleInfo sampleInfo) => null;
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
             {

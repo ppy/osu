@@ -9,15 +9,19 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Toolbar;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Tests.Beatmaps.IO;
+using osu.Game.Tests.Visual.Multiplayer;
 using osuTK;
 using osuTK.Input;
 
@@ -34,9 +38,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestExitSongSelectWithEscape()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
             pushEscape();
@@ -51,9 +55,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestOpenModSelectOverlayUsingAction()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
             AddStep("Show mods overlay", () => InputManager.Key(Key.F1));
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
         }
@@ -63,7 +67,7 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             Player player = null;
 
-            PushAndConfirm(() => new TestSongSelect());
+            PushAndConfirm(() => new TestPlaySongSelect());
 
             AddStep("import beatmap", () => ImportBeatmapTest.LoadQuickOszIntoOsu(Game).Wait());
 
@@ -89,17 +93,18 @@ namespace osu.Game.Tests.Visual.Navigation
 
             WorkingBeatmap beatmap() => Game.Beatmap.Value;
 
-            PushAndConfirm(() => new TestSongSelect());
+            PushAndConfirm(() => new TestPlaySongSelect());
 
             AddStep("import beatmap", () => ImportBeatmapTest.LoadQuickOszIntoOsu(Game).Wait());
 
             AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
 
-            AddStep("set autoplay", () => Game.SelectedMods.Value = new[] { new OsuModAutoplay() });
+            AddStep("set mods", () => Game.SelectedMods.Value = new Mod[] { new OsuModNoFail(), new OsuModDoubleTime { SpeedChange = { Value = 2 } } });
 
             AddStep("press enter", () => InputManager.Key(Key.Enter));
             AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
-            AddStep("seek to end", () => player.ChildrenOfType<GameplayClockContainer>().First().Seek(beatmap().Track.Length));
+            AddUntilStep("wait for track playing", () => beatmap().Track.IsRunning);
+            AddStep("seek to near end", () => player.ChildrenOfType<GameplayClockContainer>().First().Seek(beatmap().Beatmap.HitObjects[^1].StartTime - 1000));
             AddUntilStep("wait for pass", () => (results = Game.ScreenStack.CurrentScreen as ResultsScreen) != null && results.IsLoaded);
             AddStep("attempt to retry", () => results.ChildrenOfType<HotkeyRetryOverlay>().First().Action());
             AddUntilStep("wait for player", () => Game.ScreenStack.CurrentScreen != player && Game.ScreenStack.CurrentScreen is Player);
@@ -113,7 +118,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             WorkingBeatmap beatmap() => Game.Beatmap.Value;
 
-            PushAndConfirm(() => new TestSongSelect());
+            PushAndConfirm(() => new TestPlaySongSelect());
 
             AddStep("import beatmap", () => ImportBeatmapTest.LoadOszIntoOsu(Game, virtualTrack: true).Wait());
 
@@ -139,9 +144,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestMenuMakesMusic()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
 
             AddUntilStep("wait for no track", () => Game.MusicController.CurrentTrack.IsDummyDevice);
 
@@ -151,11 +156,19 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestPushSongSelectAndPressBackButtonImmediately()
+        {
+            AddStep("push song select", () => Game.ScreenStack.Push(new TestPlaySongSelect()));
+            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
+            AddWaitStep("wait two frames", 2);
+        }
+
+        [Test]
         public void TestExitSongSelectWithClick()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
             AddStep("Move mouse to backButton", () => InputManager.MoveMouseTo(backButtonPosition));
@@ -213,9 +226,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestModSelectInput()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
 
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
 
@@ -234,9 +247,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestBeatmapOptionsInput()
         {
-            TestSongSelect songSelect = null;
+            TestPlaySongSelect songSelect = null;
 
-            PushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
 
             AddStep("Show options overlay", () => songSelect.BeatmapOptionsOverlay.Show());
 
@@ -296,6 +309,18 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("Toolbar is hidden", () => Game.Toolbar.State.Value == Visibility.Hidden);
         }
 
+        [Test]
+        public void TestPushMatchSubScreenAndPressBackButtonImmediately()
+        {
+            TestMultiplayer multiplayer = null;
+
+            PushAndConfirm(() => multiplayer = new TestMultiplayer());
+
+            AddStep("open room", () => multiplayer.OpenNewRoom());
+            AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
+            AddWaitStep("wait two frames", 2);
+        }
+
         private void pushEscape() =>
             AddStep("Press escape", () => InputManager.Key(Key.Escape));
 
@@ -312,11 +337,26 @@ namespace osu.Game.Tests.Visual.Navigation
             ConfirmAtMainMenu();
         }
 
-        private class TestSongSelect : PlaySongSelect
+        public class TestPlaySongSelect : PlaySongSelect
         {
             public ModSelectOverlay ModSelectOverlay => ModSelect;
 
             public BeatmapOptionsOverlay BeatmapOptionsOverlay => BeatmapOptions;
+
+            protected override bool DisplayStableImportPrompt => false;
+        }
+
+        private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
+        {
+            [Cached(typeof(MultiplayerClient))]
+            public readonly TestMultiplayerClient Client;
+
+            public TestMultiplayer()
+            {
+                Client = new TestMultiplayerClient((TestMultiplayerRoomManager)RoomManager);
+            }
+
+            protected override RoomManager CreateRoomManager() => new TestMultiplayerRoomManager();
         }
     }
 }

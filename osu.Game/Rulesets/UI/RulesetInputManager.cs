@@ -13,6 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges.Events;
 using osu.Framework.Input.States;
 using osu.Game.Configuration;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
@@ -29,12 +30,14 @@ namespace osu.Game.Rulesets.UI
         {
             set
             {
-                if (recorder != null)
+                if (value != null && recorder != null)
                     throw new InvalidOperationException("Cannot attach more than one recorder");
 
+                recorder?.Expire();
                 recorder = value;
 
-                KeyBindingContainer.Add(recorder);
+                if (recorder != null)
+                    KeyBindingContainer.Add(recorder);
             }
         }
 
@@ -168,6 +171,13 @@ namespace osu.Game.Rulesets.UI
             public RulesetKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 : base(ruleset, variant, unique)
             {
+            }
+
+            protected override void ReloadMappings()
+            {
+                base.ReloadMappings();
+
+                KeyBindings = KeyBindings.Where(b => KeyBindingStore.CheckValidForGameplay(b.KeyCombination)).ToList();
             }
         }
     }

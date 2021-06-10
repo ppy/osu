@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         Bindable<bool> HyperDash { get; }
 
+        Bindable<int> IndexInBeatmap { get; }
+
         Vector2 DisplaySize { get; }
 
         float DisplayRotation { get; }

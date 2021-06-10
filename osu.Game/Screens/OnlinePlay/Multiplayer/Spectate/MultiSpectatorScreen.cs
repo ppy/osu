@@ -22,16 +22,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         // Isolates beatmap/ruleset to this screen.
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        // We are managing our own adjustments. For now, this happens inside the Player instances themselves.
+        public override bool AllowRateAdjustments => false;
+
         /// <summary>
         /// Whether all spectating players have finished loading.
         /// </summary>
         public bool AllPlayersLoaded => instances.All(p => p?.PlayerLoaded == true);
 
         [Resolved]
-        private SpectatorStreamingClient spectatorClient { get; set; }
+        private SpectatorClient spectatorClient { get; set; }
 
         [Resolved]
-        private StatefulMultiplayerClient multiplayerClient { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; }
 
         private readonly PlayerArea[] instances;
         private MasterGameplayClockContainer masterClockContainer;
