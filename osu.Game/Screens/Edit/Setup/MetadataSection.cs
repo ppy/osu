@@ -24,39 +24,23 @@ namespace osu.Game.Screens.Edit.Setup
         {
             Children = new Drawable[]
             {
-                artistTextBox = new LabelledTextBox
-                {
-                    Label = "Artist",
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Current = { Value = Beatmap.Metadata.Artist },
-                    TabbableContentContainer = this
-                },
-                titleTextBox = new LabelledTextBox
-                {
-                    Label = "Title",
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Current = { Value = Beatmap.Metadata.Title },
-                    TabbableContentContainer = this
-                },
-                creatorTextBox = new LabelledTextBox
-                {
-                    Label = "Creator",
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Current = { Value = Beatmap.Metadata.AuthorString },
-                    TabbableContentContainer = this
-                },
-                difficultyTextBox = new LabelledTextBox
-                {
-                    Label = "Difficulty Name",
-                    FixedLabelWidth = LABEL_WIDTH,
-                    Current = { Value = Beatmap.BeatmapInfo.Version },
-                    TabbableContentContainer = this
-                },
+                artistTextBox = createTextBox("Artist", Beatmap.Metadata.Artist),
+                titleTextBox = createTextBox("Title", Beatmap.Metadata.Title),
+                creatorTextBox = createTextBox("Creator", Beatmap.Metadata.AuthorString),
+                difficultyTextBox = createTextBox("Difficulty Name", Beatmap.BeatmapInfo.Version)
             };
 
             foreach (var item in Children.OfType<LabelledTextBox>())
                 item.OnCommit += onCommit;
         }
+
+        private LabelledTextBox createTextBox(string label, string initialValue) => new LabelledTextBox
+        {
+            Label = label,
+            FixedLabelWidth = LABEL_WIDTH,
+            Current = { Value = initialValue },
+            TabbableContentContainer = this
+        };
 
         protected override void LoadComplete()
         {
