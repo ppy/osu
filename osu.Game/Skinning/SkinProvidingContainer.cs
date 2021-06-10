@@ -40,12 +40,19 @@ namespace osu.Game.Skinning
 
         protected virtual bool AllowColourLookup => true;
 
+        /// <summary>
+        /// Constructs a new <see cref="SkinProvidingContainer"/> with a single skin added to the protected <see cref="SkinSources"/> list.
+        /// </summary>
         public SkinProvidingContainer(ISkin skin)
             : this()
         {
             SkinSources.Add(skin);
         }
 
+        /// <summary>
+        /// Constructs a new <see cref="SkinProvidingContainer"/> with no sources.
+        /// Up to the implementation for adding to the <see cref="SkinSources"/> list.
+        /// </summary>
         protected SkinProvidingContainer()
         {
             RelativeSizeAxes = Axes.Both;
