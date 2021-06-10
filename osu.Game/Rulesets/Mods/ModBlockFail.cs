@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Mods
 
         public bool RestartOnFail => false;
 
+        public bool DisplayResultsOnFail => false;
+
         public void ReadFromConfig(OsuConfigManager config)
         {
             showHealthBar = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail);

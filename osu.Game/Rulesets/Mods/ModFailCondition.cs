@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual bool RestartOnFail => true;
 
+        public virtual bool DisplayResultsOnFail => false;
+
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
             healthProcessor.FailConditions += FailCondition;
