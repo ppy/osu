@@ -234,7 +234,7 @@ namespace osu.Game.Screens.Play
 
             dependencies.CacheAs(GameplayBeatmap);
 
-            var rulesetSkinProvider = new RulesetSkinProvidingContainer(GameplayRuleset, playableBeatmap, Beatmap.Value.Skin);
+            var rulesetSkinProvider = CreateRulesetSkinProvider(GameplayRuleset, playableBeatmap, Beatmap.Value.Skin);
 
             // load the skinning hierarchy first.
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
@@ -314,6 +314,8 @@ namespace osu.Game.Screens.Play
         }
 
         protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
+
+        protected virtual RulesetSkinProvidingContainer CreateRulesetSkinProvider(Ruleset ruleset, IBeatmap beatmap, ISkin beatmapSkin) => new RulesetSkinProvidingContainer(ruleset, beatmap, beatmapSkin);
 
         private Drawable createUnderlayComponents() =>
             DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both };
