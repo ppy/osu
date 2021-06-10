@@ -52,8 +52,8 @@ namespace osu.Game.Skinning
 
         private void updateSkins()
         {
-            SkinLayers.Clear();
-            SkinLayers.AddRange(skinManager.CurrentSkinLayers.Select(s => ruleset.CreateLegacySkinProvider(s, beatmap)));
+            SkinSources.Clear();
+            SkinSources.AddRange(skinManager.CurrentSkinLayers.Select(s => ruleset.CreateLegacySkinProvider(s, beatmap)));
         }
     }
 }
