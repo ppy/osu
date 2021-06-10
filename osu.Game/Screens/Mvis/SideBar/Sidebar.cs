@@ -9,7 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Screens.Mvis.SideBar.Header;
+using osu.Game.Screens.Mvis.SideBar.Tabs;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.SideBar
@@ -24,9 +24,9 @@ namespace osu.Game.Screens.Mvis.SideBar
         private MvisScreen mvisScreen { get; set; }
 
         public readonly List<ISidebarContent> Components = new List<ISidebarContent>();
-        public TabHeader Header;
+        public TabControl Header;
         private const float duration = 400;
-        private HeaderTabItem prevTab;
+        private TabControlItem prevTab;
 
         public BindableBool IsVisible = new BindableBool();
         public Bindable<Drawable> CurrentDisplay = new Bindable<Drawable>();
@@ -59,12 +59,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                },
-                Header = new TabHeader
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight
-                },
+                }
             };
         }
 
@@ -106,7 +101,9 @@ namespace osu.Game.Screens.Mvis.SideBar
         {
             contentContainer.Padding = new MarginPadding
             {
-                Right = Header.Width + Header.Margin.Right + Header.Margin.Left + 5,
+                Right = Header.GetRightUnavaliableSpace(),
+                Left = Header.GetLeftUnavaliableSpace(),
+                Top = Header.GetTopUnavaliableSpace(),
                 Bottom = mvisScreen?.BottombarHeight ?? 0
             };
 
@@ -160,7 +157,7 @@ namespace osu.Game.Screens.Mvis.SideBar
             {
                 d.Alpha = 0;
                 Components.Add(s);
-                Header.Tabs.Add(new HeaderTabItem(s)
+                Header.Tabs.Add(new TabControlItem(s)
                 {
                     Action = () => ShowComponent(d, true)
                 });

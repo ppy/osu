@@ -178,8 +178,11 @@ namespace Mvis.Plugin.Yasp
         {
             if (Disabled.Value) return;
 
-            currentWorkingBeatmap = working;
-            refresh();
+            if (currentWorkingBeatmap != working)
+            {
+                currentWorkingBeatmap = working;
+                refresh();
+            }
         }
     }
 }

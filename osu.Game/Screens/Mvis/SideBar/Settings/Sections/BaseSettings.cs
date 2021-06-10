@@ -7,6 +7,7 @@ using osu.Game.Configuration;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osu.Game.Screens.Mvis.SideBar.Settings.Items;
+using osu.Game.Screens.Mvis.SideBar.Tabs;
 
 namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
 {
@@ -77,6 +78,12 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Sections
                         Default = mvisScreen.MusicControllerWrapper
                     },
                     Values = plugins
+                },
+                new SettingsEnumPiece<TabControlPosition>
+                {
+                    Icon = FontAwesome.Solid.Ruler,
+                    Description = "TabControl位置",
+                    Bindable = config.GetBindable<TabControlPosition>(MSetting.MvisTabControlPosition)
                 },
                 new SettingsSliderPiece<float>
                 {

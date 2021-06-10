@@ -31,8 +31,8 @@ using osu.Game.Screens.Mvis.Misc;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osu.Game.Screens.Mvis.SideBar;
-using osu.Game.Screens.Mvis.SideBar.Header;
 using osu.Game.Screens.Mvis.SideBar.Settings;
+using osu.Game.Screens.Mvis.SideBar.Tabs;
 using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
@@ -191,7 +191,7 @@ namespace osu.Game.Screens.Mvis
 
         private readonly Sidebar sidebar = new Sidebar();
 
-        private readonly TabHeader tabHeader = new TabHeader();
+        private readonly TabControl tabHeader = new TabControl();
 
         #endregion
 

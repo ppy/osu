@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
+using osu.Game.Screens.Mvis.SideBar.Tabs;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
@@ -61,6 +62,11 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     TransferValueOnCommit = false
                 },
                 preview = new ColourPreviewer(),
+                new SettingsEnumDropdown<TabControlPosition>
+                {
+                    LabelText = "TabControl位置",
+                    Current = config.GetBindable<TabControlPosition>(MSetting.MvisTabControlPosition)
+                },
                 new SettingsCheckbox
                 {
                     LabelText = "置顶Proxy",

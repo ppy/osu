@@ -15,6 +15,8 @@ namespace Mvis.Plugin.Yasp.UI
         {
         }
 
+        public override int Columns => 2;
+
         [BackgroundDependencyLoader]
         private void load()
         {

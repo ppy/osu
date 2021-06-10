@@ -1,4 +1,5 @@
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -6,6 +7,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.SideBar.Settings.Sections;
+using osu.Game.Screens.Mvis.SideBar.Tabs;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.SideBar.Settings
@@ -20,6 +22,8 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings
             Spacing = new Vector2(5),
             Direction = FillDirection.Vertical
         };
+
+        private Bindable<TabControlPosition> currentTabPosition;
 
         public string Title => "播放器设置";
         public IconUsage Icon { get; } = FontAwesome.Solid.Cog;
@@ -40,6 +44,27 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings
 
                 if (pluginSidebarSection != null)
                     AddSection(pluginSidebarSection);
+            }
+
+            currentTabPosition = config.GetBindable<TabControlPosition>(MSetting.MvisTabControlPosition);
+            currentTabPosition.BindValueChanged(onTabPositionChanged, true);
+        }
+
+        private void onTabPositionChanged(ValueChangedEvent<TabControlPosition> v)
+        {
+            switch (v.NewValue)
+            {
+                case TabControlPosition.Left:
+                    fillFlow.Anchor = fillFlow.Origin = Anchor.TopLeft;
+                    break;
+
+                case TabControlPosition.Right:
+                    fillFlow.Anchor = fillFlow.Origin = Anchor.TopRight;
+                    break;
+
+                case TabControlPosition.Top:
+                    fillFlow.Anchor = fillFlow.Origin = Anchor.TopCentre;
+                    break;
             }
         }
 

@@ -90,7 +90,8 @@ namespace Mvis.Plugin.StoryboardSupport
 
         private void onScreenResuming()
         {
-            MvisScreen.HideScreenBackground.Value = targetBeatmap.Storyboard.ReplacesBackground;
+            if (!Disabled.Value && ContentLoaded)
+                MvisScreen.HideScreenBackground.Value = targetBeatmap.Storyboard.ReplacesBackground;
         }
 
         private void onScreenSuspending()

@@ -1,5 +1,4 @@
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,7 +13,7 @@ namespace osu.Game.Screens.Mvis.SideBar
 {
     public class SongSelectPage : CompositeDrawable, ISidebarContent
     {
-        public string Title => "歌词选择";
+        public string Title => "歌曲选择";
         public IconUsage Icon => FontAwesome.Solid.MousePointer;
 
         public SongSelectPage()
@@ -27,7 +26,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 Direction = FillDirection.Vertical,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Colour = Color4.White.Opacity(0.8f),
+                Colour = Color4.White.Opacity(0.9f),
                 Margin = new MarginPadding(40),
                 Children = new Drawable[]
                 {
@@ -40,7 +39,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                     },
                     new OsuSpriteText
                     {
-                        Text = "点任意处继续",
+                        Text = "点任意处前往歌曲选择",
                         Font = OsuFont.GetFont(size: 45, weight: FontWeight.Bold),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

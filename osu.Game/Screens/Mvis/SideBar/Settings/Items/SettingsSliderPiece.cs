@@ -35,5 +35,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
         {
             Bindable.Value = Bindable.Default;
         }
+
+        protected override void OnMiddleClick() => OnLeftClick();
     }
 }
