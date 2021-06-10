@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -20,11 +22,12 @@ namespace osu.Game.Skinning
         /// <summary>
         /// The <see cref="ISkin"/> which is being transformed.
         /// </summary>
+        [NotNull]
         protected ISkin Skin { get; }
 
-        protected LegacySkinTransformer(ISkin skin)
+        protected LegacySkinTransformer([NotNull] ISkin skin)
         {
-            Skin = skin;
+            Skin = skin ?? throw new ArgumentNullException(nameof(skin));
         }
 
         public abstract Drawable GetDrawableComponent(ISkinComponent component);
