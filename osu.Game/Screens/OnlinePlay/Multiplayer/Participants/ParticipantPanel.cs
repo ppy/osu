@@ -139,7 +139,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                 {
                                     Scale = new Vector2(0.5f),
                                     ExpansionMode = ExpansionMode.AlwaysContracted,
-                                    DisplayUnrankedText = false,
                                 }
                             },
                             userStateDisplay = new StateDisplay
