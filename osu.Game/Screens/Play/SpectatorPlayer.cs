@@ -48,7 +48,6 @@ namespace osu.Game.Screens.Play
             base.StartGameplay();
 
             spectatorClient.OnNewFrames += userSentFrames;
-            seekToGameplay();
         }
 
         private void userSentFrames(int userId, FrameDataBundle bundle)
