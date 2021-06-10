@@ -35,18 +35,17 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, Bindable<CatcherAnimationState> currentState)
         {
-            CurrentState.BindTo(currentState);
-
             foreach (var state in Enum.GetValues(typeof(CatcherAnimationState)).Cast<CatcherAnimationState>())
             {
-                var d = getDrawableFor(state);
-                d.Anchor = Anchor.TopCentre;
-                d.Origin = Anchor.TopCentre;
-                d.RelativeSizeAxes = Axes.Both;
-                d.Size = Vector2.One;
-                d.FillMode = FillMode.Fit;
-                d.Alpha = 0;
-                AddInternal(drawables[state] = d);
+                AddInternal(drawables[state] = getDrawableFor(state).With(d =>
+                {
+                    d.Anchor = Anchor.TopCentre;
+                    d.Origin = Anchor.TopCentre;
+                    d.RelativeSizeAxes = Axes.Both;
+                    d.Size = Vector2.One;
+                    d.FillMode = FillMode.Fit;
+                    d.Alpha = 0;
+                }));
             }
 
             currentDrawable = drawables[CatcherAnimationState.Idle];
@@ -54,6 +53,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             Drawable getDrawableFor(CatcherAnimationState state) =>
                 skin.GetAnimation(@$"fruit-catcher-{state.ToString().ToLowerInvariant()}", true, true, true) ??
                 skin.GetAnimation(@"fruit-catcher-idle", true, true, true);
+
+            CurrentState.BindTo(currentState);
         }
 
         protected override void LoadComplete()
