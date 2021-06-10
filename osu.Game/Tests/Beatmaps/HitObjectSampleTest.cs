@@ -47,14 +47,10 @@ namespace osu.Game.Tests.Beatmaps
 
         private readonly TestResourceStore userSkinResourceStore = new TestResourceStore();
         private readonly TestResourceStore beatmapSkinResourceStore = new TestResourceStore();
-        private SkinSourceDependencyContainer dependencies;
         private IBeatmap currentTestBeatmap;
 
         protected sealed override bool HasCustomSteps => true;
         protected override bool Autoplay => true;
-
-        protected sealed override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-            => new DependencyContainer(dependencies = new SkinSourceDependencyContainer(base.CreateChildDependencies(parent)));
 
         protected sealed override IBeatmap CreateBeatmap(RulesetInfo ruleset) => currentTestBeatmap;
 
@@ -62,6 +58,8 @@ namespace osu.Game.Tests.Beatmaps
             => new TestWorkingBeatmap(beatmapInfo, beatmapSkinResourceStore, beatmap, storyboard, Clock, this);
 
         protected override TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false);
+
+        protected override ISkin GetPlayerSkin() => Skin;
 
         protected void CreateTestWithBeatmap(string filename)
         {
@@ -109,8 +107,7 @@ namespace osu.Game.Tests.Beatmaps
                     }
                 };
 
-                // Need to refresh the cached skin source to refresh the skin resource store.
-                dependencies.SkinSource = new SkinProvidingContainer(Skin = new LegacySkin(userSkinInfo, this));
+                Skin = new LegacySkin(userSkinInfo, this);
             });
         }
 
@@ -131,39 +128,6 @@ namespace osu.Game.Tests.Beatmaps
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
 
         #endregion
-
-        private class SkinSourceDependencyContainer : IReadOnlyDependencyContainer
-        {
-            public ISkinSource SkinSource;
-
-            private readonly IReadOnlyDependencyContainer fallback;
-
-            public SkinSourceDependencyContainer(IReadOnlyDependencyContainer fallback)
-            {
-                this.fallback = fallback;
-            }
-
-            public object Get(Type type)
-            {
-                if (type == typeof(ISkinSource))
-                    return SkinSource;
-
-                return fallback.Get(type);
-            }
-
-            public object Get(Type type, CacheInfo info)
-            {
-                if (type == typeof(ISkinSource))
-                    return SkinSource;
-
-                return fallback.Get(type, info);
-            }
-
-            public void Inject<T>(T instance) where T : class
-            {
-                // Never used directly
-            }
-        }
 
         private class TestResourceStore : IResourceStore<byte[]>
         {
