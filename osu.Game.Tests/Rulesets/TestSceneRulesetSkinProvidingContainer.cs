@@ -19,7 +19,6 @@ namespace osu.Game.Tests.Rulesets
 {
     public class TestSceneRulesetSkinProvidingContainer : OsuTestScene
     {
-        private RulesetSkinProvidingContainer rulesetSkinProvider;
         private SkinRequester requester;
 
         protected override Ruleset CreateRuleset() => new TestSceneRulesetDependencies.TestRuleset();
@@ -27,7 +26,7 @@ namespace osu.Game.Tests.Rulesets
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            Child = rulesetSkinProvider = new RulesetSkinProvidingContainer(Ruleset.Value.CreateInstance(), Beatmap.Value.Beatmap, Beatmap.Value.Skin)
+            Child = new RulesetSkinProvidingContainer(Ruleset.Value.CreateInstance(), Beatmap.Value.Beatmap, Beatmap.Value.Skin)
                 .WithChild(requester = new SkinRequester());
         });
 
