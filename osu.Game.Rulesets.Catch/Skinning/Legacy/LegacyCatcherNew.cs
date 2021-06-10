@@ -19,7 +19,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
     public class LegacyCatcherNew : CompositeDrawable, ICatcherSprite
     {
-        public Bindable<CatcherAnimationState> CurrentState { get; } = new Bindable<CatcherAnimationState>();
+        [Resolved]
+        private Bindable<CatcherAnimationState> currentState { get; set; }
 
         public Texture CurrentTexture => (currentDrawable as TextureAnimation)?.CurrentFrame ?? (currentDrawable as Sprite)?.Texture;
 
@@ -33,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin, Bindable<CatcherAnimationState> currentState)
+        private void load(ISkinSource skin)
         {
             foreach (var state in Enum.GetValues(typeof(CatcherAnimationState)).Cast<CatcherAnimationState>())
             {
@@ -53,15 +54,13 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             Drawable getDrawableFor(CatcherAnimationState state) =>
                 skin.GetAnimation(@$"fruit-catcher-{state.ToString().ToLowerInvariant()}", true, true, true) ??
                 skin.GetAnimation(@"fruit-catcher-idle", true, true, true);
-
-            CurrentState.BindTo(currentState);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            CurrentState.BindValueChanged(state =>
+            currentState.BindValueChanged(state =>
             {
                 currentDrawable.Alpha = 0;
                 currentDrawable = drawables[state.NewValue];
