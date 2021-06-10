@@ -100,7 +100,7 @@ namespace Mvis.Plugin.RulesetPanel.UI
                 },
                 new SettingsSlider<double>
                 {
-                    LabelText = "宽度",
+                    LabelText = "频谱宽度",
                     Current = config.GetBindable<double>(RulesetPanelSetting.BarWidth),
                     KeyboardStep = 0.1f
                 },

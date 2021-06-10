@@ -43,7 +43,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             sortPiece(drawableLyric);
         }
 
-        public override Drawable[] Entries => new Drawable[]
+        public override IconButton[] Entries => new[]
         {
             new IconButton
             {

@@ -27,18 +27,23 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         protected readonly OsuScrollContainer LyricScroll;
         protected readonly FillFlowContainer<DrawableLyric> LyricFlow;
 
+        //private readonly FillFlowContainer placeholder;
+
         protected LyricScreen()
         {
             RelativeSizeAxes = Axes.Both;
-            InternalChild = LyricScroll = new OsuScrollContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Child = LyricFlow = new FillFlowContainer<DrawableLyric>
+                LyricScroll = new OsuScrollContainer
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(5),
-                    Padding = new MarginPadding(5)
+                    RelativeSizeAxes = Axes.Both,
+                    Child = LyricFlow = new FillFlowContainer<DrawableLyric>
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(5),
+                        Padding = new MarginPadding(5)
+                    }
                 }
             };
         }

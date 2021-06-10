@@ -1,10 +1,10 @@
-using osu.Framework.Graphics;
 using osu.Framework.Screens;
+using osu.Game.Graphics.UserInterface;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 {
     public abstract class SidebarScreen : Screen
     {
-        public virtual Drawable[] Entries => new Drawable[] { };
+        public virtual IconButton[] Entries => new IconButton[] { };
     }
 }

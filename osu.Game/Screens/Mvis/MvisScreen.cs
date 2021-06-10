@@ -24,7 +24,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Settings;
-using osu.Game.Overlays.Settings.Sections.Mf;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Mvis.BottomBar;
 using osu.Game.Screens.Mvis.BottomBar.Buttons;
@@ -32,6 +31,8 @@ using osu.Game.Screens.Mvis.Misc;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osu.Game.Screens.Mvis.SideBar;
+using osu.Game.Screens.Mvis.SideBar.Settings;
+using osu.Game.Screens.Mvis.SideBar.Tabs;
 using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
@@ -53,6 +54,7 @@ namespace osu.Game.Screens.Mvis
 
         public override bool CursorVisible => !OverlaysHidden
                                               || sidebar.State.Value == Visibility.Visible
+                                              || tabHeader.IsVisible.Value //TabHeader可见
                                               || IsHovered == false; //隐藏界面或侧边栏可见，显示光标
 
         public override bool AllowRateAdjustments => true;
@@ -189,6 +191,8 @@ namespace osu.Game.Screens.Mvis
 
         private readonly Sidebar sidebar = new Sidebar();
 
+        private readonly TabControl tabHeader = new TabControl();
+
         #endregion
 
         #region 设置
@@ -267,8 +271,9 @@ namespace osu.Game.Screens.Mvis
         public Bindable<bool> HideScreenBackground = new Bindable<bool>();
 
         private IProvideAudioControlPlugin audioControlProvider;
-        private readonly OsuMusicControllerWrapper musicControllerWrapper = new OsuMusicControllerWrapper();
+        public readonly OsuMusicControllerWrapper MusicControllerWrapper = new OsuMusicControllerWrapper();
         private SettingsButton songSelectButton;
+        private PlayerSettings settingsScroll;
 
         public float BottombarHeight => (bottomBar?.Height - bottomBar?.Y ?? 0) + 10 + 5;
 
@@ -292,42 +297,19 @@ namespace osu.Game.Screens.Mvis
             dependencies.Cache(this);
 
             //向侧边栏添加内容
-            SidebarSettingsScrollContainer settingsScroll;
             SidebarPluginsPage pluginsPage;
+            sidebar.Header = tabHeader;
+
             sidebar.AddRange(new Drawable[]
             {
-                settingsScroll = new SidebarSettingsScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Y,
-                        RelativeSizeAxes = Axes.X,
-                        Spacing = new Vector2(20),
-                        Padding = new MarginPadding { Top = 10, Left = 5, Right = 5 },
-                        Margin = new MarginPadding { Bottom = 10 },
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
-                        {
-                            new MfMvisSection
-                            {
-                                Margin = new MarginPadding { Top = -15 },
-                                Padding = new MarginPadding(0)
-                            },
-                            new MfMvisPluginSection
-                            {
-                                Padding = new MarginPadding(0)
-                            },
-                            songSelectButton = new SettingsButton
-                            {
-                                Text = "歌曲选择",
-                                Action = () => this.Push(new MvisSongSelect())
-                            }
-                        }
-                    }
-                },
+                settingsScroll = new PlayerSettings(),
                 pluginsPage = new SidebarPluginsPage()
             });
+            songSelectButton = new SettingsButton
+            {
+                Text = "歌曲选择",
+                Action = () => this.Push(new MvisSongSelect())
+            };
 
             //配置绑定/设置
             isIdle.BindTo(idleTracker.IsIdle);
@@ -342,7 +324,7 @@ namespace osu.Game.Screens.Mvis
             InternalChildren = new Drawable[]
             {
                 colourProvider,
-                musicControllerWrapper,
+                MusicControllerWrapper,
                 nightcoreBeatContainer = new NightcoreBeatContainer
                 {
                     Alpha = 0
@@ -396,6 +378,7 @@ namespace osu.Game.Screens.Mvis
                             OverrideChildAnchor = true
                         },
                         sidebar,
+                        tabHeader,
                         loadingSpinner = new LoadingSpinner(true, true)
                         {
                             Anchor = Anchor.BottomCentre,
@@ -510,7 +493,7 @@ namespace osu.Game.Screens.Mvis
             });
 
             //todo: 找出为啥audioControlProvider会在被赋值前访问
-            audioControlProvider = musicControllerWrapper;
+            audioControlProvider = MusicControllerWrapper;
         }
 
         protected override void LoadComplete()
@@ -632,6 +615,12 @@ namespace osu.Game.Screens.Mvis
                 }
             }
 
+            //添加选歌入口
+            sidebar.Add(new SongSelectPage
+            {
+                Action = () => this.Push(new MvisSongSelect())
+            });
+
             //把lockButton放在中间
             bottomBar.CentreBotton(lockButton);
 
@@ -658,10 +647,10 @@ namespace osu.Game.Screens.Mvis
             audioControlProvider.IsCurrent = false;
 
             //切换并设置当前控制插件IsCurrent为true
-            audioControlProvider = pacp ?? musicControllerWrapper;
+            audioControlProvider = pacp ?? MusicControllerWrapper;
             audioControlProvider.IsCurrent = true;
 
-            songSelectButton.Enabled.Value = audioControlProvider == musicControllerWrapper;
+            songSelectButton.Enabled.Value = audioControlProvider == MusicControllerWrapper;
         }
 
         private void setupKeyBindings()
@@ -776,16 +765,7 @@ namespace osu.Game.Screens.Mvis
             if (d == null) sidebar.Hide(); //如果d是null, 则隐藏侧边栏
             if (!(d is ISidebarContent)) return; //如果d不是ISidebarContent, 则忽略这次调用
 
-            var sc = (ISidebarContent)d;
-
-            //如果sc是上一个显示(mvis)或sc是侧边栏的当前显示并且侧边栏未隐藏
-            if (sc == sidebar.CurrentDisplay.Value && sidebar.IsVisible.Value)
-            {
-                sidebar.Hide();
-                return;
-            }
-
-            sidebar.ShowComponent(d);
+            sidebar.ShowComponent(d, true);
         }
 
         #region override事件
@@ -877,7 +857,7 @@ namespace osu.Game.Screens.Mvis
 
             Mods.Value = timeRateMod;
 
-            Beatmap.Disabled = audioControlProvider != null && audioControlProvider != musicControllerWrapper;
+            Beatmap.Disabled = audioControlProvider != null && audioControlProvider != MusicControllerWrapper;
             this.FadeIn(duration * 0.6f)
                 .ScaleTo(1, duration * 0.6f, Easing.OutQuint);
 

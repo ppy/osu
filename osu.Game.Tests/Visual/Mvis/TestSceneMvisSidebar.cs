@@ -6,12 +6,12 @@ using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.SideBar;
-using osuTK;
 
 namespace osu.Game.Tests.Visual.Mvis
 {
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Mvis
 
             AddStep("Toggle Sidebar ", sidebar.ToggleVisibility);
             AddStep("Clear Sidebar", sidebar.Clear);
-            AddStep("Random Resize", () => addRandom(true)); //
+            AddStep("Random Resize", () => addRandom());
             AddStep("Try Resize to 20%x20%", resize);
             AddStep("Add Tabs", () =>
             {
@@ -46,6 +46,7 @@ namespace osu.Game.Tests.Visual.Mvis
                     addRandom(false);
                 }
             });
+            AddStep("Very Long Tab", () => sidebar.Add(new VoidSidebarContent(1, $"OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOH")));
         }
 
         private void resize()
@@ -90,7 +91,7 @@ namespace osu.Game.Tests.Visual.Mvis
             {
                 ReWidth = reWidth;
                 TabTitle = tabTitle;
-                Size = new Vector2(200, 100);
+                RelativeSizeAxes = Axes.Both;
                 Child = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
@@ -116,6 +117,7 @@ namespace osu.Game.Tests.Visual.Mvis
 
             public float ResizeWidth => ReWidth;
             public string Title => TabTitle;
+            public IconUsage Icon { get; } = FontAwesome.Regular.Bell;
             public float ResizeHeight => 0.8f;
         }
     }

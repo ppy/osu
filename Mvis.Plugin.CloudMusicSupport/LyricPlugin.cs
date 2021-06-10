@@ -35,9 +35,12 @@ namespace Mvis.Plugin.CloudMusicSupport
             => new LyricSettingsSubSection(this);
 
         public override PluginSidebarPage CreateSidebarPage()
-            => new LyricSidebarSectionContainer(this, 0.4f);
+            => new LyricSidebarSectionContainer(this);
 
-        public override int Version => 4;
+        public override PluginSidebarSettingsSection CreateSidebarSettingsSection()
+            => new LyricSidebarSection(this);
+
+        public override int Version => 5;
 
         private WorkingBeatmap currentWorkingBeatmap;
         private LyricLine lrcLine;

@@ -4,6 +4,7 @@
 using System.ComponentModel;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
+using osu.Game.Screens.Mvis.SideBar.Tabs;
 
 namespace osu.Game.Configuration
 {
@@ -49,6 +50,7 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.MvisInterfaceGreen, value: 119f, 0, 255f);
             SetDefault(MSetting.MvisInterfaceBlue, value: 255f, 0, 255f);
             SetDefault(MSetting.MvisCurrentAudioProvider, "osu.Game.Screens.Mvis.Plugins+OsuMusicControllerWrapper");
+            SetDefault(MSetting.MvisTabControlPosition, TabControlPosition.Right);
 
             //实验性功能
             SetDefault(MSetting.CustomWindowIconPath, "");
@@ -80,6 +82,7 @@ namespace osu.Game.Configuration
         MvisInterfaceRed,
         MvisInterfaceGreen,
         MvisInterfaceBlue,
+        MvisTabControlPosition,
         SamplePlaybackGain,
         SongSelectBgBlur,
         IntroLoadDirectToSongSelect,
