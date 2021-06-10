@@ -1,23 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Bindables;
-using osu.Game.Rulesets.Catch.Objects.Drawables;
+using osu.Game.Rulesets.Catch.Objects;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
     internal class LegacyFruitPiece : LegacyCatchHitObjectPiece
     {
-        public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            var fruitState = (IHasFruitState)ObjectState;
-            VisualRepresentation.BindTo(fruitState.VisualRepresentation);
-
-            VisualRepresentation.BindValueChanged(visual => setTexture(visual.NewValue), true);
+            IndexInBeatmap.BindValueChanged(index =>
+            {
+                setTexture(Fruit.GetVisualRepresentation(index.NewValue));
+            }, true);
         }
 
         private void setTexture(FruitVisualRepresentation visualRepresentation)

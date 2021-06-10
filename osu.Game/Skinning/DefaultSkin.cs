@@ -22,6 +22,8 @@ namespace osu.Game.Skinning
 {
     public class DefaultSkin : Skin
     {
+        private readonly IStorageResourceProvider resources;
+
         public DefaultSkin(IStorageResourceProvider resources)
             : this(SkinInfo.Default, resources)
         {
@@ -31,12 +33,23 @@ namespace osu.Game.Skinning
         public DefaultSkin(SkinInfo skin, IStorageResourceProvider resources)
             : base(skin, resources)
         {
+            this.resources = resources;
             Configuration = new DefaultSkinConfiguration();
         }
 
         public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
 
-        public override ISample GetSample(ISampleInfo sampleInfo) => null;
+        public override ISample GetSample(ISampleInfo sampleInfo)
+        {
+            foreach (var lookup in sampleInfo.LookupNames)
+            {
+                var sample = resources.AudioManager.Samples.Get(lookup);
+                if (sample != null)
+                    return sample;
+            }
+
+            return null;
+        }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
@@ -100,15 +113,15 @@ namespace osu.Game.Skinning
                                 }
                             })
                             {
-                                Children = new[]
+                                Children = new Drawable[]
                                 {
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ComboCounter)),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreCounter)),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter)),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.HealthDisplay)),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.SongProgress)),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.BarHitErrorMeter)),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.BarHitErrorMeter)),
+                                    new DefaultComboCounter(),
+                                    new DefaultScoreCounter(),
+                                    new DefaultAccuracyCounter(),
+                                    new DefaultHealthDisplay(),
+                                    new SongProgress(),
+                                    new BarHitErrorMeter(),
+                                    new BarHitErrorMeter(),
                                 }
                             };
 
@@ -116,35 +129,6 @@ namespace osu.Game.Skinning
                     }
 
                     break;
-
-                case HUDSkinComponent hudComponent:
-                {
-                    switch (hudComponent.Component)
-                    {
-                        case HUDSkinComponents.ComboCounter:
-                            return new DefaultComboCounter();
-
-                        case HUDSkinComponents.ScoreCounter:
-                            return new DefaultScoreCounter();
-
-                        case HUDSkinComponents.AccuracyCounter:
-                            return new DefaultAccuracyCounter();
-
-                        case HUDSkinComponents.HealthDisplay:
-                            return new DefaultHealthDisplay();
-
-                        case HUDSkinComponents.SongProgress:
-                            return new SongProgress();
-
-                        case HUDSkinComponents.BarHitErrorMeter:
-                            return new BarHitErrorMeter();
-
-                        case HUDSkinComponents.ColourHitErrorMeter:
-                            return new ColourHitErrorMeter();
-                    }
-
-                    break;
-                }
             }
 
             return null;

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+#nullable enable
+
 namespace osu.Game.Online.Chat
 {
     public static class MessageFormatter
@@ -61,7 +63,7 @@ namespace osu.Game.Online.Chat
 
         private static string websiteRootUrl = "osu.ppy.sh";
 
-        private static void handleMatches(Regex regex, string display, string link, MessageFormatterResult result, int startIndex = 0, LinkAction? linkActionOverride = null, char[] escapeChars = null)
+        private static void handleMatches(Regex regex, string display, string link, MessageFormatterResult result, int startIndex = 0, LinkAction? linkActionOverride = null, char[]? escapeChars = null)
         {
             int captureOffset = 0;
 
@@ -167,15 +169,18 @@ namespace osu.Game.Online.Chat
                             case "u":
                             case "users":
                                 return new LinkDetails(LinkAction.OpenUserProfile, mainArg);
+
+                            case "wiki":
+                                return new LinkDetails(LinkAction.OpenWiki, string.Join('/', args.Skip(3)));
                         }
                     }
 
-                    return new LinkDetails(LinkAction.External, null);
+                    break;
 
                 case "osu":
                     // every internal link also needs some kind of argument
                     if (args.Length < 3)
-                        return new LinkDetails(LinkAction.External, null);
+                        break;
 
                     LinkAction linkType;
 
@@ -217,7 +222,7 @@ namespace osu.Game.Online.Chat
                     return new LinkDetails(LinkAction.JoinMultiplayerMatch, args[1]);
             }
 
-            return new LinkDetails(LinkAction.External, null);
+            return new LinkDetails(LinkAction.External, url);
         }
 
         private static MessageFormatterResult format(string toFormat, int startIndex = 0, int space = 3)
@@ -311,7 +316,8 @@ namespace osu.Game.Online.Chat
         JoinMultiplayerMatch,
         Spectate,
         OpenUserProfile,
-        Custom
+        OpenWiki,
+        Custom,
     }
 
     public class Link : IComparable<Link>

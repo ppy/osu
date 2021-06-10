@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -12,7 +11,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModAutoplay : ModAutoplay<ManiaHitObject>
+    public class ManiaModAutoplay : ModAutoplay
     {
         public override Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score
         {

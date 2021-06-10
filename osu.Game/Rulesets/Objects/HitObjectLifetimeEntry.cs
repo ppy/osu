@@ -35,7 +35,11 @@ namespace osu.Game.Rulesets.Objects
             HitObject = hitObject;
 
             startTimeBindable.BindTo(HitObject.StartTimeBindable);
-            startTimeBindable.BindValueChanged(onStartTimeChanged, true);
+            startTimeBindable.BindValueChanged(_ => SetInitialLifetime(), true);
+
+            // Subscribe to this event before the DrawableHitObject so that the local callback is invoked before the entry is re-applied as a result of DefaultsApplied.
+            // This way, the DrawableHitObject can use OnApply() to overwrite the LifetimeStart that was set inside setInitialLifetime().
+            HitObject.DefaultsApplied += _ => SetInitialLifetime();
         }
 
         // The lifetime, as set by the hitobject.
@@ -82,15 +86,14 @@ namespace osu.Game.Rulesets.Objects
         /// By default, <see cref="HitObject"/>s are assumed to display their contents within 10 seconds prior to their start time.
         /// </summary>
         /// <remarks>
-        /// This is only used as an optimisation to delay the initial update of the <see cref="HitObject"/> and may be tuned more aggressively if required.
-        /// It is indirectly used to decide the automatic transform offset provided to <see cref="DrawableHitObject.UpdateInitialTransforms"/>.
-        /// A more accurate <see cref="LifetimeEntry.LifetimeStart"/> should be set for further optimisation (in <see cref="DrawableHitObject.LoadComplete"/>, for example).
+        /// This is only used as an optimisation to delay the initial application of the <see cref="HitObject"/> to a <see cref="DrawableHitObject"/>.
+        /// A more accurate <see cref="LifetimeEntry.LifetimeStart"/> should be set on the hit object application, for further optimisation.
         /// </remarks>
         protected virtual double InitialLifetimeOffset => 10000;
 
         /// <summary>
-        /// Resets <see cref="LifetimeEntry.LifetimeStart"/> according to the change in start time of the <see cref="HitObject"/>.
+        /// Set <see cref="LifetimeEntry.LifetimeStart"/> using <see cref="InitialLifetimeOffset"/>.
         /// </summary>
-        private void onStartTimeChanged(ValueChangedEvent<double> startTime) => LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
+        internal void SetInitialLifetime() => LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
     }
 }
