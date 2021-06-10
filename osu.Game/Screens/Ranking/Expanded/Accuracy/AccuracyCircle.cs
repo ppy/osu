@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         }
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host, ISkinSource skin)
+        private void load(GameHost host)
         {
             InternalChildren = new Drawable[]
             {
