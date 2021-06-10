@@ -12,11 +12,11 @@ namespace osu.Game.Screens.Edit.Setup
 {
     internal class MetadataSection : SetupSection
     {
-        private LabelledTextBox artistTextBox;
-        private LabelledTextBox romanisedArtistTextBox;
+        protected LabelledTextBox ArtistTextBox;
+        protected LabelledTextBox RomanisedArtistTextBox;
 
-        private LabelledTextBox titleTextBox;
-        private LabelledTextBox romanisedTitleTextBox;
+        protected LabelledTextBox TitleTextBox;
+        protected LabelledTextBox RomanisedTitleTextBox;
 
         private LabelledTextBox creatorTextBox;
         private LabelledTextBox difficultyTextBox;
@@ -32,16 +32,16 @@ namespace osu.Game.Screens.Edit.Setup
 
             Children = new[]
             {
-                artistTextBox = createTextBox<LabelledTextBox>("Artist",
+                ArtistTextBox = createTextBox<LabelledTextBox>("Artist",
                     !string.IsNullOrEmpty(metadata.ArtistUnicode) ? metadata.ArtistUnicode : metadata.Artist),
-                romanisedArtistTextBox = createTextBox<LabelledRomanisedTextBox>("Romanised Artist",
+                RomanisedArtistTextBox = createTextBox<LabelledRomanisedTextBox>("Romanised Artist",
                     !string.IsNullOrEmpty(metadata.Artist) ? metadata.Artist : MetadataUtils.StripNonRomanisedCharacters(metadata.ArtistUnicode)),
 
                 Empty(),
 
-                titleTextBox = createTextBox<LabelledTextBox>("Title",
+                TitleTextBox = createTextBox<LabelledTextBox>("Title",
                     !string.IsNullOrEmpty(metadata.TitleUnicode) ? metadata.TitleUnicode : metadata.Title),
-                romanisedTitleTextBox = createTextBox<LabelledRomanisedTextBox>("Romanised Title",
+                RomanisedTitleTextBox = createTextBox<LabelledRomanisedTextBox>("Romanised Title",
                     !string.IsNullOrEmpty(metadata.Title) ? metadata.Title : MetadataUtils.StripNonRomanisedCharacters(metadata.ArtistUnicode)),
 
                 Empty(),
@@ -70,11 +70,11 @@ namespace osu.Game.Screens.Edit.Setup
         {
             base.LoadComplete();
 
-            if (string.IsNullOrEmpty(artistTextBox.Current.Value))
-                GetContainingInputManager().ChangeFocus(artistTextBox);
+            if (string.IsNullOrEmpty(ArtistTextBox.Current.Value))
+                GetContainingInputManager().ChangeFocus(ArtistTextBox);
 
-            artistTextBox.Current.BindValueChanged(artist => transferIfRomanised(artist.NewValue, romanisedArtistTextBox));
-            titleTextBox.Current.BindValueChanged(title => transferIfRomanised(title.NewValue, romanisedTitleTextBox));
+            ArtistTextBox.Current.BindValueChanged(artist => transferIfRomanised(artist.NewValue, RomanisedArtistTextBox));
+            TitleTextBox.Current.BindValueChanged(title => transferIfRomanised(title.NewValue, RomanisedTitleTextBox));
             updateReadOnlyState();
         }
 
@@ -89,8 +89,8 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void updateReadOnlyState()
         {
-            romanisedArtistTextBox.ReadOnly = MetadataUtils.IsRomanised(artistTextBox.Current.Value);
-            romanisedTitleTextBox.ReadOnly = MetadataUtils.IsRomanised(titleTextBox.Current.Value);
+            RomanisedArtistTextBox.ReadOnly = MetadataUtils.IsRomanised(ArtistTextBox.Current.Value);
+            RomanisedTitleTextBox.ReadOnly = MetadataUtils.IsRomanised(TitleTextBox.Current.Value);
         }
 
         private void onCommit(TextBox sender, bool newText)
@@ -104,11 +104,11 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void updateMetadata()
         {
-            Beatmap.Metadata.ArtistUnicode = artistTextBox.Current.Value;
-            Beatmap.Metadata.Artist = romanisedArtistTextBox.Current.Value;
+            Beatmap.Metadata.ArtistUnicode = ArtistTextBox.Current.Value;
+            Beatmap.Metadata.Artist = RomanisedArtistTextBox.Current.Value;
 
-            Beatmap.Metadata.TitleUnicode = titleTextBox.Current.Value;
-            Beatmap.Metadata.Title = romanisedTitleTextBox.Current.Value;
+            Beatmap.Metadata.TitleUnicode = TitleTextBox.Current.Value;
+            Beatmap.Metadata.Title = RomanisedTitleTextBox.Current.Value;
 
             Beatmap.Metadata.AuthorString = creatorTextBox.Current.Value;
             Beatmap.BeatmapInfo.Version = difficultyTextBox.Current.Value;
