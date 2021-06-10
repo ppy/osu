@@ -24,8 +24,6 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override ModType Type => ModType.Conversion;
 
-        public override bool Ranked => false;
-
         public void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
         {
             var maniaRuleset = (DrawableManiaRuleset)drawableRuleset;

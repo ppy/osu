@@ -18,7 +18,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking.Expanded.Accuracy;
@@ -154,7 +153,7 @@ namespace osu.Game.Screens.Ranking
             if (Score != null)
             {
                 // only show flair / animation when arriving after watching a play that isn't autoplay.
-                bool shouldFlair = player != null && !Score.Mods.Any(m => m is ModAutoplay);
+                bool shouldFlair = player != null && Score.Mods.All(m => m.UserPlayable);
 
                 ScorePanelList.AddScore(Score, shouldFlair);
 
@@ -318,7 +317,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.HandleInput = false;
 
                 // Dim background.
-                ApplyToBackground(b => b.FadeTo(0.1f, 150));
+                ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.1f), 150));
 
                 detachedPanel = expandedPanel;
             }
@@ -342,7 +341,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.HandleInput = true;
 
                 // Un-dim background.
-                ApplyToBackground(b => b.FadeTo(0.5f, 150));
+                ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.5f), 150));
 
                 detachedPanel = null;
             }
