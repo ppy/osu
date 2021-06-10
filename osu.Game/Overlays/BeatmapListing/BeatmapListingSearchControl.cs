@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
-                    Child = beatmapCover = new UpdateableBeatmapSetCover
+                    Child = beatmapCover = new TopSearchBeatmapSetCover
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
@@ -183,6 +183,11 @@ namespace osu.Game.Overlays.BeatmapListing
                 TypingStarted?.Invoke();
                 return true;
             }
+        }
+
+        private class TopSearchBeatmapSetCover : UpdateableBeatmapSetCover
+        {
+            protected override bool TransformImmediately => true;
         }
     }
 }

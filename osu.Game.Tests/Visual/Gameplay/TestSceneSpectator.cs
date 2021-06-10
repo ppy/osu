@@ -27,8 +27,8 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private readonly User streamingUser = new User { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Test user" };
 
-        [Cached(typeof(SpectatorStreamingClient))]
-        private TestSpectatorStreamingClient testSpectatorStreamingClient = new TestSpectatorStreamingClient();
+        [Cached(typeof(SpectatorClient))]
+        private TestSpectatorClient testSpectatorClient = new TestSpectatorClient();
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestUserLookupCache();
@@ -61,8 +61,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("add streaming client", () =>
             {
-                Remove(testSpectatorStreamingClient);
-                Add(testSpectatorStreamingClient);
+                Remove(testSpectatorClient);
+                Add(testSpectatorClient);
             });
 
             finish();
@@ -76,9 +76,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("screen hasn't changed", () => Stack.CurrentScreen is SoloSpectator);
 
             start();
-            sendFrames();
-
             waitForPlayer();
+
+            sendFrames();
             AddAssert("ensure frames arrived", () => replayHandler.HasFrames);
 
             AddUntilStep("wait for frame starvation", () => replayHandler.WaitingForFrame);
@@ -116,11 +116,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             start();
 
             loadSpectatingScreen();
+            waitForPlayer();
 
             AddStep("advance frame count", () => nextFrame = 300);
             sendFrames();
-
-            waitForPlayer();
 
             AddUntilStep("playing from correct point in time", () => player.ChildrenOfType<DrawableRuleset>().First().FrameStableClock.CurrentTime > 30000);
         }
@@ -210,11 +209,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         private double currentFrameStableTime
             => player.ChildrenOfType<FrameStabilityContainer>().First().FrameStableClock.CurrentTime;
 
-        private void waitForPlayer() => AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
+        private void waitForPlayer() => AddUntilStep("wait for player", () => (Stack.CurrentScreen as Player)?.IsLoaded == true);
 
-        private void start(int? beatmapId = null) => AddStep("start play", () => testSpectatorStreamingClient.StartPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
+        private void start(int? beatmapId = null) => AddStep("start play", () => testSpectatorClient.StartPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
 
-        private void finish(int? beatmapId = null) => AddStep("end play", () => testSpectatorStreamingClient.EndPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
+        private void finish() => AddStep("end play", () => testSpectatorClient.EndPlay(streamingUser.Id));
 
         private void checkPaused(bool state) =>
             AddUntilStep($"game is {(state ? "paused" : "playing")}", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value == state);
@@ -223,7 +222,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("send frames", () =>
             {
-                testSpectatorStreamingClient.SendFrames(streamingUser.Id, nextFrame, count);
+                testSpectatorClient.SendFrames(streamingUser.Id, nextFrame, count);
                 nextFrame += count;
             });
         }

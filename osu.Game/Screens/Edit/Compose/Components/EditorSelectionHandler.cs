@@ -125,6 +125,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return;
 
                 h.Samples.Add(new HitSampleInfo(sampleName));
+                EditorBeatmap.Update(h);
             });
         }
 
@@ -134,7 +135,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void RemoveHitSample(string sampleName)
         {
-            EditorBeatmap.PerformOnSelection(h => h.SamplesBindable.RemoveAll(s => s.Name == sampleName));
+            EditorBeatmap.PerformOnSelection(h =>
+            {
+                h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
+                EditorBeatmap.Update(h);
+            });
         }
 
         /// <summary>
@@ -168,13 +173,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             if (SelectedBlueprints.All(b => b.Item is IHasComboInformation))
             {
-                yield return new TernaryStateMenuItem("New combo") { State = { BindTarget = SelectionNewComboState } };
+                yield return new TernaryStateToggleMenuItem("New combo") { State = { BindTarget = SelectionNewComboState } };
             }
 
             yield return new OsuMenuItem("Sound")
             {
                 Items = SelectionSampleStates.Select(kvp =>
-                    new TernaryStateMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
+                    new TernaryStateToggleMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
             };
         }
 

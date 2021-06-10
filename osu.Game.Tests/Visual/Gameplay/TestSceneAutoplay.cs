@@ -18,12 +18,12 @@ namespace osu.Game.Tests.Visual.Gameplay
     [Description("Player instantiated with an autoplay mod.")]
     public class TestSceneAutoplay : TestSceneAllRulesetPlayers
     {
-        protected new TestPlayer Player => (TestPlayer)base.Player;
+        protected new TestReplayPlayer Player => (TestReplayPlayer)base.Player;
 
         protected override Player CreatePlayer(Ruleset ruleset)
         {
             SelectedMods.Value = new[] { ruleset.GetAutoplayMod() };
-            return new TestPlayer(false);
+            return new TestReplayPlayer(false);
         }
 
         protected override void AddCheckSteps()

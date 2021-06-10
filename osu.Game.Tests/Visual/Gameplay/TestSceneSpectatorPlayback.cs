@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private IAPIProvider api { get; set; }
 
         [Resolved]
-        private SpectatorStreamingClient streamingClient { get; set; }
+        private SpectatorClient spectatorClient { get; set; }
 
         [Cached]
         private GameplayBeatmap gameplayBeatmap = new GameplayBeatmap(new Beatmap());
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             replay = new Replay();
 
-            users.BindTo(streamingClient.PlayingUsers);
+            users.BindTo(spectatorClient.PlayingUsers);
             users.BindCollectionChanged((obj, args) =>
             {
                 switch (args.Action)
@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         foreach (int user in args.NewItems)
                         {
                             if (user == api.LocalUser.Value.Id)
-                                streamingClient.WatchUser(user);
+                                spectatorClient.WatchUser(user);
                         }
 
                         break;
@@ -91,14 +91,14 @@ namespace osu.Game.Tests.Visual.Gameplay
                         foreach (int user in args.OldItems)
                         {
                             if (user == api.LocalUser.Value.Id)
-                                streamingClient.StopWatchingUser(user);
+                                spectatorClient.StopWatchingUser(user);
                         }
 
                         break;
                 }
             }, true);
 
-            streamingClient.OnNewFrames += onNewFrames;
+            spectatorClient.OnNewFrames += onNewFrames;
 
             Add(new GridContainer
             {
@@ -189,7 +189,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
         }
 
-        private double latency = SpectatorStreamingClient.TIME_BETWEEN_SENDS;
+        private double latency = SpectatorClient.TIME_BETWEEN_SENDS;
 
         protected override void Update()
         {
@@ -233,7 +233,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("stop recorder", () =>
             {
                 recorder.Expire();
-                streamingClient.OnNewFrames -= onNewFrames;
+                spectatorClient.OnNewFrames -= onNewFrames;
             });
         }
 

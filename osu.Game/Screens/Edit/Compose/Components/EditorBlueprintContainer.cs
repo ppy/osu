@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -21,6 +22,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected EditorBeatmap Beatmap { get; private set; }
 
         protected readonly HitObjectComposer Composer;
+
+        private HitObjectUsageEventBuffer usageEventBuffer;
 
         protected EditorBlueprintContainer(HitObjectComposer composer)
         {
@@ -45,9 +48,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 foreach (var obj in Composer.HitObjects)
                     AddBlueprintFor(obj.HitObject);
 
-                Composer.Playfield.HitObjectUsageBegan += AddBlueprintFor;
-                Composer.Playfield.HitObjectUsageFinished += RemoveBlueprintFor;
+                usageEventBuffer = new HitObjectUsageEventBuffer(Composer.Playfield);
+                usageEventBuffer.HitObjectUsageBegan += AddBlueprintFor;
+                usageEventBuffer.HitObjectUsageFinished += RemoveBlueprintFor;
+                usageEventBuffer.HitObjectUsageTransferred += TransferBlueprintFor;
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            usageEventBuffer?.Update();
         }
 
         protected override IEnumerable<SelectionBlueprint<HitObject>> SortForMovement(IReadOnlyList<SelectionBlueprint<HitObject>> blueprints)
@@ -66,7 +77,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 double offset = result.Time.Value - blueprints.First().Item.StartTime;
 
                 if (offset != 0)
-                    Beatmap.PerformOnSelection(obj => obj.StartTime += offset);
+                {
+                    Beatmap.PerformOnSelection(obj =>
+                    {
+                        obj.StartTime += offset;
+                        Beatmap.Update(obj);
+                    });
+                }
             }
 
             return true;
@@ -78,6 +95,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return;
 
             base.AddBlueprintFor(item);
+        }
+
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> has been transferred to another <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The hit object which has been assigned to a new drawable.</param>
+        /// <param name="drawableObject">The new drawable that is representing the hit object.</param>
+        protected virtual void TransferBlueprintFor(HitObject hitObject, DrawableHitObject drawableObject)
+        {
         }
 
         protected override void DragOperationCompleted()
@@ -133,11 +159,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Beatmap.HitObjectRemoved -= RemoveBlueprintFor;
             }
 
-            if (Composer != null)
-            {
-                Composer.Playfield.HitObjectUsageBegan -= AddBlueprintFor;
-                Composer.Playfield.HitObjectUsageFinished -= RemoveBlueprintFor;
-            }
+            usageEventBuffer?.Dispose();
         }
     }
 }

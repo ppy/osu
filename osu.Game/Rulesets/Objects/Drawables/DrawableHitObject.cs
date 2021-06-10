@@ -11,7 +11,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Threading;
 using osu.Game.Audio;
@@ -172,7 +171,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             base.AddInternal(Samples = new PausableSkinnableSound());
 
             CurrentSkin = skinSource;
-            CurrentSkin.SourceChanged += onSkinSourceChanged;
+            CurrentSkin.SourceChanged += skinSourceChanged;
+        }
+
+        protected override void LoadAsyncComplete()
+        {
+            base.LoadAsyncComplete();
+            skinChanged();
         }
 
         protected override void LoadComplete()
@@ -187,7 +192,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Applies a hit object to be represented by this <see cref="DrawableHitObject"/>.
         /// </summary>
-        [Obsolete("Use either overload of Apply that takes a single argument of type HitObject or HitObjectLifetimeEntry")]
+        [Obsolete("Use either overload of Apply that takes a single argument of type HitObject or HitObjectLifetimeEntry")] // Can be removed 20211021.
         public void Apply([NotNull] HitObject hitObject, [CanBeNull] HitObjectLifetimeEntry lifetimeEntry)
         {
             if (lifetimeEntry != null)
@@ -305,6 +310,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         /// <summary>
         /// Invoked for this <see cref="DrawableHitObject"/> to take on any values from a newly-applied <see cref="HitObject"/>.
+        /// This is also fired after any changes which occurred via an <see cref="osu.Game.Rulesets.Objects.HitObject.ApplyDefaults"/> call.
         /// </summary>
         protected virtual void OnApply()
         {
@@ -312,6 +318,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         /// <summary>
         /// Invoked for this <see cref="DrawableHitObject"/> to revert any values previously taken on from the currently-applied <see cref="HitObject"/>.
+        /// This is also fired after any changes which occurred via an <see cref="osu.Game.Rulesets.Objects.HitObject.ApplyDefaults"/> call.
         /// </summary>
         protected virtual void OnFree()
         {
@@ -402,11 +409,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             using (BeginAbsoluteSequence(StateUpdateTime, true))
                 UpdateStartTimeStateTransforms();
 
-#pragma warning disable 618
-            using (BeginAbsoluteSequence(StateUpdateTime + (Result?.TimeOffset ?? 0), true))
-                UpdateStateTransforms(newState);
-#pragma warning restore 618
-
             using (BeginAbsoluteSequence(HitStateUpdateTime, true))
                 UpdateHitStateTransforms(newState);
 
@@ -437,27 +439,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         /// <summary>
         /// Apply (generally fade-in) transforms leading into the <see cref="HitObject"/> start time.
-        /// The local drawable hierarchy is recursively delayed to <see cref="LifetimeEntry.LifetimeStart"/> for convenience.
-        ///
-        /// By default this will fade in the object from zero with no duration.
+        /// By default, this will fade in the object from zero with no duration.
         /// </summary>
         /// <remarks>
-        /// This is called once before every <see cref="UpdateStateTransforms"/>. This is to ensure a good state in the case
+        /// This is called once before every <see cref="UpdateHitStateTransforms"/>. This is to ensure a good state in the case
         /// the <see cref="JudgementResult.TimeOffset"/> was negative and potentially altered the pre-hit transforms.
         /// </remarks>
         protected virtual void UpdateInitialTransforms()
         {
             this.FadeInFromZero();
-        }
-
-        /// <summary>
-        /// Apply transforms based on the current <see cref="ArmedState"/>. Previous states are automatically cleared.
-        /// In the case of a non-idle <see cref="ArmedState"/>, and if <see cref="Drawable.LifetimeEnd"/> was not set during this call, <see cref="Drawable.Expire"/> will be invoked.
-        /// </summary>
-        /// <param name="state">The new armed state.</param>
-        [Obsolete("Use UpdateStartTimeStateTransforms and UpdateHitStateTransforms instead")] // Can be removed 20210504
-        protected virtual void UpdateStateTransforms(ArmedState state)
-        {
         }
 
         /// <summary>
@@ -495,7 +485,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected ISkinSource CurrentSkin { get; private set; }
 
-        private void onSkinSourceChanged() => Scheduler.AddOnce(() =>
+        private void skinSourceChanged() => Scheduler.AddOnce(skinChanged);
+
+        private void skinChanged()
         {
             UpdateComboColour();
 
@@ -503,7 +495,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (IsLoaded)
                 updateState(State.Value, true);
-        });
+        }
 
         protected void UpdateComboColour()
         {
@@ -511,23 +503,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             var comboColours = CurrentSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value ?? Array.Empty<Color4>();
             AccentColour.Value = combo.GetComboColour(comboColours);
-        }
-
-        /// <summary>
-        /// Called to retrieve the combo colour. Automatically assigned to <see cref="AccentColour"/>.
-        /// Defaults to using <see cref="IHasComboInformation.ComboIndex"/> to decide on a colour.
-        /// </summary>
-        /// <remarks>
-        /// This will only be called if the <see cref="HitObject"/> implements <see cref="IHasComboInformation"/>.
-        /// </remarks>
-        /// <param name="comboColours">A list of combo colours provided by the beatmap or skin. Can be null if not available.</param>
-        [Obsolete("Unused. Implement IHasComboInformation and IHasComboInformation.GetComboColour() on the HitObject model instead.")] // Can be removed 20210527
-        protected virtual Color4 GetComboColour(IReadOnlyList<Color4> comboColours)
-        {
-            if (!(HitObject is IHasComboInformation combo))
-                throw new InvalidOperationException($"{nameof(HitObject)} must implement {nameof(IHasComboInformation)}");
-
-            return comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White;
         }
 
         /// <summary>
@@ -613,23 +588,17 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected internal new ScheduledDelegate Schedule(Action action) => base.Schedule(action);
 
         /// <summary>
-        /// A safe offset prior to the start time of <see cref="HitObject"/> at which this <see cref="DrawableHitObject"/> may begin displaying contents.
+        /// An offset prior to the start time of <see cref="HitObject"/> at which this <see cref="DrawableHitObject"/> may begin displaying contents.
         /// By default, <see cref="DrawableHitObject"/>s are assumed to display their contents within 10 seconds prior to the start time of <see cref="HitObject"/>.
         /// </summary>
         /// <remarks>
-        /// This is only used as an optimisation to delay the initial update of this <see cref="DrawableHitObject"/> and may be tuned more aggressively if required.
-        /// It is indirectly used to decide the automatic transform offset provided to <see cref="UpdateInitialTransforms"/>.
-        /// A more accurate <see cref="LifetimeEntry.LifetimeStart"/> should be set for further optimisation (in <see cref="LoadComplete"/>, for example).
-        /// <para>
-        /// Only has an effect if this <see cref="DrawableHitObject"/> is not being pooled.
-        /// For pooled <see cref="DrawableHitObject"/>s, use <see cref="HitObjectLifetimeEntry.InitialLifetimeOffset"/> instead.
-        /// </para>
+        /// The initial transformation (<see cref="UpdateInitialTransforms"/>) starts at this offset before the start time of <see cref="HitObject"/>.
         /// </remarks>
         protected virtual double InitialLifetimeOffset => 10000;
 
         /// <summary>
         /// The time at which state transforms should be applied that line up to <see cref="HitObject"/>'s StartTime.
-        /// This is used to offset calls to <see cref="UpdateStateTransforms"/>.
+        /// This is used to offset calls to <see cref="UpdateStartTimeStateTransforms"/>.
         /// </summary>
         public double StateUpdateTime => HitObject.StartTime;
 
@@ -747,7 +716,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (HitObject != null)
                 HitObject.DefaultsApplied -= onDefaultsApplied;
 
-            CurrentSkin.SourceChanged -= onSkinSourceChanged;
+            CurrentSkin.SourceChanged -= skinSourceChanged;
         }
     }
 

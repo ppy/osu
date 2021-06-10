@@ -9,6 +9,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -36,6 +38,10 @@ namespace osu.Game.Tests.Visual.Online
         private Channel previousChannel => joinedChannels.ElementAt(joinedChannels.ToList().IndexOf(currentChannel) - 1);
         private Channel channel1 => channels[0];
         private Channel channel2 => channels[1];
+        private Channel channel3 => channels[2];
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         public TestSceneChatOverlay()
         {
@@ -44,7 +50,8 @@ namespace osu.Game.Tests.Visual.Online
                                  {
                                      Name = $"Channel no. {index}",
                                      Topic = index == 3 ? null : $"We talk about the number {index} here",
-                                     Type = index % 2 == 0 ? ChannelType.PM : ChannelType.Temporary
+                                     Type = index % 2 == 0 ? ChannelType.PM : ChannelType.Temporary,
+                                     Id = index
                                  })
                                  .ToList();
         }
@@ -228,12 +235,115 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
         }
 
+        [Test]
+        public void TestCloseTabShortcut()
+        {
+            AddStep("Join 2 channels", () =>
+            {
+                channelManager.JoinChannel(channel1);
+                channelManager.JoinChannel(channel2);
+            });
+
+            // Want to close channel 2
+            AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
+            AddStep("Close tab via shortcut", pressCloseDocumentKeys);
+
+            // Channel 2 should be closed
+            AddAssert("Channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("Channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
+
+            // Want to close channel 1
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+
+            AddStep("Close tab via shortcut", pressCloseDocumentKeys);
+            // Channel 1 and channel 2 should be closed
+            AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
+        }
+
+        [Test]
+        public void TestNewTabShortcut()
+        {
+            AddStep("Join 2 channels", () =>
+            {
+                channelManager.JoinChannel(channel1);
+                channelManager.JoinChannel(channel2);
+            });
+
+            // Want to join another channel
+            AddStep("Press new tab shortcut", pressNewTabKeys);
+
+            // Selector should be visible
+            AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
+        }
+
+        [Test]
+        public void TestRestoreTabShortcut()
+        {
+            AddStep("Join 3 channels", () =>
+            {
+                channelManager.JoinChannel(channel1);
+                channelManager.JoinChannel(channel2);
+                channelManager.JoinChannel(channel3);
+            });
+
+            // Should do nothing
+            AddStep("Restore tab via shortcut", pressRestoreTabKeys);
+            AddAssert("All channels still open", () => channelManager.JoinedChannels.Count == 3);
+
+            // Close channel 1
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+            AddStep("Click normal close button", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
+            AddAssert("Channel 1 closed", () => !channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("Other channels still open", () => channelManager.JoinedChannels.Count == 2);
+
+            // Reopen channel 1
+            AddStep("Restore tab via shortcut", pressRestoreTabKeys);
+            AddAssert("All channels now open", () => channelManager.JoinedChannels.Count == 3);
+            AddAssert("Current channel is channel 1", () => currentChannel == channel1);
+
+            // Close two channels
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+            AddStep("Close channel 1", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
+            AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
+            AddStep("Close channel 2", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
+            AddAssert("Only one channel open", () => channelManager.JoinedChannels.Count == 1);
+            AddAssert("Current channel is channel 3", () => currentChannel == channel3);
+
+            // Should first re-open channel 2
+            AddStep("Restore tab via shortcut", pressRestoreTabKeys);
+            AddAssert("Channel 1 still closed", () => !channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("Channel 2 now open", () => channelManager.JoinedChannels.Contains(channel2));
+            AddAssert("Current channel is channel 2", () => currentChannel == channel2);
+
+            // Should then re-open channel 1
+            AddStep("Restore tab via shortcut", pressRestoreTabKeys);
+            AddAssert("All channels now open", () => channelManager.JoinedChannels.Count == 3);
+            AddAssert("Current channel is channel 1", () => currentChannel == channel1);
+        }
+
         private void pressChannelHotkey(int number)
         {
             var channelKey = Key.Number0 + number;
             InputManager.PressKey(Key.AltLeft);
             InputManager.Key(channelKey);
             InputManager.ReleaseKey(Key.AltLeft);
+        }
+
+        private void pressCloseDocumentKeys() => pressKeysFor(PlatformActionType.DocumentClose);
+
+        private void pressNewTabKeys() => pressKeysFor(PlatformActionType.TabNew);
+
+        private void pressRestoreTabKeys() => pressKeysFor(PlatformActionType.TabRestore);
+
+        private void pressKeysFor(PlatformActionType type)
+        {
+            var binding = host.PlatformKeyBindings.First(b => ((PlatformAction)b.Action).ActionType == type);
+
+            foreach (var k in binding.KeyCombination.Keys)
+                InputManager.PressKey((Key)k);
+
+            foreach (var k in binding.KeyCombination.Keys)
+                InputManager.ReleaseKey((Key)k);
         }
 
         private void clickDrawable(Drawable d)
