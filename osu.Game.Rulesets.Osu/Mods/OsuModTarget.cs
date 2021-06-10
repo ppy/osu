@@ -36,7 +36,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModTarget : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<OsuHitObject>,
-        IApplicableToHealthProcessor, IApplicableToDifficulty
+        IApplicableToHealthProcessor, IApplicableToDifficulty, IApplicableFailOverride
     {
         public override string Name => "Target";
         public override string Acronym => "TP";
@@ -51,6 +51,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             Default = null,
             Value = null
         };
+
+        public bool PerformFail() => true;
+
+        public bool RestartOnFail => false;
+
+        public bool DisplayResultsOnFail => true;
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
