@@ -8,9 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -18,11 +16,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
@@ -36,7 +30,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModTarget : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<OsuHitObject>,
-        IApplicableToHealthProcessor, IApplicableToDifficulty, IApplicableFailOverride
+        IApplicableToHealthProcessor, IApplicableToDifficulty, IApplicableFailOverride, IHasSeed
     {
         public override string Name => "Target";
         public override string Acronym => "TP";
@@ -45,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => @"Practice keeping up with the beat of the song.";
         public override double ScoreMultiplier => 1;
 
-        [SettingSource("Seed", "Seed for random circle placement", SettingControlType = typeof(OsuModTargetSettingsControl))]
+        [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(SeedSettingsControl))]
         public Bindable<int?> Seed { get; } = new Bindable<int?>
         {
             Default = null,
@@ -416,86 +410,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (!IsBeatSyncedWithTrack) return;
 
                 sample?.Play();
-            }
-        }
-    }
-
-    public class OsuModTargetSettingsControl : SettingsItem<int?>
-    {
-        protected override Drawable CreateControl() => new SeedControl
-        {
-            RelativeSizeAxes = Axes.X,
-            Margin = new MarginPadding { Top = 5 }
-        };
-
-        private sealed class SeedControl : CompositeDrawable, IHasCurrentValue<int?>
-        {
-            private readonly BindableWithCurrent<int?> current = new BindableWithCurrent<int?>();
-
-            public Bindable<int?> Current
-            {
-                get => current.Current;
-                set
-                {
-                    current.Current = value;
-                    seedNumberBox.Text = value.Value.ToString();
-                }
-            }
-
-            private readonly OsuNumberBox seedNumberBox;
-
-            public SeedControl()
-            {
-                AutoSizeAxes = Axes.Y;
-
-                InternalChildren = new[]
-                {
-                    new GridContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        ColumnDimensions = new[]
-                        {
-                            new Dimension(),
-                            new Dimension(GridSizeMode.Absolute, 120)
-                        },
-                        RowDimensions = new[]
-                        {
-                            new Dimension(GridSizeMode.AutoSize)
-                        },
-                        Content = new[]
-                        {
-                            new Drawable[]
-                            {
-                                seedNumberBox = new OsuNumberBox
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    CommitOnFocusLost = true,
-                                },
-                                new TriangleButton
-                                {
-                                    Width = 120,
-                                    Text = "Randomise",
-                                    Action = () => current.Value = RNG.Next(),
-                                    Origin = Anchor.CentreLeft,
-                                    Anchor = Anchor.CentreLeft,
-                                },
-                            }
-                        }
-                    }
-                };
-
-                seedNumberBox.Current.BindValueChanged(e =>
-                {
-                    if (int.TryParse(e.NewValue, out var intVal))
-                        current.Value = intVal;
-                    else
-                        current.Value = null;
-                });
-                current.BindValueChanged(e =>
-                {
-                    seedNumberBox.Text = e.NewValue.ToString();
-                });
             }
         }
     }
