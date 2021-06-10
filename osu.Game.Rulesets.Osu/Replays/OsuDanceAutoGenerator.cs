@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                         v.X = Math.Clamp(v.X, pos.X - rad, pos.X + rad);
                         v.Y = Math.Clamp(v.Y, pos.Y - rad, pos.Y + rad);
                         AddFrameToReplay(new OsuReplayFrame((int)h.StartTime + j, sliderDance ? v : pos, action));
-                        mover.LastPos = v;
+                        mover.LastPos = sliderDance ? v : pos;
                     }
 
                     break;
