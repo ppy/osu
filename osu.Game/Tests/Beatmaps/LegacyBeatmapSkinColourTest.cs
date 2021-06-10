@@ -4,13 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
 using osuTK.Graphics;
@@ -49,36 +47,24 @@ namespace osu.Game.Tests.Beatmaps
 
         protected virtual ExposedPlayer LoadBeatmap(bool userHasCustomColours)
         {
-            ExposedPlayer player;
-
             Beatmap.Value = testBeatmap;
 
-            LoadScreen(player = CreateTestPlayer(userHasCustomColours));
+            ExposedPlayer player = CreateTestPlayer();
+
+            player.Skin = new TestSkin(userHasCustomColours);
+
+            LoadScreen(player);
 
             return player;
         }
 
-        protected virtual ExposedPlayer CreateTestPlayer(bool userHasCustomColours) => new ExposedPlayer(userHasCustomColours);
+        protected virtual ExposedPlayer CreateTestPlayer() => new ExposedPlayer();
 
-        protected class ExposedPlayer : Player
+        protected class ExposedPlayer : TestPlayer
         {
-            protected readonly bool UserHasCustomColours;
-
-            public ExposedPlayer(bool userHasCustomColours)
-                : base(new PlayerConfiguration
-                {
-                    AllowPause = false,
-                    ShowResults = false,
-                })
+            public ExposedPlayer()
+                : base(false, false)
             {
-                UserHasCustomColours = userHasCustomColours;
-            }
-
-            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-            {
-                var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-                dependencies.CacheAs<ISkinSource>(new TestSkin(UserHasCustomColours));
-                return dependencies;
             }
 
             public IReadOnlyList<Color4> UsableComboColours =>
