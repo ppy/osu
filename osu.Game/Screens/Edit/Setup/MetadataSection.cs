@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
@@ -14,20 +13,26 @@ namespace osu.Game.Screens.Edit.Setup
     {
         private LabelledTextBox artistTextBox;
         private LabelledTextBox titleTextBox;
+
         private LabelledTextBox creatorTextBox;
         private LabelledTextBox difficultyTextBox;
+        private LabelledTextBox sourceTextBox;
+        private LabelledTextBox tagsTextBox;
 
         public override LocalisableString Title => "Metadata";
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Children = new Drawable[]
+            Children = new[]
             {
                 artistTextBox = createTextBox("Artist", Beatmap.Metadata.Artist),
                 titleTextBox = createTextBox("Title", Beatmap.Metadata.Title),
+                Empty(),
                 creatorTextBox = createTextBox("Creator", Beatmap.Metadata.AuthorString),
-                difficultyTextBox = createTextBox("Difficulty Name", Beatmap.BeatmapInfo.Version)
+                difficultyTextBox = createTextBox("Difficulty Name", Beatmap.BeatmapInfo.Version),
+                sourceTextBox = createTextBox("Source", Beatmap.Metadata.Source),
+                tagsTextBox = createTextBox("Tags", Beatmap.Metadata.Tags)
             };
 
             foreach (var item in Children.OfType<LabelledTextBox>())
@@ -58,8 +63,11 @@ namespace osu.Game.Screens.Edit.Setup
             // after switching database engines we can reconsider if switching to bindables is a good direction.
             Beatmap.Metadata.Artist = artistTextBox.Current.Value;
             Beatmap.Metadata.Title = titleTextBox.Current.Value;
+
             Beatmap.Metadata.AuthorString = creatorTextBox.Current.Value;
             Beatmap.BeatmapInfo.Version = difficultyTextBox.Current.Value;
+            Beatmap.Metadata.Source = sourceTextBox.Current.Value;
+            Beatmap.Metadata.Tags = tagsTextBox.Current.Value;
         }
     }
 }
