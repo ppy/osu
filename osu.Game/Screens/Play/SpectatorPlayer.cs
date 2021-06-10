@@ -47,6 +47,8 @@ namespace osu.Game.Screens.Play
         {
             base.StartGameplay();
 
+            // Start gameplay along with the very first arrival frame (the latest one).
+            score.Replay.Frames.Clear();
             spectatorClient.OnNewFrames += userSentFrames;
         }
 
