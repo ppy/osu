@@ -37,7 +37,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private MultiSpectatorScreen spectatorScreen;
 
         private readonly List<int> playingUserIds = new List<int>();
-        private readonly Dictionary<int, int> nextFrame = new Dictionary<int, int>();
 
         private BeatmapSetInfo importedSet;
         private BeatmapInfo importedBeatmap;
@@ -54,8 +53,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public override void SetUpSteps()
         {
             base.SetUpSteps();
-
-            AddStep("reset sent frames", () => nextFrame.Clear());
 
             AddStep("add streaming client", () =>
             {
@@ -80,8 +77,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Client.CurrentMatchPlayingUserIds.Add(PLAYER_2_ID);
                 playingUserIds.Add(PLAYER_1_ID);
                 playingUserIds.Add(PLAYER_2_ID);
-                nextFrame[PLAYER_1_ID] = 0;
-                nextFrame[PLAYER_2_ID] = 0;
             });
 
             loadSpectateScreen(false);
@@ -253,7 +248,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Client.CurrentMatchPlayingUserIds.Add(id);
                     spectatorClient.StartPlay(id, beatmapId ?? importedBeatmapId);
                     playingUserIds.Add(id);
-                    nextFrame[id] = 0;
                 }
             });
         }
@@ -264,7 +258,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 spectatorClient.EndPlay(userId);
                 playingUserIds.Remove(userId);
-                nextFrame.Remove(userId);
             });
         }
 
@@ -275,10 +268,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("send frames", () =>
             {
                 foreach (int id in userIds)
-                {
-                    spectatorClient.SendFrames(id, nextFrame[id], count);
-                    nextFrame[id] += count;
-                }
+                    spectatorClient.SendFrames(id, count);
             });
         }
 
