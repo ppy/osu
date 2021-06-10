@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,12 +21,12 @@ namespace osu.Game.Skinning
 
         protected override Container<Drawable> Content { get; }
 
-        public RulesetSkinProvidingContainer(Ruleset ruleset, IBeatmap beatmap, ISkin beatmapSkin)
+        public RulesetSkinProvidingContainer(Ruleset ruleset, IBeatmap beatmap, [CanBeNull] ISkin beatmapSkin)
         {
             this.ruleset = ruleset;
             this.beatmap = beatmap;
 
-            InternalChild = new BeatmapSkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkin, beatmap))
+            InternalChild = new BeatmapSkinProvidingContainer(beatmapSkin == null ? null : ruleset.CreateLegacySkinProvider(beatmapSkin, beatmap))
             {
                 Child = Content = new Container
                 {
