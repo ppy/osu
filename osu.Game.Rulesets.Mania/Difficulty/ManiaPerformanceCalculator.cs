@@ -44,9 +44,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
             countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
 
-            if (mods.Any(m => !m.Ranked))
-                return 0;
-
             IEnumerable<Mod> scoreIncreaseMods = Ruleset.GetModsFor(ModType.DifficultyIncrease);
 
             double scoreMultiplier = 1.0;
