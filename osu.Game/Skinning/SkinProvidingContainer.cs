@@ -2,7 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
@@ -25,7 +26,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// The list of skins provided by this <see cref="SkinProvidingContainer"/>.
         /// </summary>
-        protected readonly List<ISkin> SkinSources = new List<ISkin>();
+        protected readonly BindableList<ISkin> SkinSources = new BindableList<ISkin>();
 
         [CanBeNull]
         private ISkinSource fallbackSource;
@@ -61,8 +62,23 @@ namespace osu.Game.Skinning
 
             noFallbackLookupProxy = new NoFallbackProxy(this);
 
-            if (skin is ISkinSource source)
-                source.SourceChanged += TriggerSourceChanged;
+            SkinSources.BindCollectionChanged(((_, args) =>
+            {
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Remove:
+                        foreach (var source in args.OldItems.Cast<ISkin>().OfType<ISkinSource>())
+                            source.SourceChanged -= OnSourceChanged;
+
+                        break;
+
+                    case NotifyCollectionChangedAction.Add:
+                        foreach (var source in args.NewItems.Cast<ISkin>().OfType<ISkinSource>())
+                            source.SourceChanged += OnSourceChanged;
+
+                        break;
+                }
+            }), true);
         }
 
         public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
@@ -146,21 +162,9 @@ namespace osu.Game.Skinning
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup, bool fallback)
         {
             if (lookup is GlobalSkinColours || lookup is SkinCustomColourLookup)
-                return lookupWithFallback<TLookup, TValue>(lookup, AllowColourLookup);
+                return lookupWithFallback<TLookup, TValue>(lookup, AllowColourLookup, fallback);
 
-            return lookupWithFallback<TLookup, TValue>(lookup, AllowConfigurationLookup);
-            if (skin != null)
-            {
-                if (lookup is GlobalSkinColours || lookup is SkinCustomColourLookup)
-                    return lookupWithFallback<TLookup, TValue>(lookup, AllowColourLookup, fallback);
-
-                return lookupWithFallback<TLookup, TValue>(lookup, AllowConfigurationLookup, fallback);
-            }
-
-            if (!fallback)
-                return null;
-
-            return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
+            return lookupWithFallback<TLookup, TValue>(lookup, AllowConfigurationLookup, fallback);
         }
 
         private IBindable<TValue> lookupWithFallback<TLookup, TValue>(TLookup lookup, bool canUseSkinLookup, bool canUseFallback)
@@ -205,10 +209,8 @@ namespace osu.Game.Skinning
 
             if (fallbackSource != null)
                 fallbackSource.SourceChanged -= OnSourceChanged;
-                fallbackSource.SourceChanged -= TriggerSourceChanged;
 
-            if (skin is ISkinSource source)
-                source.SourceChanged -= TriggerSourceChanged;
+            SkinSources.Clear();
         }
 
         private class NoFallbackProxy : ISkinSource
