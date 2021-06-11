@@ -281,19 +281,22 @@ namespace osu.Game.Skinning.Editor
             if (parent == null)
                 return drawable.Anchor;
 
-            var screenPosition = drawable.ScreenSpaceDrawQuad.TopLeft;
+            Vector2 screenPosition;
             {
+                var quad = drawable.ScreenSpaceDrawQuad;
                 var origin = drawable.Origin;
 
+                screenPosition = quad.TopLeft;
+
                 if (origin.HasFlagFast(Anchor.x2))
-                    screenPosition.X += drawable.ScreenSpaceDrawQuad.Width;
+                    screenPosition.X += quad.Width;
                 else if (origin.HasFlagFast(Anchor.x1))
-                    screenPosition.X += drawable.ScreenSpaceDrawQuad.Width / 2f;
+                    screenPosition.X += quad.Width / 2f;
 
                 if (origin.HasFlagFast(Anchor.y2))
-                    screenPosition.Y += drawable.ScreenSpaceDrawQuad.Height;
+                    screenPosition.Y += quad.Height;
                 else if (origin.HasFlagFast(Anchor.y1))
-                    screenPosition.Y += drawable.ScreenSpaceDrawQuad.Height / 2f;
+                    screenPosition.Y += quad.Height / 2f;
             }
 
             var absolutePosition = parent.ToLocalSpace(screenPosition);
