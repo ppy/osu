@@ -197,10 +197,6 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestContainer : Container
         {
-            private readonly Channel[] channels;
-
-            public TestContainer(Channel[] channels) => this.channels = channels;
-
             [Cached]
             public ChannelManager ChannelManager { get; } = new ChannelManager();
 
@@ -208,15 +204,27 @@ namespace osu.Game.Tests.Visual.Online
             public NotificationOverlay NotificationOverlay { get; } = new NotificationOverlay();
 
             [Cached]
-            public MessageNotifier MessageNotifier { get; } = new MessageNotifier();
-
-            [Cached]
             public ChatOverlay ChatOverlay { get; } = new ChatOverlay();
+
+            private readonly MessageNotifier messageNotifier = new MessageNotifier();
+
+            private readonly Channel[] channels;
+
+            public TestContainer(Channel[] channels)
+            {
+                this.channels = channels;
+            }
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                AddRange(new Drawable[] { ChannelManager, ChatOverlay, NotificationOverlay, MessageNotifier });
+                Children = new Drawable[]
+                {
+                    ChannelManager,
+                    ChatOverlay,
+                    NotificationOverlay,
+                    messageNotifier,
+                };
 
                 ((BindableList<Channel>)ChannelManager.AvailableChannels).AddRange(channels);
 
