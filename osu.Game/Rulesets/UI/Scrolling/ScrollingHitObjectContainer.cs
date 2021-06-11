@@ -20,9 +20,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         /// <summary>
-        /// 0 for horizontal scroll, 1 for vertical scroll.
+        /// Whether the scrolling direction is horizontal or vertical.
         /// </summary>
-        private int scrollingAxis => direction.Value == ScrollingDirection.Left || direction.Value == ScrollingDirection.Right ? 0 : 1;
+        private Direction scrollingAxis => direction.Value == ScrollingDirection.Left || direction.Value == ScrollingDirection.Right ? Direction.Horizontal : Direction.Vertical;
 
         /// <summary>
         /// A set of top-level <see cref="DrawableHitObject"/>s which have an up-to-date layout.
@@ -68,8 +68,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         public double TimeAtScreenSpacePosition(Vector2 screenSpacePosition)
         {
-            Vector2 localPosition = ToLocalSpace(screenSpacePosition);
-            return TimeAtPosition(localPosition[scrollingAxis], Time.Current);
+            Vector2 position = ToLocalSpace(screenSpacePosition);
+            return TimeAtPosition(scrollingAxis == Direction.Horizontal ? position.X : position.Y, Time.Current);
         }
 
         /// <summary>
@@ -77,9 +77,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         public float PositionAtTime(double time, double currentTime)
         {
-            float pos = scrollingInfo.Algorithm.PositionAt(time, currentTime, timeRange.Value, scrollLength);
-            flipPositionIfRequired(ref pos);
-            return pos;
+            float position = scrollingInfo.Algorithm.PositionAt(time, currentTime, timeRange.Value, scrollLength);
+            flipPositionIfRequired(ref position);
+            return position;
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         public Vector2 ScreenSpacePositionAtTime(double time)
         {
             float position = PositionAtTime(time, Time.Current);
-            return scrollingAxis == 0
+            return scrollingAxis == Direction.Horizontal
                 ? ToScreenSpace(new Vector2(position, DrawHeight / 2))
                 : ToScreenSpace(new Vector2(DrawWidth / 2, position));
         }
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             return scrollingInfo.Algorithm.GetLength(startTime, endTime, timeRange.Value, scrollLength);
         }
 
-        private float scrollLength => DrawSize[scrollingAxis];
+        private float scrollLength => scrollingAxis == Direction.Horizontal ? DrawWidth : DrawHeight;
 
         private void flipPositionIfRequired(ref float position)
         {
@@ -223,7 +223,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             if (hitObject.HitObject is IHasDuration e)
             {
                 float length = LengthAtTime(hitObject.HitObject.StartTime, e.EndTime);
-                if (scrollingAxis == 0)
+                if (scrollingAxis == Direction.Horizontal)
                     hitObject.Width = length;
                 else
                     hitObject.Height = length;
@@ -242,7 +242,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             float position = PositionAtTime(hitObject.HitObject.StartTime, currentTime);
 
-            if (scrollingAxis == 0)
+            if (scrollingAxis == Direction.Horizontal)
                 hitObject.X = position;
             else
                 hitObject.Y = position;
