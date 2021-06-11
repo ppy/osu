@@ -20,6 +20,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         /// <summary>
+        /// 0 for horizontal scroll, 1 for vertical scroll.
+        /// </summary>
+        private int scrollingAxis => direction.Value == ScrollingDirection.Left || direction.Value == ScrollingDirection.Right ? 0 : 1;
+
+        /// <summary>
         /// A set of top-level <see cref="DrawableHitObject"/>s which have an up-to-date layout.
         /// </summary>
         private readonly HashSet<DrawableHitObject> layoutComputed = new HashSet<DrawableHitObject>();
@@ -48,85 +53,65 @@ namespace osu.Game.Rulesets.UI.Scrolling
         }
 
         /// <summary>
-        /// Given a position in screen space, return the time within this column.
+        /// Given a position along the scrolling axis, return the time within this <see cref="HitObjectContainer"/>.
         /// </summary>
-        public double TimeAtScreenSpacePosition(Vector2 screenSpacePosition)
+        /// <param name="position">The position along the scrolling axis.</param>
+        /// <param name="referenceTime">The time the scrolling speed is used.</param>
+        public double TimeAtPosition(float position, double referenceTime)
         {
-            // convert to local space of column so we can snap and fetch correct location.
-            Vector2 localPosition = ToLocalSpace(screenSpacePosition);
-
-            float position = 0;
-
-            switch (scrollingInfo.Direction.Value)
-            {
-                case ScrollingDirection.Up:
-                case ScrollingDirection.Down:
-                    position = localPosition.Y;
-                    break;
-
-                case ScrollingDirection.Right:
-                case ScrollingDirection.Left:
-                    position = localPosition.X;
-                    break;
-            }
-
             flipPositionIfRequired(ref position);
-
-            return scrollingInfo.Algorithm.TimeAt(position, Time.Current, scrollingInfo.TimeRange.Value, scrollLength);
+            return scrollingInfo.Algorithm.TimeAt(position, referenceTime, timeRange.Value, scrollLength);
         }
 
         /// <summary>
-        /// Given a time, return the screen space position within this column.
+        /// Given a position in screen space, return the time within this <see cref="HitObjectContainer"/>.
+        /// </summary>
+        public double TimeAtScreenSpacePosition(Vector2 screenSpacePosition)
+        {
+            Vector2 localPosition = ToLocalSpace(screenSpacePosition);
+            return TimeAtPosition(localPosition[scrollingAxis], Time.Current);
+        }
+
+        /// <summary>
+        /// Given a time, return the position along the scrolling axis within this <see cref="HitObjectContainer"/> at time <paramref name="currentTime"/>.
+        /// </summary>
+        public float PositionAtTime(double time, double currentTime)
+        {
+            float pos = scrollingInfo.Algorithm.PositionAt(time, currentTime, timeRange.Value, scrollLength);
+            flipPositionIfRequired(ref pos);
+            return pos;
+        }
+
+        /// <summary>
+        /// Given a time, return the position along the scrolling axis within this <see cref="HitObjectContainer"/> at the current time.
+        /// </summary>
+        public float PositionAtTime(double time) => PositionAtTime(time, Time.Current);
+
+        /// <summary>
+        /// Given a time, return the screen space position within this <see cref="HitObjectContainer"/>.
+        /// In the non-scrolling axis, the center of this <see cref="HitObjectContainer"/> is returned.
         /// </summary>
         public Vector2 ScreenSpacePositionAtTime(double time)
         {
-            var pos = scrollingInfo.Algorithm.PositionAt(time, Time.Current, scrollingInfo.TimeRange.Value, scrollLength);
-
-            flipPositionIfRequired(ref pos);
-
-            switch (scrollingInfo.Direction.Value)
-            {
-                case ScrollingDirection.Up:
-                case ScrollingDirection.Down:
-                    return ToScreenSpace(new Vector2(getBreadth() / 2, pos));
-
-                default:
-                    return ToScreenSpace(new Vector2(pos, getBreadth() / 2));
-            }
+            float position = PositionAtTime(time, Time.Current);
+            return scrollingAxis == 0
+                ? ToScreenSpace(new Vector2(position, DrawHeight / 2))
+                : ToScreenSpace(new Vector2(DrawWidth / 2, position));
         }
 
-        private float scrollLength
+        /// <summary>
+        /// Given a start time and end time of a scrolling object, return the length of the object along the scrolling axis.
+        /// </summary>
+        public float LengthAtTime(double startTime, double endTime)
         {
-            get
-            {
-                switch (scrollingInfo.Direction.Value)
-                {
-                    case ScrollingDirection.Left:
-                    case ScrollingDirection.Right:
-                        return DrawWidth;
-
-                    default:
-                        return DrawHeight;
-                }
-            }
+            return scrollingInfo.Algorithm.GetLength(startTime, endTime, timeRange.Value, scrollLength);
         }
 
-        private float getBreadth()
-        {
-            switch (scrollingInfo.Direction.Value)
-            {
-                case ScrollingDirection.Up:
-                case ScrollingDirection.Down:
-                    return DrawWidth;
-
-                default:
-                    return DrawHeight;
-            }
-        }
+        private float scrollLength => DrawSize[scrollingAxis];
 
         private void flipPositionIfRequired(ref float position)
         {
-            // We're dealing with screen coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
+            // We're dealing with coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
             // The scrolling algorithm instead assumes a top anchor meaning an increase in time corresponds to an increase in position,
             // so when scrolling downwards the coordinates need to be flipped.
 
@@ -237,18 +222,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             if (hitObject.HitObject is IHasDuration e)
             {
-                switch (direction.Value)
-                {
-                    case ScrollingDirection.Up:
-                    case ScrollingDirection.Down:
-                        hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, e.EndTime, timeRange.Value, scrollLength);
-                        break;
-
-                    case ScrollingDirection.Left:
-                    case ScrollingDirection.Right:
-                        hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, e.EndTime, timeRange.Value, scrollLength);
-                        break;
-                }
+                float length = LengthAtTime(hitObject.HitObject.StartTime, e.EndTime);
+                if (scrollingAxis == 0)
+                    hitObject.Width = length;
+                else
+                    hitObject.Height = length;
             }
 
             foreach (var obj in hitObject.NestedHitObjects)
@@ -262,24 +240,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private void updatePosition(DrawableHitObject hitObject, double currentTime)
         {
-            switch (direction.Value)
-            {
-                case ScrollingDirection.Up:
-                    hitObject.Y = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
-                    break;
+            float position = PositionAtTime(hitObject.HitObject.StartTime, currentTime);
 
-                case ScrollingDirection.Down:
-                    hitObject.Y = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
-                    break;
-
-                case ScrollingDirection.Left:
-                    hitObject.X = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
-                    break;
-
-                case ScrollingDirection.Right:
-                    hitObject.X = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
-                    break;
-            }
+            if (scrollingAxis == 0)
+                hitObject.X = position;
+            else
+                hitObject.Y = position;
         }
     }
 }
