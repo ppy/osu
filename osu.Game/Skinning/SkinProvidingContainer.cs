@@ -24,7 +24,7 @@ namespace osu.Game.Skinning
         public event Action SourceChanged;
 
         /// <summary>
-        /// The list of skins provided by this <see cref="SkinProvidingContainer"/>.
+        /// Skins which should be exposed by this container, in order of lookup precedence.
         /// </summary>
         protected readonly BindableList<ISkin> SkinSources = new BindableList<ISkin>();
 
@@ -44,7 +44,7 @@ namespace osu.Game.Skinning
         protected virtual bool AllowColourLookup => true;
 
         /// <summary>
-        /// Constructs a new <see cref="SkinProvidingContainer"/> with a single skin added to the protected <see cref="SkinSources"/> list.
+        /// Constructs a new <see cref="SkinProvidingContainer"/> initialised with a single skin source.
         /// </summary>
         public SkinProvidingContainer(ISkin skin)
             : this()
@@ -54,7 +54,7 @@ namespace osu.Game.Skinning
 
         /// <summary>
         /// Constructs a new <see cref="SkinProvidingContainer"/> with no sources.
-        /// Up to the implementation for adding to the <see cref="SkinSources"/> list.
+        /// Implementations can add or change sources through the <see cref="SkinSources"/> list.
         /// </summary>
         protected SkinProvidingContainer()
         {
