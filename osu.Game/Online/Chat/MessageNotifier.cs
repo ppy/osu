@@ -45,8 +45,7 @@ namespace osu.Game.Online.Chat
             notifyOnPM = config.GetBindable<bool>(OsuSetting.ChatMessageNotification);
             localUser.BindTo(api.LocalUser);
 
-            // Listen for new messages
-            joinedChannels.CollectionChanged += channelsChanged;
+            joinedChannels.BindCollectionChanged(channelsChanged);
             joinedChannels.BindTo(channelManager.JoinedChannels);
         }
 
@@ -70,28 +69,14 @@ namespace osu.Game.Online.Chat
 
         private void newMessagesArrived(IEnumerable<Message> messages)
         {
-            if (messages == null || !messages.Any())
+            if (!messages.Any())
                 return;
 
-            HandleMessages(messages.First().ChannelId, messages);
-        }
-
-        /// <summary>
-        /// Searches for a channel with the matching <paramref name="channelId"/>, returns <see langword="null"/> when none found.
-        /// </summary>
-        private Channel fetchJoinedChannel(long channelId)
-        {
-            return channelManager.JoinedChannels.SingleOrDefault(c => c.Id == channelId);
-        }
-
-        public void HandleMessages(long channelId, IEnumerable<Message> messages)
-        {
-            // Fetch channel object
-            var channel = fetchJoinedChannel(channelId);
+            var channel = channelManager.JoinedChannels.SingleOrDefault(c => c.Id == messages.First().ChannelId);
 
             if (channel == null)
             {
-                Logger.Log($"Couldn't resolve channel id {channelId}", LoggingTarget.Information);
+                Logger.Log($"Couldn't resolve channel id {messages.First().ChannelId}", LoggingTarget.Information);
                 return;
             }
 
