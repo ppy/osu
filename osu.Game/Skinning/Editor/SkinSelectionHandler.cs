@@ -287,6 +287,17 @@ namespace osu.Game.Skinning.Editor
 
             var result = default(Anchor);
 
+            static Anchor getTieredComponent(float component, Anchor tier0, Anchor tier1, Anchor tier2)
+            {
+                if (component >= 2 / 3f)
+                    return tier2;
+
+                if (component >= 1 / 3f)
+                    return tier1;
+
+                return tier0;
+            }
+
             result |= getTieredComponent(absolutePosition.X / factor.X, Anchor.x0, Anchor.x1, Anchor.x2);
             result |= getTieredComponent(absolutePosition.Y / factor.Y, Anchor.y0, Anchor.y1, Anchor.y2);
 
@@ -308,17 +319,6 @@ namespace osu.Game.Skinning.Editor
                 result.Y += quad.Height / 2f;
 
             return result;
-        }
-
-        private static Anchor getTieredComponent(float component, Anchor tier0, Anchor tier1, Anchor tier2)
-        {
-            if (component >= 2 / 3f)
-                return tier2;
-
-            if (component >= 1 / 3f)
-                return tier1;
-
-            return tier0;
         }
 
         private static void applyAnchor(Drawable drawable, Anchor anchor)
