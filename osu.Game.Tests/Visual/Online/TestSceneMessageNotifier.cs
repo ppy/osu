@@ -201,7 +201,11 @@ namespace osu.Game.Tests.Visual.Online
             public ChannelManager ChannelManager { get; } = new ChannelManager();
 
             [Cached]
-            public NotificationOverlay NotificationOverlay { get; } = new NotificationOverlay();
+            public NotificationOverlay NotificationOverlay { get; } = new NotificationOverlay
+            {
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+            };
 
             [Cached]
             public ChatOverlay ChatOverlay { get; } = new ChatOverlay();
