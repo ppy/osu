@@ -23,7 +23,7 @@ namespace osu.Game.Beatmaps
         /// Returns <see langword="true"/> if the string <paramref name="str"/> can be used in <see cref="BeatmapMetadata.Artist"/> and <see cref="BeatmapMetadata.Title"/> fields.
         /// Strings not matched by this method can be placed in <see cref="BeatmapMetadata.ArtistUnicode"/> and <see cref="BeatmapMetadata.TitleUnicode"/>.
         /// </summary>
-        public static bool IsRomanised(string? str) => str == null || str.All(IsRomanised);
+        public static bool IsRomanised(string? str) => string.IsNullOrEmpty(str) || str.All(IsRomanised);
 
         /// <summary>
         /// Returns a copy of <paramref name="str"/> with all characters that do not match <see cref="IsRomanised(char)"/> removed.
