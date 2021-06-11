@@ -26,7 +26,7 @@ namespace osu.Game.Skinning
             Ruleset = ruleset;
             Beatmap = beatmap;
 
-            InternalChild = new BeatmapSkinProvidingContainer(beatmapSkin == null ? null : ruleset.CreateLegacySkinProvider(beatmapSkin, beatmap))
+            InternalChild = new BeatmapSkinProvidingContainer(GetRulesetTransformedSkin(beatmapSkin))
             {
                 Child = Content = new Container
                 {
@@ -54,13 +54,25 @@ namespace osu.Game.Skinning
         {
             SkinSources.Clear();
 
-            SkinSources.Add(Ruleset.CreateLegacySkinProvider(skinManager.CurrentSkin.Value, Beatmap));
+            SkinSources.Add(GetRulesetTransformedSkin(skinManager.CurrentSkin.Value));
 
             // TODO: we also want to return a DefaultLegacySkin here if the current *beatmap* is providing any skinned elements.
             if (skinManager.CurrentSkin.Value is LegacySkin)
-                SkinSources.Add(Ruleset.CreateLegacySkinProvider(skinManager.DefaultLegacySkin, Beatmap));
+                SkinSources.Add(GetRulesetTransformedSkin(skinManager.DefaultLegacySkin));
 
-            SkinSources.Add(Ruleset.CreateLegacySkinProvider(skinManager.DefaultSkin, Beatmap));
+            SkinSources.Add(GetRulesetTransformedSkin(skinManager.DefaultSkin));
+        }
+
+        protected ISkin GetRulesetTransformedSkin(ISkin skin)
+        {
+            if (skin == null)
+                return null;
+
+            var rulesetTransformed = Ruleset.CreateLegacySkinProvider(skin, Beatmap);
+            if (rulesetTransformed != null)
+                return rulesetTransformed;
+
+            return skin;
         }
     }
 }
