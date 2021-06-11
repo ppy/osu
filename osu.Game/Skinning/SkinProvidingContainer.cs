@@ -72,9 +72,19 @@ namespace osu.Game.Skinning
 
                         break;
 
+                    case NotifyCollectionChangedAction.Reset:
                     case NotifyCollectionChangedAction.Remove:
                         foreach (var source in args.OldItems.Cast<ISkin>().OfType<ISkinSource>())
                             source.SourceChanged -= OnSourceChanged;
+
+                        break;
+
+                    case NotifyCollectionChangedAction.Replace:
+                        foreach (var source in args.OldItems.Cast<ISkin>().OfType<ISkinSource>())
+                            source.SourceChanged -= OnSourceChanged;
+
+                        foreach (var source in args.NewItems.Cast<ISkin>().OfType<ISkinSource>())
+                            source.SourceChanged += OnSourceChanged;
 
                         break;
                 }
