@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.Containers
 
         protected virtual HoverClickSounds CreateHoverClickSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet);
 
-        public OsuClickableContainer(HoverSampleSet sampleSet = HoverSampleSet.Normal)
+        public OsuClickableContainer(HoverSampleSet sampleSet = HoverSampleSet.Default)
         {
             this.sampleSet = sampleSet;
         }
