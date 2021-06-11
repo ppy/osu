@@ -45,7 +45,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleClick = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-select");
+            sampleClick = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-select") ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
         }
     }
 }
