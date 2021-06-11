@@ -1,23 +1,95 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModHidden : ModHidden
+    public class TaikoModHidden : ModHidden, IApplicableToDifficulty
     {
         public override string Description => @"Beats fade out before you hit them!";
         public override double ScoreMultiplier => 1.06;
-        public override bool HasImplementation => false;
+
+        // In stable Taiko, hit position is 160, so playfield is essentially 160 pixels shorter
+        // than actual screen width. Normalized screen height is 480, so on a 4:3 screen the
+        // playfield ratio will actually be (640 - 160) / 480 = 1
+        // For 16:9 resolutions, screen width with normalized height becomes 853.33333 instead,
+        // meaning 16:9 playfield ratio is (853.333 - 160) / 480 = 1.444444.
+        // Thus, 4:3 ratio / 16:9 ratio = 1 / 1.4444 = 9 / 13
+        private const double hd_sv_scale = 9.0 / 13.0;
+        private BeatmapDifficulty difficulty;
+        private ControlPointInfo controlPointInfo;
+
+        [SettingSource("Hide Time", "Multiplies the time the note stays hidden")]
+        public BindableNumber<double> VisibilityMod { get; } = new BindableDouble
+        {
+            MinValue = 0.5,
+            // Max visibility is only to be used with max playfield size
+            MaxValue = 1.5,
+            Default = 1.0,
+            Value = 1.0,
+            Precision = 0.01,
+        };
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
+            ApplyNormalVisibilityState(hitObject, state);
+        }
+
+        protected double MultiplierAt(double position)
+        {
+            var beatLength = controlPointInfo.TimingPointAt(position)?.BeatLength;
+            var speedMultiplier = controlPointInfo.DifficultyPointAt(position)?.SpeedMultiplier;
+            return difficulty.SliderMultiplier * (speedMultiplier ?? 1.0) * TimingControlPoint.DEFAULT_BEAT_LENGTH / (beatLength ?? TimingControlPoint.DEFAULT_BEAT_LENGTH);
         }
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
+            switch (hitObject)
+            {
+                case DrawableDrumRollTick _:
+                    break;
+
+                case DrawableHit _:
+                    break;
+
+                default:
+                    return;
+            }
+
+            // I *think* it's like this because stable's default velocity multiplier is 1.4
+            var preempt = 14000 / MultiplierAt(hitObject.HitObject.StartTime) * VisibilityMod.Value;
+            var start = hitObject.HitObject.StartTime - preempt * 0.6;
+            var duration = preempt * 0.3;
+
+            using (hitObject.BeginAbsoluteSequence(start))
+            {
+                // With 0 opacity the object is dying, and if I set a lifetime other issues appear...
+                // Ideally these need to be fixed, but I lack the knowledge to do it, and this is good enough anyway.
+                hitObject.FadeTo(0.0005f, duration);
+            }
+        }
+
+        public void ReadFromDifficulty(BeatmapDifficulty difficulty)
+        {
+        }
+
+        public void ApplyToDifficulty(BeatmapDifficulty difficulty)
+        {
+            this.difficulty = difficulty;
+            difficulty.SliderMultiplier /= hd_sv_scale;
+        }
+
+        public override void ApplyToBeatmap(IBeatmap beatmap)
+        {
+            controlPointInfo = beatmap.ControlPointInfo;
         }
     }
 }
