@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -31,7 +30,8 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, SessionStatics statics)
         {
-            sampleHover = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-hover") ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-hover");
+            sampleHover = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-hover")
+                          ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-hover");
         }
 
         public override void PlayHoverSample()
@@ -39,23 +39,5 @@ namespace osu.Game.Graphics.UserInterface
             sampleHover.Frequency.Value = 0.98 + RNG.NextDouble(0.04);
             sampleHover.Play();
         }
-    }
-
-    public enum HoverSampleSet
-    {
-        [Description("default")]
-        Default,
-
-        [Description("button")]
-        Button,
-
-        [Description("softer")]
-        Soft,
-
-        [Description("toolbar")]
-        Toolbar,
-
-        [Description("songselect")]
-        SongSelect
     }
 }
