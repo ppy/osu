@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -32,6 +33,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// The master clock which is used to control the timing of all player clocks clocks.
         /// </summary>
         public IAdjustableClock MasterClock { get; }
+
+        public event Action ReadyToStart;
 
         /// <summary>
         /// The player clocks.
@@ -80,14 +83,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             int readyCount = playerClocks.Count(s => !s.WaitingOnFrames.Value);
 
             if (readyCount == playerClocks.Count)
-                return hasStarted = true;
+                return performStart();
 
             if (readyCount > 0)
             {
                 firstStartAttemptTime ??= Time.Current;
 
                 if (Time.Current - firstStartAttemptTime > MAXIMUM_START_DELAY)
-                    return hasStarted = true;
+                    return performStart();
+            }
+
+            bool performStart()
+            {
+                ReadyToStart?.Invoke();
+                return hasStarted = true;
             }
 
             return false;

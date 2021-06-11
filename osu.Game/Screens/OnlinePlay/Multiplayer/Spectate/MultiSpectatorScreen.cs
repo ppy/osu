@@ -101,6 +101,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
             }, leaderboardContainer.Add);
+
+            syncManager.ReadyToStart += onReadyToStart;
         }
 
         protected override void LoadComplete()
@@ -128,6 +130,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private bool isCandidateAudioSource([CanBeNull] ISpectatorPlayerClock clock)
             => clock?.IsRunning == true && !clock.IsCatchingUp && !clock.WaitingOnFrames.Value;
+
+        private void onReadyToStart()
+        {
+            var startTime = instances.Where(i => i.Score != null)
+                                     .SelectMany(i => i.Score.Replay.Frames)
+                                     .Select(f => f.Time)
+                                     .DefaultIfEmpty(0)
+                                     .Max();
+
+            masterClockContainer.Seek(startTime);
+            masterClockContainer.Start();
+        }
 
         protected override void OnUserStateChanged(int userId, SpectatorState spectatorState)
         {

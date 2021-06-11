@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Timing;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
@@ -14,6 +15,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// The master clock which player clocks should synchronise to.
         /// </summary>
         IAdjustableClock MasterClock { get; }
+
+        /// <summary>
+        /// An event which is invoked when gameplay is ready to start.
+        /// </summary>
+        event Action ReadyToStart;
 
         /// <summary>
         /// Adds an <see cref="ISpectatorPlayerClock"/> to manage.
