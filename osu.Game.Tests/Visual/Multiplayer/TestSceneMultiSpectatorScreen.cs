@@ -12,6 +12,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.Spectator;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
@@ -222,6 +223,36 @@ namespace osu.Game.Tests.Visual.Multiplayer
             waitForCatchup(PLAYER_2_ID);
             assertMuted(PLAYER_1_ID, false);
             assertMuted(PLAYER_2_ID, true);
+        }
+
+        [Test]
+        public void TestSpectatingDuringGameplay()
+        {
+            var players = new[] { PLAYER_1_ID, PLAYER_2_ID };
+
+            start(players);
+            sendFrames(players, 300);
+
+            loadSpectateScreen();
+            sendFrames(players, 300);
+
+            AddUntilStep("playing from correct point in time", () => this.ChildrenOfType<DrawableRuleset>().All(r => r.FrameStableClock.CurrentTime > 30000));
+        }
+
+        [Test]
+        public void TestSpectatingDuringGameplayWithLateFrames()
+        {
+            start(new[] { PLAYER_1_ID, PLAYER_2_ID });
+            sendFrames(new[] { PLAYER_1_ID, PLAYER_2_ID }, 300);
+
+            loadSpectateScreen();
+            sendFrames(PLAYER_1_ID, 300);
+
+            AddWaitStep("wait maximum start delay seconds", (int)(CatchUpSyncManager.MAXIMUM_START_DELAY / TimePerAction));
+            checkPaused(PLAYER_1_ID, false);
+
+            sendFrames(PLAYER_2_ID, 300);
+            AddUntilStep("player 2 playing from correct point in time", () => getPlayer(PLAYER_2_ID).ChildrenOfType<DrawableRuleset>().Single().FrameStableClock.CurrentTime > 30000);
         }
 
         private void loadSpectateScreen(bool waitForPlayerLoad = true)
