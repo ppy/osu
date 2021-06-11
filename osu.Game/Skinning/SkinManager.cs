@@ -49,12 +49,12 @@ namespace osu.Game.Skinning
         protected override string ImportFromStablePath => "Skins";
 
         /// <summary>
-        /// An <see cref="ISkin"/> providing the resources of the default skin.
+        /// The default skin.
         /// </summary>
         public Skin DefaultSkin { get; }
 
         /// <summary>
-        /// An <see cref="ISkin"/> providing the resources of the default legacy skin.
+        /// The default legacy skin.
         /// </summary>
         public Skin DefaultLegacySkin { get; }
 
