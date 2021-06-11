@@ -63,7 +63,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             }
 
             updateCatchup();
-            updateMasterClock();
         }
 
         /// <summary>
@@ -131,22 +130,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                     if (timeDelta > MAX_SYNC_OFFSET)
                         clock.IsCatchingUp = true;
                 }
-            }
-        }
-
-        /// <summary>
-        /// Updates the master clock's running state.
-        /// </summary>
-        private void updateMasterClock()
-        {
-            bool anyInSync = playerClocks.Any(s => !s.IsCatchingUp);
-
-            if (MasterClock.IsRunning != anyInSync)
-            {
-                if (anyInSync)
-                    MasterClock.Start();
-                else
-                    MasterClock.Stop();
             }
         }
     }
