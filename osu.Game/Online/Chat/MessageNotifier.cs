@@ -24,13 +24,13 @@ namespace osu.Game.Online.Chat
     /// </summary>
     public class MessageNotifier : Component
     {
-        [Resolved(CanBeNull = true)]
-        private NotificationOverlay notificationOverlay { get; set; }
+        [Resolved]
+        private NotificationOverlay notifications { get; set; }
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private ChatOverlay chatOverlay { get; set; }
 
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private ChannelManager channelManager { get; set; }
 
         private Bindable<bool> notifyOnMention;
@@ -81,7 +81,7 @@ namespace osu.Game.Online.Chat
             }
 
             // Only send notifications, if ChatOverlay and the target channel aren't visible.
-            if (chatOverlay?.IsPresent == true && channelManager.CurrentChannel.Value == channel)
+            if (chatOverlay.IsPresent && channelManager.CurrentChannel.Value == channel)
                 return;
 
             foreach (var message in messages.OrderByDescending(m => m.Id))
@@ -115,9 +115,7 @@ namespace osu.Game.Online.Chat
             if (channel.Id != message.ChannelId)
                 throw new ArgumentException("The provided channel doesn't match with the channel id provided by the message parameter.", nameof(channel));
 
-            var notification = new PrivateMessageNotification(message.Sender.Username, channel);
-            notificationOverlay?.Post(notification);
-
+            notifications.Post(new PrivateMessageNotification(message.Sender.Username, channel));
             return true;
         }
 
@@ -135,9 +133,7 @@ namespace osu.Game.Online.Chat
             if (channel.Id != message.ChannelId)
                 throw new ArgumentException("The provided channel doesn't match with the channel id provided by the message parameter.", nameof(channel));
 
-            var notification = new MentionNotification(message.Sender.Username, channel);
-            notificationOverlay?.Post(notification);
-
+            notifications.Post(new MentionNotification(message.Sender.Username, channel));
             return true;
         }
 
