@@ -56,6 +56,7 @@ namespace osu.Game.Skinning
 
             SkinSources.Add(Ruleset.CreateLegacySkinProvider(skinManager.CurrentSkin.Value, Beatmap));
 
+            // TODO: we also want to return a DefaultLegacySkin here if the current *beatmap* is providing any skinned elements.
             if (skinManager.CurrentSkin.Value is LegacySkin)
                 SkinSources.Add(Ruleset.CreateLegacySkinProvider(skinManager.DefaultLegacySkin, Beatmap));
 

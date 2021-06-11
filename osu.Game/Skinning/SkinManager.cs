@@ -247,9 +247,6 @@ namespace osu.Game.Skinning
             if (lookupFunction(CurrentSkin.Value) is T skinSourced)
                 return skinSourced;
 
-            // TODO: we also want to return a DefaultLegacySkin here if the current *beatmap* is providing any skinned elements.
-            // When attempting to address this, we may want to move the full DefaultLegacySkin fallback logic to within Player itself (to better allow
-            // for beatmap skin visibility).
             if (CurrentSkin.Value is LegacySkin && lookupFunction(DefaultLegacySkin) is T legacySourced)
                 return legacySourced;
 
