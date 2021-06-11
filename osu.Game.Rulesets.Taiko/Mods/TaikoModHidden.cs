@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         // For custom resolutions (x:y), screen width with normalized height becomes 480 * x / y instead,
         // and the playfield ratio becomes (480 * x / y - 160) / 480 = x / y - 1/3
         // The following is 4:3 playfield ratio divided by 16:9 playfield ratio
-        private const double hd_sv_scale = (4 / 3 - 1/3) / (16 / 9 - 1/3);
+        private const double hd_sv_scale = (4.0 / 3.0 - 1.0 / 3.0) / (16.0 / 9.0 - 1.0 / 3.0);
         private BeatmapDifficulty difficulty;
         private ControlPointInfo controlPointInfo;
 
