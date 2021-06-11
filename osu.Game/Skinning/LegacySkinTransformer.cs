@@ -30,7 +30,7 @@ namespace osu.Game.Skinning
             Skin = skin ?? throw new ArgumentNullException(nameof(skin));
         }
 
-        public abstract Drawable GetDrawableComponent(ISkinComponent component);
+        public virtual Drawable GetDrawableComponent(ISkinComponent component) => Skin.GetDrawableComponent(component);
 
         public Texture GetTexture(string componentName) => GetTexture(componentName, default, default);
 
@@ -49,6 +49,6 @@ namespace osu.Game.Skinning
             return Skin.GetSample(sampleInfo);
         }
 
-        public abstract IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
+        public virtual IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => Skin.GetConfig<TLookup, TValue>(lookup);
     }
 }
