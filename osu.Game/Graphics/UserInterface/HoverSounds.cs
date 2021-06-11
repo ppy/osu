@@ -31,7 +31,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, SessionStatics statics)
         {
-            sampleHover = audio.Samples.Get($@"UI/generic-hover{SampleSet.GetDescription()}");
+            sampleHover = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-hover");
         }
 
         public override void PlayHoverSample()
@@ -43,19 +43,19 @@ namespace osu.Game.Graphics.UserInterface
 
     public enum HoverSampleSet
     {
-        [Description("")]
+        [Description("default")]
         Loud,
 
-        [Description("-soft")]
+        [Description("soft")]
         Normal,
 
-        [Description("-softer")]
+        [Description("softer")]
         Soft,
 
-        [Description("-toolbar")]
+        [Description("toolbar")]
         Toolbar,
 
-        [Description("-songselect")]
+        [Description("songselect")]
         SongSelect
     }
 }
