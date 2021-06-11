@@ -186,14 +186,14 @@ namespace osu.Game.Skinning.Editor
 
             yield return new OsuMenuItem("Anchor")
             {
-                Items = createAnchorItems((i, a) => i.UsesFixedAnchor && ((Drawable)i).Anchor == a, applyFixedAnchors)
+                Items = createAnchorItems((d, a) => d.UsesFixedAnchor && ((Drawable)d).Anchor == a, applyFixedAnchors)
                         .Prepend(closestItem)
                         .ToArray()
             };
 
             yield return new OsuMenuItem("Origin")
             {
-                Items = createAnchorItems((i, o) => ((Drawable)i).Origin == o, applyOrigins).ToArray()
+                Items = createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray()
             };
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
