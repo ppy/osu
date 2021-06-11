@@ -149,10 +149,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private void onMasterStateChanged(ValueChangedEvent<MasterClockState> state)
         {
-            if (state.NewValue == MasterClockState.Synchronised)
-                masterClockContainer.Start();
-            else
-                masterClockContainer.Stop();
+            switch (state.NewValue)
+            {
+                case MasterClockState.Synchronised:
+                    masterClockContainer.Start();
+                    break;
+
+                case MasterClockState.TooFarAhead:
+                    masterClockContainer.Stop();
+                    break;
+            }
         }
 
         protected override void OnUserStateChanged(int userId, SpectatorState spectatorState)
