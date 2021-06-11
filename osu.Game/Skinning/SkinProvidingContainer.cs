@@ -65,11 +65,6 @@ namespace osu.Game.Skinning
         protected SkinProvidingContainer()
         {
             RelativeSizeAxes = Axes.Both;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
 
             SkinSources.BindCollectionChanged(((_, args) =>
             {
