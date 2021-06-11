@@ -31,7 +31,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public BindableNumber<double> VisibilityMod { get; } = new BindableDouble
         {
             MinValue = 0.5,
-            // Max visibility is only to be used with max playfield size
             MaxValue = 1.5,
             Default = 1.0,
             Value = 1.0,
