@@ -240,6 +240,10 @@ namespace osu.Game.Skinning.Editor
                 var previousOrigin = drawable.OriginPosition;
                 drawable.Origin = origin;
                 drawable.Position += drawable.OriginPosition - previousOrigin;
+
+                if (item.UsesFixedAnchor) continue;
+
+                applyClosestAnchor(drawable);
             }
         }
 
