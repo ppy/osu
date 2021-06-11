@@ -287,19 +287,19 @@ namespace osu.Game.Skinning.Editor
 
             var result = default(Anchor);
 
-            static Anchor getTieredComponent(float component, Anchor anchor0, Anchor anchor1, Anchor anchor2)
+            static Anchor getAnchorFromPosition(float xOrY, Anchor anchor0, Anchor anchor1, Anchor anchor2)
             {
-                if (component >= 2 / 3f)
+                if (xOrY >= 2 / 3f)
                     return anchor2;
 
-                if (component >= 1 / 3f)
+                if (xOrY >= 1 / 3f)
                     return anchor1;
 
                 return anchor0;
             }
 
-            result |= getTieredComponent(absolutePosition.X / factor.X, Anchor.x0, Anchor.x1, Anchor.x2);
-            result |= getTieredComponent(absolutePosition.Y / factor.Y, Anchor.y0, Anchor.y1, Anchor.y2);
+            result |= getAnchorFromPosition(absolutePosition.X / factor.X, Anchor.x0, Anchor.x1, Anchor.x2);
+            result |= getAnchorFromPosition(absolutePosition.Y / factor.Y, Anchor.y0, Anchor.y1, Anchor.y2);
 
             return result;
         }
