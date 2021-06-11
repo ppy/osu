@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Framework.Timing;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
@@ -12,14 +13,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     public interface ISyncManager
     {
         /// <summary>
+        /// An event which is invoked when gameplay is ready to start.
+        /// </summary>
+        event Action ReadyToStart;
+
+        /// <summary>
         /// The master clock which player clocks should synchronise to.
         /// </summary>
         IAdjustableClock MasterClock { get; }
 
         /// <summary>
-        /// An event which is invoked when gameplay is ready to start.
+        /// An event which is invoked when the state of <see cref="MasterClock"/> is changed.
         /// </summary>
-        event Action ReadyToStart;
+        IBindable<MasterClockState> MasterState { get; }
 
         /// <summary>
         /// Adds an <see cref="ISpectatorPlayerClock"/> to manage.

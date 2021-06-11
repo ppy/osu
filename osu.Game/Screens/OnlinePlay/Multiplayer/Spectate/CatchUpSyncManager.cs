@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 
@@ -29,17 +30,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public const double MAXIMUM_START_DELAY = 15000;
 
+        public event Action ReadyToStart;
+
         /// <summary>
         /// The master clock which is used to control the timing of all player clocks clocks.
         /// </summary>
         public IAdjustableClock MasterClock { get; }
 
-        public event Action ReadyToStart;
+        public IBindable<MasterClockState> MasterState => masterState;
 
         /// <summary>
         /// The player clocks.
         /// </summary>
         private readonly List<ISpectatorPlayerClock> playerClocks = new List<ISpectatorPlayerClock>();
+
+        private readonly Bindable<MasterClockState> masterState = new Bindable<MasterClockState>();
 
         private bool hasStarted;
         private double? firstStartAttemptTime;
@@ -65,7 +70,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 return;
             }
 
-            updateCatchup();
+            updatePlayerCatchup();
+            updateMasterState();
         }
 
         /// <summary>
@@ -105,7 +111,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// Updates the catchup states of all player clocks clocks.
         /// </summary>
-        private void updateCatchup()
+        private void updatePlayerCatchup()
         {
             for (int i = 0; i < playerClocks.Count; i++)
             {
@@ -140,6 +146,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                         clock.IsCatchingUp = true;
                 }
             }
+        }
+
+        /// <summary>
+        /// Updates the state of the master clock.
+        /// </summary>
+        private void updateMasterState()
+        {
+            bool anyInSync = playerClocks.Any(s => !s.IsCatchingUp);
+            masterState.Value = anyInSync ? MasterClockState.Synchronised : MasterClockState.TooFarAhead;
         }
     }
 }

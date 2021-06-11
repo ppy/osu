@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
@@ -103,6 +104,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             }, leaderboardContainer.Add);
 
             syncManager.ReadyToStart += onReadyToStart;
+            syncManager.MasterState.BindValueChanged(onMasterStateChanged, true);
         }
 
         protected override void LoadComplete()
@@ -143,6 +145,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             masterClockContainer.Seek(startTime);
             masterClockContainer.Start();
+        }
+
+        private void onMasterStateChanged(ValueChangedEvent<MasterClockState> state)
+        {
+            if (state.NewValue == MasterClockState.Synchronised)
+                masterClockContainer.Start();
+            else
+                masterClockContainer.Stop();
         }
 
         protected override void OnUserStateChanged(int userId, SpectatorState spectatorState)
