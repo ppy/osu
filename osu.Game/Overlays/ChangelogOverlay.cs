@@ -25,8 +25,6 @@ namespace osu.Game.Overlays
 
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
 
-        private Sample sampleBack;
-
         private List<APIChangelogBuild> builds;
 
         protected List<APIUpdateStream> Streams;
@@ -40,8 +38,6 @@ namespace osu.Game.Overlays
         private void load(AudioManager audio)
         {
             Header.Build.BindTarget = Current;
-
-            sampleBack = audio.Samples.Get(@"UI/generic-select-soft");
 
             Current.BindValueChanged(e =>
             {
@@ -108,7 +104,6 @@ namespace osu.Game.Overlays
                     else
                     {
                         Current.Value = null;
-                        sampleBack?.Play();
                     }
 
                     return true;
