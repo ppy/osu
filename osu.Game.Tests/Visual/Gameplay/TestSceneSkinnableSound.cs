@@ -29,14 +29,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("setup hierarchy", () =>
             {
-                Children = new Drawable[]
+                Child = skinSource = new TestSkinSourceContainer
                 {
-                    skinSource = new TestSkinSourceContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = skinnableSound = new PausableSkinnableSound(new SampleInfo("Gameplay/normal-sliderslide"))
-                    },
+                    RelativeSizeAxes = Axes.Both,
                 };
+
+                // has to be added after the hierarchy above else the `ISkinSource` dependency won't be cached.
+                skinSource.Add(skinnableSound = new PausableSkinnableSound(new SampleInfo("Gameplay/normal-sliderslide")));
             });
         }
 
@@ -147,6 +146,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => source?.GetTexture(componentName, wrapModeS, wrapModeT);
             public ISample GetSample(ISampleInfo sampleInfo) => source?.GetSample(sampleInfo);
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => source?.GetConfig<TLookup, TValue>(lookup);
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => source?.FindProvider(lookupFunction);
 
             public void TriggerSourceChanged()
             {

@@ -152,32 +152,35 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             throw new ArgumentOutOfRangeException(nameof(component), $"Invalid component type: {component}");
         }
 
-        public override ISample GetSample(ISampleInfo sampleInfo) => Source.GetSample(new LegacyTaikoSampleInfo(sampleInfo));
+        public override ISample GetSample(ISampleInfo sampleInfo)
+        {
+            if (sampleInfo is HitSampleInfo hitSampleInfo)
+                return Source.GetSample(new LegacyTaikoSampleInfo(hitSampleInfo));
+
+            return base.GetSample(sampleInfo);
+        }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => Source.GetConfig<TLookup, TValue>(lookup);
 
-        private class LegacyTaikoSampleInfo : ISampleInfo
+        private class LegacyTaikoSampleInfo : HitSampleInfo
         {
-            private readonly ISampleInfo source;
+            public LegacyTaikoSampleInfo(HitSampleInfo sampleInfo)
+                : base(sampleInfo.Name, sampleInfo.Bank, sampleInfo.Suffix, sampleInfo.Volume)
 
-            public LegacyTaikoSampleInfo(ISampleInfo source)
             {
-                this.source = source;
             }
 
-            public IEnumerable<string> LookupNames
+            public override IEnumerable<string> LookupNames
             {
                 get
                 {
-                    foreach (var name in source.LookupNames)
+                    foreach (var name in base.LookupNames)
                         yield return name.Insert(name.LastIndexOf('/') + 1, "taiko-");
 
-                    foreach (var name in source.LookupNames)
+                    foreach (var name in base.LookupNames)
                         yield return name;
                 }
             }
-
-            public int Volume => source.Volume;
         }
     }
 }

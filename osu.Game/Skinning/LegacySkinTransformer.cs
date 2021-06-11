@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,7 +16,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// Transformer used to handle support of legacy features for individual rulesets.
     /// </summary>
-    public abstract class LegacySkinTransformer : ISkin
+    public abstract class LegacySkinTransformer : ISkinSource
     {
         /// <summary>
         /// Source of the <see cref="ISkin"/> which is being transformed.
@@ -47,5 +48,13 @@ namespace osu.Game.Skinning
         }
 
         public abstract IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
+
+        public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => Source.FindProvider(lookupFunction);
+
+        public event Action SourceChanged
+        {
+            add => Source.SourceChanged += value;
+            remove => Source.SourceChanged -= value;
+        }
     }
 }

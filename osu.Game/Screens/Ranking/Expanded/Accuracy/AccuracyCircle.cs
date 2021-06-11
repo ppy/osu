@@ -5,14 +5,18 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Platform;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking.Expanded.Accuracy
@@ -79,13 +83,28 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private Container<RankBadge> badges;
         private RankText rankText;
 
-        public AccuracyCircle(ScoreInfo score)
+        private PoolableSkinnableSample scoreTickSound;
+        private PoolableSkinnableSample badgeTickSound;
+        private PoolableSkinnableSample badgeMaxSound;
+        private PoolableSkinnableSample swooshUpSound;
+        private PoolableSkinnableSample rankImpactSound;
+        private PoolableSkinnableSample rankApplauseSound;
+
+        private readonly Bindable<double> tickPlaybackRate = new Bindable<double>();
+
+        private double lastTickPlaybackTime;
+        private bool isTicking;
+
+        private readonly bool withFlair;
+
+        public AccuracyCircle(ScoreInfo score, bool withFlair = false)
         {
             this.score = score;
+            this.withFlair = withFlair;
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(GameHost host)
         {
             InternalChildren = new Drawable[]
             {
@@ -204,14 +223,19 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 },
                 rankText = new RankText(score.Rank)
             };
-        }
 
-        private ScoreRank getRank(ScoreRank rank)
-        {
-            foreach (var mod in score.Mods.OfType<IApplicableToScoreProcessor>())
-                rank = mod.AdjustRank(rank, score.Accuracy);
-
-            return rank;
+            if (withFlair)
+            {
+                AddRangeInternal(new Drawable[]
+                {
+                    rankImpactSound = new PoolableSkinnableSample(new SampleInfo(impactSampleName)),
+                    rankApplauseSound = new PoolableSkinnableSample(new SampleInfo(@"applause", applauseSampleName)),
+                    scoreTickSound = new PoolableSkinnableSample(new SampleInfo(@"Results/score-tick")),
+                    badgeTickSound = new PoolableSkinnableSample(new SampleInfo(@"Results/badge-dink")),
+                    badgeMaxSound = new PoolableSkinnableSample(new SampleInfo(@"Results/badge-dink-max")),
+                    swooshUpSound = new PoolableSkinnableSample(new SampleInfo(@"Results/swoosh-up")),
+                });
+            }
         }
 
         protected override void LoadComplete()
@@ -220,31 +244,168 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
             this.ScaleTo(0).Then().ScaleTo(1, APPEAR_DURATION, Easing.OutQuint);
 
-            using (BeginDelayedSequence(RANK_CIRCLE_TRANSFORM_DELAY, true))
+            if (withFlair)
+            {
+                const double swoosh_pre_delay = 443f;
+                const double swoosh_volume = 0.4f;
+
+                this.Delay(swoosh_pre_delay).Schedule(() =>
+                {
+                    swooshUpSound.VolumeTo(swoosh_volume);
+                    swooshUpSound.Play();
+                });
+            }
+
+            using (BeginDelayedSequence(RANK_CIRCLE_TRANSFORM_DELAY))
                 innerMask.FillTo(1f, RANK_CIRCLE_TRANSFORM_DURATION, ACCURACY_TRANSFORM_EASING);
 
-            using (BeginDelayedSequence(ACCURACY_TRANSFORM_DELAY, true))
+            using (BeginDelayedSequence(ACCURACY_TRANSFORM_DELAY))
             {
                 double targetAccuracy = score.Rank == ScoreRank.X || score.Rank == ScoreRank.XH ? 1 : Math.Min(1 - virtual_ss_percentage, score.Accuracy);
 
                 accuracyCircle.FillTo(targetAccuracy, ACCURACY_TRANSFORM_DURATION, ACCURACY_TRANSFORM_EASING);
+
+                if (withFlair)
+                {
+                    Schedule(() =>
+                    {
+                        const double score_tick_debounce_rate_start = 18f;
+                        const double score_tick_debounce_rate_end = 300f;
+                        const double score_tick_volume_start = 0.6f;
+                        const double score_tick_volume_end = 1.0f;
+
+                        this.TransformBindableTo(tickPlaybackRate, score_tick_debounce_rate_start);
+                        this.TransformBindableTo(tickPlaybackRate, score_tick_debounce_rate_end, ACCURACY_TRANSFORM_DURATION, Easing.OutSine);
+
+                        scoreTickSound.FrequencyTo(1 + targetAccuracy, ACCURACY_TRANSFORM_DURATION, Easing.OutSine);
+                        scoreTickSound.VolumeTo(score_tick_volume_start).Then().VolumeTo(score_tick_volume_end, ACCURACY_TRANSFORM_DURATION, Easing.OutSine);
+
+                        isTicking = true;
+                    });
+                }
+
+                int badgeNum = 0;
 
                 foreach (var badge in badges)
                 {
                     if (badge.Accuracy > score.Accuracy)
                         continue;
 
-                    using (BeginDelayedSequence(inverseEasing(ACCURACY_TRANSFORM_EASING, Math.Min(1 - virtual_ss_percentage, badge.Accuracy) / targetAccuracy) * ACCURACY_TRANSFORM_DURATION, true))
+                    using (BeginDelayedSequence(inverseEasing(ACCURACY_TRANSFORM_EASING, Math.Min(1 - virtual_ss_percentage, badge.Accuracy) / targetAccuracy) * ACCURACY_TRANSFORM_DURATION))
                     {
                         badge.Appear();
+
+                        if (withFlair)
+                        {
+                            Schedule(() =>
+                            {
+                                var dink = badgeNum < badges.Count - 1 ? badgeTickSound : badgeMaxSound;
+
+                                dink.FrequencyTo(1 + badgeNum++ * 0.05);
+                                dink.Play();
+                            });
+                        }
                     }
                 }
 
-                using (BeginDelayedSequence(TEXT_APPEAR_DELAY, true))
+                using (BeginDelayedSequence(TEXT_APPEAR_DELAY))
                 {
                     rankText.Appear();
+
+                    if (!withFlair) return;
+
+                    Schedule(() =>
+                    {
+                        isTicking = false;
+                        rankImpactSound.Play();
+                    });
+
+                    const double applause_pre_delay = 545f;
+                    const double applause_volume = 0.8f;
+
+                    using (BeginDelayedSequence(applause_pre_delay))
+                    {
+                        Schedule(() =>
+                        {
+                            rankApplauseSound.VolumeTo(applause_volume);
+                            rankApplauseSound.Play();
+                        });
+                    }
                 }
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (isTicking && Clock.CurrentTime - lastTickPlaybackTime >= tickPlaybackRate.Value)
+            {
+                scoreTickSound?.Play();
+                lastTickPlaybackTime = Clock.CurrentTime;
+            }
+        }
+
+        private string applauseSampleName
+        {
+            get
+            {
+                switch (score.Rank)
+                {
+                    default:
+                    case ScoreRank.D:
+                        return @"Results/applause-d";
+
+                    case ScoreRank.C:
+                        return @"Results/applause-c";
+
+                    case ScoreRank.B:
+                        return @"Results/applause-b";
+
+                    case ScoreRank.A:
+                        return @"Results/applause-a";
+
+                    case ScoreRank.S:
+                    case ScoreRank.SH:
+                    case ScoreRank.X:
+                    case ScoreRank.XH:
+                        return @"Results/applause-s";
+                }
+            }
+        }
+
+        private string impactSampleName
+        {
+            get
+            {
+                switch (score.Rank)
+                {
+                    default:
+                    case ScoreRank.D:
+                        return @"Results/rank-impact-fail-d";
+
+                    case ScoreRank.C:
+                    case ScoreRank.B:
+                        return @"Results/rank-impact-fail";
+
+                    case ScoreRank.A:
+                    case ScoreRank.S:
+                    case ScoreRank.SH:
+                        return @"Results/rank-impact-pass";
+
+                    case ScoreRank.X:
+                    case ScoreRank.XH:
+                        return @"Results/rank-impact-pass-ss";
+                }
+            }
+        }
+
+        private ScoreRank getRank(ScoreRank rank)
+        {
+            foreach (var mod in score.Mods.OfType<IApplicableToScoreProcessor>())
+                rank = mod.AdjustRank(rank, score.Accuracy);
+
+            return rank;
         }
 
         private double inverseEasing(Easing easing, double targetValue)

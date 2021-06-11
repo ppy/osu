@@ -14,6 +14,27 @@ namespace osu.Game.Graphics.UserInterfaceV2
     public abstract class LabelledDrawable<T> : CompositeDrawable
         where T : Drawable
     {
+        private float? fixedLabelWidth;
+
+        /// <summary>
+        /// The fixed width of the label of this <see cref="LabelledDrawable{T}"/>.
+        /// If <c>null</c>, the label portion will auto-size to its content.
+        /// Can be used in layout scenarios where several labels must match in length for the components to be aligned properly.
+        /// </summary>
+        public float? FixedLabelWidth
+        {
+            get => fixedLabelWidth;
+            set
+            {
+                if (fixedLabelWidth == value)
+                    return;
+
+                fixedLabelWidth = value;
+
+                updateLabelWidth();
+            }
+        }
+
         protected const float CONTENT_PADDING_VERTICAL = 10;
         protected const float CONTENT_PADDING_HORIZONTAL = 15;
         protected const float CORNER_RADIUS = 15;
@@ -23,6 +44,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         /// </summary>
         protected readonly T Component;
 
+        private readonly GridContainer grid;
         private readonly OsuTextFlowContainer labelText;
         private readonly OsuTextFlowContainer descriptionText;
 
@@ -56,7 +78,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     Spacing = new Vector2(0, 12),
                     Children = new Drawable[]
                     {
-                        new GridContainer
+                        grid = new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -69,7 +91,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         AutoSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding { Right = 20 }
+                                        Padding = new MarginPadding
+                                        {
+                                            Right = 20,
+                                            // ensure that the label is always vertically padded even if the component itself isn't.
+                                            // this may become an issue if the label is taller than the component.
+                                            Vertical = padded ? 0 : CONTENT_PADDING_VERTICAL
+                                        }
                                     },
                                     new Container
                                     {
@@ -87,7 +115,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                 },
                             },
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                            ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                         },
                         descriptionText = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold, italics: true))
                         {
@@ -99,6 +126,24 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     }
                 }
             };
+
+            updateLabelWidth();
+        }
+
+        private void updateLabelWidth()
+        {
+            if (fixedLabelWidth == null)
+            {
+                grid.ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) };
+                labelText.RelativeSizeAxes = Axes.None;
+                labelText.AutoSizeAxes = Axes.Both;
+            }
+            else
+            {
+                grid.ColumnDimensions = new[] { new Dimension(GridSizeMode.Absolute, fixedLabelWidth.Value) };
+                labelText.AutoSizeAxes = Axes.Y;
+                labelText.RelativeSizeAxes = Axes.X;
+            }
         }
 
         [BackgroundDependencyLoader]

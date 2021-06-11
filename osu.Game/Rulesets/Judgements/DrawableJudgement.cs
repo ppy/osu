@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -31,18 +30,6 @@ namespace osu.Game.Rulesets.Judgements
         protected SkinnableDrawable JudgementBody { get; private set; }
 
         private readonly Container aboveHitObjectsContent;
-
-        /// <summary>
-        /// Duration of initial fade in.
-        /// </summary>
-        [Obsolete("Apply any animations manually via ApplyHitAnimations / ApplyMissAnimations. Defaults were moved inside skinned components.")]
-        protected virtual double FadeInDuration => 100;
-
-        /// <summary>
-        /// Duration to wait until fade out begins. Defaults to <see cref="FadeInDuration"/>.
-        /// </summary>
-        [Obsolete("Apply any animations manually via ApplyHitAnimations / ApplyMissAnimations. Defaults were moved inside skinned components.")]
-        protected virtual double FadeOutDelay => FadeInDuration;
 
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.

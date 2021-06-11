@@ -128,5 +128,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                     spmContainer.FadeIn(drawableSpinner.HitObject.TimeFadeIn);
             }
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (drawableSpinner != null)
+                drawableSpinner.ApplyCustomUpdateState -= updateStateTransforms;
+        }
     }
 }

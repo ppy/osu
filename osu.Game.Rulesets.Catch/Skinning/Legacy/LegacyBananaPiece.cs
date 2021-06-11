@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics.Textures;
 
-namespace osu.Game.Rulesets.Catch.Skinning
+namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
     public class LegacyBananaPiece : LegacyCatchHitObjectPiece
     {
