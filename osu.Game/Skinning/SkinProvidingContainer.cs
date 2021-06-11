@@ -51,10 +51,11 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Constructs a new <see cref="SkinProvidingContainer"/> initialised with a single skin source.
         /// </summary>
-        public SkinProvidingContainer(ISkin skin)
+        public SkinProvidingContainer([CanBeNull] ISkin skin)
             : this()
         {
-            SkinSources.Add(skin);
+            if (skin != null)
+                SkinSources.Add(skin);
         }
 
         /// <summary>
