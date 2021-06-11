@@ -3,13 +3,18 @@
 
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Objects.Types;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
-    public class Hit : TaikoStrongableHitObject
+    public class Hit : TaikoStrongableHitObject, IHasDisplayColour
     {
         public readonly Bindable<HitType> TypeBindable = new Bindable<HitType>();
+
+        public Bindable<Color4> DisplayColour { get; } = new Bindable<Color4>(COLOUR_CENTRE);
 
         /// <summary>
         /// The <see cref="HitType"/> that actuates this <see cref="Hit"/>.
@@ -20,9 +25,17 @@ namespace osu.Game.Rulesets.Taiko.Objects
             set => TypeBindable.Value = value;
         }
 
+        public static readonly Color4 COLOUR_CENTRE = Color4Extensions.FromHex(@"bb1177");
+        public static readonly Color4 COLOUR_RIM = Color4Extensions.FromHex(@"2299bb");
+
         public Hit()
         {
-            TypeBindable.BindValueChanged(_ => updateSamplesFromType());
+            TypeBindable.BindValueChanged(_ =>
+            {
+                updateSamplesFromType();
+                DisplayColour.Value = Type == HitType.Centre ? COLOUR_CENTRE : COLOUR_RIM;
+            });
+
             SamplesBindable.BindCollectionChanged((_, __) => updateTypeFromSamples());
         }
 

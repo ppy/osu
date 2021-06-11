@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
@@ -68,14 +67,6 @@ namespace osu.Game.Rulesets.Judgements
         /// The health increase for the maximum achievable result.
         /// </summary>
         public double MaxHealthIncrease => HealthIncreaseFor(MaxResult);
-
-        /// <summary>
-        /// Retrieves the numeric score representation of a <see cref="HitResult"/>.
-        /// </summary>
-        /// <param name="result">The <see cref="HitResult"/> to find the numeric score representation for.</param>
-        /// <returns>The numeric score representation of <paramref name="result"/>.</returns>
-        [Obsolete("Has no effect. Use ToNumericResult(HitResult) (standardised across all rulesets).")] // Can be made non-virtual 20210328
-        protected virtual int NumericResultFor(HitResult result) => ToNumericResult(result);
 
         /// <summary>
         /// Retrieves the numeric score representation of a <see cref="JudgementResult"/>.
