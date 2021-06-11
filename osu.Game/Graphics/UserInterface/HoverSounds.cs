@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected readonly HoverSampleSet SampleSet;
 
-        public HoverSounds(HoverSampleSet sampleSet = HoverSampleSet.Normal)
+        public HoverSounds(HoverSampleSet sampleSet = HoverSampleSet.Default)
         {
             SampleSet = sampleSet;
             RelativeSizeAxes = Axes.Both;
@@ -46,8 +46,8 @@ namespace osu.Game.Graphics.UserInterface
         [Description("default")]
         Default,
 
-        [Description("soft")]
-        Normal,
+        [Description("button")]
+        Button,
 
         [Description("softer")]
         Soft,
