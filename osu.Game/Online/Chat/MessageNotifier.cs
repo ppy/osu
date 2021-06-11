@@ -45,9 +45,13 @@ namespace osu.Game.Online.Chat
             notifyOnPrivateMessage = config.GetBindable<bool>(OsuSetting.NotifyOnPrivateMessage);
 
             localUser.BindTo(api.LocalUser);
-
-            joinedChannels.BindCollectionChanged(channelsChanged);
             joinedChannels.BindTo(channelManager.JoinedChannels);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            joinedChannels.BindCollectionChanged(channelsChanged, true);
         }
 
         private void channelsChanged(object sender, NotifyCollectionChangedEventArgs e)
