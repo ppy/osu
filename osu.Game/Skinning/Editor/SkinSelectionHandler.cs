@@ -281,6 +281,23 @@ namespace osu.Game.Skinning.Editor
             if (parent == null)
                 return drawable.Anchor;
 
+            static Vector2 getOriginPositionFromQuad(in Quad quad, Anchor origin)
+            {
+                var result = quad.TopLeft;
+
+                if (origin.HasFlagFast(Anchor.x2))
+                    result.X += quad.Width;
+                else if (origin.HasFlagFast(Anchor.x1))
+                    result.X += quad.Width / 2f;
+
+                if (origin.HasFlagFast(Anchor.y2))
+                    result.Y += quad.Height;
+                else if (origin.HasFlagFast(Anchor.y1))
+                    result.Y += quad.Height / 2f;
+
+                return result;
+            }
+
             var screenPosition = getOriginPositionFromQuad(drawable.ScreenSpaceDrawQuad, drawable.Origin);
             var absolutePosition = parent.ToLocalSpace(screenPosition);
             var factor = parent.RelativeToAbsoluteFactor;
@@ -300,23 +317,6 @@ namespace osu.Game.Skinning.Editor
 
             result |= getAnchorFromPosition(absolutePosition.X / factor.X, Anchor.x0, Anchor.x1, Anchor.x2);
             result |= getAnchorFromPosition(absolutePosition.Y / factor.Y, Anchor.y0, Anchor.y1, Anchor.y2);
-
-            return result;
-        }
-
-        private static Vector2 getOriginPositionFromQuad(in Quad quad, Anchor origin)
-        {
-            var result = quad.TopLeft;
-
-            if (origin.HasFlagFast(Anchor.x2))
-                result.X += quad.Width;
-            else if (origin.HasFlagFast(Anchor.x1))
-                result.X += quad.Width / 2f;
-
-            if (origin.HasFlagFast(Anchor.y2))
-                result.Y += quad.Height;
-            else if (origin.HasFlagFast(Anchor.y1))
-                result.Y += quad.Height / 2f;
 
             return result;
         }
