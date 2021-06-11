@@ -9,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
@@ -33,16 +32,18 @@ namespace osu.Game.Online.Chat
         [Resolved]
         private ChannelManager channelManager { get; set; }
 
-        private Bindable<bool> notifyOnMention;
-        private Bindable<bool> notifyOnPM;
+        private Bindable<bool> notifyOnUsername;
+        private Bindable<bool> notifyOnPrivateMessage;
+
         private readonly IBindable<User> localUser = new Bindable<User>();
         private readonly IBindableList<Channel> joinedChannels = new BindableList<Channel>();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, IAPIProvider api)
         {
-            notifyOnMention = config.GetBindable<bool>(OsuSetting.ChatHighlightName);
-            notifyOnPM = config.GetBindable<bool>(OsuSetting.ChatMessageNotification);
+            notifyOnUsername = config.GetBindable<bool>(OsuSetting.NotifyOnUsernameMentioned);
+            notifyOnPrivateMessage = config.GetBindable<bool>(OsuSetting.NotifyOnPrivateMessage);
+
             localUser.BindTo(api.LocalUser);
 
             joinedChannels.BindCollectionChanged(channelsChanged);
@@ -55,19 +56,19 @@ namespace osu.Game.Online.Chat
             {
                 case NotifyCollectionChangedAction.Add:
                     foreach (var channel in e.NewItems.Cast<Channel>())
-                        channel.NewMessagesArrived += newMessagesArrived;
+                        channel.NewMessagesArrived += checkNewMessages;
 
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
                     foreach (var channel in e.OldItems.Cast<Channel>())
-                        channel.NewMessagesArrived -= newMessagesArrived;
+                        channel.NewMessagesArrived -= checkNewMessages;
 
                     break;
             }
         }
 
-        private void newMessagesArrived(IEnumerable<Message> messages)
+        private void checkNewMessages(IEnumerable<Message> messages)
         {
             if (!messages.Any())
                 return;
@@ -75,10 +76,7 @@ namespace osu.Game.Online.Chat
             var channel = channelManager.JoinedChannels.SingleOrDefault(c => c.Id == messages.First().ChannelId);
 
             if (channel == null)
-            {
-                Logger.Log($"Couldn't resolve channel id {messages.First().ChannelId}", LoggingTarget.Information);
                 return;
-            }
 
             // Only send notifications, if ChatOverlay and the target channel aren't visible.
             if (chatOverlay.IsPresent && channelManager.CurrentChannel.Value == channel)
@@ -93,12 +91,11 @@ namespace osu.Game.Online.Chat
                 if (message.Sender.Id == localUser.Value.Id)
                     continue;
 
-                // check for private messages first,
-                // to avoid both posting two notifications about the same message
+                // check for private messages first to avoid both posting two notifications about the same message
                 if (checkForPMs(channel, message))
                     continue;
 
-                _ = checkForMentions(channel, message, localUser.Value.Username);
+                checkForMentions(channel, message);
             }
         }
 
@@ -107,45 +104,52 @@ namespace osu.Game.Online.Chat
         /// </summary>
         /// <param name="channel">The channel associated to the <paramref name="message"/></param>
         /// <param name="message">The message to be checked</param>
+        /// <returns>Whether a notification was fired.</returns>
         private bool checkForPMs(Channel channel, Message message)
         {
-            if (!notifyOnPM.Value || channel.Type != ChannelType.PM)
+            if (!notifyOnPrivateMessage.Value || channel.Type != ChannelType.PM)
                 return false;
-
-            if (channel.Id != message.ChannelId)
-                throw new ArgumentException("The provided channel doesn't match with the channel id provided by the message parameter.", nameof(channel));
 
             notifications.Post(new PrivateMessageNotification(message.Sender.Username, channel));
             return true;
         }
 
-        /// <summary>
-        /// Checks whether the user enabled mention notifications and whether specified <paramref name="message"/> mentions the provided <paramref name="username"/>.
-        /// </summary>
-        /// <param name="channel">The channel associated to the <paramref name="message"/></param>
-        /// <param name="message">The message to be checked</param>
-        /// <param name="username">The username that will be checked for</param>
-        private bool checkForMentions(Channel channel, Message message, string username)
+        private void checkForMentions(Channel channel, Message message)
         {
-            if (!notifyOnMention.Value || !isMentioning(message.Content, username))
-                return false;
-
-            if (channel.Id != message.ChannelId)
-                throw new ArgumentException("The provided channel doesn't match with the channel id provided by the message parameter.", nameof(channel));
+            if (!notifyOnUsername.Value || !checkContainsUsername(message.Content, localUser.Value.Username)) return;
 
             notifications.Post(new MentionNotification(message.Sender.Username, channel));
-            return true;
         }
 
         /// <summary>
-        /// Checks if <paramref name="message"/> contains <paramref name="username"/>, if not, retries making spaces into underscores.
+        /// Checks if <paramref name="message"/> contains <paramref name="username"/>.
+        /// This will match against the case where underscores are used instead of spaces (which is how osu-stable handles usernames with spaces).
         /// </summary>
-        /// <returns>If the <paramref name="message"/> mentions the <paramref name="username"/></returns>
-        private static bool isMentioning(string message, string username) => message.Contains(username, StringComparison.OrdinalIgnoreCase) || message.Contains(username.Replace(' ', '_'), StringComparison.OrdinalIgnoreCase);
+        private static bool checkContainsUsername(string message, string username) => message.Contains(username, StringComparison.OrdinalIgnoreCase) || message.Contains(username.Replace(' ', '_'), StringComparison.OrdinalIgnoreCase);
 
-        public class OpenChannelNotification : SimpleNotification
+        public class PrivateMessageNotification : OpenChannelNotification
         {
-            public OpenChannelNotification(Channel channel)
+            public PrivateMessageNotification(string username, Channel channel)
+                : base(channel)
+            {
+                Icon = FontAwesome.Solid.Envelope;
+                Text = $"You received a private message from '{username}'. Click to read it!";
+            }
+        }
+
+        public class MentionNotification : OpenChannelNotification
+        {
+            public MentionNotification(string username, Channel channel)
+                : base(channel)
+            {
+                Icon = FontAwesome.Solid.At;
+                Text = $"Your name was mentioned in chat by '{username}'. Click to find out why!";
+            }
+        }
+
+        public abstract class OpenChannelNotification : SimpleNotification
+        {
+            protected OpenChannelNotification(Channel channel)
             {
                 this.channel = channel;
             }
@@ -167,26 +171,6 @@ namespace osu.Game.Online.Chat
 
                     return true;
                 };
-            }
-        }
-
-        public class PrivateMessageNotification : OpenChannelNotification
-        {
-            public PrivateMessageNotification(string username, Channel channel)
-                : base(channel)
-            {
-                Icon = FontAwesome.Solid.Envelope;
-                Text = $"You received a private message from '{username}'. Click to read it!";
-            }
-        }
-
-        public class MentionNotification : OpenChannelNotification
-        {
-            public MentionNotification(string username, Channel channel)
-                : base(channel)
-            {
-                Icon = FontAwesome.Solid.At;
-                Text = $"Your name was mentioned in chat by '{username}'. Click to find out why!";
             }
         }
     }
