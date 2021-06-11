@@ -57,10 +57,11 @@ namespace osu.Game.Skinning
             SkinSources.Add(GetRulesetTransformedSkin(skinManager.CurrentSkin.Value));
 
             // TODO: we also want to return a DefaultLegacySkin here if the current *beatmap* is providing any skinned elements.
-            if (skinManager.CurrentSkin.Value is LegacySkin)
+            if (skinManager.CurrentSkin.Value is LegacySkin && skinManager.CurrentSkin.Value != skinManager.DefaultLegacySkin)
                 SkinSources.Add(GetRulesetTransformedSkin(skinManager.DefaultLegacySkin));
 
-            SkinSources.Add(GetRulesetTransformedSkin(skinManager.DefaultSkin));
+            if (skinManager.CurrentSkin.Value != skinManager.DefaultSkin)
+                SkinSources.Add(GetRulesetTransformedSkin(skinManager.DefaultSkin));
         }
 
         protected ISkin GetRulesetTransformedSkin(ISkin skin)
