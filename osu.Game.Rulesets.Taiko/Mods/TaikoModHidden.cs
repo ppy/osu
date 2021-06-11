@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         private BeatmapDifficulty difficulty;
         private ControlPointInfo controlPointInfo;
 
-        [SettingSource("Hide Time", "Multiplies the time the note stays hidden")]
+        [SettingSource("Fade-out Time", "The bigger this multiplier is, the sooner the notes will start fading out")]
         public BindableNumber<double> VisibilityMod { get; } = new BindableDouble
         {
             MinValue = 0.5,
