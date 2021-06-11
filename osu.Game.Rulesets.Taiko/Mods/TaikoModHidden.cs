@@ -7,7 +7,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Mods
@@ -70,9 +72,13 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             using (hitObject.BeginAbsoluteSequence(start))
             {
-                // With 0 opacity the object is dying, and if I set a lifetime other issues appear...
-                // Ideally these need to be fixed, but I lack the knowledge to do it, and this is good enough anyway.
-                hitObject.FadeTo(0.0005f, duration);
+                hitObject.FadeOut(duration);
+
+                // DrawableHitObject sets LifetimeEnd to LatestTransformEndTime if it isn't manually changed.
+                // in order for the object to not be killed before its actual end time (as the latest transform ends earlier), set lifetime end explicitly.
+                hitObject.LifetimeEnd = state == ArmedState.Idle
+                    ? hitObject.HitObject.GetEndTime() + hitObject.HitObject.HitWindows.WindowFor(HitResult.Miss)
+                    : hitObject.HitStateUpdateTime;
             }
         }
 
