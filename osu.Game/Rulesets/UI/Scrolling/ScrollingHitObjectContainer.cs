@@ -114,17 +114,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
             // We're dealing with coordinates in which the position decreases towards the centre of the screen resulting in an increase in start time.
             // The scrolling algorithm instead assumes a top anchor meaning an increase in time corresponds to an increase in position,
             // so when scrolling downwards the coordinates need to be flipped.
-
-            switch (scrollingInfo.Direction.Value)
-            {
-                case ScrollingDirection.Down:
-                    position = DrawHeight - position;
-                    break;
-
-                case ScrollingDirection.Right:
-                    position = DrawWidth - position;
-                    break;
-            }
+            if (direction.Value == ScrollingDirection.Down || direction.Value == ScrollingDirection.Right)
+                position = scrollLength - position;
         }
 
         protected override void AddDrawable(HitObjectLifetimeEntry entry, DrawableHitObject drawable)
