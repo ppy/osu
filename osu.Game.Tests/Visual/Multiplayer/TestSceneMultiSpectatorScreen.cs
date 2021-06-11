@@ -104,6 +104,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestTimeDoesNotProgressWhileAllPlayersPaused()
+        {
+            start(new[] { PLAYER_1_ID, PLAYER_2_ID });
+            loadSpectateScreen();
+
+            sendFrames(PLAYER_1_ID, 20);
+            sendFrames(PLAYER_2_ID, 10);
+
+            checkPaused(PLAYER_2_ID, true);
+            checkPausedInstant(PLAYER_1_ID, false);
+            AddAssert("master clock still running", () => this.ChildrenOfType<MasterGameplayClockContainer>().Single().IsRunning);
+
+            checkPaused(PLAYER_1_ID, true);
+            AddUntilStep("master clock paused", () => !this.ChildrenOfType<MasterGameplayClockContainer>().Single().IsRunning);
+        }
+
+        [Test]
         public void TestPlayersMustStartSimultaneously()
         {
             start(new[] { PLAYER_1_ID, PLAYER_2_ID });
