@@ -162,7 +162,7 @@ namespace osu.Game.Skinning
                 }
                 else
                 {
-                    InternalChild = skin.GetAnimation("scorebar-colour", true, true, startAtCurrentTime: false, applyConfigFrameRate: true) ?? Drawable.Empty();
+                    InternalChild = skin.GetAnimation("scorebar-colour", true, true, startAtCurrentTime: false, applyConfigFrameRate: true) ?? Empty();
                     Size = new Vector2(firstFrame.DisplayWidth, firstFrame.DisplayHeight);
                 }
 
