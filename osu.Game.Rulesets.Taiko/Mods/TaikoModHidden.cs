@@ -20,10 +20,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
         // In stable Taiko, hit position is 160, so playfield is essentially 160 pixels shorter
         // than actual screen width. Normalized screen height is 480, so on a 4:3 screen the
         // playfield ratio will actually be (640 - 160) / 480 = 1
-        // For 16:9 resolutions, screen width with normalized height becomes 853.33333 instead,
-        // meaning 16:9 playfield ratio is (853.333 - 160) / 480 = 1.444444.
-        // Thus, 4:3 ratio / 16:9 ratio = 1 / 1.4444 = 9 / 13
-        private const double hd_sv_scale = 9.0 / 13.0;
+        // For custom resolutions (x:y), screen width with normalized height becomes 480 * x / y instead,
+        // and the playfield ratio becomes (480 * x / y - 160) / 480 = x / y - 1/3
+        // The following is 4:3 playfield ratio divided by 16:9 playfield ratio
+        private const double hd_sv_scale = (4 / 3 - 1/3) / (16 / 9 - 1/3);
         private BeatmapDifficulty difficulty;
         private ControlPointInfo controlPointInfo;
 
