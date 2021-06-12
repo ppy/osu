@@ -54,6 +54,7 @@ namespace osu.Game.Screens.Edit.Setup
                         backgroundTextBox = new FileChooserLabelledTextBox(".jpg", ".jpeg", ".png")
                         {
                             Label = "背景",
+                            FixedLabelWidth = LABEL_WIDTH,
                             PlaceholderText = "点击此处进行选择",
                             Current = { Value = working.Value.Metadata.BackgroundFile },
                             Target = backgroundFileChooserContainer,
@@ -72,6 +73,7 @@ namespace osu.Game.Screens.Edit.Setup
                         audioTrackTextBox = new FileChooserLabelledTextBox(".mp3", ".ogg")
                         {
                             Label = "音频文件",
+                            FixedLabelWidth = LABEL_WIDTH,
                             PlaceholderText = "点击此处进行选择",
                             Current = { Value = working.Value.Metadata.AudioFile },
                             Target = audioTrackFileChooserContainer,

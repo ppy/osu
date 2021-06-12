@@ -720,9 +720,10 @@ namespace osu.Game
                                     Origin = Anchor.BottomLeft,
                                     Action = () =>
                                     {
-                                        var currentScreen = ScreenStack.CurrentScreen as IOsuScreen;
+                                        if (!(ScreenStack.CurrentScreen is IOsuScreen currentScreen))
+                                            return;
 
-                                        if (currentScreen?.AllowBackButton == true && !currentScreen.OnBackButton())
+                                        if (!((Drawable)currentScreen).IsLoaded || (currentScreen.AllowBackButton && !currentScreen.OnBackButton()))
                                             ScreenStack.Exit();
                                     }
                                 },
@@ -814,6 +815,7 @@ namespace osu.Game
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(Picture = new OnlinePictureOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
             loadComponentSingleFile(Settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);

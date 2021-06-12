@@ -10,7 +10,7 @@ namespace Mvis.Plugin.StoryboardSupport.Storyboard
     [LongRunningLoad]
     public class BackgroundStoryboard : BeatmapSkinProvidingContainer
     {
-        public DecoupleableInterpolatingFramedClock RunningClock;
+        public InterpolatingFramedClock RunningClock;
         private DrawableStoryboard drawableStoryboard;
 
         private readonly WorkingBeatmap working;

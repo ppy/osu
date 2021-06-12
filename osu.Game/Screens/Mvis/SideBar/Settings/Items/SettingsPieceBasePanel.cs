@@ -1,4 +1,6 @@
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -11,6 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Mvis.Skinning;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
 {
@@ -63,8 +66,10 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
         private Box flashBox;
         protected FillFlowContainer FillFlow;
 
+        private Sample sampleOnClick;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             Masking = true;
             CornerRadius = 7.5f;
@@ -104,12 +109,14 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
                     Colour = Color4.White,
                     Alpha = 0,
                 },
-                new HoverClickSounds()
+                new HoverSounds()
             };
 
             colourProvider.HueColour.BindValueChanged(_ => OnColorChanged(), true);
 
             if (!haveIconSet) spriteIcon.Icon = DefaultIcon;
+
+            sampleOnClick = audio.Samples.Get("UI/generic-select-soft");
         }
 
         protected virtual void OnColorChanged()
@@ -117,6 +124,10 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
             BgBox.Colour = colourProvider.InActiveColor;
             FillFlow.Colour = Color4.White;
         }
+
+        protected virtual void OnLeftClick() { }
+        protected virtual void OnRightClick() { }
+        protected virtual void OnMiddleClick() { }
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -128,6 +139,40 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
         {
             base.OnHoverLost(e);
             flashBox.FadeTo(0f, 300);
+        }
+
+        private MouseButton mouseDownButton;
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            mouseDownButton = e.Button;
+
+            return base.OnMouseDown(e);
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            if (e.Button == mouseDownButton && IsHovered)
+            {
+                sampleOnClick?.Play();
+
+                switch (e.Button)
+                {
+                    case MouseButton.Left:
+                        OnLeftClick();
+                        break;
+
+                    case MouseButton.Right:
+                        OnRightClick();
+                        break;
+
+                    case MouseButton.Middle:
+                        OnMiddleClick();
+                        break;
+                }
+            }
+
+            base.OnMouseUp(e);
         }
     }
 }

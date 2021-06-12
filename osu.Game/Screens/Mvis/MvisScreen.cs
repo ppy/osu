@@ -31,8 +31,8 @@ using osu.Game.Screens.Mvis.Misc;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osu.Game.Screens.Mvis.SideBar;
-using osu.Game.Screens.Mvis.SideBar.Header;
 using osu.Game.Screens.Mvis.SideBar.Settings;
+using osu.Game.Screens.Mvis.SideBar.Tabs;
 using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
@@ -191,7 +191,7 @@ namespace osu.Game.Screens.Mvis
 
         private readonly Sidebar sidebar = new Sidebar();
 
-        private readonly TabHeader tabHeader = new TabHeader();
+        private readonly TabControl tabHeader = new TabControl();
 
         #endregion
 
@@ -271,7 +271,7 @@ namespace osu.Game.Screens.Mvis
         public Bindable<bool> HideScreenBackground = new Bindable<bool>();
 
         private IProvideAudioControlPlugin audioControlProvider;
-        private readonly OsuMusicControllerWrapper musicControllerWrapper = new OsuMusicControllerWrapper();
+        public readonly OsuMusicControllerWrapper MusicControllerWrapper = new OsuMusicControllerWrapper();
         private SettingsButton songSelectButton;
         private PlayerSettings settingsScroll;
 
@@ -324,7 +324,7 @@ namespace osu.Game.Screens.Mvis
             InternalChildren = new Drawable[]
             {
                 colourProvider,
-                musicControllerWrapper,
+                MusicControllerWrapper,
                 nightcoreBeatContainer = new NightcoreBeatContainer
                 {
                     Alpha = 0
@@ -493,7 +493,7 @@ namespace osu.Game.Screens.Mvis
             });
 
             //todo: 找出为啥audioControlProvider会在被赋值前访问
-            audioControlProvider = musicControllerWrapper;
+            audioControlProvider = MusicControllerWrapper;
         }
 
         protected override void LoadComplete()
@@ -615,6 +615,12 @@ namespace osu.Game.Screens.Mvis
                 }
             }
 
+            //添加选歌入口
+            sidebar.Add(new SongSelectPage
+            {
+                Action = () => this.Push(new MvisSongSelect())
+            });
+
             //把lockButton放在中间
             bottomBar.CentreBotton(lockButton);
 
@@ -641,10 +647,10 @@ namespace osu.Game.Screens.Mvis
             audioControlProvider.IsCurrent = false;
 
             //切换并设置当前控制插件IsCurrent为true
-            audioControlProvider = pacp ?? musicControllerWrapper;
+            audioControlProvider = pacp ?? MusicControllerWrapper;
             audioControlProvider.IsCurrent = true;
 
-            songSelectButton.Enabled.Value = audioControlProvider == musicControllerWrapper;
+            songSelectButton.Enabled.Value = audioControlProvider == MusicControllerWrapper;
         }
 
         private void setupKeyBindings()
@@ -822,10 +828,13 @@ namespace osu.Game.Screens.Mvis
             return base.OnExiting(next);
         }
 
+        private WorkingBeatmap suspendBeatmap;
+
         public override void OnSuspending(IScreen next)
         {
             CurrentTrack.ResetSpeedAdjustments();
             Beatmap.Disabled = false;
+            suspendBeatmap = Beatmap.Value;
 
             //恢复mods
             Mods.Value = originalMods;
@@ -848,15 +857,16 @@ namespace osu.Game.Screens.Mvis
 
             Mods.Value = timeRateMod;
 
-            Beatmap.Disabled = audioControlProvider != null && audioControlProvider != musicControllerWrapper;
+            Beatmap.Disabled = audioControlProvider != null && audioControlProvider != MusicControllerWrapper;
             this.FadeIn(duration * 0.6f)
                 .ScaleTo(1, duration * 0.6f, Easing.OutQuint);
 
             CurrentTrack.ResetSpeedAdjustments();
             applyTrackAdjustments();
-            updateBackground(Beatmap.Value);
 
-            Beatmap.BindValueChanged(onBeatmapChanged, true);
+            Beatmap.BindValueChanged(onBeatmapChanged);
+            if (Beatmap.Value != suspendBeatmap) Beatmap.TriggerChange();
+            else updateBackground(Beatmap.Value);
 
             //背景层的动画
             background.FadeOut().Then().Delay(duration * 0.6f).FadeIn(duration / 2);

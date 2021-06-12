@@ -416,7 +416,7 @@ namespace osu.Game.Online.Leaderboards
                     items.Add(new OsuMenuItem("使用这些mod游玩", MenuItemType.Highlighted, () => songSelect.Mods.Value = score.Mods));
 
                 if (score.Files?.Count > 0)
-                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => scoreManager.Export(score)));
+                    items.Add(new OsuMenuItem("导出", MenuItemType.Standard, () => scoreManager.Export(score)));
 
                 if (score.ID != 0)
                     items.Add(new OsuMenuItem("删除", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));

@@ -10,6 +10,5 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "镜像模式!";
         public override ModType Type => ModType.Conversion;
         public override double ScoreMultiplier => 1;
-        public override bool Ranked => true;
     }
 }

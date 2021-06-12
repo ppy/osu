@@ -95,7 +95,7 @@ namespace Mvis.Plugin.RulesetPanel.UI
                 },
                 new SettingsSliderPiece<double>
                 {
-                    Description = "宽度",
+                    Description = "频谱宽度",
                     Bindable = config.GetBindable<double>(RulesetPanelSetting.BarWidth),
                 },
                 new SettingsSliderPiece<int>

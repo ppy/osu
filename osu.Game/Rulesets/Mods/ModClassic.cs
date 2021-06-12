@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Mods
 
         public override string Description => "梦回V1";
 
-        public override bool Ranked => false;
-
         public override ModType Type => ModType.Conversion;
     }
 }

@@ -14,6 +14,8 @@ namespace Mvis.Plugin.FakeEditor.UI
         {
         }
 
+        public override int Columns => 1;
+
         [BackgroundDependencyLoader]
         private void load()
         {

@@ -67,8 +67,11 @@ namespace osu.Game.Screens
         /// Invoked when the back button has been pressed to close any overlays before exiting this <see cref="IOsuScreen"/>.
         /// </summary>
         /// <remarks>
+        /// If this <see cref="IOsuScreen"/> has not yet finished loading, the exit will occur immediately without this method being invoked.
+        /// <para>
         /// Return <c>true</c> to block this <see cref="IOsuScreen"/> from being exited after closing an overlay.
         /// Return <c>false</c> if this <see cref="IOsuScreen"/> should continue exiting.
+        /// </para>
         /// </remarks>
         bool OnBackButton();
     }

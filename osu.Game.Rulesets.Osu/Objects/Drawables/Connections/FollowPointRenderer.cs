@@ -6,43 +6,32 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Pooling;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
     /// <summary>
     /// Visualises connections between <see cref="DrawableOsuHitObject"/>s.
     /// </summary>
-    public class FollowPointRenderer : CompositeDrawable
+    public class FollowPointRenderer : PooledDrawableWithLifetimeContainer<FollowPointLifetimeEntry, FollowPointConnection>
     {
-        public override bool RemoveCompletedTransforms => false;
-
-        public IReadOnlyList<FollowPointLifetimeEntry> Entries => lifetimeEntries;
+        public new IReadOnlyList<FollowPointLifetimeEntry> Entries => lifetimeEntries;
 
         private DrawablePool<FollowPointConnection> connectionPool;
         private DrawablePool<FollowPoint> pointPool;
 
         private readonly List<FollowPointLifetimeEntry> lifetimeEntries = new List<FollowPointLifetimeEntry>();
-        private readonly Dictionary<LifetimeEntry, FollowPointConnection> connectionsInUse = new Dictionary<LifetimeEntry, FollowPointConnection>();
         private readonly Dictionary<HitObject, IBindable> startTimeMap = new Dictionary<HitObject, IBindable>();
-        private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
-
-        public FollowPointRenderer()
-        {
-            lifetimeManager.EntryBecameAlive += onEntryBecameAlive;
-            lifetimeManager.EntryBecameDead += onEntryBecameDead;
-        }
 
         [BackgroundDependencyLoader]
         private void load()
         {
             InternalChildren = new Drawable[]
             {
-                connectionPool = new DrawablePoolNoLifetime<FollowPointConnection>(1, 200),
-                pointPool = new DrawablePoolNoLifetime<FollowPoint>(50, 1000)
+                connectionPool = new DrawablePool<FollowPointConnection>(1, 200),
+                pointPool = new DrawablePool<FollowPoint>(50, 1000)
             };
         }
 
@@ -107,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 previousEntry.End = newEntry.Start;
             }
 
-            lifetimeManager.AddEntry(newEntry);
+            Add(newEntry);
         }
 
         private void removeEntry(OsuHitObject hitObject)
@@ -118,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             entry.UnbindEvents();
 
             lifetimeEntries.RemoveAt(index);
-            lifetimeManager.RemoveEntry(entry);
+            Remove(entry);
 
             if (index > 0)
             {
@@ -131,30 +120,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             }
         }
 
-        protected override bool CheckChildrenLife()
+        protected override FollowPointConnection GetDrawable(FollowPointLifetimeEntry entry)
         {
-            bool anyAliveChanged = base.CheckChildrenLife();
-            anyAliveChanged |= lifetimeManager.Update(Time.Current);
-            return anyAliveChanged;
-        }
-
-        private void onEntryBecameAlive(LifetimeEntry entry)
-        {
-            var connection = connectionPool.Get(c =>
-            {
-                c.Entry = (FollowPointLifetimeEntry)entry;
-                c.Pool = pointPool;
-            });
-
-            connectionsInUse[entry] = connection;
-
-            AddInternal(connection);
-        }
-
-        private void onEntryBecameDead(LifetimeEntry entry)
-        {
-            RemoveInternal(connectionsInUse[entry]);
-            connectionsInUse.Remove(entry);
+            var connection = connectionPool.Get();
+            connection.Pool = pointPool;
+            connection.Apply(entry);
+            return connection;
         }
 
         private void onStartTimeChanged(OsuHitObject hitObject)
@@ -170,17 +141,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             foreach (var entry in lifetimeEntries)
                 entry.UnbindEvents();
             lifetimeEntries.Clear();
-        }
-
-        private class DrawablePoolNoLifetime<T> : DrawablePool<T>
-            where T : PoolableDrawable, new()
-        {
-            public override bool RemoveWhenNotAlive => false;
-
-            public DrawablePoolNoLifetime(int initialSize, int? maximumSize = null)
-                : base(initialSize, maximumSize)
-            {
-            }
         }
     }
 }

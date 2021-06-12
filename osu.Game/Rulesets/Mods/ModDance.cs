@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Mods
 
         public override ModType Type => ModType.Automation;
 
+        public override bool RequiresConfiguration => true;
+
         //Copied from ModAutoplay.cs
         [Obsolete("Use the mod-supporting override")] // can be removed 20210731
         public virtual Score CreateReplayScore(IBeatmap beatmap) => new Score { Replay = new Replay() };

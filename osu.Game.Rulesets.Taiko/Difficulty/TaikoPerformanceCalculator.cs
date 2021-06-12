@@ -36,10 +36,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
             countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
 
-            // Don't count scores made with supposedly unranked mods
-            if (mods.Any(m => !m.Ranked))
-                return 0;
-
             // Custom multipliers for NoFail and SpunOut.
             double multiplier = 1.1; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 

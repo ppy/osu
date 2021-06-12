@@ -8,9 +8,9 @@ using osu.Game.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Mvis.SideBar.Header
+namespace osu.Game.Screens.Mvis.SideBar.Tabs
 {
-    public class HeaderTabItem : OsuClickableContainer
+    internal class TabControlItem : OsuClickableContainer
     {
         private readonly Box activeBox;
         private readonly SpriteIcon icon;
@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
         private Color4 activeColor => colourProvider.Highlight1;
         private Color4 inActiveColor => colourProvider.Dark4.Opacity(0);
 
-        public HeaderTabItem(ISidebarContent content)
+        public TabControlItem(ISidebarContent content)
         {
             Value = content;
             TooltipText = Value.Title;
@@ -48,7 +48,8 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
                     Icon = content.Icon,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(18)
+                    Size = new Vector2(18),
+                    Shadow = true
                 },
                 flashBox = new Box
                 {

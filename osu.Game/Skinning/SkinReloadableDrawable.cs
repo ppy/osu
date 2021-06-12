@@ -22,22 +22,6 @@ namespace osu.Game.Skinning
         /// </summary>
         protected ISkinSource CurrentSkin { get; private set; }
 
-        private readonly Func<ISkinSource, bool> allowFallback;
-
-        /// <summary>
-        /// Whether fallback to default skin should be allowed if the custom skin is missing this resource.
-        /// </summary>
-        protected bool AllowDefaultFallback => allowFallback == null || allowFallback.Invoke(CurrentSkin);
-
-        /// <summary>
-        /// Create a new <see cref="SkinReloadableDrawable"/>
-        /// </summary>
-        /// <param name="allowFallback">A conditional to decide whether to allow fallback to the default implementation if a skinned element is not present.</param>
-        protected SkinReloadableDrawable(Func<ISkinSource, bool> allowFallback = null)
-        {
-            this.allowFallback = allowFallback;
-        }
-
         [BackgroundDependencyLoader]
         private void load(ISkinSource source)
         {
@@ -58,7 +42,7 @@ namespace osu.Game.Skinning
 
         private void skinChanged()
         {
-            SkinChanged(CurrentSkin, AllowDefaultFallback);
+            SkinChanged(CurrentSkin);
             OnSkinChanged?.Invoke();
         }
 
@@ -66,8 +50,7 @@ namespace osu.Game.Skinning
         /// Called when a change is made to the skin.
         /// </summary>
         /// <param name="skin">The new skin.</param>
-        /// <param name="allowFallback">Whether fallback to default skin should be allowed if the custom skin is missing this resource.</param>
-        protected virtual void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected virtual void SkinChanged(ISkinSource skin)
         {
         }
 
