@@ -13,14 +13,14 @@ namespace osu.Game.Overlays.Settings
 {
     public class SettingsTextBox : SettingsItem<string>
     {
-        protected override Drawable CreateControl() => new OsuSettingsTextBox
+        protected override Drawable CreateControl() => new TextBox
         {
             Margin = new MarginPadding { Top = 5 },
             RelativeSizeAxes = Axes.X,
             CommitOnFocusLost = true,
         };
 
-        public class OsuSettingsTextBox : OsuTextBox
+        public class TextBox : OsuTextBox
         {
             private const float border_thickness = 3;
 
