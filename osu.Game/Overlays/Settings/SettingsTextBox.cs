@@ -56,10 +56,5 @@ namespace osu.Game.Overlays.Settings
                 BorderColour = HasFocus ? borderColourFocused : borderColourUnfocused;
             }
         }
-
-        public class OsuSettingsNumberBox : OsuSettingsTextBox
-        {
-            protected override bool CanAddCharacter(char character) => char.IsNumber(character);
-        }
     }
 }
