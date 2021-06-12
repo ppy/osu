@@ -50,6 +50,8 @@ namespace osu.Game.Skinning
 
         private readonly Skin defaultLegacySkin;
 
+        private readonly Skin defaultSkin;
+
         public SkinManager(Storage storage, DatabaseContextFactory contextFactory, GameHost host, IResourceStore<byte[]> resources, AudioManager audio)
             : base(storage, contextFactory, new SkinStore(contextFactory, storage), host)
         {
@@ -58,10 +60,11 @@ namespace osu.Game.Skinning
             this.resources = resources;
 
             defaultLegacySkin = new DefaultLegacySkin(this);
+            defaultSkin = new DefaultSkin(this);
 
             CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = GetSkin(skin.NewValue);
 
-            CurrentSkin.Value = new DefaultSkin(this);
+            CurrentSkin.Value = defaultSkin;
             CurrentSkin.ValueChanged += skin =>
             {
                 if (skin.NewValue.SkinInfo != CurrentSkinInfo.Value)
@@ -227,24 +230,26 @@ namespace osu.Game.Skinning
             if (CurrentSkin.Value is LegacySkin && lookupFunction(defaultLegacySkin))
                 return defaultLegacySkin;
 
+            if (lookupFunction(defaultSkin))
+                return defaultSkin;
+
             return null;
         }
 
-        private T lookupWithFallback<T>(Func<ISkin, T> func)
+        private T lookupWithFallback<T>(Func<ISkin, T> lookupFunction)
             where T : class
         {
-            var selectedSkin = func(CurrentSkin.Value);
-
-            if (selectedSkin != null)
-                return selectedSkin;
+            if (lookupFunction(CurrentSkin.Value) is T skinSourced)
+                return skinSourced;
 
             // TODO: we also want to return a DefaultLegacySkin here if the current *beatmap* is providing any skinned elements.
             // When attempting to address this, we may want to move the full DefaultLegacySkin fallback logic to within Player itself (to better allow
             // for beatmap skin visibility).
-            if (CurrentSkin.Value is LegacySkin)
-                return func(defaultLegacySkin);
+            if (CurrentSkin.Value is LegacySkin && lookupFunction(defaultLegacySkin) is T legacySourced)
+                return legacySourced;
 
-            return null;
+            // Finally fall back to the (non-legacy) default.
+            return lookupFunction(defaultSkin);
         }
 
         #region IResourceStorageProvider

@@ -25,6 +25,7 @@ namespace osu.Game.Screens.Edit.Setup
                 comboColours = new LabelledColourPalette
                 {
                     Label = "物件 / 滑条连击",
+                    FixedLabelWidth = LABEL_WIDTH,
                     ColourNamePrefix = "连击"
                 }
             };

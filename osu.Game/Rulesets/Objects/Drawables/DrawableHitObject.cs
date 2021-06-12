@@ -194,7 +194,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Applies a hit object to be represented by this <see cref="DrawableHitObject"/>.
         /// </summary>
-        [Obsolete("Use either overload of Apply that takes a single argument of type HitObject or HitObjectLifetimeEntry")]
+        [Obsolete("Use either overload of Apply that takes a single argument of type HitObject or HitObjectLifetimeEntry")] // Can be removed 20211021.
         public void Apply([NotNull] HitObject hitObject, [CanBeNull] HitObjectLifetimeEntry lifetimeEntry)
         {
             if (lifetimeEntry != null)
@@ -411,11 +411,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             using (BeginAbsoluteSequence(StateUpdateTime, true))
                 UpdateStartTimeStateTransforms();
 
-#pragma warning disable 618
-            using (BeginAbsoluteSequence(StateUpdateTime + (Result?.TimeOffset ?? 0), true))
-                UpdateStateTransforms(newState);
-#pragma warning restore 618
-
             using (BeginAbsoluteSequence(HitStateUpdateTime, true))
                 UpdateHitStateTransforms(newState);
 
@@ -449,22 +444,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// By default, this will fade in the object from zero with no duration.
         /// </summary>
         /// <remarks>
-        /// This is called once before every <see cref="UpdateStateTransforms"/>. This is to ensure a good state in the case
+        /// This is called once before every <see cref="UpdateHitStateTransforms"/>. This is to ensure a good state in the case
         /// the <see cref="JudgementResult.TimeOffset"/> was negative and potentially altered the pre-hit transforms.
         /// </remarks>
         protected virtual void UpdateInitialTransforms()
         {
             this.FadeInFromZero();
-        }
-
-        /// <summary>
-        /// Apply transforms based on the current <see cref="ArmedState"/>. Previous states are automatically cleared.
-        /// In the case of a non-idle <see cref="ArmedState"/>, and if <see cref="Drawable.LifetimeEnd"/> was not set during this call, <see cref="Drawable.Expire"/> will be invoked.
-        /// </summary>
-        /// <param name="state">The new armed state.</param>
-        [Obsolete("Use UpdateStartTimeStateTransforms and UpdateHitStateTransforms instead")] // Can be removed 20210504
-        protected virtual void UpdateStateTransforms(ArmedState state)
-        {
         }
 
         /// <summary>
@@ -520,23 +505,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             var comboColours = CurrentSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value ?? Array.Empty<Color4>();
             AccentColour.Value = combo.GetComboColour(comboColours);
-        }
-
-        /// <summary>
-        /// Called to retrieve the combo colour. Automatically assigned to <see cref="AccentColour"/>.
-        /// Defaults to using <see cref="IHasComboInformation.ComboIndex"/> to decide on a colour.
-        /// </summary>
-        /// <remarks>
-        /// This will only be called if the <see cref="HitObject"/> implements <see cref="IHasComboInformation"/>.
-        /// </remarks>
-        /// <param name="comboColours">A list of combo colours provided by the beatmap or skin. Can be null if not available.</param>
-        [Obsolete("Unused. Implement IHasComboInformation and IHasComboInformation.GetComboColour() on the HitObject model instead.")] // Can be removed 20210527
-        protected virtual Color4 GetComboColour(IReadOnlyList<Color4> comboColours)
-        {
-            if (!(HitObject is IHasComboInformation combo))
-                throw new InvalidOperationException($"{nameof(HitObject)} must implement {nameof(IHasComboInformation)}");
-
-            return comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White;
         }
 
         /// <summary>
@@ -632,7 +600,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         /// <summary>
         /// The time at which state transforms should be applied that line up to <see cref="HitObject"/>'s StartTime.
-        /// This is used to offset calls to <see cref="UpdateStateTransforms"/>.
+        /// This is used to offset calls to <see cref="UpdateStartTimeStateTransforms"/>.
         /// </summary>
         public double StateUpdateTime => HitObject.StartTime;
 
@@ -750,7 +718,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (HitObject != null)
                 HitObject.DefaultsApplied -= onDefaultsApplied;
 
-            CurrentSkin.SourceChanged -= skinSourceChanged;
+            if (CurrentSkin != null)
+                CurrentSkin.SourceChanged -= skinSourceChanged;
         }
     }
 

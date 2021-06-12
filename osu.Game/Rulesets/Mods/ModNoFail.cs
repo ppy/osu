@@ -15,7 +15,6 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyReduction;
         public override string Description => "无论如何,你也失败不了";
         public override double ScoreMultiplier => 0.5;
-        public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModFailCondition), typeof(ModAutoplay) };
     }
 }

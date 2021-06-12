@@ -31,7 +31,6 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                DisplayUnrankedText = false,
                 Scale = new Vector2(0.8f),
                 ExpansionMode = ExpansionMode.AlwaysContracted,
             });

@@ -28,6 +28,7 @@ namespace osu.Game.Screens.Edit.Setup
                 circleSizeSlider = new LabelledSliderBar<float>
                 {
                     Label = "物件大小(CS)",
+                    FixedLabelWidth = LABEL_WIDTH,
                     Description = "这将决定所有物件的大小, 数值越大, 物件越小",
                     Current = new BindableFloat(Beatmap.BeatmapInfo.BaseDifficulty.CircleSize)
                     {
@@ -40,6 +41,7 @@ namespace osu.Game.Screens.Edit.Setup
                 healthDrainSlider = new LabelledSliderBar<float>
                 {
                     Label = "掉血速度(HP)",
+                    FixedLabelWidth = LABEL_WIDTH,
                     Description = "这将决定掉血的速度, 数值越大, 掉血越快",
                     Current = new BindableFloat(Beatmap.BeatmapInfo.BaseDifficulty.DrainRate)
                     {
@@ -52,6 +54,7 @@ namespace osu.Game.Screens.Edit.Setup
                 approachRateSlider = new LabelledSliderBar<float>
                 {
                     Label = "缩圈速度(AR)",
+                    FixedLabelWidth = LABEL_WIDTH,
                     Description = "这将决定缩圈速度, 数值越大, 缩圈越快",
                     Current = new BindableFloat(Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate)
                     {
@@ -64,6 +67,7 @@ namespace osu.Game.Screens.Edit.Setup
                 overallDifficultySlider = new LabelledSliderBar<float>
                 {
                     Label = "整体难度(OD)",
+                    FixedLabelWidth = LABEL_WIDTH,
                     Description = "这将决定该谱面的整体难度(准确率要求, 转盘难度等), 数值越大, 难度越高",
                     Current = new BindableFloat(Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty)
                     {

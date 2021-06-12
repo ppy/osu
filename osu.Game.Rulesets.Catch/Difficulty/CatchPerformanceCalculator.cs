@@ -39,10 +39,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             tinyTicksMissed = Score.Statistics.GetOrDefault(HitResult.SmallTickMiss);
             misses = Score.Statistics.GetOrDefault(HitResult.Miss);
 
-            // Don't count scores made with supposedly unranked mods
-            if (mods.Any(m => !m.Ranked))
-                return 0;
-
             // We are heavily relying on aim in catch the beat
             double value = Math.Pow(5.0 * Math.Max(1.0, Attributes.StarRating / 0.0049) - 4.0, 2.0) / 100000.0;
 

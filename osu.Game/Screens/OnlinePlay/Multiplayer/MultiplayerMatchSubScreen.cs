@@ -185,7 +185,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                                     {
                                                                                         Anchor = Anchor.CentreLeft,
                                                                                         Origin = Anchor.CentreLeft,
-                                                                                        DisplayUnrankedText = false,
                                                                                         Current = UserMods,
                                                                                         Scale = new Vector2(0.8f),
                                                                                     },
