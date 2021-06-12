@@ -3,8 +3,8 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Input.Events;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -12,8 +12,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         private const float border_thickness = 3;
 
-        private SRGBColour borderColourFocused;
-        private SRGBColour borderColourUnfocused;
+        private Color4 borderColourFocused;
+        private Color4 borderColourUnfocused;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
@@ -21,24 +21,27 @@ namespace osu.Game.Graphics.UserInterface
             borderColourUnfocused = colour.Gray4.Opacity(0.5f);
             borderColourFocused = BorderColour;
 
-            BorderThickness = border_thickness;
-            BorderColour = borderColourUnfocused;
+            updateBorder();
         }
 
         protected override void OnFocus(FocusEvent e)
         {
             base.OnFocus(e);
 
-            BorderThickness = border_thickness;
-            BorderColour = borderColourFocused;
+            updateBorder();
         }
 
         protected override void OnFocusLost(FocusLostEvent e)
         {
             base.OnFocusLost(e);
 
+            updateBorder();
+        }
+
+        private void updateBorder()
+        {
             BorderThickness = border_thickness;
-            BorderColour = borderColourUnfocused;
+            BorderColour = HasFocus ? borderColourFocused : borderColourUnfocused;
         }
     }
 }
