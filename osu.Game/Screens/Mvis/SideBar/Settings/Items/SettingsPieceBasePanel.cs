@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
 
             if (!haveIconSet) spriteIcon.Icon = DefaultIcon;
 
-            sampleOnClick = audio.Samples.Get("UI/generic-select-soft");
+            sampleOnClick = audio.Samples.Get("UI/default-select");
         }
 
         protected virtual void OnColorChanged()
