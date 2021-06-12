@@ -15,7 +15,7 @@ using osuTK;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 {
-    public class LyricViewScreen : LyricScreen<LyricPiece>
+    public class LyricViewScreen : LyricScreen
     {
         [Resolved]
         private MvisScreen mvisScreen { get; set; }
@@ -35,7 +35,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         [Resolved]
         private LyricSidebarSectionContainer sectionContainer { get; set; }
 
-        protected override LyricPiece CreateDrawableLyric(Lyric lyric)
+        protected override DrawableLyric CreateDrawableLyric(Lyric lyric)
             => new LyricPiece(lyric);
 
         public override IconButton[] Entries => new[]
@@ -58,13 +58,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
                     new ConfirmDialog("重新获取歌词",
                         () => plugin.RefreshLyric(true))
                 )
-            },
-            new IconButton
-            {
-                Icon = FontAwesome.Solid.AngleDown,
-                Size = new Vector2(45),
-                TooltipText = "滚动到当前歌词",
-                Action = ScrollToCurrent
             },
             new IconButton
             {
@@ -109,6 +102,12 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         }
 
         private readonly BindableFloat followCooldown = new BindableFloat();
+
+        protected override void Update()
+        {
+            if (followCooldown.Value == 0) ScrollToCurrent();
+            base.Update();
+        }
 
         protected override bool OnHover(HoverEvent e)
         {

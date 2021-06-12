@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mvis.Plugin.CloudMusicSupport.Misc;
@@ -6,16 +5,16 @@ using Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Pooling;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Mvis;
+using osuTK;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 {
-    public abstract class LyricScreen<T> : SidebarScreen
-        where T : DrawableLyric, new()
+    public abstract class LyricScreen : SidebarScreen
     {
-        protected abstract T CreateDrawableLyric(Lyric lyric);
+        protected abstract DrawableLyric CreateDrawableLyric(Lyric lyric);
 
         [Resolved]
         private LyricPlugin plugin { get; set; }
@@ -25,25 +24,26 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         [Resolved]
         private MvisScreen mvisScreen { get; set; }
 
-        protected readonly OsuScrollContainer<DrawableLyric> LyricScroll;
-        private readonly DrawablePool<T> lyricPool = new DrawablePool<T>(100);
+        protected readonly OsuScrollContainer LyricScroll;
+        protected readonly FillFlowContainer<DrawableLyric> LyricFlow;
 
-        private readonly List<DrawableLyric> visibleLyrics = new List<DrawableLyric>();
-        protected readonly List<DrawableLyric> AvaliableDrawableLyrics = new List<DrawableLyric>();
-
-        private float distanceLoadUnload => 150;
+        //private readonly FillFlowContainer placeholder;
 
         protected LyricScreen()
         {
             RelativeSizeAxes = Axes.Both;
             InternalChildren = new Drawable[]
             {
-                lyricPool,
-                LyricScroll = new OsuScrollContainer<DrawableLyric>
+                LyricScroll = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ScrollContent = { AutoSizeAxes = Axes.None },
-                    Padding = new MarginPadding(5)
+                    Child = LyricFlow = new FillFlowContainer<DrawableLyric>
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(5),
+                        Padding = new MarginPadding(5)
+                    }
                 }
             };
         }
@@ -54,90 +54,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             UpdateStatus(plugin.CurrentStatus.Value);
 
             base.LoadComplete();
-        }
-
-        private readonly DrawableLyric dummyDrawableLyric = new DummyDrawableLyric();
-
-        private float visibleTop => LyricScroll.Current;
-        private float visibleBottom => LyricScroll.Current + DrawHeight;
-
-        private (int first, int last) getRange()
-        {
-            dummyDrawableLyric.CurrentY = visibleTop - distanceLoadUnload;
-            var first = visibleLyrics.BinarySearch(dummyDrawableLyric);
-            if (first < 0) first = ~first;
-
-            dummyDrawableLyric.CurrentY = visibleBottom + distanceLoadUnload;
-            var last = visibleLyrics.BinarySearch(dummyDrawableLyric);
-            if (last < 0) last = ~last;
-
-            first = Math.Max(0, first - 1);
-            last = Math.Clamp(last + 1, last - 1, Math.Max(0, visibleLyrics.Count - 1));
-
-            return (first, last);
-        }
-
-        protected (int first, int last) CurrentRange;
-
-        protected override void Update()
-        {
-            visibleLyrics.Clear();
-
-            var currentY = 0;
-
-            foreach (var drawableLyric in AvaliableDrawableLyrics)
-            {
-                drawableLyric.CurrentY = currentY;
-                visibleLyrics.Add(drawableLyric);
-
-                currentY += drawableLyric.FinalHeight();
-            }
-
-            LyricScroll.ScrollContent.Height = currentY;
-
-            //获取显示范围
-            var range = getRange();
-
-            if (range != CurrentRange)
-                updateFromRange(range);
-
-            base.Update();
-        }
-
-        private void updateFromRange((int first, int last) range)
-        {
-            //赋值
-            CurrentRange = range;
-
-            //如果可用歌词>0
-            if (visibleLyrics.Count > 0)
-            {
-                //获取要显示的歌词
-                var toDisplay = visibleLyrics.GetRange(range.first, range.last - range.first + 1);
-
-                //遍历lyricScroll的所有Child
-                foreach (var drawableLyric in LyricScroll.Children)
-                {
-                    //如果已经在显示了，则从toDisplay里去掉
-                    if (toDisplay.Remove(toDisplay.Find(d => d.Value.Equals(drawableLyric.Value)))) continue;
-
-                    //如果面板不在显示区，则直接Expire
-                    if (drawableLyric.Y + drawableLyric.DrawHeight < visibleTop - distanceLoadUnload
-                        || drawableLyric.Y > visibleBottom + distanceLoadUnload)
-                        drawableLyric.Expire();
-                }
-
-                //添加要显示的面板
-                foreach (var item in toDisplay)
-                {
-                    var panel = lyricPool.Get(p => p.Value = item.Value);
-
-                    panel.Depth = item.CurrentY;
-                    panel.Y = item.CurrentY;
-
-                    LyricScroll.Add(panel);
-                }
-            }
         }
 
         protected override void Dispose(bool isDisposing)
@@ -158,7 +74,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
                     break;
 
                 default:
-                    visibleLyrics.Clear();
+                    LyricFlow.Clear();
                     break;
             }
         }
@@ -168,10 +84,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
         protected virtual void ScrollToCurrent()
         {
-            var pos = AvaliableDrawableLyrics.FirstOrDefault(p =>
-                p.Value.Equals(plugin.CurrentLine))?.CurrentY ?? 0;
+            var pos = LyricFlow.Children.FirstOrDefault(p =>
+                p.Value.Equals(plugin.Lyrics.FindLast(l => plugin.GetCurrentTrack().CurrentTime >= l.Time)))?.Y ?? 0;
 
-            if (pos + DrawHeight > LyricScroll.ScrollContent.Height)
+            if (pos + LyricScroll.DrawHeight > LyricFlow.Height)
                 LyricScroll.ScrollToEnd();
             else
                 LyricScroll.ScrollTo(pos);
@@ -179,17 +95,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
         protected virtual void RefreshLrcInfo(List<Lyric> lyrics)
         {
-            LyricScroll.Clear();
-            AvaliableDrawableLyrics.Clear();
-            lyricPool.Clear();
-
+            LyricFlow.Clear();
             LyricScroll.ScrollToStart();
 
             foreach (var t in lyrics)
-                AvaliableDrawableLyrics.Add(CreateDrawableLyric(t));
-
-            //workaround: 恢复后歌词不显示
-            CurrentRange.first = CurrentRange.last = 0;
+            {
+                LyricFlow.Add(CreateDrawableLyric(t));
+            }
         }
     }
 }

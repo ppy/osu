@@ -107,7 +107,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
         private void onScreenChanged(IScreen lastscreen, IScreen newscreen)
         {
             if (newscreen is SidebarScreen screen)
-                toolbox.AddButtonRange(screen.Entries, (screen is LyricViewScreen));
+                toolbox.AddButtonRange(screen.Entries, (screen is LyricViewScreen || screen is LyricViewScreenWithDrawablePool));
         }
 
         protected override void LoadComplete()
@@ -115,19 +115,20 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
             mvisScreen.OnBeatmapChanged(refreshBeatmap, this);
             refreshBeatmap(mvisScreen.Beatmap.Value);
 
-            useDrawablePool.BindValueChanged(onUseDrawablePoolChanged);
-
-            screenStack.Push(new LyricViewScreen());
+            useDrawablePool.BindValueChanged(onUseDrawablePoolChanged, true);
             base.LoadComplete();
         }
 
         private void onUseDrawablePoolChanged(ValueChangedEvent<bool> v)
         {
-            screenStack.Exit();
-
-            if (screenStack.CurrentScreen is LyricViewScreen
-                || screenStack.CurrentScreen is LyricViewScreenWithDrawablePool)
+            if (screenStack.CurrentScreen != null)
+            {
                 screenStack.Exit();
+
+                if (screenStack.CurrentScreen is LyricViewScreen
+                    || screenStack.CurrentScreen is LyricViewScreenWithDrawablePool)
+                    screenStack.Exit();
+            }
 
             if (v.NewValue)
                 screenStack.Push(new LyricViewScreenWithDrawablePool());

@@ -19,6 +19,7 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
         {
             var config = (LyricConfigManager)ConfigManager;
 
+            SettingsCheckbox useDrawablePoolCheckBox;
             Children = new Drawable[]
             {
                 new SettingsCheckbox
@@ -26,10 +27,9 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                     LabelText = "启用本插件",
                     Current = config.GetBindable<bool>(LyricSettings.EnablePlugin)
                 },
-                new SettingsCheckbox
+                useDrawablePoolCheckBox = new SettingsCheckbox
                 {
                     LabelText = "使用DrawablePool",
-                    WarningText = "试验性功能！",
                     Current = config.GetBindable<bool>(LyricSettings.UseDrawablePool)
                 },
                 new SettingsCheckbox
@@ -63,6 +63,8 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                     Current = config.GetBindable<float>(LyricSettings.LyricFadeOutDuration)
                 },
             };
+
+            useDrawablePoolCheckBox.WarningText = "试验性功能！";
         }
     }
 }
