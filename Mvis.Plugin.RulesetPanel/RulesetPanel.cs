@@ -18,7 +18,7 @@ namespace Mvis.Plugin.RulesetPanel
     public class RulesetPanel : BindableControlledPlugin
     {
         public override TargetLayer Target => TargetLayer.Foreground;
-        public override int Version => 4;
+        public override int Version => 5;
         public Bindable<WorkingBeatmap> CurrentBeatmap = new Bindable<WorkingBeatmap>();
 
         public RulesetPanel()
@@ -90,6 +90,9 @@ namespace Mvis.Plugin.RulesetPanel
 
         public override PluginSettingsSubSection CreateSettingsSubSection()
             => new RulesetPanelSettings(this);
+
+        public override PluginSidebarSettingsSection CreateSidebarSettingsSection()
+            => new RulesetPanelSidebarSection(this);
 
         protected override Drawable CreateContent() => new Container
         {

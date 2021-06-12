@@ -32,6 +32,7 @@ using osu.Game.Scoring.Legacy;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Users;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -858,6 +859,7 @@ namespace osu.Game.Screens.Play
             {
                 b.IgnoreUserSettings.Value = false;
                 b.BlurAmount.Value = 0;
+                b.FadeColour(Color4.White, 250);
 
                 // bind component bindables.
                 b.IsBreakTime.BindTo(breakTracker.IsBreakTime);

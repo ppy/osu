@@ -36,12 +36,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         private LyricSidebarSectionContainer sectionContainer { get; set; }
 
         protected override DrawableLyric CreateDrawableLyric(Lyric lyric)
-            => new LyricPiece(lyric)
-            {
-                Action = l => mvisScreen.SeekTo(l.Time + 1)
-            };
+            => new LyricPiece(lyric);
 
-        public override Drawable[] Entries => new Drawable[]
+        public override IconButton[] Entries => new[]
         {
             saveButton,
             new IconButton

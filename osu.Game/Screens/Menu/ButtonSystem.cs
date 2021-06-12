@@ -143,6 +143,9 @@ namespace osu.Game.Screens.Menu
             buttonsCustom.Add(new Button(@"文件导入", @"button-solo-select", FontAwesome.Solid.File, new Color4(0, 86, 73, 255), () => OnImportButton?.Invoke()));
             buttonsCustom.ForEach(b => b.VisibleState = ButtonSystemState.Custom);
 
+            buttonsP2C.Add(new Button("最 高 机 密", "button-generic-select", FontAwesome.Solid.Question, new Color4(0, 86, 73, 255), () => State = ButtonSystemState.Custom));
+            buttonsP2C.ForEach(b => b.VisibleState = ButtonSystemState.Play);
+
             buttonsPlay.Add(new Button(ButtonSystemStrings.Solo, @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
             buttonsPlay.Add(new Button(ButtonSystemStrings.Multi, @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M));
             buttonsPlay.Add(new Button(ButtonSystemStrings.Playlists, @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onPlaylists, 0, Key.L));

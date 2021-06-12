@@ -1,20 +1,16 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Mvis;
-using osu.Game.Screens.Mvis.Skinning;
-using osu.Game.Skinning;
 using osuTK;
 
 namespace Mvis.Plugin.CollectionSupport.Sidebar
@@ -46,20 +42,6 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         {
             InternalChildren = new Drawable[]
             {
-                new SkinnableComponent(
-                    "MSidebar-Collection-background",
-                    confineMode: ConfineMode.ScaleToFill,
-                    defaultImplementation: _ => createDefaultBackground())
-                {
-                    Name = "收藏夹背景",
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    ChildAnchor = Anchor.BottomRight,
-                    ChildOrigin = Anchor.BottomRight,
-                    RelativeSizeAxes = Axes.Both,
-                    CentreComponent = false,
-                    OverrideChildAnchor = true,
-                },
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -82,20 +64,6 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                                 Masking = true,
                                 Children = new Drawable[]
                                 {
-                                    new SkinnableComponent(
-                                        "transparent",
-                                        confineMode: ConfineMode.ScaleToFill,
-                                        masking: true,
-                                        defaultImplementation: _ => new PlaceHolder())
-                                    {
-                                        Anchor = Anchor.TopRight,
-                                        Origin = Anchor.TopRight,
-                                        ChildAnchor = Anchor.TopRight,
-                                        ChildOrigin = Anchor.TopRight,
-                                        RelativeSizeAxes = Axes.Both,
-                                        CentreComponent = false,
-                                        OverrideChildAnchor = true,
-                                    },
                                     new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
@@ -152,23 +120,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         {
             base.LoadComplete();
 
-            colourProvider.HueColour.BindValueChanged(_ =>
-            {
-                bgBox?.FadeColour(colourProvider.Dark6);
-            }, true);
-
             collection.BindValueChanged(OnCollectionChanged);
-        }
-
-        private Drawable createDefaultBackground()
-        {
-            bgBox = new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = colourProvider.Dark6
-            };
-
-            return bgBox;
         }
 
         private void OnCollectionChanged(ValueChangedEvent<BeatmapCollection> v)
@@ -203,9 +155,6 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         private CancellationTokenSource refreshTaskCancellationToken;
         private Container listContainer;
         private LoadingSpinner loadingSpinner;
-
-        [CanBeNull]
-        private Box bgBox;
 
         private void refreshBeatmapSetList()
         {

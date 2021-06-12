@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -21,28 +22,32 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
         private Box hoverBox;
 
-        public Action OnSeekTriggered;
-        public Action OnAdjustTriggered;
+        public Action OnAdjust;
         public Action OnDeleted;
-        public Action OnSave;
+        private OsuTextBox timeTextBox;
+        private OsuTextBox translationTextBox;
+        private OsuTextBox contentTextBox;
 
         public EditableLyricPiece(Lyric lrc)
+        {
+            Value = lrc;
+        }
+
+        public EditableLyricPiece()
+        {
+            Value = new Lyric();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(CustomColourProvider colourProvider, OsuColour osuColour, MvisScreen mvisScreen)
         {
             CornerRadius = 5f;
             Masking = true;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Value = lrc;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(CustomColourProvider colourProvider, OsuColour osuColour)
-        {
             Box bgBox;
-            OsuTextBox timeTextBox;
-            OsuTextBox contentTextBox;
-            OsuTextBox translationTextBox;
             InternalChildren = new Drawable[]
             {
                 bgBox = new Box
@@ -60,7 +65,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                     {
                         timeTextBox = new OsuTextBox
                         {
-                            Text = Value.Time.ToString(),
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
                             Width = 0.5f,
@@ -69,7 +73,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                         },
                         contentTextBox = new OsuTextBox
                         {
-                            Text = Value.Content,
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
                             PlaceholderText = "歌词原文",
@@ -77,7 +80,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                         },
                         translationTextBox = new OsuTextBox
                         {
-                            Text = Value.TranslatedString,
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
                             PlaceholderText = "歌词翻译",
@@ -107,8 +109,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                                     Size = new Vector2(120, 40),
                                     Action = () =>
                                     {
-                                        OnAdjustTriggered?.Invoke();
-                                        timeTextBox.Text = Value.Time.ToString();
+                                        Value.Time = mvisScreen.CurrentTrack.CurrentTime;
+                                        OnAdjust?.Invoke();
+                                        timeTextBox.Text = Value.Time.ToString(CultureInfo.InvariantCulture);
                                     },
                                     BackgroundColour = osuColour.GreySeafoamDarker
                                 },
@@ -116,7 +119,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                                 {
                                     Text = "调整歌曲到歌词时间",
                                     Size = new Vector2(120, 40),
-                                    Action = () => OnSeekTriggered?.Invoke()
+                                    Action = () => mvisScreen.SeekTo(Value.Time)
                                 }
                             }
                         }
@@ -143,12 +146,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
             timeTextBox.OnCommit += (sender, isNewText) =>
             {
-                if (int.TryParse(sender.Text, out int newTime))
+                if (double.TryParse(sender.Text, out double newTime))
                 {
                     Value.Time = newTime;
+                    OnAdjust?.Invoke();
                 }
                 else
-                    timeTextBox.Text = Value.Time.ToString();
+                    timeTextBox.Text = Value.Time.ToString(CultureInfo.InvariantCulture);
             };
 
             colourProvider.HueColour.BindValueChanged(_ =>
@@ -167,6 +171,16 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         {
             hoverBox.FadeOut(300);
             base.OnHoverLost(e);
+        }
+
+        //下方按钮(40) + 3 * 文本框高度(40) + 2 * 文本框Spacing(5) + 上下Margin(10) + Spacing(10)
+        public override int FinalHeight() => 40 + 3 * 40 + 2 * 5 + 10 + 10;
+
+        protected override void UpdateValue(Lyric lyric)
+        {
+            contentTextBox.Text = lyric.Content;
+            translationTextBox.Text = lyric.TranslatedString;
+            timeTextBox.Text = lyric.Time.ToString(CultureInfo.InvariantCulture);
         }
     }
 }

@@ -15,7 +15,6 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => @"没有缩圈,圆圈渐隐,分数略微提高";
         public override IconUsage? Icon => OsuIcon.ModHidden;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override bool Ranked => true;
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {

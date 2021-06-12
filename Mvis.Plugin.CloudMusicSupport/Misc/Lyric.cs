@@ -4,7 +4,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Misc
 {
     public class Lyric : IEquatable<Lyric>
     {
-        public int Time;
+        public double Time;
         public string Content;
         public string TranslatedString;
 

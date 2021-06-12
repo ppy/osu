@@ -19,7 +19,17 @@ namespace osu.Game.Screens.Mvis.Plugins
         /// <returns>要加载的Drawable</returns>
         protected abstract Drawable CreateContent();
 
+        /// <summary>
+        /// 为游戏设置创建设置页面
+        /// </summary>
+        /// <returns>创建的设置页面</returns>
         public virtual PluginSettingsSubSection CreateSettingsSubSection() => null;
+
+        /// <summary>
+        /// 为Mvis侧边栏创建设置页面
+        /// </summary>
+        /// <returns>创建的设置页面</returns>
+        public virtual PluginSidebarSettingsSection CreateSidebarSettingsSection() => null;
 
         public virtual IPluginConfigManager CreateConfigManager(Storage storage) => null;
 

@@ -26,11 +26,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         {
             var piece = new EditableLyricPiece(lyric)
             {
-                OnSeekTriggered = () => Plugin.GetCurrentTrack().Seek(lyric.Time),
                 OnDeleted = () => this.Delay(1).Schedule(applyChanges)
             };
 
-            piece.OnAdjustTriggered = () => adjustPieceTime(piece);
+            piece.OnAdjust = () => adjustPieceTime(piece);
 
             return piece;
         }
@@ -38,12 +37,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         private void adjustPieceTime(DrawableLyric drawableLyric)
         {
             LyricFlow.Remove(drawableLyric);
-            drawableLyric.Value.Time = (int)Plugin.GetCurrentTrack().CurrentTime;
-
             sortPiece(drawableLyric);
         }
 
-        public override Drawable[] Entries => new Drawable[]
+        public override IconButton[] Entries => new[]
         {
             new IconButton
             {

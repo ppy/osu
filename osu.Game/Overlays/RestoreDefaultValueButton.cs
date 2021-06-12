@@ -76,7 +76,7 @@ namespace osu.Game.Overlays
             UpdateState();
         }
 
-        public string TooltipText => "revert to default";
+        public string TooltipText => "恢复默认值";
 
         protected override bool OnHover(HoverEvent e)
         {

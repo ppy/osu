@@ -90,7 +90,8 @@ namespace Mvis.Plugin.StoryboardSupport
 
         private void onScreenResuming()
         {
-            MvisScreen.HideScreenBackground.Value = targetBeatmap.Storyboard.ReplacesBackground;
+            if (!Disabled.Value && ContentLoaded)
+                MvisScreen.HideScreenBackground.Value = targetBeatmap.Storyboard.ReplacesBackground;
         }
 
         private void onScreenSuspending()
@@ -147,7 +148,7 @@ namespace Mvis.Plugin.StoryboardSupport
             return true;
         }
 
-        public override int Version => 4;
+        public override int Version => 5;
 
         private Drawable prevProxy;
 

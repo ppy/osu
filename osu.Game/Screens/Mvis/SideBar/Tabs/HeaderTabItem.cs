@@ -1,46 +1,61 @@
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
+using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Mvis.SideBar.Header
+namespace osu.Game.Screens.Mvis.SideBar.Tabs
 {
-    public class HeaderTabItem : OsuClickableContainer
+    internal class TabControlItem : OsuClickableContainer
     {
         private readonly Box activeBox;
-        private readonly OsuSpriteText title;
+        private readonly SpriteIcon icon;
         private bool isActive;
 
         public ISidebarContent Value;
+        private readonly Box flashBox;
 
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
 
-        public HeaderTabItem(ISidebarContent content)
+        private Color4 activeColor => colourProvider.Highlight1;
+        private Color4 inActiveColor => colourProvider.Dark4.Opacity(0);
+
+        public TabControlItem(ISidebarContent content)
         {
-            AutoSizeAxes = Axes.X;
-            RelativeSizeAxes = Axes.Y;
+            Value = content;
+            TooltipText = Value.Title;
+
+            Size = new Vector2(45);
             Anchor = Anchor.TopRight;
             Origin = Anchor.TopRight;
-            Value = content;
+            Masking = true;
+            CornerRadius = 5;
             Children = new Drawable[]
             {
                 activeBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Height = 0,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft
                 },
-                title = new OsuSpriteText
+                icon = new SpriteIcon
                 {
-                    Text = content.Title,
+                    Icon = content.Icon,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Margin = new MarginPadding { Horizontal = 5 }
+                    Size = new Vector2(18),
+                    Shadow = true
+                },
+                flashBox = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.White,
+                    Alpha = 0,
                 }
             };
         }
@@ -49,8 +64,8 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
         {
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                activeBox.Colour = colourProvider.Highlight1;
-                title.Colour = isActive ? Color4.White : colourProvider.Highlight1;
+                activeBox.Colour = isActive ? activeColor : inActiveColor;
+                icon.Colour = isActive ? Color4.Black : Color4.White;
             }, true);
 
             base.LoadComplete();
@@ -58,32 +73,28 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (!isActive)
-                activeBox.ResizeHeightTo(0.15f, 300, Easing.OutQuint);
-
+            flashBox.FadeTo(0.2f, 300);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (!isActive)
-                activeBox.ResizeHeightTo(0, 300, Easing.OutQuint);
-
             base.OnHoverLost(e);
+            flashBox.FadeTo(0f, 300);
         }
 
         public void MakeActive()
         {
             isActive = true;
-            activeBox.ResizeHeightTo(0.2f, 300, Easing.OutQuint);
-            title.Colour = Color4.White;
+            activeBox.FadeColour(activeColor, 300, Easing.OutQuint);
+            icon.Colour = Color4.Black;
         }
 
         public void MakeInActive()
         {
             isActive = false;
-            activeBox.ResizeHeightTo(IsHovered ? 0.15f : 0, 300, Easing.OutQuint);
-            title.Colour = colourProvider.Highlight1;
+            activeBox.FadeColour(inActiveColor, 300, Easing.OutQuint);
+            icon.Colour = Color4.White;
         }
     }
 }
