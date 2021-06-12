@@ -28,6 +28,12 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "使用DrawablePool",
+                    WarningText = "试验性功能！",
+                    Current = config.GetBindable<bool>(LyricSettings.UseDrawablePool)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "自动保存歌词到本地",
                     Current = config.GetBindable<bool>(LyricSettings.SaveLrcWhenFetchFinish),
                     TooltipText = "歌词将保存在\"custom/lyrics/beatmap-{ID}.json\"中"

@@ -24,6 +24,13 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                 },
                 new SettingsTogglePiece
                 {
+                    Icon = FontAwesome.Solid.SwimmingPool,
+                    Description = "使用DrawablePool",
+                    TooltipText = "试验性功能！",
+                    Bindable = config.GetBindable<bool>(LyricSettings.UseDrawablePool)
+                },
+                new SettingsTogglePiece
+                {
                     Icon = FontAwesome.Solid.Save,
                     Description = "自动保存歌词到本地",
                     Bindable = config.GetBindable<bool>(LyricSettings.SaveLrcWhenFetchFinish),
