@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mods
                     }
                 }
 
-                private readonly SettingsTextBox.OsuModSettingsNumberBox seedNumberBox;
+                private readonly SettingsTextBox.OsuSettingsNumberBox seedNumberBox;
 
                 public SeedControl()
                 {
@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Mods
                             {
                                 new Drawable[]
                                 {
-                                    seedNumberBox = new SettingsTextBox.OsuModSettingsNumberBox
+                                    seedNumberBox = new SettingsTextBox.OsuSettingsNumberBox
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         CommitOnFocusLost = true
