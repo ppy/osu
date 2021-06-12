@@ -7,13 +7,13 @@ namespace osu.Game.Overlays.Settings
 {
     public class SettingsNumberBox : SettingsItem<string>
     {
-        protected override Drawable CreateControl() => new OsuSettingsNumberBox
+        protected override Drawable CreateControl() => new NumberBox
         {
             Margin = new MarginPadding { Top = 5 },
             RelativeSizeAxes = Axes.X,
         };
 
-        public class OsuSettingsNumberBox : SettingsTextBox.OsuSettingsTextBox
+        public class NumberBox : SettingsTextBox.TextBox
         {
             protected override bool CanAddCharacter(char character) => char.IsNumber(character);
         }
