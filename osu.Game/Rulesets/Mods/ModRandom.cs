@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Mods
@@ -50,7 +49,7 @@ namespace osu.Game.Rulesets.Mods
                     }
                 }
 
-                private readonly OsuModSettingsNumberBox seedNumberBox;
+                private readonly SettingsTextBox.OsuModSettingsNumberBox seedNumberBox;
 
                 public SeedControl()
                 {
@@ -76,7 +75,7 @@ namespace osu.Game.Rulesets.Mods
                             {
                                 new Drawable[]
                                 {
-                                    seedNumberBox = new OsuModSettingsNumberBox
+                                    seedNumberBox = new SettingsTextBox.OsuModSettingsNumberBox
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         CommitOnFocusLost = true
