@@ -13,14 +13,14 @@ namespace osu.Game.Overlays.Settings
 {
     public class SettingsTextBox : SettingsItem<string>
     {
-        protected override Drawable CreateControl() => new OsuModSettingsTextBox
+        protected override Drawable CreateControl() => new OsuSettingsTextBox
         {
             Margin = new MarginPadding { Top = 5 },
             RelativeSizeAxes = Axes.X,
             CommitOnFocusLost = true,
         };
 
-        public class OsuModSettingsTextBox : OsuTextBox
+        public class OsuSettingsTextBox : OsuTextBox
         {
             private const float border_thickness = 3;
 
@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        public class OsuModSettingsNumberBox : OsuModSettingsTextBox
+        public class OsuSettingsNumberBox : OsuSettingsTextBox
         {
             protected override bool CanAddCharacter(char character) => char.IsNumber(character);
         }
