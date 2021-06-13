@@ -59,8 +59,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             [CanBeNull] OsuHitObject nextObject,
             double tapStrain,
             double gameplayRate,
-            bool hidden = false,
-            double noteDensity = 0,
+            bool hidden,
+            double noteDensity,
             [CanBeNull] OsuHitObject fourthLastObject = null)
         {
             var movement = new OsuMovement();
