@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double strainMultiplier;
             List<double> strains = GetCurrentStrainPeaks().OrderByDescending(d => d).ToList();
 
-            double baseLine = 0.6;
+            double baseLine = 0.68;
 
             for (int i = 0; i <= 9; i++)
             {
