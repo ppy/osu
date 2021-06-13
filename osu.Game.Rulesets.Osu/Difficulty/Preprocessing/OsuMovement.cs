@@ -282,7 +282,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // Correction #3 - 4-object pattern
             // Estimate how the whole pattern consisting of objNeg2 to objNext affects
             // the difficulty of hitting objCurr. This only takes effect when the pattern
-            // is not so spaced (i.e. does not contain jumps)
+            // is not so spaced (i.e. does not contain jumps) and has consistent rhythm
             double patternCorrection = 0;
 
             if (objPrevTemporallyInTheMiddle && objCurrTemporallyInTheMiddle)
@@ -295,17 +295,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Correction #4 - Tap Strain
             // Estimate how tap strain affects difficulty
+            // This buffs current object's aim difficulty rating by tap difficulty if distance is bigger than 0
+            // (if object is hard to tap - its harder to aim)
             double tapCorrection = 0;
 
             if (dPrevCurr > 0 && tapStrain != null)
             {
-                tapCorrection = SpecialFunctions.Logistic((Mean.PowerMean(tapStrain, 2) / ipPrevCurr - 1.34) / 0.1) * 0.15;
+                var meanTapStrain = Mean.PowerMean(tapStrain, 2);
+                tapCorrection = SpecialFunctions.Logistic((meanTapStrain / ipPrevCurr - 1.34) / 0.1) * 0.15;
             }
 
             // Correction #5 - Cheesing
             // The player might make the movement of objPrev -> objCurr easier by
             // hitting objPrev early and objCurr late. Here we estimate the amount of
-            // cheesing and update MT accordingly.
+            // cheesing and update MovementTime accordingly.
             double timeEarly = 0;
             double timeLate = 0;
             double cheesabilityEarly = 0;
@@ -348,28 +351,74 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 timeLate = cheesabilityLate * (1 / (1 / (tPrevCurr + 0.07) + tCurrNextReciprocal));
             }
 
-            // Correction #6 - High bpm jump buff (alt buff)
+            // time for previous object to current in BPM
             double effectiveBpm = 30 / (tPrevCurr + 1e-10);
-            double highBpmJumpBuff = SpecialFunctions.Logistic((effectiveBpm - 354) / 16) *
-                                     SpecialFunctions.Logistic((dPrevCurr - 1.9) / 0.15) * 0.23;
+
+            // Correction #6 - High bpm jump buff (alt buff)
+            // High speed (300 bpm+) jumps are underweighted by fitt's law so we're correting for it here.
+            double highBpmJumpBuff;
+            {
+                var bpmCutoff = SpecialFunctions.Logistic((effectiveBpm - 354) / 16);
+
+                var distanceBuff = SpecialFunctions.Logistic((dPrevCurr - 1.9) / 0.15);
+
+                highBpmJumpBuff = bpmCutoff * distanceBuff * 0.23;
+            }
 
             // Correction #7 - Small circle bonus
-            double smallCircleBonus = ((SpecialFunctions.Logistic((55 - 2 * objCurr.Radius) / 2.9) * 0.275) +
-                                      Math.Min(SpecialFunctions.Logistic((-objCurr.Radius + 10.0) / 4.0) * 0.8, 24.5)) *
-                                      Math.Max(SpecialFunctions.Logistic((dPrevCurr - 0.5) / 0.1), 0.25);
+            // Small circles (CS 6.5+) are underweighted by fitt's law so we're correting for it here.
+            // Graphs: https://www.desmos.com/calculator/u6rjndtklb
+            double smallCircleBonus;
+            {
+                // we only want to buff radiuses starting from about 35 (CS 4 radius is 36.48)
+                double radiusCutoff = SpecialFunctions.Logistic((55 - 2 * objCurr.Radius) / 2.9) * 0.275;
+
+                // we want to reduce bonus for small distances
+                var distanceCutoff = Math.Max(SpecialFunctions.Logistic((dPrevCurr - 0.5) / 0.1), 0.25);
+
+                var bonusCurve = Math.Min(SpecialFunctions.Logistic((-objCurr.Radius + 10.0) / 4.0) * 0.8, 24.5);
+
+                smallCircleBonus = (radiusCutoff + bonusCurve) * distanceCutoff;
+            }
 
             // Correction #8 - Stacked notes nerf
-            double dPrevCurrStackedNerf = Math.Max(0, Math.Min(dPrevCurr, Math.Min(1.2 * dPrevCurr - 0.185, 1.4 * dPrevCurr - 0.32)));
+            // We apply nerf to the difficulty depending on how much objects overlap.
+            double dPrevCurrStackedNerf =
+                Math.Max(0,
+                    Math.Min(dPrevCurr,
+                        Math.Min(1.2 * dPrevCurr - 0.185, 1.4 * dPrevCurr - 0.32)
+                        )
+                    );
 
             // Correction #9 - Slow small jump nerf
-            double smallJumpNerfFactor = 1 - 0.17 * Math.Exp(-Math.Pow((dPrevCurr - 2.2) / 0.7, 2)) *
-                SpecialFunctions.Logistic((255 - effectiveBpm) / 10);
+            // Jumps within ~1-3.5 distance (with peak at 2.2) get nerfed depending on BPM
+            // Graphs: https://www.desmos.com/calculator/lbwtkv1qom
+            double smallJumpNerfFactor;
+            {
+                // this applies nerf up to 300 bpm and starts deminishing it at ~200 bpm
+                var bpmCutoff = SpecialFunctions.Logistic((255 - effectiveBpm) / 10);
+
+                var distanceNerf = Math.Exp(-Math.Pow((dPrevCurr - 2.2) / 0.7, 2));
+
+                smallJumpNerfFactor = 1 - distanceNerf * bpmCutoff * 0.17;
+            }
 
             // Correction #10 - Slow big jump buff
-            double bigJumpBuffFactor = 1 + 0.15 * SpecialFunctions.Logistic((dPrevCurr - 6) / 0.5) *
-                SpecialFunctions.Logistic((210 - effectiveBpm) / 8);
+            // Jumps with distance starting from ~4 get buffed on low BPMs
+            // Graphs: https://www.desmos.com/calculator/fmewz0foql
+            double bigJumpBuffFactor;
+            {
+                // this applies buff up until ~250 bpm
+                var bpmCutoff = SpecialFunctions.Logistic((210 - effectiveBpm) / 8);
+
+                var distanceBuff = SpecialFunctions.Logistic((dPrevCurr - 6) / 0.5);
+
+                bigJumpBuffFactor = 1 + distanceBuff * bpmCutoff * 0.15;
+            }
+            
 
             // Correction #11 - Hidden Mod
+            // We apply slight bonus when using HD depending on current visual note density.
             double correctionHidden = 0;
 
             if (hidden)
@@ -378,6 +427,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             // Correction #12 - Stacked wiggle fix
+            // If distance between each 4 objects is less than 1 (meaning they overlap) reset all angle corrections as well as tap correction.
+            // This fixes "wiggles" (usually a stream of objects that are placed in a zig-zag pattern that can be aimed in a straight line by going through overlapped places)
             if (objNeg2 != null && objNext != null)
             {
                 var dPrevNext = ((posNext - posPrev) / (2 * objCurr.Radius)).L2Norm();
@@ -394,25 +445,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Correction #13 - Repetitive jump nerf
             // Nerf big jumps where objNeg2 and objCurr are close or where objNeg4 and objCurr are close
-            double jumpOverlapCorrection = 1 - (Math.Max(0.15 - 0.1 * dNeg2Curr, 0) + Math.Max(0.1125 - 0.075 * dNeg4Curr, 0)) *
-                SpecialFunctions.Logistic((dPrevCurr - 3.3) / 0.25);
-
-            // Correction #14 - Sudden distance increase buff
-            double distanceIncreaseBuff = 1;
-            /*
-            if (objNeg2 != null)
+            // This mainly targets repeating jumps such as
+            // 1  3
+            //  \/
+            //  /\
+            // 4  2
+            double jumpOverlapCorrection;
             {
-                double dNeg2PrevOverlapNerf = Math.Min(1, Math.Pow(dNeg2Prev, 3));
-                double timeDifferenceNerf = Math.Exp(-4 * Math.Pow(1 - Math.Max(tPrevCurr / (tNeg2Prev + 1e-10), tNeg2Prev / (tPrevCurr + 1e-10)), 2));
-                double distanceRatio = dPrevCurr / Math.Max(1, dNeg2Prev);
-                double bpmScaling = Math.Max(1, -16 * tPrevCurr + 3.4);
-                distanceIncreaseBuff = 1 + 0.225 * bpmScaling * timeDifferenceNerf * dNeg2PrevOverlapNerf * Math.Max(0, distanceRatio - 2);
+                var neg2CurrNerf = Math.Max(0.15 - 0.1 * dNeg2Curr, 0);
+                var neg4CurrNerf = Math.Max(0.1125 - 0.075 * dNeg4Curr, 0);
+
+                var distanceCutoff = SpecialFunctions.Logistic((dPrevCurr - 3.3) / 0.25);
+
+                jumpOverlapCorrection = 1 - (neg2CurrNerf + neg4CurrNerf) * distanceCutoff;
             }
-            */
+
             // Apply the corrections
             double dPrevCurrWithCorrection = dPrevCurrStackedNerf * (1 + smallCircleBonus) * (1 + correctionNeg2 + correctionNext + patternCorrection) *
                                        (1 + highBpmJumpBuff) * (1 + tapCorrection) * smallJumpNerfFactor * bigJumpBuffFactor * (1 + correctionHidden) *
-                                       jumpOverlapCorrection * distanceIncreaseBuff;
+                                       jumpOverlapCorrection;
 
             movement.Distance = dPrevCurrWithCorrection;
             movement.MovementTime = tPrevCurr;
