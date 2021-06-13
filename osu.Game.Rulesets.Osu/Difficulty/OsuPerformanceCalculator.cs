@@ -72,12 +72,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Custom multipliers for NoFail and SpunOut.
             double multiplier = 2.14; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
-            if (mods.Any(m => m is OsuModNoFail))
-                multiplier *= 0.90;
-
-            if (mods.Any(m => m is OsuModSpunOut))
-                multiplier *= 0.95;
-
             // guess the number of misses + slider breaks from combo
             double comboBasedMissCount;
 
@@ -98,6 +92,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             effectiveMissCount = Math.Max(countMiss, comboBasedMissCount);
+
+            if (mods.Any(m => m is OsuModNoFail))
+                multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
+
+            if (mods.Any(m => m is OsuModSpunOut))
+                multiplier *= 1.0 - Math.Pow(countSpinners / totalHits, 0.85);
 
             double aimValue = computeAimValue();
             double tapValue = computeTapValue();
@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Scale the aim value down with accuracy
             double accLeniency = greatWindow * Attributes.AimDiff / 300;
             double accPenalty = (0.09 / (accuracy - 1.3) + 0.3) * (accLeniency + 1.5);
-            aimValue *= Math.Exp(-accPenalty);
+            aimValue *= 0.2 + SpecialFunctions.Logistic(-((accPenalty - 0.24953) / 0.18));
 
             return aimValue;
         }
@@ -234,7 +234,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             tapValue += accBuff;
 
             // Scale tap value down with accuracy
-            double accFactor = 0.5 + 0.5 * (SpecialFunctions.Logistic((accuracy - 0.65) / 0.1) + SpecialFunctions.Logistic(-3.5));
+            double odScale = SpecialFunctions.Logistic(16.0 - greatWindow) * 0.04; // lenient curve for extreme OD
+            double accFactor = 0.5 + 0.5 * (Math.Pow(SpecialFunctions.Logistic((accuracy - 0.9543 + 1.83 * odScale) / 0.025 + odScale), 0.2) + SpecialFunctions.Logistic(-3.5));
             tapValue *= accFactor;
 
             // Penalize misses and 50s exponentially
