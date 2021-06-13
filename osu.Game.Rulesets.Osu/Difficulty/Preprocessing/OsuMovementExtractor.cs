@@ -7,7 +7,6 @@ using System.Diagnostics;
 using JetBrains.Annotations;
 using MathNet.Numerics;
 using MathNet.Numerics.Interpolation;
-using MathNet.Numerics.LinearAlgebra;
 using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -279,43 +278,43 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (p.LastToCurrent.RelativeLength > 0)
             {
-                double tNeg2PrevReciprocal;
-                double ipNeg2Prev;
+                double secondLastToLastReciprocalMovementLength;
+                double secondLastToLastThroughput;
 
                 if (p.SecondLastObject != null)
                 {
                     Debug.Assert(p.SecondLastToLast != null);
 
-                    tNeg2PrevReciprocal = 1 / (p.SecondLastToLast.Value.TimeDelta + 1e-10);
-                    ipNeg2Prev = FittsLaw.Throughput(p.SecondLastToLast.Value.RelativeLength, p.SecondLastToLast.Value.TimeDelta);
+                    secondLastToLastReciprocalMovementLength = 1 / (p.SecondLastToLast.Value.TimeDelta + 1e-10);
+                    secondLastToLastThroughput = FittsLaw.Throughput(p.SecondLastToLast.Value.RelativeLength, p.SecondLastToLast.Value.TimeDelta);
                 }
                 else
                 {
-                    tNeg2PrevReciprocal = 0;
-                    ipNeg2Prev = 0;
+                    secondLastToLastReciprocalMovementLength = 0;
+                    secondLastToLastThroughput = 0;
                 }
 
-                cheesabilityEarly = SpecialFunctions.Logistic((ipNeg2Prev / movementThroughput - 0.6) * (-15)) * 0.5;
-                timeEarly = cheesabilityEarly * (1 / (1 / (p.LastToCurrent.TimeDelta + 0.07) + tNeg2PrevReciprocal));
+                cheesabilityEarly = SpecialFunctions.Logistic((secondLastToLastThroughput / movementThroughput - 0.6) * (-15)) * 0.5;
+                timeEarly = cheesabilityEarly * (1 / (1 / (p.LastToCurrent.TimeDelta + 0.07) + secondLastToLastReciprocalMovementLength));
 
-                double tCurrNextReciprocal;
-                double ipCurrNext;
+                double currentToNextReciprocalMovementLength;
+                double currentToNextThroughput;
 
                 if (p.NextObject != null)
                 {
                     Debug.Assert(p.CurrentToNext != null);
 
-                    tCurrNextReciprocal = 1 / (p.CurrentToNext.Value.TimeDelta + 1e-10);
-                    ipCurrNext = FittsLaw.Throughput(p.CurrentToNext.Value.RelativeLength, p.CurrentToNext.Value.TimeDelta);
+                    currentToNextReciprocalMovementLength = 1 / (p.CurrentToNext.Value.TimeDelta + 1e-10);
+                    currentToNextThroughput = FittsLaw.Throughput(p.CurrentToNext.Value.RelativeLength, p.CurrentToNext.Value.TimeDelta);
                 }
                 else
                 {
-                    tCurrNextReciprocal = 0;
-                    ipCurrNext = 0;
+                    currentToNextReciprocalMovementLength = 0;
+                    currentToNextThroughput = 0;
                 }
 
-                cheesabilityLate = SpecialFunctions.Logistic((ipCurrNext / movementThroughput - 0.6) * (-15)) * 0.5;
-                timeLate = cheesabilityLate * (1 / (1 / (p.LastToCurrent.TimeDelta + 0.07) + tCurrNextReciprocal));
+                cheesabilityLate = SpecialFunctions.Logistic((currentToNextThroughput / movementThroughput - 0.6) * (-15)) * 0.5;
+                timeLate = cheesabilityLate * (1 / (1 / (p.LastToCurrent.TimeDelta + 0.07) + currentToNextReciprocalMovementLength));
             }
 
             p.Cheesability = cheesabilityEarly + cheesabilityLate;
@@ -343,7 +342,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private static double calculateSmallCircleBuff(MovementExtractionParameters p)
         {
             // we only want to buff radiuses starting from about 35 (CS 4 radius is 36.48)
-            double radiusCutoff = SpecialFunctions.Logistic((55 - 2 * p.CurrentObject.Radius) / 2.9) * 0.275;
+            var radiusCutoff = SpecialFunctions.Logistic((55 - 2 * p.CurrentObject.Radius) / 2.9) * 0.275;
 
             // we want to reduce bonus for small distances
             var distanceCutoff = Math.Max(SpecialFunctions.Logistic((p.LastToCurrent.RelativeLength - 0.5) / 0.1), 0.25);
