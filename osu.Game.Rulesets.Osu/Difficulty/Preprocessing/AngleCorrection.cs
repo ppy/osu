@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// The distance between the target note and the next note
         /// (in the case of <see cref="FLOW_NEXT"/> and <see cref="SNAP_NEXT"/>),
         /// or the distance between the second-to-last note and the last note
-        /// (in the case of <see cref="FLOW_NEG2"/> and <see cref="SNAP_NEG2"/>).
+        /// (in the case of <see cref="FLOW_SECONDLAST"/> and <see cref="SNAP_SECONDLAST"/>).
         /// </param>
         /// <param name="angles">The angle between the note pairs that are part of this movement.</param>
         /// <param name="values">Values of the correction function at the interpolation nodes.</param>
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// for the movement pair: second-to-last -> last -> target note
         /// in the case of flow aim.
         /// </summary>
-        public static readonly AngleCorrection FLOW_NEG2 = new AngleCorrection(
+        public static readonly AngleCorrection FLOW_SECONDLAST = new AngleCorrection(
             currentMovementDistance: new[] { 0.2, 0.6, 1, 1.3, 1.7, 2.1 },
             otherMovementDistance: new[] { 0.1, 0.6, 1, 1.3, 1.8, 3 },
             angles,
@@ -270,21 +270,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             });
 
         /// <summary>
-        /// Calculates the maximum allowable value for the <see cref="SNAP_NEG2"/> correction.
+        /// Calculates the maximum allowable value for the <see cref="SNAP_SECONDLAST"/> correction.
         /// </summary>
-        private static readonly CubicInterpolator snap_neg2_maximum = new CubicInterpolator(new[] { 0, 1.5, 2.5, 4, 6, 6.01 }, new[] { 1, 0.85, 0.6, 0.8, 1, 1 });
+        private static readonly CubicInterpolator snap_secondlast_maximum = new CubicInterpolator(new[] { 0, 1.5, 2.5, 4, 6, 6.01 }, new[] { 1, 0.85, 0.6, 0.8, 1, 1 });
 
         /// <summary>
         /// Calculates the angle difficulty correction
         /// for the movement pair: second-to-last -> last -> target note
         /// in the case of snap aim.
         /// </summary>
-        public static readonly AngleCorrection SNAP_NEG2 = new AngleCorrection(
+        public static readonly AngleCorrection SNAP_SECONDLAST = new AngleCorrection(
             currentMovementDistance: new[] { 0.6, 1.5, 2.4, 3.5, 5, 6.5, 9 },
             otherMovementDistance: new[] { 0, 0.5, 1, 1.5, 2.5 },
             otherMovementScalingFactor: d1 => Math.Clamp(d1, 2, 5),
             angles: angles,
-            maximumCorrection: snap_neg2_maximum,
+            maximumCorrection: snap_secondlast_maximum,
             values: new[,,]
             {
                 {
