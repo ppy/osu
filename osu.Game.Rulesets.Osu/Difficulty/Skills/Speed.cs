@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// <summary>
     /// Represents the skill required to press keys with regards to keeping up with the speed at which objects need to be hit.
     /// </summary>
-    public class Speed : StrainSkill
+    public class Speed : OsuSkill
     {
         private const double single_spacing_threshold = 125;
 
