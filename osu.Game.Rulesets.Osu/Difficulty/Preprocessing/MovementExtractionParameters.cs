@@ -34,8 +34,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         public double EffectiveBPM { get; }
 
-        public bool LastObjectCenteredBetweenNeighbours { get; set; }
-        public bool CurrentObjectCenteredBetweenNeighbours { get; set; }
+        public bool LastObjectTemporallyCenteredBetweenNeighbours { get; set; }
+        public bool CurrentObjectTemporallyCenteredBetweenNeighbours { get; set; }
 
         public double SecondLastToCurrentFlowiness { get; set; }
         public double LastToNextFlowiness { get; set; }
@@ -70,8 +70,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             EffectiveBPM = 30 / (LastToCurrent.TimeDelta + 1e-10);
 
-            LastObjectCenteredBetweenNeighbours = false;
-            CurrentObjectCenteredBetweenNeighbours = false;
+            LastObjectTemporallyCenteredBetweenNeighbours = false;
+            CurrentObjectTemporallyCenteredBetweenNeighbours = false;
 
             SecondLastToCurrentFlowiness = 0;
             LastToNextFlowiness = 0;
