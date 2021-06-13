@@ -5,11 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics;
-using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.RootFinding;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
+using osu.Game.Rulesets.Osu.Difficulty.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// We want to find a throughput level at which the probability of FC = prob_threshold
         /// </summary>
-        private const double prob_threshold = 0.02;
+        private const double probability_threshold = 0.02;
 
         /// <summary>
         /// We want to find a throughput level at which (the expected time for FC - the length of the song) = time_threshold_base
@@ -31,17 +31,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// Minimum throughput for root-finding
         /// </summary>
-        private const double tp_min = 0.1;
+        private const double throughput_min = 0.1;
 
         /// <summary>
         /// Maximum throughput for root-finding
         /// </summary>
-        private const double tp_max = 100;
+        private const double throughput_max = 100;
 
         /// <summary>
         /// Precision of probability of FC for root-finding
         /// </summary>
-        private const double prob_precision = 1e-4;
+        private const double probability_precision = 1e-4;
 
         /// <summary>
         /// Precision of expected time for FC for root-finding
@@ -64,12 +64,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         public static AimAttributes CalculateAimAttributes(List<OsuHitObject> hitObjects,
                                                            double clockRate,
-                                                           List<Vector<double>> strainHistory,
-                                                           List<double> noteDensities)
+                                                           double[] tapStrains,
+                                                           double[] noteDensities)
         {
-            List<OsuMovement> movements = createMovements(hitObjects, clockRate, strainHistory);
-            List<OsuMovement> movementsHidden = createMovements(hitObjects, clockRate, strainHistory,
-                hidden: true, noteDensities: noteDensities);
+            List<OsuMovement> movements = createMovements(hitObjects, clockRate, tapStrains, noteDensities);
+            List<OsuMovement> movementsHidden = createMovements(hitObjects, clockRate, tapStrains, noteDensities, true);
 
             var comboSectionAmount = combo_tp_count;
             if (movements.Count < comboSectionAmount)
@@ -94,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 };
             }
 
-            var mapHitProbs = new HitProbabilities(movements, default_cheese_level, difficultyCount: comboSectionAmount);
+            var mapHitProbs = new HitProbabilities(movements, default_cheese_level, sectionCount: comboSectionAmount);
             double fcProbTp = calculateFcProbTp(movements);
             double fcProbTpHidden = calculateFcProbTp(movementsHidden);
 
@@ -123,13 +122,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// Converts hit objects into movements.
         /// </summary>
         /// <param name="hitObjects">List of all map hit objects</param>
-        /// <param name="strainHistory">List of all hit objects' tap strain</param>
+        /// <param name="tapStrains">List of all hit objects' tap strain</param>
         /// <param name="noteDensities">List of all hit objects' visual note densities</param>
         /// <param name="clockRate">Clock rate</param>
         /// <param name="hidden">Are we calculating hidden mod?</param>
         /// <returns>List of all movements</returns>
-        private static List<OsuMovement> createMovements(List<OsuHitObject> hitObjects, double clockRate, List<Vector<double>> strainHistory,
-                                                         bool hidden = false, List<double> noteDensities = null)
+        private static List<OsuMovement> createMovements(List<OsuHitObject> hitObjects, double clockRate, double[] tapStrains, double[] noteDensities, bool hidden = false)
         {
             var movements = new List<OsuMovement>();
 
@@ -137,47 +135,51 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return movements;
 
             // the first object
-            movements.AddRange(OsuMovement.ExtractMovement(hitObjects[0]));
+            movements.AddRange(OsuMovementExtractor.ExtractFirst(hitObjects[0]));
 
             // the rest
             for (int i = 1; i < hitObjects.Count; i++)
             {
-                var objNeg4 = i > 3 ? hitObjects[i - 4] : null;
-                var objNeg2 = i > 1 ? hitObjects[i - 2] : null;
-                var objPrev = hitObjects[i - 1];
-                var objCurr = hitObjects[i];
-                var objNext = i < hitObjects.Count - 1 ? hitObjects[i + 1] : null;
-                var tapStrain = strainHistory[i];
+                var fourthLastObject = i > 3 ? hitObjects[i - 4] : null;
+                var secondLastObject = i > 1 ? hitObjects[i - 2] : null;
+                var lastObject = hitObjects[i - 1];
+                var currentObject = hitObjects[i];
+                var nextObject = i < hitObjects.Count - 1 ? hitObjects[i + 1] : null;
 
-                if (hidden)
-                {
-                    movements.AddRange(OsuMovement.ExtractMovement(objNeg2, objPrev, objCurr, objNext, tapStrain, clockRate,
-                        hidden: true, noteDensity: noteDensities[i], objNeg4: objNeg4));
-                }
-                else
-                    movements.AddRange(OsuMovement.ExtractMovement(objNeg2, objPrev, objCurr, objNext, tapStrain, clockRate, objNeg4: objNeg4));
+                var extractedMovements = OsuMovementExtractor.Extract(
+                    secondLastObject,
+                    lastObject,
+                    currentObject,
+                    nextObject,
+                    tapStrains[i],
+                    clockRate,
+                    hidden,
+                    noteDensities[i],
+                    fourthLastObject);
+
+                movements.AddRange(extractedMovements);
             }
 
             return movements;
         }
 
         /// <summary>
-        /// Calculates the throughput at which the probability of FC = prob_threshold
+        /// Calculates the throughput at which the probability of FC = threshold
         /// </summary>
         private static double calculateFcProbTp(IEnumerable<OsuMovement> movements, double cheeseLevel = default_cheese_level)
         {
-            double fcProbTpMin = calculateFcProb(movements, tp_min, cheeseLevel);
+            double fcProbTpMin = calculateFcProb(movements, throughput_min, cheeseLevel);
 
-            if (fcProbTpMin >= prob_threshold)
-                return tp_min;
+            if (fcProbTpMin >= probability_threshold)
+                return throughput_min;
 
-            double fcProbTpMax = calculateFcProb(movements, tp_max, cheeseLevel);
+            double fcProbTpMax = calculateFcProb(movements, throughput_max, cheeseLevel);
 
-            if (fcProbTpMax <= prob_threshold)
-                return tp_max;
+            if (fcProbTpMax <= probability_threshold)
+                return throughput_max;
 
-            double fcProbMinusThreshold(double tp) => calculateFcProb(movements, tp, cheeseLevel) - prob_threshold;
-            return Brent.FindRoot(fcProbMinusThreshold, tp_min, tp_max, prob_precision, max_iterations);
+            double fcProbMinusThreshold(double tp) => calculateFcProb(movements, tp, cheeseLevel) - probability_threshold;
+            return Brent.FindRoot(fcProbMinusThreshold, throughput_min, throughput_max, probability_precision, max_iterations);
         }
 
         /// <summary>
@@ -188,18 +190,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         // there exists a submap of length sectionCount that can be FC'd in timeThresholdBase seconds.
         private static double calculateFcTimeTp(HitProbabilities mapHitProbs, int sectionCount)
         {
-            double maxFcTime = mapHitProbs.MinExpectedTimeForSectionCount(tp_min, sectionCount);
+            double maxFcTime = mapHitProbs.MinimumTimeForFullComboOnSubmap(throughput_min, sectionCount);
 
             if (maxFcTime <= time_threshold_base)
-                return tp_min;
+                return throughput_min;
 
-            double minFcTime = mapHitProbs.MinExpectedTimeForSectionCount(tp_max, sectionCount);
+            double minFcTime = mapHitProbs.MinimumTimeForFullComboOnSubmap(throughput_max, sectionCount);
 
             if (minFcTime >= time_threshold_base)
-                return tp_max;
+                return throughput_max;
 
-            double fcTimeMinusThreshold(double tp) => mapHitProbs.MinExpectedTimeForSectionCount(tp, sectionCount) - time_threshold_base;
-            return Bisection.FindRoot(fcTimeMinusThreshold, tp_min, tp_max, time_precision, max_iterations);
+            double fcTimeMinusThreshold(double tp) => mapHitProbs.MinimumTimeForFullComboOnSubmap(tp, sectionCount) - time_threshold_base;
+            return Bisection.FindRoot(fcTimeMinusThreshold, throughput_min, throughput_max, time_precision, max_iterations);
         }
 
         /// <summary>
@@ -233,7 +235,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             for (int i = 0; i < movements.Count; ++i)
             {
                 var movement = movements[i];
-                missProbs[i] = 1 - HitProbabilities.CalculateCheeseHitProb(movement, tp, default_cheese_level);
+                missProbs[i] = 1 - HitProbabilities.GetHitProbabilityAdjustedForCheese(movement, tp, default_cheese_level);
             }
 
             return missProbs;
@@ -249,7 +251,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             var distribution = new PoissonBinomial(missProbabilities);
 
-            double cdfMinusProb(double missCount) => distribution.Cdf(missCount) - p;
+            double cdfMinusProb(double missCount) => distribution.CDF(missCount) - p;
             return Brent.FindRootExpand(cdfMinusProb, -100, 1000);
         }
 
@@ -282,7 +284,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             foreach (var movement in movements)
             {
-                double cheeseness = SpecialFunctions.Logistic((movement.IndexOfPerformance / tp - 0.6) * 15) * movement.Cheesablility;
+                double cheeseness = SpecialFunctions.Logistic((movement.Throughput / tp - 0.6) * 15) * movement.Cheesablility;
                 count += cheeseness;
             }
 
@@ -314,7 +316,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             foreach (OsuMovement movement in movements)
             {
-                double hitProb = HitProbabilities.CalculateCheeseHitProb(movement, tp, cheeseLevel);
+                double hitProb = HitProbabilities.GetHitProbabilityAdjustedForCheese(movement, tp, cheeseLevel);
                 fcProb *= hitProb;
             }
 

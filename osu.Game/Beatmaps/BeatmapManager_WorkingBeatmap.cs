@@ -2,12 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
-using osu.Framework.Audio;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Skinning;
@@ -17,22 +17,26 @@ namespace osu.Game.Beatmaps
 {
     public partial class BeatmapManager
     {
-        protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
+        [ExcludeFromDynamicCompile]
+        private class BeatmapManagerWorkingBeatmap : WorkingBeatmap
         {
-            private readonly IResourceStore<byte[]> store;
+            [NotNull]
+            private readonly IBeatmapResourceProvider resources;
 
-            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, TextureStore textureStore, BeatmapInfo beatmapInfo, AudioManager audioManager)
-                : base(beatmapInfo, audioManager)
+            public BeatmapManagerWorkingBeatmap(BeatmapInfo beatmapInfo, [NotNull] IBeatmapResourceProvider resources)
+                : base(beatmapInfo, resources.AudioManager)
             {
-                this.store = store;
-                this.textureStore = textureStore;
+                this.resources = resources;
             }
 
             protected override IBeatmap GetBeatmap()
             {
+                if (BeatmapInfo.Path == null)
+                    return new Beatmap { BeatmapInfo = BeatmapInfo };
+
                 try
                 {
-                    using (var stream = new LineBufferedReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
+                    using (var stream = new LineBufferedReader(GetStream(BeatmapSetInfo.GetPathForFile(BeatmapInfo.Path))))
                         return Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
                 }
                 catch (Exception e)
@@ -41,12 +45,6 @@ namespace osu.Game.Beatmaps
                     return null;
                 }
             }
-
-            private string getPathForFile(string filename) => BeatmapSetInfo.Files.FirstOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
-
-            private TextureStore textureStore;
-
-            private ITrackStore trackStore;
 
             protected override bool BackgroundStillValid(Texture b) => false; // bypass lazy logic. we want to return a new background each time for refcounting purposes.
 
@@ -57,7 +55,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    return textureStore.Get(getPathForFile(Metadata.BackgroundFile));
+                    return resources.LargeTextureStore.Get(BeatmapSetInfo.GetPathForFile(Metadata.BackgroundFile));
                 }
                 catch (Exception e)
                 {
@@ -66,11 +64,14 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            protected override Track GetTrack()
+            protected override Track GetBeatmapTrack()
             {
+                if (Metadata?.AudioFile == null)
+                    return null;
+
                 try
                 {
-                    return (trackStore ??= AudioManager.GetTrackStore(store)).Get(getPathForFile(Metadata.AudioFile));
+                    return resources.Tracks.Get(BeatmapSetInfo.GetPathForFile(Metadata.AudioFile));
                 }
                 catch (Exception e)
                 {
@@ -79,27 +80,14 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            public override void RecycleTrack()
-            {
-                base.RecycleTrack();
-
-                trackStore?.Dispose();
-                trackStore = null;
-            }
-
-            public override void TransferTo(WorkingBeatmap other)
-            {
-                base.TransferTo(other);
-
-                if (other is BeatmapManagerWorkingBeatmap owb && textureStore != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
-                    owb.textureStore = textureStore;
-            }
-
             protected override Waveform GetWaveform()
             {
+                if (Metadata?.AudioFile == null)
+                    return null;
+
                 try
                 {
-                    var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
+                    var trackData = GetStream(BeatmapSetInfo.GetPathForFile(Metadata.AudioFile));
                     return trackData == null ? null : new Waveform(trackData);
                 }
                 catch (Exception e)
@@ -115,7 +103,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    using (var stream = new LineBufferedReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
+                    using (var stream = new LineBufferedReader(GetStream(BeatmapSetInfo.GetPathForFile(BeatmapInfo.Path))))
                     {
                         var decoder = Decoder.GetDecoder<Storyboard>(stream);
 
@@ -124,7 +112,7 @@ namespace osu.Game.Beatmaps
                             storyboard = decoder.Decode(stream);
                         else
                         {
-                            using (var secondaryStream = new LineBufferedReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
+                            using (var secondaryStream = new LineBufferedReader(GetStream(BeatmapSetInfo.GetPathForFile(BeatmapSetInfo.StoryboardFile))))
                                 storyboard = decoder.Decode(stream, secondaryStream);
                         }
                     }
@@ -144,7 +132,7 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    return new LegacyBeatmapSkin(BeatmapInfo, store, AudioManager);
+                    return new LegacyBeatmapSkin(BeatmapInfo, resources.Files, resources);
                 }
                 catch (Exception e)
                 {
@@ -152,6 +140,8 @@ namespace osu.Game.Beatmaps
                     return null;
                 }
             }
+
+            public override Stream GetStream(string storagePath) => resources.Files.GetStream(storagePath);
         }
     }
 }

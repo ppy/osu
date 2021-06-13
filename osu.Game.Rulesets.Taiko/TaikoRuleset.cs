@@ -21,7 +21,13 @@ using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Scoring;
 using System;
-using osu.Game.Rulesets.Taiko.Skinning;
+using System.Linq;
+using osu.Framework.Extensions.EnumExtensions;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Taiko.Edit;
+using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Skinning.Legacy;
+using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko
@@ -52,41 +58,54 @@ namespace osu.Game.Rulesets.Taiko
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
-            if (mods.HasFlag(LegacyMods.Nightcore))
+            if (mods.HasFlagFast(LegacyMods.Nightcore))
                 yield return new TaikoModNightcore();
-            else if (mods.HasFlag(LegacyMods.DoubleTime))
+            else if (mods.HasFlagFast(LegacyMods.DoubleTime))
                 yield return new TaikoModDoubleTime();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
+            if (mods.HasFlagFast(LegacyMods.Perfect))
                 yield return new TaikoModPerfect();
-            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+            else if (mods.HasFlagFast(LegacyMods.SuddenDeath))
                 yield return new TaikoModSuddenDeath();
 
-            if (mods.HasFlag(LegacyMods.Cinema))
+            if (mods.HasFlagFast(LegacyMods.Cinema))
                 yield return new TaikoModCinema();
-            else if (mods.HasFlag(LegacyMods.Autoplay))
+            else if (mods.HasFlagFast(LegacyMods.Autoplay))
                 yield return new TaikoModAutoplay();
 
-            if (mods.HasFlag(LegacyMods.Easy))
+            if (mods.HasFlagFast(LegacyMods.Easy))
                 yield return new TaikoModEasy();
 
-            if (mods.HasFlag(LegacyMods.Flashlight))
+            if (mods.HasFlagFast(LegacyMods.Flashlight))
                 yield return new TaikoModFlashlight();
 
-            if (mods.HasFlag(LegacyMods.HalfTime))
+            if (mods.HasFlagFast(LegacyMods.HalfTime))
                 yield return new TaikoModHalfTime();
 
-            if (mods.HasFlag(LegacyMods.HardRock))
+            if (mods.HasFlagFast(LegacyMods.HardRock))
                 yield return new TaikoModHardRock();
 
-            if (mods.HasFlag(LegacyMods.Hidden))
+            if (mods.HasFlagFast(LegacyMods.Hidden))
                 yield return new TaikoModHidden();
 
-            if (mods.HasFlag(LegacyMods.NoFail))
+            if (mods.HasFlagFast(LegacyMods.NoFail))
                 yield return new TaikoModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Relax))
+            if (mods.HasFlagFast(LegacyMods.Relax))
                 yield return new TaikoModRelax();
+
+            if (mods.HasFlagFast(LegacyMods.Random))
+                yield return new TaikoModRandom();
+        }
+
+        public override LegacyMods ConvertToLegacyMods(Mod[] mods)
+        {
+            var value = base.ConvertToLegacyMods(mods);
+
+            if (mods.OfType<TaikoModRandom>().Any())
+                value |= LegacyMods.Random;
+
+            return value;
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -116,6 +135,8 @@ namespace osu.Game.Rulesets.Taiko
                     {
                         new TaikoModRandom(),
                         new TaikoModDifficultyAdjust(),
+                        new TaikoModClassic(),
+                        new TaikoModSwap(),
                     };
 
                 case ModType.Automation:
@@ -144,12 +165,71 @@ namespace osu.Game.Rulesets.Taiko
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetTaiko };
 
+        public override HitObjectComposer CreateHitObjectComposer() => new TaikoHitObjectComposer(this);
+
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new TaikoDifficultyCalculator(this, beatmap);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new TaikoPerformanceCalculator(this, beatmap, score);
+        public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new TaikoPerformanceCalculator(this, attributes, score);
 
         public int LegacyID => 1;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
+
+        protected override IEnumerable<HitResult> GetValidHitResults()
+        {
+            return new[]
+            {
+                HitResult.Great,
+                HitResult.Ok,
+
+                HitResult.SmallTickHit,
+
+                HitResult.SmallBonus,
+            };
+        }
+
+        public override string GetDisplayNameForHitResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.SmallTickHit:
+                    return "drum tick";
+
+                case HitResult.SmallBonus:
+                    return "strong bonus";
+            }
+
+            return base.GetDisplayNameForHitResult(result);
+        }
+
+        public override StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap)
+        {
+            var timedHitEvents = score.HitEvents.Where(e => e.HitObject is Hit).ToList();
+
+            return new[]
+            {
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
+                        new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(timedHitEvents)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 250
+                        }),
+                    }
+                },
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
+                        new StatisticItem(string.Empty, new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                        {
+                            new UnstableRate(timedHitEvents)
+                        }))
+                    }
+                }
+            };
+        }
     }
 }

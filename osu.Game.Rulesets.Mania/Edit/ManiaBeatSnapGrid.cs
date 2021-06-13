@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                 foreach (var line in grid.Objects.OfType<DrawableGridLine>())
                     availableLines.Push(line);
 
-                grid.Clear(false);
+                grid.Clear();
             }
 
             if (selectionTimeRange == null)
@@ -204,10 +204,6 @@ namespace osu.Game.Rulesets.Mania.Edit
             protected override void UpdateInitialTransforms()
             {
                 // don't perform any fading – we are handling that ourselves.
-            }
-
-            protected override void UpdateStateTransforms(ArmedState state)
-            {
                 LifetimeEnd = HitObject.StartTime + visible_range;
             }
         }

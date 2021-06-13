@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
+using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 mapLength = (beatmap.HitObjects.Last().StartTime - beatmap.HitObjects.First().StartTime) / 1000 / clockRate;
 
             double preemptNoClockRate = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450);
-            var noteDensities = NoteDensity.CalculateNoteDensities(hitObjects, preemptNoClockRate);
+            var noteDensities = NoteDensity.Calculate(hitObjects, preemptNoClockRate);
 
             // Tap
             var tapAttributes = Tap.CalculateTapAttributes(hitObjects, clockRate);
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double tapSr = tap_multiplier * Math.Pow(tapAttributes.TapDifficulty, sr_exponent);
             double aimSr = aim_multiplier * Math.Pow(aimAttributes.FcProbabilityThroughput, sr_exponent);
             double fingerControlSr = finger_control_multiplier * Math.Pow(fingerControlDiff, sr_exponent);
-            double sr = Mean.PowerMean(new[] { tapSr, aimSr, fingerControlSr }, 7) * 1.131;
+            double sr = PowerMean.Of(new[] { tapSr, aimSr, fingerControlSr }, 7) * 1.131;
 
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
@@ -64,9 +64,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate;
             double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
 
-            int maxCombo = beatmap.HitObjects.Count;
-            // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
-            maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
+            int hitCirclesCount = beatmap.HitObjects.Count(h => h is HitCircle);
+            int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
+            int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
+
+            int beatmapMaxCombo = beatmap.HitObjects.Count;
+            // Add the ticks + tail of the slider. 1 is subtracted because the "headcircle" would be counted twice (once for the slider itself in the line above)
+            beatmapMaxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
 
             return new OsuDifficultyAttributes
             {
@@ -94,19 +98,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
-                MaxCombo = maxCombo
+                MaxCombo = beatmapMaxCombo,
+                TotalObjectCount = beatmap.HitObjects.Count,
+                HitCircleCount = hitCirclesCount,
+                SliderCount = sliderCount,
+                SpinnerCount = spinnerCount,
+                //Skills = skills
             };
-        }
-
-        protected override Skill[] CreateSkills(IBeatmap beatmap)
-        {
-            throw new NotImplementedException();
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             throw new NotImplementedException();
         }
+
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[]
+        {
+            //new Aim(mods),
+            //new Speed(mods)
+        };
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {

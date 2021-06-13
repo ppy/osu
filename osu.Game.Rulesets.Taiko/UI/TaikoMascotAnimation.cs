@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             textureAnimation.Seek(0);
         }
 
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             // assume that if the animation is playing on its own, it's independent from the beat and doesn't need to be touched.
             if (textureAnimation.FrameCount == 0 || textureAnimation.IsPlaying)
@@ -85,8 +85,12 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
 
             [BackgroundDependencyLoader]
-            private void load(ISkinSource skin)
+            private void load(ISkinSource source)
             {
+                ISkin skin = source.FindProvider(s => getAnimationFrame(s, state, 0) != null);
+
+                if (skin == null) return;
+
                 for (int frameIndex = 0; true; frameIndex++)
                 {
                     var texture = getAnimationFrame(skin, state, frameIndex);
@@ -112,8 +116,12 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
 
             [BackgroundDependencyLoader]
-            private void load(ISkinSource skin)
+            private void load(ISkinSource source)
             {
+                ISkin skin = source.FindProvider(s => getAnimationFrame(s, TaikoMascotAnimationState.Clear, 0) != null);
+
+                if (skin == null) return;
+
                 foreach (var frameIndex in clear_animation_sequence)
                 {
                     var texture = getAnimationFrame(skin, TaikoMascotAnimationState.Clear, frameIndex);
@@ -128,6 +136,13 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         private static Texture getAnimationFrame(ISkin skin, TaikoMascotAnimationState state, int frameIndex)
-            => skin.GetTexture($"pippidon{state.ToString().ToLower()}{frameIndex}");
+        {
+            var texture = skin.GetTexture($"pippidon{state.ToString().ToLower()}{frameIndex}");
+
+            if (frameIndex == 0 && texture == null)
+                texture = skin.GetTexture($"pippidon{state.ToString().ToLower()}");
+
+            return texture;
+        }
     }
 }

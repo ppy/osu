@@ -1,19 +1,25 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -35,10 +41,18 @@ namespace osu.Game.Rulesets.Taiko.UI
         internal Drawable HitTarget;
         private SkinnableDrawable mascot;
 
+        private readonly IDictionary<HitResult, DrawablePool<DrawableTaikoJudgement>> judgementPools = new Dictionary<HitResult, DrawablePool<DrawableTaikoJudgement>>();
+        private readonly IDictionary<HitResult, HitExplosionPool> explosionPools = new Dictionary<HitResult, HitExplosionPool>();
+
         private ProxyContainer topLevelHitContainer;
-        private ProxyContainer barlineContainer;
         private Container rightArea;
         private Container leftArea;
+
+        /// <remarks>
+        /// <see cref="Playfield.AddNested"/> is purposefully not called on this to prevent i.e. being able to interact
+        /// with bar lines in the editor.
+        /// </remarks>
+        private BarLinePlayfield barLinePlayfield;
 
         private Container hitTargetOffsetContent;
 
@@ -82,10 +96,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                barlineContainer = new ProxyContainer
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
+                                barLinePlayfield = new BarLinePlayfield(),
                                 new Container
                                 {
                                     Name = "Hit objects",
@@ -142,6 +153,43 @@ namespace osu.Game.Rulesets.Taiko.UI
                 },
                 drumRollHitContainer.CreateProxy(),
             };
+
+            RegisterPool<Hit, DrawableHit>(50);
+            RegisterPool<Hit.StrongNestedHit, DrawableHit.StrongNestedHit>(50);
+
+            RegisterPool<DrumRoll, DrawableDrumRoll>(5);
+            RegisterPool<DrumRoll.StrongNestedHit, DrawableDrumRoll.StrongNestedHit>(5);
+
+            RegisterPool<DrumRollTick, DrawableDrumRollTick>(100);
+            RegisterPool<DrumRollTick.StrongNestedHit, DrawableDrumRollTick.StrongNestedHit>(100);
+
+            RegisterPool<Swell, DrawableSwell>(5);
+            RegisterPool<SwellTick, DrawableSwellTick>(100);
+
+            var hitWindows = new TaikoHitWindows();
+
+            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => hitWindows.IsHitResultAllowed(r)))
+            {
+                judgementPools.Add(result, new DrawablePool<DrawableTaikoJudgement>(15));
+                explosionPools.Add(result, new HitExplosionPool(result));
+            }
+
+            AddRangeInternal(judgementPools.Values);
+            AddRangeInternal(explosionPools.Values);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            NewResult += OnNewResult;
+        }
+
+        protected override void OnNewDrawableHitObject(DrawableHitObject drawableHitObject)
+        {
+            base.OnNewDrawableHitObject(drawableHitObject);
+
+            var taikoObject = (DrawableTaikoHitObject)drawableHitObject;
+            topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
         }
 
         protected override void Update()
@@ -156,22 +204,77 @@ namespace osu.Game.Rulesets.Taiko.UI
             mascot.Scale = new Vector2(DrawHeight / DEFAULT_HEIGHT);
         }
 
-        public override void Add(DrawableHitObject h)
-        {
-            h.OnNewResult += OnNewResult;
-            base.Add(h);
+        #region Pooling support
 
+        public override void Add(HitObject h)
+        {
             switch (h)
             {
-                case DrawableBarLine barline:
-                    barlineContainer.Add(barline.CreateProxy());
+                case BarLine barLine:
+                    barLinePlayfield.Add(barLine);
                     break;
 
-                case DrawableTaikoHitObject taikoObject:
-                    topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
+                case TaikoHitObject taikoHitObject:
+                    base.Add(taikoHitObject);
                     break;
+
+                default:
+                    throw new ArgumentException($"Unsupported {nameof(HitObject)} type: {h.GetType()}");
             }
         }
+
+        public override bool Remove(HitObject h)
+        {
+            switch (h)
+            {
+                case BarLine barLine:
+                    return barLinePlayfield.Remove(barLine);
+
+                case TaikoHitObject taikoHitObject:
+                    return base.Remove(taikoHitObject);
+
+                default:
+                    throw new ArgumentException($"Unsupported {nameof(HitObject)} type: {h.GetType()}");
+            }
+        }
+
+        #endregion
+
+        #region Non-pooling support
+
+        public override void Add(DrawableHitObject h)
+        {
+            switch (h)
+            {
+                case DrawableBarLine barLine:
+                    barLinePlayfield.Add(barLine);
+                    break;
+
+                case DrawableTaikoHitObject _:
+                    base.Add(h);
+                    break;
+
+                default:
+                    throw new ArgumentException($"Unsupported {nameof(DrawableHitObject)} type: {h.GetType()}");
+            }
+        }
+
+        public override bool Remove(DrawableHitObject h)
+        {
+            switch (h)
+            {
+                case DrawableBarLine barLine:
+                    return barLinePlayfield.Remove(barLine);
+
+                case DrawableTaikoHitObject _:
+                    return base.Remove(h);
+
+                default:
+                    throw new ArgumentException($"Unsupported {nameof(DrawableHitObject)} type: {h.GetType()}");
+            }
+        }
+
+        #endregion
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
@@ -184,7 +287,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 case TaikoStrongJudgement _:
                     if (result.IsHit)
-                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).MainObject)?.VisualiseSecondHit();
+                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).ParentHitObject)?.VisualiseSecondHit(result);
                     break;
 
                 case TaikoDrumRollTickJudgement _:
@@ -197,20 +300,18 @@ namespace osu.Game.Rulesets.Taiko.UI
                     break;
 
                 default:
-                    judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)
+                    judgementContainer.Add(judgementPools[result.Type].Get(j =>
                     {
-                        Anchor = result.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
-                        Origin = result.IsHit ? Anchor.BottomCentre : Anchor.Centre,
-                        RelativePositionAxes = Axes.X,
-                        X = result.IsHit ? judgedObject.Position.X : 0,
-                    });
+                        j.Apply(result, judgedObject);
 
-                    if (!result.IsHit)
-                        break;
+                        j.Anchor = result.IsHit ? Anchor.TopLeft : Anchor.CentreLeft;
+                        j.Origin = result.IsHit ? Anchor.BottomCentre : Anchor.Centre;
+                        j.RelativePositionAxes = Axes.X;
+                        j.X = result.IsHit ? judgedObject.Position.X : 0;
+                    }));
 
                     var type = (judgedObject.HitObject as Hit)?.Type ?? HitType.Centre;
-
-                    addExplosion(judgedObject, type);
+                    addExplosion(judgedObject, result.Type, type);
                     break;
             }
         }
@@ -218,9 +319,10 @@ namespace osu.Game.Rulesets.Taiko.UI
         private void addDrumRollHit(DrawableDrumRollTick drawableTick) =>
             drumRollHitContainer.Add(new DrawableFlyingHit(drawableTick));
 
-        private void addExplosion(DrawableHitObject drawableObject, HitType type)
+        private void addExplosion(DrawableHitObject drawableObject, HitResult result, HitType type)
         {
-            hitExplosionContainer.Add(new HitExplosion(drawableObject));
+            hitExplosionContainer.Add(explosionPools[result]
+                .Get(explosion => explosion.Apply(drawableObject)));
             if (drawableObject.HitObject.Kiai)
                 kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
         }

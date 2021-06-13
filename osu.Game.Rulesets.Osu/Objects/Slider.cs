@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
 using System.Threading;
+using Newtonsoft.Json;
 using osu.Framework.Caching;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -21,6 +22,7 @@ namespace osu.Game.Rulesets.Osu.Objects
     {
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
 
+        [JsonIgnore]
         public double Duration
         {
             get => EndTime - StartTime;
@@ -67,6 +69,9 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public List<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
 
+        [JsonIgnore]
+        public IList<HitSampleInfo> TailSamples { get; private set; }
+
         private int repeatCount;
 
         public int RepeatCount
@@ -100,8 +105,17 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public double TickDistanceMultiplier = 1;
 
-        public HitCircle HeadCircle;
-        public SliderTailCircle TailCircle;
+        /// <summary>
+        /// Whether this <see cref="Slider"/>'s judgement is fully handled by its nested <see cref="HitObject"/>s.
+        /// If <c>false</c>, this <see cref="Slider"/> will be judged proportionally to the number of nested <see cref="HitObject"/>s hit.
+        /// </summary>
+        public bool OnlyJudgeNestedObjects = true;
+
+        [JsonIgnore]
+        public SliderHeadCircle HeadCircle { get; protected set; }
+
+        [JsonIgnore]
+        public SliderTailCircle TailCircle { get; protected set; }
 
         public Slider()
         {
@@ -159,6 +173,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         // if this is to change, we should revisit this.
                         AddNested(TailCircle = new SliderTailCircle(this)
                         {
+                            RepeatIndex = e.SpanIndex,
                             StartTime = e.Time,
                             Position = EndPosition,
                             StackHeight = StackHeight
@@ -166,10 +181,9 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
 
                     case SliderEventType.Repeat:
-                        AddNested(new SliderRepeat
+                        AddNested(new SliderRepeat(this)
                         {
                             RepeatIndex = e.SpanIndex,
-                            SpanDuration = SpanDuration,
                             StartTime = StartTime + (e.SpanIndex + 1) * SpanDuration,
                             Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,
@@ -200,29 +214,23 @@ namespace osu.Game.Rulesets.Osu.Objects
             var sampleList = new List<HitSampleInfo>();
 
             if (firstSample != null)
-            {
-                sampleList.Add(new HitSampleInfo
-                {
-                    Bank = firstSample.Bank,
-                    Volume = firstSample.Volume,
-                    Name = @"slidertick",
-                });
-            }
+                sampleList.Add(firstSample.With("slidertick"));
 
             foreach (var tick in NestedHitObjects.OfType<SliderTick>())
                 tick.Samples = sampleList;
 
             foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
-                repeat.Samples = getNodeSamples(repeat.RepeatIndex + 1);
+                repeat.Samples = this.GetNodeSamples(repeat.RepeatIndex + 1);
 
             if (HeadCircle != null)
-                HeadCircle.Samples = getNodeSamples(0);
+                HeadCircle.Samples = this.GetNodeSamples(0);
+
+            // The samples should be attached to the slider tail, however this can only be done after LegacyLastTick is removed otherwise they would play earlier than they're intended to.
+            // For now, the samples are played by the slider itself at the correct end time.
+            TailSamples = this.GetNodeSamples(repeatCount + 1);
         }
 
-        private IList<HitSampleInfo> getNodeSamples(int nodeIndex) =>
-            nodeIndex < NodeSamples.Count ? NodeSamples[nodeIndex] : Samples;
-
-        public override Judgement CreateJudgement() => new OsuIgnoreJudgement();
+        public override Judgement CreateJudgement() => OnlyJudgeNestedObjects ? new OsuIgnoreJudgement() : new OsuJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }

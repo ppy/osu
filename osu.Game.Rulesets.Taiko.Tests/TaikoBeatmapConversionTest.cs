@@ -12,6 +12,7 @@ using osu.Game.Tests.Beatmaps;
 namespace osu.Game.Rulesets.Taiko.Tests
 {
     [TestFixture]
+    [Timeout(10000)]
     public class TaikoBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Taiko";
@@ -20,6 +21,9 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [TestCase("basic")]
         [TestCase("slider-generating-drumroll")]
         [TestCase("sample-to-type-conversions")]
+        [TestCase("slider-conversion-v6")]
+        [TestCase("slider-conversion-v14")]
+        [TestCase("slider-generating-drumroll-2")]
         public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
@@ -32,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 IsCentre = (hitObject as Hit)?.Type == HitType.Centre,
                 IsDrumRoll = hitObject is DrumRoll,
                 IsSwell = hitObject is Swell,
-                IsStrong = ((TaikoHitObject)hitObject).IsStrong
+                IsStrong = (hitObject as TaikoStrongableHitObject)?.IsStrong == true
             };
         }
 

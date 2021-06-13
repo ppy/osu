@@ -9,14 +9,16 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -27,17 +29,25 @@ namespace osu.Game.Rulesets.Mania.UI
         public const float SPECIAL_COLUMN_WIDTH = 70;
 
         /// <summary>
+        /// For hitsounds played by this <see cref="Column"/> (i.e. not as a result of hitting a hitobject),
+        /// a certain number of samples are allowed to be played concurrently so that it feels better when spam-pressing the key.
+        /// </summary>
+        private const int max_concurrent_hitsounds = OsuGameBase.SAMPLE_CONCURRENCY;
+
+        /// <summary>
         /// The index of this column as part of the whole playfield.
         /// </summary>
         public readonly int Index;
 
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
-        private readonly ColumnHitObjectArea hitObjectArea;
-
+        public readonly ColumnHitObjectArea HitObjectArea;
         internal readonly Container TopLevelContainer;
+        private readonly DrawablePool<PoolableHitExplosion> hitExplosionPool;
+        private readonly OrderedHitPolicy hitPolicy;
+        private readonly Container<SkinnableSound> hitSounds;
 
-        public Container UnderlayElements => hitObjectArea.UnderlayElements;
+        public Container UnderlayElements => HitObjectArea.UnderlayElements;
 
         public Column(int index)
         {
@@ -46,28 +56,48 @@ namespace osu.Game.Rulesets.Mania.UI
             RelativeSizeAxes = Axes.Y;
             Width = COLUMN_WIDTH;
 
-            Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground, Index), _ => new DefaultColumnBackground())
+            Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
             {
                 RelativeSizeAxes = Axes.Both
             };
 
             InternalChildren = new[]
             {
+                hitExplosionPool = new DrawablePool<PoolableHitExplosion>(5),
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
-                hitObjectArea = new ColumnHitObjectArea(Index, HitObjectContainer) { RelativeSizeAxes = Axes.Both },
-                new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea, Index), _ => new DefaultKeyArea())
+                HitObjectArea = new ColumnHitObjectArea(Index, HitObjectContainer) { RelativeSizeAxes = Axes.Both },
+                new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
                 {
                     RelativeSizeAxes = Axes.Both
                 },
                 background,
+                hitSounds = new Container<SkinnableSound>
+                {
+                    Name = "Column samples pool",
+                    RelativeSizeAxes = Axes.Both,
+                    Children = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new SkinnableSound()).ToArray()
+                },
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
 
-            TopLevelContainer.Add(hitObjectArea.Explosions.CreateProxy());
+            hitPolicy = new OrderedHitPolicy(HitObjectContainer);
+
+            TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
+
+            RegisterPool<Note, DrawableNote>(10, 50);
+            RegisterPool<HoldNote, DrawableHoldNote>(10, 50);
+            RegisterPool<HeadNote, DrawableHoldNoteHead>(10, 50);
+            RegisterPool<TailNote, DrawableHoldNoteTail>(10, 50);
+            RegisterPool<HoldNoteTick, DrawableHoldNoteTick>(50, 250);
         }
 
-        public override Axes RelativeSizeAxes => Axes.Y;
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            NewResult += OnNewResult;
+        }
 
         public ColumnType ColumnType { get; set; }
 
@@ -82,42 +112,28 @@ namespace osu.Game.Rulesets.Mania.UI
             return dependencies;
         }
 
-        /// <summary>
-        /// Adds a DrawableHitObject to this Playfield.
-        /// </summary>
-        /// <param name="hitObject">The DrawableHitObject to add.</param>
-        public override void Add(DrawableHitObject hitObject)
+        protected override void OnNewDrawableHitObject(DrawableHitObject drawableHitObject)
         {
-            hitObject.AccentColour.Value = AccentColour;
-            hitObject.OnNewResult += OnNewResult;
+            base.OnNewDrawableHitObject(drawableHitObject);
 
-            HitObjectContainer.Add(hitObject);
-        }
+            DrawableManiaHitObject maniaObject = (DrawableManiaHitObject)drawableHitObject;
 
-        public override bool Remove(DrawableHitObject h)
-        {
-            if (!base.Remove(h))
-                return false;
-
-            h.OnNewResult -= OnNewResult;
-            return true;
+            maniaObject.AccentColour.Value = AccentColour;
+            maniaObject.CheckHittable = hitPolicy.IsHittable;
         }
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
+            if (result.IsHit)
+                hitPolicy.HandleHit(judgedObject);
+
             if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            var explosion = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitExplosion, Index), _ =>
-                new DefaultHitExplosion(judgedObject.AccentColour.Value, judgedObject is DrawableHoldNoteTick))
-            {
-                RelativeSizeAxes = Axes.Both
-            };
-
-            hitObjectArea.Explosions.Add(explosion);
-
-            explosion.Delay(200).Expire(true);
+            HitObjectArea.Explosions.Add(hitExplosionPool.Get(e => e.Apply(result)));
         }
+
+        private int nextHitSoundIndex;
 
         public bool OnPressed(ManiaAction action)
         {
@@ -130,7 +146,15 @@ namespace osu.Game.Rulesets.Mania.UI
                 HitObjectContainer.Objects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current) ??
                 HitObjectContainer.Objects.LastOrDefault();
 
-            nextObject?.PlaySamples();
+            if (nextObject is DrawableManiaHitObject maniaObject)
+            {
+                var hitSound = hitSounds[nextHitSoundIndex];
+
+                hitSound.Samples = maniaObject.GetGameplaySamples();
+                hitSound.Play();
+
+                nextHitSoundIndex = (nextHitSoundIndex + 1) % max_concurrent_hitsounds;
+            }
 
             return true;
         }

@@ -77,6 +77,7 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The hit windows for this <see cref="HitObject"/>.
         /// </summary>
+        [JsonIgnore]
         public HitWindows HitWindows { get; set; }
 
         private readonly List<HitObject> nestedHitObjects = new List<HitObject>();
@@ -133,20 +134,11 @@ namespace osu.Game.Rulesets.Objects
         {
             Kiai = controlPointInfo.EffectPointAt(StartTime + control_point_leniency).KiaiMode;
 
-            if (HitWindows == null)
-                HitWindows = CreateHitWindows();
+            HitWindows ??= CreateHitWindows();
             HitWindows?.SetDifficulty(difficulty.OverallDifficulty);
         }
 
         protected virtual void CreateNestedHitObjects(CancellationToken cancellationToken)
-        {
-            // ReSharper disable once MethodSupportsCancellation (https://youtrack.jetbrains.com/issue/RIDER-44520)
-#pragma warning disable 618
-            CreateNestedHitObjects();
-#pragma warning restore 618
-        }
-
-        protected virtual void CreateNestedHitObjects()
         {
         }
 

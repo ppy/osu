@@ -7,17 +7,21 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.UI;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Mods
 {
     /// <summary>
     /// The base class for gameplay modifiers.
     /// </summary>
-    public abstract class Mod : IMod, IJsonSerializable
+    [ExcludeFromDynamicCompile]
+    public abstract class Mod : IMod, IEquatable<Mod>, IJsonSerializable
     {
         /// <summary>
         /// The name of this mod.
@@ -46,7 +50,7 @@ namespace osu.Game.Rulesets.Mods
         /// The user readable description of this mod.
         /// </summary>
         [JsonIgnore]
-        public virtual string Description => string.Empty;
+        public abstract string Description { get; }
 
         /// <summary>
         /// The tooltip to display for this mod when used in a <see cref="ModIcon"/>.
@@ -81,12 +85,10 @@ namespace osu.Game.Rulesets.Mods
 
                 foreach ((SettingSourceAttribute attr, PropertyInfo property) in this.GetOrderedSettingsSourceProperties())
                 {
-                    object bindableObj = property.GetValue(this);
+                    var bindable = (IBindable)property.GetValue(this);
 
-                    if ((bindableObj as IHasDefaultValue)?.IsDefault == true)
-                        continue;
-
-                    tooltipTexts.Add($"{attr.Label} {bindableObj}");
+                    if (!bindable.IsDefault)
+                        tooltipTexts.Add($"{attr.Label} {bindable}");
                 }
 
                 return string.Join(", ", tooltipTexts.Where(s => !string.IsNullOrEmpty(s)));
@@ -106,10 +108,14 @@ namespace osu.Game.Rulesets.Mods
         public virtual bool HasImplementation => this is IApplicableMod;
 
         /// <summary>
-        /// Returns if this mod is ranked.
+        /// Whether this mod is playable by an end user.
+        /// Should be <c>false</c> for cases where the user is not interacting with the game (so it can be excluded from mutliplayer selection, for example).
         /// </summary>
         [JsonIgnore]
-        public virtual bool Ranked => false;
+        public virtual bool UserPlayable => true;
+
+        [Obsolete("Going forward, the concept of \"ranked\" doesn't exist. The only exceptions are automation mods, which should now override and set UserPlayable to true.")] // Can be removed 20211009
+        public virtual bool IsRanked => false;
 
         /// <summary>
         /// Whether this mod requires configuration to apply changes to the game.
@@ -126,8 +132,74 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
         /// </summary>
-        public virtual Mod CreateCopy() => (Mod)MemberwiseClone();
+        public virtual Mod CreateCopy()
+        {
+            var result = (Mod)Activator.CreateInstance(GetType());
+            result.CopyFrom(this);
+            return result;
+        }
 
-        public bool Equals(IMod other) => GetType() == other?.GetType();
+        /// <summary>
+        /// Copies mod setting values from <paramref name="source"/> into this instance, overwriting all existing settings.
+        /// </summary>
+        /// <param name="source">The mod to copy properties from.</param>
+        public void CopyFrom(Mod source)
+        {
+            if (source.GetType() != GetType())
+                throw new ArgumentException($"Expected mod of type {GetType()}, got {source.GetType()}.", nameof(source));
+
+            foreach (var (_, prop) in this.GetSettingsSourceProperties())
+            {
+                var targetBindable = (IBindable)prop.GetValue(this);
+                var sourceBindable = (IBindable)prop.GetValue(source);
+
+                CopyAdjustedSetting(targetBindable, sourceBindable);
+            }
+        }
+
+        /// <summary>
+        /// When creating copies or clones of a Mod, this method will be called
+        /// to copy explicitly adjusted user settings from <paramref name="target"/>.
+        /// The base implementation will transfer the value via <see cref="Bindable{T}.Parse"/>
+        /// or by binding and unbinding (if <paramref name="source"/> is an <see cref="IBindable"/>)
+        /// and should be called unless replaced with custom logic.
+        /// </summary>
+        /// <param name="target">The target bindable to apply the adjustment to.</param>
+        /// <param name="source">The adjustment to apply.</param>
+        internal virtual void CopyAdjustedSetting(IBindable target, object source)
+        {
+            if (source is IBindable sourceBindable)
+            {
+                // copy including transfer of default values.
+                target.BindTo(sourceBindable);
+                target.UnbindFrom(sourceBindable);
+            }
+            else
+            {
+                if (!(target is IParseable parseable))
+                    throw new InvalidOperationException($"Bindable type {target.GetType().ReadableName()} is not {nameof(IParseable)}.");
+
+                parseable.Parse(source);
+            }
+        }
+
+        public bool Equals(IMod other) => other is Mod them && Equals(them);
+
+        public bool Equals(Mod other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return GetType() == other.GetType() &&
+                   this.GetSettingsSourceProperties().All(pair =>
+                       EqualityComparer<object>.Default.Equals(
+                           ModUtils.GetSettingUnderlyingValue(pair.Item2.GetValue(this)),
+                           ModUtils.GetSettingUnderlyingValue(pair.Item2.GetValue(other))));
+        }
+
+        /// <summary>
+        /// Reset all custom settings for this mod back to their defaults.
+        /// </summary>
+        public virtual void ResetSettingsToDefaults() => CopyFrom((Mod)Activator.CreateInstance(GetType()));
     }
 }

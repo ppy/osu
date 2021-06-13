@@ -6,121 +6,180 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics.UserInterface;
+using osu.Framework.Utils;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineHitObjectBlueprint : SelectionBlueprint
+    public class TimelineHitObjectBlueprint : SelectionBlueprint<HitObject>
     {
-        private readonly Circle circle;
+        private const float circle_size = 38;
+
+        private Container repeatsContainer;
+
+        public Action<DragEvent> OnDragHandled;
 
         [UsedImplicitly]
         private readonly Bindable<double> startTime;
 
-        public Action<DragEvent> OnDragHandled;
+        private Bindable<int> indexInCurrentComboBindable;
+        private Bindable<int> comboIndexBindable;
+        private Bindable<Color4> displayColourBindable;
 
-        private readonly DragBar dragBar;
+        private readonly ExtendableCircle circle;
+        private readonly Border border;
 
-        private readonly List<Container> shadowComponents = new List<Container>();
+        private readonly Container colouredComponents;
+        private readonly OsuSpriteText comboIndexText;
 
-        private const float thickness = 5;
+        [Resolved]
+        private ISkinSource skin { get; set; }
 
-        private const float shadow_radius = 5;
-
-        private const float circle_size = 16;
-
-        public TimelineHitObjectBlueprint(HitObject hitObject)
-            : base(hitObject)
+        public TimelineHitObjectBlueprint(HitObject item)
+            : base(item)
         {
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.CentreLeft;
 
-            startTime = hitObject.StartTimeBindable.GetBoundCopy();
+            startTime = item.StartTimeBindable.GetBoundCopy();
             startTime.BindValueChanged(time => X = (float)time.NewValue, true);
 
             RelativePositionAxes = Axes.X;
 
             RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
+            Height = circle_size;
 
-            circle = new Circle
+            AddRangeInternal(new Drawable[]
             {
-                Size = new Vector2(circle_size),
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.Centre,
-                RelativePositionAxes = Axes.X,
-                AlwaysPresent = true,
-                Colour = Color4.White,
-                EdgeEffect = new EdgeEffectParameters
+                circle = new ExtendableCircle
                 {
-                    Type = EdgeEffectType.Shadow,
-                    Radius = shadow_radius,
-                    Colour = Color4.Black
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
                 },
-            };
-
-            shadowComponents.Add(circle);
-
-            if (hitObject is IHasDuration)
-            {
-                DragBar dragBarUnderlay;
-                Container extensionBar;
-
-                AddRangeInternal(new Drawable[]
+                border = new Border
                 {
-                    extensionBar = new Container
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                },
+                colouredComponents = new Container
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        Masking = true,
-                        Size = new Vector2(1, thickness),
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        RelativePositionAxes = Axes.X,
-                        RelativeSizeAxes = Axes.X,
-                        EdgeEffect = new EdgeEffectParameters
+                        comboIndexText = new OsuSpriteText
                         {
-                            Type = EdgeEffectType.Shadow,
-                            Radius = shadow_radius,
-                            Colour = Color4.Black
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.Centre,
+                            Y = -1,
+                            Font = OsuFont.Default.With(size: circle_size * 0.5f, weight: FontWeight.Regular),
                         },
-                        Child = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        }
-                    },
-                    circle,
-                    // only used for drawing the shadow
-                    dragBarUnderlay = new DragBar(null),
-                    // cover up the shadow on the join
-                    new Box
-                    {
-                        Height = thickness,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        RelativeSizeAxes = Axes.X,
-                    },
-                    dragBar = new DragBar(hitObject) { OnDragHandled = e => OnDragHandled?.Invoke(e) },
-                });
+                    }
+                },
+            });
 
-                shadowComponents.Add(dragBarUnderlay);
-                shadowComponents.Add(extensionBar);
+            if (item is IHasDuration)
+            {
+                colouredComponents.Add(new DragArea(item)
+                {
+                    OnDragHandled = e => OnDragHandled?.Invoke(e)
+                });
+            }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            switch (Item)
+            {
+                case IHasDisplayColour displayColour:
+                    displayColourBindable = displayColour.DisplayColour.GetBoundCopy();
+                    displayColourBindable.BindValueChanged(_ => updateColour(), true);
+                    break;
+
+                case IHasComboInformation comboInfo:
+                    indexInCurrentComboBindable = comboInfo.IndexInCurrentComboBindable.GetBoundCopy();
+                    indexInCurrentComboBindable.BindValueChanged(_ => updateComboIndex(), true);
+
+                    comboIndexBindable = comboInfo.ComboIndexBindable.GetBoundCopy();
+                    comboIndexBindable.BindValueChanged(_ => updateColour(), true);
+
+                    skin.SourceChanged += updateColour;
+                    break;
+            }
+        }
+
+        protected override void OnSelected()
+        {
+            // base logic hides selected blueprints when not selected, but timeline doesn't do that.
+            updateColour();
+        }
+
+        protected override void OnDeselected()
+        {
+            // base logic hides selected blueprints when not selected, but timeline doesn't do that.
+            updateColour();
+        }
+
+        private void updateComboIndex() => comboIndexText.Text = (indexInCurrentComboBindable.Value + 1).ToString();
+
+        private void updateColour()
+        {
+            Color4 colour;
+
+            switch (Item)
+            {
+                case IHasDisplayColour displayColour:
+                    colour = displayColour.DisplayColour.Value;
+                    break;
+
+                case IHasComboInformation combo:
+                {
+                    var comboColours = skin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value ?? Array.Empty<Color4>();
+                    colour = combo.GetComboColour(comboColours);
+                    break;
+                }
+
+                default:
+                    return;
+            }
+
+            if (IsSelected)
+            {
+                border.Show();
+                colour = colour.Lighten(0.3f);
             }
             else
             {
-                AddInternal(circle);
+                border.Hide();
             }
 
-            updateShadows();
+            if (Item is IHasDuration duration && duration.Duration > 0)
+                circle.Colour = ColourInfo.GradientHorizontal(colour, colour.Lighten(0.4f));
+            else
+                circle.Colour = colour;
+
+            var col = circle.Colour.TopLeft.Linear;
+            colouredComponents.Colour = OsuColour.ForegroundTextColourFor(col);
         }
 
         protected override void Update()
@@ -128,67 +187,51 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.Update();
 
             // no bindable so we perform this every update
-            Width = (float)(HitObject.GetEndTime() - HitObject.StartTime);
+            float duration = (float)(Item.GetEndTime() - Item.StartTime);
+
+            if (Width != duration)
+            {
+                Width = duration;
+
+                // kind of haphazard but yeah, no bindables.
+                if (Item is IHasRepeats repeats)
+                    updateRepeats(repeats);
+            }
+        }
+
+        private void updateRepeats(IHasRepeats repeats)
+        {
+            repeatsContainer?.Expire();
+
+            colouredComponents.Add(repeatsContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+            });
+
+            for (int i = 0; i < repeats.RepeatCount; i++)
+            {
+                repeatsContainer.Add(new Circle
+                {
+                    Size = new Vector2(circle_size / 3),
+                    Alpha = 0.2f,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.Centre,
+                    RelativePositionAxes = Axes.X,
+                    X = (float)(i + 1) / (repeats.RepeatCount + 1),
+                });
+            }
         }
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => true;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
-            base.ReceivePositionalInputAt(screenSpacePos) ||
-            circle.ReceivePositionalInputAt(screenSpacePos) ||
-            dragBar?.ReceivePositionalInputAt(screenSpacePos) == true;
+            circle.ReceivePositionalInputAt(screenSpacePos);
 
-        protected override void OnSelected()
-        {
-            updateShadows();
-        }
-
-        private void updateShadows()
-        {
-            foreach (var s in shadowComponents)
-            {
-                if (State == SelectionState.Selected)
-                {
-                    s.EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Radius = shadow_radius / 2,
-                        Colour = Color4.Orange,
-                    };
-                }
-                else
-                {
-                    s.EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Radius = shadow_radius,
-                        Colour = State == SelectionState.Selected ? Color4.Orange : Color4.Black
-                    };
-                }
-            }
-        }
-
-        protected override void OnDeselected()
-        {
-            updateShadows();
-        }
-
-        public override Quad SelectionQuad
-        {
-            get
-            {
-                // correctly include the circle in the selection quad region, as it is usually outside the blueprint itself.
-                var leftQuad = circle.ScreenSpaceDrawQuad;
-                var rightQuad = dragBar?.ScreenSpaceDrawQuad ?? ScreenSpaceDrawQuad;
-
-                return new Quad(leftQuad.TopLeft, Vector2.ComponentMax(rightQuad.TopRight, leftQuad.TopRight),
-                    leftQuad.BottomLeft, Vector2.ComponentMax(rightQuad.BottomRight, leftQuad.BottomRight));
-            }
-        }
+        public override Quad SelectionQuad => circle.ScreenSpaceDrawQuad;
 
         public override Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.TopLeft;
 
-        public class DragBar : Container
+        public class DragArea : Circle
         {
             private readonly HitObject hitObject;
 
@@ -199,13 +242,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             public override bool HandlePositionalInput => hitObject != null;
 
-            public DragBar(HitObject hitObject)
+            public DragArea(HitObject hitObject)
             {
                 this.hitObject = hitObject;
 
-                CornerRadius = 2;
+                CornerRadius = circle_size / 2;
                 Masking = true;
-                Size = new Vector2(5, 1);
+                Size = new Vector2(circle_size, 1);
                 Anchor = Anchor.CentreRight;
                 Origin = Anchor.Centre;
                 RelativePositionAxes = Axes.X;
@@ -218,6 +261,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         RelativeSizeAxes = Axes.Both,
                     }
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                updateState();
+                FinishTransforms();
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -251,7 +302,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             private void updateState()
             {
-                Colour = IsHovered || hasMouseDown ? Color4.OrangeRed : Color4.White;
+                if (hasMouseDown)
+                {
+                    this.ScaleTo(0.7f, 200, Easing.OutQuint);
+                }
+                else if (IsHovered)
+                {
+                    this.ScaleTo(0.8f, 200, Easing.OutQuint);
+                }
+                else
+                {
+                    this.ScaleTo(0.6f, 200, Easing.OutQuint);
+                }
+
+                this.FadeTo(IsHovered || hasMouseDown ? 0.8f : 0.2f, 200, Easing.OutQuint);
             }
 
             [Resolved]
@@ -288,19 +352,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 return;
 
                             repeatHitObject.RepeatCount = proposedCount;
+                            beatmap.Update(hitObject);
                             break;
 
                         case IHasDuration endTimeHitObject:
                             var snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
 
-                            if (endTimeHitObject.EndTime == snappedTime)
+                            if (endTimeHitObject.EndTime == snappedTime || Precision.AlmostEquals(snappedTime, hitObject.StartTime, beatmap.GetBeatLengthAtTime(snappedTime)))
                                 return;
 
                             endTimeHitObject.Duration = snappedTime - hitObject.StartTime;
+                            beatmap.Update(hitObject);
                             break;
                     }
-
-                    beatmap.UpdateHitObject(hitObject);
                 }
             }
 
@@ -310,6 +374,49 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 OnDragHandled?.Invoke(null);
                 changeHandler?.EndChange();
+            }
+        }
+
+        public class Border : ExtendableCircle
+        {
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Content.Child.Alpha = 0;
+                Content.Child.AlwaysPresent = true;
+
+                Content.BorderColour = colours.Yellow;
+                Content.EdgeEffect = new EdgeEffectParameters();
+            }
+        }
+
+        /// <summary>
+        /// A circle with externalised end caps so it can take up the full width of a relative width area.
+        /// </summary>
+        public class ExtendableCircle : CompositeDrawable
+        {
+            protected readonly Circle Content;
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Content.ReceivePositionalInputAt(screenSpacePos);
+
+            public override Quad ScreenSpaceDrawQuad => Content.ScreenSpaceDrawQuad;
+
+            public ExtendableCircle()
+            {
+                Padding = new MarginPadding { Horizontal = -circle_size / 2f };
+                InternalChild = Content = new Circle
+                {
+                    BorderColour = OsuColour.Gray(0.75f),
+                    BorderThickness = 4,
+                    Masking = true,
+                    RelativeSizeAxes = Axes.Both,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 5,
+                        Colour = Color4.Black.Opacity(0.4f)
+                    }
+                };
             }
         }
     }

@@ -10,6 +10,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
@@ -41,9 +42,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                         Spacing = new Vector2(10),
                         Children = new[]
                         {
-                            new ExposedSkinnableDrawable("default", _ => new DefaultBox(), _ => true),
-                            new ExposedSkinnableDrawable("available", _ => new DefaultBox(), _ => true),
-                            new ExposedSkinnableDrawable("available", _ => new DefaultBox(), _ => true, ConfineMode.NoScaling)
+                            new ExposedSkinnableDrawable("default", _ => new DefaultBox()),
+                            new ExposedSkinnableDrawable("available", _ => new DefaultBox()),
+                            new ExposedSkinnableDrawable("available", _ => new DefaultBox(), ConfineMode.NoScaling)
                         }
                     },
                 };
@@ -72,9 +73,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                         Spacing = new Vector2(10),
                         Children = new[]
                         {
-                            new ExposedSkinnableDrawable("default", _ => new DefaultBox(), _ => true),
-                            new ExposedSkinnableDrawable("available", _ => new DefaultBox(), _ => true, ConfineMode.ScaleToFit),
-                            new ExposedSkinnableDrawable("available", _ => new DefaultBox(), _ => true, ConfineMode.NoScaling)
+                            new ExposedSkinnableDrawable("default", _ => new DefaultBox()),
+                            new ExposedSkinnableDrawable("available", _ => new DefaultBox(), ConfineMode.ScaleToFit),
+                            new ExposedSkinnableDrawable("available", _ => new DefaultBox(), ConfineMode.NoScaling)
                         }
                     },
                 };
@@ -99,7 +100,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Child = new SkinProvidingContainer(secondarySource)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"), source => true)
+                        Child = consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"))
                     }
                 };
             });
@@ -128,7 +129,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 };
             });
 
-            AddStep("add permissive", () => target.Add(consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"), source => true)));
+            AddStep("add permissive", () => target.Add(consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"))));
             AddAssert("consumer using override source", () => consumer.Drawable is SecondarySourceBox);
             AddAssert("skinchanged only called once", () => consumer.SkinChangedCount == 1);
         }
@@ -151,7 +152,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 };
             });
 
-            AddStep("add permissive", () => target.Add(consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"), source => true)));
+            AddStep("add permissive", () => target.Add(consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"))));
             AddAssert("consumer using override source", () => consumer.Drawable is SecondarySourceBox);
             AddStep("disable", () => target.Disable());
             AddAssert("consumer using base source", () => consumer.Drawable is BaseSourceBox);
@@ -179,9 +180,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public new Drawable Drawable => base.Drawable;
 
-            public ExposedSkinnableDrawable(string name, Func<ISkinComponent, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null,
-                                            ConfineMode confineMode = ConfineMode.ScaleToFit)
-                : base(new TestSkinComponent(name), defaultImplementation, allowFallback, confineMode)
+            public ExposedSkinnableDrawable(string name, Func<ISkinComponent, Drawable> defaultImplementation, ConfineMode confineMode = ConfineMode.ScaleToFit)
+                : base(new TestSkinComponent(name), defaultImplementation, confineMode)
             {
             }
         }
@@ -249,14 +249,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             public new Drawable Drawable => base.Drawable;
             public int SkinChangedCount { get; private set; }
 
-            public SkinConsumer(string name, Func<ISkinComponent, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null)
-                : base(new TestSkinComponent(name), defaultImplementation, allowFallback)
+            public SkinConsumer(string name, Func<ISkinComponent, Drawable> defaultImplementation)
+                : base(new TestSkinComponent(name), defaultImplementation)
             {
             }
 
-            protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+            protected override void SkinChanged(ISkinSource skin)
             {
-                base.SkinChanged(skin, allowFallback);
+                base.SkinChanged(skin);
                 SkinChangedCount++;
             }
         }
@@ -295,22 +295,26 @@ namespace osu.Game.Tests.Visual.Gameplay
                     }
                     : null;
 
-            public Texture GetTexture(string componentName) => throw new NotImplementedException();
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
 
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
+            public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
+
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => throw new NotImplementedException();
         }
 
         private class SecondarySource : ISkin
         {
             public Drawable GetDrawableComponent(ISkinComponent componentName) => new SecondarySourceBox();
 
-            public Texture GetTexture(string componentName) => throw new NotImplementedException();
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
 
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
+            public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
+
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => throw new NotImplementedException();
         }
 
         [Cached(typeof(ISkinSource))]
@@ -318,11 +322,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public Drawable GetDrawableComponent(ISkinComponent componentName) => new BaseSourceBox();
 
-            public Texture GetTexture(string componentName) => throw new NotImplementedException();
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
 
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
+            public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
+
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => throw new NotImplementedException();
 
             public event Action SourceChanged
             {

@@ -7,16 +7,6 @@ namespace osu.Game.Rulesets.Catch.Judgements
 {
     public class CatchDropletJudgement : CatchJudgement
     {
-        protected override int NumericResultFor(HitResult result)
-        {
-            switch (result)
-            {
-                default:
-                    return 0;
-
-                case HitResult.Perfect:
-                    return 30;
-            }
-        }
+        public override HitResult MaxResult => HitResult.LargeTickHit;
     }
 }

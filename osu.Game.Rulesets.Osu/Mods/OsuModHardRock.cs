@@ -14,7 +14,6 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModHardRock : ModHardRock, IApplicableToHitObject
     {
         public override double ScoreMultiplier => 1.06;
-        public override bool Ranked => true;
 
         public void ApplyToHitObject(HitObject hitObject)
         {

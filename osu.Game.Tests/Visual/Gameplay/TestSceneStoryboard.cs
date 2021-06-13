@@ -22,19 +22,32 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneStoryboard : OsuTestScene
     {
-        private readonly Container<DrawableStoryboard> storyboardContainer;
+        private Container<DrawableStoryboard> storyboardContainer;
         private DrawableStoryboard storyboard;
 
-        [Cached]
-        private MusicController musicController = new MusicController();
+        [Test]
+        public void TestStoryboard()
+        {
+            AddStep("Restart", restart);
+            AddToggleStep("Passing", passing =>
+            {
+                if (storyboard != null) storyboard.Passing = passing;
+            });
+        }
 
-        public TestSceneStoryboard()
+        [Test]
+        public void TestStoryboardMissingVideo()
+        {
+            AddStep("Load storyboard with missing video", loadStoryboardNoVideo);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Clock = new FramedClock();
 
             AddRange(new Drawable[]
             {
-                musicController,
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -58,32 +71,11 @@ namespace osu.Game.Tests.Visual.Gameplay
                     State = { Value = Visibility.Visible },
                 }
             });
+
+            Beatmap.BindValueChanged(beatmapChanged, true);
         }
 
-        [Test]
-        public void TestStoryboard()
-        {
-            AddStep("Restart", restart);
-            AddToggleStep("Passing", passing =>
-            {
-                if (storyboard != null) storyboard.Passing = passing;
-            });
-        }
-
-        [Test]
-        public void TestStoryboardMissingVideo()
-        {
-            AddStep("Load storyboard with missing video", loadStoryboardNoVideo);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Beatmap.ValueChanged += beatmapChanged;
-        }
-
-        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
-            => loadStoryboard(e.NewValue);
+        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> e) => loadStoryboard(e.NewValue);
 
         private void restart()
         {

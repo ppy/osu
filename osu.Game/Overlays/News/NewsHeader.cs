@@ -1,9 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using System;
 
 namespace osu.Game.Overlays.News
 {
@@ -11,24 +11,33 @@ namespace osu.Game.Overlays.News
     {
         private const string front_page_string = "frontpage";
 
-        public readonly Bindable<string> Post = new Bindable<string>(null);
-
         public Action ShowFrontPage;
+
+        private readonly Bindable<string> article = new Bindable<string>(null);
 
         public NewsHeader()
         {
             TabControl.AddItem(front_page_string);
 
-            Current.ValueChanged += e =>
+            article.BindValueChanged(onArticleChanged, true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindValueChanged(e =>
             {
                 if (e.NewValue == front_page_string)
                     ShowFrontPage?.Invoke();
-            };
-
-            Post.ValueChanged += showPost;
+            });
         }
 
-        private void showPost(ValueChangedEvent<string> e)
+        public void SetFrontPage() => article.Value = null;
+
+        public void SetArticle(string slug) => article.Value = slug;
+
+        private void onArticleChanged(ValueChangedEvent<string> e)
         {
             if (e.OldValue != null)
                 TabControl.RemoveItem(e.OldValue);
@@ -53,7 +62,8 @@ namespace osu.Game.Overlays.News
             public NewsHeaderTitle()
             {
                 Title = "news";
-                IconTexture = "Icons/news";
+                Description = "get up-to-date on community happenings";
+                IconTexture = "Icons/Hexacons/news";
             }
         }
     }

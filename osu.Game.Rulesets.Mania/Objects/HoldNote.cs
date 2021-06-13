@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// <summary>
         /// The head note of the hold.
         /// </summary>
-        public Note Head { get; private set; }
+        public HeadNote Head { get; private set; }
 
         /// <summary>
         /// The tail note of the hold.
@@ -98,18 +98,18 @@ namespace osu.Game.Rulesets.Mania.Objects
 
             createTicks(cancellationToken);
 
-            AddNested(Head = new Note
+            AddNested(Head = new HeadNote
             {
                 StartTime = StartTime,
                 Column = Column,
-                Samples = getNodeSamples(0),
+                Samples = GetNodeSamples(0),
             });
 
             AddNested(Tail = new TailNote
             {
                 StartTime = EndTime,
                 Column = Column,
-                Samples = getNodeSamples((NodeSamples?.Count - 1) ?? 1),
+                Samples = GetNodeSamples((NodeSamples?.Count - 1) ?? 1),
             });
         }
 
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
-        private IList<HitSampleInfo> getNodeSamples(int nodeIndex) =>
+        public IList<HitSampleInfo> GetNodeSamples(int nodeIndex) =>
             nodeIndex < NodeSamples?.Count ? NodeSamples[nodeIndex] : Samples;
     }
 }

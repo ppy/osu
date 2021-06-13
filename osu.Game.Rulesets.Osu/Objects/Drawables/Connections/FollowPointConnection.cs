@@ -2,11 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using JetBrains.Annotations;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Pooling;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
@@ -14,152 +13,108 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     /// <summary>
     /// Visualises the <see cref="FollowPoint"/>s between two <see cref="DrawableOsuHitObject"/>s.
     /// </summary>
-    public class FollowPointConnection : CompositeDrawable
+    public class FollowPointConnection : PoolableDrawableWithLifetime<FollowPointLifetimeEntry>
     {
         // Todo: These shouldn't be constants
-        private const int spacing = 32;
-        private const double preempt = 800;
+        public const int SPACING = 32;
+        public const double PREEMPT = 800;
 
-        public override bool RemoveWhenNotAlive => false;
+        public DrawablePool<FollowPoint> Pool;
 
-        /// <summary>
-        /// The start time of <see cref="Start"/>.
-        /// </summary>
-        public readonly Bindable<double> StartTime = new BindableDouble();
-
-        /// <summary>
-        /// The <see cref="DrawableOsuHitObject"/> which <see cref="FollowPoint"/>s will exit from.
-        /// </summary>
-        [NotNull]
-        public readonly DrawableOsuHitObject Start;
-
-        /// <summary>
-        /// Creates a new <see cref="FollowPointConnection"/>.
-        /// </summary>
-        /// <param name="start">The <see cref="DrawableOsuHitObject"/> which <see cref="FollowPoint"/>s will exit from.</param>
-        public FollowPointConnection([NotNull] DrawableOsuHitObject start)
+        protected override void OnApply(FollowPointLifetimeEntry entry)
         {
-            Start = start;
+            base.OnApply(entry);
 
-            RelativeSizeAxes = Axes.Both;
-
-            StartTime.BindTo(Start.HitObject.StartTimeBindable);
+            entry.Invalidated += onEntryInvalidated;
+            refreshPoints();
         }
 
-        protected override void LoadComplete()
+        protected override void OnFree(FollowPointLifetimeEntry entry)
         {
-            base.LoadComplete();
-            bindEvents(Start);
+            base.OnFree(entry);
+
+            entry.Invalidated -= onEntryInvalidated;
+            // Return points to the pool.
+            ClearInternal(false);
         }
 
-        private DrawableOsuHitObject end;
+        private void onEntryInvalidated() => Scheduler.AddOnce(refreshPoints);
 
-        /// <summary>
-        /// The <see cref="DrawableOsuHitObject"/> which <see cref="FollowPoint"/>s will enter.
-        /// </summary>
-        [CanBeNull]
-        public DrawableOsuHitObject End
+        private void refreshPoints()
         {
-            get => end;
-            set
-            {
-                end = value;
+            ClearInternal(false);
 
-                if (end != null)
-                    bindEvents(end);
+            var entry = Entry;
+            if (entry?.End == null) return;
 
-                if (IsLoaded)
-                    scheduleRefresh();
-                else
-                    refresh();
-            }
-        }
+            OsuHitObject start = entry.Start;
+            OsuHitObject end = entry.End;
 
-        private void bindEvents(DrawableOsuHitObject drawableObject)
-        {
-            drawableObject.HitObject.PositionBindable.BindValueChanged(_ => scheduleRefresh());
-            drawableObject.HitObject.DefaultsApplied += _ => scheduleRefresh();
-        }
+            double startTime = start.GetEndTime();
 
-        private void scheduleRefresh()
-        {
-            Scheduler.AddOnce(refresh);
-        }
-
-        private void refresh()
-        {
-            OsuHitObject osuStart = Start.HitObject;
-            double startTime = osuStart.GetEndTime();
-
-            LifetimeStart = startTime;
-
-            OsuHitObject osuEnd = End?.HitObject;
-
-            if (osuEnd == null || osuEnd.NewCombo || osuStart is Spinner || osuEnd is Spinner)
-            {
-                // ensure we always set a lifetime for full LifetimeManagementContainer benefits
-                LifetimeEnd = LifetimeStart;
-                return;
-            }
-
-            Vector2 startPosition = osuStart.StackedEndPosition;
-            Vector2 endPosition = osuEnd.StackedPosition;
-            double endTime = osuEnd.StartTime;
+            Vector2 startPosition = start.StackedEndPosition;
+            Vector2 endPosition = end.StackedPosition;
 
             Vector2 distanceVector = endPosition - startPosition;
             int distance = (int)distanceVector.Length;
             float rotation = (float)(Math.Atan2(distanceVector.Y, distanceVector.X) * (180 / Math.PI));
-            double duration = endTime - startTime;
 
-            double? firstTransformStartTime = null;
             double finalTransformEndTime = startTime;
 
-            int point = 0;
-
-            ClearInternal();
-
-            for (int d = (int)(spacing * 1.5); d < distance - spacing; d += spacing)
+            for (int d = (int)(SPACING * 1.5); d < distance - SPACING; d += SPACING)
             {
                 float fraction = (float)d / distance;
                 Vector2 pointStartPosition = startPosition + (fraction - 0.1f) * distanceVector;
                 Vector2 pointEndPosition = startPosition + fraction * distanceVector;
-                double fadeOutTime = startTime + fraction * duration;
-                double fadeInTime = fadeOutTime - preempt;
+
+                GetFadeTimes(start, end, (float)d / distance, out var fadeInTime, out var fadeOutTime);
 
                 FollowPoint fp;
 
-                AddInternal(fp = new FollowPoint());
+                AddInternal(fp = Pool.Get());
 
+                fp.ClearTransforms();
                 fp.Position = pointStartPosition;
                 fp.Rotation = rotation;
                 fp.Alpha = 0;
-                fp.Scale = new Vector2(1.5f * osuEnd.Scale);
+                fp.Scale = new Vector2(1.5f * end.Scale);
 
-                if (firstTransformStartTime == null)
-                    firstTransformStartTime = fadeInTime;
-
-                fp.AnimationStartTime = fadeInTime;
+                fp.AnimationStartTime.Value = fadeInTime;
 
                 using (fp.BeginAbsoluteSequence(fadeInTime))
                 {
-                    fp.FadeIn(osuEnd.TimeFadeIn);
-                    fp.ScaleTo(osuEnd.Scale, osuEnd.TimeFadeIn, Easing.Out);
-                    fp.MoveTo(pointEndPosition, osuEnd.TimeFadeIn, Easing.Out);
-                    fp.Delay(fadeOutTime - fadeInTime).FadeOut(osuEnd.TimeFadeIn);
+                    fp.FadeIn(end.TimeFadeIn);
+                    fp.ScaleTo(end.Scale, end.TimeFadeIn, Easing.Out);
+                    fp.MoveTo(pointEndPosition, end.TimeFadeIn, Easing.Out);
+                    fp.Delay(fadeOutTime - fadeInTime).FadeOut(end.TimeFadeIn).Expire();
 
-                    finalTransformEndTime = fadeOutTime + osuEnd.TimeFadeIn;
+                    finalTransformEndTime = fp.LifetimeEnd;
                 }
-
-                point++;
             }
 
-            int excessPoints = InternalChildren.Count - point;
-            for (int i = 0; i < excessPoints; i++)
-                RemoveInternal(InternalChildren[^1]);
+            entry.LifetimeEnd = finalTransformEndTime;
+        }
 
-            // todo: use Expire() on FollowPoints and take lifetime from them when https://github.com/ppy/osu-framework/issues/3300 is fixed.
-            LifetimeStart = firstTransformStartTime ?? startTime;
-            LifetimeEnd = finalTransformEndTime;
+        /// <summary>
+        /// Computes the fade time of follow point positioned between two hitobjects.
+        /// </summary>
+        /// <param name="start">The first <see cref="OsuHitObject"/>, where follow points should originate from.</param>
+        /// <param name="end">The second <see cref="OsuHitObject"/>, which follow points should target.</param>
+        /// <param name="fraction">The fractional distance along <paramref name="start"/> and <paramref name="end"/> at which the follow point is to be located.</param>
+        /// <param name="fadeInTime">The fade-in time of the follow point/</param>
+        /// <param name="fadeOutTime">The fade-out time of the follow point.</param>
+        public static void GetFadeTimes(OsuHitObject start, OsuHitObject end, float fraction, out double fadeInTime, out double fadeOutTime)
+        {
+            double startTime = start.GetEndTime();
+            double duration = end.StartTime - startTime;
+
+            // Preempt time can go below 800ms. Normally, this is achieved via the DT mod which uniformly speeds up all animations game wide regardless of AR.
+            // This uniform speedup is hard to match 1:1, however we can at least make AR>10 (via mods) feel good by extending the upper linear preempt function (see: OsuHitObject).
+            // Note that this doesn't exactly match the AR>10 visuals as they're classically known, but it feels good.
+            double preempt = PREEMPT * Math.Min(1, start.TimePreempt / OsuHitObject.PREEMPT_MIN);
+
+            fadeOutTime = startTime + fraction * duration;
+            fadeInTime = fadeOutTime - preempt;
         }
     }
 }

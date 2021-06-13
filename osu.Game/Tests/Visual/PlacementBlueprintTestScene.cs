@@ -33,7 +33,11 @@ namespace osu.Game.Tests.Visual
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
             dependencies.CacheAs(new EditorClock());
+
+            var playable = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+            dependencies.CacheAs(new EditorBeatmap(playable));
 
             return dependencies;
         }
@@ -72,7 +76,7 @@ namespace osu.Game.Tests.Visual
         {
             base.Update();
 
-            currentBlueprint.UpdatePosition(SnapForBlueprint(currentBlueprint));
+            currentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(currentBlueprint));
         }
 
         protected virtual SnapResult SnapForBlueprint(PlacementBlueprint blueprint) =>
@@ -85,7 +89,7 @@ namespace osu.Game.Tests.Visual
             if (drawable is PlacementBlueprint blueprint)
             {
                 blueprint.Show();
-                blueprint.UpdatePosition(SnapForBlueprint(blueprint));
+                blueprint.UpdateTimeAndPosition(SnapForBlueprint(blueprint));
             }
         }
 

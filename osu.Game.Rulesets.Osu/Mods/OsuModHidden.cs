@@ -2,9 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -23,73 +24,140 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
 
-        protected override bool IsFirstHideableObject(DrawableHitObject hitObject) => !(hitObject is DrawableSpinner);
+        protected override bool IsFirstAdjustableObject(HitObject hitObject) => !(hitObject is Spinner || hitObject is SpinnerTick);
 
-        public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        public override void ApplyToBeatmap(IBeatmap beatmap)
         {
-            static void adjustFadeIn(OsuHitObject h) => h.TimeFadeIn = h.TimePreempt * fade_in_duration_multiplier;
+            base.ApplyToBeatmap(beatmap);
 
-            foreach (var d in drawables.OfType<DrawableOsuHitObject>())
+            foreach (var obj in beatmap.HitObjects.OfType<OsuHitObject>())
+                applyFadeInAdjustment(obj);
+
+            static void applyFadeInAdjustment(OsuHitObject osuObject)
             {
-                adjustFadeIn(d.HitObject);
-                foreach (var h in d.HitObject.NestedHitObjects.OfType<OsuHitObject>())
-                    adjustFadeIn(h);
+                osuObject.TimeFadeIn = osuObject.TimePreempt * fade_in_duration_multiplier;
+                foreach (var nested in osuObject.NestedHitObjects.OfType<OsuHitObject>())
+                    applyFadeInAdjustment(nested);
             }
-
-            base.ApplyToDrawableHitObjects(drawables);
         }
 
-        protected override void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            if (!(drawable is DrawableOsuHitObject d))
+            applyState(hitObject, true);
+        }
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
+            applyState(hitObject, false);
+        }
+
+        private void applyState(DrawableHitObject drawableObject, bool increaseVisibility)
+        {
+            if (!(drawableObject is DrawableOsuHitObject drawableOsuObject))
                 return;
 
-            var h = d.HitObject;
+            OsuHitObject hitObject = drawableOsuObject.HitObject;
 
-            var fadeOutStartTime = h.StartTime - h.TimePreempt + h.TimeFadeIn;
-            var fadeOutDuration = h.TimePreempt * fade_out_duration_multiplier;
+            (double fadeStartTime, double fadeDuration) = getFadeOutParameters(drawableOsuObject);
 
-            // new duration from completed fade in to end (before fading out)
-            var longFadeDuration = h.GetEndTime() - fadeOutStartTime;
-
-            switch (drawable)
+            switch (drawableObject)
             {
-                case DrawableHitCircle circle:
-                    // we don't want to see the approach circle
-                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
-                        circle.ApproachCircle.Hide();
-
-                    // fade out immediately after fade in.
-                    using (drawable.BeginAbsoluteSequence(fadeOutStartTime, true))
-                        circle.FadeOut(fadeOutDuration);
+                case DrawableSliderTail _:
+                    using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
+                        drawableObject.FadeOut(fadeDuration);
 
                     break;
 
+                case DrawableSliderRepeat sliderRepeat:
+                    using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
+                        // only apply to circle piece – reverse arrow is not affected by hidden.
+                        sliderRepeat.CirclePiece.FadeOut(fadeDuration);
+
+                    break;
+
+                case DrawableHitCircle circle:
+                    Drawable fadeTarget = circle;
+
+                    if (increaseVisibility)
+                    {
+                        // only fade the circle piece (not the approach circle) for the increased visibility object.
+                        fadeTarget = circle.CirclePiece;
+                    }
+                    else
+                    {
+                        // we don't want to see the approach circle
+                        using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
+                            circle.ApproachCircle.Hide();
+                    }
+
+                    using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
+                        fadeTarget.FadeOut(fadeDuration);
+                    break;
+
                 case DrawableSlider slider:
-                    using (slider.BeginAbsoluteSequence(fadeOutStartTime, true))
-                        slider.Body.FadeOut(longFadeDuration, Easing.Out);
+                    using (slider.BeginAbsoluteSequence(fadeStartTime))
+                        slider.Body.FadeOut(fadeDuration, Easing.Out);
 
                     break;
 
                 case DrawableSliderTick sliderTick:
-                    // slider ticks fade out over up to one second
-                    var tickFadeOutDuration = Math.Min(sliderTick.HitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
-
-                    using (sliderTick.BeginAbsoluteSequence(sliderTick.HitObject.StartTime - tickFadeOutDuration, true))
-                        sliderTick.FadeOut(tickFadeOutDuration);
+                    using (sliderTick.BeginAbsoluteSequence(fadeStartTime))
+                        sliderTick.FadeOut(fadeDuration);
 
                     break;
 
                 case DrawableSpinner spinner:
                     // hide elements we don't care about.
-                    spinner.Disc.Hide();
-                    spinner.Ticks.Hide();
-                    spinner.Background.Hide();
+                    // todo: hide background
 
-                    using (spinner.BeginAbsoluteSequence(fadeOutStartTime + longFadeDuration, true))
-                        spinner.FadeOut(fadeOutDuration);
+                    using (spinner.BeginAbsoluteSequence(fadeStartTime))
+                        spinner.FadeOut(fadeDuration);
 
                     break;
+            }
+        }
+
+        private (double fadeStartTime, double fadeDuration) getFadeOutParameters(DrawableOsuHitObject drawableObject)
+        {
+            switch (drawableObject)
+            {
+                case DrawableSliderTail tail:
+                    // Use the same fade sequence as the slider head.
+                    Debug.Assert(tail.Slider != null);
+                    return getParameters(tail.Slider.HeadCircle);
+
+                case DrawableSliderRepeat repeat:
+                    // Use the same fade sequence as the slider head.
+                    Debug.Assert(repeat.Slider != null);
+                    return getParameters(repeat.Slider.HeadCircle);
+
+                default:
+                    return getParameters(drawableObject.HitObject);
+            }
+
+            static (double fadeStartTime, double fadeDuration) getParameters(OsuHitObject hitObject)
+            {
+                var fadeOutStartTime = hitObject.StartTime - hitObject.TimePreempt + hitObject.TimeFadeIn;
+                var fadeOutDuration = hitObject.TimePreempt * fade_out_duration_multiplier;
+
+                // new duration from completed fade in to end (before fading out)
+                var longFadeDuration = hitObject.GetEndTime() - fadeOutStartTime;
+
+                switch (hitObject)
+                {
+                    case Slider _:
+                        return (fadeOutStartTime, longFadeDuration);
+
+                    case SliderTick _:
+                        var tickFadeOutDuration = Math.Min(hitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
+                        return (hitObject.StartTime - tickFadeOutDuration, tickFadeOutDuration);
+
+                    case Spinner _:
+                        return (fadeOutStartTime + longFadeDuration, fadeOutDuration);
+
+                    default:
+                        return (fadeOutStartTime, fadeOutDuration);
+                }
             }
         }
     }

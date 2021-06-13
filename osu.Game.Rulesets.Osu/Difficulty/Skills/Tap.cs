@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
-using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
+using osu.Game.Rulesets.Osu.Difficulty.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 TapDifficulty = tapDiff,
                 StreamNoteCount = streamNoteCount,
                 MashedTapDifficulty = mashTapDiff,
-                StrainHistory = strainHistory
+                StrainHistory = strainHistory.Select(x=> PowerMean.Of(x, 2.0)).ToArray()
             };
         }
 
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 strainResult[j] = singleStrainResult * (1 - k) * timescale_factors[j];
             }
 
-            double diff = Mean.PowerMean(strainResult, 2);
+            double diff = PowerMean.Of(strainResult, 2);
 
             return (strainHistory, diff);
         }

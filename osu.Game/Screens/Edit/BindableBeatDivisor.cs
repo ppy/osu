@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 
@@ -48,7 +47,7 @@ namespace osu.Game.Screens.Edit
         /// <param name="beatDivisor">The beat divisor.</param>
         /// <param name="colours">The set of colours.</param>
         /// <returns>The applicable colour from <paramref name="colours"/> for <paramref name="beatDivisor"/>.</returns>
-        public static ColourInfo GetColourFor(int beatDivisor, OsuColour colours)
+        public static Color4 GetColourFor(int beatDivisor, OsuColour colours)
         {
             switch (beatDivisor)
             {

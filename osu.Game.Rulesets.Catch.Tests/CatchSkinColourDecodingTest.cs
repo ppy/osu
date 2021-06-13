@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.IO.Stores;
 using osu.Game.Rulesets.Catch.Skinning;
+using osu.Game.Rulesets.Catch.Skinning.Legacy;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -17,7 +18,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             var store = new NamespacedResourceStore<byte[]>(new DllResourceStore(GetType().Assembly), "Resources/special-skin");
             var rawSkin = new TestLegacySkin(new SkinInfo { Name = "special-skin" }, store);
-            var skin = new CatchLegacySkinTransformer(rawSkin);
+            var skinSource = new SkinProvidingContainer(rawSkin);
+            var skin = new CatchLegacySkinTransformer(skinSource);
 
             Assert.AreEqual(new Color4(232, 185, 35, 255), skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value);
             Assert.AreEqual(new Color4(232, 74, 35, 255), skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value);

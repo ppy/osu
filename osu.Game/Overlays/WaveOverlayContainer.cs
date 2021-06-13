@@ -14,7 +14,11 @@ namespace osu.Game.Overlays
         protected override bool BlockNonPositionalInput => true;
         protected override Container<Drawable> Content => Waves;
 
+        public const float WIDTH_PADDING = 80;
+
         protected override bool StartHidden => true;
+
+        protected override string PopInSampleName => "UI/wave-pop-in";
 
         protected WaveOverlayContainer()
         {

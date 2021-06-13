@@ -29,7 +29,7 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader(true)]
         private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
         {
-            var path = beatmap.Value.BeatmapSetInfo?.Files?.Find(f => f.Filename.Equals(Video.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+            var path = beatmap.Value.BeatmapSetInfo?.Files.Find(f => f.Filename.Equals(Video.Path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
             if (path == null)
                 return;
@@ -55,10 +55,11 @@ namespace osu.Game.Storyboards.Drawables
 
             if (video == null) return;
 
-            video.PlaybackPosition = Clock.CurrentTime - Video.StartTime;
-
-            using (video.BeginAbsoluteSequence(0))
+            using (video.BeginAbsoluteSequence(Video.StartTime))
+            {
+                Schedule(() => video.PlaybackPosition = Time.Current - Video.StartTime);
                 video.FadeIn(500);
+            }
         }
     }
 }

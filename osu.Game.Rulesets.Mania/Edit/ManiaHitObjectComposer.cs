@@ -9,11 +9,10 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Input;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -23,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public class ManiaHitObjectComposer : HitObjectComposer<ManiaHitObject>
     {
-        private DrawableManiaEditRuleset drawableRuleset;
+        private DrawableManiaEditorRuleset drawableRuleset;
         private ManiaBeatSnapGrid beatSnapGrid;
         private InputManager inputManager;
 
@@ -81,7 +80,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
         {
-            drawableRuleset = new DrawableManiaEditRuleset(ruleset, beatmap, mods);
+            drawableRuleset = new DrawableManiaEditorRuleset(ruleset, beatmap, mods);
 
             // This is the earliest we can cache the scrolling info to ourselves, before masks are added to the hierarchy and inject it
             dependencies.CacheAs(drawableRuleset.ScrollingInfo);
@@ -89,8 +88,8 @@ namespace osu.Game.Rulesets.Mania.Edit
             return drawableRuleset;
         }
 
-        protected override ComposeBlueprintContainer CreateBlueprintContainer(IEnumerable<DrawableHitObject> hitObjects)
-            => new ManiaBlueprintContainer(hitObjects);
+        protected override ComposeBlueprintContainer CreateBlueprintContainer()
+            => new ManiaBlueprintContainer(this);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
@@ -120,5 +119,8 @@ namespace osu.Game.Rulesets.Mania.Edit
                     beatSnapGrid.SelectionTimeRange = null;
             }
         }
+
+        public override string ConvertSelectionToString()
+            => string.Join(',', EditorBeatmap.SelectedHitObjects.Cast<ManiaHitObject>().OrderBy(h => h.StartTime).Select(h => $"{h.StartTime}|{h.Column}"));
     }
 }

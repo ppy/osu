@@ -4,12 +4,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Replays;
+using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.UI
@@ -17,7 +20,7 @@ namespace osu.Game.Rulesets.UI
     public abstract class ReplayRecorder<T> : ReplayRecorder, IKeyBindingHandler<T>
         where T : struct
     {
-        private readonly Replay target;
+        private readonly Score target;
 
         private readonly List<T> pressedActions = new List<T>();
 
@@ -25,7 +28,13 @@ namespace osu.Game.Rulesets.UI
 
         public int RecordFrameRate = 60;
 
-        protected ReplayRecorder(Replay target)
+        [Resolved(canBeNull: true)]
+        private SpectatorClient spectatorClient { get; set; }
+
+        [Resolved]
+        private GameplayBeatmap gameplayBeatmap { get; set; }
+
+        protected ReplayRecorder(Score target)
         {
             this.target = target;
 
@@ -39,6 +48,20 @@ namespace osu.Game.Rulesets.UI
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
+
+            spectatorClient?.BeginPlaying(gameplayBeatmap, target);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            spectatorClient?.EndPlaying();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            recordFrame(false);
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -62,7 +85,7 @@ namespace osu.Game.Rulesets.UI
 
         private void recordFrame(bool important)
         {
-            var last = target.Frames.LastOrDefault();
+            var last = target.Replay.Frames.LastOrDefault();
 
             if (!important && last != null && Time.Current - last.Time < (1000d / RecordFrameRate))
                 return;
@@ -72,7 +95,11 @@ namespace osu.Game.Rulesets.UI
             var frame = HandleFrame(position, pressedActions, last);
 
             if (frame != null)
-                target.Frames.Add(frame);
+            {
+                target.Replay.Frames.Add(frame);
+
+                spectatorClient?.HandleFrame(frame);
+            }
         }
 
         protected abstract ReplayFrame HandleFrame(Vector2 mousePosition, List<T> actions, ReplayFrame previousFrame);

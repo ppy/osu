@@ -12,6 +12,21 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselBeatmapSet : CarouselGroupEagerSelect
     {
+        public override float TotalHeight
+        {
+            get
+            {
+                switch (State.Value)
+                {
+                    case CarouselItemState.Selected:
+                        return DrawableCarouselBeatmapSet.HEIGHT + Children.Count(c => c.Visible) * DrawableCarouselBeatmap.HEIGHT;
+
+                    default:
+                        return DrawableCarouselBeatmapSet.HEIGHT;
+                }
+            }
+        }
+
         public IEnumerable<CarouselBeatmap> Beatmaps => InternalChildren.OfType<CarouselBeatmap>();
 
         public BeatmapSetInfo BeatmapSet;
@@ -28,11 +43,9 @@ namespace osu.Game.Screens.Select.Carousel
                       .ForEach(AddChild);
         }
 
-        protected override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmapSet(this);
-
         protected override CarouselItem GetNextToSelect()
         {
-            if (LastSelected == null)
+            if (LastSelected == null || LastSelected.Filtered.Value)
             {
                 if (GetRecommendedBeatmap?.Invoke(Children.OfType<CarouselBeatmap>().Where(b => !b.Filtered.Value).Select(b => b.Beatmap)) is BeatmapInfo recommended)
                     return Children.OfType<CarouselBeatmap>().First(b => b.Beatmap == recommended);
@@ -57,6 +70,9 @@ namespace osu.Game.Screens.Select.Carousel
 
                 case SortMode.Author:
                     return string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.OrdinalIgnoreCase);
+
+                case SortMode.Source:
+                    return string.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source, StringComparison.OrdinalIgnoreCase);
 
                 case SortMode.DateAdded:
                     return otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);

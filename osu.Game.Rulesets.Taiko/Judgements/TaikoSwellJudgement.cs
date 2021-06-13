@@ -7,8 +7,6 @@ namespace osu.Game.Rulesets.Taiko.Judgements
 {
     public class TaikoSwellJudgement : TaikoJudgement
     {
-        public override bool AffectsCombo => false;
-
         protected override double HealthIncreaseFor(HitResult result)
         {
             switch (result)

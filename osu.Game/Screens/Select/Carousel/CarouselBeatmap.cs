@@ -10,6 +10,8 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselBeatmap : CarouselItem
     {
+        public override float TotalHeight => DrawableCarouselBeatmap.HEIGHT;
+
         public readonly BeatmapInfo Beatmap;
 
         public CarouselBeatmap(BeatmapInfo beatmap)
@@ -18,7 +20,7 @@ namespace osu.Game.Screens.Select.Carousel
             State.Value = CarouselItemState.Collapsed;
         }
 
-        protected override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmap(this);
+        public override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmap(this);
 
         public override void Filter(FilterCriteria criteria)
         {
@@ -57,8 +59,22 @@ namespace osu.Game.Screens.Select.Carousel
                 var terms = Beatmap.SearchableTerms;
 
                 foreach (var criteriaTerm in criteria.SearchTerms)
-                    match &= terms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0);
+                    match &= terms.Any(term => term.Contains(criteriaTerm, StringComparison.InvariantCultureIgnoreCase));
+
+                // if a match wasn't found via text matching of terms, do a second catch-all check matching against online IDs.
+                // this should be done after text matching so we can prioritise matching numbers in metadata.
+                if (!match && criteria.SearchNumber.HasValue)
+                {
+                    match = (Beatmap.OnlineBeatmapID == criteria.SearchNumber.Value) ||
+                            (Beatmap.BeatmapSet?.OnlineBeatmapSetID == criteria.SearchNumber.Value);
+                }
             }
+
+            if (match)
+                match &= criteria.Collection?.Beatmaps.Contains(Beatmap) ?? true;
+
+            if (match && criteria.RulesetCriteria != null)
+                match &= criteria.RulesetCriteria.Matches(Beatmap);
 
             Filtered.Value = !match;
         }

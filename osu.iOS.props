@@ -70,21 +70,34 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup Label="Package References">
-    <PackageReference Include="ppy.osu.Framework.iOS" Version="2020.528.0" />
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2020.512.0" />
+    <PackageReference Include="ppy.osu.Framework.iOS" Version="2021.611.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2021.611.0" />
+  </ItemGroup>
+  <!-- See https://github.com/dotnet/runtime/issues/35988 (can be removed after Xamarin uses net5.0 / net6.0) -->
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);NU1605</NoWarn>
+  </PropertyGroup>
+  <!-- Workaround to make SignalR 5.x work properly, avoiding a runtime error (https://github.com/mono/mono/issues/20805#issuecomment-791440473) -->
+  <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.4">
+      <IncludeAssets>none</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Buffers" Version="4.5.1">
+      <IncludeAssets>none</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <!-- Xamarin.iOS does not automatically handle transitive dependencies from NuGet packages. -->
   <ItemGroup Label="Transitive Dependencies">
     <PackageReference Include="DiffPlex" Version="1.6.3" />
-    <PackageReference Include="Humanizer" Version="2.8.11" />
+    <PackageReference Include="Humanizer" Version="2.10.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.6" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="ppy.osu.Framework" Version="2020.528.0" />
-    <PackageReference Include="SharpCompress" Version="0.25.1" />
-    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="ppy.osu.Framework" Version="2021.611.0" />
+    <PackageReference Include="SharpCompress" Version="0.28.2" />
+    <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="SharpRaven" Version="2.4.0" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
-    <PackageReference Include="ppy.osu.Framework.NativeLibs" Version="2020.213.0" ExcludeAssets="all" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="ppy.osu.Framework.NativeLibs" Version="2021.115.0" ExcludeAssets="all" />
   </ItemGroup>
 </Project>

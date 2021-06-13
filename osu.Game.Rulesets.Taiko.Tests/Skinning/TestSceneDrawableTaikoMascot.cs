@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Animations;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -36,6 +37,10 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         private TaikoScoreProcessor scoreProcessor;
 
         private IEnumerable<DrawableTaikoMascot> mascots => this.ChildrenOfType<DrawableTaikoMascot>();
+
+        private IEnumerable<DrawableTaikoMascot> animatedMascots =>
+            mascots.Where(mascot => mascot.ChildrenOfType<TextureAnimation>().All(animation => animation.FrameCount > 0));
+
         private IEnumerable<TaikoPlayfield> playfields => this.ChildrenOfType<TaikoPlayfield>();
 
         [SetUp]
@@ -49,16 +54,16 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         {
             AddStep("set beatmap", () => setBeatmap());
 
-            AddStep("clear state", () => SetContents(() => new TaikoMascotAnimation(TaikoMascotAnimationState.Clear)));
-            AddStep("idle state", () => SetContents(() => new TaikoMascotAnimation(TaikoMascotAnimationState.Idle)));
-            AddStep("kiai state", () => SetContents(() => new TaikoMascotAnimation(TaikoMascotAnimationState.Kiai)));
-            AddStep("fail state", () => SetContents(() => new TaikoMascotAnimation(TaikoMascotAnimationState.Fail)));
+            AddStep("clear state", () => SetContents(_ => new TaikoMascotAnimation(TaikoMascotAnimationState.Clear)));
+            AddStep("idle state", () => SetContents(_ => new TaikoMascotAnimation(TaikoMascotAnimationState.Idle)));
+            AddStep("kiai state", () => SetContents(_ => new TaikoMascotAnimation(TaikoMascotAnimationState.Kiai)));
+            AddStep("fail state", () => SetContents(_ => new TaikoMascotAnimation(TaikoMascotAnimationState.Fail)));
         }
 
         [Test]
         public void TestInitialState()
         {
-            AddStep("create mascot", () => SetContents(() => new DrawableTaikoMascot { RelativeSizeAxes = Axes.Both }));
+            AddStep("create mascot", () => SetContents(_ => new DrawableTaikoMascot { RelativeSizeAxes = Axes.Both }));
 
             AddAssert("mascot initially idle", () => allMascotsIn(TaikoMascotAnimationState.Idle));
         }
@@ -68,15 +73,15 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         {
             AddStep("set beatmap", () => setBeatmap());
 
-            AddStep("create mascot", () => SetContents(() => new DrawableTaikoMascot { RelativeSizeAxes = Axes.Both }));
+            AddStep("create mascot", () => SetContents(_ => new DrawableTaikoMascot { RelativeSizeAxes = Axes.Both }));
 
             AddStep("set clear state", () => mascots.ForEach(mascot => mascot.State.Value = TaikoMascotAnimationState.Clear));
             AddStep("miss", () => mascots.ForEach(mascot => mascot.LastResult.Value = new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Miss }));
-            AddAssert("skins with animations remain in clear state", () => someMascotsIn(TaikoMascotAnimationState.Clear));
+            AddAssert("skins with animations remain in clear state", () => animatedMascotsIn(TaikoMascotAnimationState.Clear));
             AddUntilStep("state reverts to fail", () => allMascotsIn(TaikoMascotAnimationState.Fail));
 
             AddStep("set clear state again", () => mascots.ForEach(mascot => mascot.State.Value = TaikoMascotAnimationState.Clear));
-            AddAssert("skins with animations change to clear", () => someMascotsIn(TaikoMascotAnimationState.Clear));
+            AddAssert("skins with animations change to clear", () => animatedMascotsIn(TaikoMascotAnimationState.Clear));
         }
 
         [Test]
@@ -87,7 +92,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             createDrawableRuleset();
 
             assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Idle);
-            assertStateAfterResult(new JudgementResult(new StrongHitObject(), new TaikoStrongJudgement()) { Type = HitResult.Miss }, TaikoMascotAnimationState.Idle);
+            assertStateAfterResult(new JudgementResult(new Hit.StrongNestedHit(), new TaikoStrongJudgement()) { Type = HitResult.IgnoreMiss }, TaikoMascotAnimationState.Idle);
         }
 
         [Test]
@@ -97,8 +102,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
             createDrawableRuleset();
 
-            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Good }, TaikoMascotAnimationState.Kiai);
-            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoStrongJudgement()) { Type = HitResult.Miss }, TaikoMascotAnimationState.Kiai);
+            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Ok }, TaikoMascotAnimationState.Kiai);
+            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoStrongJudgement()) { Type = HitResult.IgnoreMiss }, TaikoMascotAnimationState.Kiai);
             assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Miss }, TaikoMascotAnimationState.Fail);
         }
 
@@ -111,8 +116,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
             assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Idle);
             assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Miss }, TaikoMascotAnimationState.Fail);
-            assertStateAfterResult(new JudgementResult(new DrumRoll(), new TaikoDrumRollJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Fail);
-            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Good }, TaikoMascotAnimationState.Idle);
+            assertStateAfterResult(new JudgementResult(new DrumRoll(), new TaikoDrumRollJudgement()) { Type = HitResult.Great }, TaikoMascotAnimationState.Idle);
+            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Ok }, TaikoMascotAnimationState.Idle);
         }
 
         [TestCase(true)]
@@ -125,7 +130,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
             AddRepeatStep("reach 49 combo", () => applyNewResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Great }), 49);
 
-            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Good }, TaikoMascotAnimationState.Clear);
+            assertStateAfterResult(new JudgementResult(new Hit(), new TaikoJudgement()) { Type = HitResult.Ok }, TaikoMascotAnimationState.Clear);
         }
 
         [TestCase(true, TaikoMascotAnimationState.Kiai)]
@@ -176,7 +181,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             {
                 Beatmap.Value.Track.Start();
 
-                SetContents(() =>
+                SetContents(_ =>
                 {
                     var ruleset = new TaikoRuleset();
                     return new DrawableTaikoRuleset(ruleset, Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo));
@@ -186,10 +191,18 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
 
         private void assertStateAfterResult(JudgementResult judgementResult, TaikoMascotAnimationState expectedState)
         {
-            AddStep($"{judgementResult.Type.ToString().ToLower()} result for {judgementResult.Judgement.GetType().Name.Humanize(LetterCasing.LowerCase)}",
-                () => applyNewResult(judgementResult));
+            TaikoMascotAnimationState[] mascotStates = null;
 
-            AddAssert($"state is {expectedState.ToString().ToLower()}", () => allMascotsIn(expectedState));
+            AddStep($"{judgementResult.Type.ToString().ToLower()} result for {judgementResult.Judgement.GetType().Name.Humanize(LetterCasing.LowerCase)}",
+                () =>
+                {
+                    applyNewResult(judgementResult);
+                    // store the states as soon as possible, so that the delay between steps doesn't incorrectly fail the test
+                    // due to not checking if the state changed quickly enough.
+                    Schedule(() => mascotStates = animatedMascots.Select(mascot => mascot.State.Value).ToArray());
+                });
+
+            AddAssert($"state is {expectedState.ToString().ToLower()}", () => mascotStates.All(state => state == expectedState));
         }
 
         private void applyNewResult(JudgementResult judgementResult)
@@ -199,7 +212,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
             foreach (var playfield in playfields)
             {
                 var hit = new DrawableTestHit(new Hit(), judgementResult.Type);
-                Add(hit);
+                playfield.Add(hit);
 
                 playfield.OnNewResult(hit, judgementResult);
             }
@@ -211,6 +224,6 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         }
 
         private bool allMascotsIn(TaikoMascotAnimationState state) => mascots.All(d => d.State.Value == state);
-        private bool someMascotsIn(TaikoMascotAnimationState state) => mascots.Any(d => d.State.Value == state);
+        private bool animatedMascotsIn(TaikoMascotAnimationState state) => animatedMascots.Any(d => d.State.Value == state);
     }
 }

@@ -10,14 +10,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
     public static class NoteDensity
     {
         /// <summary>
-        /// Calculates note density for every note
+        /// Calculates the note density for every note in the map.
         /// </summary>
-        public static List<double> CalculateNoteDensities(List<OsuHitObject> hitObjects, double preempt)
+        /// <param name="hitObjects">The list of hitobjects in the map</param>
+        /// <param name="preempt">The preemption window to use when calculating density of neighbouring notes.</param>
+        public static double[] Calculate(List<OsuHitObject> hitObjects, double preempt)
         {
             List<double> noteDensities = new List<double>();
 
             Queue<OsuHitObject> window = new Queue<OsuHitObject>();
 
+            // TODO: figure out why next is not reset
             int next = 0;
 
             for (int i = 0; i < hitObjects.Count; i++)
@@ -29,14 +32,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 }
 
                 while (window.Peek().StartTime < hitObjects[i].StartTime - preempt)
-                {
                     window.Dequeue();
-                }
 
                 noteDensities.Add(calculateNoteDensity(hitObjects[i].StartTime, preempt, window));
             }
 
-            return noteDensities;
+            return noteDensities.ToArray();
         }
 
         private static double calculateNoteDensity(double time, double preempt, Queue<OsuHitObject> window)
@@ -44,9 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double noteDensity = 0;
 
             foreach (var hitObject in window)
-            {
                 noteDensity += 1 - Math.Abs(hitObject.StartTime - time) / preempt;
-            }
 
             return noteDensity;
         }

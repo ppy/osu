@@ -1,87 +1,203 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.News;
+using osu.Game.Overlays.News.Displays;
+using osu.Game.Overlays.News.Sidebar;
 
 namespace osu.Game.Overlays
 {
-    public class NewsOverlay : FullscreenOverlay
+    public class NewsOverlay : OnlineOverlay<NewsHeader>
     {
-        private NewsHeader header;
+        private readonly Bindable<string> article = new Bindable<string>();
 
-        private Container<NewsContent> content;
+        private readonly Container sidebarContainer;
+        private readonly NewsSidebar sidebar;
+        private readonly Container content;
 
-        public readonly Bindable<string> Current = new Bindable<string>(null);
+        private GetNewsRequest request;
+
+        private Cursor lastCursor;
+
+        /// <summary>
+        /// The year currently being displayed. If null, the main listing is being displayed.
+        /// </summary>
+        private int? displayedYear;
+
+        private CancellationTokenSource cancellationToken;
+
+        private bool displayUpdateRequired = true;
 
         public NewsOverlay()
-            : base(OverlayColourScheme.Purple)
+            : base(OverlayColourScheme.Purple, false)
         {
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            Children = new Drawable[]
+            Child = new GridContainer
             {
-                new Box
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                RowDimensions = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colours.PurpleDarkAlternative
+                    new Dimension(GridSizeMode.AutoSize)
                 },
-                new OverlayScrollContainer
+                ColumnDimensions = new[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = new FillFlowContainer
+                    new Dimension(GridSizeMode.AutoSize),
+                    new Dimension()
+                },
+                Content = new[]
+                {
+                    new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                        sidebarContainer = new Container
                         {
-                            header = new NewsHeader
-                            {
-                                ShowFrontPage = ShowFrontPage
-                            },
-                            content = new Container<NewsContent>
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                            }
+                            AutoSizeAxes = Axes.X,
+                            Child = sidebar = new NewsSidebar()
                         },
-                    },
-                },
+                        content = new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        }
+                    }
+                }
             };
-
-            header.Post.BindTo(Current);
-            Current.TriggerChange();
         }
 
-        private CancellationTokenSource loadContentCancellation;
-
-        protected void LoadAndShowContent(NewsContent newContent)
+        protected override void LoadComplete()
         {
-            content.FadeTo(0.2f, 300, Easing.OutQuint);
+            base.LoadComplete();
 
-            loadContentCancellation?.Cancel();
-
-            LoadComponentAsync(newContent, c =>
+            // should not be run until first pop-in to avoid requesting data before user views.
+            article.BindValueChanged(a =>
             {
-                content.Child = c;
-                content.FadeIn(300, Easing.OutQuint);
-            }, (loadContentCancellation = new CancellationTokenSource()).Token);
+                if (a.NewValue == null)
+                    loadListing();
+                else
+                    loadArticle(a.NewValue);
+            });
+        }
+
+        protected override NewsHeader CreateHeader() => new NewsHeader { ShowFrontPage = ShowFrontPage };
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+
+            if (displayUpdateRequired)
+            {
+                article.TriggerChange();
+                displayUpdateRequired = false;
+            }
+        }
+
+        protected override void PopOutComplete()
+        {
+            base.PopOutComplete();
+            displayUpdateRequired = true;
         }
 
         public void ShowFrontPage()
         {
-            Current.Value = null;
+            article.Value = null;
             Show();
+        }
+
+        public void ShowYear(int year)
+        {
+            loadListing(year);
+            Show();
+        }
+
+        public void ShowArticle(string slug)
+        {
+            article.Value = slug;
+            Show();
+        }
+
+        protected void LoadDisplay(Drawable display)
+        {
+            ScrollFlow.ScrollToStart();
+            LoadComponentAsync(display, loaded =>
+            {
+                content.Child = loaded;
+                Loading.Hide();
+            }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+            sidebarContainer.Height = DrawHeight;
+            sidebarContainer.Y = Math.Clamp(ScrollFlow.Current - Header.DrawHeight, 0, Math.Max(ScrollFlow.ScrollContent.DrawHeight - DrawHeight - Header.DrawHeight, 0));
+        }
+
+        private void loadListing(int? year = null)
+        {
+            Header.SetFrontPage();
+
+            displayedYear = year;
+            lastCursor = null;
+
+            beginLoading(true);
+
+            request = new GetNewsRequest(displayedYear);
+            request.Success += response => Schedule(() =>
+            {
+                lastCursor = response.Cursor;
+                sidebar.Metadata.Value = response.SidebarMetadata;
+
+                var listing = new ArticleListing(getMorePosts);
+                listing.AddPosts(response.NewsPosts, response.Cursor != null);
+                LoadDisplay(listing);
+            });
+
+            API.PerformAsync(request);
+        }
+
+        private void getMorePosts()
+        {
+            beginLoading(false);
+
+            request = new GetNewsRequest(displayedYear, lastCursor);
+            request.Success += response => Schedule(() =>
+            {
+                lastCursor = response.Cursor;
+                if (content.Child is ArticleListing listing)
+                    listing.AddPosts(response.NewsPosts, response.Cursor != null);
+            });
+
+            API.PerformAsync(request);
+        }
+
+        private void loadArticle(string article)
+        {
+            // This is not yet implemented nor called from anywhere.
+            beginLoading(true);
+
+            Header.SetArticle(article);
+            LoadDisplay(Empty());
+        }
+
+        private void beginLoading(bool showLoadingOverlay)
+        {
+            request?.Cancel();
+            cancellationToken?.Cancel();
+
+            if (showLoadingOverlay)
+                Loading.Show();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            request?.Cancel();
+            cancellationToken?.Cancel();
+            base.Dispose(isDisposing);
         }
     }
 }

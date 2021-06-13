@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
@@ -16,8 +17,6 @@ namespace osu.Game.Beatmaps.Formats
 {
     public class LegacyBeatmapDecoder : LegacyDecoder<Beatmap>
     {
-        public const int LATEST_VERSION = 14;
-
         private Beatmap beatmap;
 
         private ConvertHitObjectParser parser;
@@ -68,16 +67,14 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line)
         {
-            var strippedLine = StripComments(line);
-
             switch (section)
             {
                 case Section.General:
-                    handleGeneral(strippedLine);
+                    handleGeneral(line);
                     return;
 
                 case Section.Editor:
-                    handleEditor(strippedLine);
+                    handleEditor(line);
                     return;
 
                 case Section.Metadata:
@@ -85,19 +82,19 @@ namespace osu.Game.Beatmaps.Formats
                     return;
 
                 case Section.Difficulty:
-                    handleDifficulty(strippedLine);
+                    handleDifficulty(line);
                     return;
 
                 case Section.Events:
-                    handleEvent(strippedLine);
+                    handleEvent(line);
                     return;
 
                 case Section.TimingPoints:
-                    handleTimingPoint(strippedLine);
+                    handleTimingPoint(line);
                     return;
 
                 case Section.HitObjects:
-                    handleHitObject(strippedLine);
+                    handleHitObject(line);
                     return;
             }
 
@@ -174,6 +171,10 @@ namespace osu.Game.Beatmaps.Formats
 
                 case @"WidescreenStoryboard":
                     beatmap.BeatmapInfo.WidescreenStoryboard = Parsing.ParseInt(pair.Value) == 1;
+                    break;
+
+                case @"EpilepsyWarning":
+                    beatmap.BeatmapInfo.EpilepsyWarning = Parsing.ParseInt(pair.Value) == 1;
                     break;
             }
         }
@@ -307,12 +308,7 @@ namespace osu.Game.Beatmaps.Formats
                     double start = getOffsetTime(Parsing.ParseDouble(split[1]));
                     double end = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])));
 
-                    var breakEvent = new BreakPeriod(start, end);
-
-                    if (!breakEvent.HasEffect)
-                        return;
-
-                    beatmap.Breaks.Add(breakEvent);
+                    beatmap.Breaks.Add(new BreakPeriod(start, end));
                     break;
             }
         }
@@ -351,8 +347,8 @@ namespace osu.Game.Beatmaps.Formats
             if (split.Length >= 8)
             {
                 LegacyEffectFlags effectFlags = (LegacyEffectFlags)Parsing.ParseInt(split[7]);
-                kiaiMode = effectFlags.HasFlag(LegacyEffectFlags.Kiai);
-                omitFirstBarSignature = effectFlags.HasFlag(LegacyEffectFlags.OmitFirstBarLine);
+                kiaiMode = effectFlags.HasFlagFast(LegacyEffectFlags.Kiai);
+                omitFirstBarSignature = effectFlags.HasFlagFast(LegacyEffectFlags.OmitFirstBarLine);
             }
 
             string stringSampleSet = sampleSet.ToString().ToLowerInvariant();
@@ -369,7 +365,9 @@ namespace osu.Game.Beatmaps.Formats
                 addControlPoint(time, controlPoint, true);
             }
 
-            addControlPoint(time, new LegacyDifficultyControlPoint
+#pragma warning disable 618
+            addControlPoint(time, new LegacyDifficultyControlPoint(beatLength)
+#pragma warning restore 618
             {
                 SpeedMultiplier = speedMultiplier,
             }, timingChange);
@@ -425,8 +423,7 @@ namespace osu.Game.Beatmaps.Formats
         private void handleHitObject(string line)
         {
             // If the ruleset wasn't specified, assume the osu!standard ruleset.
-            if (parser == null)
-                parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
+            parser ??= new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
 
             var obj = parser.Parse(line);
             if (obj != null)

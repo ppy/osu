@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -13,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
@@ -29,6 +29,9 @@ namespace osu.Game.Screens.Ranking.Contracted
     public class ContractedPanelMiddleContent : CompositeDrawable
     {
         private readonly ScoreInfo score;
+
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
 
         /// <summary>
         /// Creates a new <see cref="ContractedPanelMiddleContent"/>.
@@ -113,7 +116,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                                             AutoSizeAxes = Axes.Y,
                                             Direction = FillDirection.Vertical,
                                             Spacing = new Vector2(0, 5),
-                                            ChildrenEnumerable = score.SortedStatistics.Select(s => createStatistic(s.Key.GetDescription(), s.Value.ToString()))
+                                            ChildrenEnumerable = score.GetStatisticsForDisplay().Where(s => !s.Result.IsBonus()).Select(createStatistic)
                                         },
                                         new FillFlowContainer
                                         {
@@ -134,7 +137,6 @@ namespace osu.Game.Screens.Ranking.Contracted
                                             Origin = Anchor.TopCentre,
                                             AutoSizeAxes = Axes.Both,
                                             ExpansionMode = ExpansionMode.AlwaysExpanded,
-                                            DisplayUnrankedText = false,
                                             Current = { Value = score.Mods },
                                             Scale = new Vector2(0.5f),
                                         }
@@ -160,7 +162,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Text = score.TotalScore.ToString("N0"),
+                                            Current = scoreManager.GetBindableTotalScoreString(score),
                                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, fixedWidth: true),
                                             Spacing = new Vector2(-1, 0)
                                         },
@@ -194,6 +196,9 @@ namespace osu.Game.Screens.Ranking.Contracted
                 }
             };
         }
+
+        private Drawable createStatistic(HitResultDisplayStatistic result)
+            => createStatistic(result.DisplayName, result.MaxCount == null ? $"{result.Count}" : $"{result.Count}/{result.MaxCount}");
 
         private Drawable createStatistic(string key, string value) => new Container
         {

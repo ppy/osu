@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -20,12 +19,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         private Mod[] mods;
         private int countGreat;
-        private int countGood;
+        private int countOk;
         private int countMeh;
         private int countMiss;
 
-        public TaikoPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
-            : base(ruleset, beatmap, score)
+        public TaikoPerformanceCalculator(Ruleset ruleset, DifficultyAttributes attributes, ScoreInfo score)
+            : base(ruleset, attributes, score)
         {
         }
 
@@ -33,13 +32,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
             mods = Score.Mods;
             countGreat = Score.Statistics.GetOrDefault(HitResult.Great);
-            countGood = Score.Statistics.GetOrDefault(HitResult.Good);
+            countOk = Score.Statistics.GetOrDefault(HitResult.Ok);
             countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
             countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
-
-            // Don't count scores made with supposedly unranked mods
-            if (mods.Any(m => !m.Ranked))
-                return 0;
 
             // Custom multipliers for NoFail and SpunOut.
             double multiplier = 1.1; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
@@ -78,10 +73,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             strainValue *= Math.Pow(0.985, countMiss);
 
-            // Combo scaling
-            if (Attributes.MaxCombo > 0)
-                strainValue *= Math.Min(Math.Pow(Score.MaxCombo, 0.5) / Math.Pow(Attributes.MaxCombo, 0.5), 1.0);
-
             if (mods.Any(m => m is ModHidden))
                 strainValue *= 1.025;
 
@@ -106,6 +97,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return accValue * Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
         }
 
-        private int totalHits => countGreat + countGood + countMeh + countMiss;
+        private int totalHits => countGreat + countOk + countMeh + countMiss;
     }
 }

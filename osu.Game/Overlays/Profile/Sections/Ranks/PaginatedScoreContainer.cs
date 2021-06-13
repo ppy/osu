@@ -10,31 +10,58 @@ using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using System.Collections.Generic;
 using osu.Game.Online.API;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class PaginatedScoreContainer : PaginatedContainer<APILegacyScoreInfo>
+    public class PaginatedScoreContainer : PaginatedProfileSubsection<APILegacyScoreInfo>
     {
         private readonly ScoreType type;
 
-        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string header, string missing)
-            : base(user, header, missing)
+        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string headerText)
+            : base(user, headerText)
         {
             this.type = type;
 
             ItemsPerPage = 5;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             ItemsContainer.Direction = FillDirection.Vertical;
+        }
+
+        protected override int GetCount(User user)
+        {
+            switch (type)
+            {
+                case ScoreType.Best:
+                    return user.ScoresBestCount;
+
+                case ScoreType.Firsts:
+                    return user.ScoresFirstCount;
+
+                case ScoreType.Recent:
+                    return user.ScoresRecentCount;
+
+                default:
+                    return 0;
+            }
+        }
+
+        protected override void OnItemsReceived(List<APILegacyScoreInfo> items)
+        {
+            if (VisiblePages == 0)
+                drawableItemIndex = 0;
+
+            base.OnItemsReceived(items);
         }
 
         protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>
             new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
 
-        protected override int GetCount(User user) => type switch
-        {
-            ScoreType.Firsts => user.ScoresFirstCount,
-            _ => 0
-        };
+        private int drawableItemIndex;
 
         protected override Drawable CreateDrawableItem(APILegacyScoreInfo model)
         {
@@ -44,7 +71,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     return new DrawableProfileScore(model.CreateScoreInfo(Rulesets));
 
                 case ScoreType.Best:
-                    return new DrawableProfileWeightedScore(model.CreateScoreInfo(Rulesets), Math.Pow(0.95, ItemsContainer.Count));
+                    return new DrawableProfileWeightedScore(model.CreateScoreInfo(Rulesets), Math.Pow(0.95, drawableItemIndex++));
             }
         }
     }

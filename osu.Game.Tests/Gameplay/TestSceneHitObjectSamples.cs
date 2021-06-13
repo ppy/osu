@@ -1,58 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.IO.Stores;
-using osu.Framework.Testing;
-using osu.Framework.Timing;
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Formats;
-using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Skinning;
-using osu.Game.Storyboards;
+using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
-using osu.Game.Tests.Visual;
-using osu.Game.Users;
+using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Tests.Gameplay
 {
-    [HeadlessTest]
-    public class TestSceneHitObjectSamples : PlayerTestScene
+    public class TestSceneHitObjectSamples : HitObjectSampleTest
     {
-        private readonly SkinInfo userSkinInfo = new SkinInfo();
-
-        private readonly BeatmapInfo beatmapInfo = new BeatmapInfo
-        {
-            BeatmapSet = new BeatmapSetInfo(),
-            Metadata = new BeatmapMetadata
-            {
-                Author = User.SYSTEM_USER
-            }
-        };
-
-        private readonly TestResourceStore userSkinResourceStore = new TestResourceStore();
-        private readonly TestResourceStore beatmapSkinResourceStore = new TestResourceStore();
-
-        protected override bool HasCustomSteps => true;
-
-        public TestSceneHitObjectSamples()
-            : base(new OsuRuleset())
-        {
-        }
-
-        private SkinSourceDependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-            => new DependencyContainer(dependencies = new SkinSourceDependencyContainer(base.CreateChildDependencies(parent)));
+        protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
+        protected override IResourceStore<byte[]> RulesetResources => TestResources.GetStore();
 
         /// <summary>
         /// Tests that a hitobject which provides no custom sample set retrieves samples from the user skin.
@@ -62,11 +24,11 @@ namespace osu.Game.Tests.Gameplay
         {
             const string expected_sample = "normal-hitnormal";
 
-            setupSkins(expected_sample, expected_sample);
+            SetupSkins(expected_sample, expected_sample);
 
-            createTestWithBeatmap("hitobject-skin-sample.osu");
+            CreateTestWithBeatmap("hitobject-skin-sample.osu");
 
-            assertUserLookup(expected_sample);
+            AssertUserLookup(expected_sample);
         }
 
         /// <summary>
@@ -77,11 +39,11 @@ namespace osu.Game.Tests.Gameplay
         {
             const string expected_sample = "normal-hitnormal";
 
-            setupSkins(expected_sample, expected_sample);
+            SetupSkins(expected_sample, expected_sample);
 
-            createTestWithBeatmap("hitobject-beatmap-sample.osu");
+            CreateTestWithBeatmap("hitobject-beatmap-sample.osu");
 
-            assertBeatmapLookup(expected_sample);
+            AssertBeatmapLookup(expected_sample);
         }
 
         /// <summary>
@@ -92,43 +54,63 @@ namespace osu.Game.Tests.Gameplay
         {
             const string expected_sample = "normal-hitnormal";
 
-            setupSkins(null, expected_sample);
+            SetupSkins(null, expected_sample);
 
-            createTestWithBeatmap("hitobject-beatmap-sample.osu");
+            CreateTestWithBeatmap("hitobject-beatmap-sample.osu");
 
-            assertUserLookup(expected_sample);
+            AssertUserLookup(expected_sample);
         }
 
         /// <summary>
         /// Tests that a hitobject which provides a custom sample set of 2 retrieves the following samples from the beatmap skin:
         /// normal-hitnormal2
         /// normal-hitnormal
+        /// hitnormal
         /// </summary>
         [TestCase("normal-hitnormal2")]
         [TestCase("normal-hitnormal")]
+        [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromBeatmap(string expectedSample)
         {
-            setupSkins(expectedSample, expectedSample);
+            SetupSkins(expectedSample, expectedSample);
 
-            createTestWithBeatmap("hitobject-beatmap-custom-sample.osu");
+            CreateTestWithBeatmap("hitobject-beatmap-custom-sample.osu");
 
-            assertBeatmapLookup(expectedSample);
+            AssertBeatmapLookup(expectedSample);
         }
 
         /// <summary>
-        /// Tests that a hitobject which provides a custom sample set of 2 retrieves the following samples from the user skin when the beatmap does not contain the sample:
-        /// normal-hitnormal2
+        /// Tests that a hitobject which provides a custom sample set of 2 retrieves the following samples from the user skin
+        /// (ignoring the custom sample set index) when the beatmap skin does not contain the sample:
         /// normal-hitnormal
+        /// hitnormal
         /// </summary>
-        [TestCase("normal-hitnormal2")]
         [TestCase("normal-hitnormal")]
+        [TestCase("hitnormal")]
         public void TestDefaultCustomSampleFromUserSkinFallback(string expectedSample)
         {
-            setupSkins(string.Empty, expectedSample);
+            SetupSkins(string.Empty, expectedSample);
 
-            createTestWithBeatmap("hitobject-beatmap-custom-sample.osu");
+            CreateTestWithBeatmap("hitobject-beatmap-custom-sample.osu");
 
-            assertUserLookup(expectedSample);
+            AssertUserLookup(expectedSample);
+        }
+
+        /// <summary>
+        /// Tests that a hitobject which provides a custom sample set of 2 does not retrieve a normal-hitnormal2 sample from the user skin
+        /// if the beatmap skin does not contain the sample.
+        /// User skins in stable ignore the custom sample set index when performing lookups.
+        /// </summary>
+        [Test]
+        public void TestUserSkinLookupIgnoresSampleBank()
+        {
+            const string unwanted_sample = "normal-hitnormal2";
+
+            SetupSkins(string.Empty, unwanted_sample);
+
+            CreateTestWithBeatmap("hitobject-beatmap-custom-sample.osu");
+
+            AssertNoLookup(unwanted_sample);
         }
 
         /// <summary>
@@ -139,11 +121,11 @@ namespace osu.Game.Tests.Gameplay
         {
             const string expected_sample = "hit_1.wav";
 
-            setupSkins(expected_sample, expected_sample);
+            SetupSkins(expected_sample, expected_sample);
 
-            createTestWithBeatmap("file-beatmap-sample.osu");
+            CreateTestWithBeatmap("file-beatmap-sample.osu");
 
-            assertBeatmapLookup(expected_sample);
+            AssertBeatmapLookup(expected_sample);
         }
 
         /// <summary>
@@ -154,11 +136,11 @@ namespace osu.Game.Tests.Gameplay
         {
             const string expected_sample = "normal-hitnormal";
 
-            setupSkins(expected_sample, expected_sample);
+            SetupSkins(expected_sample, expected_sample);
 
-            createTestWithBeatmap("controlpoint-skin-sample.osu");
+            CreateTestWithBeatmap("controlpoint-skin-sample.osu");
 
-            assertUserLookup(expected_sample);
+            AssertUserLookup(expected_sample);
         }
 
         /// <summary>
@@ -169,11 +151,11 @@ namespace osu.Game.Tests.Gameplay
         {
             const string expected_sample = "normal-hitnormal";
 
-            setupSkins(expected_sample, expected_sample);
+            SetupSkins(expected_sample, expected_sample);
 
-            createTestWithBeatmap("controlpoint-beatmap-sample.osu");
+            CreateTestWithBeatmap("controlpoint-beatmap-sample.osu");
 
-            assertBeatmapLookup(expected_sample);
+            AssertBeatmapLookup(expected_sample);
         }
 
         /// <summary>
@@ -181,13 +163,14 @@ namespace osu.Game.Tests.Gameplay
         /// </summary>
         [TestCase("normal-hitnormal2")]
         [TestCase("normal-hitnormal")]
+        [TestCase("hitnormal")]
         public void TestControlPointCustomSampleFromBeatmap(string sampleName)
         {
-            setupSkins(sampleName, sampleName);
+            SetupSkins(sampleName, sampleName);
 
-            createTestWithBeatmap("controlpoint-beatmap-custom-sample.osu");
+            CreateTestWithBeatmap("controlpoint-beatmap-custom-sample.osu");
 
-            assertBeatmapLookup(sampleName);
+            AssertBeatmapLookup(sampleName);
         }
 
         /// <summary>
@@ -198,149 +181,70 @@ namespace osu.Game.Tests.Gameplay
         {
             const string expected_sample = "normal-hitnormal3";
 
-            setupSkins(expected_sample, expected_sample);
+            SetupSkins(expected_sample, expected_sample);
 
-            createTestWithBeatmap("hitobject-beatmap-custom-sample-override.osu");
+            CreateTestWithBeatmap("hitobject-beatmap-custom-sample-override.osu");
 
-            assertBeatmapLookup(expected_sample);
+            AssertBeatmapLookup(expected_sample);
         }
 
-        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => currentTestBeatmap;
-
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
-            => new TestWorkingBeatmap(beatmapInfo, beatmapSkinResourceStore, beatmap, storyboard, Clock, Audio);
-
-        private IBeatmap currentTestBeatmap;
-
-        private void createTestWithBeatmap(string filename)
+        /// <summary>
+        /// Tests that when a custom sample bank is used, both the normal and additional sounds will be looked up.
+        /// </summary>
+        [Test]
+        public void TestHitObjectCustomSampleBank()
         {
-            CreateTest(() =>
+            string[] expectedSamples =
             {
-                AddStep("clear performed lookups", () =>
-                {
-                    userSkinResourceStore.PerformedLookups.Clear();
-                    beatmapSkinResourceStore.PerformedLookups.Clear();
-                });
+                "normal-hitnormal2",
+                "normal-hitwhistle" // user skin lookups ignore custom sample set index
+            };
 
-                AddStep($"load {filename}", () =>
-                {
-                    using (var reader = new LineBufferedReader(TestResources.OpenResource($"SampleLookups/{filename}")))
-                        currentTestBeatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
-                });
-            });
+            SetupSkins(expectedSamples[0], expectedSamples[1]);
+
+            CreateTestWithBeatmap("hitobject-beatmap-custom-sample-bank.osu");
+
+            AssertBeatmapLookup(expectedSamples[0]);
+            AssertUserLookup(expectedSamples[1]);
         }
 
-        private void setupSkins(string beatmapFile, string userFile)
+        /// <summary>
+        /// Tests that when a custom sample bank is used, but <see cref="LegacySetting.LayeredHitSounds"/> is disabled,
+        /// only the additional sound will be looked up.
+        /// </summary>
+        [Test]
+        public void TestHitObjectCustomSampleBankWithoutLayered()
         {
-            AddStep("setup skins", () =>
-            {
-                userSkinInfo.Files = new List<SkinFileInfo>
-                {
-                    new SkinFileInfo
-                    {
-                        Filename = userFile,
-                        FileInfo = new IO.FileInfo { Hash = userFile }
-                    }
-                };
+            const string expected_sample = "normal-hitwhistle2";
+            const string unwanted_sample = "normal-hitnormal2";
 
-                beatmapInfo.BeatmapSet.Files = new List<BeatmapSetFileInfo>
-                {
-                    new BeatmapSetFileInfo
-                    {
-                        Filename = beatmapFile,
-                        FileInfo = new IO.FileInfo { Hash = beatmapFile }
-                    }
-                };
+            SetupSkins(expected_sample, unwanted_sample);
+            disableLayeredHitSounds();
 
-                // Need to refresh the cached skin source to refresh the skin resource store.
-                dependencies.SkinSource = new SkinProvidingContainer(new LegacySkin(userSkinInfo, userSkinResourceStore, Audio));
-            });
+            CreateTestWithBeatmap("hitobject-beatmap-custom-sample-bank.osu");
+
+            AssertBeatmapLookup(expected_sample);
+            AssertNoLookup(unwanted_sample);
         }
 
-        private void assertBeatmapLookup(string name) => AddAssert($"\"{name}\" looked up from beatmap skin",
-            () => !userSkinResourceStore.PerformedLookups.Contains(name) && beatmapSkinResourceStore.PerformedLookups.Contains(name));
-
-        private void assertUserLookup(string name) => AddAssert($"\"{name}\" looked up from user skin",
-            () => !beatmapSkinResourceStore.PerformedLookups.Contains(name) && userSkinResourceStore.PerformedLookups.Contains(name));
-
-        private class SkinSourceDependencyContainer : IReadOnlyDependencyContainer
+        /// <summary>
+        /// Tests that when a normal sample bank is used and <see cref="LegacySetting.LayeredHitSounds"/> is disabled,
+        /// the normal sound will be looked up anyway.
+        /// </summary>
+        [Test]
+        public void TestHitObjectNormalSampleBankWithoutLayered()
         {
-            public ISkinSource SkinSource;
+            const string expected_sample = "normal-hitnormal";
 
-            private readonly IReadOnlyDependencyContainer fallback;
+            SetupSkins(expected_sample, expected_sample);
+            disableLayeredHitSounds();
 
-            public SkinSourceDependencyContainer(IReadOnlyDependencyContainer fallback)
-            {
-                this.fallback = fallback;
-            }
+            CreateTestWithBeatmap("hitobject-beatmap-sample.osu");
 
-            public object Get(Type type)
-            {
-                if (type == typeof(ISkinSource))
-                    return SkinSource;
-
-                return fallback.Get(type);
-            }
-
-            public object Get(Type type, CacheInfo info)
-            {
-                if (type == typeof(ISkinSource))
-                    return SkinSource;
-
-                return fallback.Get(type, info);
-            }
-
-            public void Inject<T>(T instance) where T : class
-            {
-                // Never used directly
-            }
+            AssertBeatmapLookup(expected_sample);
         }
 
-        private class TestResourceStore : IResourceStore<byte[]>
-        {
-            public readonly List<string> PerformedLookups = new List<string>();
-
-            public byte[] Get(string name)
-            {
-                markLookup(name);
-                return Array.Empty<byte>();
-            }
-
-            public Task<byte[]> GetAsync(string name)
-            {
-                markLookup(name);
-                return Task.FromResult(Array.Empty<byte>());
-            }
-
-            public Stream GetStream(string name)
-            {
-                markLookup(name);
-                return new MemoryStream();
-            }
-
-            private void markLookup(string name) => PerformedLookups.Add(name.Substring(name.LastIndexOf(Path.DirectorySeparatorChar) + 1));
-
-            public IEnumerable<string> GetAvailableResources() => Enumerable.Empty<string>();
-
-            public void Dispose()
-            {
-            }
-        }
-
-        private class TestWorkingBeatmap : ClockBackedTestWorkingBeatmap
-        {
-            private readonly BeatmapInfo skinBeatmapInfo;
-            private readonly IResourceStore<byte[]> resourceStore;
-
-            public TestWorkingBeatmap(BeatmapInfo skinBeatmapInfo, IResourceStore<byte[]> resourceStore, IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio,
-                                      double length = 60000)
-                : base(beatmap, storyboard, referenceClock, audio, length)
-            {
-                this.skinBeatmapInfo = skinBeatmapInfo;
-                this.resourceStore = resourceStore;
-            }
-
-            protected override ISkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, resourceStore, AudioManager);
-        }
+        private void disableLayeredHitSounds()
+            => AddStep("set LayeredHitSounds to false", () => Skin.Configuration.ConfigDictionary[LegacySetting.LayeredHitSounds.ToString()] = "0");
     }
 }
