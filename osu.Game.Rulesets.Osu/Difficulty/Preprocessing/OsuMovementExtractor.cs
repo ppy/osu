@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <param name="lastObject">Hit object immediately preceding <paramref name="currentObject"/>.</param>
         /// <param name="currentObject">The hit object being currently considered.</param>
         /// <param name="nextObject">Hit object immediately succeeding <paramref name="currentObject"/>.</param>
-        /// <param name="tapStrain">The tap strain of the current object.</param> TODO: does this have to be passed down?
+        /// <param name="tapStrain">The tap strain of the current object.</param> TODO: does this have to be passed down? maybe store in the object?
         /// <param name="noteDensity">The visual note density of the current object.</param> TODO: above
         /// <param name="gameplayRate">The current rate of the gameplay clock.</param>
         /// <param name="hidden">Whether the hidden mod is active.</param>
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             OsuHitObject lastObject,
             OsuHitObject currentObject,
             [CanBeNull] OsuHitObject nextObject,
-            Vector<double> tapStrain,
+            double tapStrain,
             double gameplayRate,
             bool hidden = false,
             double noteDensity = 0,
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// <summary>
         /// Distance is main measure of difficulty in Fitt's Law so we correct it when we need to adjust difficulty of certain aspects/patterns.
         /// </summary>
-        private static double correctMovementDistance(MovementExtractionParameters parameters, double movementThroughput, Vector<double> tapStrain, bool hidden, double noteDensity)
+        private static double correctMovementDistance(MovementExtractionParameters parameters, double movementThroughput, double tapStrain, bool hidden, double noteDensity)
         {
             double previousObjectPlacementCorrection = calculatePreviousObjectPlacementCorrection(parameters);
             double nextObjectPlacementCorrection = calculateNextObjectPlacementCorrection(parameters);
@@ -255,12 +255,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// Correction #4 - Tap Strain
         /// This buffs current object's aim difficulty rating by tap difficulty when distance is bigger than 0.
         /// </summary>
-        private static double calculateTapStrainBuff(Vector<double> tapStrain, OsuObjectPair lastToCurrent, double movementThroughput)
+        private static double calculateTapStrainBuff(double tapStrain, OsuObjectPair lastToCurrent, double movementThroughput)
         {
-            if (!(lastToCurrent.RelativeLength > 0) || tapStrain == null)
+            if (!(lastToCurrent.RelativeLength > 0))
                 return 1.0;
 
-            var tapBonus = SpecialFunctions.Logistic((PowerMean.Of(tapStrain, 2) / movementThroughput - 1.34) / 0.1);
+            var tapBonus = SpecialFunctions.Logistic((tapStrain / movementThroughput - 1.34) / 0.1);
 
             return 1.0 + tapBonus * 0.15;
         }

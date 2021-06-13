@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 TapDifficulty = tapDiff,
                 StreamNoteCount = streamNoteCount,
                 MashedTapDifficulty = mashTapDiff,
-                StrainHistory = strainHistory
+                StrainHistory = strainHistory.Select(x=> PowerMean.Of(x, 2.0)).ToArray()
             };
         }
 

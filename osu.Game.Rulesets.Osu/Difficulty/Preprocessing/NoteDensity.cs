@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         /// <param name="hitObjects">The list of hitobjects in the map</param>
         /// <param name="preempt">The preemption window to use when calculating density of neighbouring notes.</param>
-        public static List<double> Calculate(List<OsuHitObject> hitObjects, double preempt)
+        public static double[] Calculate(List<OsuHitObject> hitObjects, double preempt)
         {
             List<double> noteDensities = new List<double>();
 
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 noteDensities.Add(calculateNoteDensity(hitObjects[i].StartTime, preempt, window));
             }
 
-            return noteDensities;
+            return noteDensities.ToArray();
         }
 
         private static double calculateNoteDensity(double time, double preempt, Queue<OsuHitObject> window)

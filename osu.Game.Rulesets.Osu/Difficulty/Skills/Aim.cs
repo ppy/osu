@@ -64,8 +64,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         public static AimAttributes CalculateAimAttributes(List<OsuHitObject> hitObjects,
                                                            double clockRate,
-                                                           List<Vector<double>> strainHistory,
-                                                           List<double> noteDensities)
+                                                           double[] strainHistory,
+                                                           double[] noteDensities)
         {
             List<OsuMovement> movements = createMovements(hitObjects, clockRate, strainHistory);
             List<OsuMovement> movementsHidden = createMovements(hitObjects, clockRate, strainHistory,
@@ -128,8 +128,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <param name="clockRate">Clock rate</param>
         /// <param name="hidden">Are we calculating hidden mod?</param>
         /// <returns>List of all movements</returns>
-        private static List<OsuMovement> createMovements(List<OsuHitObject> hitObjects, double clockRate, List<Vector<double>> strainHistory,
-                                                         bool hidden = false, List<double> noteDensities = null)
+        private static List<OsuMovement> createMovements(List<OsuHitObject> hitObjects, double clockRate, double[] strainHistory,
+                                                         bool hidden = false, double[] noteDensities = null)
         {
             var movements = new List<OsuMovement>();
 
