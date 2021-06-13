@@ -7,19 +7,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyAttributes : DifficultyAttributes
     {
-        public double TapSr { get; set; }
-        public double TapDiff { get; set; }
+        public double TapStarRating { get; set; }
+        public double TapDifficulty { get; set; }
         public double StreamNoteCount { get; set; }
-        public double MashTapDiff { get; set; }
+        public double MashTapDifficulty { get; set; }
 
-        public double FingerControlSr { get; set; }
-        public double FingerControlDiff { get; set; }
+        public double FingerControlStarRating { get; set; }
+        public double FingerControlDifficulty { get; set; }
 
-        public double AimSr { get; set; }
-        public double AimDiff { get; set; }
+        public double AimStarRating { get; set; }
+        public double AimDifficulty { get; set; }
         public double AimHiddenFactor { get; set; }
-        public double[] ComboTps { get; set; }
-        public double[] MissTps { get; set; }
+        public double[] ComboThroughputs { get; set; }
+        public double[] MissThroughputs { get; set; }
         public double[] MissCounts { get; set; }
         public double CheeseNoteCount { get; set; }
         public double[] CheeseLevels { get; set; }

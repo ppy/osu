@@ -120,15 +120,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0;
 
             // Get player's throughput according to combo
-            int comboTpCount = Attributes.ComboTps.Length;
+            int comboTpCount = Attributes.ComboThroughputs.Length;
             var comboPercentages = Generate.LinearSpaced(comboTpCount, 1.0 / comboTpCount, 1);
 
             double scoreComboPercentage = ((double)scoreMaxCombo) / Attributes.MaxCombo;
-            double comboTp = LinearSpline.InterpolateSorted(comboPercentages, Attributes.ComboTps)
+            double comboTp = LinearSpline.InterpolateSorted(comboPercentages, Attributes.ComboThroughputs)
                                          .Interpolate(scoreComboPercentage);
 
             // Get player's throughput according to miss count
-            double missTp = LinearSpline.InterpolateSorted(Attributes.MissCounts, Attributes.MissTps)
+            double missTp = LinearSpline.InterpolateSorted(Attributes.MissCounts, Attributes.MissThroughputs)
                                         .Interpolate(effectiveMissCount);
             missTp = Math.Max(missTp, 0);
 
@@ -157,7 +157,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // preserving the value when accOnCheeseNotes is close to 1
             double accOnCheeseNotesPositive = Math.Exp(accOnCheeseNotes - 1);
             double urOnCheeseNotes = 10 * greatWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCheeseNotesPositive));
-            double cheeseLevel = SpecialFunctions.Logistic(((urOnCheeseNotes * Attributes.AimDiff) - 3200) / 2000);
+            double cheeseLevel = SpecialFunctions.Logistic(((urOnCheeseNotes * Attributes.AimDifficulty) - 3200) / 2000);
             double cheeseFactor = LinearSpline.InterpolateSorted(Attributes.CheeseLevels, Attributes.CheeseFactors)
                                               .Interpolate(cheeseLevel);
 
@@ -196,7 +196,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             // Scale the aim value down with accuracy
-            double accLeniency = greatWindow * Attributes.AimDiff / 300;
+            double accLeniency = greatWindow * Attributes.AimDifficulty / 300;
             double accPenalty = (0.09 / (accuracy - 1.3) + 0.3) * (accLeniency + 1.5);
             aimValue *= 0.2 + SpecialFunctions.Logistic(-((accPenalty - 0.24953) / 0.18));
 
@@ -219,9 +219,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double urOnStreams = 10 * greatWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnStreamsPositive));
 
-            double mashLevel = SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 4000) / 1000);
+            double mashLevel = SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDifficulty) - 4000) / 1000);
 
-            double tapSkill = mashLevel * Attributes.MashTapDiff + (1 - mashLevel) * Attributes.TapDiff;
+            double tapSkill = mashLevel * Attributes.MashTapDifficulty + (1 - mashLevel) * Attributes.TapDifficulty;
 
             double tapValue = tapSkillToPP(tapSkill);
 
@@ -251,7 +251,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAccuracyValue()
         {
-            double fingerControlDiff = Attributes.FingerControlDiff;
+            double fingerControlDiff = Attributes.FingerControlDifficulty;
 
             double modifiedAcc = getModifiedAcc();
 

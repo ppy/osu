@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private const double tap_multiplier = 0.641;
         private const double finger_control_multiplier = 1.245;
 
-        private const double sr_exponent = 0.83;
+        private const double star_rating_exponent = 0.83;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -52,10 +52,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Aim
             var aimAttributes = Aim.CalculateAimAttributes(hitObjects, clockRate, tapAttributes.StrainHistory, noteDensities);
 
-            double tapSr = tap_multiplier * Math.Pow(tapAttributes.TapDifficulty, sr_exponent);
-            double aimSr = aim_multiplier * Math.Pow(aimAttributes.FcProbabilityThroughput, sr_exponent);
-            double fingerControlSr = finger_control_multiplier * Math.Pow(fingerControlDiff, sr_exponent);
-            double sr = PowerMean.Of(new[] { tapSr, aimSr, fingerControlSr }, 7) * 1.131;
+            double tapStarRating = tap_multiplier * Math.Pow(tapAttributes.TapDifficulty, star_rating_exponent);
+            double aimStarRating = aim_multiplier * Math.Pow(aimAttributes.FcProbabilityThroughput, star_rating_exponent);
+            double fingerControlStarRating = finger_control_multiplier * Math.Pow(fingerControlDiff, star_rating_exponent);
+            double combinedStarRating = PowerMean.Of(new[] { tapStarRating, aimStarRating, fingerControlStarRating }, 7) * 1.131;
 
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
@@ -74,23 +74,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             return new OsuDifficultyAttributes
             {
-                StarRating = sr,
+                StarRating = combinedStarRating,
                 Mods = mods,
                 Length = mapLength,
 
-                TapSr = tapSr,
-                TapDiff = tapAttributes.TapDifficulty,
+                TapStarRating = tapStarRating,
+                TapDifficulty = tapAttributes.TapDifficulty,
                 StreamNoteCount = tapAttributes.StreamNoteCount,
-                MashTapDiff = tapAttributes.MashedTapDifficulty,
+                MashTapDifficulty = tapAttributes.MashedTapDifficulty,
 
-                FingerControlSr = fingerControlSr,
-                FingerControlDiff = fingerControlDiff,
+                FingerControlStarRating = fingerControlStarRating,
+                FingerControlDifficulty = fingerControlDiff,
 
-                AimSr = aimSr,
-                AimDiff = aimAttributes.FcProbabilityThroughput,
+                AimStarRating = aimStarRating,
+                AimDifficulty = aimAttributes.FcProbabilityThroughput,
                 AimHiddenFactor = aimAttributes.HiddenFactor,
-                ComboTps = aimAttributes.ComboThroughputs,
-                MissTps = aimAttributes.MissThroughputs,
+                ComboThroughputs = aimAttributes.ComboThroughputs,
+                MissThroughputs = aimAttributes.MissThroughputs,
                 MissCounts = aimAttributes.MissCounts,
                 CheeseNoteCount = aimAttributes.CheeseNoteCount,
                 CheeseLevels = aimAttributes.CheeseLevels,
@@ -102,8 +102,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 TotalObjectCount = beatmap.HitObjects.Count,
                 HitCircleCount = hitCirclesCount,
                 SliderCount = sliderCount,
-                SpinnerCount = spinnerCount,
-                //Skills = skills
+                SpinnerCount = spinnerCount
             };
         }
 
@@ -112,11 +111,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             throw new NotImplementedException();
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            //new Aim(mods),
-            //new Speed(mods)
-        };
+            throw new NotImplementedException();
+        }
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
