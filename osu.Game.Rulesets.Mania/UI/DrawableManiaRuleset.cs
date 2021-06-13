@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -11,18 +12,19 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -47,6 +49,22 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override bool RelativeScaleBeatLengths => true;
 
         protected new ManiaRulesetConfigManager Config => (ManiaRulesetConfigManager)base.Config;
+
+        public ScrollVisualisationMethod ScrollMethod
+        {
+            get => scrollMethod;
+            set
+            {
+                if (IsLoaded)
+                    throw new InvalidOperationException($"Can't alter {nameof(ScrollMethod)} after ruleset is already loaded");
+
+                scrollMethod = value;
+            }
+        }
+
+        private ScrollVisualisationMethod scrollMethod = ScrollVisualisationMethod.Sequential;
+
+        protected override ScrollVisualisationMethod VisualisationMethod => scrollMethod;
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
         private readonly Bindable<double> configTimeRange = new BindableDouble();
@@ -115,23 +133,10 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
 
-        public override DrawableHitObject<ManiaHitObject> CreateDrawableRepresentation(ManiaHitObject h)
-        {
-            switch (h)
-            {
-                case HoldNote holdNote:
-                    return new DrawableHoldNote(holdNote);
-
-                case Note note:
-                    return new DrawableNote(note);
-
-                default:
-                    return null;
-            }
-        }
+        public override DrawableHitObject<ManiaHitObject> CreateDrawableRepresentation(ManiaHitObject h) => null;
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
 
-        protected override ReplayRecorder CreateReplayRecorder(Replay replay) => new ManiaReplayRecorder(replay);
+        protected override ReplayRecorder CreateReplayRecorder(Score score) => new ManiaReplayRecorder(score);
     }
 }

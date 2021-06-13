@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         private Container content;
 
         public PreviewTrack Preview => PlayButton.Preview;
-        public Bindable<bool> PreviewPlaying => PlayButton?.Playing;
+        public IBindable<bool> PreviewPlaying => PlayButton?.Playing;
 
         protected abstract PlayButton PlayButton { get; }
         protected abstract Box PreviewBar { get; }
@@ -152,7 +152,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             }
             else
             {
-                foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
+                foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.Ruleset.ID).ThenBy(beatmap => beatmap.StarDifficulty))
                     icons.Add(new DifficultyIcon(b));
             }
 

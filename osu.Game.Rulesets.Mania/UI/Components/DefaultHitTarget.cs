@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK.Graphics;
 

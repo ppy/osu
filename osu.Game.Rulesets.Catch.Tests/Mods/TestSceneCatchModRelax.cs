@@ -38,17 +38,17 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                     new Fruit
                     {
                         X = 0,
-                        StartTime = 250
+                        StartTime = 1000
                     },
                     new Fruit
                     {
                         X = CatchPlayfield.WIDTH,
-                        StartTime = 500
+                        StartTime = 2000
                     },
                     new JuiceStream
                     {
                         X = CatchPlayfield.CENTER_X,
-                        StartTime = 750,
+                        StartTime = 3000,
                         Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, Vector2.UnitY * 200 })
                     }
                 }

@@ -13,6 +13,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Skinning;
+using osu.Game.Rulesets.Catch.Skinning.Legacy;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
@@ -117,7 +118,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             AddStep("create hyper-dashing catcher", () =>
             {
-                Child = setupSkinHierarchy(catcherArea = new CatcherArea
+                Child = setupSkinHierarchy(catcherArea = new CatcherArea(new Container<CaughtObject>())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

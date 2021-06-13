@@ -121,7 +121,9 @@ namespace osu.Game.Tests.Gameplay
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
 
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
+            public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
+
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
             {

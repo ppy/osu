@@ -25,8 +25,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler changeHandler { get; set; }
+
         [Resolved]
         private OsuColour colours { get; set; }
+
+        private static readonly int highest_divisor = BindableBeatDivisor.VALID_DIVISORS.Last();
 
         public TimelineTickDisplay()
         {
@@ -38,7 +43,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [BackgroundDependencyLoader]
         private void load()
         {
-            beatDivisor.BindValueChanged(_ => tickCache.Invalidate());
+            beatDivisor.BindValueChanged(_ => invalidateTicks());
+
+            if (changeHandler != null)
+                // currently this is the best way to handle any kind of timing changes.
+                changeHandler.OnStateChange += invalidateTicks;
+        }
+
+        private void invalidateTicks()
+        {
+            tickCache.Invalidate();
         }
 
         /// <summary>
@@ -66,8 +80,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (timeline != null)
             {
                 var newRange = (
-                    (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopLeft).X - PointVisualisation.WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X,
-                    (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopRight).X + PointVisualisation.WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X);
+                    (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopLeft).X - PointVisualisation.MAX_WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X,
+                    (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopRight).X + PointVisualisation.MAX_WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X);
 
                 if (visibleRange != newRange)
                 {
@@ -86,7 +100,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private void createTicks()
         {
             int drawableIndex = 0;
-            int highestDivisor = BindableBeatDivisor.VALID_DIVISORS.Last();
 
             nextMinTick = null;
             nextMaxTick = null;
@@ -112,27 +125,18 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         if (beat == 0 && i == 0)
                             nextMinTick = float.MinValue;
 
-                        var indexInBar = beat % ((int)point.TimeSignature * beatDivisor.Value);
+                        int indexInBar = beat % ((int)point.TimeSignature * beatDivisor.Value);
 
                         var divisor = BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value);
                         var colour = BindableBeatDivisor.GetColourFor(divisor, colours);
 
                         // even though "bar lines" take up the full vertical space, we render them in two pieces because it allows for less anchor/origin churn.
-                        var height = indexInBar == 0 ? 0.5f : 0.1f - (float)divisor / highestDivisor * 0.08f;
 
-                        var topPoint = getNextUsablePoint();
-                        topPoint.X = xPos;
-                        topPoint.Colour = colour;
-                        topPoint.Height = height;
-                        topPoint.Anchor = Anchor.TopLeft;
-                        topPoint.Origin = Anchor.TopCentre;
-
-                        var bottomPoint = getNextUsablePoint();
-                        bottomPoint.X = xPos;
-                        bottomPoint.Colour = colour;
-                        bottomPoint.Anchor = Anchor.BottomLeft;
-                        bottomPoint.Origin = Anchor.BottomCentre;
-                        bottomPoint.Height = height;
+                        var line = getNextUsableLine();
+                        line.X = xPos;
+                        line.Width = PointVisualisation.MAX_WIDTH * getWidth(indexInBar, divisor);
+                        line.Height = 0.9f * getHeight(indexInBar, divisor);
+                        line.Colour = colour;
                     }
 
                     beat++;
@@ -151,7 +155,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             tickCache.Validate();
 
-            Drawable getNextUsablePoint()
+            Drawable getNextUsableLine()
             {
                 PointVisualisation point;
                 if (drawableIndex >= Count)
@@ -164,6 +168,62 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 return point;
             }
+        }
+
+        private static float getWidth(int indexInBar, int divisor)
+        {
+            if (indexInBar == 0)
+                return 1;
+
+            switch (divisor)
+            {
+                case 1:
+                case 2:
+                    return 0.6f;
+
+                case 3:
+                case 4:
+                    return 0.5f;
+
+                case 6:
+                case 8:
+                    return 0.4f;
+
+                default:
+                    return 0.3f;
+            }
+        }
+
+        private static float getHeight(int indexInBar, int divisor)
+        {
+            if (indexInBar == 0)
+                return 1;
+
+            switch (divisor)
+            {
+                case 1:
+                case 2:
+                    return 0.9f;
+
+                case 3:
+                case 4:
+                    return 0.8f;
+
+                case 6:
+                case 8:
+                    return 0.7f;
+
+                default:
+                    return 0.6f;
+            }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (changeHandler != null)
+                changeHandler.OnStateChange -= invalidateTicks;
         }
     }
 }

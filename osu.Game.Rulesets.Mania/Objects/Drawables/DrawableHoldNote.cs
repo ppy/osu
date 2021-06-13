@@ -2,16 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -29,21 +31,21 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public DrawableHoldNoteHead Head => headContainer.Child;
         public DrawableHoldNoteTail Tail => tailContainer.Child;
 
-        private readonly Container<DrawableHoldNoteHead> headContainer;
-        private readonly Container<DrawableHoldNoteTail> tailContainer;
-        private readonly Container<DrawableHoldNoteTick> tickContainer;
+        private Container<DrawableHoldNoteHead> headContainer;
+        private Container<DrawableHoldNoteTail> tailContainer;
+        private Container<DrawableHoldNoteTick> tickContainer;
 
         /// <summary>
         /// Contains the size of the hold note covering the whole head/tail bounds. The size of this container changes as the hold note is being pressed.
         /// </summary>
-        private readonly Container sizingContainer;
+        private Container sizingContainer;
 
         /// <summary>
         /// Contains the contents of the hold note that should be masked as the hold note is being pressed. Follows changes in the size of <see cref="sizingContainer"/>.
         /// </summary>
-        private readonly Container maskingContainer;
+        private Container maskingContainer;
 
-        private readonly SkinnableDrawable bodyPiece;
+        private SkinnableDrawable bodyPiece;
 
         /// <summary>
         /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
@@ -51,20 +53,28 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public double? HoldStartTime { get; private set; }
 
         /// <summary>
-        /// Whether the hold note has been released too early and shouldn't give full score for the release.
+        /// Time at which the hold note has been broken, i.e. released too early, resulting in a reduced score.
         /// </summary>
-        public bool HasBroken { get; private set; }
+        public double? HoldBrokenTime { get; private set; }
 
         /// <summary>
         /// Whether the hold note has been released potentially without having caused a break.
         /// </summary>
         private double? releaseTime;
 
+        public DrawableHoldNote()
+            : this(null)
+        {
+        }
+
         public DrawableHoldNote(HoldNote hitObject)
             : base(hitObject)
         {
-            RelativeSizeAxes = Axes.X;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             Container maskedContents;
 
             AddRangeInternal(new Drawable[]
@@ -86,7 +96,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                         headContainer = new Container<DrawableHoldNoteHead> { RelativeSizeAxes = Axes.Both }
                     }
                 },
-                bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody, hitObject.Column), _ => new DefaultBodyPiece
+                bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody), _ => new DefaultBodyPiece
                 {
                     RelativeSizeAxes = Axes.Both,
                 })
@@ -103,6 +113,16 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 tickContainer.CreateProxy(),
                 tailContainer.CreateProxy(),
             });
+        }
+
+        protected override void OnApply()
+        {
+            base.OnApply();
+
+            sizingContainer.Size = Vector2.One;
+            HoldStartTime = null;
+            HoldBrokenTime = null;
+            releaseTime = null;
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -128,37 +148,23 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected override void ClearNestedHitObjects()
         {
             base.ClearNestedHitObjects();
-            headContainer.Clear();
-            tailContainer.Clear();
-            tickContainer.Clear();
+            headContainer.Clear(false);
+            tailContainer.Clear(false);
+            tickContainer.Clear(false);
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
         {
             switch (hitObject)
             {
-                case TailNote _:
-                    return new DrawableHoldNoteTail(this)
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        AccentColour = { BindTarget = AccentColour }
-                    };
+                case TailNote tail:
+                    return new DrawableHoldNoteTail(tail);
 
-                case Note _:
-                    return new DrawableHoldNoteHead(this)
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        AccentColour = { BindTarget = AccentColour }
-                    };
+                case HeadNote head:
+                    return new DrawableHoldNoteHead(head);
 
                 case HoldNoteTick tick:
-                    return new DrawableHoldNoteTick(tick)
-                    {
-                        HoldStartTime = () => HoldStartTime,
-                        AccentColour = { BindTarget = AccentColour }
-                    };
+                    return new DrawableHoldNoteTick(tick);
             }
 
             return base.CreateNestedHitObject(hitObject);
@@ -221,7 +227,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // As the note is being held, adjust the size of the sizing container. This has two effects:
             // 1. The contained masking container will mask the body and ticks.
             // 2. The head note will move along with the new "head position" in the container.
-            if (Head.IsHit && releaseTime == null)
+            if (Head.IsHit && releaseTime == null && DrawHeight > 0)
             {
                 // How far past the hit target this hold note is. Always a positive value.
                 float yOffset = Math.Max(0, Direction.Value == ScrollingDirection.Up ? -Y : Y);
@@ -233,12 +239,18 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             if (Tail.AllJudged)
             {
+                foreach (var tick in tickContainer)
+                {
+                    if (!tick.Judged)
+                        tick.MissForcefully();
+                }
+
                 ApplyResult(r => r.Type = r.Judgement.MaxResult);
                 endHold();
             }
 
             if (Tail.Judged && !Tail.IsHit)
-                HasBroken = true;
+                HoldBrokenTime = Time.Current;
         }
 
         public bool OnPressed(ManiaAction action)
@@ -247,6 +259,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 return false;
 
             if (action != Action.Value)
+                return false;
+
+            // do not run any of this logic when rewinding, as it inverts order of presses/releases.
+            if (Time.Elapsed < 0)
                 return false;
 
             if (CheckHittable?.Invoke(this, Time.Current) == false)
@@ -281,6 +297,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (action != Action.Value)
                 return;
 
+            // do not run any of this logic when rewinding, as it inverts order of presses/releases.
+            if (Time.Elapsed < 0)
+                return;
+
             // Make sure a hold was started
             if (HoldStartTime == null)
                 return;
@@ -290,7 +310,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             // If the key has been released too early, the user should not receive full score for the release
             if (!Tail.IsHit)
-                HasBroken = true;
+                HoldBrokenTime = Time.Current;
 
             releaseTime = Time.Current;
         }

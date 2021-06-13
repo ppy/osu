@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -8,78 +9,52 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class UpdateableBeatmapSetCover : Container
+    public class UpdateableBeatmapSetCover : ModelBackedDrawable<BeatmapSetInfo>
     {
-        private Drawable displayedCover;
-
-        private BeatmapSetInfo beatmapSet;
+        private readonly BeatmapSetCoverType coverType;
 
         public BeatmapSetInfo BeatmapSet
         {
-            get => beatmapSet;
-            set
-            {
-                if (value == beatmapSet) return;
-
-                beatmapSet = value;
-
-                if (IsLoaded)
-                    updateCover();
-            }
+            get => Model;
+            set => Model = value;
         }
 
-        private BeatmapSetCoverType coverType = BeatmapSetCoverType.Cover;
-
-        public BeatmapSetCoverType CoverType
+        public new bool Masking
         {
-            get => coverType;
-            set
-            {
-                if (value == coverType) return;
-
-                coverType = value;
-
-                if (IsLoaded)
-                    updateCover();
-            }
+            get => base.Masking;
+            set => base.Masking = value;
         }
 
-        public UpdateableBeatmapSetCover()
+        public UpdateableBeatmapSetCover(BeatmapSetCoverType coverType = BeatmapSetCoverType.Cover)
         {
-            Child = new Box
+            this.coverType = coverType;
+
+            InternalChild = new Box
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = OsuColour.Gray(0.2f),
             };
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            updateCover();
-        }
+        protected override double LoadDelay => 500;
 
-        private void updateCover()
-        {
-            displayedCover?.FadeOut(400);
-            displayedCover?.Expire();
-            displayedCover = null;
+        protected override double TransformDuration => 400;
 
-            if (beatmapSet != null)
+        protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
+            => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad);
+
+        protected override Drawable CreateDrawable(BeatmapSetInfo model)
+        {
+            if (model == null)
+                return null;
+
+            return new BeatmapSetCover(model, coverType)
             {
-                Add(displayedCover = new DelayedLoadUnloadWrapper(() =>
-                {
-                    var cover = new BeatmapSetCover(beatmapSet, coverType)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        FillMode = FillMode.Fill,
-                    };
-                    cover.OnLoadComplete += d => d.FadeInFromZero(400, Easing.Out);
-                    return cover;
-                }));
-            }
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                FillMode = FillMode.Fill,
+            };
         }
     }
 }

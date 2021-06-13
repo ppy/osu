@@ -3,13 +3,20 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Extensions;
+using osu.Game.IO;
 
 namespace osu.Game.Skinning
 {
     public class SkinInfo : IHasFiles<SkinFileInfo>, IEquatable<SkinInfo>, IHasPrimaryKey, ISoftDelete
     {
+        internal const int DEFAULT_SKIN = 0;
+        internal const int CLASSIC_SKIN = -1;
+        internal const int RANDOM_SKIN = -2;
+
         public int ID { get; set; }
 
         public string Name { get; set; }
@@ -18,7 +25,19 @@ namespace osu.Game.Skinning
 
         public string Creator { get; set; }
 
-        public List<SkinFileInfo> Files { get; set; }
+        public string InstantiationInfo { get; set; }
+
+        public virtual Skin CreateInstance(IStorageResourceProvider resources)
+        {
+            var type = string.IsNullOrEmpty(InstantiationInfo)
+                // handle the case of skins imported before InstantiationInfo was added.
+                ? typeof(LegacySkin)
+                : Type.GetType(InstantiationInfo).AsNonNull();
+
+            return (Skin)Activator.CreateInstance(type, this, resources);
+        }
+
+        public List<SkinFileInfo> Files { get; set; } = new List<SkinFileInfo>();
 
         public List<DatabasedSetting> Settings { get; set; }
 
@@ -26,8 +45,10 @@ namespace osu.Game.Skinning
 
         public static SkinInfo Default { get; } = new SkinInfo
         {
+            ID = DEFAULT_SKIN,
             Name = "osu!lazer",
-            Creator = "team osu!"
+            Creator = "team osu!",
+            InstantiationInfo = typeof(DefaultSkin).GetInvariantInstantiationInfo()
         };
 
         public bool Equals(SkinInfo other) => other != null && ID == other.ID;

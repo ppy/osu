@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Judgements;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects;
 using osuTK;
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            SetContents(() =>
+            SetContents(_ =>
             {
                 var pool = new DrawablePool<PoolableHitExplosion>(5);
                 hitExplosionPools.Add(pool);

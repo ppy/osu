@@ -217,7 +217,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             private void performLogin()
             {
                 if (!string.IsNullOrEmpty(username.Text) && !string.IsNullOrEmpty(password.Text))
-                    api.Login(username.Text, password.Text);
+                    api?.Login(username.Text, password.Text);
                 else
                     shakeSignIn.Shake();
             }

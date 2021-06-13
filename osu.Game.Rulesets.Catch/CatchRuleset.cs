@@ -21,7 +21,8 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using System;
-using osu.Game.Rulesets.Catch.Skinning;
+using osu.Framework.Extensions.EnumExtensions;
+using osu.Game.Rulesets.Catch.Skinning.Legacy;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch
@@ -50,40 +51,40 @@ namespace osu.Game.Rulesets.Catch
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
-            if (mods.HasFlag(LegacyMods.Nightcore))
+            if (mods.HasFlagFast(LegacyMods.Nightcore))
                 yield return new CatchModNightcore();
-            else if (mods.HasFlag(LegacyMods.DoubleTime))
+            else if (mods.HasFlagFast(LegacyMods.DoubleTime))
                 yield return new CatchModDoubleTime();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
+            if (mods.HasFlagFast(LegacyMods.Perfect))
                 yield return new CatchModPerfect();
-            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+            else if (mods.HasFlagFast(LegacyMods.SuddenDeath))
                 yield return new CatchModSuddenDeath();
 
-            if (mods.HasFlag(LegacyMods.Cinema))
+            if (mods.HasFlagFast(LegacyMods.Cinema))
                 yield return new CatchModCinema();
-            else if (mods.HasFlag(LegacyMods.Autoplay))
+            else if (mods.HasFlagFast(LegacyMods.Autoplay))
                 yield return new CatchModAutoplay();
 
-            if (mods.HasFlag(LegacyMods.Easy))
+            if (mods.HasFlagFast(LegacyMods.Easy))
                 yield return new CatchModEasy();
 
-            if (mods.HasFlag(LegacyMods.Flashlight))
+            if (mods.HasFlagFast(LegacyMods.Flashlight))
                 yield return new CatchModFlashlight();
 
-            if (mods.HasFlag(LegacyMods.HalfTime))
+            if (mods.HasFlagFast(LegacyMods.HalfTime))
                 yield return new CatchModHalfTime();
 
-            if (mods.HasFlag(LegacyMods.HardRock))
+            if (mods.HasFlagFast(LegacyMods.HardRock))
                 yield return new CatchModHardRock();
 
-            if (mods.HasFlag(LegacyMods.Hidden))
+            if (mods.HasFlagFast(LegacyMods.Hidden))
                 yield return new CatchModHidden();
 
-            if (mods.HasFlag(LegacyMods.NoFail))
+            if (mods.HasFlagFast(LegacyMods.NoFail))
                 yield return new CatchModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Relax))
+            if (mods.HasFlagFast(LegacyMods.Relax))
                 yield return new CatchModRelax();
         }
 
@@ -113,6 +114,7 @@ namespace osu.Game.Rulesets.Catch
                     return new Mod[]
                     {
                         new CatchModDifficultyAdjust(),
+                        new CatchModClassic(),
                     };
 
                 case ModType.Automation:
@@ -125,7 +127,8 @@ namespace osu.Game.Rulesets.Catch
                 case ModType.Fun:
                     return new Mod[]
                     {
-                        new MultiMod(new ModWindUp(), new ModWindDown())
+                        new MultiMod(new ModWindUp(), new ModWindDown()),
+                        new CatchModFloatingFruits()
                     };
 
                 default:
@@ -158,13 +161,13 @@ namespace osu.Game.Rulesets.Catch
             switch (result)
             {
                 case HitResult.LargeTickHit:
-                    return "large droplet";
+                    return "Large droplet";
 
                 case HitResult.SmallTickHit:
-                    return "small droplet";
+                    return "Small droplet";
 
                 case HitResult.LargeBonus:
-                    return "banana";
+                    return "Banana";
             }
 
             return base.GetDisplayNameForHitResult(result);

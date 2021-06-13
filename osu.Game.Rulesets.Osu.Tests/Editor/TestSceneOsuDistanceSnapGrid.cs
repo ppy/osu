@@ -174,6 +174,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private class SnapProvider : IPositionSnapProvider
         {
+            public SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
+                new SnapResult(screenSpacePosition, null);
+
             public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, 0);
 
             public float GetBeatSnapDistanceAt(double referenceTime) => (float)beat_length;

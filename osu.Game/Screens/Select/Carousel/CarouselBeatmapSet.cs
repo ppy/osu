@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override CarouselItem GetNextToSelect()
         {
-            if (LastSelected == null)
+            if (LastSelected == null || LastSelected.Filtered.Value)
             {
                 if (GetRecommendedBeatmap?.Invoke(Children.OfType<CarouselBeatmap>().Where(b => !b.Filtered.Value).Select(b => b.Beatmap)) is BeatmapInfo recommended)
                     return Children.OfType<CarouselBeatmap>().First(b => b.Beatmap == recommended);
@@ -70,6 +70,9 @@ namespace osu.Game.Screens.Select.Carousel
 
                 case SortMode.Author:
                     return string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.OrdinalIgnoreCase);
+
+                case SortMode.Source:
+                    return string.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source, StringComparison.OrdinalIgnoreCase);
 
                 case SortMode.DateAdded:
                     return otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);

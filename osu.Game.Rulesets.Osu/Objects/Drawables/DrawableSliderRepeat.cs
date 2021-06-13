@@ -3,35 +3,45 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking
+    public class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking, IHasMainCirclePiece
     {
-        private readonly SliderRepeat sliderRepeat;
-        private readonly DrawableSlider drawableSlider;
+        public new SliderRepeat HitObject => (SliderRepeat)base.HitObject;
+
+        [CanBeNull]
+        public Slider Slider => DrawableSlider?.HitObject;
+
+        protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
         private double animDuration;
 
-        public Drawable CirclePiece { get; private set; }
+        public SkinnableDrawable CirclePiece { get; private set; }
+
+        public ReverseArrowPiece Arrow { get; private set; }
+
         private Drawable scaleContainer;
-        private ReverseArrowPiece arrow;
 
         public override bool DisplayResult => false;
 
-        public DrawableSliderRepeat(SliderRepeat sliderRepeat, DrawableSlider drawableSlider)
+        public DrawableSliderRepeat()
+            : base(null)
+        {
+        }
+
+        public DrawableSliderRepeat(SliderRepeat sliderRepeat)
             : base(sliderRepeat)
         {
-            this.sliderRepeat = sliderRepeat;
-            this.drawableSlider = drawableSlider;
         }
 
         [BackgroundDependencyLoader]
@@ -45,26 +55,37 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Children = new[]
+                Children = new Drawable[]
                 {
                     // no default for this; only visible in legacy skins.
-                    CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTailHitCircle), _ => Empty()),
-                    arrow = new ReverseArrowPiece(),
+                    CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTailHitCircle), _ => Empty())
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                    Arrow = new ReverseArrowPiece(),
                 }
             };
 
-            ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
+            ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
+        }
+
+        protected override void OnApply()
+        {
+            base.OnApply();
+
+            Position = HitObject.Position - DrawableSlider.Position;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (sliderRepeat.StartTime <= Time.Current)
-                ApplyResult(r => r.Type = drawableSlider.Tracking.Value ? r.Judgement.MaxResult : r.Judgement.MinResult);
+            if (HitObject.StartTime <= Time.Current)
+                ApplyResult(r => r.Type = DrawableSlider.Tracking.Value ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
         protected override void UpdateInitialTransforms()
         {
-            animDuration = Math.Min(300, sliderRepeat.SpanDuration);
+            animDuration = Math.Min(300, HitObject.SpanDuration);
 
             this.Animate(
                 d => d.FadeIn(animDuration),
@@ -87,8 +108,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
 
                 case ArmedState.Hit:
-                    this.FadeOut(animDuration, Easing.Out)
-                        .ScaleTo(Scale * 1.5f, animDuration, Easing.Out);
+                    this.FadeOut(animDuration, Easing.Out);
+
+                    const float final_scale = 1.5f;
+
+                    Arrow.ScaleTo(Scale * final_scale, animDuration, Easing.Out);
+                    CirclePiece.ScaleTo(Scale * final_scale, animDuration, Easing.Out);
                     break;
             }
         }
@@ -100,8 +125,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // When the repeat is hit, the arrow should fade out on spot rather than following the slider
             if (IsHit) return;
 
-            bool isRepeatAtEnd = sliderRepeat.RepeatIndex % 2 == 0;
-            List<Vector2> curve = ((PlaySliderBody)drawableSlider.Body.Drawable).CurrentCurve;
+            bool isRepeatAtEnd = HitObject.RepeatIndex % 2 == 0;
+            List<Vector2> curve = ((PlaySliderBody)DrawableSlider.Body.Drawable).CurrentCurve;
 
             Position = isRepeatAtEnd ? end : start;
 
@@ -124,18 +149,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
 
             float aimRotation = MathUtils.RadiansToDegrees(MathF.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
-            while (Math.Abs(aimRotation - arrow.Rotation) > 180)
-                aimRotation += aimRotation < arrow.Rotation ? 360 : -360;
+            while (Math.Abs(aimRotation - Arrow.Rotation) > 180)
+                aimRotation += aimRotation < Arrow.Rotation ? 360 : -360;
 
-            if (!hasRotation)
+            // The clock may be paused in a scenario like the editor.
+            if (!hasRotation || !Clock.IsRunning)
             {
-                arrow.Rotation = aimRotation;
+                Arrow.Rotation = aimRotation;
                 hasRotation = true;
             }
             else
             {
                 // If we're already snaking, interpolate to smooth out sharp curves (linear sliders, mainly).
-                arrow.Rotation = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 100), arrow.Rotation, aimRotation, 0, 50, Easing.OutQuint);
+                Arrow.Rotation = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 100), Arrow.Rotation, aimRotation, 0, 50, Easing.OutQuint);
             }
         }
     }

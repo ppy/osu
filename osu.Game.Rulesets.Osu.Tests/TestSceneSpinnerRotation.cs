@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Visual;
 using osuTK;
@@ -62,11 +63,11 @@ namespace osu.Game.Rulesets.Osu.Tests
                 trackerRotationTolerance = Math.Abs(drawableSpinner.RotationTracker.Rotation * 0.1f);
             });
             AddAssert("is disc rotation not almost 0", () => !Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, 0, 100));
-            AddAssert("is disc rotation absolute not almost 0", () => !Precision.AlmostEquals(drawableSpinner.RotationTracker.RateAdjustedRotation, 0, 100));
+            AddAssert("is disc rotation absolute not almost 0", () => !Precision.AlmostEquals(drawableSpinner.Result.RateAdjustedRotation, 0, 100));
 
             addSeekStep(0);
             AddAssert("is disc rotation almost 0", () => Precision.AlmostEquals(drawableSpinner.RotationTracker.Rotation, 0, trackerRotationTolerance));
-            AddAssert("is disc rotation absolute almost 0", () => Precision.AlmostEquals(drawableSpinner.RotationTracker.RateAdjustedRotation, 0, 100));
+            AddAssert("is disc rotation absolute almost 0", () => Precision.AlmostEquals(drawableSpinner.Result.RateAdjustedRotation, 0, 100));
         }
 
         [Test]
@@ -87,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 finalSpinnerSymbolRotation = spinnerSymbol.Rotation;
                 spinnerSymbolRotationTolerance = Math.Abs(finalSpinnerSymbolRotation * 0.05f);
             });
-            AddStep("retrieve cumulative disc rotation", () => finalCumulativeTrackerRotation = drawableSpinner.RotationTracker.RateAdjustedRotation);
+            AddStep("retrieve cumulative disc rotation", () => finalCumulativeTrackerRotation = drawableSpinner.Result.RateAdjustedRotation);
 
             addSeekStep(2500);
             AddAssert("disc rotation rewound",
@@ -99,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 () => Precision.AlmostEquals(spinnerSymbol.Rotation, finalSpinnerSymbolRotation / 2, spinnerSymbolRotationTolerance));
             AddAssert("is cumulative rotation rewound",
                 // cumulative rotation is not damped, so we're treating it as the "ground truth" and allowing a comparatively smaller margin of error.
-                () => Precision.AlmostEquals(drawableSpinner.RotationTracker.RateAdjustedRotation, finalCumulativeTrackerRotation / 2, 100));
+                () => Precision.AlmostEquals(drawableSpinner.Result.RateAdjustedRotation, finalCumulativeTrackerRotation / 2, 100));
 
             addSeekStep(5000);
             AddAssert("is disc rotation almost same",
@@ -107,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("is symbol rotation almost same",
                 () => Precision.AlmostEquals(spinnerSymbol.Rotation, finalSpinnerSymbolRotation, spinnerSymbolRotationTolerance));
             AddAssert("is cumulative rotation almost same",
-                () => Precision.AlmostEquals(drawableSpinner.RotationTracker.RateAdjustedRotation, finalCumulativeTrackerRotation, 100));
+                () => Precision.AlmostEquals(drawableSpinner.Result.RateAdjustedRotation, finalCumulativeTrackerRotation, 100));
         }
 
         [Test]
@@ -145,7 +146,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 // multipled by 2 to nullify the score multiplier. (autoplay mod selected)
                 var totalScore = ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value * 2;
-                return totalScore == (int)(drawableSpinner.RotationTracker.RateAdjustedRotation / 360) * new SpinnerTick().CreateJudgement().MaxNumericResult;
+                return totalScore == (int)(drawableSpinner.Result.RateAdjustedRotation / 360) * new SpinnerTick().CreateJudgement().MaxNumericResult;
             });
 
             addSeekStep(0);
@@ -168,13 +169,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             double estimatedSpm = 0;
 
             addSeekStep(1000);
-            AddStep("retrieve spm", () => estimatedSpm = drawableSpinner.SpmCounter.SpinsPerMinute);
+            AddStep("retrieve spm", () => estimatedSpm = drawableSpinner.SpinsPerMinute.Value);
 
             addSeekStep(2000);
-            AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
+            AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpinsPerMinute.Value, estimatedSpm, 1.0));
 
             addSeekStep(1000);
-            AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
+            AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpinsPerMinute.Value, estimatedSpm, 1.0));
         }
 
         [TestCase(0.5)]
@@ -188,16 +189,16 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("retrieve spinner state", () =>
             {
                 expectedProgress = drawableSpinner.Progress;
-                expectedSpm = drawableSpinner.SpmCounter.SpinsPerMinute;
+                expectedSpm = drawableSpinner.SpinsPerMinute.Value;
             });
 
             addSeekStep(0);
 
-            AddStep("adjust track rate", () => Player.GameplayClockContainer.UserPlaybackRate.Value = rate);
+            AddStep("adjust track rate", () => ((MasterGameplayClockContainer)Player.GameplayClockContainer).UserPlaybackRate.Value = rate);
 
             addSeekStep(1000);
             AddAssert("progress almost same", () => Precision.AlmostEquals(expectedProgress, drawableSpinner.Progress, 0.05));
-            AddAssert("spm almost same", () => Precision.AlmostEquals(expectedSpm, drawableSpinner.SpmCounter.SpinsPerMinute, 2.0));
+            AddAssert("spm almost same", () => Precision.AlmostEquals(expectedSpm, drawableSpinner.SpinsPerMinute.Value, 2.0));
         }
 
         private Replay applyRateAdjustment(Replay scoreReplay, double rate) => new Replay

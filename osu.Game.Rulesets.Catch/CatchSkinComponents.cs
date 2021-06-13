@@ -5,15 +5,10 @@ namespace osu.Game.Rulesets.Catch
 {
     public enum CatchSkinComponents
     {
-        FruitBananas,
-        FruitApple,
-        FruitGrapes,
-        FruitOrange,
-        FruitPear,
+        Fruit,
+        Banana,
         Droplet,
-        CatcherIdle,
-        CatcherFail,
-        CatcherKiai,
+        Catcher,
         CatchComboCounter
     }
 }

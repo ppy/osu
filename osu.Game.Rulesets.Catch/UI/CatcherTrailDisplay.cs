@@ -4,9 +4,8 @@
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Pooling;
 using osuTK;
 using osuTK.Graphics;
 
@@ -19,6 +18,8 @@ namespace osu.Game.Rulesets.Catch.UI
     public class CatcherTrailDisplay : CompositeDrawable
     {
         private readonly Catcher catcher;
+
+        private readonly DrawablePool<CatcherTrailSprite> trailPool;
 
         private readonly Container<CatcherTrailSprite> dashTrails;
         private readonly Container<CatcherTrailSprite> hyperDashTrails;
@@ -80,8 +81,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
             RelativeSizeAxes = Axes.Both;
 
-            InternalChildren = new[]
+            InternalChildren = new Drawable[]
             {
+                trailPool = new DrawablePool<CatcherTrailSprite>(30),
                 dashTrails = new Container<CatcherTrailSprite> { RelativeSizeAxes = Axes.Both },
                 hyperDashTrails = new Container<CatcherTrailSprite> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
                 endGlowSprites = new Container<CatcherTrailSprite> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
@@ -116,16 +118,14 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private CatcherTrailSprite createTrailSprite(Container<CatcherTrailSprite> target)
         {
-            var texture = (catcher.CurrentDrawableCatcher as TextureAnimation)?.CurrentFrame ?? ((Sprite)catcher.CurrentDrawableCatcher).Texture;
+            CatcherTrailSprite sprite = trailPool.Get();
 
-            var sprite = new CatcherTrailSprite(texture)
-            {
-                Anchor = catcher.Anchor,
-                Scale = catcher.Scale,
-                Blending = BlendingParameters.Additive,
-                RelativePositionAxes = catcher.RelativePositionAxes,
-                Position = catcher.Position
-            };
+            sprite.Texture = catcher.CurrentTexture;
+            sprite.Anchor = catcher.Anchor;
+            sprite.Scale = catcher.Scale;
+            sprite.Blending = BlendingParameters.Additive;
+            sprite.RelativePositionAxes = catcher.RelativePositionAxes;
+            sprite.Position = catcher.Position;
 
             target.Add(sprite);
 

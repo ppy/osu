@@ -10,8 +10,8 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Online.Spectator;
-using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osuTK;
 
@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.UI
     public abstract class ReplayRecorder<T> : ReplayRecorder, IKeyBindingHandler<T>
         where T : struct
     {
-        private readonly Replay target;
+        private readonly Score target;
 
         private readonly List<T> pressedActions = new List<T>();
 
@@ -29,12 +29,12 @@ namespace osu.Game.Rulesets.UI
         public int RecordFrameRate = 60;
 
         [Resolved(canBeNull: true)]
-        private SpectatorStreamingClient spectatorStreaming { get; set; }
+        private SpectatorClient spectatorClient { get; set; }
 
         [Resolved]
         private GameplayBeatmap gameplayBeatmap { get; set; }
 
-        protected ReplayRecorder(Replay target)
+        protected ReplayRecorder(Score target)
         {
             this.target = target;
 
@@ -49,13 +49,19 @@ namespace osu.Game.Rulesets.UI
 
             inputManager = GetContainingInputManager();
 
-            spectatorStreaming?.BeginPlaying(gameplayBeatmap);
+            spectatorClient?.BeginPlaying(gameplayBeatmap, target);
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            spectatorStreaming?.EndPlaying();
+            spectatorClient?.EndPlaying();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            recordFrame(false);
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -79,7 +85,7 @@ namespace osu.Game.Rulesets.UI
 
         private void recordFrame(bool important)
         {
-            var last = target.Frames.LastOrDefault();
+            var last = target.Replay.Frames.LastOrDefault();
 
             if (!important && last != null && Time.Current - last.Time < (1000d / RecordFrameRate))
                 return;
@@ -90,9 +96,9 @@ namespace osu.Game.Rulesets.UI
 
             if (frame != null)
             {
-                target.Frames.Add(frame);
+                target.Replay.Frames.Add(frame);
 
-                spectatorStreaming?.HandleFrame(frame);
+                spectatorClient?.HandleFrame(frame);
             }
         }
 

@@ -4,7 +4,6 @@
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -16,32 +15,55 @@ namespace osu.Game.Rulesets.Catch.Objects
     {
         public const float OBJECT_RADIUS = 64;
 
-        private float x;
+        public readonly Bindable<float> OriginalXBindable = new Bindable<float>();
 
         /// <summary>
-        /// The horizontal position of the fruit between 0 and <see cref="CatchPlayfield.WIDTH"/>.
+        /// The horizontal position of the hit object between 0 and <see cref="CatchPlayfield.WIDTH"/>.
         /// </summary>
         public float X
         {
-            get => x + XOffset;
-            set => x = value;
+            set => OriginalXBindable.Value = value;
+        }
+
+        float IHasXPosition.X => OriginalXBindable.Value;
+
+        public readonly Bindable<float> XOffsetBindable = new Bindable<float>();
+
+        /// <summary>
+        /// A random offset applied to the horizontal position, set by the beatmap processing.
+        /// </summary>
+        public float XOffset
+        {
+            set => XOffsetBindable.Value = value;
         }
 
         /// <summary>
-        /// Whether this object can be placed on the catcher's plate.
+        /// The horizontal position of the hit object between 0 and <see cref="CatchPlayfield.WIDTH"/>.
         /// </summary>
-        public virtual bool CanBePlated => false;
+        /// <remarks>
+        /// This value is the original <see cref="X"/> value specified in the beatmap, not affected by the beatmap processing.
+        /// Use <see cref="EffectiveX"/> for a gameplay.
+        /// </remarks>
+        public float OriginalX => OriginalXBindable.Value;
 
         /// <summary>
-        /// A random offset applied to <see cref="X"/>, set by the <see cref="CatchBeatmapProcessor"/>.
+        /// The effective horizontal position of the hit object between 0 and <see cref="CatchPlayfield.WIDTH"/>.
         /// </summary>
-        internal float XOffset { get; set; }
+        /// <remarks>
+        /// This value is the original <see cref="X"/> value plus the offset applied by the beatmap processing.
+        /// Use <see cref="OriginalX"/> if a value not affected by the offset is desired.
+        /// </remarks>
+        public float EffectiveX => OriginalXBindable.Value + XOffsetBindable.Value;
 
         public double TimePreempt = 1000;
 
-        public int IndexInBeatmap { get; set; }
+        public readonly Bindable<int> IndexInBeatmapBindable = new Bindable<int>();
 
-        public virtual FruitVisualRepresentation VisualRepresentation => (FruitVisualRepresentation)(IndexInBeatmap % 4);
+        public int IndexInBeatmap
+        {
+            get => IndexInBeatmapBindable.Value;
+            set => IndexInBeatmapBindable.Value = value;
+        }
 
         public virtual bool NewCombo { get; set; }
 
@@ -63,13 +85,6 @@ namespace osu.Game.Rulesets.Catch.Objects
             set => ComboIndexBindable.Value = value;
         }
 
-        /// <summary>
-        /// Difference between the distance to the next object
-        /// and the distance that would have triggered a hyper dash.
-        /// A value close to 0 indicates a difficult jump (for difficulty calculation).
-        /// </summary>
-        public float DistanceToHyperDash { get; set; }
-
         public Bindable<bool> LastInComboBindable { get; } = new Bindable<bool>();
 
         /// <summary>
@@ -81,17 +96,19 @@ namespace osu.Game.Rulesets.Catch.Objects
             set => LastInComboBindable.Value = value;
         }
 
-        public float Scale { get; set; } = 1;
+        public readonly Bindable<float> ScaleBindable = new Bindable<float>(1);
+
+        public float Scale
+        {
+            get => ScaleBindable.Value;
+            set => ScaleBindable.Value = value;
+        }
 
         /// <summary>
-        /// Whether this fruit can initiate a hyperdash.
+        /// The seed value used for visual randomness such as fruit rotation.
+        /// The value is <see cref="HitObject.StartTime"/> truncated to an integer.
         /// </summary>
-        public bool HyperDash => HyperDashTarget != null;
-
-        /// <summary>
-        /// The target fruit if we are to initiate a hyperdash.
-        /// </summary>
-        public CatchHitObject HyperDashTarget;
+        public int RandomSeed => (int)StartTime;
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
@@ -103,22 +120,5 @@ namespace osu.Game.Rulesets.Catch.Objects
         }
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
-    }
-
-    /// <summary>
-    /// Represents a single object that can be caught by the catcher.
-    /// </summary>
-    public abstract class PalpableCatchHitObject : CatchHitObject
-    {
-        public override bool CanBePlated => true;
-    }
-
-    public enum FruitVisualRepresentation
-    {
-        Pear,
-        Grape,
-        Pineapple,
-        Raspberry,
-        Banana // banananananannaanana
     }
 }

@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
@@ -29,6 +31,26 @@ namespace osu.Game.Overlays.Settings.Sections
         private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo> { Default = SkinInfo.Default };
         private readonly Bindable<int> configBindable = new Bindable<int>();
 
+        private static readonly SkinInfo random_skin_info = new SkinInfo
+        {
+            ID = SkinInfo.RANDOM_SKIN,
+            Name = "<Random Skin>",
+        };
+
+        private List<SkinInfo> skinItems;
+
+        private int firstNonDefaultSkinIndex
+        {
+            get
+            {
+                var index = skinItems.FindIndex(s => s.ID > 0);
+                if (index < 0)
+                    index = skinItems.Count;
+
+                return index;
+            }
+        }
+
         [Resolved]
         private SkinManager skins { get; set; }
 
@@ -44,12 +66,6 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 skinDropdown = new SkinSettingsDropdown(),
                 new ExportSkinButton(),
-                new SettingsSlider<float, SizeSlider>
-                {
-                    LabelText = "Menu cursor size",
-                    Current = config.GetBindable<float>(OsuSetting.MenuCursorSize),
-                    KeyboardStep = 0.01f
-                },
                 new SettingsSlider<float, SizeSlider>
                 {
                     LabelText = "Gameplay cursor size",
@@ -68,6 +84,11 @@ namespace osu.Game.Overlays.Settings.Sections
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "Beatmap colours",
+                    Current = config.GetBindable<bool>(OsuSetting.BeatmapColours)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Beatmap hitsounds",
                     Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
                 },
@@ -82,20 +103,61 @@ namespace osu.Game.Overlays.Settings.Sections
             config.BindWith(OsuSetting.Skin, configBindable);
 
             skinDropdown.Current = dropdownBindable;
-            skinDropdown.Items = skins.GetAllUsableSkins().ToArray();
+            updateItems();
 
             // Todo: This should not be necessary when OsuConfigManager is databased
             if (skinDropdown.Items.All(s => s.ID != configBindable.Value))
                 configBindable.Value = 0;
 
-            configBindable.BindValueChanged(id => dropdownBindable.Value = skinDropdown.Items.Single(s => s.ID == id.NewValue), true);
-            dropdownBindable.BindValueChanged(skin => configBindable.Value = skin.NewValue.ID);
+            configBindable.BindValueChanged(id => Scheduler.AddOnce(updateSelectedSkinFromConfig), true);
+            dropdownBindable.BindValueChanged(skin =>
+            {
+                if (skin.NewValue == random_skin_info)
+                {
+                    skins.SelectRandomSkin();
+                    return;
+                }
+
+                configBindable.Value = skin.NewValue.ID;
+            });
+        }
+
+        private void updateSelectedSkinFromConfig()
+        {
+            int id = configBindable.Value;
+
+            var skin = skinDropdown.Items.FirstOrDefault(s => s.ID == id);
+
+            if (skin == null)
+            {
+                // there may be a thread race condition where an item is selected that hasn't yet been added to the dropdown.
+                // to avoid adding complexity, let's just ensure the item is added so we can perform the selection.
+                skin = skins.Query(s => s.ID == id);
+                addItem(skin);
+            }
+
+            dropdownBindable.Value = skin;
+        }
+
+        private void updateItems()
+        {
+            skinItems = skins.GetAllUsableSkins();
+            skinItems.Insert(firstNonDefaultSkinIndex, random_skin_info);
+            sortUserSkins(skinItems);
+            skinDropdown.Items = skinItems;
         }
 
         private void itemUpdated(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
         {
             if (weakItem.NewValue.TryGetTarget(out var item))
-                Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => !i.Equals(item)).Append(item).ToArray());
+                Schedule(() => addItem(item));
+        }
+
+        private void addItem(SkinInfo item)
+        {
+            List<SkinInfo> newDropdownItems = skinDropdown.Items.Where(i => !i.Equals(item)).Append(item).ToList();
+            sortUserSkins(newDropdownItems);
+            skinDropdown.Items = newDropdownItems;
         }
 
         private void itemRemoved(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
@@ -104,9 +166,11 @@ namespace osu.Game.Overlays.Settings.Sections
                 Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != item.ID).ToArray());
         }
 
-        private class SizeSlider : OsuSliderBar<float>
+        private void sortUserSkins(List<SkinInfo> skinsList)
         {
-            public override string TooltipText => Current.Value.ToString(@"0.##x");
+            // Sort user skins separately from built-in skins
+            skinsList.Sort(firstNonDefaultSkinIndex, skinsList.Count - firstNonDefaultSkinIndex,
+                Comparer<SkinInfo>.Create((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase)));
         }
 
         private class SkinSettingsDropdown : SettingsDropdown<SkinInfo>
@@ -115,7 +179,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
             private class SkinDropdownControl : DropdownControl
             {
-                protected override string GenerateItemText(SkinInfo item) => item.ToString();
+                protected override LocalisableString GenerateItemText(SkinInfo item) => item.ToString();
             }
         }
 

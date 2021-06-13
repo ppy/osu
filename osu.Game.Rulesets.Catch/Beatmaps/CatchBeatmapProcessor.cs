@@ -5,11 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
-using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
                     case JuiceStream juiceStream:
                         // Todo: BUG!! Stable used the last control point as the final position of the path, but it should use the computed path instead.
-                        lastPosition = juiceStream.X + juiceStream.Path.ControlPoints[^1].Position.Value.X;
+                        lastPosition = juiceStream.OriginalX + juiceStream.Path.ControlPoints[^1].Position.Value.X;
 
                         // Todo: BUG!! Stable attempted to use the end time of the stream, but referenced it too early in execution and used the start time instead.
                         lastStartTime = juiceStream.StartTime;
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                             catchObject.XOffset = 0;
 
                             if (catchObject is TinyDroplet)
-                                catchObject.XOffset = Math.Clamp(rng.Next(-20, 20), -catchObject.X, CatchPlayfield.WIDTH - catchObject.X);
+                                catchObject.XOffset = Math.Clamp(rng.Next(-20, 20), -catchObject.OriginalX, CatchPlayfield.WIDTH - catchObject.OriginalX);
                             else if (catchObject is Droplet)
                                 rng.Next(); // osu!stable retrieved a random droplet rotation
                         }
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         private static void applyHardRockOffset(CatchHitObject hitObject, ref float? lastPosition, ref double lastStartTime, FastRandom rng)
         {
-            float offsetPosition = hitObject.X;
+            float offsetPosition = hitObject.OriginalX;
             double startTime = hitObject.StartTime;
 
             if (lastPosition == null)
@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             if (positionDiff == 0)
             {
                 applyRandomOffset(ref offsetPosition, timeDiff / 4d, rng);
-                hitObject.XOffset = offsetPosition - hitObject.X;
+                hitObject.XOffset = offsetPosition - hitObject.OriginalX;
                 return;
             }
 
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             if (Math.Abs(positionDiff) < timeDiff / 3)
                 applyOffset(ref offsetPosition, positionDiff);
 
-            hitObject.XOffset = offsetPosition - hitObject.X;
+            hitObject.XOffset = offsetPosition - hitObject.OriginalX;
 
             lastPosition = offsetPosition;
             lastStartTime = startTime;
@@ -192,24 +192,24 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         private static void initialiseHyperDash(IBeatmap beatmap)
         {
-            List<CatchHitObject> objectWithDroplets = new List<CatchHitObject>();
+            List<PalpableCatchHitObject> palpableObjects = new List<PalpableCatchHitObject>();
 
             foreach (var currentObject in beatmap.HitObjects)
             {
                 if (currentObject is Fruit fruitObject)
-                    objectWithDroplets.Add(fruitObject);
+                    palpableObjects.Add(fruitObject);
 
                 if (currentObject is JuiceStream)
                 {
-                    foreach (var currentJuiceElement in currentObject.NestedHitObjects)
+                    foreach (var juice in currentObject.NestedHitObjects)
                     {
-                        if (!(currentJuiceElement is TinyDroplet))
-                            objectWithDroplets.Add((CatchHitObject)currentJuiceElement);
+                        if (juice is PalpableCatchHitObject palpableObject && !(juice is TinyDroplet))
+                            palpableObjects.Add(palpableObject);
                     }
                 }
             }
 
-            objectWithDroplets.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
+            palpableObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
             double halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.BeatmapInfo.BaseDifficulty) / 2;
 
@@ -221,18 +221,18 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             int lastDirection = 0;
             double lastExcess = halfCatcherWidth;
 
-            for (int i = 0; i < objectWithDroplets.Count - 1; i++)
+            for (int i = 0; i < palpableObjects.Count - 1; i++)
             {
-                CatchHitObject currentObject = objectWithDroplets[i];
-                CatchHitObject nextObject = objectWithDroplets[i + 1];
+                var currentObject = palpableObjects[i];
+                var nextObject = palpableObjects[i + 1];
 
                 // Reset variables in-case values have changed (e.g. after applying HR)
                 currentObject.HyperDashTarget = null;
                 currentObject.DistanceToHyperDash = 0;
 
-                int thisDirection = nextObject.X > currentObject.X ? 1 : -1;
+                int thisDirection = nextObject.EffectiveX > currentObject.EffectiveX ? 1 : -1;
                 double timeToNext = nextObject.StartTime - currentObject.StartTime - 1000f / 60f / 4; // 1/4th of a frame of grace time, taken from osu-stable
-                double distanceToNext = Math.Abs(nextObject.X - currentObject.X) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
+                double distanceToNext = Math.Abs(nextObject.EffectiveX - currentObject.EffectiveX) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
                 float distanceToHyper = (float)(timeToNext * Catcher.BASE_SPEED - distanceToNext);
 
                 if (distanceToHyper < 0)

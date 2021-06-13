@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -21,10 +20,7 @@ using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Utils;
 using SharpCompress.Archives.Zip;
-using SharpCompress.Common;
-using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Database
 {
@@ -41,6 +37,11 @@ namespace osu.Game.Database
         private const int import_queue_request_concurrency = 1;
 
         /// <summary>
+        /// The size of a batch import operation before considering it a lower priority operation.
+        /// </summary>
+        private const int low_priority_import_batch_size = 1;
+
+        /// <summary>
         /// A singleton scheduler shared by all <see cref="ArchiveModelManager{TModel,TFileModel}"/>.
         /// </summary>
         /// <remarks>
@@ -48,6 +49,13 @@ namespace osu.Game.Database
         /// It is mainly being used as a queue mechanism for large imports.
         /// </remarks>
         private static readonly ThreadedTaskScheduler import_scheduler = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(ArchiveModelManager<TModel, TFileModel>));
+
+        /// <summary>
+        /// A second scheduler for lower priority imports.
+        /// For simplicity, these will just run in parallel with normal priority imports, but a future refactor would see this implemented via a custom scheduler/queue.
+        /// See https://gist.github.com/peppy/f0e118a14751fc832ca30dd48ba3876b for an incomplete version of this.
+        /// </summary>
+        private static readonly ThreadedTaskScheduler import_scheduler_low_priority = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(ArchiveModelManager<TModel, TFileModel>));
 
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
@@ -71,8 +79,6 @@ namespace osu.Game.Database
         private readonly Bindable<WeakReference<TModel>> itemRemoved = new Bindable<WeakReference<TModel>>();
 
         public virtual IEnumerable<string> HandledExtensions => new[] { ".zip" };
-
-        public virtual bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
         protected readonly FileStore Files;
 
@@ -105,8 +111,11 @@ namespace osu.Game.Database
 
         /// <summary>
         /// Import one or more <typeparamref name="TModel"/> items from filesystem <paramref name="paths"/>.
-        /// This will post notifications tracking progress.
         /// </summary>
+        /// <remarks>
+        /// This will be treated as a low priority import if more than one path is specified; use <see cref="Import(ImportTask[])"/> to always import at standard priority.
+        /// This will post notifications tracking progress.
+        /// </remarks>
         /// <param name="paths">One or more archive locations on disk.</param>
         public Task Import(params string[] paths)
         {
@@ -114,11 +123,27 @@ namespace osu.Game.Database
 
             PostNotification?.Invoke(notification);
 
-            return Import(notification, paths);
+            return Import(notification, paths.Select(p => new ImportTask(p)).ToArray());
         }
 
-        protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params string[] paths)
+        public Task Import(params ImportTask[] tasks)
         {
+            var notification = new ProgressNotification { State = ProgressNotificationState.Active };
+
+            PostNotification?.Invoke(notification);
+
+            return Import(notification, tasks);
+        }
+
+        protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        {
+            if (tasks.Length == 0)
+            {
+                notification.CompletionText = $"No {HumanisedModelName}s were found to import!";
+                notification.State = ProgressNotificationState.Completed;
+                return Enumerable.Empty<TModel>();
+            }
+
             notification.Progress = 0;
             notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
 
@@ -126,33 +151,46 @@ namespace osu.Game.Database
 
             var imported = new List<TModel>();
 
-            await Task.WhenAll(paths.Select(async path =>
+            bool isLowPriorityImport = tasks.Length > low_priority_import_batch_size;
+
+            try
             {
-                notification.CancellationToken.ThrowIfCancellationRequested();
-
-                try
+                await Task.WhenAll(tasks.Select(async task =>
                 {
-                    var model = await Import(path, notification.CancellationToken);
+                    notification.CancellationToken.ThrowIfCancellationRequested();
 
-                    lock (imported)
+                    try
                     {
-                        if (model != null)
-                            imported.Add(model);
-                        current++;
+                        var model = await Import(task, isLowPriorityImport, notification.CancellationToken).ConfigureAwait(false);
 
-                        notification.Text = $"Imported {current} of {paths.Length} {HumanisedModelName}s";
-                        notification.Progress = (float)current / paths.Length;
+                        lock (imported)
+                        {
+                            if (model != null)
+                                imported.Add(model);
+                            current++;
+
+                            notification.Text = $"Imported {current} of {tasks.Length} {HumanisedModelName}s";
+                            notification.Progress = (float)current / tasks.Length;
+                        }
                     }
-                }
-                catch (TaskCanceledException)
+                    catch (TaskCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
+                    }
+                })).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                if (imported.Count == 0)
                 {
-                    throw;
+                    notification.State = ProgressNotificationState.Cancelled;
+                    return imported;
                 }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})", LoggingTarget.Database);
-                }
-            }));
+            }
 
             if (imported.Count == 0)
             {
@@ -183,17 +221,19 @@ namespace osu.Game.Database
 
         /// <summary>
         /// Import one <typeparamref name="TModel"/> from the filesystem and delete the file on success.
+        /// Note that this bypasses the UI flow and should only be used for special cases or testing.
         /// </summary>
-        /// <param name="path">The archive location on disk.</param>
+        /// <param name="task">The <see cref="ImportTask"/> containing data about the <typeparamref name="TModel"/> to import.</param>
+        /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>The imported model, if successful.</returns>
-        public async Task<TModel> Import(string path, CancellationToken cancellationToken = default)
+        internal async Task<TModel> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             TModel import;
-            using (ArchiveReader reader = getReaderFrom(path))
-                import = await Import(reader, cancellationToken);
+            using (ArchiveReader reader = task.GetReader())
+                import = await Import(reader, lowPriority, cancellationToken).ConfigureAwait(false);
 
             // We may or may not want to delete the file depending on where it is stored.
             //  e.g. reconstructing/repairing database with items from default storage.
@@ -201,12 +241,12 @@ namespace osu.Game.Database
             // TODO: Add a check to prevent files from storage to be deleted.
             try
             {
-                if (import != null && File.Exists(path) && ShouldDeleteArchive(path))
-                    File.Delete(path);
+                if (import != null && File.Exists(task.Path) && ShouldDeleteArchive(task.Path))
+                    File.Delete(task.Path);
             }
             catch (Exception e)
             {
-                LogForModel(import, $@"Could not delete original file after import ({Path.GetFileName(path)})", e);
+                LogForModel(import, $@"Could not delete original file after import ({task})", e);
             }
 
             return import;
@@ -218,11 +258,12 @@ namespace osu.Game.Database
         public Action<IEnumerable<TModel>> PresentImport;
 
         /// <summary>
-        /// Import an item from an <see cref="ArchiveReader"/>.
+        /// Silently import an item from an <see cref="ArchiveReader"/>.
         /// </summary>
         /// <param name="archive">The archive to be imported.</param>
+        /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public Task<TModel> Import(ArchiveReader archive, CancellationToken cancellationToken = default)
+        public Task<TModel> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -245,7 +286,7 @@ namespace osu.Game.Database
                 return null;
             }
 
-            return Import(model, archive, cancellationToken);
+            return Import(model, archive, lowPriority, cancellationToken);
         }
 
         /// <summary>
@@ -295,12 +336,13 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Import an item from a <typeparamref name="TModel"/>.
+        /// Silently import an item from a <typeparamref name="TModel"/>.
         /// </summary>
         /// <param name="item">The model to be imported.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
+        /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public async Task<TModel> Import(TModel item, ArchiveReader archive = null, CancellationToken cancellationToken = default) => await Task.Factory.StartNew(async () =>
+        public virtual async Task<TModel> Import(TModel item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default) => await Task.Factory.StartNew(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -323,7 +365,7 @@ namespace osu.Game.Database
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
                 item.Hash = ComputeHash(item, archive);
 
-                await Populate(item, archive, cancellationToken);
+                await Populate(item, archive, cancellationToken).ConfigureAwait(false);
 
                 using (var write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
                 {
@@ -375,7 +417,7 @@ namespace osu.Game.Database
 
             flushEvents(true);
             return item;
-        }, cancellationToken, TaskCreationOptions.HideScheduler, import_scheduler).Unwrap();
+        }, cancellationToken, TaskCreationOptions.HideScheduler, lowPriority ? import_scheduler_low_priority : import_scheduler).Unwrap().ConfigureAwait(false);
 
         /// <summary>
         /// Exports an item to a legacy (.zip based) package.
@@ -388,15 +430,25 @@ namespace osu.Game.Database
             if (retrievedItem == null)
                 throw new ArgumentException("Specified model could not be found", nameof(item));
 
+            using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
+                ExportModelTo(retrievedItem, outputStream);
+
+            exportStorage.OpenInNativeExplorer();
+        }
+
+        /// <summary>
+        /// Exports an item to the given output stream.
+        /// </summary>
+        /// <param name="model">The item to export.</param>
+        /// <param name="outputStream">The output stream to export to.</param>
+        protected virtual void ExportModelTo(TModel model, Stream outputStream)
+        {
             using (var archive = ZipArchive.Create())
             {
-                foreach (var file in retrievedItem.Files)
+                foreach (var file in model.Files)
                     archive.AddEntry(file.Filename, Files.Storage.GetStream(file.FileInfo.StoragePath));
 
-                using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
-                    archive.SaveTo(outputStream);
-
-                exportStorage.OpenInNativeExplorer();
+                archive.SaveTo(outputStream);
             }
         }
 
@@ -417,7 +469,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Delete new file.
+        /// Delete an existing file.
         /// </summary>
         /// <param name="model">The item to operate on.</param>
         /// <param name="file">The existing file to be deleted.</param>
@@ -586,7 +638,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Create all required <see cref="FileInfo"/>s for the provided archive, adding them to the global file store.
+        /// Create all required <see cref="IO.FileInfo"/>s for the provided archive, adding them to the global file store.
         /// </summary>
         private List<TFileModel> createFileInfos(ArchiveReader reader, FileStore files)
         {
@@ -615,24 +667,15 @@ namespace osu.Game.Database
         #region osu-stable import
 
         /// <summary>
-        /// Set a storage with access to an osu-stable install for import purposes.
-        /// </summary>
-        public Func<Storage> GetStableStorage { private get; set; }
-
-        /// <summary>
-        /// Denotes whether an osu-stable installation is present to perform automated imports from.
-        /// </summary>
-        public bool StableInstallationAvailable => GetStableStorage?.Invoke() != null;
-
-        /// <summary>
         /// The relative path from osu-stable's data directory to import items from.
         /// </summary>
         protected virtual string ImportFromStablePath => null;
 
         /// <summary>
-        /// Select paths to import from stable. Default implementation iterates all directories in <see cref="ImportFromStablePath"/>.
+        /// Select paths to import from stable where all paths should be absolute. Default implementation iterates all directories in <see cref="ImportFromStablePath"/>.
         /// </summary>
-        protected virtual IEnumerable<string> GetStableImportPaths(Storage stableStoage) => stableStoage.GetDirectories(ImportFromStablePath);
+        protected virtual IEnumerable<string> GetStableImportPaths(Storage storage) => storage.GetDirectories(ImportFromStablePath)
+                                                                                              .Select(path => storage.GetFullPath(path));
 
         /// <summary>
         /// Whether this specified path should be removed after successful import.
@@ -644,25 +687,28 @@ namespace osu.Game.Database
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
-        public Task ImportFromStableAsync()
+        public Task ImportFromStableAsync(StableStorage stableStorage)
         {
-            var stable = GetStableStorage?.Invoke();
+            var storage = PrepareStableStorage(stableStorage);
 
-            if (stable == null)
+            // Handle situations like when the user does not have a Skins folder.
+            if (!storage.ExistsDirectory(ImportFromStablePath))
             {
-                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
+                string fullPath = storage.GetFullPath(ImportFromStablePath);
+
+                Logger.Log($"Folder \"{fullPath}\" not available in the target osu!stable installation to import {HumanisedModelName}s.", LoggingTarget.Information, LogLevel.Error);
                 return Task.CompletedTask;
             }
 
-            if (!stable.ExistsDirectory(ImportFromStablePath))
-            {
-                // This handles situations like when the user does not have a Skins folder
-                Logger.Log($"No {ImportFromStablePath} folder available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
-                return Task.CompletedTask;
-            }
-
-            return Task.Run(async () => await Import(GetStableImportPaths(GetStableStorage()).Select(f => stable.GetFullPath(f)).ToArray()));
+            return Task.Run(async () => await Import(GetStableImportPaths(storage).ToArray()).ConfigureAwait(false));
         }
+
+        /// <summary>
+        /// Run any required traversal operations on the stable storage location before performing operations.
+        /// </summary>
+        /// <param name="stableStorage">The stable storage.</param>
+        /// <returns>The usable storage. Return the unchanged <paramref name="stableStorage"/> if no traversal is required.</returns>
+        protected virtual Storage PrepareStableStorage(StableStorage stableStorage) => stableStorage;
 
         #endregion
 
@@ -726,23 +772,6 @@ namespace osu.Game.Database
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
         protected virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace("Info", "").ToLower()}";
-
-        /// <summary>
-        /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
-        /// </summary>
-        /// <param name="path">A file or folder path resolving the archive content.</param>
-        /// <returns>A reader giving access to the archive's content.</returns>
-        private ArchiveReader getReaderFrom(string path)
-        {
-            if (ZipUtils.IsZipArchive(path))
-                return new ZipArchiveReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read), Path.GetFileName(path));
-            if (Directory.Exists(path))
-                return new LegacyDirectoryArchiveReader(path);
-            if (File.Exists(path))
-                return new LegacyFileArchiveReader(path);
-
-            throw new InvalidFormatException($"{path} is not a valid archive");
-        }
 
         #region Event handling / delaying
 

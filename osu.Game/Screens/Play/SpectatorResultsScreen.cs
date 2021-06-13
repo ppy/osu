@@ -12,17 +12,17 @@ namespace osu.Game.Screens.Play
     public class SpectatorResultsScreen : SoloResultsScreen
     {
         public SpectatorResultsScreen(ScoreInfo score)
-            : base(score)
+            : base(score, false)
         {
         }
 
         [Resolved]
-        private SpectatorStreamingClient spectatorStreaming { get; set; }
+        private SpectatorClient spectatorClient { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            spectatorStreaming.OnUserBeganPlaying += userBeganPlaying;
+            spectatorClient.OnUserBeganPlaying += userBeganPlaying;
         }
 
         private void userBeganPlaying(int userId, SpectatorState state)
@@ -40,8 +40,8 @@ namespace osu.Game.Screens.Play
         {
             base.Dispose(isDisposing);
 
-            if (spectatorStreaming != null)
-                spectatorStreaming.OnUserBeganPlaying -= userBeganPlaying;
+            if (spectatorClient != null)
+                spectatorClient.OnUserBeganPlaying -= userBeganPlaying;
         }
     }
 }

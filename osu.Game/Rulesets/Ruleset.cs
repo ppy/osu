@@ -24,9 +24,11 @@ using osu.Game.Skinning;
 using osu.Game.Users;
 using JetBrains.Annotations;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Testing;
+using osu.Game.Extensions;
+using osu.Game.Rulesets.Filter;
 using osu.Game.Screens.Ranking.Statistics;
-using osu.Game.Utils;
 
 namespace osu.Game.Rulesets
 {
@@ -81,8 +83,16 @@ namespace osu.Game.Rulesets
                         value |= LegacyMods.HardRock;
                         break;
 
+                    case ModPerfect _:
+                        value |= LegacyMods.Perfect;
+                        break;
+
                     case ModSuddenDeath _:
                         value |= LegacyMods.SuddenDeath;
+                        break;
+
+                    case ModNightcore _:
+                        value |= LegacyMods.Nightcore;
                         break;
 
                     case ModDoubleTime _:
@@ -99,6 +109,14 @@ namespace osu.Game.Rulesets
 
                     case ModFlashlight _:
                         value |= LegacyMods.Flashlight;
+                        break;
+
+                    case ModCinema _:
+                        value |= LegacyMods.Cinema;
+                        break;
+
+                    case ModAutoplay _:
+                        value |= LegacyMods.Autoplay;
                         break;
                 }
             }
@@ -118,7 +136,7 @@ namespace osu.Game.Rulesets
                 Name = Description,
                 ShortName = ShortName,
                 ID = (this as ILegacyRuleset)?.LegacyID,
-                InstantiationInfo = GetType().AssemblyQualifiedName,
+                InstantiationInfo = GetType().GetInvariantInstantiationInfo(),
                 Available = true,
             };
         }
@@ -129,7 +147,6 @@ namespace osu.Game.Rulesets
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
         /// <exception cref="BeatmapInvalidForRulesetException">Unable to successfully load the beatmap to be usable with this ruleset.</exception>
-        /// <returns></returns>
         public abstract DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null);
 
         /// <summary>
@@ -184,6 +201,8 @@ namespace osu.Game.Rulesets
         }
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
+
+        public virtual IBeatmapVerifier CreateBeatmapVerifier() => null;
 
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.QuestionCircle };
 
@@ -256,7 +275,7 @@ namespace osu.Game.Rulesets
             var validResults = GetValidHitResults();
 
             // enumerate over ordered list to guarantee return order is stable.
-            foreach (var result in OrderAttributeUtils.GetValuesInOrder<HitResult>())
+            foreach (var result in EnumExtensions.GetValuesInOrder<HitResult>())
             {
                 switch (result)
                 {
@@ -282,7 +301,7 @@ namespace osu.Game.Rulesets
         /// <remarks>
         /// <see cref="HitResult.Miss"/> is implicitly included. Special types like <see cref="HitResult.IgnoreHit"/> are ignored even when specified.
         /// </remarks>
-        protected virtual IEnumerable<HitResult> GetValidHitResults() => OrderAttributeUtils.GetValuesInOrder<HitResult>();
+        protected virtual IEnumerable<HitResult> GetValidHitResults() => EnumExtensions.GetValuesInOrder<HitResult>();
 
         /// <summary>
         /// Get a display friendly name for the specified result type.
@@ -290,5 +309,11 @@ namespace osu.Game.Rulesets
         /// <param name="result">The result type to get the name for.</param>
         /// <returns>The display name.</returns>
         public virtual string GetDisplayNameForHitResult(HitResult result) => result.GetDescription();
+
+        /// <summary>
+        /// Creates ruleset-specific beatmap filter criteria to be used on the song select screen.
+        /// </summary>
+        [CanBeNull]
+        public virtual IRulesetFilterCriteria CreateRulesetFilterCriteria() => null;
     }
 }

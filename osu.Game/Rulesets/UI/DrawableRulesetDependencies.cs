@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 using osu.Game.Rulesets.Configuration;
 
 namespace osu.Game.Rulesets.UI
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.UI
 
             if (resources != null)
             {
-                TextureStore = new TextureStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, @"Textures")));
+                TextureStore = new TextureStore(parent.Get<GameHost>().CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, @"Textures")));
                 CacheAs(TextureStore = new FallbackTextureStore(TextureStore, parent.Get<TextureStore>()));
 
                 SampleStore = parent.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, @"Samples"));
@@ -63,6 +63,7 @@ namespace osu.Game.Rulesets.UI
 
         ~DrawableRulesetDependencies()
         {
+            // required to potentially clean up sample store from audio hierarchy.
             Dispose(false);
         }
 
@@ -102,19 +103,23 @@ namespace osu.Game.Rulesets.UI
                 this.fallback = fallback;
             }
 
-            public SampleChannel Get(string name) => primary.Get(name) ?? fallback.Get(name);
+            public Sample Get(string name) => primary.Get(name) ?? fallback.Get(name);
 
-            public Task<SampleChannel> GetAsync(string name) => primary.GetAsync(name) ?? fallback.GetAsync(name);
+            public Task<Sample> GetAsync(string name) => primary.GetAsync(name) ?? fallback.GetAsync(name);
 
             public Stream GetStream(string name) => primary.GetStream(name) ?? fallback.GetStream(name);
 
             public IEnumerable<string> GetAvailableResources() => throw new NotSupportedException();
 
-            public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
+            public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotSupportedException();
 
-            public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
+            public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotSupportedException();
 
             public void RemoveAllAdjustments(AdjustableProperty type) => throw new NotSupportedException();
+
+            public void BindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
+
+            public void UnbindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
 
             public BindableNumber<double> Volume => throw new NotSupportedException();
 
@@ -123,8 +128,6 @@ namespace osu.Game.Rulesets.UI
             public BindableNumber<double> Frequency => throw new NotSupportedException();
 
             public BindableNumber<double> Tempo => throw new NotSupportedException();
-
-            public IBindable<double> GetAggregate(AdjustableProperty type) => throw new NotSupportedException();
 
             public IBindable<double> AggregateVolume => throw new NotSupportedException();
 

@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
 
-        private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
+        private DrawableEditorRulesetWrapper<TObject> drawableRulesetWrapper;
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
 
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Edit
 
             try
             {
-                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() }))
+                drawableRulesetWrapper = new DrawableEditorRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() }))
                 {
                     Clock = EditorClock,
                     ProcessCustomClock = false
@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Edit
                         drawableRulesetWrapper,
                         // layers above playfield
                         drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
-                                              .WithChild(BlueprintContainer = CreateBlueprintContainer(HitObjects))
+                                              .WithChild(BlueprintContainer = CreateBlueprintContainer())
                     }
                 },
                 new FillFlowContainer
@@ -182,9 +182,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
         /// </summary>
-        /// <param name="hitObjects">A live collection of all <see cref="DrawableHitObject"/>s in the editor beatmap.</param>
-        protected virtual ComposeBlueprintContainer CreateBlueprintContainer(IEnumerable<DrawableHitObject> hitObjects)
-            => new ComposeBlueprintContainer(hitObjects);
+        protected virtual ComposeBlueprintContainer CreateBlueprintContainer() => new ComposeBlueprintContainer(this);
 
         /// <summary>
         /// Construct a drawable ruleset for the provided ruleset.
@@ -333,7 +331,7 @@ namespace osu.Game.Rulesets.Edit
                 EditorBeatmap.Add(hitObject);
 
                 if (EditorClock.CurrentTime < hitObject.StartTime)
-                    EditorClock.SeekTo(hitObject.StartTime);
+                    EditorClock.SeekSmoothlyTo(hitObject.StartTime);
             }
         }
 
@@ -439,9 +437,14 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public abstract bool CursorInPlacementArea { get; }
 
+        public virtual string ConvertSelectionToString() => string.Empty;
+
         #region IPositionSnapProvider
 
         public abstract SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
+
+        public virtual SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
+            new SnapResult(screenSpacePosition, null);
 
         public abstract float GetBeatSnapDistanceAt(double referenceTime);
 

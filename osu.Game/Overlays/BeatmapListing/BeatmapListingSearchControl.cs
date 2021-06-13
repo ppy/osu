@@ -1,14 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osuTK;
 using osu.Framework.Bindables;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
@@ -19,7 +22,14 @@ namespace osu.Game.Overlays.BeatmapListing
 {
     public class BeatmapListingSearchControl : CompositeDrawable
     {
+        /// <summary>
+        /// Any time the text box receives key events (even while masked).
+        /// </summary>
+        public Action TypingStarted;
+
         public Bindable<string> Query => textBox.Current;
+
+        public BindableList<SearchGeneral> General => generalFilter.Current;
 
         public Bindable<RulesetInfo> Ruleset => modeFilter.Current;
 
@@ -34,6 +44,8 @@ namespace osu.Game.Overlays.BeatmapListing
         public BindableList<ScoreRank> Ranks => ranksFilter.Current;
 
         public Bindable<SearchPlayed> Played => playedFilter.Current;
+
+        public Bindable<SearchExplicit> ExplicitContent => explicitContentFilter.Current;
 
         public BeatmapSetInfo BeatmapSet
         {
@@ -51,6 +63,7 @@ namespace osu.Game.Overlays.BeatmapListing
         }
 
         private readonly BeatmapSearchTextBox textBox;
+        private readonly BeatmapSearchMultipleSelectionFilterRow<SearchGeneral> generalFilter;
         private readonly BeatmapSearchRulesetFilterRow modeFilter;
         private readonly BeatmapSearchFilterRow<SearchCategory> categoryFilter;
         private readonly BeatmapSearchFilterRow<SearchGenre> genreFilter;
@@ -58,6 +71,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly BeatmapSearchMultipleSelectionFilterRow<SearchExtra> extraFilter;
         private readonly BeatmapSearchScoreFilterRow ranksFilter;
         private readonly BeatmapSearchFilterRow<SearchPlayed> playedFilter;
+        private readonly BeatmapSearchFilterRow<SearchExplicit> explicitContentFilter;
 
         private readonly Box background;
         private readonly UpdateableBeatmapSetCover beatmapCover;
@@ -76,7 +90,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
-                    Child = beatmapCover = new UpdateableBeatmapSetCover
+                    Child = beatmapCover = new TopSearchBeatmapSetCover
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
@@ -102,6 +116,7 @@ namespace osu.Game.Overlays.BeatmapListing
                             textBox = new BeatmapSearchTextBox
                             {
                                 RelativeSizeAxes = Axes.X,
+                                TypingStarted = () => TypingStarted?.Invoke(),
                             },
                             new ReverseChildIDFillFlowContainer<Drawable>
                             {
@@ -111,13 +126,15 @@ namespace osu.Game.Overlays.BeatmapListing
                                 Padding = new MarginPadding { Horizontal = 10 },
                                 Children = new Drawable[]
                                 {
+                                    generalFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchGeneral>(@"General"),
                                     modeFilter = new BeatmapSearchRulesetFilterRow(),
                                     categoryFilter = new BeatmapSearchFilterRow<SearchCategory>(@"Categories"),
                                     genreFilter = new BeatmapSearchFilterRow<SearchGenre>(@"Genre"),
                                     languageFilter = new BeatmapSearchFilterRow<SearchLanguage>(@"Language"),
                                     extraFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchExtra>(@"Extra"),
                                     ranksFilter = new BeatmapSearchScoreFilterRow(),
-                                    playedFilter = new BeatmapSearchFilterRow<SearchPlayed>(@"Played")
+                                    playedFilter = new BeatmapSearchFilterRow<SearchPlayed>(@"Played"),
+                                    explicitContentFilter = new BeatmapSearchFilterRow<SearchExplicit>(@"Explicit Content"),
                                 }
                             }
                         }
@@ -128,22 +145,49 @@ namespace osu.Game.Overlays.BeatmapListing
             categoryFilter.Current.Value = SearchCategory.Leaderboard;
         }
 
+        private IBindable<bool> allowExplicitContent;
+
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, OsuConfigManager config)
         {
             background.Colour = colourProvider.Dark6;
+
+            allowExplicitContent = config.GetBindable<bool>(OsuSetting.ShowOnlineExplicitContent);
+            allowExplicitContent.BindValueChanged(allow =>
+            {
+                ExplicitContent.Value = allow.NewValue ? SearchExplicit.Show : SearchExplicit.Hide;
+            }, true);
         }
 
         public void TakeFocus() => textBox.TakeFocus();
 
         private class BeatmapSearchTextBox : SearchTextBox
         {
+            /// <summary>
+            /// Any time the text box receives key events (even while masked).
+            /// </summary>
+            public Action TypingStarted;
+
             protected override Color4 SelectionColour => Color4.Gray;
 
             public BeatmapSearchTextBox()
             {
                 PlaceholderText = @"type in keywords...";
             }
+
+            protected override bool OnKeyDown(KeyDownEvent e)
+            {
+                if (!base.OnKeyDown(e))
+                    return false;
+
+                TypingStarted?.Invoke();
+                return true;
+            }
+        }
+
+        private class TopSearchBeatmapSetCover : UpdateableBeatmapSetCover
+        {
+            protected override bool TransformImmediately => true;
         }
     }
 }

@@ -49,11 +49,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ShakeDuration = 30,
                 RelativeSizeAxes = Axes.Both
             });
+        }
+
+        protected override void OnApply()
+        {
+            base.OnApply();
 
             IndexInCurrentComboBindable.BindTo(HitObject.IndexInCurrentComboBindable);
             PositionBindable.BindTo(HitObject.PositionBindable);
             StackHeightBindable.BindTo(HitObject.StackHeightBindable);
             ScaleBindable.BindTo(HitObject.ScaleBindable);
+        }
+
+        protected override void OnFree()
+        {
+            base.OnFree();
+
+            IndexInCurrentComboBindable.UnbindFrom(HitObject.IndexInCurrentComboBindable);
+            PositionBindable.UnbindFrom(HitObject.PositionBindable);
+            StackHeightBindable.UnbindFrom(HitObject.StackHeightBindable);
+            ScaleBindable.UnbindFrom(HitObject.ScaleBindable);
         }
 
         // Forward all internal management to shakeContainer.
@@ -67,15 +82,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private OsuInputManager osuActionInputManager;
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ??= GetContainingInputManager() as OsuInputManager;
 
-        protected virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
-
-        protected override void UpdateInitialTransforms()
-        {
-            base.UpdateInitialTransforms();
-
-            // Manually set to reduce the number of future alive objects to a bare minimum.
-            LifetimeStart = HitObject.StartTime - HitObject.TimePreempt;
-        }
+        public virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
 
         /// <summary>
         /// Causes this <see cref="DrawableOsuHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.

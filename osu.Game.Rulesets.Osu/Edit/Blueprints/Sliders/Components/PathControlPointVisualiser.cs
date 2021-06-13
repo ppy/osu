@@ -20,12 +20,15 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     public class PathControlPointVisualiser : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // allow context menu to appear outside of the playfield.
+
         internal readonly Container<PathControlPointPiece> Pieces;
         internal readonly Container<PathControlPointConnectionPiece> Connections;
 
@@ -66,6 +69,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    // If inserting in the path (not appending),
+                    // update indices of existing connections after insert location
+                    if (e.NewStartingIndex < Pieces.Count)
+                    {
+                        foreach (var connection in Connections)
+                        {
+                            if (connection.ControlPointIndex >= e.NewStartingIndex)
+                                connection.ControlPointIndex += e.NewItems.Count;
+                        }
+                    }
+
                     for (int i = 0; i < e.NewItems.Count; i++)
                     {
                         var point = (PathControlPoint)e.NewItems[i];
@@ -86,6 +100,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     {
                         Pieces.RemoveAll(p => p.ControlPoint == point);
                         Connections.RemoveAll(c => c.ControlPoint == point);
+                    }
+
+                    // If removing before the end of the path,
+                    // update indices of connections after remove location
+                    if (e.OldStartingIndex < Pieces.Count)
+                    {
+                        foreach (var connection in Connections)
+                        {
+                            if (connection.ControlPointIndex >= e.OldStartingIndex)
+                                connection.ControlPointIndex -= e.OldItems.Count;
+                        }
                     }
 
                     break;
@@ -126,6 +151,34 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 foreach (var p in Pieces)
                     p.IsSelected.Value = p == piece;
             }
+        }
+
+        /// <summary>
+        /// Attempts to set the given control point piece to the given path type.
+        /// If that would fail, try to change the path such that it instead succeeds
+        /// in a UX-friendly way.
+        /// </summary>
+        /// <param name="piece">The control point piece that we want to change the path type of.</param>
+        /// <param name="type">The path type we want to assign to the given control point piece.</param>
+        private void updatePathType(PathControlPointPiece piece, PathType? type)
+        {
+            int indexInSegment = piece.PointsInSegment.IndexOf(piece.ControlPoint);
+
+            switch (type)
+            {
+                case PathType.PerfectCurve:
+                    // Can't always create a circular arc out of 4 or more points,
+                    // so we split the segment into one 3-point circular arc segment
+                    // and one segment of the previous type.
+                    int thirdPointIndex = indexInSegment + 2;
+
+                    if (piece.PointsInSegment.Count > thirdPointIndex + 1)
+                        piece.PointsInSegment[thirdPointIndex].Type.Value = piece.PointsInSegment[0].Type.Value;
+
+                    break;
+            }
+
+            piece.ControlPoint.Type.Value = type;
         }
 
         [Resolved(CanBeNull = true)]
@@ -190,10 +243,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             int totalCount = Pieces.Count(p => p.IsSelected.Value);
             int countOfState = Pieces.Where(p => p.IsSelected.Value).Count(p => p.ControlPoint.Type.Value == type);
 
-            var item = new PathTypeMenuItem(type, () =>
+            var item = new TernaryStateRadioMenuItem(type == null ? "Inherit" : type.ToString().Humanize(), MenuItemType.Standard, _ =>
             {
                 foreach (var p in Pieces.Where(p => p.IsSelected.Value))
-                    p.ControlPoint.Type.Value = type;
+                    updatePathType(p, type);
             });
 
             if (countOfState == totalCount)
@@ -204,16 +257,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 item.State.Value = TernaryState.False;
 
             return item;
-        }
-
-        private class PathTypeMenuItem : TernaryStateMenuItem
-        {
-            public PathTypeMenuItem(PathType? type, Action action)
-                : base(type == null ? "Inherit" : type.ToString().Humanize(), changeState, MenuItemType.Standard, _ => action?.Invoke())
-            {
-            }
-
-            private static TernaryState changeState(TernaryState state) => TernaryState.True;
         }
     }
 }

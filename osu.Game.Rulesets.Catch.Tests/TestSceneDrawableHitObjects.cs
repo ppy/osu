@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             if (juice.NestedHitObjects.Last() is CatchHitObject tail)
                 tail.LastInCombo = true; // usually the (Catch)BeatmapProcessor would do this for us when necessary
 
-            addToPlayfield(new DrawableJuiceStream(juice, drawableRuleset.CreateDrawableRepresentation));
+            addToPlayfield(new DrawableJuiceStream(juice));
         }
 
         private void spawnBananas(bool hit = false)

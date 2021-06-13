@@ -8,6 +8,13 @@
   <ItemGroup>
     <PackageReference Include="MathNet.Numerics" Version="4.7.0" />
   </ItemGroup>
+
+  <PropertyGroup Label="Nuget">
+    <Title>osu! (ruleset)</Title>
+    <PackageId>ppy.osu.Game.Rulesets.Osu</PackageId>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>

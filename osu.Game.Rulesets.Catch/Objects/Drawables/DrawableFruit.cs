@@ -1,16 +1,22 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Utils;
+using osu.Framework.Graphics;
+using osu.Game.Rulesets.Catch.Skinning.Default;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableFruit : PalpableDrawableCatchHitObject<Fruit>
+    public class DrawableFruit : DrawablePalpableCatchHitObject
     {
-        public DrawableFruit(Fruit h)
+        public DrawableFruit()
+            : this(null)
+        {
+        }
+
+        public DrawableFruit([CanBeNull] Fruit h)
             : base(h)
         {
         }
@@ -18,34 +24,16 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            ScaleContainer.Child = new SkinnableDrawable(
-                new CatchSkinComponent(getComponent(HitObject.VisualRepresentation)), _ => new FruitPiece());
-
-            ScaleContainer.Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
+            ScalingContainer.Child = new SkinnableDrawable(
+                new CatchSkinComponent(CatchSkinComponents.Fruit),
+                _ => new FruitPiece());
         }
 
-        private CatchSkinComponents getComponent(FruitVisualRepresentation hitObjectVisualRepresentation)
+        protected override void UpdateInitialTransforms()
         {
-            switch (hitObjectVisualRepresentation)
-            {
-                case FruitVisualRepresentation.Pear:
-                    return CatchSkinComponents.FruitPear;
+            base.UpdateInitialTransforms();
 
-                case FruitVisualRepresentation.Grape:
-                    return CatchSkinComponents.FruitGrapes;
-
-                case FruitVisualRepresentation.Pineapple:
-                    return CatchSkinComponents.FruitApple;
-
-                case FruitVisualRepresentation.Raspberry:
-                    return CatchSkinComponents.FruitOrange;
-
-                case FruitVisualRepresentation.Banana:
-                    return CatchSkinComponents.FruitBananas;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(hitObjectVisualRepresentation), hitObjectVisualRepresentation, null);
-            }
+            ScalingContainer.RotateTo((RandomSingle(1) - 0.5f) * 40);
         }
     }
 }

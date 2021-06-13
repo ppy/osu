@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
@@ -33,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         protected override DrawableRuleset<OsuHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
-            => new DrawableOsuEditRuleset(ruleset, beatmap, mods);
+            => new DrawableOsuEditorRuleset(ruleset, beatmap, mods);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
@@ -80,8 +79,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             updateDistanceSnapGrid();
         }
 
-        protected override ComposeBlueprintContainer CreateBlueprintContainer(IEnumerable<DrawableHitObject> hitObjects)
-            => new OsuBlueprintContainer(hitObjects);
+        protected override ComposeBlueprintContainer CreateBlueprintContainer()
+            => new OsuBlueprintContainer(this);
+
+        public override string ConvertSelectionToString()
+            => string.Join(',', selectedHitObjects.Cast<OsuHitObject>().OrderBy(h => h.StartTime).Select(h => (h.IndexInCurrentCombo + 1).ToString()));
 
         private DistanceSnapGrid distanceSnapGrid;
         private Container distanceSnapGridContainer;
@@ -106,10 +108,19 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
         }
 
-        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        public override SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition)
         {
             if (snapToVisibleBlueprints(screenSpacePosition, out var snapResult))
                 return snapResult;
+
+            return new SnapResult(screenSpacePosition, null);
+        }
+
+        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        {
+            var positionSnap = SnapScreenSpacePositionToValidPosition(screenSpacePosition);
+            if (positionSnap.ScreenSpacePosition != screenSpacePosition)
+                return positionSnap;
 
             // will be null if distance snap is disabled or not feasible for the current time value.
             if (distanceSnapGrid == null)
@@ -136,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 if (b.IsSelected)
                     continue;
 
-                var hitObject = (OsuHitObject)b.HitObject;
+                var hitObject = (OsuHitObject)b.Item;
 
                 Vector2? snap = checkSnap(hitObject.Position);
                 if (snap == null && hitObject.Position != hitObject.EndPosition)

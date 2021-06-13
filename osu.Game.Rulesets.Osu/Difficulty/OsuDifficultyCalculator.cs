@@ -102,19 +102,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 TotalObjectCount = beatmap.HitObjects.Count,
                 HitCircleCount = hitCirclesCount,
                 SliderCount = sliderCount,
-                SpinnerCount = spinnerCount
+                SpinnerCount = spinnerCount,
+                //Skills = skills
             };
-        }
-
-        protected override Skill[] CreateSkills(IBeatmap beatmap)
-        {
-            throw new NotImplementedException();
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             throw new NotImplementedException();
         }
+
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[]
+        {
+            //new Aim(mods),
+            //new Speed(mods)
+        };
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {

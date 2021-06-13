@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterfaceV2
@@ -20,6 +21,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public bool ReadOnly
         {
+            get => Component.ReadOnly;
             set => Component.ReadOnly = value;
         }
 
@@ -44,17 +46,24 @@ namespace osu.Game.Graphics.UserInterfaceV2
             Component.BorderColour = colours.Blue;
         }
 
-        protected virtual OsuTextBox CreateTextBox() => new OsuTextBox
+        protected virtual OsuTextBox CreateTextBox() => new OsuTextBox();
+
+        public override bool AcceptsFocus => true;
+
+        protected override void OnFocus(FocusEvent e)
         {
-            CommitOnFocusLost = true,
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-            RelativeSizeAxes = Axes.X,
-            CornerRadius = CORNER_RADIUS,
-        };
+            base.OnFocus(e);
+            GetContainingInputManager().ChangeFocus(Component);
+        }
 
         protected override OsuTextBox CreateComponent() => CreateTextBox().With(t =>
         {
+            t.CommitOnFocusLost = true;
+            t.Anchor = Anchor.Centre;
+            t.Origin = Anchor.Centre;
+            t.RelativeSizeAxes = Axes.X;
+            t.CornerRadius = CORNER_RADIUS;
+
             t.OnCommit += (sender, newText) => OnCommit?.Invoke(sender, newText);
         });
     }

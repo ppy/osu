@@ -65,10 +65,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             greatWindow = 79.5 - 6 * Attributes.OverallDifficulty;
 
-            // Don't count scores made with supposedly unranked mods
-            if (mods.Any(m => !m.Ranked))
-                return 0;
-
             double multiplier = 2.14; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
             // guess the number of misses + slider breaks from combo
@@ -97,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
 
             if (mods.Any(m => m is OsuModSpunOut))
-                multiplier *= 1.0 - Math.Pow(Attributes.SpinnerCount / totalHits, 0.85);
+                multiplier *= 1.0 - Math.Pow((double)Attributes.SpinnerCount / totalHits, 0.85);
 
             double aimValue = computeAimValue();
             double tapValue = computeTapValue();

@@ -1,35 +1,23 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osuTK.Input;
+using osu.Game.Input.Bindings;
+using osuTK;
 
 namespace osu.Game.Screens.Select
 {
     public class FooterButtonRandom : FooterButton
     {
-        private readonly SpriteText secondaryText;
-        private bool secondaryActive;
+        public Action NextRandom { get; set; }
+        public Action PreviousRandom { get; set; }
 
-        public FooterButtonRandom()
-        {
-            TextContainer.Add(secondaryText = new OsuSpriteText
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Text = @"rewind",
-                Alpha = 0,
-            });
-
-            // force both text sprites to always be present to avoid width flickering while they're being swapped out
-            SpriteText.AlwaysPresent = secondaryText.AlwaysPresent = true;
-        }
+        private bool rewindSearch;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -37,34 +25,57 @@ namespace osu.Game.Screens.Select
             SelectedColour = colours.Green;
             DeselectedColour = SelectedColour.Opacity(0.5f);
             Text = @"random";
-            Hotkey = Key.F2;
-        }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            secondaryActive = e.ShiftPressed;
-            updateText();
-            return base.OnKeyDown(e);
-        }
-
-        protected override void OnKeyUp(KeyUpEvent e)
-        {
-            secondaryActive = e.ShiftPressed;
-            updateText();
-            base.OnKeyUp(e);
-        }
-
-        private void updateText()
-        {
-            if (secondaryActive)
+            Action = () =>
             {
-                SpriteText.FadeOut(120, Easing.InQuad);
-                secondaryText.FadeIn(120, Easing.InQuad);
+                if (rewindSearch)
+                {
+                    const double fade_time = 500;
+
+                    OsuSpriteText rewindSpriteText;
+
+                    TextContainer.Add(rewindSpriteText = new OsuSpriteText
+                    {
+                        Alpha = 0,
+                        Text = @"rewind",
+                        AlwaysPresent = true, // make sure the button is sized large enough to always show this
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    });
+
+                    rewindSpriteText.FadeOutFromOne(fade_time, Easing.In);
+                    rewindSpriteText.MoveTo(Vector2.Zero).MoveTo(new Vector2(0, 10), fade_time, Easing.In);
+                    rewindSpriteText.Expire();
+
+                    SpriteText.FadeInFromZero(fade_time, Easing.In);
+
+                    PreviousRandom.Invoke();
+                }
+                else
+                {
+                    NextRandom.Invoke();
+                }
+            };
+        }
+
+        public override bool OnPressed(GlobalAction action)
+        {
+            rewindSearch = action == GlobalAction.SelectPreviousRandom;
+
+            if (action != GlobalAction.SelectNextRandom && action != GlobalAction.SelectPreviousRandom)
+            {
+                return false;
             }
-            else
+
+            Click();
+            return true;
+        }
+
+        public override void OnReleased(GlobalAction action)
+        {
+            if (action == GlobalAction.SelectPreviousRandom)
             {
-                SpriteText.FadeIn(120, Easing.InQuad);
-                secondaryText.FadeOut(120, Easing.InQuad);
+                rewindSearch = false;
             }
         }
     }

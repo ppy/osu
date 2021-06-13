@@ -1,26 +1,40 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Utils;
-using osuTK.Graphics;
+using osu.Game.Rulesets.Catch.Skinning.Default;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class DrawableBanana : DrawableFruit
+    public class DrawableBanana : DrawablePalpableCatchHitObject
     {
-        public DrawableBanana(Banana h)
+        public DrawableBanana()
+            : this(null)
+        {
+        }
+
+        public DrawableBanana([CanBeNull] Banana h)
             : base(h)
         {
         }
 
-        private Color4? colour;
-
-        protected override Color4 GetComboColour(IReadOnlyList<Color4> comboColours)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            // override any external colour changes with banananana
-            return colour ??= getBananaColour();
+            ScalingContainer.Child = new SkinnableDrawable(
+                new CatchSkinComponent(CatchSkinComponents.Banana),
+                _ => new BananaPiece());
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // start time affects the random seed which is used to determine the banana colour
+            StartTimeBindable.BindValueChanged(_ => UpdateComboColour());
         }
 
         protected override void UpdateInitialTransforms()
@@ -30,14 +44,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             const float end_scale = 0.6f;
             const float random_scale_range = 1.6f;
 
-            ScaleContainer.ScaleTo(HitObject.Scale * (end_scale + random_scale_range * RNG.NextSingle()))
-                          .Then().ScaleTo(HitObject.Scale * end_scale, HitObject.TimePreempt);
+            ScalingContainer.ScaleTo(HitObject.Scale * (end_scale + random_scale_range * RandomSingle(3)))
+                            .Then().ScaleTo(HitObject.Scale * end_scale, HitObject.TimePreempt);
 
-            ScaleContainer.RotateTo(getRandomAngle())
-                          .Then()
-                          .RotateTo(getRandomAngle(), HitObject.TimePreempt);
+            ScalingContainer.RotateTo(getRandomAngle(1))
+                            .Then()
+                            .RotateTo(getRandomAngle(2), HitObject.TimePreempt);
 
-            float getRandomAngle() => 180 * (RNG.NextSingle() * 2 - 1);
+            float getRandomAngle(int series) => 180 * (RandomSingle(series) * 2 - 1);
         }
 
         public override void PlaySamples()
@@ -45,21 +59,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             base.PlaySamples();
             if (Samples != null)
                 Samples.Frequency.Value = 0.77f + ((Banana)HitObject).BananaIndex * 0.006f;
-        }
-
-        private Color4 getBananaColour()
-        {
-            switch (RNG.Next(0, 3))
-            {
-                default:
-                    return new Color4(255, 240, 0, 255);
-
-                case 1:
-                    return new Color4(255, 192, 0, 255);
-
-                case 2:
-                    return new Color4(214, 221, 28, 255);
-            }
         }
     }
 }

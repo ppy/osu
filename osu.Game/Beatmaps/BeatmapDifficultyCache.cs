@@ -30,8 +30,22 @@ namespace osu.Game.Beatmaps
         // Too many simultaneous updates can lead to stutters. One thread seems to work fine for song select display purposes.
         private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(1, nameof(BeatmapDifficultyCache));
 
-        // All bindables that should be updated along with the current ruleset + mods.
-        private readonly LockedWeakList<BindableStarDifficulty> trackedBindables = new LockedWeakList<BindableStarDifficulty>();
+        /// <summary>
+        /// All bindables that should be updated along with the current ruleset + mods.
+        /// </summary>
+        private readonly WeakList<BindableStarDifficulty> trackedBindables = new WeakList<BindableStarDifficulty>();
+
+        /// <summary>
+        /// Cancellation sources used by tracked bindables.
+        /// </summary>
+        private readonly List<CancellationTokenSource> linkedCancellationSources = new List<CancellationTokenSource>();
+
+        /// <summary>
+        /// Lock to be held when operating on <see cref="trackedBindables"/> or <see cref="linkedCancellationSources"/>.
+        /// </summary>
+        private readonly object bindableUpdateLock = new object();
+
+        private CancellationTokenSource trackedUpdateCancellationSource;
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -55,11 +69,14 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the difficulty of.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
-        /// <returns>A bindable that is updated to contain the star difficulty when it becomes available.</returns>
-        public IBindable<StarDifficulty> GetBindableDifficulty([NotNull] BeatmapInfo beatmapInfo, CancellationToken cancellationToken = default)
+        /// <returns>A bindable that is updated to contain the star difficulty when it becomes available. Will be null while in an initial calculating state (but not during updates to ruleset and mods if a stale value is already propagated).</returns>
+        public IBindable<StarDifficulty?> GetBindableDifficulty([NotNull] BeatmapInfo beatmapInfo, CancellationToken cancellationToken = default)
         {
             var bindable = createBindable(beatmapInfo, currentRuleset.Value, currentMods.Value, cancellationToken);
-            trackedBindables.Add(bindable);
+
+            lock (bindableUpdateLock)
+                trackedBindables.Add(bindable);
+
             return bindable;
         }
 
@@ -73,9 +90,9 @@ namespace osu.Game.Beatmaps
         /// <param name="rulesetInfo">The <see cref="RulesetInfo"/> to get the difficulty with. If <c>null</c>, the <paramref name="beatmapInfo"/>'s ruleset is used.</param>
         /// <param name="mods">The <see cref="Mod"/>s to get the difficulty with. If <c>null</c>, no mods will be assumed.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
-        /// <returns>A bindable that is updated to contain the star difficulty when it becomes available.</returns>
-        public IBindable<StarDifficulty> GetBindableDifficulty([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo, [CanBeNull] IEnumerable<Mod> mods,
-                                                               CancellationToken cancellationToken = default)
+        /// <returns>A bindable that is updated to contain the star difficulty when it becomes available. Will be null while in an initial calculating state.</returns>
+        public IBindable<StarDifficulty?> GetBindableDifficulty([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo, [CanBeNull] IEnumerable<Mod> mods,
+                                                                CancellationToken cancellationToken = default)
             => createBindable(beatmapInfo, rulesetInfo, mods, cancellationToken);
 
         /// <summary>
@@ -86,7 +103,8 @@ namespace osu.Game.Beatmaps
         /// <param name="mods">The <see cref="Mod"/>s to get the difficulty with.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops computing the star difficulty.</param>
         /// <returns>The <see cref="StarDifficulty"/>.</returns>
-        public Task<StarDifficulty> GetDifficultyAsync([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo = null, [CanBeNull] IEnumerable<Mod> mods = null, CancellationToken cancellationToken = default)
+        public virtual Task<StarDifficulty> GetDifficultyAsync([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo = null,
+                                                               [CanBeNull] IEnumerable<Mod> mods = null, CancellationToken cancellationToken = default)
         {
             // In the case that the user hasn't given us a ruleset, use the beatmap's default ruleset.
             rulesetInfo ??= beatmapInfo.Ruleset;
@@ -140,23 +158,23 @@ namespace osu.Game.Beatmaps
             return DifficultyRating.Easy;
         }
 
-        private CancellationTokenSource trackedUpdateCancellationSource;
-        private readonly List<CancellationTokenSource> linkedCancellationSources = new List<CancellationTokenSource>();
-
         /// <summary>
         /// Updates all tracked <see cref="BindableStarDifficulty"/> using the current ruleset and mods.
         /// </summary>
         private void updateTrackedBindables()
         {
-            cancelTrackedBindableUpdate();
-            trackedUpdateCancellationSource = new CancellationTokenSource();
-
-            foreach (var b in trackedBindables)
+            lock (bindableUpdateLock)
             {
-                var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(trackedUpdateCancellationSource.Token, b.CancellationToken);
-                linkedCancellationSources.Add(linkedSource);
+                cancelTrackedBindableUpdate();
+                trackedUpdateCancellationSource = new CancellationTokenSource();
 
-                updateBindable(b, currentRuleset.Value, currentMods.Value, linkedSource.Token);
+                foreach (var b in trackedBindables)
+                {
+                    var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(trackedUpdateCancellationSource.Token, b.CancellationToken);
+                    linkedCancellationSources.Add(linkedSource);
+
+                    updateBindable(b, currentRuleset.Value, currentMods.Value, linkedSource.Token);
+                }
             }
         }
 
@@ -165,15 +183,18 @@ namespace osu.Game.Beatmaps
         /// </summary>
         private void cancelTrackedBindableUpdate()
         {
-            trackedUpdateCancellationSource?.Cancel();
-            trackedUpdateCancellationSource = null;
-
-            if (linkedCancellationSources != null)
+            lock (bindableUpdateLock)
             {
-                foreach (var c in linkedCancellationSources)
-                    c.Dispose();
+                trackedUpdateCancellationSource?.Cancel();
+                trackedUpdateCancellationSource = null;
 
-                linkedCancellationSources.Clear();
+                if (linkedCancellationSources != null)
+                {
+                    foreach (var c in linkedCancellationSources)
+                        c.Dispose();
+
+                    linkedCancellationSources.Clear();
+                }
             }
         }
 
@@ -239,17 +260,10 @@ namespace osu.Game.Beatmaps
             }
             catch (BeatmapInvalidForRulesetException e)
             {
-                // Conversion has failed for the given ruleset, so return the difficulty in the beatmap's default ruleset.
-
-                // Ensure the beatmap's default ruleset isn't the one already being converted to.
-                // This shouldn't happen as it means something went seriously wrong, but if it does an endless loop should be avoided.
                 if (rulesetInfo.Equals(beatmapInfo.Ruleset))
-                {
                     Logger.Error(e, $"Failed to convert {beatmapInfo.OnlineBeatmapID} to the beatmap's default ruleset ({beatmapInfo.Ruleset}).");
-                    return new StarDifficulty();
-                }
 
-                return GetAsync(new DifficultyCacheLookup(key.Beatmap, key.Beatmap.Ruleset, key.OrderedMods)).Result;
+                return new StarDifficulty();
             }
             catch
             {
@@ -299,7 +313,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        private class BindableStarDifficulty : Bindable<StarDifficulty>
+        private class BindableStarDifficulty : Bindable<StarDifficulty?>
         {
             public readonly BeatmapInfo Beatmap;
             public readonly CancellationToken CancellationToken;

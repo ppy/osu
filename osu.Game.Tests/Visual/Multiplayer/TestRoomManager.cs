@@ -3,8 +3,8 @@
 
 using System;
 using osu.Framework.Bindables;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Screens.Multi;
+using osu.Game.Online.Rooms;
+using osu.Game.Screens.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public readonly BindableList<Room> Rooms = new BindableList<Room>();
 
-        public Bindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>(true);
+        public IBindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>(true);
 
         IBindableList<Room> IRoomManager.Rooms => Rooms;
 

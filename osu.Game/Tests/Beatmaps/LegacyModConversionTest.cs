@@ -17,10 +17,9 @@ namespace osu.Game.Tests.Beatmaps
         /// <summary>
         /// Creates the <see cref="Ruleset"/> whose legacy mod conversion is to be tested.
         /// </summary>
-        /// <returns></returns>
         protected abstract Ruleset CreateRuleset();
 
-        protected void Test(LegacyMods legacyMods, Type[] expectedMods)
+        protected void TestFromLegacy(LegacyMods legacyMods, Type[] expectedMods)
         {
             var ruleset = CreateRuleset();
             var mods = ruleset.ConvertFromLegacyMods(legacyMods).ToList();
@@ -30,6 +29,16 @@ namespace osu.Game.Tests.Beatmaps
             {
                 Assert.IsNotNull(mods.SingleOrDefault(mod => mod.GetType() == modType));
             }
+        }
+
+        protected void TestToLegacy(LegacyMods expectedLegacyMods, Type[] providedModTypes)
+        {
+            var ruleset = CreateRuleset();
+            var modInstances = ruleset.GetAllMods()
+                                      .Where(mod => providedModTypes.Contains(mod.GetType()))
+                                      .ToArray();
+            var actualLegacyMods = ruleset.ConvertToLegacyMods(modInstances);
+            Assert.AreEqual(expectedLegacyMods, actualLegacyMods);
         }
     }
 }
