@@ -31,5 +31,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public int TotalObjectCount;
         public int HitCircleCount;
         public int SliderCount;
+        public int SpinnerCount;
     }
 }

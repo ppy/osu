@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private const double skill_to_pp_exponent = 2.7;
 
         /// <summary>
-        /// The first 0.5 miss doesn't count when we penalize misses
+        /// Miss count is continuous so the first 0.5 miss doesn't count when we penalize misses.
         /// </summary>
         private const double miss_count_leniency = 0.5;
 
@@ -69,7 +69,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => !m.Ranked))
                 return 0;
 
-            // Custom multipliers for NoFail and SpunOut.
             double multiplier = 2.14; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
             // guess the number of misses + slider breaks from combo
@@ -93,11 +92,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             effectiveMissCount = Math.Max(countMiss, comboBasedMissCount);
 
+            // Custom multipliers for NoFail and SpunOut.
             if (mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
 
             if (mods.Any(m => m is OsuModSpunOut))
-                multiplier *= 1.0 - Math.Pow(countSpinners / totalHits, 0.85);
+                multiplier *= 1.0 - Math.Pow(Attributes.SpinnerCount / totalHits, 0.85);
 
             double aimValue = computeAimValue();
             double tapValue = computeTapValue();
