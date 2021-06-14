@@ -27,9 +27,9 @@ namespace osu.Game.Rulesets.Catch.Tests
                 }
             };
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 12; i++)
             {
-                float width = (i % 10 + 1) / 20f * CatchPlayfield.WIDTH;
+                float width = (i + 1) / 20f * CatchPlayfield.WIDTH;
 
                 beatmap.HitObjects.Add(new JuiceStream
                 {
@@ -39,8 +39,8 @@ namespace osu.Game.Rulesets.Catch.Tests
                         Vector2.Zero,
                         new Vector2(width, 0)
                     }),
-                    StartTime = i * 2000,
-                    NewCombo = i % 8 == 0,
+                    StartTime = i * 1000,
+                    NewCombo = i % 5 == 0,
                     Samples = new List<HitSampleInfo>(new[]
                     {
                         new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "normal", volume: 100)
