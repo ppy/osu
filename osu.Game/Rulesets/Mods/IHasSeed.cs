@@ -5,7 +5,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 
@@ -18,11 +17,14 @@ namespace osu.Game.Rulesets.Mods
 
     public class SeedSettingsControl : SettingsItem<int?>
     {
-        protected override Drawable CreateControl() => new SeedControl
+        protected override Drawable CreateControl()
         {
-            RelativeSizeAxes = Axes.X,
-            Margin = new MarginPadding { Top = 5 }
-        };
+            return new SeedControl
+            {
+                RelativeSizeAxes = Axes.X,
+                Margin = new MarginPadding { Top = 5 }
+            };
+        }
 
         private sealed class SeedControl : CompositeDrawable, IHasCurrentValue<int?>
         {
@@ -46,33 +48,33 @@ namespace osu.Game.Rulesets.Mods
 
                 InternalChildren = new[]
                 {
-                        new GridContainer
+                    new GridContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        ColumnDimensions = new[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            ColumnDimensions = new[]
+                            new Dimension(),
+                            new Dimension(GridSizeMode.Absolute, 2),
+                            new Dimension(GridSizeMode.Relative, 0.25f)
+                        },
+                        RowDimensions = new[]
+                        {
+                            new Dimension(GridSizeMode.AutoSize)
+                        },
+                        Content = new[]
+                        {
+                            new Drawable[]
                             {
-                                new Dimension(),
-                                new Dimension(GridSizeMode.Absolute, 2),
-                                new Dimension(GridSizeMode.Relative, 0.25f)
-                            },
-                            RowDimensions = new[]
-                            {
-                                new Dimension(GridSizeMode.AutoSize)
-                            },
-                            Content = new[]
-                            {
-                                new Drawable[]
+                                seedNumberBox = new OsuNumberBox
                                 {
-                                    seedNumberBox = new OsuNumberBox
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        CommitOnFocusLost = true
-                                    }
+                                    RelativeSizeAxes = Axes.X,
+                                    CommitOnFocusLost = true
                                 }
                             }
                         }
-                    };
+                    }
+                };
 
                 seedNumberBox.Current.BindValueChanged(e =>
                 {
