@@ -30,7 +30,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModTarget : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<OsuHitObject>,
-        IApplicableToHealthProcessor, IApplicableToDifficulty, IApplicableFailOverride, IHasSeed
+                                IApplicableToHealthProcessor, IApplicableToDifficulty, IApplicableFailOverride, IHasSeed
     {
         public override string Name => "Target";
         public override string Acronym => "TP";
@@ -57,11 +57,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             // Sudden death
             healthProcessor.FailConditions += (_, result)
                 => result.Type.AffectsCombo()
-                && !result.IsHit;
+                   && !result.IsHit;
         }
 
         // Maximum distance to jump
-        public const float MAX_DISTANCE = 250f;
+        private const float max_distance = 250f;
 
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
@@ -69,76 +69,68 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var rng = new Random(Seed.Value.GetValueOrDefault());
 
-            float nextSingle(float max = 1f)
-            {
-                return (float)(rng.NextDouble() * max);
-            }
+            float nextSingle(float max = 1f) => (float)(rng.NextDouble() * max);
 
             var osuBeatmap = (OsuBeatmap)beatmap;
             var origHitObjects = osuBeatmap.HitObjects.OrderBy(x => x.StartTime).ToList();
 
             // Only place circles between startTime and endTime
             var startTime = origHitObjects.First().StartTime;
-            double endTime;
             var endObj = origHitObjects.Last();
-            switch (endObj)
+            var endTime = endObj switch
             {
-                case Slider slider:
-                    endTime = slider.EndTime;
-                    break;
-                case Spinner spinner:
-                    endTime = spinner.EndTime;
-                    break;
-                default:
-                    endTime = endObj.StartTime;
-                    break;
-            }
+                Slider slider => slider.EndTime,
+                Spinner spinner => spinner.EndTime,
+                _ => endObj.StartTime
+            };
 
             // Generate the beats
             var beats = osuBeatmap.ControlPointInfo.TimingPoints
-                .Where(x => Precision.AlmostBigger(endTime, x.Time))
-                .SelectMany(tp =>
-                {
-                    var tpBeats = new List<double>();
-                    var currentTime = tp.Time;
-                    while (Precision.AlmostBigger(endTime, currentTime) && osuBeatmap.ControlPointInfo.TimingPointAt(currentTime) == tp)
-                    {
-                        tpBeats.Add(currentTime);
-                        currentTime += tp.BeatLength;
-                    }
-                    return tpBeats;
-                })
-                // Remove beats that are before startTime
-                .Where(x => Precision.AlmostBigger(x, startTime))
-                // Remove beats during breaks
-                .Where(x => !osuBeatmap.Breaks.Any(b =>
-                     Precision.AlmostBigger(x, b.StartTime)
-                     && Precision.AlmostBigger(origHitObjects.First(y => Precision.AlmostBigger(y.StartTime, b.EndTime)).StartTime, x)
-                ))
-                .ToList();
+                                  .Where(x => Precision.AlmostBigger(endTime, x.Time))
+                                  .SelectMany(tp =>
+                                  {
+                                      var tpBeats = new List<double>();
+                                      var currentTime = tp.Time;
+
+                                      while (Precision.AlmostBigger(endTime, currentTime) && osuBeatmap.ControlPointInfo.TimingPointAt(currentTime) == tp)
+                                      {
+                                          tpBeats.Add(currentTime);
+                                          currentTime += tp.BeatLength;
+                                      }
+
+                                      return tpBeats;
+                                  })
+                                  // Remove beats that are before startTime
+                                  .Where(x => Precision.AlmostBigger(x, startTime))
+                                  // Remove beats during breaks
+                                  .Where(x => !osuBeatmap.Breaks.Any(b =>
+                                      Precision.AlmostBigger(x, b.StartTime)
+                                      && Precision.AlmostBigger(origHitObjects.First(y => Precision.AlmostBigger(y.StartTime, b.EndTime)).StartTime, x)
+                                  ))
+                                  .ToList();
             // Generate a hit circle for each beat
             var hitObjects = beats
-                // Remove beats that are too close to the next one (e.g. due to timing point changes)
-                .Where((x, idx) =>
-                {
-                    if (idx == beats.Count - 1) return true;
-                    if (Precision.AlmostBigger(osuBeatmap.ControlPointInfo.TimingPointAt(x).BeatLength / 2, beats[idx + 1] - x))
-                        return false;
-                    return true;
-                })
-                .Select(x =>
-                {
-                    var newCircle = new HitCircle();
-                    newCircle.ApplyDefaults(osuBeatmap.ControlPointInfo, osuBeatmap.BeatmapInfo.BaseDifficulty);
-                    newCircle.StartTime = x;
-                    return (OsuHitObject)newCircle;
-                }).ToList();
+                             // Remove beats that are too close to the next one (e.g. due to timing point changes)
+                             .Where((x, idx) =>
+                             {
+                                 if (idx == beats.Count - 1) return true;
+
+                                 return !Precision.AlmostBigger(osuBeatmap.ControlPointInfo.TimingPointAt(x).BeatLength / 2, beats[idx + 1] - x);
+                             })
+                             .Select(x =>
+                             {
+                                 var newCircle = new HitCircle();
+                                 newCircle.ApplyDefaults(osuBeatmap.ControlPointInfo, osuBeatmap.BeatmapInfo.BaseDifficulty);
+                                 newCircle.StartTime = x;
+                                 return (OsuHitObject)newCircle;
+                             }).ToList();
 
             // Add hit samples to the circles
             for (int i = 0; i < hitObjects.Count; i++)
             {
                 var x = hitObjects[i];
                 var samples = getSamplesAtTime(origHitObjects, x.StartTime);
+
                 if (samples == null)
                 {
                     if (i > 0)
@@ -155,11 +147,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             hitObjects.ForEach(x =>
             {
                 var origObj = origHitObjects.FindLast(y => Precision.AlmostBigger(x.StartTime, y.StartTime));
-                if (origObj == null) x.ComboIndex = 0;
-                else x.ComboIndex = origObj.ComboIndex;
+                x.ComboIndex = origObj?.ComboIndex ?? 0;
             });
             // Then reprocess them to ensure continuity in the combo indices and add indices in current combo
             var combos = hitObjects.GroupBy(x => x.ComboIndex).ToList();
+
             for (int i = 0; i < combos.Count; i++)
             {
                 var group = combos[i].ToList();
@@ -176,20 +168,22 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // Position all hit circles
             var direction = MathHelper.TwoPi * nextSingle();
+
             for (int i = 0; i < hitObjects.Count; i++)
             {
                 var x = hitObjects[i];
+
                 if (i == 0)
                 {
                     x.Position = new Vector2(nextSingle(OsuPlayfield.BASE_SIZE.X), nextSingle(OsuPlayfield.BASE_SIZE.Y));
                 }
                 else
                 {
-                    var distance = Math.Min(MAX_DISTANCE, 40f * (float)Math.Pow(1.05, x.ComboIndex));
+                    var distance = Math.Min(max_distance, 40f * (float)Math.Pow(1.05, x.ComboIndex));
                     var relativePos = new Vector2(
-                            distance * (float)Math.Cos(direction),
-                           distance * (float)Math.Sin(direction)
-                        );
+                        distance * (float)Math.Cos(direction),
+                        distance * (float)Math.Sin(direction)
+                    );
                     relativePos = getRotatedVector(hitObjects[i - 1].Position, relativePos);
                     direction = (float)Math.Atan2(relativePos.Y, relativePos.X);
 
@@ -209,7 +203,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     if (x.LastInCombo)
                         direction = MathHelper.TwoPi * nextSingle();
                     else
-                        direction += distance / MAX_DISTANCE * (nextSingle() * MathHelper.TwoPi - MathHelper.Pi);
+                        direction += distance / max_distance * (nextSingle() * MathHelper.TwoPi - MathHelper.Pi);
                 }
             }
 
@@ -227,25 +221,24 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <param name="hitObjects">The list of hit objects in a beatmap, ordered by StartTime</param>
         /// <param name="time">The point in time to get samples for</param>
         /// <returns>Hit samples</returns>
-        private IList<HitSampleInfo> getSamplesAtTime(List<OsuHitObject> hitObjects, double time)
+        private IList<HitSampleInfo> getSamplesAtTime(IEnumerable<OsuHitObject> hitObjects, double time)
         {
             var sampleObj = hitObjects.FirstOrDefault(x =>
             {
                 if (Precision.AlmostEquals(time, x.StartTime)) return true;
-                if (x is Slider slider
-                    && Precision.AlmostBigger(time, slider.StartTime)
-                    && Precision.AlmostBigger(slider.EndTime, time))
-                {
-                    if (Precision.AlmostEquals((time - slider.StartTime) % slider.SpanDuration, 0))
-                    {
-                        return true;
-                    }
-                }
-                return false;
+
+                if (!(x is Slider s))
+                    return false;
+                if (!Precision.AlmostBigger(time, s.StartTime)
+                    || !Precision.AlmostBigger(s.EndTime, time))
+                    return false;
+
+                return Precision.AlmostEquals((time - s.StartTime) % s.SpanDuration, 0);
             });
             if (sampleObj == null) return null;
 
-            IList<HitSampleInfo> samples = null;
+            IList<HitSampleInfo> samples;
+
             if (sampleObj is Slider slider)
             {
                 samples = slider.NodeSamples[(int)Math.Round((time - slider.StartTime) % slider.SpanDuration)];
@@ -254,6 +247,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 samples = sampleObj.Samples;
             }
+
             return samples;
         }
 
@@ -269,19 +263,18 @@ namespace osu.Game.Rulesets.Osu.Mods
             var h = (OsuHitObject)drawable.HitObject;
 
             // apply grow and fade effect
-            if (drawable is DrawableHitCircle circle)
+            if (!(drawable is DrawableHitCircle circle)) return;
+
+            using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
             {
-                using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
-                {
-                    // todo: this doesn't feel quite right yet
-                    drawable.ScaleTo(0.4f)
+                // todo: this doesn't feel quite right yet
+                drawable.ScaleTo(0.4f)
                         .Then().ScaleTo(1.6f, h.TimePreempt * 2);
-                    drawable.FadeTo(0.5f)
+                drawable.FadeTo(0.5f)
                         .Then().Delay(h.TimeFadeIn).FadeTo(1f);
 
-                    // remove approach circles
-                    circle.ApproachCircle.Hide();
-                }
+                // remove approach circles
+                circle.ApproachCircle.Hide();
             }
         }
 
@@ -347,7 +340,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
 
         /// <summary>
-        /// Rotates vector "initial" towards vector "destinantion"
+        /// Rotates vector "initial" towards vector "destination"
         /// </summary>
         /// <param name="initial">Vector to rotate to "destination"</param>
         /// <param name="destination">Vector "initial" should be rotated to</param>
@@ -399,7 +392,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 InternalChildren = new Drawable[]
                 {
-                    sample = new PausableSkinnableSound(new SampleInfo("spinnerbonus")), // todo: use another sample?
+                    sample = new PausableSkinnableSound(new SampleInfo("spinnerbonus")) // todo: use another sample?
                 };
             }
 
