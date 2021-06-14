@@ -44,9 +44,9 @@ namespace osu.Game.Online.Leaderboards
 
         protected override Container<Drawable> Content => content;
 
-        private IEnumerable<TScoreInfo> scores;
+        private ICollection<TScoreInfo> scores;
 
-        public IEnumerable<TScoreInfo> Scores
+        public ICollection<TScoreInfo> Scores
         {
             get => scores;
             set
@@ -290,7 +290,7 @@ namespace osu.Game.Online.Leaderboards
 
                 getScoresRequest = FetchScores(scores => Schedule(() =>
                 {
-                    Scores = scores;
+                    Scores = scores.ToArray();
                     PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
                 }));
 
