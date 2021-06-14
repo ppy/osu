@@ -25,8 +25,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
         private Direction scrollingAxis => direction.Value == ScrollingDirection.Left || direction.Value == ScrollingDirection.Right ? Direction.Horizontal : Direction.Vertical;
 
         /// <summary>
-        /// Whether the scrolling direction is the positive-to-negative direction in the local coordinate.
+        /// The scrolling axis is inverted if objects temporally farther in the future have a smaller position value across the scrolling axis.
         /// </summary>
+        /// <example>
+        /// <see cref="ScrollingDirection.Down"/> is inverted, because given two objects, one of which is at the current time and one of which is 1000ms in the future,
+        /// in the current time instant the future object is spatially above the current object, and therefore has a smaller value of the Y coordinate of its position.
+        /// </example>
         private bool axisInverted => direction.Value == ScrollingDirection.Down || direction.Value == ScrollingDirection.Right;
 
         /// <summary>
@@ -58,7 +62,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         }
 
         /// <summary>
-        /// Given a position at <paramref name="currentTime"/>, return the time of the object corresponding the position.
+        /// Given a position at <paramref name="currentTime"/>, return the time of the object corresponding to the position.
         /// </summary>
         /// <remarks>
         /// If there are multiple valid time values, one arbitrary time is returned.
