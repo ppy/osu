@@ -1,0 +1,538 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="pinned_topics" xml:space="preserve">
+    <value>Subiecte fixate</value>
+  </data>
+  <data name="slogan" xml:space="preserve">
+    <value>este periculos să te joci singur.</value>
+  </data>
+  <data name="subforums" xml:space="preserve">
+    <value>Subforumuri</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>forumuri osu!</value>
+  </data>
+  <data name="covers.edit" xml:space="preserve">
+    <value>Editare copertă</value>
+  </data>
+  <data name="covers.create._" xml:space="preserve">
+    <value>Setează imaginea de copertă</value>
+  </data>
+  <data name="covers.create.button" xml:space="preserve">
+    <value>Încarcă imaginea</value>
+  </data>
+  <data name="covers.create.info" xml:space="preserve">
+    <value>Dimensiunea imaginii de copertă ar trebui să fie la {0}. Poți, de asemenea, să plasezi imaginea aici pentru a o încărca.</value>
+  </data>
+  <data name="covers.destroy._" xml:space="preserve">
+    <value>Elimină imaginea de copertă</value>
+  </data>
+  <data name="covers.destroy.confirm" xml:space="preserve">
+    <value>Ești sigur că vrei să elimini imaginea de copertă?</value>
+  </data>
+  <data name="forums.latest_post" xml:space="preserve">
+    <value>Ultima Postare</value>
+  </data>
+  <data name="forums.index.title" xml:space="preserve">
+    <value>Index forum</value>
+  </data>
+  <data name="forums.topics.empty" xml:space="preserve">
+    <value>Niciun subiect!</value>
+  </data>
+  <data name="mark_as_read.forum" xml:space="preserve">
+    <value>Marchează forumul ca citit</value>
+  </data>
+  <data name="mark_as_read.forums" xml:space="preserve">
+    <value>Marchează forumurile ca citite</value>
+  </data>
+  <data name="mark_as_read.busy" xml:space="preserve">
+    <value>Se marchează ca citit...</value>
+  </data>
+  <data name="post.confirm_destroy" xml:space="preserve">
+    <value>Sigur dorești să ștergi postarea?</value>
+  </data>
+  <data name="post.confirm_restore" xml:space="preserve">
+    <value>Sigur dorești să restaurezi postarea?</value>
+  </data>
+  <data name="post.edited" xml:space="preserve">
+    <value>Editat ultima dată de către {0} {1}, editat de {2} ori în total.</value>
+  </data>
+  <data name="post.posted_at" xml:space="preserve">
+    <value>postat {0}</value>
+  </data>
+  <data name="post.actions.destroy" xml:space="preserve">
+    <value>Șterge postarea</value>
+  </data>
+  <data name="post.actions.edit" xml:space="preserve">
+    <value>Editează postarea</value>
+  </data>
+  <data name="post.actions.restore" xml:space="preserve">
+    <value>Restaurează postarea</value>
+  </data>
+  <data name="post.create.title.reply" xml:space="preserve">
+    <value>Răspuns nou</value>
+  </data>
+  <data name="post.info.post_count" xml:space="preserve">
+    <value>{0} postare|{0} postări</value>
+  </data>
+  <data name="post.info.topic_starter" xml:space="preserve">
+    <value>Începător de topic</value>
+  </data>
+  <data name="search.go_to_post" xml:space="preserve">
+    <value>Mergi la postare</value>
+  </data>
+  <data name="search.post_number_input" xml:space="preserve">
+    <value>introdu numărul postării</value>
+  </data>
+  <data name="search.total_posts" xml:space="preserve">
+    <value>{0} postări în total</value>
+  </data>
+  <data name="topic.deleted" xml:space="preserve">
+    <value>subiect șters</value>
+  </data>
+  <data name="topic.go_to_latest" xml:space="preserve">
+    <value>vezi cea mai recentă postare</value>
+  </data>
+  <data name="topic.has_replied" xml:space="preserve">
+    <value>Ai răspuns în acest topic</value>
+  </data>
+  <data name="topic.in_forum" xml:space="preserve">
+    <value>in {0}</value>
+  </data>
+  <data name="topic.latest_post" xml:space="preserve">
+    <value>{0} de {1}</value>
+  </data>
+  <data name="topic.latest_reply_by" xml:space="preserve">
+    <value>ultima replică de {0}</value>
+  </data>
+  <data name="topic.new_topic" xml:space="preserve">
+    <value>Postează un subiect nou</value>
+  </data>
+  <data name="topic.new_topic_login" xml:space="preserve">
+    <value>Conectează-te pentru a posta un subiect nou</value>
+  </data>
+  <data name="topic.post_reply" xml:space="preserve">
+    <value>Postează</value>
+  </data>
+  <data name="topic.reply_box_placeholder" xml:space="preserve">
+    <value>Scrie aici pentru a răspunde</value>
+  </data>
+  <data name="topic.reply_title_prefix" xml:space="preserve">
+    <value>Re</value>
+  </data>
+  <data name="topic.started_by" xml:space="preserve">
+    <value>de {0}</value>
+  </data>
+  <data name="topic.started_by_verbose" xml:space="preserve">
+    <value>început de {0}</value>
+  </data>
+  <data name="topic.create.close" xml:space="preserve">
+    <value>Închide</value>
+  </data>
+  <data name="topic.create.preview" xml:space="preserve">
+    <value>Previzualizare</value>
+  </data>
+  <data name="topic.create.preview_hide" xml:space="preserve">
+    <value>Scrie</value>
+  </data>
+  <data name="topic.create.submit" xml:space="preserve">
+    <value>Postează</value>
+  </data>
+  <data name="topic.create.necropost.default" xml:space="preserve">
+    <value>Acest subiect a fost inactiv pentru o vreme. Postează aici doar dacă ai un motiv specific.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic._" xml:space="preserve">
+    <value>Acest subiect a fost inactiv pentru o vreme. Dacă nu ai un motiv specific pentru a posta aici, te rugăm să {0} în schimb.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic.create" xml:space="preserve">
+    <value>creezi un subiect nou</value>
+  </data>
+  <data name="topic.create.placeholder.body" xml:space="preserve">
+    <value>Introdu conținutul postării aici</value>
+  </data>
+  <data name="topic.create.placeholder.title" xml:space="preserve">
+    <value>Click aici pentru a stabili un titlu</value>
+  </data>
+  <data name="topic.jump.enter" xml:space="preserve">
+    <value>click pentru a introduce numărul postării</value>
+  </data>
+  <data name="topic.jump.first" xml:space="preserve">
+    <value>mergi la prima postare</value>
+  </data>
+  <data name="topic.jump.last" xml:space="preserve">
+    <value>mergi la ultima postare</value>
+  </data>
+  <data name="topic.jump.next" xml:space="preserve">
+    <value>sari peste următoarele 10 postări</value>
+  </data>
+  <data name="topic.jump.previous" xml:space="preserve">
+    <value>mergi înapoi 10 postări</value>
+  </data>
+  <data name="topic.post_edit.cancel" xml:space="preserve">
+    <value>Anulează</value>
+  </data>
+  <data name="topic.post_edit.post" xml:space="preserve">
+    <value>Salvează</value>
+  </data>
+  <data name="topic_watches.index.title_compact" xml:space="preserve">
+    <value>abonamente</value>
+  </data>
+  <data name="topic_watches.index.box.total" xml:space="preserve">
+    <value>Subiecte la care te-ai abonat</value>
+  </data>
+  <data name="topic_watches.index.box.unread" xml:space="preserve">
+    <value>Subiecte cu răspunsuri noi</value>
+  </data>
+  <data name="topic_watches.index.info.total" xml:space="preserve">
+    <value>Tu ești abonat la {0} subiecte.</value>
+  </data>
+  <data name="topic_watches.index.info.unread" xml:space="preserve">
+    <value>Tu ai {0} răspunsuri necitite la subiectele la care te-ai abonat.</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.confirmation" xml:space="preserve">
+    <value>Te dezabonezi de la acest subiect?</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.title" xml:space="preserve">
+    <value>Dezabonare</value>
+  </data>
+  <data name="topics._" xml:space="preserve">
+    <value>Subiecte</value>
+  </data>
+  <data name="topics.actions.login_reply" xml:space="preserve">
+    <value>Conectează-te pentru a răspunde</value>
+  </data>
+  <data name="topics.actions.reply" xml:space="preserve">
+    <value>Răspunde</value>
+  </data>
+  <data name="topics.actions.reply_with_quote" xml:space="preserve">
+    <value>Citează mesajul și răspunde</value>
+  </data>
+  <data name="topics.actions.search" xml:space="preserve">
+    <value>Caută</value>
+  </data>
+  <data name="topics.create.create_poll" xml:space="preserve">
+    <value>Crearea unui sondaj</value>
+  </data>
+  <data name="topics.create.preview" xml:space="preserve">
+    <value>Previzualizare</value>
+  </data>
+  <data name="topics.create.create_poll_button.add" xml:space="preserve">
+    <value>Creează un sondaj</value>
+  </data>
+  <data name="topics.create.create_poll_button.remove" xml:space="preserve">
+    <value>Anulează crearea unui sondaj</value>
+  </data>
+  <data name="topics.create.poll.hide_results" xml:space="preserve">
+    <value>Ascunde rezultatele poll-ului.</value>
+  </data>
+  <data name="topics.create.poll.hide_results_info" xml:space="preserve">
+    <value>Vor fi arătate doar după ce poll-ul conclude.</value>
+  </data>
+  <data name="topics.create.poll.length" xml:space="preserve">
+    <value>Rulează sondajul pentru</value>
+  </data>
+  <data name="topics.create.poll.length_days_suffix" xml:space="preserve">
+    <value>zile</value>
+  </data>
+  <data name="topics.create.poll.length_info" xml:space="preserve">
+    <value>Lasă liber pentru un sondaj ce nu se termină niciodată</value>
+  </data>
+  <data name="topics.create.poll.max_options" xml:space="preserve">
+    <value>Opțiuni per utilizator</value>
+  </data>
+  <data name="topics.create.poll.max_options_info" xml:space="preserve">
+    <value>Acesta este numărul de opțiuni pe care fiecare utilizator îl poate selecta când votează.</value>
+  </data>
+  <data name="topics.create.poll.options" xml:space="preserve">
+    <value>Opțiuni</value>
+  </data>
+  <data name="topics.create.poll.options_info" xml:space="preserve">
+    <value>Plasează fiecare opțiune pe o linie nouă. Poți introduce până la 10 opțiuni.</value>
+  </data>
+  <data name="topics.create.poll.title" xml:space="preserve">
+    <value>Întrebare</value>
+  </data>
+  <data name="topics.create.poll.vote_change" xml:space="preserve">
+    <value>Permite re-votarea.</value>
+  </data>
+  <data name="topics.create.poll.vote_change_info" xml:space="preserve">
+    <value>Dacă este activată, utilizatorii au posibilitatea de a-și schimba votul.</value>
+  </data>
+  <data name="topics.edit_title.start" xml:space="preserve">
+    <value>Editează titlul</value>
+  </data>
+  <data name="topics.index.feature_votes" xml:space="preserve">
+    <value>prioritatea stelelor</value>
+  </data>
+  <data name="topics.index.replies" xml:space="preserve">
+    <value>răspunsuri</value>
+  </data>
+  <data name="topics.index.views" xml:space="preserve">
+    <value>vizualizări</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0" xml:space="preserve">
+    <value>Elimină tagul "added"</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0_done" xml:space="preserve">
+    <value>S-a eliminat tagul "added"</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1" xml:space="preserve">
+    <value>Adaugă tagul "added"</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1_done" xml:space="preserve">
+    <value>S-a adăugat tagul "added"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0" xml:space="preserve">
+    <value>Elimină tagul "assigned"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0_done" xml:space="preserve">
+    <value>S-a eliminat tagul "assigned"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1" xml:space="preserve">
+    <value>Adaugă tagul "assigned"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1_done" xml:space="preserve">
+    <value>S-a adăugat tagul "assigned"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0" xml:space="preserve">
+    <value>Elimină tagul "confirmed"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0_done" xml:space="preserve">
+    <value>S-a eliminat tagul "confirmed"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1" xml:space="preserve">
+    <value>Adaugă tagul "confirmed"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1_done" xml:space="preserve">
+    <value>S-a adăugat tagul "confirmed"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0" xml:space="preserve">
+    <value>Elimină tagul "duplicate"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0_done" xml:space="preserve">
+    <value>S-a eliminat tagul "duplicate"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1" xml:space="preserve">
+    <value>Adaugă tagul "duplicate"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1_done" xml:space="preserve">
+    <value>S-a adăugat tagul "duplicate"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0" xml:space="preserve">
+    <value>Elimină tagul "invalid"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0_done" xml:space="preserve">
+    <value>S-a eliminat tagul "invalid"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1" xml:space="preserve">
+    <value>Adaugă tagul "invalid"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1_done" xml:space="preserve">
+    <value>S-a adăugat tagul "invalid"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0" xml:space="preserve">
+    <value>Elimină tagul "resolved"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0_done" xml:space="preserve">
+    <value>S-a eliminat tagul "resolved"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1" xml:space="preserve">
+    <value>Adaugă tagul "resolved"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1_done" xml:space="preserve">
+    <value>S-a adăugat tagul "resolved"</value>
+  </data>
+  <data name="topics.lock.is_locked" xml:space="preserve">
+    <value>Acest subiect este închis și nu se pot adăuga răspunsuri</value>
+  </data>
+  <data name="topics.lock.to_0" xml:space="preserve">
+    <value>Deblochează subiectul</value>
+  </data>
+  <data name="topics.lock.to_0_confirm" xml:space="preserve">
+    <value>Deblochează topicul?</value>
+  </data>
+  <data name="topics.lock.to_0_done" xml:space="preserve">
+    <value>Subiectul a fost deblocat</value>
+  </data>
+  <data name="topics.lock.to_1" xml:space="preserve">
+    <value>Blochează subiectul</value>
+  </data>
+  <data name="topics.lock.to_1_confirm" xml:space="preserve">
+    <value>Blochează topicul?</value>
+  </data>
+  <data name="topics.lock.to_1_done" xml:space="preserve">
+    <value>Subiectul a fost blocat</value>
+  </data>
+  <data name="topics.moderate_move.title" xml:space="preserve">
+    <value>Mergi la un alt forum</value>
+  </data>
+  <data name="topics.moderate_pin.to_0" xml:space="preserve">
+    <value>Anulează fixarea subiectului</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_confirm" xml:space="preserve">
+    <value>Nu mai fixa topicul?</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_done" xml:space="preserve">
+    <value>Subiectul nu mai este fixat</value>
+  </data>
+  <data name="topics.moderate_pin.to_1" xml:space="preserve">
+    <value>Fixează subiectul</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_confirm" xml:space="preserve">
+    <value>Fixează topicul?</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_done" xml:space="preserve">
+    <value>Subiectul a fost fixat</value>
+  </data>
+  <data name="topics.moderate_pin.to_2" xml:space="preserve">
+    <value>Fixează subiectul și marchează-l ca un anunț</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_confirm" xml:space="preserve">
+    <value>Fixează topicul și marchează-l ca anunț?</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_done" xml:space="preserve">
+    <value>Subiectul a fost fixat și marcat ca un anunț</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.show" xml:space="preserve">
+    <value>Arată postări șterse</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.hide" xml:space="preserve">
+    <value>Ascunde postări șterse</value>
+  </data>
+  <data name="topics.show.deleted-posts" xml:space="preserve">
+    <value>Postări șterse</value>
+  </data>
+  <data name="topics.show.total_posts" xml:space="preserve">
+    <value>Total postări</value>
+  </data>
+  <data name="topics.show.feature_vote.current" xml:space="preserve">
+    <value>Prioritate curentă: +{0}</value>
+  </data>
+  <data name="topics.show.feature_vote.do" xml:space="preserve">
+    <value>Promovează această cerere</value>
+  </data>
+  <data name="topics.show.feature_vote.info._" xml:space="preserve">
+    <value>Aceasta este o {0}. Cererile pot fi votate de către {1}.</value>
+  </data>
+  <data name="topics.show.feature_vote.info.feature_request" xml:space="preserve">
+    <value>cerere de avantaje</value>
+  </data>
+  <data name="topics.show.feature_vote.info.supporters" xml:space="preserve">
+    <value>suporteri</value>
+  </data>
+  <data name="topics.show.feature_vote.user.count" xml:space="preserve">
+    <value>{0} niciun vot|{1} {0} vot|[2,*] {0} voturi</value>
+  </data>
+  <data name="topics.show.feature_vote.user.current" xml:space="preserve">
+    <value>Tu ai {0} rămase.</value>
+  </data>
+  <data name="topics.show.feature_vote.user.not_enough" xml:space="preserve">
+    <value>Tu nu mai ai niciun vot rămas</value>
+  </data>
+  <data name="topics.show.poll.edit" xml:space="preserve">
+    <value>Editare Poll</value>
+  </data>
+  <data name="topics.show.poll.edit_warning" xml:space="preserve">
+    <value>Editarea unui poll va înlătura rezultatele curente!</value>
+  </data>
+  <data name="topics.show.poll.vote" xml:space="preserve">
+    <value>Votează</value>
+  </data>
+  <data name="topics.show.poll.button.change_vote" xml:space="preserve">
+    <value>Schimbă votul</value>
+  </data>
+  <data name="topics.show.poll.button.edit" xml:space="preserve">
+    <value>Editează poll-ul</value>
+  </data>
+  <data name="topics.show.poll.button.view_results" xml:space="preserve">
+    <value>Sări la rezultate</value>
+  </data>
+  <data name="topics.show.poll.button.vote" xml:space="preserve">
+    <value>Votează</value>
+  </data>
+  <data name="topics.show.poll.detail.end_time" xml:space="preserve">
+    <value>Votarea se va termina în {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.ended" xml:space="preserve">
+    <value>Votarea s-a terminat {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.results_hidden" xml:space="preserve">
+    <value>Rezultatele vor fi arătate după sfârșirea poll-ului.</value>
+  </data>
+  <data name="topics.show.poll.detail.total" xml:space="preserve">
+    <value>Total voturi: {0}</value>
+  </data>
+  <data name="topics.watch.to_not_watching" xml:space="preserve">
+    <value>Nu este marcat</value>
+  </data>
+  <data name="topics.watch.to_watching" xml:space="preserve">
+    <value>Marchează</value>
+  </data>
+  <data name="topics.watch.to_watching_mail" xml:space="preserve">
+    <value>Marchează cu notificare</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_disable" xml:space="preserve">
+    <value>Notificările sunt activate. Click pentru a le dezactiva</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_enable" xml:space="preserve">
+    <value>Notificările sunt dezactivate. Click pentru a le activa</value>
+  </data>
+</root>

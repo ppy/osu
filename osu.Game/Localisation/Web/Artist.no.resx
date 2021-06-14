@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="page_description" xml:space="preserve">
+    <value>Utvalgte artister på osu!</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>Utvalgte Artister</value>
+  </data>
+  <data name="admin.hidden" xml:space="preserve">
+    <value>ARTISTEN ER FOR ØYEBLIKKET SKJULT</value>
+  </data>
+  <data name="beatmaps._" xml:space="preserve">
+    <value>Beatmapper</value>
+  </data>
+  <data name="beatmaps.download" xml:space="preserve">
+    <value>Last ned Beatmapmal</value>
+  </data>
+  <data name="beatmaps.download-na" xml:space="preserve">
+    <value>Beatmapmalen er ikke tilgjengelig ennå</value>
+  </data>
+  <data name="index.description" xml:space="preserve">
+    <value>Featured artists er artister som vi samarbeider med for å bringe ny og original musikk til osu!. Disse artistene og et utvalg av deres sanger har blitt håndplukket av osu! teamet, ettersom de er imponerende og tilpasset til mapping. Noen av disse artistene fra "featured artists" har også laget nye og eksklusive sanger til bruk i osu!.&lt;br&gt;&lt;br&gt;Alle sangene i denne seksjonen tilbys som forhåndstrimmet .osz filer og har offisielt blitt lisensiert for bruk i osu! og osu! relatert innhold.</value>
+  </data>
+  <data name="links.osu" xml:space="preserve">
+    <value>osu! profil</value>
+  </data>
+  <data name="links.site" xml:space="preserve">
+    <value>Offisielt nettsted</value>
+  </data>
+  <data name="songs._" xml:space="preserve">
+    <value>Sanger</value>
+  </data>
+  <data name="songs.count" xml:space="preserve">
+    <value>{0} sang|{0} sanger</value>
+  </data>
+  <data name="songs.exclusive" xml:space="preserve">
+    <value>osu! eksklusiv</value>
+  </data>
+  <data name="tracklist.title" xml:space="preserve">
+    <value>tittel</value>
+  </data>
+  <data name="tracklist.length" xml:space="preserve">
+    <value>lengde</value>
+  </data>
+  <data name="tracklist.bpm" xml:space="preserve">
+    <value>spm</value>
+  </data>
+  <data name="tracklist.genre" xml:space="preserve">
+    <value>sjanger</value>
+  </data>
+</root>

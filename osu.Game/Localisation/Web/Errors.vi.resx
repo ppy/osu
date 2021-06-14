@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="no_restricted_access" xml:space="preserve">
+    <value>Không thể thực hiện hành động do tài khoản của bạn đang bị hạn chế.</value>
+  </data>
+  <data name="supporter_only" xml:space="preserve">
+    <value>Bạn phải là một osu!supporter để sử dụng tính năng này.</value>
+  </data>
+  <data name="unknown" xml:space="preserve">
+    <value>Đã xảy ra lỗi không xác định.</value>
+  </data>
+  <data name="codes.http-401" xml:space="preserve">
+    <value>Vui lòng đăng nhập để tiếp tục.</value>
+  </data>
+  <data name="codes.http-403" xml:space="preserve">
+    <value>Truy cập bị từ chối.</value>
+  </data>
+  <data name="codes.http-404" xml:space="preserve">
+    <value>Không tìm thấy.</value>
+  </data>
+  <data name="codes.http-429" xml:space="preserve">
+    <value>Quá nhiều lần thử. Thử lại sau.</value>
+  </data>
+  <data name="account.profile-order.generic" xml:space="preserve">
+    <value>Đã xảy ra lỗi. Vui lòng thử tải lại trang.</value>
+  </data>
+  <data name="beatmaps.invalid_mode" xml:space="preserve">
+    <value>Chế độ đã chỉ định không hợp lệ.</value>
+  </data>
+  <data name="beatmaps.standard_converts_only" xml:space="preserve">
+    <value>Chưa có điểm số nào cho chế độ chơi này cho độ khó này của beatmap.</value>
+  </data>
+  <data name="checkout.generic" xml:space="preserve">
+    <value>Đã xảy ra lỗi trong quá trình thanh toán cho đơn hàng của bạn.</value>
+  </data>
+  <data name="search.default" xml:space="preserve">
+    <value>Không có kết quả, vui lòng thử lại sau.</value>
+  </data>
+  <data name="search.operation_timeout_exception" xml:space="preserve">
+    <value>Hệ thống tìm kiếm đang quá tải, vui lòng thử lại sau.</value>
+  </data>
+</root>

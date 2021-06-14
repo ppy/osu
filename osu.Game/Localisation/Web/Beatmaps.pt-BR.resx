@@ -1,0 +1,694 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="discussion-votes.update.error" xml:space="preserve">
+    <value>Falha ao atualizar votos</value>
+  </data>
+  <data name="discussions.allow_kudosu" xml:space="preserve">
+    <value>permitir kudosu</value>
+  </data>
+  <data name="discussions.beatmap_information" xml:space="preserve">
+    <value>Página do Beatmap</value>
+  </data>
+  <data name="discussions.delete" xml:space="preserve">
+    <value>excluir</value>
+  </data>
+  <data name="discussions.deleted" xml:space="preserve">
+    <value>Excluído por {0} às {1}.</value>
+  </data>
+  <data name="discussions.deny_kudosu" xml:space="preserve">
+    <value>negar kudosu</value>
+  </data>
+  <data name="discussions.edit" xml:space="preserve">
+    <value>editar</value>
+  </data>
+  <data name="discussions.edited" xml:space="preserve">
+    <value>Última vez editado por {0} {1}.</value>
+  </data>
+  <data name="discussions.guest" xml:space="preserve">
+    <value>Dificuldade de convidado feita por {0}</value>
+  </data>
+  <data name="discussions.kudosu_denied" xml:space="preserve">
+    <value>Impossibilitado de receber kudosu.</value>
+  </data>
+  <data name="discussions.message_placeholder_deleted_beatmap" xml:space="preserve">
+    <value>Esta dificuldade foi deletada e uma dicussão não poderá ser aberta.</value>
+  </data>
+  <data name="discussions.message_placeholder_locked" xml:space="preserve">
+    <value>A discussão para este beatmap foi desabilitada.</value>
+  </data>
+  <data name="discussions.message_placeholder_silenced" xml:space="preserve">
+    <value>Não é possível postar na discussão enquanto silenciado.</value>
+  </data>
+  <data name="discussions.message_type_select" xml:space="preserve">
+    <value>Selecione o Tipo de Comentário</value>
+  </data>
+  <data name="discussions.reply_notice" xml:space="preserve">
+    <value>Pressione enter para responder.</value>
+  </data>
+  <data name="discussions.reply_placeholder" xml:space="preserve">
+    <value>Digite sua resposta aqui</value>
+  </data>
+  <data name="discussions.require-login" xml:space="preserve">
+    <value>Por favor, conecte-se para postar ou responder</value>
+  </data>
+  <data name="discussions.resolved" xml:space="preserve">
+    <value>Resolvido</value>
+  </data>
+  <data name="discussions.restore" xml:space="preserve">
+    <value>restaurar</value>
+  </data>
+  <data name="discussions.show_deleted" xml:space="preserve">
+    <value>Mostrar excluídos</value>
+  </data>
+  <data name="discussions.title" xml:space="preserve">
+    <value>Discussões</value>
+  </data>
+  <data name="discussions.collapse.all-collapse" xml:space="preserve">
+    <value>Juntar</value>
+  </data>
+  <data name="discussions.collapse.all-expand" xml:space="preserve">
+    <value>Expandir</value>
+  </data>
+  <data name="discussions.empty.empty" xml:space="preserve">
+    <value>Nenhuma discussão ainda!</value>
+  </data>
+  <data name="discussions.empty.hidden" xml:space="preserve">
+    <value>Nenhuma discussão encontrada com o filtro selecionado.</value>
+  </data>
+  <data name="discussions.lock.button.lock" xml:space="preserve">
+    <value>Trancar discussão</value>
+  </data>
+  <data name="discussions.lock.button.unlock" xml:space="preserve">
+    <value>Destrancar discussão</value>
+  </data>
+  <data name="discussions.lock.prompt.lock" xml:space="preserve">
+    <value>Motivo para trancar</value>
+  </data>
+  <data name="discussions.lock.prompt.unlock" xml:space="preserve">
+    <value>Quer mesmo destrancar?</value>
+  </data>
+  <data name="discussions.message_hint.in_general" xml:space="preserve">
+    <value>Esta postagem vai para a discussão geral do beatmap. Para fazer uma sugestão neste beatmap, inicie a mensagem com uma marcação de tempo (ex.: 00:12:345).</value>
+  </data>
+  <data name="discussions.message_hint.in_timeline" xml:space="preserve">
+    <value>Para fazer várias sugestões ao mesmo tempo, poste várias marcações (uma publicação por marcação de tempo).</value>
+  </data>
+  <data name="discussions.message_placeholder.general" xml:space="preserve">
+    <value>Digite aqui para publicar em Geral ({0})</value>
+  </data>
+  <data name="discussions.message_placeholder.generalall" xml:space="preserve">
+    <value>Digite aqui para publicar em Geral (Todas as dificuldades)</value>
+  </data>
+  <data name="discussions.message_placeholder.review" xml:space="preserve">
+    <value>Digite aqui para postar uma revisão</value>
+  </data>
+  <data name="discussions.message_placeholder.timeline" xml:space="preserve">
+    <value>Digite aqui para publicar em Linha do Tempo ({0})</value>
+  </data>
+  <data name="discussions.message_type.disqualify" xml:space="preserve">
+    <value>Desqualificar</value>
+  </data>
+  <data name="discussions.message_type.hype" xml:space="preserve">
+    <value>Hype!</value>
+  </data>
+  <data name="discussions.message_type.mapper_note" xml:space="preserve">
+    <value>Nota</value>
+  </data>
+  <data name="discussions.message_type.nomination_reset" xml:space="preserve">
+    <value>Reiniciar nomeação</value>
+  </data>
+  <data name="discussions.message_type.praise" xml:space="preserve">
+    <value>Elogio</value>
+  </data>
+  <data name="discussions.message_type.problem" xml:space="preserve">
+    <value>Problema</value>
+  </data>
+  <data name="discussions.message_type.review" xml:space="preserve">
+    <value>Revisão</value>
+  </data>
+  <data name="discussions.message_type.suggestion" xml:space="preserve">
+    <value>Sugestão</value>
+  </data>
+  <data name="discussions.mode.events" xml:space="preserve">
+    <value>Histórico</value>
+  </data>
+  <data name="discussions.mode.general" xml:space="preserve">
+    <value>Geral {0}</value>
+  </data>
+  <data name="discussions.mode.reviews" xml:space="preserve">
+    <value>Revisões</value>
+  </data>
+  <data name="discussions.mode.timeline" xml:space="preserve">
+    <value>Linha do tempo</value>
+  </data>
+  <data name="discussions.mode.scopes.general" xml:space="preserve">
+    <value>Esta dificuldade</value>
+  </data>
+  <data name="discussions.mode.scopes.generalall" xml:space="preserve">
+    <value>Todas as dificuldades</value>
+  </data>
+  <data name="discussions.new.pin" xml:space="preserve">
+    <value>Fixar</value>
+  </data>
+  <data name="discussions.new.timestamp" xml:space="preserve">
+    <value>Marcação de tempo</value>
+  </data>
+  <data name="discussions.new.timestamp_missing" xml:space="preserve">
+    <value>ctrl-c no editor e ctrl-v na sua mensagem para adicionar uma timestamp!</value>
+  </data>
+  <data name="discussions.new.title" xml:space="preserve">
+    <value>Nova Discussão</value>
+  </data>
+  <data name="discussions.new.unpin" xml:space="preserve">
+    <value>Desafixar</value>
+  </data>
+  <data name="discussions.review.new" xml:space="preserve">
+    <value>Nova Revisão</value>
+  </data>
+  <data name="discussions.review.embed.delete" xml:space="preserve">
+    <value>Excluir</value>
+  </data>
+  <data name="discussions.review.embed.missing" xml:space="preserve">
+    <value>[DISCUSSÃO EXCLUÍDA]</value>
+  </data>
+  <data name="discussions.review.embed.unlink" xml:space="preserve">
+    <value>Desvincular</value>
+  </data>
+  <data name="discussions.review.embed.unsaved" xml:space="preserve">
+    <value>Não salvo</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.all-diff" xml:space="preserve">
+    <value>As postagens em "Todas as dificuldades" não podem ser temporizadas.</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.diff" xml:space="preserve">
+    <value>Se este {0} começa com marcação de tempo, será mostrado na Linha do Tempo.</value>
+  </data>
+  <data name="discussions.review.insert-block.paragraph" xml:space="preserve">
+    <value>inserir parágrafo</value>
+  </data>
+  <data name="discussions.review.insert-block.praise" xml:space="preserve">
+    <value>inserir elogio</value>
+  </data>
+  <data name="discussions.review.insert-block.problem" xml:space="preserve">
+    <value>inserir problema</value>
+  </data>
+  <data name="discussions.review.insert-block.suggestion" xml:space="preserve">
+    <value>inserir sugestão</value>
+  </data>
+  <data name="discussions.show.title" xml:space="preserve">
+    <value>{0} mapeado por {1}</value>
+  </data>
+  <data name="discussions.sort.created_at" xml:space="preserve">
+    <value>Data de criação</value>
+  </data>
+  <data name="discussions.sort.timeline" xml:space="preserve">
+    <value>Linha do tempo</value>
+  </data>
+  <data name="discussions.sort.updated_at" xml:space="preserve">
+    <value>Última atualização</value>
+  </data>
+  <data name="discussions.stats.deleted" xml:space="preserve">
+    <value>Excluído</value>
+  </data>
+  <data name="discussions.stats.mapper_notes" xml:space="preserve">
+    <value>Notas</value>
+  </data>
+  <data name="discussions.stats.mine" xml:space="preserve">
+    <value>Meus</value>
+  </data>
+  <data name="discussions.stats.pending" xml:space="preserve">
+    <value>Pendentes</value>
+  </data>
+  <data name="discussions.stats.praises" xml:space="preserve">
+    <value>Elogios</value>
+  </data>
+  <data name="discussions.stats.resolved" xml:space="preserve">
+    <value>Resolvidos</value>
+  </data>
+  <data name="discussions.stats.total" xml:space="preserve">
+    <value>Tudo</value>
+  </data>
+  <data name="discussions.status-messages.approved" xml:space="preserve">
+    <value>Esse beatmap foi aprovado em {0}!</value>
+  </data>
+  <data name="discussions.status-messages.graveyard" xml:space="preserve">
+    <value>Esse beatmap não foi atualizado desde {0} e provavelmente já foi abandonado pelo seu criador...</value>
+  </data>
+  <data name="discussions.status-messages.loved" xml:space="preserve">
+    <value>Esse beatmap foi adicionado ao loved em {0}!</value>
+  </data>
+  <data name="discussions.status-messages.ranked" xml:space="preserve">
+    <value>Esse beatmap foi ranqueado em {0}!</value>
+  </data>
+  <data name="discussions.status-messages.wip" xml:space="preserve">
+    <value>Nota: Esse beatmap ainda não foi finalizado pelo seu criador.</value>
+  </data>
+  <data name="discussions.votes.none.down" xml:space="preserve">
+    <value>Sem votos negativos ainda</value>
+  </data>
+  <data name="discussions.votes.none.up" xml:space="preserve">
+    <value>Sem votos positivos ainda</value>
+  </data>
+  <data name="discussions.votes.latest.down" xml:space="preserve">
+    <value>Últimos votos negativos</value>
+  </data>
+  <data name="discussions.votes.latest.up" xml:space="preserve">
+    <value>Últimos votos positivos</value>
+  </data>
+  <data name="hype.button" xml:space="preserve">
+    <value>Dar um Hype!</value>
+  </data>
+  <data name="hype.button_done" xml:space="preserve">
+    <value>Já deu um Hype!</value>
+  </data>
+  <data name="hype.confirm" xml:space="preserve">
+    <value>Você tem certeza? Isso irá utilizar um dos seus {0} hypes e não poderá ser desfeito.</value>
+  </data>
+  <data name="hype.explanation" xml:space="preserve">
+    <value>Adicione um Hype nesse beatmap e torne-o mais visível para que um Beatmap Nominator possa ranqueá-lo!</value>
+  </data>
+  <data name="hype.explanation_guest" xml:space="preserve">
+    <value>Conecte-se e adicione um Hype nesse beatmap e torne-o mais visível para que um Beatmap Nominator possa ranqueá-lo!</value>
+  </data>
+  <data name="hype.new_time" xml:space="preserve">
+    <value>Você ganhará um novo hype em {0}.</value>
+  </data>
+  <data name="hype.remaining" xml:space="preserve">
+    <value>Você ainda tem {0} hypes sobrando.</value>
+  </data>
+  <data name="hype.required_text" xml:space="preserve">
+    <value>Hype: {0}/{1}</value>
+  </data>
+  <data name="hype.section_title" xml:space="preserve">
+    <value>Trenzinho do Hype</value>
+  </data>
+  <data name="hype.title" xml:space="preserve">
+    <value>Hype</value>
+  </data>
+  <data name="feedback.button" xml:space="preserve">
+    <value>Deixar Feedback</value>
+  </data>
+  <data name="nominations.delete" xml:space="preserve">
+    <value>Excluir</value>
+  </data>
+  <data name="nominations.delete_own_confirm" xml:space="preserve">
+    <value>Você tem certeza? Esse beatmap será deletado e você será redirecionado de volta para seu perfil.</value>
+  </data>
+  <data name="nominations.delete_other_confirm" xml:space="preserve">
+    <value>Você tem certeza? Esse beatmap será deletado e você será redirecionado de volta para seu perfil de usuário.</value>
+  </data>
+  <data name="nominations.disqualification_prompt" xml:space="preserve">
+    <value>Motivo da desqualificação?</value>
+  </data>
+  <data name="nominations.disqualified_at" xml:space="preserve">
+    <value>Desqualificado {0} ({1}).</value>
+  </data>
+  <data name="nominations.disqualified_no_reason" xml:space="preserve">
+    <value>sem motivo específico</value>
+  </data>
+  <data name="nominations.disqualify" xml:space="preserve">
+    <value>Desqualificar</value>
+  </data>
+  <data name="nominations.incorrect_state" xml:space="preserve">
+    <value>Erro ao realizar essa ação, tente atualizar a página.</value>
+  </data>
+  <data name="nominations.love" xml:space="preserve">
+    <value>Amar</value>
+  </data>
+  <data name="nominations.love_confirm" xml:space="preserve">
+    <value>Amar esse beatmap?</value>
+  </data>
+  <data name="nominations.nominate" xml:space="preserve">
+    <value>Nomear</value>
+  </data>
+  <data name="nominations.nominate_confirm" xml:space="preserve">
+    <value>Nomear este beatmap?</value>
+  </data>
+  <data name="nominations.nominated_by" xml:space="preserve">
+    <value>nomeado por {0}</value>
+  </data>
+  <data name="nominations.not_enough_hype" xml:space="preserve">
+    <value>Não há hype suficiente.</value>
+  </data>
+  <data name="nominations.remove_from_loved" xml:space="preserve">
+    <value>Remover dos Loved</value>
+  </data>
+  <data name="nominations.remove_from_loved_prompt" xml:space="preserve">
+    <value>Motivo da remoção dos Loved:</value>
+  </data>
+  <data name="nominations.required_text" xml:space="preserve">
+    <value>Nomeações: {0}/{1}</value>
+  </data>
+  <data name="nominations.reset_message_deleted" xml:space="preserve">
+    <value>excluído</value>
+  </data>
+  <data name="nominations.title" xml:space="preserve">
+    <value>Estado de nomeação</value>
+  </data>
+  <data name="nominations.unresolved_issues" xml:space="preserve">
+    <value>Ainda há problemas não resolvidos que precisam de uma resposta.</value>
+  </data>
+  <data name="nominations.rank_estimate._" xml:space="preserve">
+    <value>Este mapa é estimado a ser ranqueado em {0} se nenhum problema for encontrado. É o #{1} na {2}.</value>
+  </data>
+  <data name="nominations.rank_estimate.queue" xml:space="preserve">
+    <value>fila de ranqueamento</value>
+  </data>
+  <data name="nominations.rank_estimate.soon" xml:space="preserve">
+    <value>em breve</value>
+  </data>
+  <data name="nominations.reset_at.nomination_reset" xml:space="preserve">
+    <value>Processo de nomeação reiniciado {0} por {1} com um novo problema {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_at.disqualify" xml:space="preserve">
+    <value>Desqualificado {0} por {1} com um novo problema {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_confirm.nomination_reset" xml:space="preserve">
+    <value>Você tem certeza? Postar um novo problema reiniciará as nomeações.</value>
+  </data>
+  <data name="nominations.reset_confirm.disqualify" xml:space="preserve">
+    <value>Você tem certeza? Isso irá remover este beatmap da qualificação e reiniciará o processo de nomeação.</value>
+  </data>
+  <data name="listing.search.prompt" xml:space="preserve">
+    <value>digite em palavras-chave...</value>
+  </data>
+  <data name="listing.search.login_required" xml:space="preserve">
+    <value>Conecte-se para pesquisar.</value>
+  </data>
+  <data name="listing.search.options" xml:space="preserve">
+    <value>Mais opções de busca</value>
+  </data>
+  <data name="listing.search.supporter_filter" xml:space="preserve">
+    <value>Filtrar por {0} requer uma osu!supporter tag ativa</value>
+  </data>
+  <data name="listing.search.not-found" xml:space="preserve">
+    <value>nenhum resultado</value>
+  </data>
+  <data name="listing.search.not-found-quote" xml:space="preserve">
+    <value>... não, nada encontrado.</value>
+  </data>
+  <data name="listing.search.filters.extra" xml:space="preserve">
+    <value>Extra</value>
+  </data>
+  <data name="listing.search.filters.general" xml:space="preserve">
+    <value>Geral</value>
+  </data>
+  <data name="listing.search.filters.genre" xml:space="preserve">
+    <value>Gênero</value>
+  </data>
+  <data name="listing.search.filters.language" xml:space="preserve">
+    <value>Idioma</value>
+  </data>
+  <data name="listing.search.filters.mode" xml:space="preserve">
+    <value>Modo</value>
+  </data>
+  <data name="listing.search.filters.nsfw" xml:space="preserve">
+    <value>Beatmaps explícitos</value>
+  </data>
+  <data name="listing.search.filters.played" xml:space="preserve">
+    <value>Jogado</value>
+  </data>
+  <data name="listing.search.filters.rank" xml:space="preserve">
+    <value>Rank Conquistado</value>
+  </data>
+  <data name="listing.search.filters.status" xml:space="preserve">
+    <value>Categorias</value>
+  </data>
+  <data name="listing.search.sorting.title" xml:space="preserve">
+    <value>Título</value>
+  </data>
+  <data name="listing.search.sorting.artist" xml:space="preserve">
+    <value>Artista</value>
+  </data>
+  <data name="listing.search.sorting.difficulty" xml:space="preserve">
+    <value>Dificuldade</value>
+  </data>
+  <data name="listing.search.sorting.favourites" xml:space="preserve">
+    <value>Favoritos</value>
+  </data>
+  <data name="listing.search.sorting.updated" xml:space="preserve">
+    <value>Atualizado</value>
+  </data>
+  <data name="listing.search.sorting.ranked" xml:space="preserve">
+    <value>Ranqueados</value>
+  </data>
+  <data name="listing.search.sorting.rating" xml:space="preserve">
+    <value>Avaliação</value>
+  </data>
+  <data name="listing.search.sorting.plays" xml:space="preserve">
+    <value>Vezes jogadas</value>
+  </data>
+  <data name="listing.search.sorting.relevance" xml:space="preserve">
+    <value>Relevância</value>
+  </data>
+  <data name="listing.search.sorting.nominations" xml:space="preserve">
+    <value>Nomeações</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote._" xml:space="preserve">
+    <value>Filtrar por {0} requer uma {1}</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote.link_text" xml:space="preserve">
+    <value>osu!supporter tag</value>
+  </data>
+  <data name="general.converts" xml:space="preserve">
+    <value>Incluir beatmaps convertidos</value>
+  </data>
+  <data name="general.follows" xml:space="preserve">
+    <value>Mappers inscritos</value>
+  </data>
+  <data name="general.recommended" xml:space="preserve">
+    <value>Dificuldade recomendada</value>
+  </data>
+  <data name="mode.all" xml:space="preserve">
+    <value>Todos</value>
+  </data>
+  <data name="mode.any" xml:space="preserve">
+    <value>Todos</value>
+  </data>
+  <data name="status.any" xml:space="preserve">
+    <value>Todos</value>
+  </data>
+  <data name="status.approved" xml:space="preserve">
+    <value>Aprovado</value>
+  </data>
+  <data name="status.favourites" xml:space="preserve">
+    <value>Favoritos</value>
+  </data>
+  <data name="status.graveyard" xml:space="preserve">
+    <value>Cemitério</value>
+  </data>
+  <data name="status.leaderboard" xml:space="preserve">
+    <value>Possuem Classificações</value>
+  </data>
+  <data name="status.loved" xml:space="preserve">
+    <value>Loved</value>
+  </data>
+  <data name="status.mine" xml:space="preserve">
+    <value>Meus Maps</value>
+  </data>
+  <data name="status.pending" xml:space="preserve">
+    <value>Pendentes &amp; Em Progresso</value>
+  </data>
+  <data name="status.qualified" xml:space="preserve">
+    <value>Qualificados</value>
+  </data>
+  <data name="status.ranked" xml:space="preserve">
+    <value>Ranqueados</value>
+  </data>
+  <data name="genre.any" xml:space="preserve">
+    <value>Todos</value>
+  </data>
+  <data name="genre.unspecified" xml:space="preserve">
+    <value>Não Especificado</value>
+  </data>
+  <data name="genre.video-game" xml:space="preserve">
+    <value>Vídeo Game</value>
+  </data>
+  <data name="genre.anime" xml:space="preserve">
+    <value>Anime</value>
+  </data>
+  <data name="genre.rock" xml:space="preserve">
+    <value>Rock</value>
+  </data>
+  <data name="genre.pop" xml:space="preserve">
+    <value>Pop</value>
+  </data>
+  <data name="genre.other" xml:space="preserve">
+    <value>Outro</value>
+  </data>
+  <data name="genre.novelty" xml:space="preserve">
+    <value>Novelty</value>
+  </data>
+  <data name="genre.hip-hop" xml:space="preserve">
+    <value>Hip Hop</value>
+  </data>
+  <data name="genre.electronic" xml:space="preserve">
+    <value>Electronic</value>
+  </data>
+  <data name="genre.metal" xml:space="preserve">
+    <value>Metal</value>
+  </data>
+  <data name="genre.classical" xml:space="preserve">
+    <value>Clássica</value>
+  </data>
+  <data name="genre.folk" xml:space="preserve">
+    <value>Música popular</value>
+  </data>
+  <data name="genre.jazz" xml:space="preserve">
+    <value>Jazz</value>
+  </data>
+  <data name="mods.rx" xml:space="preserve">
+    <value>Relax</value>
+  </data>
+  <data name="mods.v2" xml:space="preserve">
+    <value>Pontuação V2</value>
+  </data>
+  <data name="language.any" xml:space="preserve">
+    <value>Todos</value>
+  </data>
+  <data name="language.english" xml:space="preserve">
+    <value>Inglês</value>
+  </data>
+  <data name="language.chinese" xml:space="preserve">
+    <value>Chinês</value>
+  </data>
+  <data name="language.french" xml:space="preserve">
+    <value>Francês</value>
+  </data>
+  <data name="language.german" xml:space="preserve">
+    <value>Alemão</value>
+  </data>
+  <data name="language.italian" xml:space="preserve">
+    <value>Italiano</value>
+  </data>
+  <data name="language.japanese" xml:space="preserve">
+    <value>Japonês</value>
+  </data>
+  <data name="language.korean" xml:space="preserve">
+    <value>Coreano</value>
+  </data>
+  <data name="language.spanish" xml:space="preserve">
+    <value>Espanhol</value>
+  </data>
+  <data name="language.swedish" xml:space="preserve">
+    <value>Sueco</value>
+  </data>
+  <data name="language.russian" xml:space="preserve">
+    <value>Russo</value>
+  </data>
+  <data name="language.polish" xml:space="preserve">
+    <value>Polonês</value>
+  </data>
+  <data name="language.instrumental" xml:space="preserve">
+    <value>Instrumental</value>
+  </data>
+  <data name="language.other" xml:space="preserve">
+    <value>Outro</value>
+  </data>
+  <data name="language.unspecified" xml:space="preserve">
+    <value>Não especificada</value>
+  </data>
+  <data name="nsfw.exclude" xml:space="preserve">
+    <value>Ocultar</value>
+  </data>
+  <data name="nsfw.include" xml:space="preserve">
+    <value>Exibir</value>
+  </data>
+  <data name="played.any" xml:space="preserve">
+    <value>Todos</value>
+  </data>
+  <data name="played.played" xml:space="preserve">
+    <value>Jogado</value>
+  </data>
+  <data name="played.unplayed" xml:space="preserve">
+    <value>Não jogado</value>
+  </data>
+  <data name="extra.video" xml:space="preserve">
+    <value>Possui Vídeo</value>
+  </data>
+  <data name="extra.storyboard" xml:space="preserve">
+    <value>Possui Storyboard</value>
+  </data>
+  <data name="rank.any" xml:space="preserve">
+    <value>Todos</value>
+  </data>
+  <data name="rank.xh" xml:space="preserve">
+    <value>Silver SS</value>
+  </data>
+  <data name="rank.sh" xml:space="preserve">
+    <value>Silver S</value>
+  </data>
+  <data name="panel.playcount" xml:space="preserve">
+    <value>Vezes jogadas {0}</value>
+  </data>
+  <data name="panel.favourites" xml:space="preserve">
+    <value>Favoritos {0}</value>
+  </data>
+  <data name="variant.mania.4k" xml:space="preserve">
+    <value>4K</value>
+  </data>
+  <data name="variant.mania.7k" xml:space="preserve">
+    <value>7K</value>
+  </data>
+  <data name="variant.mania.all" xml:space="preserve">
+    <value>Todos</value>
+  </data>
+</root>

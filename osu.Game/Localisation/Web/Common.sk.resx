@@ -1,0 +1,283 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="confirmation" xml:space="preserve">
+    <value>Naozaj chcete pokračovať?</value>
+  </data>
+  <data name="confirmation_unsaved" xml:space="preserve">
+    <value>Neuložené zmeny sa stratia. Si si istý?</value>
+  </data>
+  <data name="saved" xml:space="preserve">
+    <value>Uložené</value>
+  </data>
+  <data name="array_and.words_connector" xml:space="preserve">
+    <value>, </value>
+  </data>
+  <data name="array_and.two_words_connector" xml:space="preserve">
+    <value> a </value>
+  </data>
+  <data name="array_and.last_word_connector" xml:space="preserve">
+    <value>, a </value>
+  </data>
+  <data name="badges.new" xml:space="preserve">
+    <value>NOVÉ</value>
+  </data>
+  <data name="buttons.admin" xml:space="preserve">
+    <value>Administrátor</value>
+  </data>
+  <data name="buttons.back_to_previous" xml:space="preserve">
+    <value>Návrat do predchádzajúceho stavu</value>
+  </data>
+  <data name="buttons.back_to_top" xml:space="preserve">
+    <value>Naspäť hore</value>
+  </data>
+  <data name="buttons.cancel" xml:space="preserve">
+    <value>Zrušiť</value>
+  </data>
+  <data name="buttons.change" xml:space="preserve">
+    <value>zmeniť</value>
+  </data>
+  <data name="buttons.click_to_copy" xml:space="preserve">
+    <value>kliknite pre skopírovanie do schránky</value>
+  </data>
+  <data name="buttons.click_to_copy_copied" xml:space="preserve">
+    <value>skopírované do schránky!</value>
+  </data>
+  <data name="buttons.close" xml:space="preserve">
+    <value>Zavrieť</value>
+  </data>
+  <data name="buttons.collapse" xml:space="preserve">
+    <value>zbaliť</value>
+  </data>
+  <data name="buttons.delete" xml:space="preserve">
+    <value>Odstrániť</value>
+  </data>
+  <data name="buttons.edit" xml:space="preserve">
+    <value>Upraviť</value>
+  </data>
+  <data name="buttons.expand" xml:space="preserve">
+    <value>rozbaliť</value>
+  </data>
+  <data name="buttons.hide" xml:space="preserve">
+    <value>skryť</value>
+  </data>
+  <data name="buttons.permalink" xml:space="preserve">
+    <value>trvalý odkaz</value>
+  </data>
+  <data name="buttons.pin" xml:space="preserve">
+    <value>pripnúť</value>
+  </data>
+  <data name="buttons.post" xml:space="preserve">
+    <value>Príspevok</value>
+  </data>
+  <data name="buttons.reply" xml:space="preserve">
+    <value>Odpovedať</value>
+  </data>
+  <data name="buttons.reply_reopen" xml:space="preserve">
+    <value>Odpovedať a znova otvoriť</value>
+  </data>
+  <data name="buttons.reply_resolve" xml:space="preserve">
+    <value>Odpovedať a archivovať</value>
+  </data>
+  <data name="buttons.reset" xml:space="preserve">
+    <value>Resetovať</value>
+  </data>
+  <data name="buttons.restore" xml:space="preserve">
+    <value>Obnoviť</value>
+  </data>
+  <data name="buttons.save" xml:space="preserve">
+    <value>Uložiť</value>
+  </data>
+  <data name="buttons.saving" xml:space="preserve">
+    <value>Ukladá sa...</value>
+  </data>
+  <data name="buttons.search" xml:space="preserve">
+    <value>Hľadať</value>
+  </data>
+  <data name="buttons.see_more" xml:space="preserve">
+    <value>zobraziť viacej</value>
+  </data>
+  <data name="buttons.show" xml:space="preserve">
+    <value>zobraziť</value>
+  </data>
+  <data name="buttons.show_more" xml:space="preserve">
+    <value>zobraziť viac</value>
+  </data>
+  <data name="buttons.show_more_options" xml:space="preserve">
+    <value>zobraziť viac možností</value>
+  </data>
+  <data name="buttons.update" xml:space="preserve">
+    <value>Aktualizácia</value>
+  </data>
+  <data name="buttons.upload_image" xml:space="preserve">
+    <value>nahrať obrázok</value>
+  </data>
+  <data name="buttons.watch.to_0" xml:space="preserve">
+    <value>Nesledovať</value>
+  </data>
+  <data name="buttons.watch.to_1" xml:space="preserve">
+    <value>Sledovať</value>
+  </data>
+  <data name="count.badges" xml:space="preserve">
+    <value>{0} odznak |{0} odznaky</value>
+  </data>
+  <data name="count.days" xml:space="preserve">
+    <value>{0} deň|{0} dni</value>
+  </data>
+  <data name="count.hour_short_unit" xml:space="preserve">
+    <value>hod</value>
+  </data>
+  <data name="count.hours" xml:space="preserve">
+    <value>{0} hodina|{0} hodín</value>
+  </data>
+  <data name="count.item" xml:space="preserve">
+    <value>{0} jednotka |{0} jednotiek</value>
+  </data>
+  <data name="count.minute_short_unit" xml:space="preserve">
+    <value>min</value>
+  </data>
+  <data name="count.minutes" xml:space="preserve">
+    <value>{0} minúta|{0} minúty</value>
+  </data>
+  <data name="count.months" xml:space="preserve">
+    <value>{0} mesiac|{0} mesiace</value>
+  </data>
+  <data name="count.second_short_unit" xml:space="preserve">
+    <value>sek</value>
+  </data>
+  <data name="count.years" xml:space="preserve">
+    <value>{0} rok|{0} roky</value>
+  </data>
+  <data name="countdown.days" xml:space="preserve">
+    <value>dni</value>
+  </data>
+  <data name="countdown.hours" xml:space="preserve">
+    <value>hodín</value>
+  </data>
+  <data name="countdown.minutes" xml:space="preserve">
+    <value>minút</value>
+  </data>
+  <data name="countdown.seconds" xml:space="preserve">
+    <value>sekúnd</value>
+  </data>
+  <data name="datetime.year_month.moment" xml:space="preserve">
+    <value>MMMM YYYY</value>
+  </data>
+  <data name="datetime.year_month.php" xml:space="preserve">
+    <value>MMMM y</value>
+  </data>
+  <data name="datetime.year_month_short.moment" xml:space="preserve">
+    <value>MMM YYYY</value>
+  </data>
+  <data name="device.keyboard" xml:space="preserve">
+    <value>Klávesnica</value>
+  </data>
+  <data name="device.mouse" xml:space="preserve">
+    <value>Myš</value>
+  </data>
+  <data name="device.tablet" xml:space="preserve">
+    <value>Tablet</value>
+  </data>
+  <data name="device.touch" xml:space="preserve">
+    <value>Dotyková obrazovka</value>
+  </data>
+  <data name="dropzone.target" xml:space="preserve">
+    <value>tu vložte súbor pre nahratie</value>
+  </data>
+  <data name="input.search" xml:space="preserve">
+    <value>hľadať...</value>
+  </data>
+  <data name="pagination.previous" xml:space="preserve">
+    <value>predošlé</value>
+  </data>
+  <data name="pagination.next" xml:space="preserve">
+    <value>ďalej</value>
+  </data>
+  <data name="score_count.count_100" xml:space="preserve">
+    <value>100</value>
+  </data>
+  <data name="score_count.count_300" xml:space="preserve">
+    <value>300</value>
+  </data>
+  <data name="score_count.count_50" xml:space="preserve">
+    <value>50</value>
+  </data>
+  <data name="score_count.count_katu" xml:space="preserve">
+    <value>200</value>
+  </data>
+  <data name="score_count.count_miss" xml:space="preserve">
+    <value>Miss</value>
+  </data>
+  <data name="time.days_ago" xml:space="preserve">
+    <value>pred{0} dňom|pred{1} dňami</value>
+  </data>
+  <data name="time.hours_ago" xml:space="preserve">
+    <value>pred{0} hodinou|pred{0} hodinami</value>
+  </data>
+  <data name="time.now" xml:space="preserve">
+    <value>teraz</value>
+  </data>
+  <data name="time.remaining" xml:space="preserve">
+    <value>Zostávajúci čas</value>
+  </data>
+  <data name="title.notice" xml:space="preserve">
+    <value>Oznámenie</value>
+  </data>
+</root>

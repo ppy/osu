@@ -1,0 +1,391 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>このビートマップは現在ダウンロード不可能です。</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>権利者の申し立てによりこのビートマップは部分的に削除されています。</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>詳細はこちらです。</value>
+  </data>
+  <data name="availability.rule_violation" xml:space="preserve">
+    <value>このマップに含まれる一部のアセットは、osu!での使用に適さないと判断され、削除されています。</value>
+  </data>
+  <data name="download.limit_exceeded" xml:space="preserve">
+    <value>スピードを落として、もっと遊ぼう。</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>ビートマップリスト</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>ビートマップ</value>
+  </data>
+  <data name="panel.empty" xml:space="preserve">
+    <value>ビートマップがありません</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>ダウンロード</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>動画ありでダウンロード</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>動画なしでダウンロード</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>osu!directで開く</value>
+  </data>
+  <data name="nominate.hybrid_requires_modes" xml:space="preserve">
+    <value>ハイブリッドビートマップセットでは、少なくとも1つのモードを選択してノミネートする必要があります。</value>
+  </data>
+  <data name="nominate.incorrect_mode" xml:space="preserve">
+    <value>モード{0}でノミネートする権限がありません。</value>
+  </data>
+  <data name="nominate.full_bn_required" xml:space="preserve">
+    <value>Qualifyノミネーションを行うにはフルノミネーターでなければなりません。</value>
+  </data>
+  <data name="nominate.too_many" xml:space="preserve">
+    <value>ノミネーションの要件を満たしています</value>
+  </data>
+  <data name="nominate.dialog.confirmation" xml:space="preserve">
+    <value>このビートマップを本当にノミネートしますか？</value>
+  </data>
+  <data name="nominate.dialog.header" xml:space="preserve">
+    <value>ビートマップをノミネート</value>
+  </data>
+  <data name="nominate.dialog.hybrid_warning" xml:space="preserve">
+    <value>注意: 一度しかノミネートできないので、ノミネートするゲームモードの全てにノミネートするようにしてください。</value>
+  </data>
+  <data name="nominate.dialog.which_modes" xml:space="preserve">
+    <value>どのモードをノミネートしますか？</value>
+  </data>
+  <data name="nsfw_badge.label" xml:space="preserve">
+    <value>過激表現を含む</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>ディスカッション</value>
+  </data>
+  <data name="show.details.by_artist" xml:space="preserve">
+    <value>by {0}</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>このビートマップをお気に入りに登録する</value>
+  </data>
+  <data name="show.details.favourite_login" xml:space="preserve">
+    <value>ログインしてこのビートマップをお気に入りに登録する</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>ビートマップをダウンロードするにはログインが必要です！</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>作者 {0}</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>このビートマップをお気に入りから削除する</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>最終更新 {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>ダウンロード</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>動画なし</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>動画あり</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>より多くの機能にアクセスする</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>ログイン</value>
+  </data>
+  <data name="show.details_date.approved" xml:space="preserve">
+    <value>approved {0}</value>
+  </data>
+  <data name="show.details_date.loved" xml:space="preserve">
+    <value>loved {0}</value>
+  </data>
+  <data name="show.details_date.qualified" xml:space="preserve">
+    <value>qualified {0}</value>
+  </data>
+  <data name="show.details_date.ranked" xml:space="preserve">
+    <value>ranked {0}</value>
+  </data>
+  <data name="show.details_date.submitted" xml:space="preserve">
+    <value>投稿 {0}</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>最終更新 {0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>お気に入りのビートマップが多すぎます！お気に入りを外してから再試行してください。</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>もしこのビートマップが良かった場合、Hypeすることでビートマップのステータスが&lt;strong&gt;Ranked&lt;/strong&gt;状態になります。</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>このビートマップは現在{0}です。</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>Qualified</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>作業中</value>
+  </data>
+  <data name="show.hype.disqualify._" xml:space="preserve">
+    <value>このビートマップで問題が見つかった場合は、Disqualifyにしてください。{0}</value>
+  </data>
+  <data name="show.hype.report._" xml:space="preserve">
+    <value>ビートマップに問題を見つけた場合、{0} からチームに報告してください。</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>問題を報告する</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>ここ</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>概要</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>ジャンル</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>言語</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>データはまだ計算中です・・・</value>
+  </data>
+  <data name="show.info.nsfw" xml:space="preserve">
+    <value>過激な表現を含むコンテンツ</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>失敗地点</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>ソース</value>
+  </data>
+  <data name="show.info.storyboard" xml:space="preserve">
+    <value>このビートマップにはストーリーボードが含まれています</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>クリア率</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>タグ</value>
+  </data>
+  <data name="show.info.video" xml:space="preserve">
+    <value>このビートマップには動画が含まれています</value>
+  </data>
+  <data name="show.nsfw_warning.details" xml:space="preserve">
+    <value>このビートマップには過激な表現、攻撃的、または不穏なコンテンツが含まれています。それでも表示しますか？</value>
+  </data>
+  <data name="show.nsfw_warning.title" xml:space="preserve">
+    <value>過激な表現を含むコンテンツ</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.disable" xml:space="preserve">
+    <value>警告を無効にする</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.listing" xml:space="preserve">
+    <value>ビートマップリスト</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.show" xml:space="preserve">
+    <value>表示</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>達成日 {0}</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>国別ランキング</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>フレンドランキング</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>世界ランキング</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>&lt;a href="{0}"&gt;ここ&lt;/a&gt;をクリックする事でosu!サポーターの詳細が見れます。</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>フレンドランキングと国別ランキングを利用するにはosu!サポータータグが必要です！</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>スコアボード</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>精度</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>最大コンボ</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>ミス</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>Mods</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>プレイヤー</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>順位</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>合計スコア</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>スコア</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>時間</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>あなたの国のプレイヤーで記録を作った人はまだいません！</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>あなたのフレンドで記録を作った人はまだいません！</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>まだ記録はありません。一番乗りを目指そう！</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>スコアの読み込み中・・・</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>Unrankedのビートマップです。</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>リード</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>あなたのベスト</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>サークルサイズ</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>キー数</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>HPの厳しさ</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>精度</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>アプローチ速度</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>難易度（★）</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>長さ (Drainの長さ: {0})</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>サークルの数</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>スライダーの数</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>ユーザーの評価</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>評価分布</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>ノミネーション</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>プレイ数</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>Ranked</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>Loved</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>Qualified</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>WIP</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>Graveyard</value>
+  </data>
+</root>

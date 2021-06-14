@@ -1,0 +1,349 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>Acest beatmap nu poate fi descărcat momentan.</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>Unele porțiuni din acest beatmap au fost eliminate la cererea creatorului sau al unui deținător de drepturi de autor.</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>Vezi aici pentru mai multe informații.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Listarea beatmapurilor</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>Beatmaps</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>descarcă</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>descarcă cu video</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>descarcă fără video</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>deschide în osu!direct</value>
+  </data>
+  <data name="nominate.full_bn_required" xml:space="preserve">
+    <value>Trebuie să fi un nominator să participi în această nominare calificată.</value>
+  </data>
+  <data name="nominate.dialog.confirmation" xml:space="preserve">
+    <value>Ești sigur că vrei să nominalizezi acest Beatmap?</value>
+  </data>
+  <data name="nsfw_badge.label" xml:space="preserve">
+    <value>Explicit</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>Discuție</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>Adaugă acest beatmapset la favorite</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>Trebuie să te autentifici înainte de a descărca vreun beatmap!</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>mapat de {0}</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>Elimină acest beatmapset de la favorite</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>ultima dată actualizat {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>Descarcă</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>fără videoclip</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>cu videoclip</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>pentru a accesa mai multe avantaje</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>Autentificare</value>
+  </data>
+  <data name="show.details_date.approved" xml:space="preserve">
+    <value>aprobat {0}</value>
+  </data>
+  <data name="show.details_date.loved" xml:space="preserve">
+    <value>iubit {0}</value>
+  </data>
+  <data name="show.details_date.qualified" xml:space="preserve">
+    <value>calificat {0}</value>
+  </data>
+  <data name="show.details_date.ranked" xml:space="preserve">
+    <value>clasat {0}</value>
+  </data>
+  <data name="show.details_date.submitted" xml:space="preserve">
+    <value>postat {0}</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>ultima dată actualizat {0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>Ai prea multe beatmaps favorite! Te rugăm să mai elimini câteva înainte de a încerca din nou.</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>Hype această mapă dacă ți-a plăcut să o joci, astfel încât să progreseze la stadiul de &lt;strong&gt;Clasat&lt;/strong&gt;.</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>Această mapă este în prezent {0}.</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>în așteptare</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>calificată</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>muncă în desfășurare</value>
+  </data>
+  <data name="show.hype.disqualify._" xml:space="preserve">
+    <value>Dacă găsești o problemă cu acest beatmap, vă rugăm descalificați-o {0}.</value>
+  </data>
+  <data name="show.hype.report._" xml:space="preserve">
+    <value>Dacă găsești o problemă cu acest beatmap, vă rugăm raportați-o {0} ca să alertați echipa.</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>Raportează problemă</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>aici</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>Descriere</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>Gen</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>Limbă</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>Încă se calculează datele...</value>
+  </data>
+  <data name="show.info.nsfw" xml:space="preserve">
+    <value>Conținut explicit</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>Puncte de eșec</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>Sursă</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>Rata de succes</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>Tag-uri</value>
+  </data>
+  <data name="show.nsfw_warning.details" xml:space="preserve">
+    <value>Acest beatmap conține conținut explicit, ofensiv sau deranjant. Doriți să-l vedeți oricum?</value>
+  </data>
+  <data name="show.nsfw_warning.title" xml:space="preserve">
+    <value>Conținut explicit</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.disable" xml:space="preserve">
+    <value>Dezactivează avertisment</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.show" xml:space="preserve">
+    <value>Arată</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>realizat {0}</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>Clasament pe țară</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>Clasamentul prietenilor</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>Clasament global</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>Click &lt;a href="{0}"&gt;aici&lt;/a&gt; pentru a vedea toate avantajele pe care le poți obține!</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>Trebuie să fii un suporter pentru a accesa clasamentul prietenilor și pe țară!</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>Tabela de scor</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>Precizie</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>Combo maxim</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>Ratări</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>Moduri</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>Jucător</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>Rang</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>Scor total</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>Scor</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>Timp</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>Nimeni din țara ta nu a stabilit un scor pe această mapă încă!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>Nimeni din prietenii tăi nu a stabilit un scor pe această mapă încă!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>Niciun scor încă. Poate ar trebui să încerci să obții câteva?</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>Se încarcă scorurile...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>Beatmap neclasificat.</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>În top</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>Cel mai bun</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>Dimensiunea cercului</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>Numărul de taste</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>Scurgere HP</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>Precizie</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>Viteza de apropiere</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>Dificultatea de stele</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>Durată</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>Numărul de cercuri</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>Numărul de glisări</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>Evaluarea jucătorului</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>Clasament grafic</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>Nominalizări</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>Numărul de jocuri</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>Clasat</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>Aprobat</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>Iubit</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>Calificat</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>WIP</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>În Așteptare</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>Cimitir</value>
+  </data>
+</root>

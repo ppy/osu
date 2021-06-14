@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="box.sent" xml:space="preserve">
+    <value>อีเมล์ได้ถูกส่งไปที่ {0} พร้อมรหัสยืนยันตัวตนแล้ว กรุณาป้อนรหัส</value>
+  </data>
+  <data name="box.title" xml:space="preserve">
+    <value>ยืนยันตัวตนบัญชี</value>
+  </data>
+  <data name="box.verifying" xml:space="preserve">
+    <value>กำลังยืนยันตัวตน...</value>
+  </data>
+  <data name="box.issuing" xml:space="preserve">
+    <value>กำลังส่งรหัสชุดใหม่...</value>
+  </data>
+  <data name="box.info.check_spam" xml:space="preserve">
+    <value>หากไม่พบอีเมล ให้ลองค้นหาที่โฟลเดอร์สแปมของท่านดู</value>
+  </data>
+  <data name="box.info.recover" xml:space="preserve">
+    <value>หากคุณเข้าอีเมล์ไม่ได้ หรือลืมอีเมล์ที่ผูกกับบัญชีผู้ใช้ของคุณ กรุณาทำตามนี้ {0}.</value>
+  </data>
+  <data name="box.info.recover_link" xml:space="preserve">
+    <value>ขั้นตอนการกู้อีเมลได้ที่นี่</value>
+  </data>
+  <data name="box.info.reissue" xml:space="preserve">
+    <value>คุณสามารถ {0} หรือ {1}.</value>
+  </data>
+  <data name="box.info.reissue_link" xml:space="preserve">
+    <value>ขอรหัสใหม่</value>
+  </data>
+  <data name="box.info.logout_link" xml:space="preserve">
+    <value>ออกจากระบบ</value>
+  </data>
+  <data name="errors.expired" xml:space="preserve">
+    <value>รหัสยืนยันตัวตนนี้หมดอายุแล้ว ได้ทำการส่งรหัสยืนยันตัวตนใหม่ไปทางอีเมลแล้ว</value>
+  </data>
+  <data name="errors.incorrect_key" xml:space="preserve">
+    <value>รหัสยืนยันตัวตนไม่ถูกต้อง</value>
+  </data>
+  <data name="errors.retries_exceeded" xml:space="preserve">
+    <value>รหัสยืนยันตัวตนไม่ถูกต้อง จำนวนการลองใหม่เกินกว่าที่กำหนด ได้ทำการส่งรหัสยืนยันตัวตนใหม่ไปทางอีเมลแล้ว</value>
+  </data>
+  <data name="errors.reissued" xml:space="preserve">
+    <value>รหัสยืนยันตัวตนถูกเปลี่ยน ได้ทำการส่งรหัสยืนยันตัวตนใหม่ไปทางอีเมลแล้ว</value>
+  </data>
+  <data name="errors.unknown" xml:space="preserve">
+    <value>พบข้อผิดพลาดเกิดขึ้น ได้ทำการส่งรหัสยืนยันตัวตนใหม่ไปทางอีเมลแล้ว</value>
+  </data>
+</root>

@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="beatmapset_update_notice.new" xml:space="preserve">
+    <value>Просто даём Вам знать, что с Вашего последнего посещения у карты «{0}» вышло новое обновление.</value>
+  </data>
+  <data name="beatmapset_update_notice.subject" xml:space="preserve">
+    <value>Новое обновление у карты «{0}»</value>
+  </data>
+  <data name="beatmapset_update_notice.unwatch" xml:space="preserve">
+    <value>Если Вы больше не желаете следить за этой картой, вы можете нажать ссылку «Не следить» на странице выше или со страницы подписок на карты:</value>
+  </data>
+  <data name="beatmapset_update_notice.visit" xml:space="preserve">
+    <value>Посетите страницу обсуждения:</value>
+  </data>
+  <data name="common.closing" xml:space="preserve">
+    <value>С уважением,</value>
+  </data>
+  <data name="common.hello" xml:space="preserve">
+    <value>Привет, {0},</value>
+  </data>
+  <data name="common.report" xml:space="preserve">
+    <value>Пожалуйста, ответьте на это письмо НЕМЕДЛЕННО, если вы не запрашивали это изменение.</value>
+  </data>
+  <data name="donation_thanks.benefit_more" xml:space="preserve">
+    <value>Также, со временем у тега osu!supporter появится ещё больше привилегий!</value>
+  </data>
+  <data name="donation_thanks.feedback" xml:space="preserve">
+    <value>Если у Вас есть вопросы, или Вы хотите оставить отзыв, не стесняйтесь ответить на это письмо; я напишу Вам в ответ так скоро, как смогу!</value>
+  </data>
+  <data name="donation_thanks.keep_free" xml:space="preserve">
+    <value>Благодаря таким людям, как Вы, osu! способна обеспечить бесперебойную работу игры и сообщества без каких-либо рекламных объявлений или принудительных платежей.</value>
+  </data>
+  <data name="donation_thanks.keep_running" xml:space="preserve">
+    <value>Ваша поддержка помогла osu! проработать около {0}! На первый взгляд это немного, но все суммируется :).</value>
+  </data>
+  <data name="donation_thanks.subject" xml:space="preserve">
+    <value>Спасибо, osu! &lt;3 вас</value>
+  </data>
+  <data name="donation_thanks.translation" xml:space="preserve">
+    <value>Ниже приводится пользовательский перевод для ознакомления:</value>
+  </data>
+  <data name="donation_thanks.benefit.gift" xml:space="preserve">
+    <value>Получатель вашего подарка теперь будет иметь доступ к osu!direct и многим другим привилегиям тега supporter.</value>
+  </data>
+  <data name="donation_thanks.benefit.self" xml:space="preserve">
+    <value>Теперь у Вас есть доступ к osu!direct и многим другим привилегиям тега supporter на {0}.</value>
+  </data>
+  <data name="donation_thanks.support._" xml:space="preserve">
+    <value>Большое спасибо за вашу {0} в отношении osu!.</value>
+  </data>
+  <data name="donation_thanks.support.first" xml:space="preserve">
+    <value>поддержку</value>
+  </data>
+  <data name="donation_thanks.support.repeat" xml:space="preserve">
+    <value>продолжительную поддержку</value>
+  </data>
+  <data name="forum_new_reply.new" xml:space="preserve">
+    <value>Просто даём Вам знать, что с Вашего последнего посещения в теме «{0}» появился новый ответ.</value>
+  </data>
+  <data name="forum_new_reply.subject" xml:space="preserve">
+    <value>[osu!] Новый ответ в теме "{0}"</value>
+  </data>
+  <data name="forum_new_reply.unwatch" xml:space="preserve">
+    <value>Если Вы больше не желаете наблюдать за этой темой, Вы можете нажать ссылку «Отписаться» внизу темы выше или со страницы подписок на темы:</value>
+  </data>
+  <data name="forum_new_reply.visit" xml:space="preserve">
+    <value>Перейдите напрямую к последнему ответу, используя следующую ссылку:</value>
+  </data>
+  <data name="password_reset.code" xml:space="preserve">
+    <value>Ваш код верификации:</value>
+  </data>
+  <data name="password_reset.requested" xml:space="preserve">
+    <value>Либо вы, либо кто-то, выдающий себя за вас, запросил смену пароля на вашем аккаунте в osu!</value>
+  </data>
+  <data name="password_reset.subject" xml:space="preserve">
+    <value>Восстановления доступа к аккаунту osu!</value>
+  </data>
+  <data name="store_payment_completed.prepare_shipping" xml:space="preserve">
+    <value>Мы получили Ваш платёж и готовим Ваш заказ к доставке. Его оправка может занять несколько дней, в зависимости от количества заказов. Вы можете следить за прогрессом своего заказа здесь, включая детали доставки, где они доступны:</value>
+  </data>
+  <data name="store_payment_completed.processing" xml:space="preserve">
+    <value>Мы получили Ваш платёж и сейчас обрабатываем Ваш заказ. Вы можете следить за прогрессом своего заказа здесь:</value>
+  </data>
+  <data name="store_payment_completed.questions" xml:space="preserve">
+    <value>Если у Вас есть какие-то вопросы, не стесняйтесь отвечать на это письмо.</value>
+  </data>
+  <data name="store_payment_completed.shipping" xml:space="preserve">
+    <value>Доставка</value>
+  </data>
+  <data name="store_payment_completed.subject" xml:space="preserve">
+    <value>Мы получили ваш заказ в osu!store!</value>
+  </data>
+  <data name="store_payment_completed.thank_you" xml:space="preserve">
+    <value>Спасибо за Ваш заказ в osu!store!</value>
+  </data>
+  <data name="store_payment_completed.total" xml:space="preserve">
+    <value>Всего</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift" xml:space="preserve">
+    <value>Человек, который подарил Вам тег, возможно, хочет сохранить анонимность, так что он не был упомянут в этом уведомлении.</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift_maybe_not" xml:space="preserve">
+    <value>Но Вы, наверняка, сами уже знаете, кто это ;).</value>
+  </data>
+  <data name="supporter_gift.duration" xml:space="preserve">
+    <value>Благодаря ему, у вас теперь есть доступ к osu!direct и другим преимуществам osu!supporter на {0}.</value>
+  </data>
+  <data name="supporter_gift.features" xml:space="preserve">
+    <value>Подробнее об этих функциях можно узнать здесь:</value>
+  </data>
+  <data name="supporter_gift.gifted" xml:space="preserve">
+    <value>Кто-то только что подарил вам тег osu!supporter!</value>
+  </data>
+  <data name="supporter_gift.subject" xml:space="preserve">
+    <value>Вам подарили osu!supporter!</value>
+  </data>
+  <data name="user_email_updated.changed_to" xml:space="preserve">
+    <value>Это письмо с подтверждением о том, что ваш адрес электронной почты osu! был изменён на "{0}".</value>
+  </data>
+  <data name="user_email_updated.check" xml:space="preserve">
+    <value>Пожалуйста, убедитесь, что вы получили это письмо на ваш новый адрес, чтобы предотвратить потерю доступа к вашему аккаунту osu! в будущем.</value>
+  </data>
+  <data name="user_email_updated.sent" xml:space="preserve">
+    <value>По соображениям безопасности, это письмо было отправлено и на Ваш старый, и на новый адрес электронной почты.</value>
+  </data>
+  <data name="user_email_updated.subject" xml:space="preserve">
+    <value>Подтверждение смены почты аккаунта osu!</value>
+  </data>
+  <data name="user_force_reactivation.main" xml:space="preserve">
+    <value>Предполагается, что Ваша учетная запись была взломана, имеет недавние подозрительные действия или ОЧЕНЬ слабый пароль. В результате мы требуем, чтобы Вы установили новый пароль. Пожалуйста, убедитесь, что Вы выбрали БЕЗОПАСНЫЙ пароль.</value>
+  </data>
+  <data name="user_force_reactivation.perform_reset" xml:space="preserve">
+    <value>Вы можете выполнить сброс по ссылке: {0}</value>
+  </data>
+  <data name="user_force_reactivation.reason" xml:space="preserve">
+    <value>Причина:</value>
+  </data>
+  <data name="user_force_reactivation.subject" xml:space="preserve">
+    <value>Необходима повторная активация аккаунта osu!</value>
+  </data>
+  <data name="user_notification_digest.new" xml:space="preserve">
+    <value>Просто даём знать, что в темах, за которыми вы следите, появились новые ответы.</value>
+  </data>
+  <data name="user_notification_digest.settings" xml:space="preserve">
+    <value>Измените настройки email уведомлений:</value>
+  </data>
+  <data name="user_notification_digest.subject" xml:space="preserve">
+    <value>Новые уведомления osu!</value>
+  </data>
+  <data name="user_password_updated.confirmation" xml:space="preserve">
+    <value>Это всего лишь подверждение, что Ваш пароль к osu! был изменён.</value>
+  </data>
+  <data name="user_password_updated.subject" xml:space="preserve">
+    <value>Подтверждение смены пароля аккаунта osu!</value>
+  </data>
+  <data name="user_verification.code" xml:space="preserve">
+    <value>Ваш код верификации:</value>
+  </data>
+  <data name="user_verification.code_hint" xml:space="preserve">
+    <value>Вы можете ввести код с пробелами или без них.</value>
+  </data>
+  <data name="user_verification.link" xml:space="preserve">
+    <value>В качестве альтернативы, Вы также можете перейти по ссылке ниже для завершения верификации:</value>
+  </data>
+  <data name="user_verification.report" xml:space="preserve">
+    <value>Если Вы не запрашивали его, пожалуйста, НЕМЕДЛЕННО ОТВЕТЬТЕ на письмо, так как Ваш аккаунт может быть под угрозой.</value>
+  </data>
+  <data name="user_verification.subject" xml:space="preserve">
+    <value>Подтверждение доступа к аккаунту osu!</value>
+  </data>
+  <data name="user_verification.action_from._" xml:space="preserve">
+    <value>Действие, выполненное в вашем аккаунте из {0} требует верификации.</value>
+  </data>
+  <data name="user_verification.action_from.unknown_country" xml:space="preserve">
+    <value>неизвестной страны</value>
+  </data>
+</root>

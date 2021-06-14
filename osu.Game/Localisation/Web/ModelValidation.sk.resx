@@ -1,0 +1,247 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="not_negative" xml:space="preserve">
+    <value>{0} nemôže byť negatívny.</value>
+  </data>
+  <data name="required" xml:space="preserve">
+    <value>{0} je vyžadovaný.</value>
+  </data>
+  <data name="too_long" xml:space="preserve">
+    <value>{0} presiahol maximálnu dĺžku - môže mať maximálne {1} znakov.</value>
+  </data>
+  <data name="wrong_confirmation" xml:space="preserve">
+    <value>Potvrdenie sa nezhoduje.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmap_missing" xml:space="preserve">
+    <value>Časová sekvencia je špecifikovaná, ale chýba beatmapa.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmapset_no_hype" xml:space="preserve">
+    <value>Táto beatmapa nemôže byť nadchnutá.</value>
+  </data>
+  <data name="beatmapset_discussion.hype_requires_null_beatmap" xml:space="preserve">
+    <value>Nadšenie musí byť konané v General (vśetkých obtiažností).</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmap_id" xml:space="preserve">
+    <value>Bola zadaná neplatná obtiažnosť.</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmapset_id" xml:space="preserve">
+    <value>Bola zadaná neplatná beatmapa.</value>
+  </data>
+  <data name="beatmapset_discussion.locked" xml:space="preserve">
+    <value>Diskusia je uzamknutá.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.guest" xml:space="preserve">
+    <value>Musíš byť prihláseny k nadšeniu.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.hyped" xml:space="preserve">
+    <value>Túto beatmapu si už nadchol.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.limit_exceeded" xml:space="preserve">
+    <value>Použil si všetky svoje nadšenia.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.not_hypeable" xml:space="preserve">
+    <value>Táto beatmapa nemôže byť nadchnutá</value>
+  </data>
+  <data name="beatmapset_discussion.hype.owner" xml:space="preserve">
+    <value>Nemôžeš nadchnúť svoju beatmapu.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.exceeds_beatmapset_length" xml:space="preserve">
+    <value>Upresnená sekvencia času presahuje dĺžku beatmapy.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.negative" xml:space="preserve">
+    <value>Časová sekvencia nemôže byť záporná.</value>
+  </data>
+  <data name="beatmapset_discussion_post.discussion_locked" xml:space="preserve">
+    <value>Diskusia je uzamknutá.</value>
+  </data>
+  <data name="beatmapset_discussion_post.first_post" xml:space="preserve">
+    <value>Počiatočný príspevok sa nedá odstrániť.</value>
+  </data>
+  <data name="comment.deleted_parent" xml:space="preserve">
+    <value>Odpovedať na odstránený komentár nie je povolené.</value>
+  </data>
+  <data name="comment.attributes.message" xml:space="preserve">
+    <value>Správa</value>
+  </data>
+  <data name="forum.feature_vote.not_feature_topic" xml:space="preserve">
+    <value>Dá sa hlasovať iba o funkciách.</value>
+  </data>
+  <data name="forum.feature_vote.not_enough_feature_votes" xml:space="preserve">
+    <value>Nedostatok hlasov.</value>
+  </data>
+  <data name="forum.poll_vote.invalid" xml:space="preserve">
+    <value>Bola zadaná neplatná možnosť.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_delete" xml:space="preserve">
+    <value>Mazanie metadát beatmapy nie je povolené.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_edit" xml:space="preserve">
+    <value>Editovanie metadát beatmapy nie je povolené.</value>
+  </data>
+  <data name="forum.topic_poll.duplicate_options" xml:space="preserve">
+    <value>Duplikované možnosti nie su povolené.</value>
+  </data>
+  <data name="forum.topic_poll.invalid_max_options" xml:space="preserve">
+    <value>Možnosť jedného použivatela by nemala presiahnúť hodnotu povolených možností.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_one_selection" xml:space="preserve">
+    <value>Minimálne jedná možnosť na používatela je vyžadovaná.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_two_options" xml:space="preserve">
+    <value>Sú vyžadované aspoň dve možnosti.</value>
+  </data>
+  <data name="forum.topic_poll.too_many_options" xml:space="preserve">
+    <value>Bol prekročený limit povolených možností.</value>
+  </data>
+  <data name="forum.topic_vote.required" xml:space="preserve">
+    <value>Vyber možnosť pri hlasovaní.</value>
+  </data>
+  <data name="forum.topic_vote.too_many" xml:space="preserve">
+    <value>Vybral si viacej možností, než je povolené.</value>
+  </data>
+  <data name="oauth.client.attributes.name" xml:space="preserve">
+    <value>Názov aplikácie</value>
+  </data>
+  <data name="user.contains_username" xml:space="preserve">
+    <value>Heslo nemôže obsahovať užívateľské meno.</value>
+  </data>
+  <data name="user.email_already_used" xml:space="preserve">
+    <value>E-mailová adresa už bola použitá.</value>
+  </data>
+  <data name="user.invalid_country" xml:space="preserve">
+    <value>Krajina nie je v databáze.</value>
+  </data>
+  <data name="user.invalid_discord" xml:space="preserve">
+    <value>Nesprávne užívateľské meno na Discorde.</value>
+  </data>
+  <data name="user.invalid_email" xml:space="preserve">
+    <value>Vyzerá to na neplatnú e-mailovú adresu.</value>
+  </data>
+  <data name="user.too_short" xml:space="preserve">
+    <value>Nové heslo je príliš krátke.</value>
+  </data>
+  <data name="user.unknown_duplicate" xml:space="preserve">
+    <value>Užívateľské meno alebo e-mailová adresa sa už používa.</value>
+  </data>
+  <data name="user.username_available_in" xml:space="preserve">
+    <value>Toto užívateľské meno bude k dispozícií za {0}.</value>
+  </data>
+  <data name="user.username_available_soon" xml:space="preserve">
+    <value>Toto užívateľské meno bude k dispozícií každú chvíľu!</value>
+  </data>
+  <data name="user.username_invalid_characters" xml:space="preserve">
+    <value>Zadané užívateľské meno obsahuje neplatné znaky.</value>
+  </data>
+  <data name="user.username_in_use" xml:space="preserve">
+    <value>Užívateľské meno sa už používa!</value>
+  </data>
+  <data name="user.username_no_space_userscore_mix" xml:space="preserve">
+    <value>Prosím použite podčiarknutia alebo medzery, nie oboje!</value>
+  </data>
+  <data name="user.username_no_spaces" xml:space="preserve">
+    <value>Užívateľské meno nesmie začať alebo končiť medzerou!</value>
+  </data>
+  <data name="user.username_not_allowed" xml:space="preserve">
+    <value>Toto užívateľské meno nie je povolené.</value>
+  </data>
+  <data name="user.username_too_short" xml:space="preserve">
+    <value>Požadované užívateľské meno je príliš krátke.</value>
+  </data>
+  <data name="user.username_too_long" xml:space="preserve">
+    <value>Požadované užívateľské meno je príliš dlhé.</value>
+  </data>
+  <data name="user.weak" xml:space="preserve">
+    <value>Zakázané heslo.</value>
+  </data>
+  <data name="user.wrong_current_password" xml:space="preserve">
+    <value>Aktuálne heslo je nesprávne.</value>
+  </data>
+  <data name="user.wrong_email_confirmation" xml:space="preserve">
+    <value>Potvrdenie e-mailu sa nezhoduje.</value>
+  </data>
+  <data name="user.wrong_password_confirmation" xml:space="preserve">
+    <value>Zadané heslá sa nezhodujú.</value>
+  </data>
+  <data name="user.too_long" xml:space="preserve">
+    <value>Prekročila sa maximálna dĺžka - maximálna dĺžka je {0} znakov.</value>
+  </data>
+  <data name="user.attributes.username" xml:space="preserve">
+    <value>Meno Uživateľa</value>
+  </data>
+  <data name="user.attributes.user_email" xml:space="preserve">
+    <value>E-mailová adrEsa</value>
+  </data>
+  <data name="user.attributes.password" xml:space="preserve">
+    <value>Heslo</value>
+  </data>
+  <data name="user.change_username.supporter_required._" xml:space="preserve">
+    <value>Musíš mať {0} pre zmenu mena!</value>
+  </data>
+  <data name="user.change_username.supporter_required.link_text" xml:space="preserve">
+    <value>podporiť osu!</value>
+  </data>
+  <data name="user.change_username.username_is_same" xml:space="preserve">
+    <value>Toto už je tvoje užívateľské meno, hlupák!</value>
+  </data>
+  <data name="store.order_item.attributes.cost" xml:space="preserve">
+    <value>Cena</value>
+  </data>
+</root>

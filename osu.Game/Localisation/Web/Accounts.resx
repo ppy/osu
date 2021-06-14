@@ -1,0 +1,259 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="edit.title_compact" xml:space="preserve">
+    <value>account settings</value>
+  </data>
+  <data name="edit.username" xml:space="preserve">
+    <value>username</value>
+  </data>
+  <data name="edit.avatar.title" xml:space="preserve">
+    <value>Avatar</value>
+  </data>
+  <data name="edit.avatar.rules" xml:space="preserve">
+    <value>Please ensure your avatar adheres to {0}.&lt;br/&gt;This means it must be &lt;strong&gt;suitable for all ages&lt;/strong&gt;. i.e. no nudity, profanity or suggestive content.</value>
+  </data>
+  <data name="edit.avatar.rules_link" xml:space="preserve">
+    <value>the community rules</value>
+  </data>
+  <data name="edit.email.current" xml:space="preserve">
+    <value>current email</value>
+  </data>
+  <data name="edit.email.new" xml:space="preserve">
+    <value>new email</value>
+  </data>
+  <data name="edit.email.new_confirmation" xml:space="preserve">
+    <value>email confirmation</value>
+  </data>
+  <data name="edit.email.title" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="edit.password.current" xml:space="preserve">
+    <value>current password</value>
+  </data>
+  <data name="edit.password.new" xml:space="preserve">
+    <value>new password</value>
+  </data>
+  <data name="edit.password.new_confirmation" xml:space="preserve">
+    <value>password confirmation</value>
+  </data>
+  <data name="edit.password.title" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="edit.profile.title" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="edit.profile.user.user_discord" xml:space="preserve">
+    <value>discord</value>
+  </data>
+  <data name="edit.profile.user.user_from" xml:space="preserve">
+    <value>current location</value>
+  </data>
+  <data name="edit.profile.user.user_interests" xml:space="preserve">
+    <value>interests</value>
+  </data>
+  <data name="edit.profile.user.user_occ" xml:space="preserve">
+    <value>occupation</value>
+  </data>
+  <data name="edit.profile.user.user_twitter" xml:space="preserve">
+    <value>twitter</value>
+  </data>
+  <data name="edit.profile.user.user_website" xml:space="preserve">
+    <value>website</value>
+  </data>
+  <data name="edit.signature.title" xml:space="preserve">
+    <value>Signature</value>
+  </data>
+  <data name="edit.signature.update" xml:space="preserve">
+    <value>update</value>
+  </data>
+  <data name="notifications.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>receive notifications for new problem on qualified beatmaps of following modes</value>
+  </data>
+  <data name="notifications.beatmapset_disqualify" xml:space="preserve">
+    <value>receive notifications for when beatmaps of following modes are disqualified</value>
+  </data>
+  <data name="notifications.comment_reply" xml:space="preserve">
+    <value>receive notifications for replies to your comments</value>
+  </data>
+  <data name="notifications.title" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="notifications.topic_auto_subscribe" xml:space="preserve">
+    <value>automatically enable notifications on new forum topics that you create</value>
+  </data>
+  <data name="notifications.options._" xml:space="preserve">
+    <value>delivery options</value>
+  </data>
+  <data name="notifications.options.beatmap_owner_change" xml:space="preserve">
+    <value>guest difficulty</value>
+  </data>
+  <data name="notifications.options.beatmapset:modding" xml:space="preserve">
+    <value>beatmap modding</value>
+  </data>
+  <data name="notifications.options.channel_message" xml:space="preserve">
+    <value>private chat messages</value>
+  </data>
+  <data name="notifications.options.comment_new" xml:space="preserve">
+    <value>new comments</value>
+  </data>
+  <data name="notifications.options.forum_topic_reply" xml:space="preserve">
+    <value>topic reply</value>
+  </data>
+  <data name="notifications.options.mail" xml:space="preserve">
+    <value>mail</value>
+  </data>
+  <data name="notifications.options.mapping" xml:space="preserve">
+    <value>beatmap mapper</value>
+  </data>
+  <data name="notifications.options.push" xml:space="preserve">
+    <value>push</value>
+  </data>
+  <data name="notifications.options.user_achievement_unlock" xml:space="preserve">
+    <value>user medal unlocked</value>
+  </data>
+  <data name="oauth.authorized_clients" xml:space="preserve">
+    <value>authorized clients</value>
+  </data>
+  <data name="oauth.own_clients" xml:space="preserve">
+    <value>own clients</value>
+  </data>
+  <data name="oauth.title" xml:space="preserve">
+    <value>OAuth</value>
+  </data>
+  <data name="options.beatmapset_show_nsfw" xml:space="preserve">
+    <value>hide warnings for explicit content in beatmaps</value>
+  </data>
+  <data name="options.beatmapset_title_show_original" xml:space="preserve">
+    <value>show beatmap metadata in original language</value>
+  </data>
+  <data name="options.title" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="options.beatmapset_download._" xml:space="preserve">
+    <value>default beatmap download type</value>
+  </data>
+  <data name="options.beatmapset_download.all" xml:space="preserve">
+    <value>with video if available</value>
+  </data>
+  <data name="options.beatmapset_download.direct" xml:space="preserve">
+    <value>open in osu!direct</value>
+  </data>
+  <data name="options.beatmapset_download.no_video" xml:space="preserve">
+    <value>without video</value>
+  </data>
+  <data name="playstyles.keyboard" xml:space="preserve">
+    <value>keyboard</value>
+  </data>
+  <data name="playstyles.mouse" xml:space="preserve">
+    <value>mouse</value>
+  </data>
+  <data name="playstyles.tablet" xml:space="preserve">
+    <value>tablet</value>
+  </data>
+  <data name="playstyles.title" xml:space="preserve">
+    <value>Playstyles</value>
+  </data>
+  <data name="playstyles.touch" xml:space="preserve">
+    <value>touch</value>
+  </data>
+  <data name="privacy.friends_only" xml:space="preserve">
+    <value>block private messages from people not on your friends list</value>
+  </data>
+  <data name="privacy.hide_online" xml:space="preserve">
+    <value>hide your online presence</value>
+  </data>
+  <data name="privacy.title" xml:space="preserve">
+    <value>Privacy</value>
+  </data>
+  <data name="security.current_session" xml:space="preserve">
+    <value>current</value>
+  </data>
+  <data name="security.end_session" xml:space="preserve">
+    <value>End Session</value>
+  </data>
+  <data name="security.end_session_confirmation" xml:space="preserve">
+    <value>This will immediately end your session on that device. Are you sure?</value>
+  </data>
+  <data name="security.last_active" xml:space="preserve">
+    <value>Last active:</value>
+  </data>
+  <data name="security.title" xml:space="preserve">
+    <value>Security</value>
+  </data>
+  <data name="security.web_sessions" xml:space="preserve">
+    <value>web sessions</value>
+  </data>
+  <data name="update_email.update" xml:space="preserve">
+    <value>update</value>
+  </data>
+  <data name="update_password.update" xml:space="preserve">
+    <value>update</value>
+  </data>
+  <data name="verification_completed.text" xml:space="preserve">
+    <value>You can close this tab/window now</value>
+  </data>
+  <data name="verification_completed.title" xml:space="preserve">
+    <value>Verification has been completed</value>
+  </data>
+  <data name="verification_invalid.title" xml:space="preserve">
+    <value>Invalid or expired verification link</value>
+  </data>
+</root>

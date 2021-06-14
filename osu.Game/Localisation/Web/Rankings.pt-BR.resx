@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="countries.all" xml:space="preserve">
+    <value>Todos</value>
+  </data>
+  <data name="countries.title" xml:space="preserve">
+    <value>País</value>
+  </data>
+  <data name="filter.title" xml:space="preserve">
+    <value>Exibir</value>
+  </data>
+  <data name="filter.variant.title" xml:space="preserve">
+    <value>Variante</value>
+  </data>
+  <data name="type.charts" xml:space="preserve">
+    <value>Destaques</value>
+  </data>
+  <data name="type.country" xml:space="preserve">
+    <value>País</value>
+  </data>
+  <data name="type.multiplayer" xml:space="preserve">
+    <value>multiplayer</value>
+  </data>
+  <data name="type.performance" xml:space="preserve">
+    <value>Desempenho</value>
+  </data>
+  <data name="type.score" xml:space="preserve">
+    <value>Pontuação</value>
+  </data>
+  <data name="spotlight.end_date" xml:space="preserve">
+    <value>Data de Término</value>
+  </data>
+  <data name="spotlight.map_count" xml:space="preserve">
+    <value>Contagem de Map</value>
+  </data>
+  <data name="spotlight.participants" xml:space="preserve">
+    <value>Participantes</value>
+  </data>
+  <data name="spotlight.start_date" xml:space="preserve">
+    <value>Data de Ínicio</value>
+  </data>
+  <data name="stat.accuracy" xml:space="preserve">
+    <value>Precisão</value>
+  </data>
+  <data name="stat.active_users" xml:space="preserve">
+    <value>Usuários Ativos</value>
+  </data>
+  <data name="stat.country" xml:space="preserve">
+    <value>País</value>
+  </data>
+  <data name="stat.play_count" xml:space="preserve">
+    <value>Vezes Jogadas</value>
+  </data>
+  <data name="stat.performance" xml:space="preserve">
+    <value>Desempenho</value>
+  </data>
+  <data name="stat.total_score" xml:space="preserve">
+    <value>Pontuação Total</value>
+  </data>
+  <data name="stat.ranked_score" xml:space="preserve">
+    <value>Pontuação Ranqueada</value>
+  </data>
+  <data name="stat.average_score" xml:space="preserve">
+    <value>Pont. Média</value>
+  </data>
+  <data name="stat.average_performance" xml:space="preserve">
+    <value>Perf. Média</value>
+  </data>
+</root>

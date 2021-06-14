@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="page_description" xml:space="preserve">
+    <value>osu! 精選藝術家</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>精選藝術家</value>
+  </data>
+  <data name="admin.hidden" xml:space="preserve">
+    <value>此藝術家已被隱藏</value>
+  </data>
+  <data name="beatmaps._" xml:space="preserve">
+    <value>圖譜</value>
+  </data>
+  <data name="beatmaps.download" xml:space="preserve">
+    <value>下載圖譜範本</value>
+  </data>
+  <data name="beatmaps.download-na" xml:space="preserve">
+    <value>圖譜範本暫不提供</value>
+  </data>
+  <data name="index.description" xml:space="preserve">
+    <value>為了給 osu! 帶來新的原創歌曲，我們正在和一些藝術家合作。他們的部分專輯被 osu! 團隊選中作為制譜的絕佳素材。有的藝術家還為 osu! 提供了高質量的新專輯。&lt;br&gt;&lt;br&gt;這些專輯均提供了預先準備的 .osz 文件，並且已經獲得了官方授權(在 osu! 及其周邊內容中使用)</value>
+  </data>
+  <data name="links.osu" xml:space="preserve">
+    <value>osu! 個人簡介</value>
+  </data>
+  <data name="links.site" xml:space="preserve">
+    <value>官方網站</value>
+  </data>
+  <data name="songs._" xml:space="preserve">
+    <value>樂曲</value>
+  </data>
+  <data name="songs.count" xml:space="preserve">
+    <value>{0} 首音樂|{0} 首音樂</value>
+  </data>
+  <data name="songs.exclusive" xml:space="preserve">
+    <value>osu! 獨享</value>
+  </data>
+  <data name="tracklist.title" xml:space="preserve">
+    <value>標題</value>
+  </data>
+  <data name="tracklist.length" xml:space="preserve">
+    <value>長度</value>
+  </data>
+  <data name="tracklist.bpm" xml:space="preserve">
+    <value>bpm</value>
+  </data>
+  <data name="tracklist.genre" xml:space="preserve">
+    <value>類型</value>
+  </data>
+</root>

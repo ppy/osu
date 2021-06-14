@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="event.approve" xml:space="preserve">
+    <value>Aprobado.</value>
+  </data>
+  <data name="event.beatmap_owner_change" xml:space="preserve">
+    <value>El dueño de la dificultad {0} ha sido cambiado a {1}.</value>
+  </data>
+  <data name="event.discussion_delete" xml:space="preserve">
+    <value>Un moderador eliminó la discusión {0}.</value>
+  </data>
+  <data name="event.discussion_lock" xml:space="preserve">
+    <value>La discusión para este mapa ha sido desactivada. ({0})</value>
+  </data>
+  <data name="event.discussion_post_delete" xml:space="preserve">
+    <value>Un moderador eliminó una publicación en la discusión {0}.</value>
+  </data>
+  <data name="event.discussion_post_restore" xml:space="preserve">
+    <value>Un moderador restauró una publicación de la discusión {0}.</value>
+  </data>
+  <data name="event.discussion_restore" xml:space="preserve">
+    <value>Un moderador restauró la discusión {0}.</value>
+  </data>
+  <data name="event.discussion_unlock" xml:space="preserve">
+    <value>La discusión para este mapa ha sido activada.</value>
+  </data>
+  <data name="event.disqualify" xml:space="preserve">
+    <value>Descalificado por {0}. Motivo: {1} ({2}).</value>
+  </data>
+  <data name="event.disqualify_legacy" xml:space="preserve">
+    <value>Descalificado por {0}. Motivo: {1}.</value>
+  </data>
+  <data name="event.genre_edit" xml:space="preserve">
+    <value>El género cambió de {0} a {1}.</value>
+  </data>
+  <data name="event.issue_reopen" xml:space="preserve">
+    <value>El problema resuelto {0} por {1} ha sido reabierto por {2}.</value>
+  </data>
+  <data name="event.issue_resolve" xml:space="preserve">
+    <value>El problema {0} ha sido marcado como resuelto.</value>
+  </data>
+  <data name="event.kudosu_allow" xml:space="preserve">
+    <value>La negación de kudosu para la discusión {0} ha sido eliminada.</value>
+  </data>
+  <data name="event.kudosu_deny" xml:space="preserve">
+    <value>La discusión {0} ha sido negada para kudosu.</value>
+  </data>
+  <data name="event.kudosu_gain" xml:space="preserve">
+    <value>La discusión {0} por {1} ha obtenido suficientes votos para kudosu.</value>
+  </data>
+  <data name="event.kudosu_lost" xml:space="preserve">
+    <value>La discusión {0} por {1} ha perdido votos y su kudosu ganado ha sido removido.</value>
+  </data>
+  <data name="event.kudosu_recalculate" xml:space="preserve">
+    <value>A la discusión {0} se le han recalculado los kudosu otorgados.</value>
+  </data>
+  <data name="event.language_edit" xml:space="preserve">
+    <value>El lenguaje cambió de {0} a {1}.</value>
+  </data>
+  <data name="event.love" xml:space="preserve">
+    <value>Amado por {0}.</value>
+  </data>
+  <data name="event.nominate" xml:space="preserve">
+    <value>Nominado por {0}.</value>
+  </data>
+  <data name="event.nominate_modes" xml:space="preserve">
+    <value>Nominado por {0} ({1}).</value>
+  </data>
+  <data name="event.nomination_reset" xml:space="preserve">
+    <value>Un nuevo problema {0} ({1}) ha restablecido las nominaciones.</value>
+  </data>
+  <data name="event.qualify" xml:space="preserve">
+    <value>Este mapa ha alcanzado el número requerido de nominaciones y ha sido calificado.</value>
+  </data>
+  <data name="event.rank" xml:space="preserve">
+    <value>Clasificado.</value>
+  </data>
+  <data name="event.remove_from_loved" xml:space="preserve">
+    <value>Removido de Amados por {0}. ({1})</value>
+  </data>
+  <data name="event.nsfw_toggle.to_0" xml:space="preserve">
+    <value>Marca explícita removida</value>
+  </data>
+  <data name="event.nsfw_toggle.to_1" xml:space="preserve">
+    <value>Marcado como explícito</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Eventos del set de mapas</value>
+  </data>
+  <data name="index.form.period" xml:space="preserve">
+    <value>Período</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Tipos</value>
+  </data>
+  <data name="item.content" xml:space="preserve">
+    <value>Contenido</value>
+  </data>
+  <data name="item.discussion_deleted" xml:space="preserve">
+    <value>[eliminado]</value>
+  </data>
+  <data name="item.type" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="type.approve" xml:space="preserve">
+    <value>Aprobación</value>
+  </data>
+  <data name="type.beatmap_owner_change" xml:space="preserve">
+    <value>Cambio de dueño de la dificultad</value>
+  </data>
+  <data name="type.discussion_delete" xml:space="preserve">
+    <value>Eliminación de discusión</value>
+  </data>
+  <data name="type.discussion_post_delete" xml:space="preserve">
+    <value>Eliminación de respuesta a discusión</value>
+  </data>
+  <data name="type.discussion_post_restore" xml:space="preserve">
+    <value>Restauración de respuesta a discusión</value>
+  </data>
+  <data name="type.discussion_restore" xml:space="preserve">
+    <value>Restauración de discusión</value>
+  </data>
+  <data name="type.disqualify" xml:space="preserve">
+    <value>Descalificación</value>
+  </data>
+  <data name="type.genre_edit" xml:space="preserve">
+    <value>Edición de género</value>
+  </data>
+  <data name="type.issue_reopen" xml:space="preserve">
+    <value>Reapertura de discusión</value>
+  </data>
+  <data name="type.issue_resolve" xml:space="preserve">
+    <value>Resolución de discusión</value>
+  </data>
+  <data name="type.kudosu_allow" xml:space="preserve">
+    <value>Permiso de Kudosu</value>
+  </data>
+  <data name="type.kudosu_deny" xml:space="preserve">
+    <value>Negación de Kudosu</value>
+  </data>
+  <data name="type.kudosu_gain" xml:space="preserve">
+    <value>Ganancia de Kudosu</value>
+  </data>
+  <data name="type.kudosu_lost" xml:space="preserve">
+    <value>Pérdida de Kudosu</value>
+  </data>
+  <data name="type.kudosu_recalculate" xml:space="preserve">
+    <value>Recalculación de Kudosu</value>
+  </data>
+  <data name="type.language_edit" xml:space="preserve">
+    <value>Edición del idioma</value>
+  </data>
+  <data name="type.love" xml:space="preserve">
+    <value>Amor</value>
+  </data>
+  <data name="type.nominate" xml:space="preserve">
+    <value>Nominación</value>
+  </data>
+  <data name="type.nomination_reset" xml:space="preserve">
+    <value>Restablecimiento de nominación</value>
+  </data>
+  <data name="type.nsfw_toggle" xml:space="preserve">
+    <value>Marca explícita</value>
+  </data>
+  <data name="type.qualify" xml:space="preserve">
+    <value>Calificación</value>
+  </data>
+  <data name="type.rank" xml:space="preserve">
+    <value>Clasificación</value>
+  </data>
+  <data name="type.remove_from_loved" xml:space="preserve">
+    <value>Remoción de Amados</value>
+  </data>
+</root>

@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="index.description" xml:space="preserve">
+    <value>Valmiiksi kasattuja beatmap kokoelmia, joissa yhdistyy tietty teema.</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>listaus</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmap-Kokoelmat</value>
+  </data>
+  <data name="index.blurb.important" xml:space="preserve">
+    <value>LUE TÄMÄ ENNEN LATAAMISTA</value>
+  </data>
+  <data name="index.blurb.instruction._" xml:space="preserve">
+    <value>Asennus: Kun paketti on ladattu, pura .rar tiedosto osu! Songs kansioon.
+                 Kappaleet ovat vielä .zip ja/tai .osz muodossa paketin sisällä, joten osu! purkaa beatmapit seuraavalla pelikerrallla.
+                 {0} pura .zip/.osz-tiedostoja itse,
+                 tai beatmapit eivät näy oikein pelissä eivätkä toimi kunnolla.</value>
+  </data>
+  <data name="index.blurb.instruction.scary" xml:space="preserve">
+    <value>ÄLÄ</value>
+  </data>
+  <data name="index.blurb.note._" xml:space="preserve">
+    <value>Huomaa myös, että on erittäin suositeltavaa {0}, koska vanhemmat mapit ovat paljon huonompia kuin uudet.</value>
+  </data>
+  <data name="index.blurb.note.scary" xml:space="preserve">
+    <value>ladata uusimpia kokoelmia vanhojen sijaan</value>
+  </data>
+  <data name="show.download" xml:space="preserve">
+    <value>Lataa</value>
+  </data>
+  <data name="show.item.cleared" xml:space="preserve">
+    <value>läpäisty</value>
+  </data>
+  <data name="show.item.not_cleared" xml:space="preserve">
+    <value>läpäisemätön</value>
+  </data>
+  <data name="show.no_diff_reduction._" xml:space="preserve">
+    <value>{0} ei voi käyttää tämän paketin suorittamiseen.</value>
+  </data>
+  <data name="show.no_diff_reduction.link" xml:space="preserve">
+    <value>Vaikeusastetta vähentäviä modeja</value>
+  </data>
+  <data name="mode.artist" xml:space="preserve">
+    <value>Esittäjä/Albumi</value>
+  </data>
+  <data name="mode.chart" xml:space="preserve">
+    <value>Valokeilassa</value>
+  </data>
+  <data name="mode.standard" xml:space="preserve">
+    <value>Tavallinen</value>
+  </data>
+  <data name="mode.theme" xml:space="preserve">
+    <value>Teema</value>
+  </data>
+  <data name="require_login._" xml:space="preserve">
+    <value>Sinun täytyy olla {0} ladataksesi</value>
+  </data>
+  <data name="require_login.link_text" xml:space="preserve">
+    <value>kirjautuneena sisään</value>
+  </data>
+</root>

@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authorizations.update.null_user" xml:space="preserve">
+    <value>A szerkesztéshez be kell lépni.</value>
+  </data>
+  <data name="authorizations.update.system_generated" xml:space="preserve">
+    <value>Rendszer által generált posztot nem lehet szerkeszteni.</value>
+  </data>
+  <data name="authorizations.update.wrong_user" xml:space="preserve">
+    <value>Csak a tulajdonos szerkesztheti a posztot.</value>
+  </data>
+  <data name="events.empty" xml:space="preserve">
+    <value>Semmi sem történt... eddig.</value>
+  </data>
+  <data name="index.deleted_beatmap" xml:space="preserve">
+    <value>törölve</value>
+  </data>
+  <data name="index.none_found" xml:space="preserve">
+    <value>Nem található a keresési feltételeknek megfelelő beszélgetés.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmap Megbeszélés</value>
+  </data>
+  <data name="index.form._" xml:space="preserve">
+    <value>Keresés</value>
+  </data>
+  <data name="index.form.deleted" xml:space="preserve">
+    <value>Törölt beszélgetések mellékelése</value>
+  </data>
+  <data name="index.form.mode" xml:space="preserve">
+    <value>Beatmap  mód</value>
+  </data>
+  <data name="index.form.only_unresolved" xml:space="preserve">
+    <value>Csak a megoldatlan beszélgetéseket mutasd</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Üzenettípusok</value>
+  </data>
+  <data name="index.form.username" xml:space="preserve">
+    <value>Felhasználónév</value>
+  </data>
+  <data name="index.form.beatmapset_status._" xml:space="preserve">
+    <value>Beatmap státusz</value>
+  </data>
+  <data name="index.form.beatmapset_status.all" xml:space="preserve">
+    <value>Mind</value>
+  </data>
+  <data name="index.form.beatmapset_status.disqualified" xml:space="preserve">
+    <value>Diszkvalifikálva</value>
+  </data>
+  <data name="index.form.beatmapset_status.never_qualified" xml:space="preserve">
+    <value>Minősítetlen</value>
+  </data>
+  <data name="index.form.beatmapset_status.qualified" xml:space="preserve">
+    <value>Minősített</value>
+  </data>
+  <data name="index.form.beatmapset_status.ranked" xml:space="preserve">
+    <value>Rangsorolt</value>
+  </data>
+  <data name="index.form.user.label" xml:space="preserve">
+    <value>Felhasználó</value>
+  </data>
+  <data name="index.form.user.overview" xml:space="preserve">
+    <value>Tevékenység áttekintés</value>
+  </data>
+  <data name="item.created_at" xml:space="preserve">
+    <value>Beküldés időpontja</value>
+  </data>
+  <data name="item.deleted_at" xml:space="preserve">
+    <value>Törlés dátuma</value>
+  </data>
+  <data name="item.message_type" xml:space="preserve">
+    <value>Típus</value>
+  </data>
+  <data name="item.permalink" xml:space="preserve">
+    <value>Permalink</value>
+  </data>
+  <data name="nearby_posts.confirm" xml:space="preserve">
+    <value>Egy poszt sem foglalkozik a problémámmal</value>
+  </data>
+  <data name="nearby_posts.notice" xml:space="preserve">
+    <value>Már vannak posztok {0} ({1}) körül. Kérlek nézd meg posztolás előtt.</value>
+  </data>
+  <data name="nearby_posts.unsaved" xml:space="preserve">
+    <value>{0} ellenőrzés alatt áll</value>
+  </data>
+  <data name="owner_editor.button" xml:space="preserve">
+    <value>Nehézség</value>
+  </data>
+  <data name="owner_editor.reset_confirm" xml:space="preserve">
+    <value>Visszaállítod ennek a nehézségi szintnek a tulajdonosát?</value>
+  </data>
+  <data name="owner_editor.user" xml:space="preserve">
+    <value>Tulajdonos</value>
+  </data>
+  <data name="owner_editor.version" xml:space="preserve">
+    <value>Nehézség</value>
+  </data>
+  <data name="reply.open.guest" xml:space="preserve">
+    <value>Jelentkezz be a válaszoláshoz</value>
+  </data>
+  <data name="reply.open.user" xml:space="preserve">
+    <value>Válasz</value>
+  </data>
+  <data name="review.block_count" xml:space="preserve">
+    <value>{0} / {1} blokk használva</value>
+  </data>
+  <data name="review.go_to_parent" xml:space="preserve">
+    <value>Legújabb posztok mutatása</value>
+  </data>
+  <data name="review.go_to_child" xml:space="preserve">
+    <value>Megbeszélés megtekintése</value>
+  </data>
+  <data name="review.validation.block_too_large" xml:space="preserve">
+    <value>a maximális karakter szám {0}</value>
+  </data>
+  <data name="review.validation.external_references" xml:space="preserve">
+    <value>az áttekintés olyan kérdésekre hivatkozik, amelyek nem tartoznak ehhez a felülvizsgálathoz</value>
+  </data>
+  <data name="review.validation.invalid_block_type" xml:space="preserve">
+    <value>érvénytelen blokk típus</value>
+  </data>
+  <data name="review.validation.invalid_document" xml:space="preserve">
+    <value>érévnytelen értékelés</value>
+  </data>
+  <data name="review.validation.minimum_issues" xml:space="preserve">
+    <value>az áttekintésnek tartalmaznia kell legalább {0} problémát|Az áttekintésnek tartalmaznia kell legalább {0} problémákat</value>
+  </data>
+  <data name="review.validation.missing_text" xml:space="preserve">
+    <value>hiányzó szöveg</value>
+  </data>
+  <data name="review.validation.too_many_blocks" xml:space="preserve">
+    <value>a beszámolók csak {0} bekezdés/problémát tartalmazhatnak|a beszámolók legfeljebb {0} bekezdést/problémát tartalmazhatnak</value>
+  </data>
+  <data name="system.resolved.true" xml:space="preserve">
+    <value>Megoldottnak jelölve {0} által</value>
+  </data>
+  <data name="system.resolved.false" xml:space="preserve">
+    <value>Újranyitva {0} által</value>
+  </data>
+  <data name="timestamp_display.general" xml:space="preserve">
+    <value>általános</value>
+  </data>
+  <data name="timestamp_display.general_all" xml:space="preserve">
+    <value>általános (mind)</value>
+  </data>
+  <data name="user_filter.everyone" xml:space="preserve">
+    <value>Mindenki</value>
+  </data>
+  <data name="user_filter.label" xml:space="preserve">
+    <value>Szűrés felhasználó szerint</value>
+  </data>
+</root>

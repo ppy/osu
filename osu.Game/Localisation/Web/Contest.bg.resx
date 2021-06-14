@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="header.small" xml:space="preserve">
+    <value>Състезавайте се по повече начини освен да кликате на кръгчета.</value>
+  </data>
+  <data name="header.large" xml:space="preserve">
+    <value>Обществени конкурси</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>списък</value>
+  </data>
+  <data name="voting.login_required" xml:space="preserve">
+    <value>Моля влезте в профила си, за да гласувате.</value>
+  </data>
+  <data name="voting.over" xml:space="preserve">
+    <value>Гласуването за този конкурс е приключилo</value>
+  </data>
+  <data name="voting.best_of.none_played" xml:space="preserve">
+    <value>Изглежда не сте играли никои от бийтмаповете, които са определени за този конкурс!</value>
+  </data>
+  <data name="voting.button.add" xml:space="preserve">
+    <value>Гласувай</value>
+  </data>
+  <data name="voting.button.remove" xml:space="preserve">
+    <value>Премахване на гласа</value>
+  </data>
+  <data name="voting.button.used_up" xml:space="preserve">
+    <value>Използвахте всичките си гласове</value>
+  </data>
+  <data name="entry._" xml:space="preserve">
+    <value>запис</value>
+  </data>
+  <data name="entry.login_required" xml:space="preserve">
+    <value>Моля влезте в профила си, за да се запишете за този конкурс.</value>
+  </data>
+  <data name="entry.silenced_or_restricted" xml:space="preserve">
+    <value>Не можете да се запишете за конкурси докато сте с ограничен статут или заглушени.</value>
+  </data>
+  <data name="entry.preparation" xml:space="preserve">
+    <value>В момента подготвяме този конкурс. Моля бъдете търпеливи!</value>
+  </data>
+  <data name="entry.drop_here" xml:space="preserve">
+    <value>Пуснете вашия файл тук</value>
+  </data>
+  <data name="entry.download" xml:space="preserve">
+    <value>Изтегли .osz</value>
+  </data>
+  <data name="entry.wrong_type.art" xml:space="preserve">
+    <value>Само файлове с .jpg или .png формат се приемат за този конкурс.</value>
+  </data>
+  <data name="entry.wrong_type.beatmap" xml:space="preserve">
+    <value>Само файл с .osu формат се приема за този конкурс.</value>
+  </data>
+  <data name="entry.wrong_type.music" xml:space="preserve">
+    <value>Само файл с .mp3 формат се приема за този конкурс.</value>
+  </data>
+  <data name="entry.too_big" xml:space="preserve">
+    <value>Записите за този конкурс могат да са до {0} пъти.</value>
+  </data>
+  <data name="beatmaps.download" xml:space="preserve">
+    <value>Изтегляне на запис</value>
+  </data>
+  <data name="vote.list" xml:space="preserve">
+    <value>гласове</value>
+  </data>
+  <data name="vote.count" xml:space="preserve">
+    <value>{0} глас|{0} гласове</value>
+  </data>
+  <data name="vote.points" xml:space="preserve">
+    <value>{0} точка|{0} точки</value>
+  </data>
+  <data name="dates.ended" xml:space="preserve">
+    <value>Приключи на {0}</value>
+  </data>
+  <data name="dates.ended_no_date" xml:space="preserve">
+    <value>Приключи</value>
+  </data>
+  <data name="dates.starts._" xml:space="preserve">
+    <value>Започва на {0}</value>
+  </data>
+  <data name="dates.starts.soon" xml:space="preserve">
+    <value>скоро™</value>
+  </data>
+  <data name="states.entry" xml:space="preserve">
+    <value>Отворено записване</value>
+  </data>
+  <data name="states.voting" xml:space="preserve">
+    <value>Гласуването започна</value>
+  </data>
+  <data name="states.results" xml:space="preserve">
+    <value>Резултатите са обявени</value>
+  </data>
+</root>

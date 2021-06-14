@@ -1,0 +1,226 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="admin._" xml:space="preserve">
+    <value>المشرف</value>
+  </data>
+  <data name="admin_forum._" xml:space="preserve">
+    <value>المشرف</value>
+  </data>
+  <data name="admin_store._" xml:space="preserve">
+    <value>المشرف</value>
+  </data>
+  <data name="error.error.400" xml:space="preserve">
+    <value>طلب غير صالح</value>
+  </data>
+  <data name="error.error.404" xml:space="preserve">
+    <value>مفقود</value>
+  </data>
+  <data name="error.error.403" xml:space="preserve">
+    <value>محظور</value>
+  </data>
+  <data name="error.error.401" xml:space="preserve">
+    <value>غير مصرح به</value>
+  </data>
+  <data name="error.error.401-verification" xml:space="preserve">
+    <value>التحقق من الحساب</value>
+  </data>
+  <data name="error.error.405" xml:space="preserve">
+    <value>مفقود</value>
+  </data>
+  <data name="error.error.422" xml:space="preserve">
+    <value>طلب غير صالح</value>
+  </data>
+  <data name="error.error.429" xml:space="preserve">
+    <value>طلبات كثيرة جداً</value>
+  </data>
+  <data name="error.error.500" xml:space="preserve">
+    <value>وقعَ خطأ</value>
+  </data>
+  <data name="error.error.503" xml:space="preserve">
+    <value>صيانة</value>
+  </data>
+  <data name="forum._" xml:space="preserve">
+    <value>المنتدى</value>
+  </data>
+  <data name="forum.topic_watches_controller.index" xml:space="preserve">
+    <value>لوحة التحكم</value>
+  </data>
+  <data name="main.account_controller.edit" xml:space="preserve">
+    <value>لوحة التحكم</value>
+  </data>
+  <data name="main.account_controller.verify_link" xml:space="preserve">
+    <value>التحقق من الحساب</value>
+  </data>
+  <data name="main.artists_controller._" xml:space="preserve">
+    <value>الفنانين المميزين</value>
+  </data>
+  <data name="main.beatmap_discussion_posts_controller._" xml:space="preserve">
+    <value>منشورات مناقشة الخريطة</value>
+  </data>
+  <data name="main.beatmap_discussions_controller._" xml:space="preserve">
+    <value>مناقشات الخريطة</value>
+  </data>
+  <data name="main.beatmap_packs_controller._" xml:space="preserve">
+    <value>حزم الخرائط</value>
+  </data>
+  <data name="main.beatmapset_discussion_votes_controller._" xml:space="preserve">
+    <value>أَصوات مناقشة الخريطة</value>
+  </data>
+  <data name="main.beatmapset_events_controller._" xml:space="preserve">
+    <value>تاريخ الخريطة</value>
+  </data>
+  <data name="main.beatmapset_watches_controller.index" xml:space="preserve">
+    <value>لوحة التحكم</value>
+  </data>
+  <data name="main.beatmapsets_controller.discussion" xml:space="preserve">
+    <value>مناقشة الخريطة</value>
+  </data>
+  <data name="main.beatmapsets_controller.index" xml:space="preserve">
+    <value>قائمة الخرائط</value>
+  </data>
+  <data name="main.beatmapsets_controller.show" xml:space="preserve">
+    <value>معلومات الخريطة</value>
+  </data>
+  <data name="main.changelog_controller._" xml:space="preserve">
+    <value>سِجل التغييرات</value>
+  </data>
+  <data name="main.chat_controller._" xml:space="preserve">
+    <value>الدردشة</value>
+  </data>
+  <data name="main.comments_controller._" xml:space="preserve">
+    <value>التعليقات</value>
+  </data>
+  <data name="main.contests_controller._" xml:space="preserve">
+    <value>المسابقات</value>
+  </data>
+  <data name="main.follows_controller.index" xml:space="preserve">
+    <value>لوحة التحكم</value>
+  </data>
+  <data name="main.friends_controller.index" xml:space="preserve">
+    <value>لوحة التحكم</value>
+  </data>
+  <data name="main.groups_controller.show" xml:space="preserve">
+    <value>المجموعات</value>
+  </data>
+  <data name="main.home_controller.get_download" xml:space="preserve">
+    <value>تنزيل</value>
+  </data>
+  <data name="main.home_controller.index" xml:space="preserve">
+    <value>لوحة التحكم</value>
+  </data>
+  <data name="main.home_controller.search" xml:space="preserve">
+    <value>البحث</value>
+  </data>
+  <data name="main.home_controller.support_the_game" xml:space="preserve">
+    <value>أِدعَم اللعبة</value>
+  </data>
+  <data name="main.home_controller.testflight" xml:space="preserve">
+    <value>مشروع الأختبار</value>
+  </data>
+  <data name="main.legal_controller._" xml:space="preserve">
+    <value>المعلومات</value>
+  </data>
+  <data name="main.livestreams_controller._" xml:space="preserve">
+    <value>البث المباشر</value>
+  </data>
+  <data name="main.matches_controller._" xml:space="preserve">
+    <value>المباريات</value>
+  </data>
+  <data name="main.news_controller._" xml:space="preserve">
+    <value>الأخبار</value>
+  </data>
+  <data name="main.notifications_controller._" xml:space="preserve">
+    <value>سجل الإشعارات</value>
+  </data>
+  <data name="main.password_reset_controller._" xml:space="preserve">
+    <value>إعادة تعيين كلمة المرور</value>
+  </data>
+  <data name="main.ranking_controller._" xml:space="preserve">
+    <value>التصنيف</value>
+  </data>
+  <data name="main.scores_controller._" xml:space="preserve">
+    <value>الأداء</value>
+  </data>
+  <data name="main.store_controller._" xml:space="preserve">
+    <value>osu!store</value>
+  </data>
+  <data name="main.tournaments_controller._" xml:space="preserve">
+    <value>البطولات</value>
+  </data>
+  <data name="main.users_controller._" xml:space="preserve">
+    <value>معلومات اللاعب</value>
+  </data>
+  <data name="main.users_controller.disabled" xml:space="preserve">
+    <value>ملحوظة</value>
+  </data>
+  <data name="main.wiki_controller._" xml:space="preserve">
+    <value>قاعدة المعارف</value>
+  </data>
+  <data name="multiplayer.rooms_controller._" xml:space="preserve">
+    <value>التصنيف</value>
+  </data>
+  <data name="store._" xml:space="preserve">
+    <value>osu!store</value>
+  </data>
+  <data name="users.modding_history_controller._" xml:space="preserve">
+    <value>معلومات المُعَدِل</value>
+  </data>
+</root>

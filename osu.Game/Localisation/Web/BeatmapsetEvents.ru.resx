@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="event.approve" xml:space="preserve">
+    <value>Одобрена.</value>
+  </data>
+  <data name="event.beatmap_owner_change" xml:space="preserve">
+    <value>Владелец сложности {0} изменен на {1}.</value>
+  </data>
+  <data name="event.discussion_delete" xml:space="preserve">
+    <value>Модератор удалил отзыв {0}.</value>
+  </data>
+  <data name="event.discussion_lock" xml:space="preserve">
+    <value>Обсуждение для этой карты было отключено. ({0})</value>
+  </data>
+  <data name="event.discussion_post_delete" xml:space="preserve">
+    <value>Модератор удалил публикацию из отзыва {0}.</value>
+  </data>
+  <data name="event.discussion_post_restore" xml:space="preserve">
+    <value>Модератор восстановил публикацию в отзыве {0}.</value>
+  </data>
+  <data name="event.discussion_restore" xml:space="preserve">
+    <value>Модератор восстановил отзыв {0}.</value>
+  </data>
+  <data name="event.discussion_unlock" xml:space="preserve">
+    <value>Обсуждение для этой карты было включено.</value>
+  </data>
+  <data name="event.disqualify" xml:space="preserve">
+    <value>Дисквалифицирована {0}. Причина: {1}.</value>
+  </data>
+  <data name="event.disqualify_legacy" xml:space="preserve">
+    <value>Дисквалифицирована {0}. Причина: {1}.</value>
+  </data>
+  <data name="event.genre_edit" xml:space="preserve">
+    <value>Жанр изменен с {0} на {1}.</value>
+  </data>
+  <data name="event.issue_reopen" xml:space="preserve">
+    <value>Проблема в {0} вновь решена.</value>
+  </data>
+  <data name="event.issue_resolve" xml:space="preserve">
+    <value>Проблема {0} отмечена как решенная.</value>
+  </data>
+  <data name="event.kudosu_allow" xml:space="preserve">
+    <value>Кудосу из отзыва {0} были удалены.</value>
+  </data>
+  <data name="event.kudosu_deny" xml:space="preserve">
+    <value>Отзыву {0} отказано в кудосу.</value>
+  </data>
+  <data name="event.kudosu_gain" xml:space="preserve">
+    <value>Отзыв {0} от {1} получил достаточно голосов для получения кудосу.</value>
+  </data>
+  <data name="event.kudosu_lost" xml:space="preserve">
+    <value>Отзыв {0} от {1} потерял голоса и присуждённые кудосу были удалены.</value>
+  </data>
+  <data name="event.kudosu_recalculate" xml:space="preserve">
+    <value>Кудосу за отзыв {0} были пересчитаны.</value>
+  </data>
+  <data name="event.language_edit" xml:space="preserve">
+    <value>Язык изменен с {0} на {1}.</value>
+  </data>
+  <data name="event.love" xml:space="preserve">
+    <value>Добавлено {0} в любимое</value>
+  </data>
+  <data name="event.nominate" xml:space="preserve">
+    <value>Номинирована {0}.</value>
+  </data>
+  <data name="event.nominate_modes" xml:space="preserve">
+    <value>Номинатор: {0} ({1}).</value>
+  </data>
+  <data name="event.nomination_reset" xml:space="preserve">
+    <value>Из-за новой проблемы в {0} статус номинации был сброшен.</value>
+  </data>
+  <data name="event.qualify" xml:space="preserve">
+    <value>Эта карта была номинирована достаточное количество раз для квалификации.</value>
+  </data>
+  <data name="event.rank" xml:space="preserve">
+    <value>Рейтинговая.</value>
+  </data>
+  <data name="event.remove_from_loved" xml:space="preserve">
+    <value>{0} удалил карту из Любимых ({1})</value>
+  </data>
+  <data name="event.nsfw_toggle.to_0" xml:space="preserve">
+    <value>Удалить отметку 18+</value>
+  </data>
+  <data name="event.nsfw_toggle.to_1" xml:space="preserve">
+    <value>Помечено как откровенное</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>События карты</value>
+  </data>
+  <data name="index.form.period" xml:space="preserve">
+    <value>Период</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Типы</value>
+  </data>
+  <data name="item.content" xml:space="preserve">
+    <value>Контент</value>
+  </data>
+  <data name="item.discussion_deleted" xml:space="preserve">
+    <value>[удалено]</value>
+  </data>
+  <data name="item.type" xml:space="preserve">
+    <value>Тип</value>
+  </data>
+  <data name="type.approve" xml:space="preserve">
+    <value>Одобрено</value>
+  </data>
+  <data name="type.beatmap_owner_change" xml:space="preserve">
+    <value>Сменить владельца сложности</value>
+  </data>
+  <data name="type.discussion_delete" xml:space="preserve">
+    <value>Удаление обсуждения</value>
+  </data>
+  <data name="type.discussion_post_delete" xml:space="preserve">
+    <value>Удаление ответов в обсуждении</value>
+  </data>
+  <data name="type.discussion_post_restore" xml:space="preserve">
+    <value>Восстановление ответов в обсуждении</value>
+  </data>
+  <data name="type.discussion_restore" xml:space="preserve">
+    <value>Восстановление обсуждения</value>
+  </data>
+  <data name="type.disqualify" xml:space="preserve">
+    <value>Дисквалификация</value>
+  </data>
+  <data name="type.genre_edit" xml:space="preserve">
+    <value>Изменение жанра</value>
+  </data>
+  <data name="type.issue_reopen" xml:space="preserve">
+    <value>Возобновление обсуждения</value>
+  </data>
+  <data name="type.issue_resolve" xml:space="preserve">
+    <value>Обсуждение решения</value>
+  </data>
+  <data name="type.kudosu_allow" xml:space="preserve">
+    <value>Квота Kudosu</value>
+  </data>
+  <data name="type.kudosu_deny" xml:space="preserve">
+    <value>Отказ в Kudosu</value>
+  </data>
+  <data name="type.kudosu_gain" xml:space="preserve">
+    <value>Получение Kudosu</value>
+  </data>
+  <data name="type.kudosu_lost" xml:space="preserve">
+    <value>Потеря Kudosu</value>
+  </data>
+  <data name="type.kudosu_recalculate" xml:space="preserve">
+    <value>Перерасчет Kudosu</value>
+  </data>
+  <data name="type.language_edit" xml:space="preserve">
+    <value>Изменение языка</value>
+  </data>
+  <data name="type.love" xml:space="preserve">
+    <value>Любовь</value>
+  </data>
+  <data name="type.nominate" xml:space="preserve">
+    <value>Номинация</value>
+  </data>
+  <data name="type.nomination_reset" xml:space="preserve">
+    <value>Сброс номинации</value>
+  </data>
+  <data name="type.nsfw_toggle" xml:space="preserve">
+    <value>Контент 18+</value>
+  </data>
+  <data name="type.qualify" xml:space="preserve">
+    <value>Квалификация</value>
+  </data>
+  <data name="type.rank" xml:space="preserve">
+    <value>Рейтинг</value>
+  </data>
+  <data name="type.remove_from_loved" xml:space="preserve">
+    <value>Удаление из Любимых</value>
+  </data>
+</root>

@@ -1,0 +1,721 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="deleted" xml:space="preserve">
+    <value>[удалённый пользователь]</value>
+  </data>
+  <data name="beatmapset_activities.title" xml:space="preserve">
+    <value>История редактирования карт пользователя {0}</value>
+  </data>
+  <data name="beatmapset_activities.title_compact" xml:space="preserve">
+    <value>Моддинг</value>
+  </data>
+  <data name="beatmapset_activities.discussions.title_recent" xml:space="preserve">
+    <value>Недавно начатые дискуссии</value>
+  </data>
+  <data name="beatmapset_activities.events.title_recent" xml:space="preserve">
+    <value>Недавние события</value>
+  </data>
+  <data name="beatmapset_activities.posts.title_recent" xml:space="preserve">
+    <value>Недавние публикации</value>
+  </data>
+  <data name="beatmapset_activities.votes_received.title_most" xml:space="preserve">
+    <value>Самые популярные от (за 3 месяца)</value>
+  </data>
+  <data name="beatmapset_activities.votes_made.title_most" xml:space="preserve">
+    <value>Самые популярные (за 3 месяца)</value>
+  </data>
+  <data name="blocks.banner_text" xml:space="preserve">
+    <value>пользователь добавлен в ваш чёрный список</value>
+  </data>
+  <data name="blocks.blocked_count" xml:space="preserve">
+    <value>чёрный список ({0})</value>
+  </data>
+  <data name="blocks.hide_profile" xml:space="preserve">
+    <value>скрыть профиль</value>
+  </data>
+  <data name="blocks.not_blocked" xml:space="preserve">
+    <value>Этот пользователь не заблокирован.</value>
+  </data>
+  <data name="blocks.show_profile" xml:space="preserve">
+    <value>показать профиль</value>
+  </data>
+  <data name="blocks.too_many" xml:space="preserve">
+    <value>Достигнут лимит кол-ва заблокированных.</value>
+  </data>
+  <data name="blocks.button.block" xml:space="preserve">
+    <value>заблокировать</value>
+  </data>
+  <data name="blocks.button.unblock" xml:space="preserve">
+    <value>разблокировать</value>
+  </data>
+  <data name="card.loading" xml:space="preserve">
+    <value>Загрузка...</value>
+  </data>
+  <data name="card.send_message" xml:space="preserve">
+    <value>отправить сообщение</value>
+  </data>
+  <data name="disabled.title" xml:space="preserve">
+    <value>О нет! Похоже, ваш аккаунт был отключен.</value>
+  </data>
+  <data name="disabled.warning" xml:space="preserve">
+    <value>Учтите, что если вы нарушили правила, то как минимум месяц ваши попытки обжаловать блокировку рассматриваться не будут. По истечении одного месяца можете связываться с нами, если посчитаете это необходимым. Также знайте, что создание новых аккаунтов во избежание блокировки &lt;strong&gt;лишь продлит этот месячный период&lt;/strong&gt;, в который вы не сможете восстановить свой главный аккаунт. Вдобавок, &lt;strong&gt;создание вторичных аккаунтов запрещено правилами&lt;/strong&gt;, поэтому советуем вам не делать этого!</value>
+  </data>
+  <data name="disabled.if_mistake._" xml:space="preserve">
+    <value>Если вы считаете, что это ошибка, то можете связаться с нами (по {0}, или нажав на «?» в нижнем правом углу страницы). Пожалуйста, учтите, что мы всегда уверены в своих действиях, так как они основаны на надёжных данных. Мы оставляем за собой право игнорировать ваши жалобы, если посчитаем, что вы ведёте себя недобросовестно.</value>
+  </data>
+  <data name="disabled.if_mistake.email" xml:space="preserve">
+    <value>электронной почте</value>
+  </data>
+  <data name="disabled.reasons.compromised" xml:space="preserve">
+    <value>Возможно, ваш аккаунт был скомпрометирован. Он может быть временно отключен, пока личность владельца подтверждается.</value>
+  </data>
+  <data name="disabled.reasons.opening" xml:space="preserve">
+    <value>Есть ряд причин, которые могут привести к отключению вашего аккаунта:</value>
+  </data>
+  <data name="disabled.reasons.tos._" xml:space="preserve">
+    <value>Вы нарушили одно или больше из {0} или {1}.</value>
+  </data>
+  <data name="disabled.reasons.tos.community_rules" xml:space="preserve">
+    <value>правил сообщества</value>
+  </data>
+  <data name="disabled.reasons.tos.tos" xml:space="preserve">
+    <value>условий использования</value>
+  </data>
+  <data name="filtering.by_game_mode" xml:space="preserve">
+    <value>Участники по игровому режиму</value>
+  </data>
+  <data name="force_reactivation.reason.inactive_different_country" xml:space="preserve">
+    <value>Ваш аккаунт не использовался в течение долгого времени.</value>
+  </data>
+  <data name="login._" xml:space="preserve">
+    <value>Вход</value>
+  </data>
+  <data name="login.button" xml:space="preserve">
+    <value>Войти</value>
+  </data>
+  <data name="login.button_posting" xml:space="preserve">
+    <value>Входим...</value>
+  </data>
+  <data name="login.email_login_disabled" xml:space="preserve">
+    <value>Вход в аккаунт с помощью электронной почты в настоящее время отключён. Вместо этого, пожалуйста, используйте имя пользователя.</value>
+  </data>
+  <data name="login.failed" xml:space="preserve">
+    <value>Неверный вход</value>
+  </data>
+  <data name="login.forgot" xml:space="preserve">
+    <value>Забыли пароль?</value>
+  </data>
+  <data name="login.info" xml:space="preserve">
+    <value>Пожалуйста, войдите в аккаунт, чтобы продолжить</value>
+  </data>
+  <data name="login.invalid_captcha" xml:space="preserve">
+    <value>Неверная капча, перезагрузите страницу и попробуйте снова.</value>
+  </data>
+  <data name="login.locked_ip" xml:space="preserve">
+    <value>Ваш IP адрес заблокирован. Попробуйте через несколько минут.</value>
+  </data>
+  <data name="login.password" xml:space="preserve">
+    <value>Пароль</value>
+  </data>
+  <data name="login.register" xml:space="preserve">
+    <value>У вас всё ещё нет аккаунта в osu!? Создайте новый</value>
+  </data>
+  <data name="login.remember" xml:space="preserve">
+    <value>Запомнить этот браузер</value>
+  </data>
+  <data name="login.title" xml:space="preserve">
+    <value>Войдите для продолжения</value>
+  </data>
+  <data name="login.username" xml:space="preserve">
+    <value>Никнейм</value>
+  </data>
+  <data name="login.beta.main" xml:space="preserve">
+    <value>Доступ к бета-версии ограничен.</value>
+  </data>
+  <data name="login.beta.small" xml:space="preserve">
+    <value>(владельцы osu!supporter получат доступ позже)</value>
+  </data>
+  <data name="posts.title" xml:space="preserve">
+    <value>публикации {0}</value>
+  </data>
+  <data name="anonymous.login_link" xml:space="preserve">
+    <value>нажмите для входа</value>
+  </data>
+  <data name="anonymous.login_text" xml:space="preserve">
+    <value>войти</value>
+  </data>
+  <data name="anonymous.username" xml:space="preserve">
+    <value>Гость</value>
+  </data>
+  <data name="anonymous.error" xml:space="preserve">
+    <value>Вы должны войти чтобы сделать это.</value>
+  </data>
+  <data name="logout_confirm" xml:space="preserve">
+    <value>Вы точно хотите выйти? :(</value>
+  </data>
+  <data name="report.button_text" xml:space="preserve">
+    <value>пожаловаться</value>
+  </data>
+  <data name="report.comments" xml:space="preserve">
+    <value>Дополнительные комментарии</value>
+  </data>
+  <data name="report.placeholder" xml:space="preserve">
+    <value>Пожалуйста, представьте всю информацию, которую вы считаете нужной.</value>
+  </data>
+  <data name="report.reason" xml:space="preserve">
+    <value>Причина</value>
+  </data>
+  <data name="report.thanks" xml:space="preserve">
+    <value>Спасибо за ваше сообщение!</value>
+  </data>
+  <data name="report.title" xml:space="preserve">
+    <value>Пожаловаться на {0}?</value>
+  </data>
+  <data name="report.actions.send" xml:space="preserve">
+    <value>Отправить жалобу</value>
+  </data>
+  <data name="report.actions.cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="report.options.cheating" xml:space="preserve">
+    <value>Нечестная игра / читы</value>
+  </data>
+  <data name="report.options.insults" xml:space="preserve">
+    <value>Оскорбление меня / других</value>
+  </data>
+  <data name="report.options.spam" xml:space="preserve">
+    <value>Спам</value>
+  </data>
+  <data name="report.options.unwanted_content" xml:space="preserve">
+    <value>Неприемлемый контент</value>
+  </data>
+  <data name="report.options.nonsense" xml:space="preserve">
+    <value>Чушь</value>
+  </data>
+  <data name="report.options.other" xml:space="preserve">
+    <value>Другая (введите ниже)</value>
+  </data>
+  <data name="restricted_banner.title" xml:space="preserve">
+    <value>Права вашего аккаунта ограничены!</value>
+  </data>
+  <data name="restricted_banner.message" xml:space="preserve">
+    <value>Пока права вашего аккаунта ограничены, вы не сможете взаимодействовать с другими игроками и ваши результаты будут видны только вам. Обычно это результат автоматизированного процесса и, как правило, ограничение снимается в течении суток. Если вы хотите обжаловать ваше ограничение, пожалуйста &lt;a href="mailto{0}@ppy.sh"&gt;свяжитесь с поддержкой&lt;/a&gt;.</value>
+  </data>
+  <data name="show.age" xml:space="preserve">
+    <value>{0} лет</value>
+  </data>
+  <data name="show.change_avatar" xml:space="preserve">
+    <value>сменить аватар!</value>
+  </data>
+  <data name="show.first_members" xml:space="preserve">
+    <value>Здесь с самого начала</value>
+  </data>
+  <data name="show.is_developer" xml:space="preserve">
+    <value>osu!developer</value>
+  </data>
+  <data name="show.is_supporter" xml:space="preserve">
+    <value>osu!supporter</value>
+  </data>
+  <data name="show.joined_at" xml:space="preserve">
+    <value>Дата регистрации: {0}</value>
+  </data>
+  <data name="show.lastvisit" xml:space="preserve">
+    <value>Был в сети {0}</value>
+  </data>
+  <data name="show.lastvisit_online" xml:space="preserve">
+    <value>Сейчас в сети</value>
+  </data>
+  <data name="show.missingtext" xml:space="preserve">
+    <value>Возможно, вы сделали опечатку! (или игрок заблокирован)</value>
+  </data>
+  <data name="show.origin_country" xml:space="preserve">
+    <value>Проживает в {0}</value>
+  </data>
+  <data name="show.previous_usernames" xml:space="preserve">
+    <value>ранее известный как</value>
+  </data>
+  <data name="show.plays_with" xml:space="preserve">
+    <value>Играет с {0}</value>
+  </data>
+  <data name="show.title" xml:space="preserve">
+    <value>Профиль {0}</value>
+  </data>
+  <data name="show.comments_count._" xml:space="preserve">
+    <value>Опубликовано {0}</value>
+  </data>
+  <data name="show.comments_count.count" xml:space="preserve">
+    <value>{0} комментарий|{0} комментария|{0} комментариев</value>
+  </data>
+  <data name="show.edit.cover.button" xml:space="preserve">
+    <value>Сменить обложку профиля</value>
+  </data>
+  <data name="show.edit.cover.defaults_info" xml:space="preserve">
+    <value>Больше вариантов в недалёком будущем</value>
+  </data>
+  <data name="show.edit.cover.upload.broken_file" xml:space="preserve">
+    <value>Не удалось обработать изображение. Проверьте загруженное изображение и попробуйте снова.</value>
+  </data>
+  <data name="show.edit.cover.upload.button" xml:space="preserve">
+    <value>Загрузить изображение</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone" xml:space="preserve">
+    <value>Перетащите для загрузки</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone_info" xml:space="preserve">
+    <value>Вы также можете перетащить изображение сюда для загрузки</value>
+  </data>
+  <data name="show.edit.cover.upload.size_info" xml:space="preserve">
+    <value>Размер обложки должен быть равен 2400x620</value>
+  </data>
+  <data name="show.edit.cover.upload.too_large" xml:space="preserve">
+    <value>Загруженное изображение слишком большое.</value>
+  </data>
+  <data name="show.edit.cover.upload.unsupported_format" xml:space="preserve">
+    <value>Неподдерживаемый формат.</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info._" xml:space="preserve">
+    <value>Загрузка доступна только {0}</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info.link" xml:space="preserve">
+    <value>приобретшим тег osu!supporter</value>
+  </data>
+  <data name="show.edit.default_playmode.is_default_tooltip" xml:space="preserve">
+    <value>режим игры по умолчанию</value>
+  </data>
+  <data name="show.edit.default_playmode.set" xml:space="preserve">
+    <value>установить {0} как режим игры по умолчанию</value>
+  </data>
+  <data name="show.extra.none" xml:space="preserve">
+    <value>нет</value>
+  </data>
+  <data name="show.extra.unranked" xml:space="preserve">
+    <value>Нет недавних игр</value>
+  </data>
+  <data name="show.extra.achievements.achieved-on" xml:space="preserve">
+    <value>Получено {0}</value>
+  </data>
+  <data name="show.extra.achievements.locked" xml:space="preserve">
+    <value>Не получено</value>
+  </data>
+  <data name="show.extra.achievements.title" xml:space="preserve">
+    <value>Достижения</value>
+  </data>
+  <data name="show.extra.beatmaps.by_artist" xml:space="preserve">
+    <value>от {0}</value>
+  </data>
+  <data name="show.extra.beatmaps.title" xml:space="preserve">
+    <value>Карты</value>
+  </data>
+  <data name="show.extra.beatmaps.favourite.title" xml:space="preserve">
+    <value>Избранные карты</value>
+  </data>
+  <data name="show.extra.beatmaps.graveyard.title" xml:space="preserve">
+    <value>Заброшенные карты</value>
+  </data>
+  <data name="show.extra.beatmaps.loved.title" xml:space="preserve">
+    <value>Любимые карты</value>
+  </data>
+  <data name="show.extra.beatmaps.ranked_and_approved.title" xml:space="preserve">
+    <value>Рейтинговые и одобренные карты</value>
+  </data>
+  <data name="show.extra.beatmaps.unranked.title" xml:space="preserve">
+    <value>Ожидающие</value>
+  </data>
+  <data name="show.extra.discussions.title" xml:space="preserve">
+    <value>Обсуждения</value>
+  </data>
+  <data name="show.extra.discussions.title_longer" xml:space="preserve">
+    <value>Недавние обсуждения</value>
+  </data>
+  <data name="show.extra.discussions.show_more" xml:space="preserve">
+    <value>посмотреть больше обсуждений</value>
+  </data>
+  <data name="show.extra.events.title" xml:space="preserve">
+    <value>События</value>
+  </data>
+  <data name="show.extra.events.title_longer" xml:space="preserve">
+    <value>Недавние события</value>
+  </data>
+  <data name="show.extra.events.show_more" xml:space="preserve">
+    <value>посмотреть больше событий</value>
+  </data>
+  <data name="show.extra.historical.title" xml:space="preserve">
+    <value>Хронология</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.title" xml:space="preserve">
+    <value>График по месяцам</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.count_label" xml:space="preserve">
+    <value>Игр</value>
+  </data>
+  <data name="show.extra.historical.most_played.count" xml:space="preserve">
+    <value>количество игр</value>
+  </data>
+  <data name="show.extra.historical.most_played.title" xml:space="preserve">
+    <value>Наибольше сыгранные карты</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.accuracy" xml:space="preserve">
+    <value>точность: {0}</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.title" xml:space="preserve">
+    <value>Последние игры (за сутки)</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.title" xml:space="preserve">
+    <value>История просмотров реплеев</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.count_label" xml:space="preserve">
+    <value>Просмотрено реплеев</value>
+  </data>
+  <data name="show.extra.kudosu.recent_entries" xml:space="preserve">
+    <value>История кудосу</value>
+  </data>
+  <data name="show.extra.kudosu.title" xml:space="preserve">
+    <value>Кудосу!</value>
+  </data>
+  <data name="show.extra.kudosu.total" xml:space="preserve">
+    <value>Кудосу накоплено</value>
+  </data>
+  <data name="show.extra.kudosu.entry.amount" xml:space="preserve">
+    <value>{0} кудосу</value>
+  </data>
+  <data name="show.extra.kudosu.entry.empty" xml:space="preserve">
+    <value>Этот пользователь ещё не получал Кудосу!</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.allow_kudosu.give" xml:space="preserve">
+    <value>Получено {0} за ответ в {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.deny_kudosu.reset" xml:space="preserve">
+    <value>Отнято {0} за ответ в {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.delete.reset" xml:space="preserve">
+    <value>Потеряно {0} за удаление ответа в посте {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.restore.give" xml:space="preserve">
+    <value>Получено {0} за восстановление ответа в посте {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.give" xml:space="preserve">
+    <value>Получено {0} за получение голосов в посте {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.reset" xml:space="preserve">
+    <value>Потеряно {0} за потерю голосов в посте {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.give" xml:space="preserve">
+    <value>Получено {0} за перерасчёт голосов в посте {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.reset" xml:space="preserve">
+    <value>Потеряно {0} за перерасчёт голосов в посте {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.give" xml:space="preserve">
+    <value>Получено {0} от {1} за сообщение в посте {2}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.reset" xml:space="preserve">
+    <value>{0} сбросил кудосу за ответ в посте {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.revoke" xml:space="preserve">
+    <value>{0} отнял кудосу за ответ в посте {1}</value>
+  </data>
+  <data name="show.extra.kudosu.total_info._" xml:space="preserve">
+    <value>Зависит от того, сколько вклада пользователь внёс в модерацию карт. Посетите {0} для дополнительной информации.</value>
+  </data>
+  <data name="show.extra.kudosu.total_info.link" xml:space="preserve">
+    <value>эту страницу</value>
+  </data>
+  <data name="show.extra.me.title" xml:space="preserve">
+    <value>обо мне!</value>
+  </data>
+  <data name="show.extra.medals.empty" xml:space="preserve">
+    <value>Этот пользователь ещё ничего не получил. ;_;</value>
+  </data>
+  <data name="show.extra.medals.recent" xml:space="preserve">
+    <value>Последние полученные медали</value>
+  </data>
+  <data name="show.extra.medals.title" xml:space="preserve">
+    <value>Медали</value>
+  </data>
+  <data name="show.extra.posts.title" xml:space="preserve">
+    <value>Посты</value>
+  </data>
+  <data name="show.extra.posts.title_longer" xml:space="preserve">
+    <value>Недавние посты</value>
+  </data>
+  <data name="show.extra.posts.show_more" xml:space="preserve">
+    <value>загрузить больше постов</value>
+  </data>
+  <data name="show.extra.recent_activity.title" xml:space="preserve">
+    <value>Последняя активность</value>
+  </data>
+  <data name="show.extra.top_ranks.download_replay" xml:space="preserve">
+    <value>Скачать повтор</value>
+  </data>
+  <data name="show.extra.top_ranks.not_ranked" xml:space="preserve">
+    <value>Очки производительности выдаются только за прохождение рейтинговых карт.</value>
+  </data>
+  <data name="show.extra.top_ranks.pp_weight" xml:space="preserve">
+    <value>засчитано: {0} pp</value>
+  </data>
+  <data name="show.extra.top_ranks.view_details" xml:space="preserve">
+    <value>Подробнее</value>
+  </data>
+  <data name="show.extra.top_ranks.title" xml:space="preserve">
+    <value>Рейтинги</value>
+  </data>
+  <data name="show.extra.top_ranks.best.title" xml:space="preserve">
+    <value>Лучшие результаты</value>
+  </data>
+  <data name="show.extra.top_ranks.first.title" xml:space="preserve">
+    <value>Первые места</value>
+  </data>
+  <data name="show.extra.votes.given" xml:space="preserve">
+    <value>Отданные голоса (за 3 месяца)</value>
+  </data>
+  <data name="show.extra.votes.received" xml:space="preserve">
+    <value>Полученные голоса (за 3 месяца)</value>
+  </data>
+  <data name="show.extra.votes.title" xml:space="preserve">
+    <value>Голоса</value>
+  </data>
+  <data name="show.extra.votes.title_longer" xml:space="preserve">
+    <value>Недавние голоса</value>
+  </data>
+  <data name="show.extra.votes.vote_count" xml:space="preserve">
+    <value>{0} голос|{0} голоса|{0} голосов</value>
+  </data>
+  <data name="show.extra.account_standing.title" xml:space="preserve">
+    <value>Нарушения</value>
+  </data>
+  <data name="show.extra.account_standing.bad_standing" xml:space="preserve">
+    <value>с аккаунтом &lt;strong&gt;{0}&lt;/strong&gt; не всё хорошо :(</value>
+  </data>
+  <data name="show.extra.account_standing.remaining_silence" xml:space="preserve">
+    <value>пользователю &lt;strong&gt;{0}&lt;/strong&gt; можно будет говорить через {1}.</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.title" xml:space="preserve">
+    <value>Недавние нарушения</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.date" xml:space="preserve">
+    <value>Дата</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.action" xml:space="preserve">
+    <value>действие</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length" xml:space="preserve">
+    <value>продолжительность</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length_permanent" xml:space="preserve">
+    <value>Навсегда</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.description" xml:space="preserve">
+    <value>описание</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actor" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.restriction" xml:space="preserve">
+    <value>Рестриктед</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.silence" xml:space="preserve">
+    <value>Сайленс</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.note" xml:space="preserve">
+    <value>Заметка</value>
+  </data>
+  <data name="show.info.interests" xml:space="preserve">
+    <value>Интересы</value>
+  </data>
+  <data name="show.info.location" xml:space="preserve">
+    <value>Текущее местоположение</value>
+  </data>
+  <data name="show.info.occupation" xml:space="preserve">
+    <value>Род деятельности</value>
+  </data>
+  <data name="show.info.website" xml:space="preserve">
+    <value>Веб-сайт</value>
+  </data>
+  <data name="show.not_found.reason_1" xml:space="preserve">
+    <value>Они могли изменить свои псевдонимы.</value>
+  </data>
+  <data name="show.not_found.reason_2" xml:space="preserve">
+    <value>Учетная запись может быть временно недоступна в связи с жалобами или проблемами безопасности.</value>
+  </data>
+  <data name="show.not_found.reason_3" xml:space="preserve">
+    <value>Возможно, вы сделали опечатку!</value>
+  </data>
+  <data name="show.not_found.reason_header" xml:space="preserve">
+    <value>Есть несколько возможных причин:</value>
+  </data>
+  <data name="show.not_found.title" xml:space="preserve">
+    <value>Игрок не найден! ;_;</value>
+  </data>
+  <data name="show.page.button" xml:space="preserve">
+    <value>Отредактировать профиль</value>
+  </data>
+  <data name="show.page.description" xml:space="preserve">
+    <value>&lt;strong&gt;обо мне!&lt;/strong&gt; - это ваше личное редактируемое пространство в профиле.</value>
+  </data>
+  <data name="show.page.edit_big" xml:space="preserve">
+    <value>редактировать</value>
+  </data>
+  <data name="show.page.placeholder" xml:space="preserve">
+    <value>Введите контент страницы сюда</value>
+  </data>
+  <data name="show.page.restriction_info._" xml:space="preserve">
+    <value>Для использования этой функции нужен {0}.</value>
+  </data>
+  <data name="show.page.restriction_info.link" xml:space="preserve">
+    <value>тег osu!supporter</value>
+  </data>
+  <data name="show.post_count._" xml:space="preserve">
+    <value>Написал {0}</value>
+  </data>
+  <data name="show.post_count.count" xml:space="preserve">
+    <value>{0} пост|{0} поста|{0} постов</value>
+  </data>
+  <data name="show.rank.country" xml:space="preserve">
+    <value>Рейтинг стран для {0}</value>
+  </data>
+  <data name="show.rank.country_simple" xml:space="preserve">
+    <value>Рейтинг в стране</value>
+  </data>
+  <data name="show.rank.global" xml:space="preserve">
+    <value>Глобальный рейтинг для {0}</value>
+  </data>
+  <data name="show.rank.global_simple" xml:space="preserve">
+    <value>Рейтинг в мире</value>
+  </data>
+  <data name="show.stats.hit_accuracy" xml:space="preserve">
+    <value>Точность попаданий</value>
+  </data>
+  <data name="show.stats.level" xml:space="preserve">
+    <value>Уровень {0}</value>
+  </data>
+  <data name="show.stats.level_progress" xml:space="preserve">
+    <value>Прогресс до следующего уровня</value>
+  </data>
+  <data name="show.stats.maximum_combo" xml:space="preserve">
+    <value>Максимальное комбо</value>
+  </data>
+  <data name="show.stats.medals" xml:space="preserve">
+    <value>Медалей</value>
+  </data>
+  <data name="show.stats.play_count" xml:space="preserve">
+    <value>Количество игр</value>
+  </data>
+  <data name="show.stats.play_time" xml:space="preserve">
+    <value>Времени в игре</value>
+  </data>
+  <data name="show.stats.ranked_score" xml:space="preserve">
+    <value>Рейтинговые очки</value>
+  </data>
+  <data name="show.stats.replays_watched_by_others" xml:space="preserve">
+    <value>Реплеев просмотрено другими</value>
+  </data>
+  <data name="show.stats.score_ranks" xml:space="preserve">
+    <value>Рейтинг по очкам</value>
+  </data>
+  <data name="show.stats.total_hits" xml:space="preserve">
+    <value>Всего попаданий</value>
+  </data>
+  <data name="show.stats.total_score" xml:space="preserve">
+    <value>Всего очков</value>
+  </data>
+  <data name="show.stats.ranked_and_approved_beatmapset_count" xml:space="preserve">
+    <value>Рейтинговые и утвержденные карты</value>
+  </data>
+  <data name="show.stats.loved_beatmapset_count" xml:space="preserve">
+    <value>Любимые сообществом карты</value>
+  </data>
+  <data name="show.stats.unranked_beatmapset_count" xml:space="preserve">
+    <value>Карты на рассмотрении</value>
+  </data>
+  <data name="show.stats.graveyard_beatmapset_count" xml:space="preserve">
+    <value>Заброшенные карты</value>
+  </data>
+  <data name="silenced_banner.title" xml:space="preserve">
+    <value>У вас сайленс.</value>
+  </data>
+  <data name="silenced_banner.message" xml:space="preserve">
+    <value>Некоторые действия могут быть недоступны.</value>
+  </data>
+  <data name="status.all" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="status.online" xml:space="preserve">
+    <value>В сети</value>
+  </data>
+  <data name="status.offline" xml:space="preserve">
+    <value>Не в сети</value>
+  </data>
+  <data name="store.saved" xml:space="preserve">
+    <value>Пользователь создан</value>
+  </data>
+  <data name="verify.title" xml:space="preserve">
+    <value>Подтверждения аккаунта</value>
+  </data>
+  <data name="view_mode.brick" xml:space="preserve">
+    <value>Показывать кирпичиками</value>
+  </data>
+  <data name="view_mode.card" xml:space="preserve">
+    <value>Показывать карточками</value>
+  </data>
+  <data name="view_mode.list" xml:space="preserve">
+    <value>Показывать списком</value>
+  </data>
+</root>

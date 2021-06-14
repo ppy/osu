@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="beatmapset_update_notice.new" xml:space="preserve">
+    <value>Sadece sana son girdiğinden beri "{0}" beatmap'inde yeni bir güncelleme olduğunu bildiriyoruz.</value>
+  </data>
+  <data name="beatmapset_update_notice.subject" xml:space="preserve">
+    <value>"{0}" beatmapi için yeni bir güncelleme</value>
+  </data>
+  <data name="beatmapset_update_notice.unwatch" xml:space="preserve">
+    <value>Artık bu beatmap'i izlemek istemiyorsan, yukarıdaki sayfada veya modlama izleme listesi sayfasında bulunan "İzlemeyi Bırak" bağlantısına tıklayabilirsin:</value>
+  </data>
+  <data name="beatmapset_update_notice.visit" xml:space="preserve">
+    <value>Tartışma sayfasını buradan ziyaret edin:</value>
+  </data>
+  <data name="common.closing" xml:space="preserve">
+    <value>Saygılarımızla,</value>
+  </data>
+  <data name="common.hello" xml:space="preserve">
+    <value>Selam {0},</value>
+  </data>
+  <data name="common.report" xml:space="preserve">
+    <value>Eğer böyle bir değişiklik talep etmediyseniz lütfen DERHAL bu e-postayı yanıtlayın.</value>
+  </data>
+  <data name="donation_thanks.benefit_more" xml:space="preserve">
+    <value>Zaman içinde daha fazla yeni supporter ayrıcalığı da eklenecek bu arada!</value>
+  </data>
+  <data name="donation_thanks.feedback" xml:space="preserve">
+    <value>Eğer herhangi bir sorunuz veya geribildiriminiz varsa, bu postaya cevap yazmaktan çekinmeyin; Size en kısa zamanda geri döneceğim!</value>
+  </data>
+  <data name="donation_thanks.keep_free" xml:space="preserve">
+    <value>Sizin gibi insanlar sayesinde osu!, oyunu ve topluluğu akıcı bir şekilde hiçbir reklam veya zorla ödeme olmadan oyunu devam ettirebiliyor.</value>
+  </data>
+  <data name="donation_thanks.keep_running" xml:space="preserve">
+    <value>Senin katkın osu!'yu {0} kadardır ayakta tutuyor. Fazla görünmüyor olabilir ama damlaya damlaya göl olur :).</value>
+  </data>
+  <data name="donation_thanks.subject" xml:space="preserve">
+    <value>Teşekkürler, osu! sizi seviyor &lt;3</value>
+  </data>
+  <data name="donation_thanks.translation" xml:space="preserve">
+    <value>Metnin topluluk tarafından sağlanan bilgi amaçlı çevirisi aşağıdaki gibidir:</value>
+  </data>
+  <data name="donation_thanks.benefit.gift" xml:space="preserve">
+    <value>Hediye ettikleriniz artık osu!direct ve diğer pek çok destekçi avantajlarından faydalanabilecek.</value>
+  </data>
+  <data name="donation_thanks.benefit.self" xml:space="preserve">
+    <value>Şu andan itibaren osu!direct ve diğer başka destekçi avantajlarına {0} kadar erişim hakkın vardır.</value>
+  </data>
+  <data name="donation_thanks.support._" xml:space="preserve">
+    <value>osu!'ya vermiş olduğun {0} için çok teşekkür ederiz!</value>
+  </data>
+  <data name="donation_thanks.support.first" xml:space="preserve">
+    <value>destek</value>
+  </data>
+  <data name="donation_thanks.support.repeat" xml:space="preserve">
+    <value>sürekli destek</value>
+  </data>
+  <data name="forum_new_reply.new" xml:space="preserve">
+    <value>Sadece sana son girdiğinden beri "{0}" sayfasında yeni bir cevap geldiğini bildiriyoruz.</value>
+  </data>
+  <data name="forum_new_reply.subject" xml:space="preserve">
+    <value>[osu!] "{0}" başlığına yeni cevap</value>
+  </data>
+  <data name="forum_new_reply.unwatch" xml:space="preserve">
+    <value>Eğer bu konuyu daha fazla gözlemlemek istemiyorsanız, üstteki konunun en alt kısmındaki linkten, ya da forum abonelikleri yönetme sayfasında bulunan "Abonelikten Çık" butonuna tıklayabilirsiniz:</value>
+  </data>
+  <data name="forum_new_reply.visit" xml:space="preserve">
+    <value>Bağlantıyı kullanarak en son yanıtı görüntüleyebilirsiniz:</value>
+  </data>
+  <data name="password_reset.code" xml:space="preserve">
+    <value>Doğrulama kodun:</value>
+  </data>
+  <data name="password_reset.requested" xml:space="preserve">
+    <value>Sen veya seni taklit eden biri osu! hesabın için bir şifre sıfırlama isteğinde bulundu.</value>
+  </data>
+  <data name="password_reset.subject" xml:space="preserve">
+    <value>osu! hesap kurtarma</value>
+  </data>
+  <data name="store_payment_completed.prepare_shipping" xml:space="preserve">
+    <value>Ödemeniz tarafımıza ulaştı ve siparişinizi kargo için hazırlıyoruz. Gönderilmesi, sipariş adedine bağlı olarak, birkaç günü bulabilir. Siparişinizin sürecini, mevcut olduğunda takip detaylarıyla birlikte, buradan takip edebilirsiniz:</value>
+  </data>
+  <data name="store_payment_completed.processing" xml:space="preserve">
+    <value>Ödemeniz tarafımıza ulaştı ve şuanda siparişinizi hazırlıyoruz. Siparişinizin sürecini buradan takip edebilirsiniz:</value>
+  </data>
+  <data name="store_payment_completed.questions" xml:space="preserve">
+    <value>Herhangi bir sorunuz varsa, bu e-postayı yanıtlamaktan çekinmeyin.</value>
+  </data>
+  <data name="store_payment_completed.shipping" xml:space="preserve">
+    <value>Teslimat</value>
+  </data>
+  <data name="store_payment_completed.subject" xml:space="preserve">
+    <value>osu!store siparişinizi aldık!</value>
+  </data>
+  <data name="store_payment_completed.thank_you" xml:space="preserve">
+    <value>osu!store siparişin için teşekkürler!</value>
+  </data>
+  <data name="store_payment_completed.total" xml:space="preserve">
+    <value>Toplam</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift" xml:space="preserve">
+    <value>Sana bu etiketi hediye eden kişi, anonim kalmayı seçebilir. Bu yüzden bu bildirimde ondan bahsetmiyoruz.</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift_maybe_not" xml:space="preserve">
+    <value>Ama muhtemelen kim olduğunu biliyorsun ;).</value>
+  </data>
+  <data name="supporter_gift.duration" xml:space="preserve">
+    <value>Onun sayesinde, sonraki {0} boyunca osu!direct'e ve diğer osu!supporter ayrıcalıklarına sahip olacaksın.</value>
+  </data>
+  <data name="supporter_gift.features" xml:space="preserve">
+    <value>Bu avantajlar hakkında daha fazla detaylı bilgiye buradan ulaşabilirsiniz:</value>
+  </data>
+  <data name="supporter_gift.gifted" xml:space="preserve">
+    <value>Birisi size az önce bir osu!supporter etiketi hediye etti!</value>
+  </data>
+  <data name="supporter_gift.subject" xml:space="preserve">
+    <value>Size bir osu! Destekçisi etiketi verildi!</value>
+  </data>
+  <data name="user_email_updated.changed_to" xml:space="preserve">
+    <value>Bu, osu! e-posta adresinin "{0}" olarak değiştiğini bildiren bir doğrulama e-postasıdır.</value>
+  </data>
+  <data name="user_email_updated.check" xml:space="preserve">
+    <value>Lütfen gelecekte osu! hesabınıza olan erişimin kaybolmasını önlemek için bu e-postayı yeni adresinizden aldığınıza emin olun.</value>
+  </data>
+  <data name="user_email_updated.sent" xml:space="preserve">
+    <value>Güvenlik sebeplerinden ötürü, bu e-posta hem yeni hem de eski e-posta adresinde gönderildi.</value>
+  </data>
+  <data name="user_email_updated.subject" xml:space="preserve">
+    <value>osu! e-posta değişikliği onayı</value>
+  </data>
+  <data name="user_force_reactivation.main" xml:space="preserve">
+    <value>Son zamanlardaki şüpheli aktivitelerden ya da ÇOK zayıf bir şifresi olduğundan, hesabınızın ele geçirildiği şüpheleniliyor. Sonuç olarak, yeni bir şifre belirlemeniz gerekmektedir. Lütfen GÜVENLİ bir şifre seçtiğinizden emin olun. </value>
+  </data>
+  <data name="user_force_reactivation.perform_reset" xml:space="preserve">
+    <value>Sıfırlama işlemini şuradan gerçekleştirebilirsin: {0}</value>
+  </data>
+  <data name="user_force_reactivation.reason" xml:space="preserve">
+    <value>Sebep:</value>
+  </data>
+  <data name="user_force_reactivation.subject" xml:space="preserve">
+    <value>osu! Hesabının Yeniden Doğrulanması Gerekli</value>
+  </data>
+  <data name="user_notification_digest.new" xml:space="preserve">
+    <value>Sadece sana son girdiğinden beri izlediğin ögelerde yeni güncellemeler olduğunu bildiriyoruz.</value>
+  </data>
+  <data name="user_notification_digest.settings" xml:space="preserve">
+    <value>E-posta bildirim tercihlerini değiştirin:</value>
+  </data>
+  <data name="user_notification_digest.subject" xml:space="preserve">
+    <value>Yeni osu! bildirimleri</value>
+  </data>
+  <data name="user_password_updated.confirmation" xml:space="preserve">
+    <value>Bu sadece osu! şifrenin değiştiğine dair bir doğrulamadır.</value>
+  </data>
+  <data name="user_password_updated.subject" xml:space="preserve">
+    <value>osu! şifre değişikliği onayı</value>
+  </data>
+  <data name="user_verification.code" xml:space="preserve">
+    <value>Doğrulama kodun:</value>
+  </data>
+  <data name="user_verification.code_hint" xml:space="preserve">
+    <value>Kodu boşluk bırakarak ya da bırakmadan girebilirsiniz.</value>
+  </data>
+  <data name="user_verification.link" xml:space="preserve">
+    <value>Alternatif olarak, doğrulamayı bitirmek için bu bağlantıya da gidebilirsin:</value>
+  </data>
+  <data name="user_verification.report" xml:space="preserve">
+    <value>Eğer siz böyle bir istemde bulunmadıysanız, hesabınız tehlikede olabileceğinden lütfen HEMEN YANITLAYIN. </value>
+  </data>
+  <data name="user_verification.subject" xml:space="preserve">
+    <value>osu! hesap doğrulama</value>
+  </data>
+  <data name="user_verification.action_from._" xml:space="preserve">
+    <value>Hesabında {0} bölgesinden gerçekleştirilen bir eylem için doğrulama gerekiyor.</value>
+  </data>
+  <data name="user_verification.action_from.unknown_country" xml:space="preserve">
+    <value>bilinmeyen ülke</value>
+  </data>
+</root>

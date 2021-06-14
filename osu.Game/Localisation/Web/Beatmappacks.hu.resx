@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="index.description" xml:space="preserve">
+    <value>Előre csomagolt, általános témákat körbeölelő beatmap gyűjtemények.</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>listázás</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmap Csomagok</value>
+  </data>
+  <data name="index.blurb.important" xml:space="preserve">
+    <value>OLVASD EL LETÖLTÉS ELŐTT</value>
+  </data>
+  <data name="index.blurb.instruction._" xml:space="preserve">
+    <value>Telepítés: Amint egy csomag letöltődött, csomagold ki a .rar fájlt az osu! Songs mappába.
+Mivel az összes szám .zip és/vagy .osz kiterjesztésű, ezért a következő Play módba lépéskor ezek a beatmapek ki lesznek csomagolva.
+{0} csomagold ki a .zip/.osz fájlokat saját magadtól, különben a beatmapek hibásan jelenhetnek meg és nem fognak megfelelően működni.</value>
+  </data>
+  <data name="index.blurb.instruction.scary" xml:space="preserve">
+    <value>NE</value>
+  </data>
+  <data name="index.blurb.note._" xml:space="preserve">
+    <value>Valamint vedd figyelembe, hogy erősen javasolt a {0}, mivel a régebbi pályák minősége jóval alacsonyabb az újakéhoz képest.</value>
+  </data>
+  <data name="index.blurb.note.scary" xml:space="preserve">
+    <value>legújabb csomagok letöltése</value>
+  </data>
+  <data name="show.download" xml:space="preserve">
+    <value>Letöltés</value>
+  </data>
+  <data name="show.item.cleared" xml:space="preserve">
+    <value>lejátszott</value>
+  </data>
+  <data name="show.item.not_cleared" xml:space="preserve">
+    <value>nem játszott</value>
+  </data>
+  <data name="show.no_diff_reduction._" xml:space="preserve">
+    <value>{0} nem használhatóak e csomag teljesítéséhez.</value>
+  </data>
+  <data name="show.no_diff_reduction.link" xml:space="preserve">
+    <value>Nehézséget csökkentő módok</value>
+  </data>
+  <data name="mode.artist" xml:space="preserve">
+    <value>Előadó/Album</value>
+  </data>
+  <data name="mode.chart" xml:space="preserve">
+    <value>Reflektorfény</value>
+  </data>
+  <data name="mode.standard" xml:space="preserve">
+    <value>Standard</value>
+  </data>
+  <data name="mode.theme" xml:space="preserve">
+    <value>Téma</value>
+  </data>
+  <data name="require_login._" xml:space="preserve">
+    <value>A letöltéshez {0} kell lenned</value>
+  </data>
+  <data name="require_login.link_text" xml:space="preserve">
+    <value>bejelentkezve</value>
+  </data>
+</root>

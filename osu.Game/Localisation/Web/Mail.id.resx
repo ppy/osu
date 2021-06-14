@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="beatmapset_update_notice.new" xml:space="preserve">
+    <value>Pemberitahuan bahwa ada pembaruan dalam beatmap "{0}" sejak kunjungan terakhir kamu.</value>
+  </data>
+  <data name="beatmapset_update_notice.subject" xml:space="preserve">
+    <value>Pembaruan baru untuk beatmap "{0}"</value>
+  </data>
+  <data name="beatmapset_update_notice.unwatch" xml:space="preserve">
+    <value>Jika Anda tidak lagi ingin memantau beatmap ini, Anda dapat membatalkan pantauan Anda melalui tautan "Batalkan Pantauan" yang tertera di atas atau melalui laman Daftar Pantauan berikut:</value>
+  </data>
+  <data name="beatmapset_update_notice.visit" xml:space="preserve">
+    <value>Kunjungi laman diskusi di sini:</value>
+  </data>
+  <data name="common.closing" xml:space="preserve">
+    <value>Salam,</value>
+  </data>
+  <data name="common.hello" xml:space="preserve">
+    <value>Hai {0},</value>
+  </data>
+  <data name="common.report" xml:space="preserve">
+    <value>Harap balas email ini SEGERA jika kamu tidak tahu mengenai perubahan ini.</value>
+  </data>
+  <data name="donation_thanks.benefit_more" xml:space="preserve">
+    <value>Banyak manfaat yang didapat untuk supporter baru akan muncul seiring waktu!</value>
+  </data>
+  <data name="donation_thanks.feedback" xml:space="preserve">
+    <value>Jika kamu memiliki pertanyaan atau umpan balik, jangan ragu untuk membalas email ini; Aku akan menghubungimu secepat mungkin!</value>
+  </data>
+  <data name="donation_thanks.keep_free" xml:space="preserve">
+    <value>Terima kasih kepada orang-orang seperti kamu, osu! mampu menjaga game dan komunitasnya tetap berjalan lancar tanpa iklan atau memasang sistem pembayaran.</value>
+  </data>
+  <data name="donation_thanks.keep_running" xml:space="preserve">
+    <value>Dukunganmu membuat osu! berjalan sekitar {0}! Ini mungkin seperti tidak banyak, tetapi nilai berapapun tetap berharga :).</value>
+  </data>
+  <data name="donation_thanks.subject" xml:space="preserve">
+    <value>Terima kasih, osu! mencintaimu</value>
+  </data>
+  <data name="donation_thanks.translation" xml:space="preserve">
+    <value>Sebagai bahan rujukan, tersedia terjemahan dari komunitas di bawah ini:</value>
+  </data>
+  <data name="donation_thanks.benefit.gift" xml:space="preserve">
+    <value>Pengguna yang dihadiahkan kini dapat secara bebas menggunakan osu!direct dan fitur-fitur lainnya yang dikhususkan untuk para pemilik supporter tag.</value>
+  </data>
+  <data name="donation_thanks.benefit.self" xml:space="preserve">
+    <value>Anda kini dapat secara bebas menggunakan osu!direct dan fitur-fitur lainnya yang dikhususkan untuk para pemilik supporter tag selama {0}.</value>
+  </data>
+  <data name="donation_thanks.support._" xml:space="preserve">
+    <value>Terima kasih banyak atas {0} yang Anda berikan terhadap osu!.</value>
+  </data>
+  <data name="donation_thanks.support.first" xml:space="preserve">
+    <value>dukungan</value>
+  </data>
+  <data name="donation_thanks.support.repeat" xml:space="preserve">
+    <value>dukungan yang berlanjut</value>
+  </data>
+  <data name="forum_new_reply.new" xml:space="preserve">
+    <value>Kami ingin memberitahukan bahwa saat ini terdapat balasan baru pada "{0}" sejak kunjungan terakhir Anda.</value>
+  </data>
+  <data name="forum_new_reply.subject" xml:space="preserve">
+    <value>[osu!] Balasan terbaru dari topik "{0}"</value>
+  </data>
+  <data name="forum_new_reply.unwatch" xml:space="preserve">
+    <value>Jika Anda tidak lagi ingin memantau topik forum ini, Anda dapat membatalkan pantauan Anda melalui tautan "Batalkan Pantauan" yang tertera di atas atau melalui laman Daftar Pantauan berikut:</value>
+  </data>
+  <data name="forum_new_reply.visit" xml:space="preserve">
+    <value>Anda dapat segera melihat balasan terbaru melalui link berikut:</value>
+  </data>
+  <data name="password_reset.code" xml:space="preserve">
+    <value>Kode verifikasi Anda adalah:</value>
+  </data>
+  <data name="password_reset.requested" xml:space="preserve">
+    <value>Baik kamu atau seseorang yang berpura-pura menjadi kamu telah meminta pengaturan ulang kata sandi akun osu! kamu.</value>
+  </data>
+  <data name="password_reset.subject" xml:space="preserve">
+    <value>Pemulihan akun osu!</value>
+  </data>
+  <data name="store_payment_completed.prepare_shipping" xml:space="preserve">
+    <value>Kami telah menerima pembayaranmu dan sedang mempersiapkan pesananmu untuk dikirim. Mungkin perlu beberapa hari bagi kami untuk mengirimkannya, tergantung pada jumlah pesanan. Kamu dapat mengikuti perkembangan pesanan Anda di sini, termasuk rincian nomor pelacakan yang ada:</value>
+  </data>
+  <data name="store_payment_completed.processing" xml:space="preserve">
+    <value>Kami telah menerima pembayaranmu dan saat ini sedang diproses. Kamu dapat mengikuti perkembangan pesananmu di sini:</value>
+  </data>
+  <data name="store_payment_completed.questions" xml:space="preserve">
+    <value>Jika kamu memiliki pertanyaan, jangan ragu untuk membalas email ini.</value>
+  </data>
+  <data name="store_payment_completed.shipping" xml:space="preserve">
+    <value>Pengiriman</value>
+  </data>
+  <data name="store_payment_completed.subject" xml:space="preserve">
+    <value>Kami menerima pesanan osu!store Anda!</value>
+  </data>
+  <data name="store_payment_completed.thank_you" xml:space="preserve">
+    <value>Terima kasih atas pemesananmu di osu!store!</value>
+  </data>
+  <data name="store_payment_completed.total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift" xml:space="preserve">
+    <value>Orang yang memberimu tag ini memilih untuk tetap anonim, sehingga nama mereka tidak akan disebutkan di notifikasi ini.</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift_maybe_not" xml:space="preserve">
+    <value>Tapi kamu mungkin sudah tahu siapa itu;).</value>
+  </data>
+  <data name="supporter_gift.duration" xml:space="preserve">
+    <value>Berkat mereka, kamu memiliki akses osu!direct dan manfaat eksklusif osu!supporter lainnya selama {0}.</value>
+  </data>
+  <data name="supporter_gift.features" xml:space="preserve">
+    <value>Kamu dapat mengetahui rincian lebih lanjut tentang fitur-fitur ini di sini:</value>
+  </data>
+  <data name="supporter_gift.gifted" xml:space="preserve">
+    <value>Seseorang baru saja memberimu osu!supporter tag!</value>
+  </data>
+  <data name="supporter_gift.subject" xml:space="preserve">
+    <value>Anda telah diberikan osu!supporter tag!</value>
+  </data>
+  <data name="user_email_updated.changed_to" xml:space="preserve">
+    <value>Ini adalah email konfirmasi untuk memberi tahu kamu bahwa alamat email yang digunakan untuk akun osu! kamu telah dirubah menjadi "{0}".</value>
+  </data>
+  <data name="user_email_updated.check" xml:space="preserve">
+    <value>Harap pastikan bahwa kamu menerima email ini di alamat email barumu untuk mencegah kehilangan akses pada akun osu! kamu di masa yang akan datang.</value>
+  </data>
+  <data name="user_email_updated.sent" xml:space="preserve">
+    <value>Demi alasan keamanan, email ini telah dikirim ke alamat email baru dan lama kamu.</value>
+  </data>
+  <data name="user_email_updated.subject" xml:space="preserve">
+    <value>Konfirmasi perubahan email osu!</value>
+  </data>
+  <data name="user_force_reactivation.main" xml:space="preserve">
+    <value>Akun kamu diduga dalam bahaya, memiliki aktivitas mencurigakan baru-baru ini atau memiliki kata sandi yang SANGAT lemah. Akibatnya, kami memintamu untuk mengatur kata sandi baru. Pastikan untuk memilih kata sandi yang LEBIH AMAN.</value>
+  </data>
+  <data name="user_force_reactivation.perform_reset" xml:space="preserve">
+    <value>Kamu dapat melakukan pengaturan ulang melewati {0}</value>
+  </data>
+  <data name="user_force_reactivation.reason" xml:space="preserve">
+    <value>Alasan:</value>
+  </data>
+  <data name="user_force_reactivation.subject" xml:space="preserve">
+    <value>Pengaktifan Ulang Akun osu! Dibutuhkan</value>
+  </data>
+  <data name="user_notification_digest.new" xml:space="preserve">
+    <value>Kami ingin memberi tahu Anda bahwa saat ini terdapat perkembangan baru pada hal-hal yang telah Anda pantau sebelumnya.</value>
+  </data>
+  <data name="user_notification_digest.settings" xml:space="preserve">
+    <value>Ubah preferensi penerimaan notifikasi:</value>
+  </data>
+  <data name="user_notification_digest.subject" xml:space="preserve">
+    <value>Notifikasi baru terkait osu!</value>
+  </data>
+  <data name="user_password_updated.confirmation" xml:space="preserve">
+    <value>Email ini hanya konfirmasi bahwa kata sandi akun osu! kamu telah diubah.</value>
+  </data>
+  <data name="user_password_updated.subject" xml:space="preserve">
+    <value>Konfirmasi perubahan kata sandi osu!</value>
+  </data>
+  <data name="user_verification.code" xml:space="preserve">
+    <value>Kode verifikasi Anda adalah:</value>
+  </data>
+  <data name="user_verification.code_hint" xml:space="preserve">
+    <value>Kamu dapat memasukkan kodenya dengan atau tanpa spasi.</value>
+  </data>
+  <data name="user_verification.link" xml:space="preserve">
+    <value>Atau, kamu juga dapat mengunjungi tautan di bawah ini untuk menyelesaikan proses verifikasi:</value>
+  </data>
+  <data name="user_verification.report" xml:space="preserve">
+    <value>Jika kamu tidak mengetahui aksi ini, harap SEGERA BALAS email ini karena akun kamu mungkin dalam bahaya.</value>
+  </data>
+  <data name="user_verification.subject" xml:space="preserve">
+    <value>Verifikasi akun osu!</value>
+  </data>
+  <data name="user_verification.action_from._" xml:space="preserve">
+    <value>Terdapat aktivitas baru yang dilakukan pada akun kamu dari {0} dan memerlukan verifikasi.</value>
+  </data>
+  <data name="user_verification.action_from.unknown_country" xml:space="preserve">
+    <value>negara yang tidak diketahui</value>
+  </data>
+</root>

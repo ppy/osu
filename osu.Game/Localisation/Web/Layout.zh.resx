@@ -1,0 +1,388 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="audio.autoplay" xml:space="preserve">
+    <value>自动播放下一曲目</value>
+  </data>
+  <data name="defaults.page_description" xml:space="preserve">
+    <value>osu! - 节奏跃然指上！内含来自「押忍！战斗应援团」、「精英节拍特工」、太鼓的以及 osu! 原创的游戏模式，以及为其设计的全功能谱面编辑器。</value>
+  </data>
+  <data name="header.admin.beatmapset" xml:space="preserve">
+    <value>谱面集</value>
+  </data>
+  <data name="header.admin.beatmapset_covers" xml:space="preserve">
+    <value>谱面集封面</value>
+  </data>
+  <data name="header.admin.contest" xml:space="preserve">
+    <value>竞赛</value>
+  </data>
+  <data name="header.admin.contests" xml:space="preserve">
+    <value>竞赛</value>
+  </data>
+  <data name="header.admin.root" xml:space="preserve">
+    <value>控制中心</value>
+  </data>
+  <data name="header.admin.store_orders" xml:space="preserve">
+    <value>商店管理</value>
+  </data>
+  <data name="header.artists.index" xml:space="preserve">
+    <value>列表</value>
+  </data>
+  <data name="header.changelog.index" xml:space="preserve">
+    <value>列表</value>
+  </data>
+  <data name="header.help.index" xml:space="preserve">
+    <value>主页</value>
+  </data>
+  <data name="header.help.sitemap" xml:space="preserve">
+    <value>站点地图</value>
+  </data>
+  <data name="header.store.cart" xml:space="preserve">
+    <value>购物车</value>
+  </data>
+  <data name="header.store.orders" xml:space="preserve">
+    <value>历史订单</value>
+  </data>
+  <data name="header.store.products" xml:space="preserve">
+    <value>商品</value>
+  </data>
+  <data name="header.tournaments.index" xml:space="preserve">
+    <value>列表</value>
+  </data>
+  <data name="header.users.modding" xml:space="preserve">
+    <value>摸图</value>
+  </data>
+  <data name="header.users.show" xml:space="preserve">
+    <value>信息</value>
+  </data>
+  <data name="gallery.close" xml:space="preserve">
+    <value>关闭（ESC）</value>
+  </data>
+  <data name="gallery.fullscreen" xml:space="preserve">
+    <value>切换全屏</value>
+  </data>
+  <data name="gallery.zoom" xml:space="preserve">
+    <value>放大/缩小</value>
+  </data>
+  <data name="gallery.previous" xml:space="preserve">
+    <value>前一个（左箭头）</value>
+  </data>
+  <data name="gallery.next" xml:space="preserve">
+    <value>后一个（右箭头）</value>
+  </data>
+  <data name="menu.beatmaps._" xml:space="preserve">
+    <value>谱面</value>
+  </data>
+  <data name="menu.beatmaps.artists" xml:space="preserve">
+    <value>精选艺术家</value>
+  </data>
+  <data name="menu.beatmaps.index" xml:space="preserve">
+    <value>列表</value>
+  </data>
+  <data name="menu.beatmaps.packs" xml:space="preserve">
+    <value>曲包</value>
+  </data>
+  <data name="menu.community._" xml:space="preserve">
+    <value>社区</value>
+  </data>
+  <data name="menu.community.chat" xml:space="preserve">
+    <value>聊天</value>
+  </data>
+  <data name="menu.community.contests" xml:space="preserve">
+    <value>评选</value>
+  </data>
+  <data name="menu.community.dev" xml:space="preserve">
+    <value>开发</value>
+  </data>
+  <data name="menu.community.forum-forums-index" xml:space="preserve">
+    <value>论坛</value>
+  </data>
+  <data name="menu.community.getlive" xml:space="preserve">
+    <value>直播</value>
+  </data>
+  <data name="menu.community.tournaments" xml:space="preserve">
+    <value>官方比赛</value>
+  </data>
+  <data name="menu.help._" xml:space="preserve">
+    <value>帮助</value>
+  </data>
+  <data name="menu.help.getabuse" xml:space="preserve">
+    <value>报告不当行为</value>
+  </data>
+  <data name="menu.help.getfaq" xml:space="preserve">
+    <value>常见问题</value>
+  </data>
+  <data name="menu.help.getrules" xml:space="preserve">
+    <value>规章制度</value>
+  </data>
+  <data name="menu.help.getsupport" xml:space="preserve">
+    <value>帮助中心</value>
+  </data>
+  <data name="menu.help.getwiki" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="menu.home._" xml:space="preserve">
+    <value>主页</value>
+  </data>
+  <data name="menu.home.changelog-index" xml:space="preserve">
+    <value>更新日志</value>
+  </data>
+  <data name="menu.home.getdownload" xml:space="preserve">
+    <value>下载</value>
+  </data>
+  <data name="menu.home.news-index" xml:space="preserve">
+    <value>新闻</value>
+  </data>
+  <data name="menu.home.search" xml:space="preserve">
+    <value>搜索</value>
+  </data>
+  <data name="menu.home.team" xml:space="preserve">
+    <value>团队</value>
+  </data>
+  <data name="menu.rankings._" xml:space="preserve">
+    <value>排名</value>
+  </data>
+  <data name="menu.rankings.charts" xml:space="preserve">
+    <value>月赛</value>
+  </data>
+  <data name="menu.rankings.country" xml:space="preserve">
+    <value>国家和地区</value>
+  </data>
+  <data name="menu.rankings.index" xml:space="preserve">
+    <value>表现</value>
+  </data>
+  <data name="menu.rankings.kudosu" xml:space="preserve">
+    <value>kudosu</value>
+  </data>
+  <data name="menu.rankings.multiplayer" xml:space="preserve">
+    <value>聚光灯</value>
+  </data>
+  <data name="menu.rankings.score" xml:space="preserve">
+    <value>得分</value>
+  </data>
+  <data name="menu.store._" xml:space="preserve">
+    <value>商店</value>
+  </data>
+  <data name="menu.store.cart-show" xml:space="preserve">
+    <value>购物车</value>
+  </data>
+  <data name="menu.store.getlisting" xml:space="preserve">
+    <value>列表</value>
+  </data>
+  <data name="menu.store.orders-index" xml:space="preserve">
+    <value>历史订单</value>
+  </data>
+  <data name="footer.general._" xml:space="preserve">
+    <value>常用</value>
+  </data>
+  <data name="footer.general.home" xml:space="preserve">
+    <value>主页</value>
+  </data>
+  <data name="footer.general.changelog-index" xml:space="preserve">
+    <value>更新日志</value>
+  </data>
+  <data name="footer.general.beatmaps" xml:space="preserve">
+    <value>谱面列表</value>
+  </data>
+  <data name="footer.general.download" xml:space="preserve">
+    <value>下载 osu!</value>
+  </data>
+  <data name="footer.help._" xml:space="preserve">
+    <value>帮助 &amp; 社区</value>
+  </data>
+  <data name="footer.help.faq" xml:space="preserve">
+    <value>常见问题</value>
+  </data>
+  <data name="footer.help.forum" xml:space="preserve">
+    <value>论坛</value>
+  </data>
+  <data name="footer.help.livestreams" xml:space="preserve">
+    <value>直播</value>
+  </data>
+  <data name="footer.help.report" xml:space="preserve">
+    <value>报告问题</value>
+  </data>
+  <data name="footer.help.wiki" xml:space="preserve">
+    <value>维基</value>
+  </data>
+  <data name="footer.legal._" xml:space="preserve">
+    <value>法律 &amp; 状态</value>
+  </data>
+  <data name="footer.legal.copyright" xml:space="preserve">
+    <value>版权（DMCA）</value>
+  </data>
+  <data name="footer.legal.privacy" xml:space="preserve">
+    <value>隐私政策</value>
+  </data>
+  <data name="footer.legal.server_status" xml:space="preserve">
+    <value>服务器状态</value>
+  </data>
+  <data name="footer.legal.source_code" xml:space="preserve">
+    <value>源代码</value>
+  </data>
+  <data name="footer.legal.terms" xml:space="preserve">
+    <value>服务条款</value>
+  </data>
+  <data name="errors.400.error" xml:space="preserve">
+    <value>请求参数无效</value>
+  </data>
+  <data name="errors.404.error" xml:space="preserve">
+    <value>无法找到网页</value>
+  </data>
+  <data name="errors.404.description" xml:space="preserve">
+    <value>抱歉，您正在尝试访问的页面不存在！</value>
+  </data>
+  <data name="errors.403.error" xml:space="preserve">
+    <value>这里不是你该来的地方。</value>
+  </data>
+  <data name="errors.403.description" xml:space="preserve">
+    <value>不过，你可以选择往回走。</value>
+  </data>
+  <data name="errors.401.error" xml:space="preserve">
+    <value>这里不是你该来的地方。</value>
+  </data>
+  <data name="errors.401.description" xml:space="preserve">
+    <value>不过，你可以选择往回走。或者试试登录？</value>
+  </data>
+  <data name="errors.405.error" xml:space="preserve">
+    <value>无法找到网页</value>
+  </data>
+  <data name="errors.405.description" xml:space="preserve">
+    <value>抱歉，您正在尝试访问的页面不存在！</value>
+  </data>
+  <data name="errors.422.error" xml:space="preserve">
+    <value>请求参数无效</value>
+  </data>
+  <data name="errors.429.error" xml:space="preserve">
+    <value>超出速率限制</value>
+  </data>
+  <data name="errors.500.error" xml:space="preserve">
+    <value>哎呀，服务器崩溃了！;_;</value>
+  </data>
+  <data name="errors.500.description" xml:space="preserve">
+    <value>服务器一旦出错，我们都会收到通知。请返回到上一个页面。</value>
+  </data>
+  <data name="errors.fatal.error" xml:space="preserve">
+    <value>哎呀，服务器被外星人带走了！;_;</value>
+  </data>
+  <data name="errors.fatal.description" xml:space="preserve">
+    <value>服务器一旦出错，我们都会收到通知。请返回到上一个页面。</value>
+  </data>
+  <data name="errors.503.error" xml:space="preserve">
+    <value>服务器维护中！</value>
+  </data>
+  <data name="errors.503.description" xml:space="preserve">
+    <value>一般情况下，维护工作只需要 5 秒到 10 分钟的时间。如果服务器一直处于维护状态，请查看 {0} 以获得更多信息。</value>
+  </data>
+  <data name="errors.reference" xml:space="preserve">
+    <value>如果需要的话，请把这里的代码发送给支持团队！</value>
+  </data>
+  <data name="popup_login.button" xml:space="preserve">
+    <value>登录/注册</value>
+  </data>
+  <data name="popup_login.login.forgot" xml:space="preserve">
+    <value>我忘记了我的登录信息</value>
+  </data>
+  <data name="popup_login.login.password" xml:space="preserve">
+    <value>密码</value>
+  </data>
+  <data name="popup_login.login.title" xml:space="preserve">
+    <value>登录以继续</value>
+  </data>
+  <data name="popup_login.login.username" xml:space="preserve">
+    <value>用户名</value>
+  </data>
+  <data name="popup_login.login.error.email" xml:space="preserve">
+    <value>用户名或邮箱不存在</value>
+  </data>
+  <data name="popup_login.login.error.password" xml:space="preserve">
+    <value>密码错误</value>
+  </data>
+  <data name="popup_login.register.download" xml:space="preserve">
+    <value>下载</value>
+  </data>
+  <data name="popup_login.register.info" xml:space="preserve">
+    <value>立刻下载 osu! 并且注册帐号吧！</value>
+  </data>
+  <data name="popup_login.register.title" xml:space="preserve">
+    <value>没有账号？</value>
+  </data>
+  <data name="popup_user.links.account-edit" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="popup_user.links.follows" xml:space="preserve">
+    <value>订阅</value>
+  </data>
+  <data name="popup_user.links.friends" xml:space="preserve">
+    <value>好友</value>
+  </data>
+  <data name="popup_user.links.logout" xml:space="preserve">
+    <value>退出</value>
+  </data>
+  <data name="popup_user.links.profile" xml:space="preserve">
+    <value>资料</value>
+  </data>
+  <data name="popup_search.initial" xml:space="preserve">
+    <value>键入以搜索！</value>
+  </data>
+  <data name="popup_search.retry" xml:space="preserve">
+    <value>搜索失败。点此重试。</value>
+  </data>
+</root>

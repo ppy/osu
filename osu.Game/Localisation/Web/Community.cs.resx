@@ -1,0 +1,202 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="support.convinced.title" xml:space="preserve">
+    <value>Přesvědčili jste mě! {0}</value>
+  </data>
+  <data name="support.convinced.support" xml:space="preserve">
+    <value>podpořit osu! nákupem supporter tagu!</value>
+  </data>
+  <data name="support.convinced.gift" xml:space="preserve">
+    <value>nebo darujte supporter tag jiným hráčům</value>
+  </data>
+  <data name="support.convinced.instructions" xml:space="preserve">
+    <value>klikněte na srdíčko pro přesměrování do osu!store</value>
+  </data>
+  <data name="support.why-support.title" xml:space="preserve">
+    <value>Proč bych měl podpořit osu!? Kam jdou peníze?</value>
+  </data>
+  <data name="support.why-support.team.title" xml:space="preserve">
+    <value>Podpořit tým</value>
+  </data>
+  <data name="support.why-support.infra.title" xml:space="preserve">
+    <value>Infrastruktura serveru</value>
+  </data>
+  <data name="support.why-support.featured-artists.title" xml:space="preserve">
+    <value>Vybraní umělci</value>
+  </data>
+  <data name="support.why-support.ads.description" xml:space="preserve">
+    <value>Vaše pomoc pomáhá udržet hru nezávislou a zcela bez reklam a externích sponzorů.</value>
+  </data>
+  <data name="support.why-support.tournaments.title" xml:space="preserve">
+    <value>Oficiální turnaje</value>
+  </data>
+  <data name="support.perks.title" xml:space="preserve">
+    <value>Oh? Co dostanu?!</value>
+  </data>
+  <data name="support.perks.osu_direct.title" xml:space="preserve">
+    <value>osu!direct</value>
+  </data>
+  <data name="support.perks.osu_direct.description" xml:space="preserve">
+    <value>rychlý a snadný přístup k vyhledávání beatmap bez opuštění hry.</value>
+  </data>
+  <data name="support.perks.friend_ranking.title" xml:space="preserve">
+    <value>Žebříček přátel</value>
+  </data>
+  <data name="support.perks.country_ranking.title" xml:space="preserve">
+    <value>Státní žebříčky</value>
+  </data>
+  <data name="support.perks.mod_filtering.title" xml:space="preserve">
+    <value>Filtrovat podle módů</value>
+  </data>
+  <data name="support.perks.auto_downloads.title" xml:space="preserve">
+    <value>Automatické Stahování</value>
+  </data>
+  <data name="support.perks.auto_downloads.description" xml:space="preserve">
+    <value>Automatické stahování při hraní s více hráči, sledování ostatních, nebo při klikání na odkazy v chatu!</value>
+  </data>
+  <data name="support.perks.upload_more.title" xml:space="preserve">
+    <value>Nahraj více</value>
+  </data>
+  <data name="support.perks.upload_more.description" xml:space="preserve">
+    <value>Další nevyřízené beatmapové sloty (za každou hodnocenou beatmapu), max 10.</value>
+  </data>
+  <data name="support.perks.early_access.title" xml:space="preserve">
+    <value>Předběžný přístup</value>
+  </data>
+  <data name="support.perks.early_access.description" xml:space="preserve">
+    <value>Přístup do předběžných vydání, kde si můžeš vyzkoušet novinky ještě než výjdou!</value>
+  </data>
+  <data name="support.perks.customisation.title" xml:space="preserve">
+    <value>Přizpůsobení</value>
+  </data>
+  <data name="support.perks.customisation.description" xml:space="preserve">
+    <value>Přizpůsobte si svůj profil přidáním plně upravitelné uživatelské stránky.</value>
+  </data>
+  <data name="support.perks.beatmap_filters.title" xml:space="preserve">
+    <value>Beatmapové filtry</value>
+  </data>
+  <data name="support.perks.beatmap_filters.description" xml:space="preserve">
+    <value>Filtrujte beatmapové vyhledávání podle zahraných a ještě nehraných a podle umístění (jestli jsou nějaké).</value>
+  </data>
+  <data name="support.perks.yellow_fellow.title" xml:space="preserve">
+    <value>Žlutý chlapík</value>
+  </data>
+  <data name="support.perks.yellow_fellow.description" xml:space="preserve">
+    <value>Buďte odlišní ve hrě se světle žlutým jménem v chatu.</value>
+  </data>
+  <data name="support.perks.speedy_downloads.title" xml:space="preserve">
+    <value>Rychlé stahování</value>
+  </data>
+  <data name="support.perks.speedy_downloads.description" xml:space="preserve">
+    <value>Méně omezená stahování, zejména když používáte osu!direct.</value>
+  </data>
+  <data name="support.perks.change_username.title" xml:space="preserve">
+    <value>Změna uživatelského jména</value>
+  </data>
+  <data name="support.perks.change_username.description" xml:space="preserve">
+    <value>Možnost si jednou změnit zdarma své uživatelské jméno.</value>
+  </data>
+  <data name="support.perks.skinnables.title" xml:space="preserve">
+    <value>Větší přizpůsobivost skinů</value>
+  </data>
+  <data name="support.perks.skinnables.description" xml:space="preserve">
+    <value>Více přizpůsobitelných elementů skinu ve hře, například pozadí hlavního menu.</value>
+  </data>
+  <data name="support.perks.feature_votes.title" xml:space="preserve">
+    <value>Hlasování o funkcích</value>
+  </data>
+  <data name="support.perks.feature_votes.description" xml:space="preserve">
+    <value>Hlasy pro požadavky na nové funkce. (2 za měsíc)</value>
+  </data>
+  <data name="support.perks.sort_options.title" xml:space="preserve">
+    <value>Možnosti třídění žebříčků</value>
+  </data>
+  <data name="support.perks.sort_options.description" xml:space="preserve">
+    <value>Možnost zobrazit hodnocení na mapě podle země / přátel / modifikací.</value>
+  </data>
+  <data name="support.perks.more_favourites.title" xml:space="preserve">
+    <value>Více oblíbených</value>
+  </data>
+  <data name="support.perks.more_friends.title" xml:space="preserve">
+    <value>Více přátel</value>
+  </data>
+  <data name="support.perks.more_beatmaps.title" xml:space="preserve">
+    <value>Nahrát více Beatmap</value>
+  </data>
+  <data name="support.perks.friend_filtering.title" xml:space="preserve">
+    <value>Žebříček kamarádů</value>
+  </data>
+  <data name="support.supporter_status.contribution" xml:space="preserve">
+    <value>Díky za tvou podporu! Zatím jsi přispěl/a celkově {0} napříč {1} nákupy supporter tagů!</value>
+  </data>
+  <data name="support.supporter_status.gifted" xml:space="preserve">
+    <value>{0} z vašich nákupů tagů bylo darováno (což dělá celkem {1}), jak štědré!</value>
+  </data>
+  <data name="support.supporter_status.not_yet" xml:space="preserve">
+    <value>Ještě nemáš supporter tag :(</value>
+  </data>
+  <data name="support.supporter_status.valid_until" xml:space="preserve">
+    <value>Tvůj supporter tag je platný do {0}!</value>
+  </data>
+  <data name="support.supporter_status.was_valid_until" xml:space="preserve">
+    <value>Tvůj supporter tag byl platný do {0}.</value>
+  </data>
+</root>

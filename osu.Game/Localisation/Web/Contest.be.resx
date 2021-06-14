@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="header.small" xml:space="preserve">
+    <value>Спаборнічайце не толькі ў націсканні па кругах.</value>
+  </data>
+  <data name="header.large" xml:space="preserve">
+    <value>Конкурсы супольнасці</value>
+  </data>
+  <data name="voting.login_required" xml:space="preserve">
+    <value>Увайдзіце, каб прагаласаваць.</value>
+  </data>
+  <data name="voting.over" xml:space="preserve">
+    <value>Галасаванне за гэты конкурс скончылася</value>
+  </data>
+  <data name="voting.best_of.none_played" xml:space="preserve">
+    <value>Падобна на тое, што вы не гулялі на бітмапах, якія ўдзельнічаюць у конкурсе!</value>
+  </data>
+  <data name="voting.button.add" xml:space="preserve">
+    <value>Галасаваць</value>
+  </data>
+  <data name="voting.button.remove" xml:space="preserve">
+    <value>Адрабіць голас</value>
+  </data>
+  <data name="voting.button.used_up" xml:space="preserve">
+    <value>Вы ўжо скарысталі ўсе вашыя галасы</value>
+  </data>
+  <data name="entry._" xml:space="preserve">
+    <value>удзельнікі конкурсу</value>
+  </data>
+  <data name="entry.login_required" xml:space="preserve">
+    <value>Увайдзіце, каб удзельнічаць у гэтым конкурсе.</value>
+  </data>
+  <data name="entry.silenced_or_restricted" xml:space="preserve">
+    <value>Вы не можаце удзельнічаць у конкурсах падчас абмежавання або сцішша.</value>
+  </data>
+  <data name="entry.preparation" xml:space="preserve">
+    <value>Падрыхтоўваем гэты конкурс. Калі ласка, пачакайце!</value>
+  </data>
+  <data name="entry.drop_here" xml:space="preserve">
+    <value>Перацягніце файл сюды</value>
+  </data>
+  <data name="entry.download" xml:space="preserve">
+    <value>Спампаваць .osz</value>
+  </data>
+  <data name="entry.wrong_type.art" xml:space="preserve">
+    <value>Толькі .jpg і .png файлы дазволены для гэтага конкурсу.</value>
+  </data>
+  <data name="entry.wrong_type.beatmap" xml:space="preserve">
+    <value>Толькі .osu файлы дазволены для гэтага конкурсу.</value>
+  </data>
+  <data name="entry.wrong_type.music" xml:space="preserve">
+    <value>Толькі .mp3 файлы дазволены для гэтага конкурсу.</value>
+  </data>
+  <data name="entry.too_big" xml:space="preserve">
+    <value>Памеры файлаў для гэтага конкурсу не могуць быць вышэй за {0}.</value>
+  </data>
+  <data name="beatmaps.download" xml:space="preserve">
+    <value>Спампаваць файлы</value>
+  </data>
+  <data name="vote.list" xml:space="preserve">
+    <value>галасоў</value>
+  </data>
+  <data name="vote.count" xml:space="preserve">
+    <value>{0} голас|{0} галасы|{0} галасоў</value>
+  </data>
+  <data name="vote.points" xml:space="preserve">
+    <value>{0} ачко|{0} ачкі|{0} ачкоў</value>
+  </data>
+  <data name="dates.ended" xml:space="preserve">
+    <value>Скончыцца {0}</value>
+  </data>
+  <data name="dates.starts._" xml:space="preserve">
+    <value>Пачнецца {0}</value>
+  </data>
+  <data name="dates.starts.soon" xml:space="preserve">
+    <value>хутка™</value>
+  </data>
+  <data name="states.entry" xml:space="preserve">
+    <value>Адкрытыя ўдзелы</value>
+  </data>
+  <data name="states.voting" xml:space="preserve">
+    <value>Пачатае галасаванне</value>
+  </data>
+  <data name="states.results" xml:space="preserve">
+    <value>Апублікаваныя вынікі</value>
+  </data>
+</root>

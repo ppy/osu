@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="deleted" xml:space="preserve">
+    <value>已删除</value>
+  </data>
+  <data name="deleted_count" xml:space="preserve">
+    <value>{0} 条已删除评论</value>
+  </data>
+  <data name="edited" xml:space="preserve">
+    <value>{0} 编辑于 {1}</value>
+  </data>
+  <data name="pinned" xml:space="preserve">
+    <value>已置顶</value>
+  </data>
+  <data name="empty" xml:space="preserve">
+    <value>暂无评论。</value>
+  </data>
+  <data name="load_replies" xml:space="preserve">
+    <value>加载回复</value>
+  </data>
+  <data name="replies_count" xml:space="preserve">
+    <value>{0} 条回复</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>评论</value>
+  </data>
+  <data name="commentable_name.beatmapset" xml:space="preserve">
+    <value>谱面</value>
+  </data>
+  <data name="commentable_name.build" xml:space="preserve">
+    <value>更新日志</value>
+  </data>
+  <data name="commentable_name.news_post" xml:space="preserve">
+    <value>新闻</value>
+  </data>
+  <data name="commentable_name._deleted" xml:space="preserve">
+    <value>被删除的项目</value>
+  </data>
+  <data name="editor.textarea_hint._" xml:space="preserve">
+    <value>按回车以 {0} 。使用 Shift+Enter 以换行。</value>
+  </data>
+  <data name="editor.textarea_hint.edit" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="editor.textarea_hint.new" xml:space="preserve">
+    <value>发送</value>
+  </data>
+  <data name="editor.textarea_hint.reply" xml:space="preserve">
+    <value>回复</value>
+  </data>
+  <data name="guest_button.new" xml:space="preserve">
+    <value>登录以评论</value>
+  </data>
+  <data name="guest_button.reply" xml:space="preserve">
+    <value>登录以回复</value>
+  </data>
+  <data name="index.nav_comments" xml:space="preserve">
+    <value>评论</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>列表</value>
+  </data>
+  <data name="index.no_comments" xml:space="preserve">
+    <value>未找到评论</value>
+  </data>
+  <data name="placeholder.edit" xml:space="preserve">
+    <value>在此编辑评论</value>
+  </data>
+  <data name="placeholder.new" xml:space="preserve">
+    <value>在此输入新评论</value>
+  </data>
+  <data name="placeholder.reply" xml:space="preserve">
+    <value>在此输入你的回复</value>
+  </data>
+  <data name="show.nav_title" xml:space="preserve">
+    <value>评论</value>
+  </data>
+</root>

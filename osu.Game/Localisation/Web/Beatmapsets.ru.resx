@@ -1,0 +1,391 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>Данная карта временно недоступна для загрузки.</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>Некоторые части этой карты были удалены по требованию автора или правообладателей.</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>Для подробностей нажми сюда.</value>
+  </data>
+  <data name="availability.rule_violation" xml:space="preserve">
+    <value>Некоторые части содержащиеся внутри данной карты были удалены после того, как их посчитали неприемлемыми для osu!.</value>
+  </data>
+  <data name="download.limit_exceeded" xml:space="preserve">
+    <value>Притормози, поиграй больше.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Библиотека карт</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>Карты</value>
+  </data>
+  <data name="panel.empty" xml:space="preserve">
+    <value>нет карт</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>скачать</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>скачать с видео</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>скачать без видео</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>открыть в osu!direct</value>
+  </data>
+  <data name="nominate.hybrid_requires_modes" xml:space="preserve">
+    <value>Для гибридных карт требуется, чтобы вы выбрали по крайней мере один режим игры для номинирования.</value>
+  </data>
+  <data name="nominate.incorrect_mode" xml:space="preserve">
+    <value>У вас недостаточно прав для номинирования: {0}</value>
+  </data>
+  <data name="nominate.full_bn_required" xml:space="preserve">
+    <value>Вы должны быть полноправным номинатором, чтобы номинировать эту карту на ранк.</value>
+  </data>
+  <data name="nominate.too_many" xml:space="preserve">
+    <value>Требования к номинации уже выполнены.</value>
+  </data>
+  <data name="nominate.dialog.confirmation" xml:space="preserve">
+    <value>Вы уверены, что хотите номинировать эту карту?</value>
+  </data>
+  <data name="nominate.dialog.header" xml:space="preserve">
+    <value>Номинировать карту</value>
+  </data>
+  <data name="nominate.dialog.hybrid_warning" xml:space="preserve">
+    <value>примечание: вы можете номинировать лишь один раз, так что убедитесь, что вы номинируете все режимы, которые необходимы</value>
+  </data>
+  <data name="nominate.dialog.which_modes" xml:space="preserve">
+    <value>Номинировать для каких режимов?</value>
+  </data>
+  <data name="nsfw_badge.label" xml:space="preserve">
+    <value>18+</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>Обсуждение</value>
+  </data>
+  <data name="show.details.by_artist" xml:space="preserve">
+    <value>от {0}</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>Добавить в избранное</value>
+  </data>
+  <data name="show.details.favourite_login" xml:space="preserve">
+    <value>Войдите, чтобы добавить эту карту в избранное</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>Вы должны войти для загрузки карты!</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>сделана {0}</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>Удалить из избранного</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>обновлена {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>Скачать</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>без видео</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>с видео</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>чтобы скачать</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>Войдите</value>
+  </data>
+  <data name="show.details_date.approved" xml:space="preserve">
+    <value>одобрена {0}</value>
+  </data>
+  <data name="show.details_date.loved" xml:space="preserve">
+    <value>стала любимой {0}</value>
+  </data>
+  <data name="show.details_date.qualified" xml:space="preserve">
+    <value>квалифицирована {0}</value>
+  </data>
+  <data name="show.details_date.ranked" xml:space="preserve">
+    <value>стала рейтинговой {0}</value>
+  </data>
+  <data name="show.details_date.submitted" xml:space="preserve">
+    <value>загружена {0}</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>обновлена {0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>У вас слишком много избранных карт! Пожалуйста, удалите некоторые из них из избранных и попробуйте снова.</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>Хайпаните эту карту, если Вам понравилось её играть, чтобы помочь ей стать &lt;strong&gt;Рейтинговой&lt;/strong&gt;.</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>Эта карта сейчас {0}.</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>на рассмотрении</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>квалифицирована</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>в разработке</value>
+  </data>
+  <data name="show.hype.disqualify._" xml:space="preserve">
+    <value>Если Вы обнаружили проблему у этой карты, пожалуйста, дисквалифицируйте её {0}.</value>
+  </data>
+  <data name="show.hype.report._" xml:space="preserve">
+    <value>Если вы обнаружили проблему, связанную с этой картой, пожалуйста, сообщите об этом {0}, чтобы оповестить команду osu!.</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>Сообщить о проблеме</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>здесь</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>Описание</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>Жанр</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>Язык</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>Данные всё ещё обрабатываются...</value>
+  </data>
+  <data name="show.info.nsfw" xml:space="preserve">
+    <value>Откровенное содержание</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>Шкала провалов</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>Источник</value>
+  </data>
+  <data name="show.info.storyboard" xml:space="preserve">
+    <value>Эта карта содержит сториборд</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>Шанс успеха</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>Теги</value>
+  </data>
+  <data name="show.info.video" xml:space="preserve">
+    <value>Эта карта содержит видео</value>
+  </data>
+  <data name="show.nsfw_warning.details" xml:space="preserve">
+    <value>Эта карта содержит откровенное или оскорбительное содержание. Вы уверены, что хотите продолжить?</value>
+  </data>
+  <data name="show.nsfw_warning.title" xml:space="preserve">
+    <value>Откровенное содержание</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.disable" xml:space="preserve">
+    <value>Отключить предупреждение</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.listing" xml:space="preserve">
+    <value>Библиотека карт</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.show" xml:space="preserve">
+    <value>Показать</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>достигнут {0}</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>Рейтинг по стране</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>Рейтинг среди друзей</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>Глобальный рейтинг</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>Нажмите &lt;a href="{0}"&gt;сюда&lt;/a&gt; для просмотра всех возможностей, что Вы можете получить!</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>Вы должны иметь osu!supporter для использования данной возможности!</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>Табло</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>Точность</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>Максимальное комбо</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>Промах</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>Моды</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>Игрок</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>Ранг</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>Всего очков</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>Очки</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>Время</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>Никто из вашей страны ещё не играл в эту карту!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>Никто из ваших друзей ещё не играл в эту карту!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>Никто ещё не играл в эту карту! Может быть вы попробуете?</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>Результаты загружаются...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>Безрейтинговая карта.</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>Лидирует</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>Ваш рекорд</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>Размер нот</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>Количество клавиш</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>Потеря HP</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>Точность</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>Скорость подхода</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>Сложность</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>Длительность (длительность дренажа: {0})</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>Количество нот</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>Количество слайдеров</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>Оценки пользователей</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>Шкала оценок</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>Номинации</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>Количество игр</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>Рейтинговая</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>Одобренная</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>Любимая</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>Квалифицированная</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>В разработке</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>Ожидающая</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>Заброшенная</value>
+  </data>
+</root>

@@ -1,0 +1,199 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="event.approve" xml:space="preserve">
+    <value>Vahvistettu.</value>
+  </data>
+  <data name="event.discussion_delete" xml:space="preserve">
+    <value>Moderaattori poisti keskustelun {0}.</value>
+  </data>
+  <data name="event.discussion_post_delete" xml:space="preserve">
+    <value>Moderaattori poisti viestin keskustelusta {0}.</value>
+  </data>
+  <data name="event.discussion_post_restore" xml:space="preserve">
+    <value>Moderaattori toi viestin takaisin keskusteluun {0}.</value>
+  </data>
+  <data name="event.discussion_restore" xml:space="preserve">
+    <value>Moderaattori toi keskustelun {0} takaisin.</value>
+  </data>
+  <data name="event.disqualify" xml:space="preserve">
+    <value>Hyväksymisen keskeytti {0}. Syy: {1} ({2}).</value>
+  </data>
+  <data name="event.disqualify_legacy" xml:space="preserve">
+    <value>{0} keskeytti hyväksymisen. Syy: {1}.</value>
+  </data>
+  <data name="event.issue_reopen" xml:space="preserve">
+    <value>Ratkaistu ongelma {0} uudelleenavattu.</value>
+  </data>
+  <data name="event.issue_resolve" xml:space="preserve">
+    <value>Ongelma {0} merkitty ratkaistuksi.</value>
+  </data>
+  <data name="event.kudosu_allow" xml:space="preserve">
+    <value>Kudosuhylkäys keskustelusta {0} on poistettu.</value>
+  </data>
+  <data name="event.kudosu_deny" xml:space="preserve">
+    <value>Keskustelusta {0} hylättiin kudosu.</value>
+  </data>
+  <data name="event.kudosu_gain" xml:space="preserve">
+    <value>Keskustelu {0} käyttäjältä {1} sai tarpeeksi ääniä kudosua varten.</value>
+  </data>
+  <data name="event.kudosu_lost" xml:space="preserve">
+    <value>Keskustelu {0} käyttäjältä {1} menetti ääniä ja annettu kudosu on poistettu.</value>
+  </data>
+  <data name="event.kudosu_recalculate" xml:space="preserve">
+    <value>Keskustelun {0} kudosu on uudelleenlaskettu.</value>
+  </data>
+  <data name="event.language_edit" xml:space="preserve">
+    <value>Kieli {0} muutettu kieleen {1}.</value>
+  </data>
+  <data name="event.love" xml:space="preserve">
+    <value>{0} rakastaa</value>
+  </data>
+  <data name="event.nominate" xml:space="preserve">
+    <value>Käyttäjän {0} suosittelema.</value>
+  </data>
+  <data name="event.nomination_reset" xml:space="preserve">
+    <value>Uusi ongelma {0} ({1}) nollasi suositukset.</value>
+  </data>
+  <data name="event.qualify" xml:space="preserve">
+    <value>Tämä beatmap sai vaaditun määrän suosituksia hyväksymisvaihetta varten.</value>
+  </data>
+  <data name="event.rank" xml:space="preserve">
+    <value>Hyväksytty.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmapin Tapahtumat</value>
+  </data>
+  <data name="index.form.period" xml:space="preserve">
+    <value>Piste</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Tyypit</value>
+  </data>
+  <data name="item.content" xml:space="preserve">
+    <value>Sisältö</value>
+  </data>
+  <data name="item.discussion_deleted" xml:space="preserve">
+    <value>[poistettu]</value>
+  </data>
+  <data name="item.type" xml:space="preserve">
+    <value>Tyyppi</value>
+  </data>
+  <data name="type.approve" xml:space="preserve">
+    <value>Hyväksyntä</value>
+  </data>
+  <data name="type.discussion_delete" xml:space="preserve">
+    <value>Poista keskustelu</value>
+  </data>
+  <data name="type.discussion_post_delete" xml:space="preserve">
+    <value>Keskustelun vastauksen poistaminen</value>
+  </data>
+  <data name="type.discussion_post_restore" xml:space="preserve">
+    <value>Keskustelun vastauksen palautus</value>
+  </data>
+  <data name="type.discussion_restore" xml:space="preserve">
+    <value>Keskustelun palauttaminen</value>
+  </data>
+  <data name="type.disqualify" xml:space="preserve">
+    <value>Epähyväksyntä</value>
+  </data>
+  <data name="type.genre_edit" xml:space="preserve">
+    <value>Genren muokkaus</value>
+  </data>
+  <data name="type.issue_reopen" xml:space="preserve">
+    <value>Keskustelun uudelleenavaaminen</value>
+  </data>
+  <data name="type.issue_resolve" xml:space="preserve">
+    <value>Keskustelun ratkaiseminen</value>
+  </data>
+  <data name="type.kudosu_allow" xml:space="preserve">
+    <value>Kusodun hyväksyntä</value>
+  </data>
+  <data name="type.kudosu_deny" xml:space="preserve">
+    <value>Kusodun kieltäminen</value>
+  </data>
+  <data name="type.kudosu_gain" xml:space="preserve">
+    <value>Kusodun ansaitseminen</value>
+  </data>
+  <data name="type.kudosu_lost" xml:space="preserve">
+    <value>Kusodun menettäminen</value>
+  </data>
+  <data name="type.kudosu_recalculate" xml:space="preserve">
+    <value>Kusodun uudelleenlaskenta</value>
+  </data>
+  <data name="type.language_edit" xml:space="preserve">
+    <value>Kielen muokkaus</value>
+  </data>
+  <data name="type.love" xml:space="preserve">
+    <value>Rakkaus</value>
+  </data>
+  <data name="type.nominate" xml:space="preserve">
+    <value>Äänestetty</value>
+  </data>
+  <data name="type.nomination_reset" xml:space="preserve">
+    <value>Äänestyksen resetointi</value>
+  </data>
+  <data name="type.qualify" xml:space="preserve">
+    <value>Hyväksyntä</value>
+  </data>
+  <data name="type.rank" xml:space="preserve">
+    <value>Luokittelu</value>
+  </data>
+</root>

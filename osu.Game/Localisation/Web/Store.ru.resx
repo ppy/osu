@@ -1,0 +1,265 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="admin.warehouse" xml:space="preserve">
+    <value>Склад</value>
+  </data>
+  <data name="cart.checkout" xml:space="preserve">
+    <value>Проверка</value>
+  </data>
+  <data name="cart.info" xml:space="preserve">
+    <value>{0} товар в корзине (${1})|{0} товара в корзине (${1})|{0} товаров в корзине (${1})</value>
+  </data>
+  <data name="cart.more_goodies" xml:space="preserve">
+    <value>Я хочу посмотреть другие товары перед завершением заказа</value>
+  </data>
+  <data name="cart.shipping_fees" xml:space="preserve">
+    <value>стоимость доставки</value>
+  </data>
+  <data name="cart.title" xml:space="preserve">
+    <value>Корзина</value>
+  </data>
+  <data name="cart.total" xml:space="preserve">
+    <value>итого</value>
+  </data>
+  <data name="cart.errors_no_checkout.line_1" xml:space="preserve">
+    <value>Ой ой, у вас проблемы с корзиной!</value>
+  </data>
+  <data name="cart.errors_no_checkout.line_2" xml:space="preserve">
+    <value>Удалите или обновите товары ниже для продолжения.</value>
+  </data>
+  <data name="cart.empty.text" xml:space="preserve">
+    <value>Ваша корзина пуста.</value>
+  </data>
+  <data name="cart.empty.return_link._" xml:space="preserve">
+    <value>Вернитесь в {0} чтобы найти другие товары!</value>
+  </data>
+  <data name="cart.empty.return_link.link_text" xml:space="preserve">
+    <value>магазин</value>
+  </data>
+  <data name="checkout.cart_problems" xml:space="preserve">
+    <value>Ой-ой, у нас проблемы с вашей картой!</value>
+  </data>
+  <data name="checkout.cart_problems_edit" xml:space="preserve">
+    <value>Нажмите здесь, чтобы изменить это.</value>
+  </data>
+  <data name="checkout.declined" xml:space="preserve">
+    <value>Ваш платеж был отменен.</value>
+  </data>
+  <data name="checkout.delayed_shipping" xml:space="preserve">
+    <value>В настоящее время у нас много заказов! Вы можете заказать товар, но пожалуйста, помните, что его обработка может задержаться на 1–2 недели, пока мы разбираемся с существующими заказами.</value>
+  </data>
+  <data name="checkout.old_cart" xml:space="preserve">
+    <value>Ваша корзина, кажется, устарела и была перезагружена, пожалуйста попробуйте еще раз.</value>
+  </data>
+  <data name="checkout.pay" xml:space="preserve">
+    <value>Оплатить с PayPal</value>
+  </data>
+  <data name="checkout.title_compact" xml:space="preserve">
+    <value>проверка</value>
+  </data>
+  <data name="checkout.has_pending._" xml:space="preserve">
+    <value>У Вас есть незавершённые транзакции, нажмите {0}, чтобы завершить их.</value>
+  </data>
+  <data name="checkout.has_pending.link_text" xml:space="preserve">
+    <value>сюда</value>
+  </data>
+  <data name="checkout.pending_checkout.line_1" xml:space="preserve">
+    <value>Ваш предыдущий платеж был начат, но не был завершен.</value>
+  </data>
+  <data name="checkout.pending_checkout.line_2" xml:space="preserve">
+    <value>Продолжите оформление заказа, выбрав способ оплаты.</value>
+  </data>
+  <data name="discount" xml:space="preserve">
+    <value>вы сэкономите {0}%</value>
+  </data>
+  <data name="invoice.echeck_delay" xml:space="preserve">
+    <value>Поскольку оплата была через eCheck, ожидание подтверждения оплаты через Paypal может занят до 10 дней!</value>
+  </data>
+  <data name="invoice.title_compact" xml:space="preserve">
+    <value>чек</value>
+  </data>
+  <data name="invoice.status.processing.title" xml:space="preserve">
+    <value>Ваш платеж ещё не подтверждён!</value>
+  </data>
+  <data name="invoice.status.processing.line_1" xml:space="preserve">
+    <value>Если вы уже заплатили, мы все ещё можем ожидать подтверждения платежа. Пожалуйста, обновите эту страницу через минуту или две!</value>
+  </data>
+  <data name="invoice.status.processing.line_2._" xml:space="preserve">
+    <value>Если во время оплаты возникла проблема, {0}</value>
+  </data>
+  <data name="invoice.status.processing.line_2.link_text" xml:space="preserve">
+    <value>нажмите здесь, чтобы продолжить оплату</value>
+  </data>
+  <data name="order.cancel" xml:space="preserve">
+    <value>Отменить заказ</value>
+  </data>
+  <data name="order.cancel_confirm" xml:space="preserve">
+    <value>Этот заказ будет отменен и оплата за него не будет принята. Платёжная система не сразу вернёт вам средства. Вы уверены?</value>
+  </data>
+  <data name="order.cancel_not_allowed" xml:space="preserve">
+    <value>Этот заказ не может быть отменен в данный момент.</value>
+  </data>
+  <data name="order.invoice" xml:space="preserve">
+    <value>Посмотреть чек</value>
+  </data>
+  <data name="order.no_orders" xml:space="preserve">
+    <value>Вы ничего не заказывали.</value>
+  </data>
+  <data name="order.paid_on" xml:space="preserve">
+    <value>Заказ размещён {0}</value>
+  </data>
+  <data name="order.resume" xml:space="preserve">
+    <value>Продолжить покупку</value>
+  </data>
+  <data name="order.shopify_expired" xml:space="preserve">
+    <value>Срок действия ссылки на чек вашего заказа кончился.</value>
+  </data>
+  <data name="order.item.display_name.supporter_tag" xml:space="preserve">
+    <value>{0} для {1} ({2})</value>
+  </data>
+  <data name="order.item.quantity" xml:space="preserve">
+    <value>Количество</value>
+  </data>
+  <data name="order.not_modifiable_exception.cancelled" xml:space="preserve">
+    <value>Вы не можете изменить свой заказ, так как он был отменён.</value>
+  </data>
+  <data name="order.not_modifiable_exception.checkout" xml:space="preserve">
+    <value>Вы не можете изменить свой заказ, пока он обрабатывается.</value>
+  </data>
+  <data name="order.not_modifiable_exception.default" xml:space="preserve">
+    <value>Заказ невозможно изменить</value>
+  </data>
+  <data name="order.not_modifiable_exception.delivered" xml:space="preserve">
+    <value>Вы не можете изменить свой заказ, так как он уже доставлен.</value>
+  </data>
+  <data name="order.not_modifiable_exception.paid" xml:space="preserve">
+    <value>Вы не можете изменить свой заказ, поскольку он уже оплачен.</value>
+  </data>
+  <data name="order.not_modifiable_exception.processing" xml:space="preserve">
+    <value>Вы не можете изменить свой заказ, пока он обрабатывается.</value>
+  </data>
+  <data name="order.not_modifiable_exception.shipped" xml:space="preserve">
+    <value>Вы не можете изменить свой заказ, так как он уже отправлен.</value>
+  </data>
+  <data name="order.status.cancelled" xml:space="preserve">
+    <value>Отменено</value>
+  </data>
+  <data name="order.status.checkout" xml:space="preserve">
+    <value>Подготовка</value>
+  </data>
+  <data name="order.status.delivered" xml:space="preserve">
+    <value>Доставлено</value>
+  </data>
+  <data name="order.status.paid" xml:space="preserve">
+    <value>Оплачено</value>
+  </data>
+  <data name="order.status.processing" xml:space="preserve">
+    <value>Ожидание подтверждения</value>
+  </data>
+  <data name="order.status.shipped" xml:space="preserve">
+    <value>В пути</value>
+  </data>
+  <data name="product.name" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="product.stock.out" xml:space="preserve">
+    <value>В настоящее время данного товара нет в наличии. Загляните сюда позже!</value>
+  </data>
+  <data name="product.stock.out_with_alternative" xml:space="preserve">
+    <value>К сожалению, данного товара нет в наличии. Используйте выпадающее меню, чтобы выбрать другой тип товара, или загляните сюда позже!</value>
+  </data>
+  <data name="product.add_to_cart" xml:space="preserve">
+    <value>Добавить в корзину</value>
+  </data>
+  <data name="product.notify" xml:space="preserve">
+    <value>Напомнить мне о поступлении!</value>
+  </data>
+  <data name="product.notification_success" xml:space="preserve">
+    <value>Вы будете оповещены когда товар будет в наличии. Нажмите {0} для отмены</value>
+  </data>
+  <data name="product.notification_remove_text" xml:space="preserve">
+    <value>сюда</value>
+  </data>
+  <data name="product.notification_in_stock" xml:space="preserve">
+    <value>Данный товар уже в наличии!</value>
+  </data>
+  <data name="supporter_tag.gift" xml:space="preserve">
+    <value>подарок для игрока</value>
+  </data>
+  <data name="supporter_tag.require_login._" xml:space="preserve">
+    <value>Вы должны {0} для покупки osu!supporter!</value>
+  </data>
+  <data name="supporter_tag.require_login.link_text" xml:space="preserve">
+    <value>войти в аккаунт</value>
+  </data>
+  <data name="username_change.check" xml:space="preserve">
+    <value>Введите имя, чтобы проверить его доступность!</value>
+  </data>
+  <data name="username_change.checking" xml:space="preserve">
+    <value>Проверяем доступность имени {0}...</value>
+  </data>
+  <data name="username_change.require_login._" xml:space="preserve">
+    <value>Вы должны {0} для смены имени пользователя!</value>
+  </data>
+  <data name="username_change.require_login.link_text" xml:space="preserve">
+    <value>войти в аккаунт</value>
+  </data>
+</root>

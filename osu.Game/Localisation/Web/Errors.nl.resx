@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="no_restricted_access" xml:space="preserve">
+    <value>Je mag dit niet doen terwijl je account de restricted status heeft.</value>
+  </data>
+  <data name="supporter_only" xml:space="preserve">
+    <value>Je moet een supporter zijn om dit te gebruiken.</value>
+  </data>
+  <data name="unknown" xml:space="preserve">
+    <value>Een onbekende fout trad op.</value>
+  </data>
+  <data name="codes.http-401" xml:space="preserve">
+    <value>Log in om verder te gaan.</value>
+  </data>
+  <data name="codes.http-403" xml:space="preserve">
+    <value>Toegang geweigerd.</value>
+  </data>
+  <data name="codes.http-404" xml:space="preserve">
+    <value>Niet gevonden.</value>
+  </data>
+  <data name="codes.http-429" xml:space="preserve">
+    <value>Te veel pogingen. Probeer later opnieuw.</value>
+  </data>
+  <data name="account.profile-order.generic" xml:space="preserve">
+    <value>Iets ging fout. Probeer de pagina te vernieuwen.</value>
+  </data>
+  <data name="beatmaps.invalid_mode" xml:space="preserve">
+    <value>Invalide mode opgegeven.</value>
+  </data>
+  <data name="beatmaps.standard_converts_only" xml:space="preserve">
+    <value>Er zijn geen scores beschikbaar voor de gevraagde mode voor deze beatmap difficulty.</value>
+  </data>
+  <data name="checkout.generic" xml:space="preserve">
+    <value>Er is een fout opgetreden tijdens het voorbereiden voor het afrekenen.</value>
+  </data>
+  <data name="search.default" xml:space="preserve">
+    <value>Kan geen resultaten krijgen, probeer het later opnieuw.</value>
+  </data>
+  <data name="search.operation_timeout_exception" xml:space="preserve">
+    <value>Zoeken is momenteel drukker dan gebruikelijk, probeer het later opnieuw.</value>
+  </data>
+</root>

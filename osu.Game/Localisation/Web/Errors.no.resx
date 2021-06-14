@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="no_restricted_access" xml:space="preserve">
+    <value>Du kan ikke utføre denne handlingen mens kontoen din er i begrenset tilstand.</value>
+  </data>
+  <data name="supporter_only" xml:space="preserve">
+    <value>Du må være en osu!supporter for å bruke denne funksjonen.</value>
+  </data>
+  <data name="unknown" xml:space="preserve">
+    <value>En ukjent feil har oppstått.</value>
+  </data>
+  <data name="codes.http-401" xml:space="preserve">
+    <value>Vennligst logg inn for å fortsette.</value>
+  </data>
+  <data name="codes.http-403" xml:space="preserve">
+    <value>Ingen tillatelse.</value>
+  </data>
+  <data name="codes.http-404" xml:space="preserve">
+    <value>Fantes ikke.</value>
+  </data>
+  <data name="codes.http-429" xml:space="preserve">
+    <value>For mange forsøk. Prøv igjen senere.</value>
+  </data>
+  <data name="account.profile-order.generic" xml:space="preserve">
+    <value>En feil oppstod. Prøv å oppdatere siden.</value>
+  </data>
+  <data name="beatmaps.invalid_mode" xml:space="preserve">
+    <value>Ugyldig spillmodus angitt.</value>
+  </data>
+  <data name="beatmaps.standard_converts_only" xml:space="preserve">
+    <value>Ingen spillforsøk på dette beatmappet er tilgjengelig for den forespurte spillmodusen på denne vanskelighetsgraden.</value>
+  </data>
+  <data name="checkout.generic" xml:space="preserve">
+    <value>En feil oppstod under klargjøring av kjøpet ditt.</value>
+  </data>
+  <data name="search.default" xml:space="preserve">
+    <value>Kunne ikke hente noen treff. Prøv igjen senere.</value>
+  </data>
+  <data name="search.operation_timeout_exception" xml:space="preserve">
+    <value>Søkefunksjonen ser ikke ut til å fungere akkurat nå. Prøv igjen senere.</value>
+  </data>
+</root>

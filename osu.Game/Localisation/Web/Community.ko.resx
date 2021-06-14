@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="support.convinced.title" xml:space="preserve">
+    <value>납득하셨나요? {0}</value>
+  </data>
+  <data name="support.convinced.support" xml:space="preserve">
+    <value>osu! 지원하기</value>
+  </data>
+  <data name="support.convinced.gift" xml:space="preserve">
+    <value>아니면 osu!를 지원하여 다른 플레이어에게 선물할 수도 있습니다.</value>
+  </data>
+  <data name="support.convinced.instructions" xml:space="preserve">
+    <value>하트 버튼을 누르면 osu!store로 이동합니다.</value>
+  </data>
+  <data name="support.why-support.title" xml:space="preserve">
+    <value>osu!를 지원하면 뭐가 좋은 거죠? 제 돈은 어디로 가나요?</value>
+  </data>
+  <data name="support.why-support.team.title" xml:space="preserve">
+    <value>개발진 지원</value>
+  </data>
+  <data name="support.why-support.team.description" xml:space="preserve">
+    <value>소규모 개발진들이 osu!를 개발하고 운영합니다. 여러분의 도움이 이들이 생존... 하는데 도움이 되겠죠.</value>
+  </data>
+  <data name="support.why-support.infra.title" xml:space="preserve">
+    <value>서버 인프라</value>
+  </data>
+  <data name="support.why-support.infra.description" xml:space="preserve">
+    <value>여러분의 기부금은 웹사이트, 멀티플레이 서비스, 온라인 순위 등의 서버를 운영하는 곳에 사용됩니다.</value>
+  </data>
+  <data name="support.why-support.featured-artists.title" xml:space="preserve">
+    <value>공식 아티스트</value>
+  </data>
+  <data name="support.why-support.featured-artists.description" xml:space="preserve">
+    <value>여러분의 지원으로, 더 많은 놀라운 아티스트를 만나 osu! 에 사용할 굉장한 음악의 사용권을 취득할 수 있습니다!</value>
+  </data>
+  <data name="support.why-support.featured-artists.link_text" xml:space="preserve">
+    <value>현재 아티스트 명단 보기 &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.ads.title" xml:space="preserve">
+    <value>osu!를 자립하게 유지</value>
+  </data>
+  <data name="support.why-support.ads.description" xml:space="preserve">
+    <value>여러분의 기부금이 게임을 독립적이고, 일체의 광고와 외부 스폰서 없이 자립할 수 있도록 돕습니다.</value>
+  </data>
+  <data name="support.why-support.tournaments.title" xml:space="preserve">
+    <value>공식 토너먼트</value>
+  </data>
+  <data name="support.why-support.tournaments.description" xml:space="preserve">
+    <value>osu! 공식 월드컵 토너먼트의 운영비 (그리고 상금) 를 마련할 수 있도록 돕습니다.</value>
+  </data>
+  <data name="support.why-support.tournaments.link_text" xml:space="preserve">
+    <value>토너먼트 찾아보기 &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.bounty-program.title" xml:space="preserve">
+    <value>오픈 소스 포상금 프로그램</value>
+  </data>
+  <data name="support.why-support.bounty-program.description" xml:space="preserve">
+    <value>시간과 노력을 투자하여 osu!가 더 나은 방향으로 갈 수 있게 도와주시는 커뮤니티 기여자들을 지원합니다.</value>
+  </data>
+  <data name="support.why-support.bounty-program.link_text" xml:space="preserve">
+    <value>더 알아보기 &amp;raquo;</value>
+  </data>
+  <data name="support.perks.title" xml:space="preserve">
+    <value>그래서 제가 받는 혜택은 뭐가 있는데요?</value>
+  </data>
+  <data name="support.perks.osu_direct.title" xml:space="preserve">
+    <value>osu!direct</value>
+  </data>
+  <data name="support.perks.osu_direct.description" xml:space="preserve">
+    <value>게임 밖에서 비트맵을 찾을 필요 없이, 게임 내에서 비트맵을 쉽고 빠르게 다운로드 받을 수 있습니다.</value>
+  </data>
+  <data name="support.perks.friend_ranking.title" xml:space="preserve">
+    <value>친구 순위</value>
+  </data>
+  <data name="support.perks.friend_ranking.description" xml:space="preserve">
+    <value>게임 안과 웹사이트의 비트맵 리더보드에서 친구보다 얼마나 한수 위인지 볼 수 있습니다.</value>
+  </data>
+  <data name="support.perks.country_ranking.title" xml:space="preserve">
+    <value>국가 순위</value>
+  </data>
+  <data name="support.perks.country_ranking.description" xml:space="preserve">
+    <value>세계 정복 전에는 국가 정복이죠.</value>
+  </data>
+  <data name="support.perks.mod_filtering.title" xml:space="preserve">
+    <value>모드순 필터링</value>
+  </data>
+  <data name="support.perks.mod_filtering.description" xml:space="preserve">
+    <value>HDHR을 플레이하는 사람들만 찾고 싶으신가요? 문제없답니다.</value>
+  </data>
+  <data name="support.perks.auto_downloads.title" xml:space="preserve">
+    <value>자동 다운로드</value>
+  </data>
+  <data name="support.perks.auto_downloads.description" xml:space="preserve">
+    <value>멀티플레이, 관전, 채팅에 올라온 링크를 누를 때 자동으로 비트맵을 다운로드합니다!</value>
+  </data>
+  <data name="support.perks.upload_more.title" xml:space="preserve">
+    <value>업로드 제한 감소</value>
+  </data>
+  <data name="support.perks.upload_more.description" xml:space="preserve">
+    <value>최대 10개까지 (랭크된 비트맵 당) 비트맵을 추가로 업로드할 수 있습니다.</value>
+  </data>
+  <data name="support.perks.early_access.title" xml:space="preserve">
+    <value>얼리 엑세스</value>
+  </data>
+  <data name="support.perks.early_access.description" xml:space="preserve">
+    <value>osu!에 새 기능을 패치하기 전에, 미리 기능을 체험해 볼 수 있습니다!</value>
+  </data>
+  <data name="support.perks.customisation.title" xml:space="preserve">
+    <value>커스터마이징</value>
+  </data>
+  <data name="support.perks.customisation.description" xml:space="preserve">
+    <value>여러분의 유저 페이지를 원하는 기호에 맞게 수정할 수 있습니다.</value>
+  </data>
+  <data name="support.perks.beatmap_filters.title" xml:space="preserve">
+    <value>비트맵 필터</value>
+  </data>
+  <data name="support.perks.beatmap_filters.description" xml:space="preserve">
+    <value>비트맵을 플레이한 맵, 플레이하지 않은 맵, 점수가 등록된 맵을 기준으로 필터링하여 검색할 수 있습니다.</value>
+  </data>
+  <data name="support.perks.yellow_fellow.title" xml:space="preserve">
+    <value>노란색 이름 태그</value>
+  </data>
+  <data name="support.perks.yellow_fellow.description" xml:space="preserve">
+    <value>게임 내 유저 이름이 노란색으로 표시되어 서포터임을 주목받을 수 있습니다.</value>
+  </data>
+  <data name="support.perks.speedy_downloads.title" xml:space="preserve">
+    <value>빠른 다운로드</value>
+  </data>
+  <data name="support.perks.speedy_downloads.description" xml:space="preserve">
+    <value>비트맵 다운로드 속도 제한이 느슨해집니다. 특히 osu!direct를 사용할 때에는요.</value>
+  </data>
+  <data name="support.perks.change_username.title" xml:space="preserve">
+    <value>사용자 이름 변경</value>
+  </data>
+  <data name="support.perks.change_username.description" xml:space="preserve">
+    <value>추가 비용없이 사용자 이름을 바꿀 수 있습니다. (1회 한정)</value>
+  </data>
+  <data name="support.perks.skinnables.title" xml:space="preserve">
+    <value>스킨 옵션 추가</value>
+  </data>
+  <data name="support.perks.skinnables.description" xml:space="preserve">
+    <value>메인 메뉴 배경 변경과 같은 추가적인 스킨 옵션을 게임 내에서 사용할 수 있습니다.</value>
+  </data>
+  <data name="support.perks.feature_votes.title" xml:space="preserve">
+    <value>기능 요청</value>
+  </data>
+  <data name="support.perks.feature_votes.description" xml:space="preserve">
+    <value>원하는 기능을 요청하는 글에 투표할 수 있습니다. (매월 2번 투표 가능)</value>
+  </data>
+  <data name="support.perks.sort_options.title" xml:space="preserve">
+    <value>정렬 옵션</value>
+  </data>
+  <data name="support.perks.sort_options.description" xml:space="preserve">
+    <value>게임 내에서 비트맵 랭킹을 국가 / 친구 / 모드별 랭킹 기준으로 볼 수 있습니다.</value>
+  </data>
+  <data name="support.perks.more_favourites.title" xml:space="preserve">
+    <value>최대 즐겨찾기 수 증가</value>
+  </data>
+  <data name="support.perks.more_favourites.description" xml:space="preserve">
+    <value>즐겨 찾을 수 있는 비트맵의 수가 {0} &amp;rarr; {1} 으로 늘어납니다.</value>
+  </data>
+  <data name="support.perks.more_friends.title" xml:space="preserve">
+    <value>최대 친구 수 증가</value>
+  </data>
+  <data name="support.perks.more_friends.description" xml:space="preserve">
+    <value>사귈 수 있는 친구의 숫자가 {0} &amp;rarr; {1} 으로 늘어납니다.</value>
+  </data>
+  <data name="support.perks.more_beatmaps.title" xml:space="preserve">
+    <value>더 많은 비트맵 업로드</value>
+  </data>
+  <data name="support.perks.more_beatmaps.description" xml:space="preserve">
+    <value>한 번에 가질 수 있는 Ranked 되지 않은 비트맵의 수는 기본 값 + 현재 소유하고 있는 각 Ranked 된 비트맵 (한계치까지) 의 추가적 보너스로 계산됩니다. &lt;br/&gt;&lt;br/&gt;일반적으로 이 값은 Ranked 된 비트맵 당 4 + 1입니다 (최대 2). 서포터가 있으면, 이 값이 Ranked 된 비트맵 당 8 + 1로 증가합니다 (최대 12).</value>
+  </data>
+  <data name="support.perks.friend_filtering.title" xml:space="preserve">
+    <value>친구 리더보드</value>
+  </data>
+  <data name="support.perks.friend_filtering.description" xml:space="preserve">
+    <value>친구와 경쟁하고 친구보다 얼마나 더 한수위인지 알아보세요!</value>
+  </data>
+  <data name="support.supporter_status.contribution" xml:space="preserve">
+    <value>지금까지 지원해 주셔서 감사합니다! 총 {0}번의 결제로 {1}를 후원하셨습니다.</value>
+  </data>
+  <data name="support.supporter_status.gifted" xml:space="preserve">
+    <value>총 {0}번 서포터 태그를 선물하셨습니다. (총 {1} 달러 어치), 관대의 끝판왕이시네요!</value>
+  </data>
+  <data name="support.supporter_status.not_yet" xml:space="preserve">
+    <value>아직 osu!서포터 태그를 다셔보신 적이 없으시네요 :(</value>
+  </data>
+  <data name="support.supporter_status.valid_until" xml:space="preserve">
+    <value>현재 서포터 태그는 {0}까지 유효합니다!</value>
+  </data>
+  <data name="support.supporter_status.was_valid_until" xml:space="preserve">
+    <value>지난 서포터 태그는 {0}까지였습니다.</value>
+  </data>
+</root>

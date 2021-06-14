@@ -1,0 +1,274 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="not_negative" xml:space="preserve">
+    <value>{0} ei voi olla negatiivinen.</value>
+  </data>
+  <data name="required" xml:space="preserve">
+    <value>{0} on pakollinen.</value>
+  </data>
+  <data name="too_long" xml:space="preserve">
+    <value>{0} ylittää maksimipituuden - voi olla enintään {1} merkkiä.</value>
+  </data>
+  <data name="wrong_confirmation" xml:space="preserve">
+    <value>Tarkistus ei täsmää.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmap_missing" xml:space="preserve">
+    <value>Aikaleima on määritelty, mutta beatmap puuttuu.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmapset_no_hype" xml:space="preserve">
+    <value>Beatmappia ei voi hurrata.</value>
+  </data>
+  <data name="beatmapset_discussion.hype_requires_null_beatmap" xml:space="preserve">
+    <value>Hurraus täytyy tehdä Yleiset -osiossa (kaikki vaikeusasteet).</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmap_id" xml:space="preserve">
+    <value>Määritelly vaikeustaso on virheellinen.</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmapset_id" xml:space="preserve">
+    <value>Määritelty beatmap on virheellinen.</value>
+  </data>
+  <data name="beatmapset_discussion.locked" xml:space="preserve">
+    <value>Keskustelu on lukittu.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.guest" xml:space="preserve">
+    <value>Sinun on kirjauduttava sisään hurrataksesi.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.hyped" xml:space="preserve">
+    <value>Hurrasit jo tätä beatmappia.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.limit_exceeded" xml:space="preserve">
+    <value>Olet käyttänyt kaikki hurrauksesi.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.not_hypeable" xml:space="preserve">
+    <value>Tätä beatmappia ei voi hurrata</value>
+  </data>
+  <data name="beatmapset_discussion.hype.owner" xml:space="preserve">
+    <value>Ei omien beatmappien hurraamista.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.exceeds_beatmapset_length" xml:space="preserve">
+    <value>Määritelty aikaleima on beatmapin pituuden ulkopuolella.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.negative" xml:space="preserve">
+    <value>Aikaleima ei voi olla negatiivinen.</value>
+  </data>
+  <data name="beatmapset_discussion_post.discussion_locked" xml:space="preserve">
+    <value>Keskustelu on lukittu.</value>
+  </data>
+  <data name="beatmapset_discussion_post.first_post" xml:space="preserve">
+    <value>Aloitusviestiä ei voida poistaa.</value>
+  </data>
+  <data name="comment.deleted_parent" xml:space="preserve">
+    <value>Poistettuun kommenttiin ei voida vastata.</value>
+  </data>
+  <data name="forum.feature_vote.not_feature_topic" xml:space="preserve">
+    <value>Vain ominaisuutta voi äänestää.</value>
+  </data>
+  <data name="forum.feature_vote.not_enough_feature_votes" xml:space="preserve">
+    <value>Ei tarpeeksi ääniä.</value>
+  </data>
+  <data name="forum.poll_vote.invalid" xml:space="preserve">
+    <value>Virheellinen valinta määritelty.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_delete" xml:space="preserve">
+    <value>Beatmapin metatietoviestiä ei voida poistaa.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_edit" xml:space="preserve">
+    <value>Beatmapin metatietoviestiä ei voida muokata.</value>
+  </data>
+  <data name="forum.post.only_quote" xml:space="preserve">
+    <value>Sinun vastauksesi sisältää ainoastaan lainauksen.</value>
+  </data>
+  <data name="forum.topic_poll.duplicate_options" xml:space="preserve">
+    <value>Identtiset valinnat eivät ole sallittuja.</value>
+  </data>
+  <data name="forum.topic_poll.grace_period_expired" xml:space="preserve">
+    <value>Äänestystä ei voi muokata {0} tunnin jälkeen</value>
+  </data>
+  <data name="forum.topic_poll.invalid_max_options" xml:space="preserve">
+    <value>Valinnat käyttäjää kohti eivät voi ylittää kaikkien valintojen määrää.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_one_selection" xml:space="preserve">
+    <value>Vähintään yksi valinta käyttäjää kohti on vaadittu.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_two_options" xml:space="preserve">
+    <value>Tarvitsee ainakin kaksi valintaa.</value>
+  </data>
+  <data name="forum.topic_poll.too_many_options" xml:space="preserve">
+    <value>Sallittujen valintojen määrä ylittyi.</value>
+  </data>
+  <data name="forum.topic_vote.required" xml:space="preserve">
+    <value>Valitse jotain äänestäessäsi.</value>
+  </data>
+  <data name="forum.topic_vote.too_many" xml:space="preserve">
+    <value>Enemmän valintoja kuin sallittu.</value>
+  </data>
+  <data name="oauth.client.url" xml:space="preserve">
+    <value>Syötä kelvollinen URL-osoite.</value>
+  </data>
+  <data name="oauth.client.attributes.name" xml:space="preserve">
+    <value>Sovelluksen Nimi</value>
+  </data>
+  <data name="oauth.client.attributes.redirect" xml:space="preserve">
+    <value>Sovelluksen Vastakutsun URL</value>
+  </data>
+  <data name="user.contains_username" xml:space="preserve">
+    <value>Salasana ei saa sisältää käyttäjätunnusta.</value>
+  </data>
+  <data name="user.email_already_used" xml:space="preserve">
+    <value>Tämä sähköpostiosoite on jo käytössä.</value>
+  </data>
+  <data name="user.invalid_country" xml:space="preserve">
+    <value>Maata ei ole tietokannassa.</value>
+  </data>
+  <data name="user.invalid_discord" xml:space="preserve">
+    <value>Virheellinen Discord käyttäjänimi.</value>
+  </data>
+  <data name="user.invalid_email" xml:space="preserve">
+    <value>Ei näytä kelvolliselta sähköpostiosoitteelta.</value>
+  </data>
+  <data name="user.invalid_twitter" xml:space="preserve">
+    <value>Twitter-käyttäjätunnus ei kelpaa.</value>
+  </data>
+  <data name="user.too_short" xml:space="preserve">
+    <value>Uusi salasana on liian lyhyt.</value>
+  </data>
+  <data name="user.unknown_duplicate" xml:space="preserve">
+    <value>Käyttäjätunnus tai sähköpostiosoite on jo käytössä.</value>
+  </data>
+  <data name="user.username_available_in" xml:space="preserve">
+    <value>Tämän käyttäjänimen aukeamiseen on aikaa {0}.</value>
+  </data>
+  <data name="user.username_available_soon" xml:space="preserve">
+    <value>Tämä nimi on käytössä millä hetkellä hyvänsä!</value>
+  </data>
+  <data name="user.username_invalid_characters" xml:space="preserve">
+    <value>Käyttäjätunnus sisältää virheellisiä merkkejä.</value>
+  </data>
+  <data name="user.username_in_use" xml:space="preserve">
+    <value>Käyttäjätunnus on jo käytössä!</value>
+  </data>
+  <data name="user.username_locked" xml:space="preserve">
+    <value>Käyttäjänimi on jo käytössä!</value>
+  </data>
+  <data name="user.username_no_space_userscore_mix" xml:space="preserve">
+    <value>Käytä joko alaviivoja tai välilyöntejä, ei molempia!</value>
+  </data>
+  <data name="user.username_no_spaces" xml:space="preserve">
+    <value>Käyttäjätunnus ei voi alkaa tai loppua välilyönneillä!</value>
+  </data>
+  <data name="user.username_not_allowed" xml:space="preserve">
+    <value>Tätä käyttäjätunnusta ei ole sallittu.</value>
+  </data>
+  <data name="user.username_too_short" xml:space="preserve">
+    <value>Haluamasi käyttäjätunnus on liian lyhyt.</value>
+  </data>
+  <data name="user.username_too_long" xml:space="preserve">
+    <value>Haluamasi käyttäjätunnus on liian pitkä.</value>
+  </data>
+  <data name="user.weak" xml:space="preserve">
+    <value>Mustalla listalla oleva salasana.</value>
+  </data>
+  <data name="user.wrong_current_password" xml:space="preserve">
+    <value>Nykyinen salasanasi on virheellinen.</value>
+  </data>
+  <data name="user.wrong_email_confirmation" xml:space="preserve">
+    <value>Sähköpostivahvistus ei täsmää.</value>
+  </data>
+  <data name="user.wrong_password_confirmation" xml:space="preserve">
+    <value>Salasanat eivät vastaa toisiaan.</value>
+  </data>
+  <data name="user.too_long" xml:space="preserve">
+    <value>Liian pitkä - Kirjaimia voi olla enintään {0}.</value>
+  </data>
+  <data name="user.attributes.username" xml:space="preserve">
+    <value>Käyttäjänimi</value>
+  </data>
+  <data name="user.attributes.user_email" xml:space="preserve">
+    <value>Sähköpostiosoite</value>
+  </data>
+  <data name="user.attributes.password" xml:space="preserve">
+    <value>Salasana</value>
+  </data>
+  <data name="user.change_username.restricted" xml:space="preserve">
+    <value>Et voi vaihtaa käyttäjänimeäsi kun tilisi on rajoitettu.</value>
+  </data>
+  <data name="user.change_username.supporter_required._" xml:space="preserve">
+    <value>Sinun pitää olla {0}, jotta voit muuttaa nimeäsi!</value>
+  </data>
+  <data name="user.change_username.supporter_required.link_text" xml:space="preserve">
+    <value>tukenut osua!</value>
+  </data>
+  <data name="user.change_username.username_is_same" xml:space="preserve">
+    <value>Tämä on jo käyttäjänimesi, höpsö!</value>
+  </data>
+  <data name="user_report.reason_not_valid" xml:space="preserve">
+    <value>{0} ei kelpaa tälle ilmoitustyypille.</value>
+  </data>
+  <data name="user_report.self" xml:space="preserve">
+    <value>Et voi ilmiantaa itseäsi!</value>
+  </data>
+  <data name="store.order_item.attributes.quantity" xml:space="preserve">
+    <value>Määrä</value>
+  </data>
+  <data name="store.order_item.attributes.cost" xml:space="preserve">
+    <value>Hinta</value>
+  </data>
+</root>

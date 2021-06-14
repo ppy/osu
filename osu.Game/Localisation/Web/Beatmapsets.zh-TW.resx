@@ -1,0 +1,376 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>該圖譜現在無法下載。</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>因作者或第三方版權擁有者的要求，故該圖譜已經下架。</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>點擊這裡查看更多資訊。</value>
+  </data>
+  <data name="download.limit_exceeded" xml:space="preserve">
+    <value>欲速則不達。</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>圖譜列表</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>圖譜</value>
+  </data>
+  <data name="panel.empty" xml:space="preserve">
+    <value>沒有圖譜</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>下載</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>下載並包含影片</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>下載並不包含影片</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>在osu!direct中查看</value>
+  </data>
+  <data name="nominate.incorrect_mode" xml:space="preserve">
+    <value>您沒有權限為 {0} 模式提名</value>
+  </data>
+  <data name="nominate.too_many" xml:space="preserve">
+    <value>提名需求已達成。</value>
+  </data>
+  <data name="nominate.dialog.confirmation" xml:space="preserve">
+    <value>您確定要提名這張圖譜嗎？</value>
+  </data>
+  <data name="nominate.dialog.header" xml:space="preserve">
+    <value>提名圖譜</value>
+  </data>
+  <data name="nominate.dialog.hybrid_warning" xml:space="preserve">
+    <value>注意: 您只能提名一次，所以請確保您的提名包含所有您想提名的模式。</value>
+  </data>
+  <data name="nominate.dialog.which_modes" xml:space="preserve">
+    <value>您想為哪個模式提名？</value>
+  </data>
+  <data name="nsfw_badge.label" xml:space="preserve">
+    <value>成人內容</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>討論</value>
+  </data>
+  <data name="show.details.by_artist" xml:space="preserve">
+    <value>作者：{0}</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>收藏這張圖譜</value>
+  </data>
+  <data name="show.details.favourite_login" xml:space="preserve">
+    <value>登入後才能把這張圖譜加到最愛</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>下載圖譜前請先登入！</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>由 {0} 製作</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>取消收藏</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>最後更新時間 {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>下載</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>不含影像</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>含影像</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>以使用更多的功能</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>登入</value>
+  </data>
+  <data name="show.details_date.approved" xml:space="preserve">
+    <value>於{0}批准</value>
+  </data>
+  <data name="show.details_date.ranked" xml:space="preserve">
+    <value>於{0}進榜</value>
+  </data>
+  <data name="show.details_date.submitted" xml:space="preserve">
+    <value>於{0}提交</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>上次更新於{0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>您收藏的圖譜已達上限，請取消一張再試。</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>如果你喜歡這張圖譜，請推薦它來幫助它進展至&lt;strong&gt;進榜&lt;/strong&gt;狀態。</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>此地圖目前是 {0} 的。</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>待處理</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>已提名</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>製作中</value>
+  </data>
+  <data name="show.hype.disqualify._" xml:space="preserve">
+    <value>如果你認為此圖譜有問題，可將之取消提名：{0}</value>
+  </data>
+  <data name="show.hype.report._" xml:space="preserve">
+    <value>如果您發現此圖譜有問題，請在 {0} 通知團隊。</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>回報問題</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>這裡</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>詳情</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>曲風</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>語言</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>資料還在計算中。。。</value>
+  </data>
+  <data name="show.info.nsfw" xml:space="preserve">
+    <value>成人內容</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>失敗位置</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>來源</value>
+  </data>
+  <data name="show.info.storyboard" xml:space="preserve">
+    <value>這張圖譜包含 Storyboard</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>成功率</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>標籤</value>
+  </data>
+  <data name="show.info.video" xml:space="preserve">
+    <value>此圖譜包含背景影片</value>
+  </data>
+  <data name="show.nsfw_warning.details" xml:space="preserve">
+    <value>這張圖譜含有兒童不宜、具冒犯性、或令人不安的內容。您確定要查看嗎？</value>
+  </data>
+  <data name="show.nsfw_warning.title" xml:space="preserve">
+    <value>成人內容</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.disable" xml:space="preserve">
+    <value>關閉警告</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.listing" xml:space="preserve">
+    <value>圖譜列表</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.show" xml:space="preserve">
+    <value>顯示</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>在 {0} 達成</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>國內排行榜</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>好友排行榜</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>世界排行榜</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>點擊 &lt;a href="{0}"&gt;這裡&lt;/a&gt; 來查看你可以得到的精彩功能！</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>你需要成為贊助者才能查看國內與好友排名！</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>排行榜</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>準確率</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>最大連擊</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>Miss</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>Mods</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>玩家</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>排行榜</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>總分</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>得分</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>時間</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>您的所在地玩家尚未上傳成績！</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>您的好友尚未上傳成績！</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>沒有任何玩家上傳過成績，來挑戰嗎？</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>加載分數中...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>未進榜圖譜</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>領先者</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>您的最佳成績</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>縮圈大小</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>鍵位數量</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>扣血速度</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>準確率</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>縮圈速度</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>難度星級</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>長度</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>圓圈總數</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>滑條總數</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>玩家評價</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>評分情況</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>提名</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>遊玩次数</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>已進榜</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>已批准</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>Loved</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>已提名</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>製作中</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>待處理</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>拋棄</value>
+  </data>
+</root>

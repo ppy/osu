@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="beatmapset_update_notice.new" xml:space="preserve">
+    <value>Doar vă las să știți că a fost un update nou în beatmap-ul ”{0}” de la vizita ta trecută.</value>
+  </data>
+  <data name="beatmapset_update_notice.subject" xml:space="preserve">
+    <value>Actualizare nouă pentru beatmapul "{0}"</value>
+  </data>
+  <data name="beatmapset_update_notice.unwatch" xml:space="preserve">
+    <value>Dacă nu mai dorești să urmărești acest beatmap, puteți fie să dați click pe link-ul "Unwatch" găsit în pagina de mai sus, fie din pagina de vizualizare de modare:</value>
+  </data>
+  <data name="beatmapset_update_notice.visit" xml:space="preserve">
+    <value>Vizitați pagina de discuție aici:</value>
+  </data>
+  <data name="common.closing" xml:space="preserve">
+    <value>Cu stimă,</value>
+  </data>
+  <data name="common.hello" xml:space="preserve">
+    <value>Bună {0},</value>
+  </data>
+  <data name="common.report" xml:space="preserve">
+    <value>Vă rugăm să răspundeți la acest e-mail IMEDIAT dacă nu ați solicitat această modificare.</value>
+  </data>
+  <data name="donation_thanks.benefit_more" xml:space="preserve">
+    <value>Mai multe beneficii de sprinjinitor vor apărea pe timp ce trece!</value>
+  </data>
+  <data name="donation_thanks.feedback" xml:space="preserve">
+    <value>Dacă ai orice întrebare sau feedback, nu ezita să răspunzi acestui mail; O să mă întorc la tine cât mai curând posibil!</value>
+  </data>
+  <data name="donation_thanks.keep_free" xml:space="preserve">
+    <value>Este mulțumită oamenilor ca tine care joacă osu! pentru care putem să menținem jocul și comunitatea funcțională în mod lin fără reclame sau plăți forțate.</value>
+  </data>
+  <data name="donation_thanks.keep_running" xml:space="preserve">
+    <value>Sprijinul tău păstrează osu! rulează de aproximativ {0}! Poate nu pare prea mult, dar totul se adaugă :).</value>
+  </data>
+  <data name="donation_thanks.subject" xml:space="preserve">
+    <value>Mulțumim, osu! te &lt;3</value>
+  </data>
+  <data name="donation_thanks.translation" xml:space="preserve">
+    <value>O traducere furnizată de comunitate pentru scopuri informaționale urmează:</value>
+  </data>
+  <data name="donation_thanks.benefit.self" xml:space="preserve">
+    <value>Acum vei avea acces la osu!direct și la multe alte beneficii de supporter pentru {0}.</value>
+  </data>
+  <data name="donation_thanks.support._" xml:space="preserve">
+    <value>Îți mulțumim mult pentru {0} tau catre osu!.</value>
+  </data>
+  <data name="donation_thanks.support.first" xml:space="preserve">
+    <value>suport</value>
+  </data>
+  <data name="donation_thanks.support.repeat" xml:space="preserve">
+    <value>suport continuu</value>
+  </data>
+  <data name="forum_new_reply.subject" xml:space="preserve">
+    <value>[osu!] Nou răspuns pentru subiectul "{0}"</value>
+  </data>
+  <data name="forum_new_reply.visit" xml:space="preserve">
+    <value>Sari direct la cel mai recent răspuns folosind următorul link:</value>
+  </data>
+  <data name="password_reset.code" xml:space="preserve">
+    <value>Codul tau de verificare este:</value>
+  </data>
+  <data name="password_reset.requested" xml:space="preserve">
+    <value>Fie tu sau cineva care pretinde că ești tu a solicitat o resetare a parolei pe contul tău osu!.</value>
+  </data>
+  <data name="password_reset.subject" xml:space="preserve">
+    <value>recuperarea contului osu!</value>
+  </data>
+  <data name="store_payment_completed.processing" xml:space="preserve">
+    <value>Am primit plata ta și momentan procesăm comanda. Poți urmări progresul comenzii tale aici:</value>
+  </data>
+  <data name="store_payment_completed.shipping" xml:space="preserve">
+    <value>Livrare</value>
+  </data>
+  <data name="store_payment_completed.subject" xml:space="preserve">
+    <value>Am primit comanda ta din magazinul osu!</value>
+  </data>
+  <data name="store_payment_completed.total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift_maybe_not" xml:space="preserve">
+    <value>Dar probabil că ştii deja cine este ;).</value>
+  </data>
+  <data name="supporter_gift.duration" xml:space="preserve">
+    <value>Mulțumită lor, ai acces la beneficii directe și alte beneficii de suporter osu! pentru următoarea {0}.</value>
+  </data>
+  <data name="supporter_gift.features" xml:space="preserve">
+    <value>Mai multe detalii privind aceste funcții pot fi găsite aici:</value>
+  </data>
+  <data name="supporter_gift.gifted" xml:space="preserve">
+    <value>Cineva tocmai ti-a daruit osu! supporter!</value>
+  </data>
+  <data name="supporter_gift.subject" xml:space="preserve">
+    <value>Ţi-a fost oferită o insignă de suporter osu!</value>
+  </data>
+  <data name="user_email_updated.sent" xml:space="preserve">
+    <value>Din motive de securitate, acest e-mail a fost trimis atât la adresa de e-mail nouă, cât și la adresa veche.</value>
+  </data>
+  <data name="user_email_updated.subject" xml:space="preserve">
+    <value>confirmarea schimbării e-mailului în osu!</value>
+  </data>
+  <data name="user_force_reactivation.main" xml:space="preserve">
+    <value>Contul tău este suspectat că a fost compromis, că a avut recent o activitate suspectă sau o parolă FOARTE slabă. Ca urmare, vă cerem să setați o parolă nouă. Vă rugăm să alegeți o parolă SIGURĂ.</value>
+  </data>
+  <data name="user_force_reactivation.reason" xml:space="preserve">
+    <value>Motiv:</value>
+  </data>
+  <data name="user_force_reactivation.subject" xml:space="preserve">
+    <value>reactivarea contului osu! este necesar</value>
+  </data>
+  <data name="user_password_updated.confirmation" xml:space="preserve">
+    <value>Aceasta este doar o confirmare că parola de osu! a fost schimbat.</value>
+  </data>
+  <data name="user_password_updated.subject" xml:space="preserve">
+    <value>confirmarea schimbării parolei în osu!</value>
+  </data>
+  <data name="user_verification.code" xml:space="preserve">
+    <value>Codul tau de verificare este:</value>
+  </data>
+  <data name="user_verification.link" xml:space="preserve">
+    <value>Alternativ, puteți de asemenea vizita acest link de mai jos pentru a finaliza verificarea:</value>
+  </data>
+  <data name="user_verification.subject" xml:space="preserve">
+    <value>verificarea contului osu!</value>
+  </data>
+  <data name="user_verification.action_from.unknown_country" xml:space="preserve">
+    <value>țară necunoscută</value>
+  </data>
+</root>

@@ -1,0 +1,556 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="pinned_topics" xml:space="preserve">
+    <value>المواضيع المثبتة</value>
+  </data>
+  <data name="slogan" xml:space="preserve">
+    <value>من الخطر اللعب بمفردك.</value>
+  </data>
+  <data name="subforums" xml:space="preserve">
+    <value>المنتديات الفرعية</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>منتديات osu!</value>
+  </data>
+  <data name="covers.edit" xml:space="preserve">
+    <value>تحرير الغلاف</value>
+  </data>
+  <data name="covers.create._" xml:space="preserve">
+    <value>أضف صورة غلاف</value>
+  </data>
+  <data name="covers.create.button" xml:space="preserve">
+    <value>رفع صورة</value>
+  </data>
+  <data name="covers.create.info" xml:space="preserve">
+    <value>يجب أن يكون حجم الغلاف {0}. يمكنك أيضا إسقاط صورتك هنا لرفعها.</value>
+  </data>
+  <data name="covers.destroy._" xml:space="preserve">
+    <value>إزالة صورة الغلاف</value>
+  </data>
+  <data name="covers.destroy.confirm" xml:space="preserve">
+    <value>هل أنت متأكد أنك تريد إزالة صورة الغلاف؟</value>
+  </data>
+  <data name="forums.latest_post" xml:space="preserve">
+    <value>اخر المنشورات</value>
+  </data>
+  <data name="forums.index.title" xml:space="preserve">
+    <value>فهرس المنتدى</value>
+  </data>
+  <data name="forums.topics.empty" xml:space="preserve">
+    <value>لا توجد مواضيع!</value>
+  </data>
+  <data name="mark_as_read.forum" xml:space="preserve">
+    <value>تحديد المنتدى كمقروء</value>
+  </data>
+  <data name="mark_as_read.forums" xml:space="preserve">
+    <value>تحديد المنتديات كمقروءة</value>
+  </data>
+  <data name="mark_as_read.busy" xml:space="preserve">
+    <value>يتم التحديد كمقروءة...</value>
+  </data>
+  <data name="post.confirm_destroy" xml:space="preserve">
+    <value>اتريد حقاََ حذف المنشور؟</value>
+  </data>
+  <data name="post.confirm_restore" xml:space="preserve">
+    <value>اتريد حقاََ اِسترجاع المنشور؟</value>
+  </data>
+  <data name="post.edited" xml:space="preserve">
+    <value>التعديل الأخير تم بواسطة {0} {1}، عُدِلَ :{2} مرة في المجموع.|التعديل الأخير تم بواسطة {0}{1}, عُدِلَ :{2} مرات في المجموع.</value>
+  </data>
+  <data name="post.posted_at" xml:space="preserve">
+    <value>نُشِر {0}</value>
+  </data>
+  <data name="post.posted_by" xml:space="preserve">
+    <value>منشور بواسطة {0}</value>
+  </data>
+  <data name="post.actions.destroy" xml:space="preserve">
+    <value>منشور محذوف</value>
+  </data>
+  <data name="post.actions.edit" xml:space="preserve">
+    <value>تعديل المنشور</value>
+  </data>
+  <data name="post.actions.report" xml:space="preserve">
+    <value>الإبلاغ عن المنشور</value>
+  </data>
+  <data name="post.actions.restore" xml:space="preserve">
+    <value>اِستعادة المنشور</value>
+  </data>
+  <data name="post.create.title.reply" xml:space="preserve">
+    <value>رد جديد</value>
+  </data>
+  <data name="post.info.post_count" xml:space="preserve">
+    <value>{0} منشور|{0} منشورات</value>
+  </data>
+  <data name="post.info.topic_starter" xml:space="preserve">
+    <value>كاتب الموضوع</value>
+  </data>
+  <data name="search.go_to_post" xml:space="preserve">
+    <value>انتقل الى المنشور</value>
+  </data>
+  <data name="search.post_number_input" xml:space="preserve">
+    <value>ادخل رقم المنشور</value>
+  </data>
+  <data name="search.total_posts" xml:space="preserve">
+    <value>{0} المنشورات الكلية</value>
+  </data>
+  <data name="topic.confirm_destroy" xml:space="preserve">
+    <value>حذف الموضوع حقاً؟</value>
+  </data>
+  <data name="topic.confirm_restore" xml:space="preserve">
+    <value>استعادة الموضوع حقاً؟</value>
+  </data>
+  <data name="topic.deleted" xml:space="preserve">
+    <value>موضوع محذوف</value>
+  </data>
+  <data name="topic.go_to_latest" xml:space="preserve">
+    <value>عرض اخر منشور</value>
+  </data>
+  <data name="topic.has_replied" xml:space="preserve">
+    <value>لقد قمت بالرد على هذا الموضوع</value>
+  </data>
+  <data name="topic.in_forum" xml:space="preserve">
+    <value>في {0}</value>
+  </data>
+  <data name="topic.latest_post" xml:space="preserve">
+    <value>{0} بواسطة {1}</value>
+  </data>
+  <data name="topic.latest_reply_by" xml:space="preserve">
+    <value>آخر رد من {0}</value>
+  </data>
+  <data name="topic.new_topic" xml:space="preserve">
+    <value>موضوع جديد</value>
+  </data>
+  <data name="topic.new_topic_login" xml:space="preserve">
+    <value>قم بتسجيل الدخول لإضافة موضوع جديد</value>
+  </data>
+  <data name="topic.post_reply" xml:space="preserve">
+    <value>نشر</value>
+  </data>
+  <data name="topic.reply_box_placeholder" xml:space="preserve">
+    <value>اكتب هنا للرد</value>
+  </data>
+  <data name="topic.reply_title_prefix" xml:space="preserve">
+    <value>إعادة</value>
+  </data>
+  <data name="topic.started_by" xml:space="preserve">
+    <value>بواسطة {0}</value>
+  </data>
+  <data name="topic.started_by_verbose" xml:space="preserve">
+    <value>بدأت بواسطة {0}</value>
+  </data>
+  <data name="topic.actions.destroy" xml:space="preserve">
+    <value>حذف الموضوع</value>
+  </data>
+  <data name="topic.actions.restore" xml:space="preserve">
+    <value>استعادة الموضوع</value>
+  </data>
+  <data name="topic.create.close" xml:space="preserve">
+    <value>إغلاق</value>
+  </data>
+  <data name="topic.create.preview" xml:space="preserve">
+    <value>معاينة</value>
+  </data>
+  <data name="topic.create.preview_hide" xml:space="preserve">
+    <value>كتابة</value>
+  </data>
+  <data name="topic.create.submit" xml:space="preserve">
+    <value>نشر</value>
+  </data>
+  <data name="topic.create.necropost.default" xml:space="preserve">
+    <value>هذا الموضوع غير نشط لفترة من الوقت. انشر هنا فقط إذا كان لديك سبب محدد للقيام بذلك.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic._" xml:space="preserve">
+    <value>هذا الموضوع غير نشط منذ فترة. اذا لم تكن تملك سبب محدد للنشر هنا, ارجوك {0} بدلاََ من النشر.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic.create" xml:space="preserve">
+    <value>ابدأ موضوعاً جديداً</value>
+  </data>
+  <data name="topic.create.placeholder.body" xml:space="preserve">
+    <value>ادخل محتوى المنشور هنا</value>
+  </data>
+  <data name="topic.create.placeholder.title" xml:space="preserve">
+    <value>اضغط هنا لاِدخال عنوان</value>
+  </data>
+  <data name="topic.jump.enter" xml:space="preserve">
+    <value>اضغط هنا لاِدخال رقم منشور محدد</value>
+  </data>
+  <data name="topic.jump.first" xml:space="preserve">
+    <value>الذهاب إلى المنشور الأول</value>
+  </data>
+  <data name="topic.jump.last" xml:space="preserve">
+    <value>الذهاب إلى آخر منشور</value>
+  </data>
+  <data name="topic.jump.next" xml:space="preserve">
+    <value>تخطى الـ 10 منشورات القادمة</value>
+  </data>
+  <data name="topic.jump.previous" xml:space="preserve">
+    <value>عُد 10 منشورات للخلف</value>
+  </data>
+  <data name="topic.post_edit.cancel" xml:space="preserve">
+    <value>إلغاء</value>
+  </data>
+  <data name="topic.post_edit.post" xml:space="preserve">
+    <value>حفظ</value>
+  </data>
+  <data name="topic_watches.index.title_compact" xml:space="preserve">
+    <value>اشتراكات المنتدى</value>
+  </data>
+  <data name="topic_watches.index.box.total" xml:space="preserve">
+    <value>الموضيع المشترك فيها</value>
+  </data>
+  <data name="topic_watches.index.box.unread" xml:space="preserve">
+    <value>المواضيع مع ردود جديدة</value>
+  </data>
+  <data name="topic_watches.index.info.total" xml:space="preserve">
+    <value>لقد اشتركت في {0} موضوع.</value>
+  </data>
+  <data name="topic_watches.index.info.unread" xml:space="preserve">
+    <value>لديك {0} ردود غير مقروءة في المواضيع المشترك فيها.</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.confirmation" xml:space="preserve">
+    <value>إلغاء الاشتراك من الموضوع؟</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.title" xml:space="preserve">
+    <value>إلغاء الإشتراك</value>
+  </data>
+  <data name="topics._" xml:space="preserve">
+    <value>المواضيع</value>
+  </data>
+  <data name="topics.actions.login_reply" xml:space="preserve">
+    <value>سجل الدخول للرد</value>
+  </data>
+  <data name="topics.actions.reply" xml:space="preserve">
+    <value>رد</value>
+  </data>
+  <data name="topics.actions.reply_with_quote" xml:space="preserve">
+    <value>اقتبس المنشور للرد</value>
+  </data>
+  <data name="topics.actions.search" xml:space="preserve">
+    <value>بحث</value>
+  </data>
+  <data name="topics.create.create_poll" xml:space="preserve">
+    <value>انشاء اِستطلاع رأي</value>
+  </data>
+  <data name="topics.create.preview" xml:space="preserve">
+    <value>معاينة المنشور</value>
+  </data>
+  <data name="topics.create.create_poll_button.add" xml:space="preserve">
+    <value>إنشاء اِستطلاع</value>
+  </data>
+  <data name="topics.create.create_poll_button.remove" xml:space="preserve">
+    <value>الغاء اِنشاء الاِستطلاع</value>
+  </data>
+  <data name="topics.create.poll.hide_results" xml:space="preserve">
+    <value>إخفاء نتائج التصويت.</value>
+  </data>
+  <data name="topics.create.poll.hide_results_info" xml:space="preserve">
+    <value>لن يتم عرضها إلا بعد انتهاء التصويت.</value>
+  </data>
+  <data name="topics.create.poll.length" xml:space="preserve">
+    <value>افتح الاِستطلاع لـ</value>
+  </data>
+  <data name="topics.create.poll.length_days_suffix" xml:space="preserve">
+    <value>أيام</value>
+  </data>
+  <data name="topics.create.poll.length_info" xml:space="preserve">
+    <value>اترك فارغاََ لمدة لا تنتهي</value>
+  </data>
+  <data name="topics.create.poll.max_options" xml:space="preserve">
+    <value>الخيارات للـ مستخدم</value>
+  </data>
+  <data name="topics.create.poll.max_options_info" xml:space="preserve">
+    <value>هذا رقم الخيارات التي يمكن ان يختارها كل مستخدم عند التصويت.</value>
+  </data>
+  <data name="topics.create.poll.options" xml:space="preserve">
+    <value>الخيارات</value>
+  </data>
+  <data name="topics.create.poll.options_info" xml:space="preserve">
+    <value>ضع كل خيار في سطر جديد. تستطيع ادخال 10 خيارات.</value>
+  </data>
+  <data name="topics.create.poll.title" xml:space="preserve">
+    <value>سؤال</value>
+  </data>
+  <data name="topics.create.poll.vote_change" xml:space="preserve">
+    <value>اسمح باِعادة التصويت.</value>
+  </data>
+  <data name="topics.create.poll.vote_change_info" xml:space="preserve">
+    <value>اذا قمت بتفعيله, سيكون بمقدور المستخدمين تغيير اصواتهم.</value>
+  </data>
+  <data name="topics.edit_title.start" xml:space="preserve">
+    <value>تعديل العنوان</value>
+  </data>
+  <data name="topics.index.feature_votes" xml:space="preserve">
+    <value>تفضيل النجمة</value>
+  </data>
+  <data name="topics.index.replies" xml:space="preserve">
+    <value>الردود</value>
+  </data>
+  <data name="topics.index.views" xml:space="preserve">
+    <value>المشاهدات</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0" xml:space="preserve">
+    <value>احذف اشارة "الاِضافة"</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0_done" xml:space="preserve">
+    <value>اشارة "الاِضافة" حُذِفَت</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1" xml:space="preserve">
+    <value>اضف اشارة "الاِضافة"</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1_done" xml:space="preserve">
+    <value>اشارة "الاِضافة" اضيفت</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0" xml:space="preserve">
+    <value>احذف اشارة "التعيين"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0_done" xml:space="preserve">
+    <value>اشارة "التعيين" حُذِفَت</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1" xml:space="preserve">
+    <value>اضف اشارة "التعيين"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1_done" xml:space="preserve">
+    <value>اشارة "التعيين" اضيفت</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0" xml:space="preserve">
+    <value>احذف اشارة "التأكيد"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0_done" xml:space="preserve">
+    <value>اشارة "التأكيد" حذفت</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1" xml:space="preserve">
+    <value>اضف اشارة "التأكيد"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1_done" xml:space="preserve">
+    <value>اشارة "التأكيد" اضيفت</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0" xml:space="preserve">
+    <value>احذف اشارة "التكرار"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0_done" xml:space="preserve">
+    <value>اشارة "التكرار" حذفت</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1" xml:space="preserve">
+    <value>اضف اشارة "التكرار"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1_done" xml:space="preserve">
+    <value>اشارة "التكرار" اضيفت</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0" xml:space="preserve">
+    <value>احذف اشارة "غير صالح"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0_done" xml:space="preserve">
+    <value>اشارة "غير صالح" حُذِفَت</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1" xml:space="preserve">
+    <value>اضف اشارة "غير صالح"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1_done" xml:space="preserve">
+    <value>اشارة "غير صالح" اضيفت</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0" xml:space="preserve">
+    <value>احذفت اشارة "مُصلَح"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0_done" xml:space="preserve">
+    <value>اشارة "مُصلَح" حُذِفَت</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1" xml:space="preserve">
+    <value>اضف اشارة "مُصلَح"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1_done" xml:space="preserve">
+    <value>اشارة "مُصلَح" اضيفت</value>
+  </data>
+  <data name="topics.lock.is_locked" xml:space="preserve">
+    <value>هذا الموضوع مغلق ولا يمكن الرد عليه</value>
+  </data>
+  <data name="topics.lock.to_0" xml:space="preserve">
+    <value>فتح الموضوع</value>
+  </data>
+  <data name="topics.lock.to_0_confirm" xml:space="preserve">
+    <value>فتح الموضوع؟</value>
+  </data>
+  <data name="topics.lock.to_0_done" xml:space="preserve">
+    <value>تمّ إلغاء تأمين الموضوع</value>
+  </data>
+  <data name="topics.lock.to_1" xml:space="preserve">
+    <value>قفل الموضوع</value>
+  </data>
+  <data name="topics.lock.to_1_confirm" xml:space="preserve">
+    <value>قفل الموضوع؟</value>
+  </data>
+  <data name="topics.lock.to_1_done" xml:space="preserve">
+    <value>تمّ تأمين الموضوع</value>
+  </data>
+  <data name="topics.moderate_move.title" xml:space="preserve">
+    <value>نقل إلى منتدى آخر</value>
+  </data>
+  <data name="topics.moderate_pin.to_0" xml:space="preserve">
+    <value>إزالة تثبيت الموضوع</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_confirm" xml:space="preserve">
+    <value>إلغاء تثبيت الموضوع؟</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_done" xml:space="preserve">
+    <value>تمّ إلغاء تثبيت الموضوع</value>
+  </data>
+  <data name="topics.moderate_pin.to_1" xml:space="preserve">
+    <value>تثبيت الموضوع</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_confirm" xml:space="preserve">
+    <value>تثبيت الموضوع؟</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_done" xml:space="preserve">
+    <value>تم تثبيت الموضوع</value>
+  </data>
+  <data name="topics.moderate_pin.to_2" xml:space="preserve">
+    <value>ثبت الموضوع وعَلِم كـ اِعلان</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_confirm" xml:space="preserve">
+    <value>تثبيت الموضوع وتعليمه كـ أِعلان؟</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_done" xml:space="preserve">
+    <value>تم تثبيت الموضوع ووضعه كـ إعلان</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.show" xml:space="preserve">
+    <value>إظهار المنشورات المحذوفة</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.hide" xml:space="preserve">
+    <value>إخفاء المنشورات المحذوفة</value>
+  </data>
+  <data name="topics.show.deleted-posts" xml:space="preserve">
+    <value>المنشورات المحذوفة</value>
+  </data>
+  <data name="topics.show.total_posts" xml:space="preserve">
+    <value>عدد المنشورات الكلي</value>
+  </data>
+  <data name="topics.show.feature_vote.current" xml:space="preserve">
+    <value>الأفضلية الحالية: +{0}</value>
+  </data>
+  <data name="topics.show.feature_vote.do" xml:space="preserve">
+    <value>روج لهذا المنشور</value>
+  </data>
+  <data name="topics.show.feature_vote.info._" xml:space="preserve">
+    <value>هذا {0}. هذه الطلبات يمكن ان يوافق عليها بواسطة {1}.</value>
+  </data>
+  <data name="topics.show.feature_vote.info.feature_request" xml:space="preserve">
+    <value>طلبات الميزات</value>
+  </data>
+  <data name="topics.show.feature_vote.info.supporters" xml:space="preserve">
+    <value>الداعمون</value>
+  </data>
+  <data name="topics.show.feature_vote.user.count" xml:space="preserve">
+    <value>{0} لا اصوات|{1}{0} صوت|[2,*] {0} اصوات</value>
+  </data>
+  <data name="topics.show.feature_vote.user.current" xml:space="preserve">
+    <value>لديك {0} متبقية.</value>
+  </data>
+  <data name="topics.show.feature_vote.user.not_enough" xml:space="preserve">
+    <value>ليس لديك أي اصوات متبقية</value>
+  </data>
+  <data name="topics.show.poll.edit" xml:space="preserve">
+    <value>تعديل الاستبيان</value>
+  </data>
+  <data name="topics.show.poll.edit_warning" xml:space="preserve">
+    <value>تحرير الاِستطلاع سيقوم بإزالة النتائج الحالية!</value>
+  </data>
+  <data name="topics.show.poll.vote" xml:space="preserve">
+    <value>تصويت</value>
+  </data>
+  <data name="topics.show.poll.button.change_vote" xml:space="preserve">
+    <value>تغيير التصويت</value>
+  </data>
+  <data name="topics.show.poll.button.edit" xml:space="preserve">
+    <value>تعديل الاستطلاع</value>
+  </data>
+  <data name="topics.show.poll.button.view_results" xml:space="preserve">
+    <value>تخطي الى النتائج</value>
+  </data>
+  <data name="topics.show.poll.button.vote" xml:space="preserve">
+    <value>تصويت</value>
+  </data>
+  <data name="topics.show.poll.detail.end_time" xml:space="preserve">
+    <value>سوف ينتهي الاقتراع في {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.ended" xml:space="preserve">
+    <value>انتهى الاقتراع {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.results_hidden" xml:space="preserve">
+    <value>سيتم عرض النتائج بعد انتهاء التصويت.</value>
+  </data>
+  <data name="topics.show.poll.detail.total" xml:space="preserve">
+    <value>مجموع الأصوات: {0}</value>
+  </data>
+  <data name="topics.watch.to_not_watching" xml:space="preserve">
+    <value>لا إشارات مرجعية</value>
+  </data>
+  <data name="topics.watch.to_watching" xml:space="preserve">
+    <value>إشارة مرجعية</value>
+  </data>
+  <data name="topics.watch.to_watching_mail" xml:space="preserve">
+    <value>اِشارة مرجعية مع اخطار</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_disable" xml:space="preserve">
+    <value>تم تمكين الاِخطار. انقر للتعطيل</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_enable" xml:space="preserve">
+    <value>تم اِطفاء الاِخطار. انقر للتشغيل</value>
+  </data>
+</root>

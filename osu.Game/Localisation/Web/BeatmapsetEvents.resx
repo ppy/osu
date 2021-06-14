@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="event.approve" xml:space="preserve">
+    <value>Approved.</value>
+  </data>
+  <data name="event.beatmap_owner_change" xml:space="preserve">
+    <value>Owner of difficulty {0} changed to {1}.</value>
+  </data>
+  <data name="event.discussion_delete" xml:space="preserve">
+    <value>Moderator deleted discussion {0}.</value>
+  </data>
+  <data name="event.discussion_lock" xml:space="preserve">
+    <value>Discussion for this beatmap has been disabled. ({0})</value>
+  </data>
+  <data name="event.discussion_post_delete" xml:space="preserve">
+    <value>Moderator deleted post from discussion {0}.</value>
+  </data>
+  <data name="event.discussion_post_restore" xml:space="preserve">
+    <value>Moderator restored post from discussion {0}.</value>
+  </data>
+  <data name="event.discussion_restore" xml:space="preserve">
+    <value>Moderator restored discussion {0}.</value>
+  </data>
+  <data name="event.discussion_unlock" xml:space="preserve">
+    <value>Discussion for this beatmap has been enabled.</value>
+  </data>
+  <data name="event.disqualify" xml:space="preserve">
+    <value>Disqualified by {0}. Reason: {1} ({2}).</value>
+  </data>
+  <data name="event.disqualify_legacy" xml:space="preserve">
+    <value>Disqualified by {0}. Reason: {1}.</value>
+  </data>
+  <data name="event.genre_edit" xml:space="preserve">
+    <value>Genre changed from {0} to {1}.</value>
+  </data>
+  <data name="event.issue_reopen" xml:space="preserve">
+    <value>Resolved issue {0} by {1} reopened by {2}.</value>
+  </data>
+  <data name="event.issue_resolve" xml:space="preserve">
+    <value>Issue {0} by {1} marked as resolved by {2}.</value>
+  </data>
+  <data name="event.kudosu_allow" xml:space="preserve">
+    <value>Kudosu denial for discussion {0} has been removed.</value>
+  </data>
+  <data name="event.kudosu_deny" xml:space="preserve">
+    <value>Discussion {0} denied for kudosu.</value>
+  </data>
+  <data name="event.kudosu_gain" xml:space="preserve">
+    <value>Discussion {0} by {1} obtained enough votes for kudosu.</value>
+  </data>
+  <data name="event.kudosu_lost" xml:space="preserve">
+    <value>Discussion {0} by {1} lost votes and granted kudosu has been removed.</value>
+  </data>
+  <data name="event.kudosu_recalculate" xml:space="preserve">
+    <value>Discussion {0} has had its kudosu grants recalculated.</value>
+  </data>
+  <data name="event.language_edit" xml:space="preserve">
+    <value>Language changed from {0} to {1}.</value>
+  </data>
+  <data name="event.love" xml:space="preserve">
+    <value>Loved by {0}.</value>
+  </data>
+  <data name="event.nominate" xml:space="preserve">
+    <value>Nominated by {0}.</value>
+  </data>
+  <data name="event.nominate_modes" xml:space="preserve">
+    <value>Nominated by {0} ({1}).</value>
+  </data>
+  <data name="event.nomination_reset" xml:space="preserve">
+    <value>New problem {0} ({1}) triggered a nomination reset.</value>
+  </data>
+  <data name="event.qualify" xml:space="preserve">
+    <value>This beatmap has reached the required number of nominations and has been qualified.</value>
+  </data>
+  <data name="event.rank" xml:space="preserve">
+    <value>Ranked.</value>
+  </data>
+  <data name="event.remove_from_loved" xml:space="preserve">
+    <value>Removed from Loved by {0}. ({1})</value>
+  </data>
+  <data name="event.nsfw_toggle.to_0" xml:space="preserve">
+    <value>Removed explicit mark</value>
+  </data>
+  <data name="event.nsfw_toggle.to_1" xml:space="preserve">
+    <value>Marked as explicit</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmapset Events</value>
+  </data>
+  <data name="index.form.period" xml:space="preserve">
+    <value>Period</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Types</value>
+  </data>
+  <data name="item.content" xml:space="preserve">
+    <value>Content</value>
+  </data>
+  <data name="item.discussion_deleted" xml:space="preserve">
+    <value>[deleted]</value>
+  </data>
+  <data name="item.type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="type.approve" xml:space="preserve">
+    <value>Approval</value>
+  </data>
+  <data name="type.beatmap_owner_change" xml:space="preserve">
+    <value>Difficulty owner change</value>
+  </data>
+  <data name="type.discussion_delete" xml:space="preserve">
+    <value>Discussion deletion</value>
+  </data>
+  <data name="type.discussion_post_delete" xml:space="preserve">
+    <value>Discussion reply deletion</value>
+  </data>
+  <data name="type.discussion_post_restore" xml:space="preserve">
+    <value>Discussion reply restoration</value>
+  </data>
+  <data name="type.discussion_restore" xml:space="preserve">
+    <value>Discussion restoration</value>
+  </data>
+  <data name="type.disqualify" xml:space="preserve">
+    <value>Disqualification</value>
+  </data>
+  <data name="type.genre_edit" xml:space="preserve">
+    <value>Genre edit</value>
+  </data>
+  <data name="type.issue_reopen" xml:space="preserve">
+    <value>Discussion reopening</value>
+  </data>
+  <data name="type.issue_resolve" xml:space="preserve">
+    <value>Discussion resolving</value>
+  </data>
+  <data name="type.kudosu_allow" xml:space="preserve">
+    <value>Kudosu allowance</value>
+  </data>
+  <data name="type.kudosu_deny" xml:space="preserve">
+    <value>Kudosu denial</value>
+  </data>
+  <data name="type.kudosu_gain" xml:space="preserve">
+    <value>Kudosu gain</value>
+  </data>
+  <data name="type.kudosu_lost" xml:space="preserve">
+    <value>Kudosu loss</value>
+  </data>
+  <data name="type.kudosu_recalculate" xml:space="preserve">
+    <value>Kudosu recalculation</value>
+  </data>
+  <data name="type.language_edit" xml:space="preserve">
+    <value>Language edit</value>
+  </data>
+  <data name="type.love" xml:space="preserve">
+    <value>Love</value>
+  </data>
+  <data name="type.nominate" xml:space="preserve">
+    <value>Nomination</value>
+  </data>
+  <data name="type.nomination_reset" xml:space="preserve">
+    <value>Nomination resetting</value>
+  </data>
+  <data name="type.nsfw_toggle" xml:space="preserve">
+    <value>Explicit mark</value>
+  </data>
+  <data name="type.qualify" xml:space="preserve">
+    <value>Qualification</value>
+  </data>
+  <data name="type.rank" xml:space="preserve">
+    <value>Ranking</value>
+  </data>
+  <data name="type.remove_from_loved" xml:space="preserve">
+    <value>Loved removal</value>
+  </data>
+</root>

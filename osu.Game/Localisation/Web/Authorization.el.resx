@@ -1,0 +1,262 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="require_login" xml:space="preserve">
+    <value>Παρακαλώ συνδεθείτε για να συνεχίσετε.</value>
+  </data>
+  <data name="require_verification" xml:space="preserve">
+    <value>Παρακαλώ επιβεβαιώστε για να συνεχίσετε.</value>
+  </data>
+  <data name="restricted" xml:space="preserve">
+    <value>Δε μπορείτε να το κάνετε αυτό όσο είστε restricted.</value>
+  </data>
+  <data name="silenced" xml:space="preserve">
+    <value>Δε μπορείτε να το κάνετε αυτό όσο είστε silenced.</value>
+  </data>
+  <data name="unauthorized" xml:space="preserve">
+    <value>Απαγορεύεται η πρόσβαση.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.is_hype" xml:space="preserve">
+    <value>Δεν μπορείτε να αναιρέσετε το hype.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.has_reply" xml:space="preserve">
+    <value>Δεν μπορείτε να διαγράψετε τη συζήτηση με απαντήσεις</value>
+  </data>
+  <data name="beatmap_discussion.nominate.exhausted" xml:space="preserve">
+    <value>Έχετε φτάσει στο όριο των nomination για σήμερα, παρακαλώ προσπαθήστε ξανά αύριο.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.incorrect_state" xml:space="preserve">
+    <value>Σφάλμα κατά την εκτέλεση αυτής της ενέργειας, δοκιμάστε να ανανεώσετε τη σελίδα.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.owner" xml:space="preserve">
+    <value>Δεν μπορείτε να κάνετε nominate το δικό σας beatmap.</value>
+  </data>
+  <data name="beatmap_discussion.resolve.not_owner" xml:space="preserve">
+    <value>Μόνο οι δημιουργοί του thread και του beatmap μπορούν να επιλύσουν τη συζήτηση.</value>
+  </data>
+  <data name="beatmap_discussion.store.mapper_note_wrong_user" xml:space="preserve">
+    <value>Μόνο ο ιδιοκτήτης ή κάποιος nominator/μέλος του QAT γκρουπ του beatmap μπορεί να δημοσιεύσει σημειώσεις τύπου mapper.</value>
+  </data>
+  <data name="beatmap_discussion.vote.limit_exceeded" xml:space="preserve">
+    <value>Παρακαλώ περιμένετε λίγο πριν ψηφίσετε ξανά</value>
+  </data>
+  <data name="beatmap_discussion.vote.owner" xml:space="preserve">
+    <value>Δεν μπορείτε να ψηφίσετε τη δική σας συζήτηση.</value>
+  </data>
+  <data name="beatmap_discussion.vote.wrong_beatmapset_state" xml:space="preserve">
+    <value>Μπορείτε να ψηφίσετε μόνο σε συζήτηση των pending beatmap.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.not_owner" xml:space="preserve">
+    <value>Μπορείτε να διαγράψετε μόνο τις δικές σας δημοσιεύσεις.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.system_generated" xml:space="preserve">
+    <value>Οι δημοσιεύσεις που έχουν δημιουργηθεί αυτόματα δεν μπορούν να διαγραφούν.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.not_owner" xml:space="preserve">
+    <value>Μόνο ο δημιουργός της δημοσίευσης μπορεί να την επεξεργαστεί.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.system_generated" xml:space="preserve">
+    <value>Οι δημοσιεύσεις που έχουν δημιουργηθεί αυτόματα δεν μπορούν να επεξεργαστούν.</value>
+  </data>
+  <data name="beatmap_discussion_post.store.beatmapset_locked" xml:space="preserve">
+    <value>Αυτό το beatmap είναι κλειδωμένο προς συζήτηση.</value>
+  </data>
+  <data name="chat.blocked" xml:space="preserve">
+    <value>Αδυναμία αποστολής σε χρήστη που σας έχει ή έχετε αποκλείσει.</value>
+  </data>
+  <data name="chat.friends_only" xml:space="preserve">
+    <value>Ο χρήστης αποκλείει μηνύματα απο άτομα εκτός της λίστας φίλων του.</value>
+  </data>
+  <data name="chat.moderated" xml:space="preserve">
+    <value>Το κανάλι βρίσκεται υπό παρακολούθηση.</value>
+  </data>
+  <data name="chat.no_access" xml:space="preserve">
+    <value>Δεν έχετε πρόσβαση σε αυτό το κανάλι.</value>
+  </data>
+  <data name="chat.restricted" xml:space="preserve">
+    <value>Δεν μπορείτε να στείλετε μηνύματα ενώ είστε σιγασμένος, περιορισμένος ή απαγορευμένος.</value>
+  </data>
+  <data name="chat.silenced" xml:space="preserve">
+    <value>Δεν μπορείτε να στείλετε μηνύματα ενώ είστε σιγασμένος, περιορισμένος ή απαγορευμένος.</value>
+  </data>
+  <data name="comment.update.deleted" xml:space="preserve">
+    <value>Δεν μπορείτε να επεξεργαστείτε διαγραμμένη δημοσίευση.</value>
+  </data>
+  <data name="contest.voting_over" xml:space="preserve">
+    <value>Δε μπορείτε να αλλάξετε την ψήφο σας αφού η περίοδος ψηφοφορίας γι' αυτόν τον διαγωνισμό έχει τελειώσει.</value>
+  </data>
+  <data name="contest.entry.limit_reached" xml:space="preserve">
+    <value>Έχετε φτάσει το όριο καταχωρήσεων για αυτόν τον διαγωνισμό</value>
+  </data>
+  <data name="contest.entry.over" xml:space="preserve">
+    <value>Σας ευχαριστούμε για τις καταχωρήσεις σας! Οι υποβολές έχουν κλείσει για αυτόν τον διαγωνισμό και η ψηφοφορία θα ανοίξει σύντομα.</value>
+  </data>
+  <data name="forum.moderate.no_permission" xml:space="preserve">
+    <value>Δεν έχει άδεια να εποπτεύσετε αυτό το φόρουμ.</value>
+  </data>
+  <data name="forum.post.delete.only_last_post" xml:space="preserve">
+    <value>Μόνο η τελευταία δημοσίευση μπορεί να διαγραφεί.</value>
+  </data>
+  <data name="forum.post.delete.locked" xml:space="preserve">
+    <value>Δεν μπορεί να διαγραφεί δημοσίευση κλειδωμένου θέματος.</value>
+  </data>
+  <data name="forum.post.delete.no_forum_access" xml:space="preserve">
+    <value>Απαιτείται πρόσβαση για το συγκεκριμένο φόρουμ.</value>
+  </data>
+  <data name="forum.post.delete.not_owner" xml:space="preserve">
+    <value>Μόνο ο δημιουργός της δημοσίευσης μπορεί να τη διαγράψει.</value>
+  </data>
+  <data name="forum.post.edit.deleted" xml:space="preserve">
+    <value>Δεν μπορείτε να επεξεργαστείτε διαγραμμένη δημοσίευση.</value>
+  </data>
+  <data name="forum.post.edit.locked" xml:space="preserve">
+    <value>Αυτή η δημοσίευση δεν μπορεί να επεξεργαστεί λόγω κλειδώματος.</value>
+  </data>
+  <data name="forum.post.edit.no_forum_access" xml:space="preserve">
+    <value>Απαιτείται πρόσβαση για το συγκεκριμένο φόρουμ.</value>
+  </data>
+  <data name="forum.post.edit.not_owner" xml:space="preserve">
+    <value>Μόνο ο δημιουργός της δημοσίευσης μπορεί να την επεξεργαστεί.</value>
+  </data>
+  <data name="forum.post.edit.topic_locked" xml:space="preserve">
+    <value>Δεν μπορείτε να επεξεργαστείτε post κλειδωμένου θέματος.</value>
+  </data>
+  <data name="forum.post.store.play_more" xml:space="preserve">
+    <value>Παρακαλώ παίξτε το παιχνίδι πριν δημοσιεύσετε στα φόρουμ! Αν έχετε πρόβλημα στο παιχνίδι, παρακαλώ γράψτε στο φόρουμ Βοήθεια και Υποστήριξη.</value>
+  </data>
+  <data name="forum.post.store.too_many_help_posts" xml:space="preserve">
+    <value>Πρέπει να παίξετε περισσότερο για να έχετε τη δυνατότητα να κάνετε περισσότερες αναρτήσεις. Αν εξακολουθείτε να αντιμετωπίζετε προβλήματα με το παιχνίδι, στείλτε μας email στο support@ppy.sh</value>
+  </data>
+  <data name="forum.topic.reply.double_post" xml:space="preserve">
+    <value>Παρακαλώ επεξεργαστείτε τη τελευταία σας δημοσίευση, αντί να αναρτήσετε ξανά.</value>
+  </data>
+  <data name="forum.topic.reply.locked" xml:space="preserve">
+    <value>Δεν μπορείτε να απαντήσετε σε κλειδωμένο thread.</value>
+  </data>
+  <data name="forum.topic.reply.no_forum_access" xml:space="preserve">
+    <value>Απαιτείται πρόσβαση για το συγκεκριμένο φόρουμ.</value>
+  </data>
+  <data name="forum.topic.reply.no_permission" xml:space="preserve">
+    <value>Δεν έχετε την άδεια να απαντήσετε.</value>
+  </data>
+  <data name="forum.topic.reply.user.require_login" xml:space="preserve">
+    <value>Παρακαλώ συνδεθείτε για να απαντήσετε.</value>
+  </data>
+  <data name="forum.topic.reply.user.restricted" xml:space="preserve">
+    <value>Δε μπορείτε να απαντήσετε όταν είστε restricted.</value>
+  </data>
+  <data name="forum.topic.reply.user.silenced" xml:space="preserve">
+    <value>Δε μπορείτε να απαντήσετε όταν είστε silenced.</value>
+  </data>
+  <data name="forum.topic.store.no_forum_access" xml:space="preserve">
+    <value>Απαιτείται πρόσβαση για το συγκεκριμένο φόρουμ.</value>
+  </data>
+  <data name="forum.topic.store.no_permission" xml:space="preserve">
+    <value>Δεν έχετε την άδεια να δημιουργήσετε νέο θέμα.</value>
+  </data>
+  <data name="forum.topic.store.forum_closed" xml:space="preserve">
+    <value>Το φόρουμ είναι κλειστό και δε μπορείτε να δημοσιεύσετε σε αυτό.</value>
+  </data>
+  <data name="forum.topic.vote.no_forum_access" xml:space="preserve">
+    <value>Απαιτείται πρόσβαση για το συγκεκριμένο φόρουμ.</value>
+  </data>
+  <data name="forum.topic.vote.over" xml:space="preserve">
+    <value>Η ψηφοφορία έχει τερματιστεί και δε μπορείτε πλέον να ψηφίσετε.</value>
+  </data>
+  <data name="forum.topic.vote.play_more" xml:space="preserve">
+    <value>Χρειάζεται να παίξετε παραπάνω πριν ψηφίσετε σε αυτό το forum.</value>
+  </data>
+  <data name="forum.topic.vote.voted" xml:space="preserve">
+    <value>Δεν επιτρέπεται η αλλαγή ψήφου.</value>
+  </data>
+  <data name="forum.topic.vote.user.require_login" xml:space="preserve">
+    <value>Παρακαλώ συνδεθείτε για να ψηφίσετε.</value>
+  </data>
+  <data name="forum.topic.vote.user.restricted" xml:space="preserve">
+    <value>Δε μπορείτε να ψηφίσετε όταν είστε restricted.</value>
+  </data>
+  <data name="forum.topic.vote.user.silenced" xml:space="preserve">
+    <value>Δε μπορείτε να ψηφίσετε όταν είστε silenced.</value>
+  </data>
+  <data name="forum.topic.watch.no_forum_access" xml:space="preserve">
+    <value>Απαιτείται πρόσβαση για το συγκεκριμένο φόρουμ.</value>
+  </data>
+  <data name="forum.topic_cover.edit.uneditable" xml:space="preserve">
+    <value>Καθορίσατε μη έγκυρο εξώφυλλο.</value>
+  </data>
+  <data name="forum.topic_cover.edit.not_owner" xml:space="preserve">
+    <value>Μόνο ο ιδιοκτήτης μπορεί να επεξεργαστεί το εξώφυλλο.</value>
+  </data>
+  <data name="forum.topic_cover.store.forum_not_allowed" xml:space="preserve">
+    <value>Αυτό το φόρουμ δεν αποδέχεται εξώφυλλα θεμάτων.</value>
+  </data>
+  <data name="forum.view.admin_only" xml:space="preserve">
+    <value>Μόνο οι διαχειριστές μπορούν να δούν αυτό το φόρουμ.</value>
+  </data>
+  <data name="user.page.edit.locked" xml:space="preserve">
+    <value>Το userpage είναι κλειδωμένο.</value>
+  </data>
+  <data name="user.page.edit.not_owner" xml:space="preserve">
+    <value>Μπορείτε να επεξεργαστείτε μόνο το δικό σας userpage.</value>
+  </data>
+  <data name="user.page.edit.require_supporter_tag" xml:space="preserve">
+    <value>απαιτείται osu!supporter tag.</value>
+  </data>
+</root>

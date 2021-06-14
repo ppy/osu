@@ -1,0 +1,355 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="confirmation" xml:space="preserve">
+    <value>هل أنت متأكد؟</value>
+  </data>
+  <data name="confirmation_unsaved" xml:space="preserve">
+    <value>سيتم فقدان التغييرات غير المحفوظة. هل أنت متأكد؟</value>
+  </data>
+  <data name="saved" xml:space="preserve">
+    <value>تم الحفظ</value>
+  </data>
+  <data name="array_and.words_connector" xml:space="preserve">
+    <value>, </value>
+  </data>
+  <data name="array_and.two_words_connector" xml:space="preserve">
+    <value> و </value>
+  </data>
+  <data name="array_and.last_word_connector" xml:space="preserve">
+    <value>, و </value>
+  </data>
+  <data name="badges.new" xml:space="preserve">
+    <value>جديد</value>
+  </data>
+  <data name="buttons.admin" xml:space="preserve">
+    <value>المشرف</value>
+  </data>
+  <data name="buttons.authorise" xml:space="preserve">
+    <value>استأِذان</value>
+  </data>
+  <data name="buttons.authorising" xml:space="preserve">
+    <value>استأِذان...</value>
+  </data>
+  <data name="buttons.back_to_previous" xml:space="preserve">
+    <value>العودة إلى الحالة السابقة</value>
+  </data>
+  <data name="buttons.back_to_top" xml:space="preserve">
+    <value>العودة إلى الأعلى</value>
+  </data>
+  <data name="buttons.cancel" xml:space="preserve">
+    <value>إلغاء</value>
+  </data>
+  <data name="buttons.change" xml:space="preserve">
+    <value>تغيير</value>
+  </data>
+  <data name="buttons.clear" xml:space="preserve">
+    <value>محو</value>
+  </data>
+  <data name="buttons.click_to_copy" xml:space="preserve">
+    <value>انقر للنسخ إلى الحافظة</value>
+  </data>
+  <data name="buttons.click_to_copy_copied" xml:space="preserve">
+    <value>نُسِخَ إلى الحافظة!</value>
+  </data>
+  <data name="buttons.close" xml:space="preserve">
+    <value>إغلاق</value>
+  </data>
+  <data name="buttons.collapse" xml:space="preserve">
+    <value>طي</value>
+  </data>
+  <data name="buttons.delete" xml:space="preserve">
+    <value>حذف</value>
+  </data>
+  <data name="buttons.edit" xml:space="preserve">
+    <value>تعديل</value>
+  </data>
+  <data name="buttons.expand" xml:space="preserve">
+    <value>وسّع</value>
+  </data>
+  <data name="buttons.hide" xml:space="preserve">
+    <value>إخفاء</value>
+  </data>
+  <data name="buttons.permalink" xml:space="preserve">
+    <value>الرابط الدائم</value>
+  </data>
+  <data name="buttons.pin" xml:space="preserve">
+    <value>ثبّت</value>
+  </data>
+  <data name="buttons.post" xml:space="preserve">
+    <value>نشر</value>
+  </data>
+  <data name="buttons.read_more" xml:space="preserve">
+    <value>إقرأ المزيد</value>
+  </data>
+  <data name="buttons.reply" xml:space="preserve">
+    <value>رد</value>
+  </data>
+  <data name="buttons.reply_reopen" xml:space="preserve">
+    <value>الرد وإعادة فتح</value>
+  </data>
+  <data name="buttons.reply_resolve" xml:space="preserve">
+    <value>الرد والاِصلاح</value>
+  </data>
+  <data name="buttons.reset" xml:space="preserve">
+    <value>إعادة تعيين</value>
+  </data>
+  <data name="buttons.restore" xml:space="preserve">
+    <value>استعادة</value>
+  </data>
+  <data name="buttons.save" xml:space="preserve">
+    <value>حفظ</value>
+  </data>
+  <data name="buttons.saving" xml:space="preserve">
+    <value>جاري الحفظ...</value>
+  </data>
+  <data name="buttons.search" xml:space="preserve">
+    <value>البحث</value>
+  </data>
+  <data name="buttons.see_more" xml:space="preserve">
+    <value>مشاهدة المزيد</value>
+  </data>
+  <data name="buttons.show" xml:space="preserve">
+    <value>إظهار</value>
+  </data>
+  <data name="buttons.show_deleted" xml:space="preserve">
+    <value>عرض المحذوف</value>
+  </data>
+  <data name="buttons.show_less" xml:space="preserve">
+    <value>إظهار أقل</value>
+  </data>
+  <data name="buttons.show_more" xml:space="preserve">
+    <value>إعرض المزيد</value>
+  </data>
+  <data name="buttons.show_more_options" xml:space="preserve">
+    <value>إظهار خيارات أكثر</value>
+  </data>
+  <data name="buttons.unpin" xml:space="preserve">
+    <value>ألغ التثبيت</value>
+  </data>
+  <data name="buttons.update" xml:space="preserve">
+    <value>تحديث</value>
+  </data>
+  <data name="buttons.upload_image" xml:space="preserve">
+    <value>رفع صورة</value>
+  </data>
+  <data name="buttons.watch.to_0" xml:space="preserve">
+    <value>إلغاء المشاهدة</value>
+  </data>
+  <data name="buttons.watch.to_1" xml:space="preserve">
+    <value>شاهد</value>
+  </data>
+  <data name="count.badges" xml:space="preserve">
+    <value>{0} شارة|{0} شارات</value>
+  </data>
+  <data name="count.days" xml:space="preserve">
+    <value>{0} يوم|{0} ايام</value>
+  </data>
+  <data name="count.hour_short_unit" xml:space="preserve">
+    <value>ساعة|ساعات</value>
+  </data>
+  <data name="count.hours" xml:space="preserve">
+    <value>{0} ساعة|{0} ساعات</value>
+  </data>
+  <data name="count.item" xml:space="preserve">
+    <value>{0} وحدة|{0} وحدات</value>
+  </data>
+  <data name="count.minute_short_unit" xml:space="preserve">
+    <value>دقائقِ|دقيقة</value>
+  </data>
+  <data name="count.minutes" xml:space="preserve">
+    <value>{0} دقيقة|{0} دقائق</value>
+  </data>
+  <data name="count.months" xml:space="preserve">
+    <value>{0} شهر|{0} أشهر</value>
+  </data>
+  <data name="count.notifications" xml:space="preserve">
+    <value>{0} أِشعار|{0} أِشعارات</value>
+  </data>
+  <data name="count.plus_others" xml:space="preserve">
+    <value>+ {0} اخر!|+ {0} اخرون!</value>
+  </data>
+  <data name="count.post" xml:space="preserve">
+    <value>{0} منشور|{0} منشورات</value>
+  </data>
+  <data name="count.second_short_unit" xml:space="preserve">
+    <value>ثانية|ثواني</value>
+  </data>
+  <data name="count.star_priority" xml:space="preserve">
+    <value>{0} اهمية النجمة|{0} اهمية النجوم</value>
+  </data>
+  <data name="count.update" xml:space="preserve">
+    <value>{0} تحديث|{0} تحديثات</value>
+  </data>
+  <data name="count.view" xml:space="preserve">
+    <value>{0} مشاهدة|{0} مشاهدات</value>
+  </data>
+  <data name="count.years" xml:space="preserve">
+    <value>{0} سنة|{0} سنوات</value>
+  </data>
+  <data name="countdown.days" xml:space="preserve">
+    <value>أيام</value>
+  </data>
+  <data name="countdown.hours" xml:space="preserve">
+    <value>ساعات</value>
+  </data>
+  <data name="countdown.minutes" xml:space="preserve">
+    <value>دقائق</value>
+  </data>
+  <data name="countdown.seconds" xml:space="preserve">
+    <value>ثوانٍ</value>
+  </data>
+  <data name="datetime.year_month.moment" xml:space="preserve">
+    <value>MMMM YYYY</value>
+  </data>
+  <data name="datetime.year_month.php" xml:space="preserve">
+    <value>MMMM y</value>
+  </data>
+  <data name="datetime.year_month_short.moment" xml:space="preserve">
+    <value>MMM YYYY</value>
+  </data>
+  <data name="device.keyboard" xml:space="preserve">
+    <value>لوحة مفاتيح</value>
+  </data>
+  <data name="device.mouse" xml:space="preserve">
+    <value>ماوس</value>
+  </data>
+  <data name="device.tablet" xml:space="preserve">
+    <value>تابلت لوحي</value>
+  </data>
+  <data name="device.touch" xml:space="preserve">
+    <value>شاشة اللمس</value>
+  </data>
+  <data name="dropzone.target" xml:space="preserve">
+    <value>اَسقط الملف هنا للرفع</value>
+  </data>
+  <data name="input.search" xml:space="preserve">
+    <value>بحث...</value>
+  </data>
+  <data name="pagination.previous" xml:space="preserve">
+    <value>السابق</value>
+  </data>
+  <data name="pagination.next" xml:space="preserve">
+    <value>التالي</value>
+  </data>
+  <data name="score_count.count_100" xml:space="preserve">
+    <value>١٠٠</value>
+  </data>
+  <data name="score_count.count_300" xml:space="preserve">
+    <value>٣٠٠</value>
+  </data>
+  <data name="score_count.count_50" xml:space="preserve">
+    <value>٥٠</value>
+  </data>
+  <data name="score_count.count_katu" xml:space="preserve">
+    <value>٢٠٠</value>
+  </data>
+  <data name="score_count.count_miss" xml:space="preserve">
+    <value>اِخفاق</value>
+  </data>
+  <data name="scoreboard_time.d" xml:space="preserve">
+    <value>%d يوم</value>
+  </data>
+  <data name="scoreboard_time.dd" xml:space="preserve">
+    <value>%d يوم</value>
+  </data>
+  <data name="scoreboard_time.h" xml:space="preserve">
+    <value>%d ساعة</value>
+  </data>
+  <data name="scoreboard_time.hh" xml:space="preserve">
+    <value>%d ساعة</value>
+  </data>
+  <data name="scoreboard_time.m" xml:space="preserve">
+    <value>%d شهر</value>
+  </data>
+  <data name="scoreboard_time.mm" xml:space="preserve">
+    <value>%d شهر</value>
+  </data>
+  <data name="scoreboard_time.s" xml:space="preserve">
+    <value>%d ثانية</value>
+  </data>
+  <data name="scoreboard_time.y" xml:space="preserve">
+    <value>%d سنة</value>
+  </data>
+  <data name="scoreboard_time.yy" xml:space="preserve">
+    <value>%d سنة</value>
+  </data>
+  <data name="time.days_ago" xml:space="preserve">
+    <value>{0} منذ يوم|{0} منذ أيام</value>
+  </data>
+  <data name="time.hours_ago" xml:space="preserve">
+    <value>{0} منذ ساعة|{0} ساعات مضت</value>
+  </data>
+  <data name="time.now" xml:space="preserve">
+    <value>الآن</value>
+  </data>
+  <data name="time.remaining" xml:space="preserve">
+    <value>الوقت المتبقي</value>
+  </data>
+  <data name="title.notice" xml:space="preserve">
+    <value>تنبيه</value>
+  </data>
+  <data name="wrong_user._" xml:space="preserve">
+    <value>انت مسجل كـ {0}. {1}.</value>
+  </data>
+  <data name="wrong_user.logout_link" xml:space="preserve">
+    <value>انقر هنا لتسجيل الدخول كمستخدم مختلف</value>
+  </data>
+</root>

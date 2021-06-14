@@ -1,0 +1,388 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="audio.autoplay" xml:space="preserve">
+    <value>تشغيل المقطع التالي تلقائياً</value>
+  </data>
+  <data name="defaults.page_description" xml:space="preserve">
+    <value>osu! - الأغنية قريبة *نقرة* واحدة فقط! مع Ouendan/EBA, تايكو واوضاع اللعب الأصلية, وكذلك مُعدل مستويات متكامل.</value>
+  </data>
+  <data name="header.admin.beatmapset" xml:space="preserve">
+    <value>حزمة الأغنية</value>
+  </data>
+  <data name="header.admin.beatmapset_covers" xml:space="preserve">
+    <value>اغطية الأغاني</value>
+  </data>
+  <data name="header.admin.contest" xml:space="preserve">
+    <value>مسابقة</value>
+  </data>
+  <data name="header.admin.contests" xml:space="preserve">
+    <value>المسابقات</value>
+  </data>
+  <data name="header.admin.root" xml:space="preserve">
+    <value>وحدة التحكم</value>
+  </data>
+  <data name="header.admin.store_orders" xml:space="preserve">
+    <value>مشرف المتجر</value>
+  </data>
+  <data name="header.artists.index" xml:space="preserve">
+    <value>القائمة</value>
+  </data>
+  <data name="header.changelog.index" xml:space="preserve">
+    <value>جدولة</value>
+  </data>
+  <data name="header.help.index" xml:space="preserve">
+    <value>الفهرس</value>
+  </data>
+  <data name="header.help.sitemap" xml:space="preserve">
+    <value>خارطة الموقع</value>
+  </data>
+  <data name="header.store.cart" xml:space="preserve">
+    <value>العربة</value>
+  </data>
+  <data name="header.store.orders" xml:space="preserve">
+    <value>تاريخ الطلب</value>
+  </data>
+  <data name="header.store.products" xml:space="preserve">
+    <value>المنتجات</value>
+  </data>
+  <data name="header.tournaments.index" xml:space="preserve">
+    <value>جدولة</value>
+  </data>
+  <data name="header.users.modding" xml:space="preserve">
+    <value>الاِقتراح</value>
+  </data>
+  <data name="header.users.show" xml:space="preserve">
+    <value>معلومات</value>
+  </data>
+  <data name="gallery.close" xml:space="preserve">
+    <value>إغلاق (Esc)</value>
+  </data>
+  <data name="gallery.fullscreen" xml:space="preserve">
+    <value>تغيير للشاشة الكاملة</value>
+  </data>
+  <data name="gallery.zoom" xml:space="preserve">
+    <value>التكبير / التصغير</value>
+  </data>
+  <data name="gallery.previous" xml:space="preserve">
+    <value>السابق (السهم اليسار)</value>
+  </data>
+  <data name="gallery.next" xml:space="preserve">
+    <value>التالي (السهم اليمين)</value>
+  </data>
+  <data name="menu.beatmaps._" xml:space="preserve">
+    <value>خرائط الموسيقى</value>
+  </data>
+  <data name="menu.beatmaps.artists" xml:space="preserve">
+    <value>الفنانين الموصى بهم</value>
+  </data>
+  <data name="menu.beatmaps.index" xml:space="preserve">
+    <value>القائمة</value>
+  </data>
+  <data name="menu.beatmaps.packs" xml:space="preserve">
+    <value>حزم</value>
+  </data>
+  <data name="menu.community._" xml:space="preserve">
+    <value>المجتمع</value>
+  </data>
+  <data name="menu.community.chat" xml:space="preserve">
+    <value>محادثة</value>
+  </data>
+  <data name="menu.community.contests" xml:space="preserve">
+    <value>مسابقة</value>
+  </data>
+  <data name="menu.community.dev" xml:space="preserve">
+    <value>التطوير</value>
+  </data>
+  <data name="menu.community.forum-forums-index" xml:space="preserve">
+    <value>المنتديات</value>
+  </data>
+  <data name="menu.community.getlive" xml:space="preserve">
+    <value>مباشر</value>
+  </data>
+  <data name="menu.community.tournaments" xml:space="preserve">
+    <value>البطولات</value>
+  </data>
+  <data name="menu.help._" xml:space="preserve">
+    <value>مساعدة</value>
+  </data>
+  <data name="menu.help.getabuse" xml:space="preserve">
+    <value>الإبلاغ عن إساءة</value>
+  </data>
+  <data name="menu.help.getfaq" xml:space="preserve">
+    <value>الأسئلة الشائعة</value>
+  </data>
+  <data name="menu.help.getrules" xml:space="preserve">
+    <value>القوانين</value>
+  </data>
+  <data name="menu.help.getsupport" xml:space="preserve">
+    <value>لا، حقاً، أنا بحاجة إلى مساعدة!</value>
+  </data>
+  <data name="menu.help.getwiki" xml:space="preserve">
+    <value>ويكي</value>
+  </data>
+  <data name="menu.home._" xml:space="preserve">
+    <value>الرئيسية</value>
+  </data>
+  <data name="menu.home.changelog-index" xml:space="preserve">
+    <value>سِجل التغييرات</value>
+  </data>
+  <data name="menu.home.getdownload" xml:space="preserve">
+    <value>تحميل</value>
+  </data>
+  <data name="menu.home.news-index" xml:space="preserve">
+    <value>الأخبار</value>
+  </data>
+  <data name="menu.home.search" xml:space="preserve">
+    <value>البحث</value>
+  </data>
+  <data name="menu.home.team" xml:space="preserve">
+    <value>الفريق</value>
+  </data>
+  <data name="menu.rankings._" xml:space="preserve">
+    <value>الترتيب</value>
+  </data>
+  <data name="menu.rankings.charts" xml:space="preserve">
+    <value>منطقة ألأضواء</value>
+  </data>
+  <data name="menu.rankings.country" xml:space="preserve">
+    <value>الدولة</value>
+  </data>
+  <data name="menu.rankings.index" xml:space="preserve">
+    <value>الأداء</value>
+  </data>
+  <data name="menu.rankings.kudosu" xml:space="preserve">
+    <value>كودوسو</value>
+  </data>
+  <data name="menu.rankings.multiplayer" xml:space="preserve">
+    <value>متعدد اللاعبين</value>
+  </data>
+  <data name="menu.rankings.score" xml:space="preserve">
+    <value>النتيجة</value>
+  </data>
+  <data name="menu.store._" xml:space="preserve">
+    <value>المتجر</value>
+  </data>
+  <data name="menu.store.cart-show" xml:space="preserve">
+    <value>عربة التسوق</value>
+  </data>
+  <data name="menu.store.getlisting" xml:space="preserve">
+    <value>القائمة</value>
+  </data>
+  <data name="menu.store.orders-index" xml:space="preserve">
+    <value>تاريخ الطلب</value>
+  </data>
+  <data name="footer.general._" xml:space="preserve">
+    <value>عام</value>
+  </data>
+  <data name="footer.general.home" xml:space="preserve">
+    <value>الرئيسية</value>
+  </data>
+  <data name="footer.general.changelog-index" xml:space="preserve">
+    <value>سِجل التغييرات</value>
+  </data>
+  <data name="footer.general.beatmaps" xml:space="preserve">
+    <value>قائمة الخرائط</value>
+  </data>
+  <data name="footer.general.download" xml:space="preserve">
+    <value>تحميل osu!</value>
+  </data>
+  <data name="footer.help._" xml:space="preserve">
+    <value>المساعدة والمجتمع</value>
+  </data>
+  <data name="footer.help.faq" xml:space="preserve">
+    <value>الأسئلة الشائعة</value>
+  </data>
+  <data name="footer.help.forum" xml:space="preserve">
+    <value>منتديات المجتمع</value>
+  </data>
+  <data name="footer.help.livestreams" xml:space="preserve">
+    <value>البث المباشر</value>
+  </data>
+  <data name="footer.help.report" xml:space="preserve">
+    <value>أبلغ عن مشكلة</value>
+  </data>
+  <data name="footer.help.wiki" xml:space="preserve">
+    <value>ويكي</value>
+  </data>
+  <data name="footer.legal._" xml:space="preserve">
+    <value>القوانين والحالات</value>
+  </data>
+  <data name="footer.legal.copyright" xml:space="preserve">
+    <value>حقوق الطبع والنشر (DMCA)</value>
+  </data>
+  <data name="footer.legal.privacy" xml:space="preserve">
+    <value>الخصوصية</value>
+  </data>
+  <data name="footer.legal.server_status" xml:space="preserve">
+    <value>حالة الخادم</value>
+  </data>
+  <data name="footer.legal.source_code" xml:space="preserve">
+    <value>الشفرة المصدرية</value>
+  </data>
+  <data name="footer.legal.terms" xml:space="preserve">
+    <value>المفردات</value>
+  </data>
+  <data name="errors.400.error" xml:space="preserve">
+    <value>تعديلات الطلب خاطئة</value>
+  </data>
+  <data name="errors.404.error" xml:space="preserve">
+    <value>صفحة مفقودة</value>
+  </data>
+  <data name="errors.404.description" xml:space="preserve">
+    <value>عذراً، ولكن الصفحة التي طلبتها ليست هنا!</value>
+  </data>
+  <data name="errors.403.error" xml:space="preserve">
+    <value>يجب أن لا تكون هنا.</value>
+  </data>
+  <data name="errors.403.description" xml:space="preserve">
+    <value>على الرغم من ذلك, يمكنك محاولة العودة.</value>
+  </data>
+  <data name="errors.401.error" xml:space="preserve">
+    <value>يجب أن لا تكون هنا.</value>
+  </data>
+  <data name="errors.401.description" xml:space="preserve">
+    <value>يمكنك العودة رغما عن ذلك. او تسجيل الدخول.</value>
+  </data>
+  <data name="errors.405.error" xml:space="preserve">
+    <value>صفحة مفقودة</value>
+  </data>
+  <data name="errors.405.description" xml:space="preserve">
+    <value>عذراً، ولكن الصفحة التي طلبتها ليست هنا!</value>
+  </data>
+  <data name="errors.422.error" xml:space="preserve">
+    <value>تعديلات الطلب خاطئة</value>
+  </data>
+  <data name="errors.429.error" xml:space="preserve">
+    <value>تجاوزت افصى حد</value>
+  </data>
+  <data name="errors.500.error" xml:space="preserve">
+    <value>اوه لا! كسر شيء! ;_;</value>
+  </data>
+  <data name="errors.500.description" xml:space="preserve">
+    <value>نحن معلمون تلقائيا بكل خطأ.</value>
+  </data>
+  <data name="errors.fatal.error" xml:space="preserve">
+    <value>اوه لا! كسر شيء (badly)! ;_;</value>
+  </data>
+  <data name="errors.fatal.description" xml:space="preserve">
+    <value>نحن معلمون تلقائيا بكل خطأ.</value>
+  </data>
+  <data name="errors.503.error" xml:space="preserve">
+    <value>مغلق للصيانة!</value>
+  </data>
+  <data name="errors.503.description" xml:space="preserve">
+    <value>عادة ما تستغرق الصيانة في أي مكان من 5 ثوان لمدة 10 دقائق. إذا كنا مغلقين لفترة أطول، انظر الى {0} لمزيد من المعلومات.</value>
+  </data>
+  <data name="errors.reference" xml:space="preserve">
+    <value>فقط في حالة، هنا رمز يمكنك إعطاءه للدعم!</value>
+  </data>
+  <data name="popup_login.button" xml:space="preserve">
+    <value>تسجيل الدخول / إنشاء حساب</value>
+  </data>
+  <data name="popup_login.login.forgot" xml:space="preserve">
+    <value>لقد نسيت بياناتي</value>
+  </data>
+  <data name="popup_login.login.password" xml:space="preserve">
+    <value>كلمة السر</value>
+  </data>
+  <data name="popup_login.login.title" xml:space="preserve">
+    <value>قم بتسجيل الدخول للمتابعة</value>
+  </data>
+  <data name="popup_login.login.username" xml:space="preserve">
+    <value>اسم المستخدم</value>
+  </data>
+  <data name="popup_login.login.error.email" xml:space="preserve">
+    <value>إسم المستخدم أو كلمة المرور غير موجودة</value>
+  </data>
+  <data name="popup_login.login.error.password" xml:space="preserve">
+    <value>كلمة المرور غير صحيحة</value>
+  </data>
+  <data name="popup_login.register.download" xml:space="preserve">
+    <value>تحميل</value>
+  </data>
+  <data name="popup_login.register.info" xml:space="preserve">
+    <value>تحتاج الى حساب، سيدي. لماذا لا تملك واحد اساساََ؟</value>
+  </data>
+  <data name="popup_login.register.title" xml:space="preserve">
+    <value>ليس لديك حساب؟</value>
+  </data>
+  <data name="popup_user.links.account-edit" xml:space="preserve">
+    <value>الاعدادات</value>
+  </data>
+  <data name="popup_user.links.follows" xml:space="preserve">
+    <value>قوائم المشاهدة</value>
+  </data>
+  <data name="popup_user.links.friends" xml:space="preserve">
+    <value>الأصدقاء</value>
+  </data>
+  <data name="popup_user.links.logout" xml:space="preserve">
+    <value>تسجيل الخروج</value>
+  </data>
+  <data name="popup_user.links.profile" xml:space="preserve">
+    <value>الصفحة الشخصية</value>
+  </data>
+  <data name="popup_search.initial" xml:space="preserve">
+    <value>اكتب للبحث!</value>
+  </data>
+  <data name="popup_search.retry" xml:space="preserve">
+    <value>فشل البحث. انقر لإعادة المحاولة.</value>
+  </data>
+</root>

@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>Hiện tại beatmap này không có sẵn để tải xuống.</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>Một phần của beatmap này đã bị xóa bỏ theo yêu cầu của người tạo lập hoặc bên người có quyền bên thứ ba.</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>Nhấp vào đây để biết thêm thông tin.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Danh Sách Beatmap</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>Beatmaps</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>tải xuống</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>tải xuống cùng video</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>tải xuống không video</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>mở trong osu!direct</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>Góc Thảo Luận</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>Yêu thích beatmapset này</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>Bạn cần phải đăng nhập trước khi tải xuống beatmap!</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>được tạo bởi {0}</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>Bỏ yêu thích beatmapset này</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>cập nhật lần cuối vào {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>Tải Xuống</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>không Video</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>cùng Video</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>để truy cập vào nhiều tính năng hơn</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>Đăng Nhập</value>
+  </data>
+  <data name="show.details_date.approved" xml:space="preserve">
+    <value>được chấp nhận {0}</value>
+  </data>
+  <data name="show.details_date.loved" xml:space="preserve">
+    <value>được yêu thích {0}</value>
+  </data>
+  <data name="show.details_date.ranked" xml:space="preserve">
+    <value>được xếp hạng {0}</value>
+  </data>
+  <data name="show.details_date.submitted" xml:space="preserve">
+    <value>được đăng {0}</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>cập nhật lần cuối {0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>Bạn có quá nhiều beatmap yêu thích! Hãy hũy yêu thích vài beatmap và thử lại sau.</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>Hype nếu bạn thích map này để giúp nó tiến tới trạng thái &lt;strong&gt;Được xếp hạng&lt;/strong&gt;.</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>Map này đang ở trạng thái {0}.</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>chờ</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>qualified</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>đang thực hiện</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>Báo cáo vấn đề</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>đây</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>Mô Tả</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>Thể Loại</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>Ngôn Ngữ</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>Vẫn đang tính toán dữ liệu...</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>Tỉ Lệ Thất Bại</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>Nguồn</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>Tỉ Lệ Thành Công</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>Tags</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.disable" xml:space="preserve">
+    <value>Ẩn thông báo</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.listing" xml:space="preserve">
+    <value>Danh sách beatmap</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.show" xml:space="preserve">
+    <value>Hiển thị</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>đạt được {0}</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>Hạng Quốc Gia</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>Hạng Bạn Bè</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>Hạng Toàn Cầu</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>Nhấp vào &lt;a href="{0}"&gt;đây&lt;/a&gt; để biết thêm những tính năng bạn có thể nhận!</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>Bạn cần là người ủng hộ để truy cập xếp hạng bạn bè và quốc gia!</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>Bảng Xếp hạng</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>Độ Chính Xác</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>Combo Tối Đa</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>Miss</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>Mods</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>Người Chơi</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>Xếp Hạng</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>Tổng Điểm</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>Điểm</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>Thời gian</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>Chưa có ai từ quốc gia của bạn lập điểm số tại beatmap này!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>Chưa có bạn bè nào của bạn lập điểm số tại beatmap này!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>Chưa có điểm số. Hãy thử lập một vài điểm số xem?</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>Đang tải điểm số...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>Beatmap chưa được xếp hạng.</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>Dẫn Đầu</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>Tốt Nhất Của Bạn</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>Kích Cỡ Nốt</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>Số Phím</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>Độ Giảm HP</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>Độ Chính Xác</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>Tốc Độ Tiếp Cận</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>Độ Khó</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>Độ Dài</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>Số Nốt Bấm</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>Số Nốt Trượt</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>Đánh Giá</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>Phân Loại Đánh Giá</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>Đề cử</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>Đã chơi</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>Đã được xếp hạng</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>Được Chấp Nhận</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>Được yêu thích</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>Qualified</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>Đang Chờ</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>Graveyard</value>
+  </data>
+</root>

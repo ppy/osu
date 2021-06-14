@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="edit.title_compact" xml:space="preserve">
+    <value>الإعدادات</value>
+  </data>
+  <data name="edit.username" xml:space="preserve">
+    <value>اسم المستخدم</value>
+  </data>
+  <data name="edit.avatar.title" xml:space="preserve">
+    <value>الصورة الشخصية</value>
+  </data>
+  <data name="edit.avatar.rules" xml:space="preserve">
+    <value>يرجى التأكد من ان صورتك تلتزم بـ{0}&lt;br/&gt;هذا يعني انه يجب ان تكون &lt;strong&gt;مناسبة لجميع الأعمار&lt;/strong&gt;. أي بلا تعري أو الفاظ نابية أو محتوى عنيف.</value>
+  </data>
+  <data name="edit.avatar.rules_link" xml:space="preserve">
+    <value>قوانين المجتمع</value>
+  </data>
+  <data name="edit.email.current" xml:space="preserve">
+    <value>البريد الإلكتروني الحالي</value>
+  </data>
+  <data name="edit.email.new" xml:space="preserve">
+    <value>بريد إلكتروني جديد</value>
+  </data>
+  <data name="edit.email.new_confirmation" xml:space="preserve">
+    <value>تأكيد البريد الإلكتروني</value>
+  </data>
+  <data name="edit.email.title" xml:space="preserve">
+    <value>البريد الإلكتروني</value>
+  </data>
+  <data name="edit.password.current" xml:space="preserve">
+    <value>كلمة المرور الحالية</value>
+  </data>
+  <data name="edit.password.new" xml:space="preserve">
+    <value>كلمة المرور الجديدة</value>
+  </data>
+  <data name="edit.password.new_confirmation" xml:space="preserve">
+    <value>تأكيد كلمة المرور</value>
+  </data>
+  <data name="edit.password.title" xml:space="preserve">
+    <value>كلمة المرور</value>
+  </data>
+  <data name="edit.profile.title" xml:space="preserve">
+    <value>الملف الشخصي</value>
+  </data>
+  <data name="edit.profile.user.user_from" xml:space="preserve">
+    <value>الموقع الحالي</value>
+  </data>
+  <data name="edit.profile.user.user_interests" xml:space="preserve">
+    <value>الاهتمامات</value>
+  </data>
+  <data name="edit.profile.user.user_occ" xml:space="preserve">
+    <value>المهنة</value>
+  </data>
+  <data name="edit.profile.user.user_website" xml:space="preserve">
+    <value>موقع شخصي</value>
+  </data>
+  <data name="edit.signature.title" xml:space="preserve">
+    <value>التوقيع</value>
+  </data>
+  <data name="edit.signature.update" xml:space="preserve">
+    <value>تحديث</value>
+  </data>
+  <data name="notifications.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>تلقي إشعارات عن مشاكل جديدة في الخرائط المؤهلة على الأنماط التالية</value>
+  </data>
+  <data name="notifications.beatmapset_disqualify" xml:space="preserve">
+    <value>تلقي إشعارات عندما تكون الخرائط للأنماط التالية غير مؤهلة</value>
+  </data>
+  <data name="notifications.comment_reply" xml:space="preserve">
+    <value>تلقي إشعارات الردود على تعليقاتك</value>
+  </data>
+  <data name="notifications.title" xml:space="preserve">
+    <value>الإشعارات</value>
+  </data>
+  <data name="notifications.topic_auto_subscribe" xml:space="preserve">
+    <value>تمكين الإشعارات تلقائياً حول مواضيع المنتدى الجديدة التي تنشئها</value>
+  </data>
+  <data name="notifications.options._" xml:space="preserve">
+    <value>خيارات التوصيل</value>
+  </data>
+  <data name="notifications.options.beatmap_owner_change" xml:space="preserve">
+    <value>صعوبة ضيف</value>
+  </data>
+  <data name="notifications.options.beatmapset:modding" xml:space="preserve">
+    <value>اقتراحات الخريطة</value>
+  </data>
+  <data name="notifications.options.channel_message" xml:space="preserve">
+    <value>الرسائل الخاصة</value>
+  </data>
+  <data name="notifications.options.comment_new" xml:space="preserve">
+    <value>تعليقات جديدة</value>
+  </data>
+  <data name="notifications.options.forum_topic_reply" xml:space="preserve">
+    <value>رد الموضوع</value>
+  </data>
+  <data name="notifications.options.mail" xml:space="preserve">
+    <value>البريد</value>
+  </data>
+  <data name="notifications.options.mapping" xml:space="preserve">
+    <value>مُنشئ خرائط</value>
+  </data>
+  <data name="notifications.options.push" xml:space="preserve">
+    <value>دفع</value>
+  </data>
+  <data name="notifications.options.user_achievement_unlock" xml:space="preserve">
+    <value>تم فتح ميدالية المستخدم</value>
+  </data>
+  <data name="oauth.authorized_clients" xml:space="preserve">
+    <value>العملاء المصرح لهم</value>
+  </data>
+  <data name="oauth.own_clients" xml:space="preserve">
+    <value>العملاء الخاصين بك</value>
+  </data>
+  <data name="oauth.title" xml:space="preserve">
+    <value>OAuth</value>
+  </data>
+  <data name="options.beatmapset_show_nsfw" xml:space="preserve">
+    <value>إخفاء تحذيرات للمحتوى الحساس في الخرائط</value>
+  </data>
+  <data name="options.beatmapset_title_show_original" xml:space="preserve">
+    <value>إظهار بيانات تعريف الخرائط باللغة الأصلية</value>
+  </data>
+  <data name="options.title" xml:space="preserve">
+    <value>الخيارات</value>
+  </data>
+  <data name="options.beatmapset_download._" xml:space="preserve">
+    <value>نوع تحميل الخريطة الافتراضي</value>
+  </data>
+  <data name="options.beatmapset_download.all" xml:space="preserve">
+    <value>مع الفيديو إذا كان متاحا</value>
+  </data>
+  <data name="options.beatmapset_download.direct" xml:space="preserve">
+    <value>فتح في osu!direct</value>
+  </data>
+  <data name="options.beatmapset_download.no_video" xml:space="preserve">
+    <value>دون الفيديو</value>
+  </data>
+  <data name="playstyles.keyboard" xml:space="preserve">
+    <value>لوحة المفاتيح</value>
+  </data>
+  <data name="playstyles.mouse" xml:space="preserve">
+    <value>الفأرة</value>
+  </data>
+  <data name="playstyles.tablet" xml:space="preserve">
+    <value>لوحة وقلم رقمي</value>
+  </data>
+  <data name="playstyles.title" xml:space="preserve">
+    <value>أساليب اللعب</value>
+  </data>
+  <data name="playstyles.touch" xml:space="preserve">
+    <value>شاشة لمس</value>
+  </data>
+  <data name="privacy.friends_only" xml:space="preserve">
+    <value>حظر الرسائل الخاصة من الأشخاص غير المدرجين في قائمة اصدقائك</value>
+  </data>
+  <data name="privacy.hide_online" xml:space="preserve">
+    <value>إخفاء وجودك على الموقع</value>
+  </data>
+  <data name="privacy.title" xml:space="preserve">
+    <value>الخصوصية</value>
+  </data>
+  <data name="security.current_session" xml:space="preserve">
+    <value>الحالي</value>
+  </data>
+  <data name="security.end_session" xml:space="preserve">
+    <value>إنهاء الجلسة</value>
+  </data>
+  <data name="security.end_session_confirmation" xml:space="preserve">
+    <value>سيؤدي هذا إلى إنهاء جلستك فورا على ذلك الجهاز. هل أنت متأكد؟</value>
+  </data>
+  <data name="security.last_active" xml:space="preserve">
+    <value>آخر نشاط:</value>
+  </data>
+  <data name="security.title" xml:space="preserve">
+    <value>الأمان</value>
+  </data>
+  <data name="security.web_sessions" xml:space="preserve">
+    <value>جلسات الإنترنت</value>
+  </data>
+  <data name="update_email.update" xml:space="preserve">
+    <value>تحديث</value>
+  </data>
+  <data name="update_password.update" xml:space="preserve">
+    <value>تحديث</value>
+  </data>
+  <data name="verification_completed.text" xml:space="preserve">
+    <value>يمكنك الآن إغلاق هذه النافذة</value>
+  </data>
+  <data name="verification_completed.title" xml:space="preserve">
+    <value>تم الانتهاء من التحقق</value>
+  </data>
+  <data name="verification_invalid.title" xml:space="preserve">
+    <value>رابط التحقق غير صالح أو منتهي الصلاحية</value>
+  </data>
+</root>

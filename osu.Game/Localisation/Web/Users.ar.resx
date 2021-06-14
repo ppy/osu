@@ -1,0 +1,721 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="deleted" xml:space="preserve">
+    <value>[مستخدم محذوف]</value>
+  </data>
+  <data name="beatmapset_activities.title" xml:space="preserve">
+    <value>سجل اقتراحات {0}</value>
+  </data>
+  <data name="beatmapset_activities.title_compact" xml:space="preserve">
+    <value>الإقتراحات</value>
+  </data>
+  <data name="beatmapset_activities.discussions.title_recent" xml:space="preserve">
+    <value>المناقشات التي بدأت مؤخرا</value>
+  </data>
+  <data name="beatmapset_activities.events.title_recent" xml:space="preserve">
+    <value>آخر الأحداث</value>
+  </data>
+  <data name="beatmapset_activities.posts.title_recent" xml:space="preserve">
+    <value>المنشورات الأخيرة</value>
+  </data>
+  <data name="beatmapset_activities.votes_received.title_most" xml:space="preserve">
+    <value>الأكثر تصويتاََ بواسطة (آخر ٣ اشهر)</value>
+  </data>
+  <data name="beatmapset_activities.votes_made.title_most" xml:space="preserve">
+    <value>الأكثر تصويتاََ (آخر ٣ اشهر)</value>
+  </data>
+  <data name="blocks.banner_text" xml:space="preserve">
+    <value>لقد قمت بحظر هذا المستخدم.</value>
+  </data>
+  <data name="blocks.blocked_count" xml:space="preserve">
+    <value>المستخدمون المحظورون ({0})</value>
+  </data>
+  <data name="blocks.hide_profile" xml:space="preserve">
+    <value>إخفاء الملف الشخصي</value>
+  </data>
+  <data name="blocks.not_blocked" xml:space="preserve">
+    <value>هذا المستخدم ليس محظوراََ.</value>
+  </data>
+  <data name="blocks.show_profile" xml:space="preserve">
+    <value>عرض الملف الشخصي</value>
+  </data>
+  <data name="blocks.too_many" xml:space="preserve">
+    <value>تم الوصول للحد الأقصى للحظر.</value>
+  </data>
+  <data name="blocks.button.block" xml:space="preserve">
+    <value>حظر</value>
+  </data>
+  <data name="blocks.button.unblock" xml:space="preserve">
+    <value>إلغاء الحظر</value>
+  </data>
+  <data name="card.loading" xml:space="preserve">
+    <value>جاري التحميل...</value>
+  </data>
+  <data name="card.send_message" xml:space="preserve">
+    <value>إرسال رسالة</value>
+  </data>
+  <data name="disabled.title" xml:space="preserve">
+    <value>اه-اوه! يبدو انه قد تم تعطيل حسابك.</value>
+  </data>
+  <data name="disabled.warning" xml:space="preserve">
+    <value>في حالة مخالفَتِكَ لِقاعِدة, خذ بعين الاِعتبار ان هنالك حظر لمدة شهر واحد لم يكون ضمنه اي طلبات عفو. بعد هذه المدة, قد يكون من الضرورة مراسلتنا. برجاء الاِنتباه الى ان انشاءكَ لحِساب في هذه الفترة سيؤدي الى &lt;strong&gt;زيادة في فترة حظر الشهر الواحد&lt;/strong&gt;. يرجى الاِنتباه ايضاََ الى ان &lt;strong&gt;كل حساب تنشأهُ, فأِنك تنتهك القوانين اكثر&lt;/strong&gt;. ننصحك وبشدة ان لا تتجه لهذا المسار المظلم!</value>
+  </data>
+  <data name="disabled.if_mistake._" xml:space="preserve">
+    <value>اذا كنت تعتقد ان هذا خطأ, انت مرحب بمراسلتنا ( على {0} او بالنقر على "؟" على اسغل زاوية-اليد-اليمنى من هذه الصفحة). ارجوك تفهم اننا واثقون دائماََ من جميع اجرائاتِنا, بحسبِ انها تستند الى معلومات دقيقة جداََ. لدينا الحق في مخالفة طلبك اعتقدنا انه يبدو غير صادق.</value>
+  </data>
+  <data name="disabled.if_mistake.email" xml:space="preserve">
+    <value>البريد الإلكتروني</value>
+  </data>
+  <data name="disabled.reasons.compromised" xml:space="preserve">
+    <value>تم اتخاذ اِجراءات بحق حِسابِك. قد يكون معطلاََ مؤقتاََ حتى تؤكَدَ هويتهُ.</value>
+  </data>
+  <data name="disabled.reasons.opening" xml:space="preserve">
+    <value>هنالك عدد من الأسباب التي تجعل من حِسابِك معطلاََ:</value>
+  </data>
+  <data name="disabled.reasons.tos._" xml:space="preserve">
+    <value>لقد خرقت واحداََ او اكثر من {0} او {1}.</value>
+  </data>
+  <data name="disabled.reasons.tos.community_rules" xml:space="preserve">
+    <value>قوانين المجتمع</value>
+  </data>
+  <data name="disabled.reasons.tos.tos" xml:space="preserve">
+    <value>بنود الخدمة</value>
+  </data>
+  <data name="filtering.by_game_mode" xml:space="preserve">
+    <value>الأعضاء حسب نمط اللعبة</value>
+  </data>
+  <data name="force_reactivation.reason.inactive_different_country" xml:space="preserve">
+    <value>لم تستعمل حسابك منذ وقتِِ طويل.</value>
+  </data>
+  <data name="login._" xml:space="preserve">
+    <value>تسجيل الدخول</value>
+  </data>
+  <data name="login.button" xml:space="preserve">
+    <value>تسجيل الدخول</value>
+  </data>
+  <data name="login.button_posting" xml:space="preserve">
+    <value>يسجل الدخول...</value>
+  </data>
+  <data name="login.email_login_disabled" xml:space="preserve">
+    <value>تسجيل الدخول بالبريد الالكتروني معطل حالياََ. برجاء تسجيل الدخول عن طريق اسم المستخدم بدلا من ذلك.</value>
+  </data>
+  <data name="login.failed" xml:space="preserve">
+    <value>تسجيل دخول غير صحيح</value>
+  </data>
+  <data name="login.forgot" xml:space="preserve">
+    <value>نسيت كلمة المرور؟</value>
+  </data>
+  <data name="login.info" xml:space="preserve">
+    <value>الرجاء تسجيل الدخول للاستمرار</value>
+  </data>
+  <data name="login.invalid_captcha" xml:space="preserve">
+    <value>فَشِلت الكابتشا، قم بتحديث الصفحة وحاول مرة أخرى.</value>
+  </data>
+  <data name="login.locked_ip" xml:space="preserve">
+    <value>عنوان IP الخاص بك مؤمن. الرجاء الانتظار بضع دقائق.</value>
+  </data>
+  <data name="login.password" xml:space="preserve">
+    <value>كلمة السر</value>
+  </data>
+  <data name="login.register" xml:space="preserve">
+    <value>ليس لديك حساب osu!؟ قم باِنشاء واحد</value>
+  </data>
+  <data name="login.remember" xml:space="preserve">
+    <value>تذكر هذا الجهاز</value>
+  </data>
+  <data name="login.title" xml:space="preserve">
+    <value>الرجاء تسجيل الدخول للمضي قدما</value>
+  </data>
+  <data name="login.username" xml:space="preserve">
+    <value>اسم المستخدم</value>
+  </data>
+  <data name="login.beta.main" xml:space="preserve">
+    <value>وصول البيتا مقيد حالياََ للمستخدمين ذوي الاِمتيازات فقط.</value>
+  </data>
+  <data name="login.beta.small" xml:space="preserve">
+    <value>(سوف يحصل عليه osu!supporters قريبا)</value>
+  </data>
+  <data name="posts.title" xml:space="preserve">
+    <value>{0} منشورات</value>
+  </data>
+  <data name="anonymous.login_link" xml:space="preserve">
+    <value>انقر لتسجيل الدخول</value>
+  </data>
+  <data name="anonymous.login_text" xml:space="preserve">
+    <value>تسجيل الدخول</value>
+  </data>
+  <data name="anonymous.username" xml:space="preserve">
+    <value>زائر</value>
+  </data>
+  <data name="anonymous.error" xml:space="preserve">
+    <value>تحتاج إلى تسجيل الدخول للقيام بذلك.</value>
+  </data>
+  <data name="logout_confirm" xml:space="preserve">
+    <value>أتريد تسجيل الخروج حقا؟ :(</value>
+  </data>
+  <data name="report.button_text" xml:space="preserve">
+    <value>اِبلاغ</value>
+  </data>
+  <data name="report.comments" xml:space="preserve">
+    <value>تعليقات إضافية</value>
+  </data>
+  <data name="report.placeholder" xml:space="preserve">
+    <value>يرجى تقديم أي معلومات تعتقد انه يمكن أن تكون مفيدة.</value>
+  </data>
+  <data name="report.reason" xml:space="preserve">
+    <value>السبب</value>
+  </data>
+  <data name="report.thanks" xml:space="preserve">
+    <value>شكرا لبلاغِك!</value>
+  </data>
+  <data name="report.title" xml:space="preserve">
+    <value>الاِبلاغ عن {0}؟</value>
+  </data>
+  <data name="report.actions.send" xml:space="preserve">
+    <value>إرسال البلاغ</value>
+  </data>
+  <data name="report.actions.cancel" xml:space="preserve">
+    <value>إلغاء</value>
+  </data>
+  <data name="report.options.cheating" xml:space="preserve">
+    <value>لعب مؤذي/ غش</value>
+  </data>
+  <data name="report.options.insults" xml:space="preserve">
+    <value>اهانتي / اهانة الاخرين</value>
+  </data>
+  <data name="report.options.spam" xml:space="preserve">
+    <value>سبام</value>
+  </data>
+  <data name="report.options.unwanted_content" xml:space="preserve">
+    <value>ربط عن محتوى غير لائق</value>
+  </data>
+  <data name="report.options.nonsense" xml:space="preserve">
+    <value>هُراء</value>
+  </data>
+  <data name="report.options.other" xml:space="preserve">
+    <value>أخرى (اكتب أدناه)</value>
+  </data>
+  <data name="restricted_banner.title" xml:space="preserve">
+    <value>تم تقييد حسابك!</value>
+  </data>
+  <data name="restricted_banner.message" xml:space="preserve">
+    <value>عندما تكون مقيداََ, سوف تمنع من مراسلة الاخرين ونتائج ستكون ظاهرة لك فقط. هذه عادة نتيجة تلقائية وسوف تختفي خلال 24 ساعة. اذا كنت تريد الغاء تقييدك, ارجوك &lt;a href="mailto{0}@ppy.sh"&gt;اتصل بالدعم&lt;/a&gt;.</value>
+  </data>
+  <data name="show.age" xml:space="preserve">
+    <value>{0} سنة</value>
+  </data>
+  <data name="show.change_avatar" xml:space="preserve">
+    <value>غير صورتك!</value>
+  </data>
+  <data name="show.first_members" xml:space="preserve">
+    <value>هنا منذ البداية</value>
+  </data>
+  <data name="show.is_developer" xml:space="preserve">
+    <value>مطور!osu</value>
+  </data>
+  <data name="show.is_supporter" xml:space="preserve">
+    <value>osu!supporter</value>
+  </data>
+  <data name="show.joined_at" xml:space="preserve">
+    <value>انضم في {0}</value>
+  </data>
+  <data name="show.lastvisit" xml:space="preserve">
+    <value>اخر ظهور {0}</value>
+  </data>
+  <data name="show.lastvisit_online" xml:space="preserve">
+    <value>متصل حالياً</value>
+  </data>
+  <data name="show.missingtext" xml:space="preserve">
+    <value>لقد ادخلت معلومات خاطئة! (او قد يكون المستخدم مقيد)</value>
+  </data>
+  <data name="show.origin_country" xml:space="preserve">
+    <value>من {0}</value>
+  </data>
+  <data name="show.previous_usernames" xml:space="preserve">
+    <value>سابقاََ</value>
+  </data>
+  <data name="show.plays_with" xml:space="preserve">
+    <value>يستخدم {0}</value>
+  </data>
+  <data name="show.title" xml:space="preserve">
+    <value>صفحة{0} الشخصية</value>
+  </data>
+  <data name="show.comments_count._" xml:space="preserve">
+    <value>نَشَر {0}</value>
+  </data>
+  <data name="show.comments_count.count" xml:space="preserve">
+    <value>{0} تعليق|{0} تعليقات</value>
+  </data>
+  <data name="show.edit.cover.button" xml:space="preserve">
+    <value>تغيير صورة الغلاف</value>
+  </data>
+  <data name="show.edit.cover.defaults_info" xml:space="preserve">
+    <value>خيارات اغلفة اضافية ستكون متاحة في المستقبل</value>
+  </data>
+  <data name="show.edit.cover.upload.broken_file" xml:space="preserve">
+    <value>فشلت معالجة الصورة. تحقق من الصورة المرفوعة وحاول مرة أخرى.</value>
+  </data>
+  <data name="show.edit.cover.upload.button" xml:space="preserve">
+    <value>رفع صورة</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone" xml:space="preserve">
+    <value>اَسقط الملف هنا للرفع</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone_info" xml:space="preserve">
+    <value>يمكنك أيضا إسقاط الصورة هنا للرفع</value>
+  </data>
+  <data name="show.edit.cover.upload.size_info" xml:space="preserve">
+    <value>حجم الغلاف يجب ان يكون 2400x640</value>
+  </data>
+  <data name="show.edit.cover.upload.too_large" xml:space="preserve">
+    <value>الملف المرفوع كبير جدا.</value>
+  </data>
+  <data name="show.edit.cover.upload.unsupported_format" xml:space="preserve">
+    <value>تنسيق غير مدعوم.</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info._" xml:space="preserve">
+    <value>الرفع متاح لـ {0} فقط</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info.link" xml:space="preserve">
+    <value>osu!supporters</value>
+  </data>
+  <data name="show.edit.default_playmode.is_default_tooltip" xml:space="preserve">
+    <value>الوضع الافتراضي للعبة</value>
+  </data>
+  <data name="show.edit.default_playmode.set" xml:space="preserve">
+    <value>عين {0} كالوضع الافتراضي للعبة</value>
+  </data>
+  <data name="show.extra.none" xml:space="preserve">
+    <value>بلا</value>
+  </data>
+  <data name="show.extra.unranked" xml:space="preserve">
+    <value>لا نتائج اخيرة</value>
+  </data>
+  <data name="show.extra.achievements.achieved-on" xml:space="preserve">
+    <value>احتُل عند {0}</value>
+  </data>
+  <data name="show.extra.achievements.locked" xml:space="preserve">
+    <value>مُغلق</value>
+  </data>
+  <data name="show.extra.achievements.title" xml:space="preserve">
+    <value>الانجازات</value>
+  </data>
+  <data name="show.extra.beatmaps.by_artist" xml:space="preserve">
+    <value>بواسطة {0}</value>
+  </data>
+  <data name="show.extra.beatmaps.title" xml:space="preserve">
+    <value>خرائط الايقاع</value>
+  </data>
+  <data name="show.extra.beatmaps.favourite.title" xml:space="preserve">
+    <value>الخرائط المفضلة</value>
+  </data>
+  <data name="show.extra.beatmaps.graveyard.title" xml:space="preserve">
+    <value>الخرائط المقبورة</value>
+  </data>
+  <data name="show.extra.beatmaps.loved.title" xml:space="preserve">
+    <value>الخرائط المُحَبَبة</value>
+  </data>
+  <data name="show.extra.beatmaps.ranked_and_approved.title" xml:space="preserve">
+    <value>الخرائط المصفوفة والمقبولة</value>
+  </data>
+  <data name="show.extra.beatmaps.unranked.title" xml:space="preserve">
+    <value>الخرائط المعلقة</value>
+  </data>
+  <data name="show.extra.discussions.title" xml:space="preserve">
+    <value>المناقشات</value>
+  </data>
+  <data name="show.extra.discussions.title_longer" xml:space="preserve">
+    <value>المناقشات الأخيرة</value>
+  </data>
+  <data name="show.extra.discussions.show_more" xml:space="preserve">
+    <value>رؤية المزيد من المناقشات</value>
+  </data>
+  <data name="show.extra.events.title" xml:space="preserve">
+    <value>الأحداث</value>
+  </data>
+  <data name="show.extra.events.title_longer" xml:space="preserve">
+    <value>الأحداث الأخيرة</value>
+  </data>
+  <data name="show.extra.events.show_more" xml:space="preserve">
+    <value>عرض المزيد من الأحداث</value>
+  </data>
+  <data name="show.extra.historical.title" xml:space="preserve">
+    <value>التاريخ</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.title" xml:space="preserve">
+    <value>تاريخ اللعب</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.count_label" xml:space="preserve">
+    <value>مرات اللعب</value>
+  </data>
+  <data name="show.extra.historical.most_played.count" xml:space="preserve">
+    <value>مرة لُعِبت</value>
+  </data>
+  <data name="show.extra.historical.most_played.title" xml:space="preserve">
+    <value>الخرائط الاكثر لعباََ</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.accuracy" xml:space="preserve">
+    <value>الدقة: {0}</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.title" xml:space="preserve">
+    <value>الخرائط الملعوبة اخر (24 ساعة)</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.title" xml:space="preserve">
+    <value>تاريخ مشاهدات النتائج</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.count_label" xml:space="preserve">
+    <value>مشاهدات النتائج</value>
+  </data>
+  <data name="show.extra.kudosu.recent_entries" xml:space="preserve">
+    <value>تاريخ الكودوسو الفائت</value>
+  </data>
+  <data name="show.extra.kudosu.title" xml:space="preserve">
+    <value>كودوسو!</value>
+  </data>
+  <data name="show.extra.kudosu.total" xml:space="preserve">
+    <value>عدد الكودوسو الحاصل عليها</value>
+  </data>
+  <data name="show.extra.kudosu.entry.amount" xml:space="preserve">
+    <value>{0} كودوسو</value>
+  </data>
+  <data name="show.extra.kudosu.entry.empty" xml:space="preserve">
+    <value>هذا المستخدم لم يحصل على اية كودوسو!</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.allow_kudosu.give" xml:space="preserve">
+    <value>حصل على {0} من الكودوسو التي رفضت من اقتراح على منشور {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.deny_kudosu.reset" xml:space="preserve">
+    <value>رفض {0} من منشور الاقتراح {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.delete.reset" xml:space="preserve">
+    <value>خسر {0} من حذف منشور الاقتراح {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.restore.give" xml:space="preserve">
+    <value>استلم {0} من استعادة منشور الاقتراح {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.give" xml:space="preserve">
+    <value>استلم {0} من خلال الحصول على اصوات منشور الاقتراح {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.reset" xml:space="preserve">
+    <value>خسر {0} من خلال خسارة اصوات منشور الاقتراح {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.give" xml:space="preserve">
+    <value>استلم {0} من خلال اعادة حساب منشور الاقتراح {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.reset" xml:space="preserve">
+    <value>خسر {0} من خلال اعادة حساب منشور الاقتراح {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.give" xml:space="preserve">
+    <value>استلم {0} من {1} لمنشوره في {2}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.reset" xml:space="preserve">
+    <value>إعادة تعيين كودوسو بواسطة {0} للمنشور {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.revoke" xml:space="preserve">
+    <value>رفض كودوسو بواسطة {0} للمنشور {1}</value>
+  </data>
+  <data name="show.extra.kudosu.total_info._" xml:space="preserve">
+    <value>مبنية على اساس مساهمات المستخدم في اعطاء اقتراحات الخرائط. انظر {0} لمزيد من المعلومات.</value>
+  </data>
+  <data name="show.extra.kudosu.total_info.link" xml:space="preserve">
+    <value>هذه الصفحة</value>
+  </data>
+  <data name="show.extra.me.title" xml:space="preserve">
+    <value>أنا!</value>
+  </data>
+  <data name="show.extra.medals.empty" xml:space="preserve">
+    <value>هذا المستخدم لم يحصل على أي شيئ حتى الآن. ;_;</value>
+  </data>
+  <data name="show.extra.medals.recent" xml:space="preserve">
+    <value>الأخير</value>
+  </data>
+  <data name="show.extra.medals.title" xml:space="preserve">
+    <value>الاوسمة</value>
+  </data>
+  <data name="show.extra.posts.title" xml:space="preserve">
+    <value>المنشورات</value>
+  </data>
+  <data name="show.extra.posts.title_longer" xml:space="preserve">
+    <value>المنشورات الحديثة</value>
+  </data>
+  <data name="show.extra.posts.show_more" xml:space="preserve">
+    <value>عرض المزيد من المنشورات</value>
+  </data>
+  <data name="show.extra.recent_activity.title" xml:space="preserve">
+    <value>الأخيرة</value>
+  </data>
+  <data name="show.extra.top_ranks.download_replay" xml:space="preserve">
+    <value>تحميل النتيجة</value>
+  </data>
+  <data name="show.extra.top_ranks.not_ranked" xml:space="preserve">
+    <value>فقط الخرائط المصفوفة تعطي نقاط خبرة.</value>
+  </data>
+  <data name="show.extra.top_ranks.pp_weight" xml:space="preserve">
+    <value>موزون {0}</value>
+  </data>
+  <data name="show.extra.top_ranks.view_details" xml:space="preserve">
+    <value>عرض التفاصيل</value>
+  </data>
+  <data name="show.extra.top_ranks.title" xml:space="preserve">
+    <value>النتائج</value>
+  </data>
+  <data name="show.extra.top_ranks.best.title" xml:space="preserve">
+    <value>افضل اداء</value>
+  </data>
+  <data name="show.extra.top_ranks.first.title" xml:space="preserve">
+    <value>المراكز الاولى</value>
+  </data>
+  <data name="show.extra.votes.given" xml:space="preserve">
+    <value>الأصوات المقدمة (اخر 3 اشهر)</value>
+  </data>
+  <data name="show.extra.votes.received" xml:space="preserve">
+    <value>الأصوات المستلمة (اخر 3 اشهر)</value>
+  </data>
+  <data name="show.extra.votes.title" xml:space="preserve">
+    <value>الأصوات</value>
+  </data>
+  <data name="show.extra.votes.title_longer" xml:space="preserve">
+    <value>الأصوات الأخيرة</value>
+  </data>
+  <data name="show.extra.votes.vote_count" xml:space="preserve">
+    <value>{0} صوت|{0} اصوات</value>
+  </data>
+  <data name="show.extra.account_standing.title" xml:space="preserve">
+    <value>حالة الحساب</value>
+  </data>
+  <data name="show.extra.account_standing.bad_standing" xml:space="preserve">
+    <value>حساب &lt;strong&gt;{0}&lt;/strong&gt; في حالة غير جيدة :(</value>
+  </data>
+  <data name="show.extra.account_standing.remaining_silence" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; سوف يكون قادراََ على التحدث في {1}.</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.title" xml:space="preserve">
+    <value>الحوادث الاخيرة</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.date" xml:space="preserve">
+    <value>التاريخ</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.action" xml:space="preserve">
+    <value>النشاط</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length" xml:space="preserve">
+    <value>الطول</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length_permanent" xml:space="preserve">
+    <value>دائم</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.description" xml:space="preserve">
+    <value>الوصف</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actor" xml:space="preserve">
+    <value>بواسطة {0}</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.restriction" xml:space="preserve">
+    <value>حظر</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.silence" xml:space="preserve">
+    <value>سكون</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.note" xml:space="preserve">
+    <value>ملاحظة</value>
+  </data>
+  <data name="show.info.interests" xml:space="preserve">
+    <value>الاهتمامات</value>
+  </data>
+  <data name="show.info.location" xml:space="preserve">
+    <value>الموقع الحالي</value>
+  </data>
+  <data name="show.info.occupation" xml:space="preserve">
+    <value>المهنة</value>
+  </data>
+  <data name="show.info.website" xml:space="preserve">
+    <value>الموقع</value>
+  </data>
+  <data name="show.not_found.reason_1" xml:space="preserve">
+    <value>لربما غير اسم المستخدم الخاص به.</value>
+  </data>
+  <data name="show.not_found.reason_2" xml:space="preserve">
+    <value>الحساب غير متوفر حالياََ بسبب الأمان او مشاكل اخرى.</value>
+  </data>
+  <data name="show.not_found.reason_3" xml:space="preserve">
+    <value>لربما قمت بخطأ!</value>
+  </data>
+  <data name="show.not_found.reason_header" xml:space="preserve">
+    <value>هناك عدة اسباب لهذا:</value>
+  </data>
+  <data name="show.not_found.title" xml:space="preserve">
+    <value>لم يتم العثور على المستخدم ! ;_;</value>
+  </data>
+  <data name="show.page.button" xml:space="preserve">
+    <value>تعديل الملف الشخصي</value>
+  </data>
+  <data name="show.page.description" xml:space="preserve">
+    <value>&lt;strong&gt;انا!&lt;/strong&gt; هي منطقة تخصصها بنفسك لعرض ما تريده للزوار.</value>
+  </data>
+  <data name="show.page.edit_big" xml:space="preserve">
+    <value>عدلني!</value>
+  </data>
+  <data name="show.page.placeholder" xml:space="preserve">
+    <value>ادخل محتوى الصفحة هنا</value>
+  </data>
+  <data name="show.page.restriction_info._" xml:space="preserve">
+    <value>تحتاج ان تكون {0} لفتح هذه الميزة.</value>
+  </data>
+  <data name="show.page.restriction_info.link" xml:space="preserve">
+    <value>osu!supporter</value>
+  </data>
+  <data name="show.post_count._" xml:space="preserve">
+    <value>ساهم بـ {0}</value>
+  </data>
+  <data name="show.post_count.count" xml:space="preserve">
+    <value>{0} منشور منتدى"{0} منشورات المنتدى</value>
+  </data>
+  <data name="show.rank.country" xml:space="preserve">
+    <value>ترتيب الدولة لـ {0}</value>
+  </data>
+  <data name="show.rank.country_simple" xml:space="preserve">
+    <value>ترتيب الدولة</value>
+  </data>
+  <data name="show.rank.global" xml:space="preserve">
+    <value>الترتيب العالمي لـ {0}</value>
+  </data>
+  <data name="show.rank.global_simple" xml:space="preserve">
+    <value>الترتيب العالمي</value>
+  </data>
+  <data name="show.stats.hit_accuracy" xml:space="preserve">
+    <value>دقة التصويب</value>
+  </data>
+  <data name="show.stats.level" xml:space="preserve">
+    <value>المستوى {0}</value>
+  </data>
+  <data name="show.stats.level_progress" xml:space="preserve">
+    <value>التقدم للمستوى التالي</value>
+  </data>
+  <data name="show.stats.maximum_combo" xml:space="preserve">
+    <value>السرد الأقصى</value>
+  </data>
+  <data name="show.stats.medals" xml:space="preserve">
+    <value>الاوسمة</value>
+  </data>
+  <data name="show.stats.play_count" xml:space="preserve">
+    <value>مرات اللعب</value>
+  </data>
+  <data name="show.stats.play_time" xml:space="preserve">
+    <value>وقت اللعب الإجمالي</value>
+  </data>
+  <data name="show.stats.ranked_score" xml:space="preserve">
+    <value>نقاط الترتيب</value>
+  </data>
+  <data name="show.stats.replays_watched_by_others" xml:space="preserve">
+    <value>النتائج التي شوهدت بواسطة الاخرين</value>
+  </data>
+  <data name="show.stats.score_ranks" xml:space="preserve">
+    <value>ترتيب النقاط</value>
+  </data>
+  <data name="show.stats.total_hits" xml:space="preserve">
+    <value>مجموع التصويبات</value>
+  </data>
+  <data name="show.stats.total_score" xml:space="preserve">
+    <value>مجموع النقاط</value>
+  </data>
+  <data name="show.stats.ranked_and_approved_beatmapset_count" xml:space="preserve">
+    <value>الخرائط المصفوفة والمقبولة</value>
+  </data>
+  <data name="show.stats.loved_beatmapset_count" xml:space="preserve">
+    <value>الخرائط المُحَبَبة</value>
+  </data>
+  <data name="show.stats.unranked_beatmapset_count" xml:space="preserve">
+    <value>الخرائط المعلقة</value>
+  </data>
+  <data name="show.stats.graveyard_beatmapset_count" xml:space="preserve">
+    <value>الخرائط المقبورة</value>
+  </data>
+  <data name="silenced_banner.title" xml:space="preserve">
+    <value>أنت مُقيد (صامت) حاليا.</value>
+  </data>
+  <data name="silenced_banner.message" xml:space="preserve">
+    <value>قد تكون بعض الإجراءات غير متوفرة.</value>
+  </data>
+  <data name="status.all" xml:space="preserve">
+    <value>الكل</value>
+  </data>
+  <data name="status.online" xml:space="preserve">
+    <value>متصل</value>
+  </data>
+  <data name="status.offline" xml:space="preserve">
+    <value>غير متصل</value>
+  </data>
+  <data name="store.saved" xml:space="preserve">
+    <value>انشأ المستخدم</value>
+  </data>
+  <data name="verify.title" xml:space="preserve">
+    <value>التحقق من الحساب</value>
+  </data>
+  <data name="view_mode.brick" xml:space="preserve">
+    <value>عرض الطوب</value>
+  </data>
+  <data name="view_mode.card" xml:space="preserve">
+    <value>العرض كبطاقة</value>
+  </data>
+  <data name="view_mode.list" xml:space="preserve">
+    <value>عرض كلائحة</value>
+  </data>
+</root>

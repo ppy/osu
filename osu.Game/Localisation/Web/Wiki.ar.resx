@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="show.fallback_translation" xml:space="preserve">
+    <value>الصفحة المطلوبة لم تترجم بعد إلى اللغة المحددة ({0}). سيتم عرض نسخة اللغة الإنجليزية بدلاََ عن ذلك.</value>
+  </data>
+  <data name="show.incomplete_or_outdated" xml:space="preserve">
+    <value>محتوى هذه الصفحة غير مكتمل أو منتهي الصلاحية. إن كنت قادراً على المساعدة، فكر في تحديث المقالة!</value>
+  </data>
+  <data name="show.missing" xml:space="preserve">
+    <value>يتعذر العثور على الصفحة المطلوبة "{0}".</value>
+  </data>
+  <data name="show.missing_title" xml:space="preserve">
+    <value>غير موجود</value>
+  </data>
+  <data name="show.missing_translation" xml:space="preserve">
+    <value>يتعذر العثور على الصفحة المطلوبة للغة المحددة حاليا.</value>
+  </data>
+  <data name="show.needs_cleanup_or_rewrite" xml:space="preserve">
+    <value>هذه الصفحة لا تفي بمعايير osu! وتحتاج الى ان تُمسَح او تعاد كتابتها. إن كنت قادراً على المساعدة، فكر في تحديث المقالة!</value>
+  </data>
+  <data name="show.search" xml:space="preserve">
+    <value>البحث عن الصفحات الموجودة لـ {0}.</value>
+  </data>
+  <data name="show.toc" xml:space="preserve">
+    <value>المحتويات</value>
+  </data>
+  <data name="show.edit.link" xml:space="preserve">
+    <value>أظهر على GitHub</value>
+  </data>
+  <data name="show.edit.refresh" xml:space="preserve">
+    <value>تحديث</value>
+  </data>
+  <data name="show.translation.legal" xml:space="preserve">
+    <value>هذه الترجمة موفرة للتسهيل فقط. النسخة الأصلية {0} هي النسخة الوحيدة الملزمة قانوناً من هذا النص.</value>
+  </data>
+  <data name="show.translation.outdated" xml:space="preserve">
+    <value>تحتوي هذه الصفحة على ترجمة قديمة من المحتوى الأصلي. الرجاء التحقق من {0} لمعلومات أكثر دقة (والنظر إلى تحديث الترجمة اذا كنت قادراً على المساعدة)!</value>
+  </data>
+  <data name="show.translation.default" xml:space="preserve">
+    <value>النسخة الإنجليزية</value>
+  </data>
+</root>

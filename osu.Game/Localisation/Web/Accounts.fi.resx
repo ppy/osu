@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="edit.title_compact" xml:space="preserve">
+    <value>asetukset</value>
+  </data>
+  <data name="edit.username" xml:space="preserve">
+    <value>käyttäjätunnus</value>
+  </data>
+  <data name="edit.avatar.title" xml:space="preserve">
+    <value>Avatar</value>
+  </data>
+  <data name="edit.avatar.rules" xml:space="preserve">
+    <value>Pidä huoli, että avatari ei riko {0}.&lt;br/&gt;Tämä tarkoittaa sitä, että kuvan on &lt;strong&gt;sovittava kaikenikäisille&lt;/strong&gt;, eli ei alastomuutta tai muita hävyttömyyksiä.</value>
+  </data>
+  <data name="edit.avatar.rules_link" xml:space="preserve">
+    <value>yhteisön sääntöjä</value>
+  </data>
+  <data name="edit.email.current" xml:space="preserve">
+    <value>nykyinen sähköpostiosoite</value>
+  </data>
+  <data name="edit.email.new" xml:space="preserve">
+    <value>uusi sähköpostiosoite</value>
+  </data>
+  <data name="edit.email.new_confirmation" xml:space="preserve">
+    <value>sähköpostivahvistus</value>
+  </data>
+  <data name="edit.email.title" xml:space="preserve">
+    <value>Sähköposti</value>
+  </data>
+  <data name="edit.password.current" xml:space="preserve">
+    <value>nykyinen salasana</value>
+  </data>
+  <data name="edit.password.new" xml:space="preserve">
+    <value>uusi salasana</value>
+  </data>
+  <data name="edit.password.new_confirmation" xml:space="preserve">
+    <value>salasanan vahvistus</value>
+  </data>
+  <data name="edit.password.title" xml:space="preserve">
+    <value>Salasana</value>
+  </data>
+  <data name="edit.profile.title" xml:space="preserve">
+    <value>Profiili</value>
+  </data>
+  <data name="edit.profile.user.user_from" xml:space="preserve">
+    <value>nykyinen sijainti</value>
+  </data>
+  <data name="edit.profile.user.user_interests" xml:space="preserve">
+    <value>kiinnostukset</value>
+  </data>
+  <data name="edit.profile.user.user_occ" xml:space="preserve">
+    <value>ammatti</value>
+  </data>
+  <data name="edit.profile.user.user_website" xml:space="preserve">
+    <value>verkkosivu</value>
+  </data>
+  <data name="edit.signature.title" xml:space="preserve">
+    <value>Allekirjoitus</value>
+  </data>
+  <data name="edit.signature.update" xml:space="preserve">
+    <value>päivitä</value>
+  </data>
+  <data name="notifications.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>vastaanota ilmoituksia uudesta ongelmasta seuraavien tilojen hyväksytyissä beatmapeissa</value>
+  </data>
+  <data name="notifications.beatmapset_disqualify" xml:space="preserve">
+    <value>vastaanota ilmoituksia kun beatmappeja hylätään seuraavista tiloista</value>
+  </data>
+  <data name="notifications.comment_reply" xml:space="preserve">
+    <value>vastaanota ilmoituksia vastauksista kommentteihisi</value>
+  </data>
+  <data name="notifications.title" xml:space="preserve">
+    <value>Ilmoitukset</value>
+  </data>
+  <data name="notifications.topic_auto_subscribe" xml:space="preserve">
+    <value>automaattisesti salli ilmoitukset uusille foorumiaiheille jotka luot</value>
+  </data>
+  <data name="notifications.options._" xml:space="preserve">
+    <value>toimitusvaihtoehdot</value>
+  </data>
+  <data name="notifications.options.beatmapset:modding" xml:space="preserve">
+    <value>beatmapin modaus</value>
+  </data>
+  <data name="notifications.options.channel_message" xml:space="preserve">
+    <value>yksityisviestit</value>
+  </data>
+  <data name="notifications.options.comment_new" xml:space="preserve">
+    <value>uudet kommentit</value>
+  </data>
+  <data name="notifications.options.forum_topic_reply" xml:space="preserve">
+    <value>aihevastaus</value>
+  </data>
+  <data name="notifications.options.mail" xml:space="preserve">
+    <value>posti</value>
+  </data>
+  <data name="notifications.options.push" xml:space="preserve">
+    <value>push</value>
+  </data>
+  <data name="notifications.options.user_achievement_unlock" xml:space="preserve">
+    <value>käyttäjämitali avattu</value>
+  </data>
+  <data name="oauth.authorized_clients" xml:space="preserve">
+    <value>valtuutetut clientit</value>
+  </data>
+  <data name="oauth.own_clients" xml:space="preserve">
+    <value>omat clientit</value>
+  </data>
+  <data name="oauth.title" xml:space="preserve">
+    <value>OAuth</value>
+  </data>
+  <data name="options.beatmapset_title_show_original" xml:space="preserve">
+    <value>näytä beatmap-metadata alkuperäisellä kielellä</value>
+  </data>
+  <data name="options.title" xml:space="preserve">
+    <value>Asetukset</value>
+  </data>
+  <data name="options.beatmapset_download._" xml:space="preserve">
+    <value>oletus beatmap-lataus tyyppi</value>
+  </data>
+  <data name="options.beatmapset_download.all" xml:space="preserve">
+    <value>videon kanssa jos saatavilla</value>
+  </data>
+  <data name="options.beatmapset_download.direct" xml:space="preserve">
+    <value>avaa osu!directissä</value>
+  </data>
+  <data name="options.beatmapset_download.no_video" xml:space="preserve">
+    <value>ilman videota</value>
+  </data>
+  <data name="playstyles.keyboard" xml:space="preserve">
+    <value>näppäimistö</value>
+  </data>
+  <data name="playstyles.mouse" xml:space="preserve">
+    <value>hiiri</value>
+  </data>
+  <data name="playstyles.tablet" xml:space="preserve">
+    <value>piirtopöytä</value>
+  </data>
+  <data name="playstyles.title" xml:space="preserve">
+    <value>Pelityylit</value>
+  </data>
+  <data name="playstyles.touch" xml:space="preserve">
+    <value>kosketus</value>
+  </data>
+  <data name="privacy.friends_only" xml:space="preserve">
+    <value>estä yksityisviestit henkilöiltä jotka eivät ole kaverilistallasi</value>
+  </data>
+  <data name="privacy.hide_online" xml:space="preserve">
+    <value>piilota online-tilasi</value>
+  </data>
+  <data name="privacy.title" xml:space="preserve">
+    <value>Yksityisyys</value>
+  </data>
+  <data name="security.current_session" xml:space="preserve">
+    <value>nykyinen</value>
+  </data>
+  <data name="security.end_session" xml:space="preserve">
+    <value>Sulje istunto</value>
+  </data>
+  <data name="security.end_session_confirmation" xml:space="preserve">
+    <value>Suljetaanko istuntosi kyseisellä laitteella?</value>
+  </data>
+  <data name="security.last_active" xml:space="preserve">
+    <value>Viimeksi aktiivisena</value>
+  </data>
+  <data name="security.title" xml:space="preserve">
+    <value>Turvallisuus</value>
+  </data>
+  <data name="security.web_sessions" xml:space="preserve">
+    <value>aktiiviset istunnot</value>
+  </data>
+  <data name="update_email.update" xml:space="preserve">
+    <value>päivitä</value>
+  </data>
+  <data name="update_password.update" xml:space="preserve">
+    <value>päivitä</value>
+  </data>
+  <data name="verification_completed.text" xml:space="preserve">
+    <value>Tämän välilehden/ikkunan voi nyt sulkea</value>
+  </data>
+  <data name="verification_completed.title" xml:space="preserve">
+    <value>Vahvistaminen on valmis</value>
+  </data>
+  <data name="verification_invalid.title" xml:space="preserve">
+    <value>Kelvoton tai vanhentunut vahvistuslinkki
+</value>
+  </data>
+</root>

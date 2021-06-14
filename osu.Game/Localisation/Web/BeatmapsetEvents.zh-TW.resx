@@ -1,0 +1,226 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="event.approve" xml:space="preserve">
+    <value>已批准。</value>
+  </data>
+  <data name="event.beatmap_owner_change" xml:space="preserve">
+    <value>難度 {0} 的作者已變更為 {1}。</value>
+  </data>
+  <data name="event.discussion_delete" xml:space="preserve">
+    <value>管理員刪除了 {0} 。</value>
+  </data>
+  <data name="event.discussion_lock" xml:space="preserve">
+    <value>此圖譜的討論已被禁用。（{0}）</value>
+  </data>
+  <data name="event.discussion_post_delete" xml:space="preserve">
+    <value>管理員在 {0} 中刪除了這條回覆。</value>
+  </data>
+  <data name="event.discussion_post_restore" xml:space="preserve">
+    <value>管理員在 {0} 中恢復了這條回覆。</value>
+  </data>
+  <data name="event.discussion_restore" xml:space="preserve">
+    <value>管理員已恢復 {0} 。</value>
+  </data>
+  <data name="event.discussion_unlock" xml:space="preserve">
+    <value>此圖譜的討論已被啟用。</value>
+  </data>
+  <data name="event.disqualify" xml:space="preserve">
+    <value>由於 {0} ({1}) 被 {2} DQ。</value>
+  </data>
+  <data name="event.disqualify_legacy" xml:space="preserve">
+    <value>該圖譜因 {0} 被 DQ</value>
+  </data>
+  <data name="event.issue_reopen" xml:space="preserve">
+    <value>問題 {0} 被重新打開。</value>
+  </data>
+  <data name="event.issue_resolve" xml:space="preserve">
+    <value>問題 {0} 被標記為 “已解決”。</value>
+  </data>
+  <data name="event.kudosu_allow" xml:space="preserve">
+    <value>討論 {0} 的 kudosu 移除操作已被重置。</value>
+  </data>
+  <data name="event.kudosu_deny" xml:space="preserve">
+    <value>討論 {0} 所得的 kudosu 被移除。</value>
+  </data>
+  <data name="event.kudosu_gain" xml:space="preserve">
+    <value>討論 {0} 獲得了足夠的票數而被給予 kudosu 。</value>
+  </data>
+  <data name="event.kudosu_lost" xml:space="preserve">
+    <value>討論 {0} 失去了票數，並且所得 kudosu 已被移除。</value>
+  </data>
+  <data name="event.kudosu_recalculate" xml:space="preserve">
+    <value>討論 {0} 所得的 kudosu 已經重新計算。</value>
+  </data>
+  <data name="event.language_edit" xml:space="preserve">
+    <value>語言由{0}更改為{1}</value>
+  </data>
+  <data name="event.love" xml:space="preserve">
+    <value>受到 {0} 的喜愛</value>
+  </data>
+  <data name="event.nominate" xml:space="preserve">
+    <value>被 {0} 提名</value>
+  </data>
+  <data name="event.nominate_modes" xml:space="preserve">
+    <value>由 {0} 提名 ({1})。</value>
+  </data>
+  <data name="event.nomination_reset" xml:space="preserve">
+    <value>新問題 {0} 導致提名被重置。</value>
+  </data>
+  <data name="event.qualify" xml:space="preserve">
+    <value>這張圖譜已經達到所需的提名數量，並已經 qualified。</value>
+  </data>
+  <data name="event.rank" xml:space="preserve">
+    <value>進榜</value>
+  </data>
+  <data name="event.remove_from_loved" xml:space="preserve">
+    <value>由 {0} 從 Loved 中移除。({1})</value>
+  </data>
+  <data name="event.nsfw_toggle.to_0" xml:space="preserve">
+    <value>移除成人內容標記</value>
+  </data>
+  <data name="event.nsfw_toggle.to_1" xml:space="preserve">
+    <value>標記為成人內容</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>圖譜事件</value>
+  </data>
+  <data name="index.form.period" xml:space="preserve">
+    <value>期間</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>類型</value>
+  </data>
+  <data name="item.content" xml:space="preserve">
+    <value>內容</value>
+  </data>
+  <data name="item.discussion_deleted" xml:space="preserve">
+    <value>[已刪除]</value>
+  </data>
+  <data name="item.type" xml:space="preserve">
+    <value>類型</value>
+  </data>
+  <data name="type.approve" xml:space="preserve">
+    <value>Approval</value>
+  </data>
+  <data name="type.beatmap_owner_change" xml:space="preserve">
+    <value>難度作者變更</value>
+  </data>
+  <data name="type.discussion_delete" xml:space="preserve">
+    <value>刪除討論</value>
+  </data>
+  <data name="type.discussion_post_delete" xml:space="preserve">
+    <value>刪除討論的回覆</value>
+  </data>
+  <data name="type.discussion_post_restore" xml:space="preserve">
+    <value>恢復已刪除的討論的回覆</value>
+  </data>
+  <data name="type.discussion_restore" xml:space="preserve">
+    <value>恢復已刪除的討論</value>
+  </data>
+  <data name="type.disqualify" xml:space="preserve">
+    <value>Disqualification</value>
+  </data>
+  <data name="type.genre_edit" xml:space="preserve">
+    <value>編輯曲風</value>
+  </data>
+  <data name="type.issue_reopen" xml:space="preserve">
+    <value>重新打開討論</value>
+  </data>
+  <data name="type.issue_resolve" xml:space="preserve">
+    <value>討論被解決</value>
+  </data>
+  <data name="type.kudosu_allow" xml:space="preserve">
+    <value>給予 Kudosu</value>
+  </data>
+  <data name="type.kudosu_deny" xml:space="preserve">
+    <value>收回 Kudosu</value>
+  </data>
+  <data name="type.kudosu_gain" xml:space="preserve">
+    <value>獲得 Kudosu</value>
+  </data>
+  <data name="type.kudosu_lost" xml:space="preserve">
+    <value>失去 Kudosu</value>
+  </data>
+  <data name="type.kudosu_recalculate" xml:space="preserve">
+    <value>重新計算 Kudosu</value>
+  </data>
+  <data name="type.language_edit" xml:space="preserve">
+    <value>更改語言</value>
+  </data>
+  <data name="type.love" xml:space="preserve">
+    <value>Love</value>
+  </data>
+  <data name="type.nominate" xml:space="preserve">
+    <value>被提名</value>
+  </data>
+  <data name="type.nomination_reset" xml:space="preserve">
+    <value>被取消提名</value>
+  </data>
+  <data name="type.nsfw_toggle" xml:space="preserve">
+    <value>成人內容標記</value>
+  </data>
+  <data name="type.qualify" xml:space="preserve">
+    <value>Qualification</value>
+  </data>
+  <data name="type.rank" xml:space="preserve">
+    <value>Ranking</value>
+  </data>
+</root>

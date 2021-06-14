@@ -1,0 +1,391 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>Cette beatmap n'est actuellement pas disponible au téléchargement.</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>Des parties de cette beatmap ont été supprimées suite à la requête du créateur ou d'un titulaire de droits tiers.</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>Pour plus d'informations, cliquez ici.</value>
+  </data>
+  <data name="availability.rule_violation" xml:space="preserve">
+    <value>Certains éléments contenus dans cette map ont été supprimés après avoir été jugés inappropriés pour être utilisés dans osu!.</value>
+  </data>
+  <data name="download.limit_exceeded" xml:space="preserve">
+    <value>Ralentissez, jouez plus.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Liste des beatmaps</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>Beatmaps</value>
+  </data>
+  <data name="panel.empty" xml:space="preserve">
+    <value>pas de beatmaps</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>télécharger</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>télécharger avec la vidéo</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>télécharger sans la vidéo</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>ouvrir dans osu!direct</value>
+  </data>
+  <data name="nominate.hybrid_requires_modes" xml:space="preserve">
+    <value>Un beatmapset hybride nécessite de sélectionner au moins un mode de jeu à nominer.</value>
+  </data>
+  <data name="nominate.incorrect_mode" xml:space="preserve">
+    <value>Vous n'avez pas la permission de nominer pour le mode {0}</value>
+  </data>
+  <data name="nominate.full_bn_required" xml:space="preserve">
+    <value>Vous devez être un Beatmap Nominator avec toutes les autorisations pour effectuer cette qualification.</value>
+  </data>
+  <data name="nominate.too_many" xml:space="preserve">
+    <value>L'exigence de nomination est déjà remplie.</value>
+  </data>
+  <data name="nominate.dialog.confirmation" xml:space="preserve">
+    <value>Êtes-vous sûr de vouloir nominer cette beatmap ?</value>
+  </data>
+  <data name="nominate.dialog.header" xml:space="preserve">
+    <value>Nominer la beatmap</value>
+  </data>
+  <data name="nominate.dialog.hybrid_warning" xml:space="preserve">
+    <value>remarque : vous ne pouvez nominer qu'une seule fois, assurez-vous que vous êtes en nomination pour tous les modes de jeu que vous avez l'intention de proposer</value>
+  </data>
+  <data name="nominate.dialog.which_modes" xml:space="preserve">
+    <value>Nominer pour quels modes ?</value>
+  </data>
+  <data name="nsfw_badge.label" xml:space="preserve">
+    <value>Explicite</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>Discussion</value>
+  </data>
+  <data name="show.details.by_artist" xml:space="preserve">
+    <value>par {0}</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>Ajouter ce beatmapset aux favoris</value>
+  </data>
+  <data name="show.details.favourite_login" xml:space="preserve">
+    <value>Connectez-vous pour ajouter cette beatmap aux favoris</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>Vous devez vous connecter pour pouvoir télécharger des beatmaps !</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>mappée par {0}</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>Retirer cette beatmapset des favoris</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>dernière mise à jour le {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>Télécharger</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>sans Vidéo</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>avec Vidéo</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>pour accéder à plus de fonctionnalités</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>Se connecter</value>
+  </data>
+  <data name="show.details_date.approved" xml:space="preserve">
+    <value>approuvé le {0}</value>
+  </data>
+  <data name="show.details_date.loved" xml:space="preserve">
+    <value>a été loved le {0}</value>
+  </data>
+  <data name="show.details_date.qualified" xml:space="preserve">
+    <value>qualifiée le {0}</value>
+  </data>
+  <data name="show.details_date.ranked" xml:space="preserve">
+    <value>classée le {0}</value>
+  </data>
+  <data name="show.details_date.submitted" xml:space="preserve">
+    <value>envoyée le {0}</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>dernière mise à jour le {0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>Vous avez trop de beatmaps favorites ! Veuillez en supprimer quelques-unes avant d'essayer à nouveau.</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>Hype cette map si vous avez aimé la jouer afin qu’elle progresse au statut de &lt;strong&gt;Classée&lt;/strong&gt;.</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>Cette map est actuellement {0}.</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>en attente</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>qualifiée</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>work in progress</value>
+  </data>
+  <data name="show.hype.disqualify._" xml:space="preserve">
+    <value>Si vous avez un problème avec cette beatmap, veuillez la disqualifier {0}.</value>
+  </data>
+  <data name="show.hype.report._" xml:space="preserve">
+    <value>Si vous trouvez un problème avec cette beatmap, merci de le signaler {0} pour alerter l'équipe.</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>Signaler un problème</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>ici</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>Langue</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>Les données sont encore en cours de calcul...</value>
+  </data>
+  <data name="show.info.nsfw" xml:space="preserve">
+    <value>Contenu explicite</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>Répartition des échecs</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="show.info.storyboard" xml:space="preserve">
+    <value>Ce beatmap contient un storyboard</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>Taux de réussite</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>Tags</value>
+  </data>
+  <data name="show.info.video" xml:space="preserve">
+    <value>Cette beatmap contient une vidéo</value>
+  </data>
+  <data name="show.nsfw_warning.details" xml:space="preserve">
+    <value>Cette beatmap contient du contenu explicite, offensant ou perturbant. Voulez-vous le voir quand même ?</value>
+  </data>
+  <data name="show.nsfw_warning.title" xml:space="preserve">
+    <value>Contenu explicite</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.disable" xml:space="preserve">
+    <value>Désactiver l'avertissement</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.listing" xml:space="preserve">
+    <value>Liste des beatmaps</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.show" xml:space="preserve">
+    <value>Afficher</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>atteint {0}</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>Classement national</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>Classement des amis</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>Classement global</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>Cliquez &lt;a href="{0}"&gt;ici&lt;/a&gt; pour connaître toutes les supers fonctions obtenues avec !</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>Vous devez être un osu!supporter pour accéder à cette fonctionnalité !</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>Tableaux des scores</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>Précision</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>Combo max</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>Raté</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>Mods</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>Joueur</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>Rang</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>Score total</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>Score</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>Temps</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>Personne de votre pays n'a encore fait un score !</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>Aucun de vos amis n'a encore établi de score sur cette map !</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>Pas de scores. Peut-être devriez vous en faire un ?</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>Chargement des scores...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>Beatmap non classée.</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>En Tête</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>Votre meilleur</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>Taille des Cercles</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>Nombre de touches</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>Drain de santé</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>Précision</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>Taux d'approche</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>Difficulté en étoiles</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>Longueur (Longueur de drain : {0})</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>Nombre de Cercles</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>Nombre de Sliders</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>Évaluation des joueurs</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>Écart de notation</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>Nominations</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>Nombre de jeux</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>Classée</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>Approuvée</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>Aimée</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>Qualifiée</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>WIP</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>En attente</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>Cimetière</value>
+  </data>
+</root>

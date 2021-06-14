@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="play_more" xml:space="preserve">
+    <value>Que tal jogar um pouco de osu! em vez disso?</value>
+  </data>
+  <data name="require_login" xml:space="preserve">
+    <value>Por favor inicia sessão para proceder.</value>
+  </data>
+  <data name="require_verification" xml:space="preserve">
+    <value>Por favor verifica para proceder.</value>
+  </data>
+  <data name="restricted" xml:space="preserve">
+    <value>Não é possível fazeres isso enquanto estiveres restrito.</value>
+  </data>
+  <data name="silenced" xml:space="preserve">
+    <value>Não é possível fazeres isso enquanto estiveres silenciado.</value>
+  </data>
+  <data name="unauthorized" xml:space="preserve">
+    <value>Acesso negado.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.is_hype" xml:space="preserve">
+    <value>Não é possível anular a publicação.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.has_reply" xml:space="preserve">
+    <value>Não é possível apagares uma discussão com respostas</value>
+  </data>
+  <data name="beatmap_discussion.nominate.exhausted" xml:space="preserve">
+    <value>Alcançaste o teu limite de nomeações por dia, por favor tenta outra vez amanhã.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.incorrect_state" xml:space="preserve">
+    <value>Erro ao executar essa ação, tenta recarregar a página.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.owner" xml:space="preserve">
+    <value>Não é possível nomeares o teu próprio beatmap.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.set_metadata" xml:space="preserve">
+    <value>Tens de definir o género e a língua antes de nomeares.</value>
+  </data>
+  <data name="beatmap_discussion.resolve.not_owner" xml:space="preserve">
+    <value>Só quem começou um segmento de mensagens ou o proprietário do beatmap é que consegue resolver uma discussão.</value>
+  </data>
+  <data name="beatmap_discussion.store.mapper_note_wrong_user" xml:space="preserve">
+    <value>Apenas o proprietário do beatmap ou nomeador/membro do grupo QAT é que pode publicar notas de mapeador.</value>
+  </data>
+  <data name="beatmap_discussion.vote.bot" xml:space="preserve">
+    <value>Não é possível votar numa discussão criada por um bot</value>
+  </data>
+  <data name="beatmap_discussion.vote.limit_exceeded" xml:space="preserve">
+    <value>Por favor espera um momento antes de pores mais votos</value>
+  </data>
+  <data name="beatmap_discussion.vote.owner" xml:space="preserve">
+    <value>Não é possível votares na tua própria discussão.</value>
+  </data>
+  <data name="beatmap_discussion.vote.wrong_beatmapset_state" xml:space="preserve">
+    <value>Só é possível votares em discussões com beatmaps que estejam a aguardar aprovação.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.not_owner" xml:space="preserve">
+    <value>Só podes eliminar as tuas próprias publicações.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.resolved" xml:space="preserve">
+    <value>Não podes eliminar uma publicação duma discussão resolvida.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.system_generated" xml:space="preserve">
+    <value>Uma publicação automaticamente gerada não pode ser apagada.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.not_owner" xml:space="preserve">
+    <value>Só o próprio criador é que pode editar a publicação.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.resolved" xml:space="preserve">
+    <value>Não podes editar uma publicação duma discussão resolvida.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.system_generated" xml:space="preserve">
+    <value>Uma publicação gerada automaticamente não pode ser editada.</value>
+  </data>
+  <data name="beatmap_discussion_post.store.beatmapset_locked" xml:space="preserve">
+    <value>Este beatmap está bloqueado para discussão.</value>
+  </data>
+  <data name="beatmapset.metadata.nominated" xml:space="preserve">
+    <value>Não podes alterar os metadados dum mapa nomeado. Contacta um membro dos BN ou da NAT se achas que estão estabelecidos incorretamente.</value>
+  </data>
+  <data name="chat.blocked" xml:space="preserve">
+    <value>Não é possível enviar uma mensagem a um utilizador que te esteja a bloquear ou que o tenhas bloqueado.</value>
+  </data>
+  <data name="chat.friends_only" xml:space="preserve">
+    <value>O utilizador está a bloquear mensagens de pessoas que não façam parte da sua lista de amigos.</value>
+  </data>
+  <data name="chat.moderated" xml:space="preserve">
+    <value>Esse canal está atualmente moderado.</value>
+  </data>
+  <data name="chat.no_access" xml:space="preserve">
+    <value>Tu não tens acesso a esse canal.</value>
+  </data>
+  <data name="chat.restricted" xml:space="preserve">
+    <value>Não podes enviar mensagens enquanto estiveres silenciado, restrito ou banido.</value>
+  </data>
+  <data name="chat.silenced" xml:space="preserve">
+    <value>Não podes enviar mensagens enquanto estiveres silenciado, restringido ou banido.</value>
+  </data>
+  <data name="comment.update.deleted" xml:space="preserve">
+    <value>Não é possível editares uma publicação apagada.</value>
+  </data>
+  <data name="contest.voting_over" xml:space="preserve">
+    <value>Não podes mudar o teu voto depois do período de votação deste concurso ter terminado.</value>
+  </data>
+  <data name="contest.entry.limit_reached" xml:space="preserve">
+    <value>Chegaste ao limite de inscrições para este concurso</value>
+  </data>
+  <data name="contest.entry.over" xml:space="preserve">
+    <value>Obrigado pelas tuas inscrições! As submissões foram fechadas para este concurso e a votação irá abrir em breve.</value>
+  </data>
+  <data name="forum.moderate.no_permission" xml:space="preserve">
+    <value>Não tens permissão para moderar este fórum.</value>
+  </data>
+  <data name="forum.post.delete.only_last_post" xml:space="preserve">
+    <value>Somente a ultima publicação é que pode ser apagada.</value>
+  </data>
+  <data name="forum.post.delete.locked" xml:space="preserve">
+    <value>Não é possível eliminar uma publicação dum tópico bloqueado.</value>
+  </data>
+  <data name="forum.post.delete.no_forum_access" xml:space="preserve">
+    <value>Um acesso ao fórum solicitado é obrigatório.</value>
+  </data>
+  <data name="forum.post.delete.not_owner" xml:space="preserve">
+    <value>Só o próprio criador é que pode apagar a publicação.</value>
+  </data>
+  <data name="forum.post.edit.deleted" xml:space="preserve">
+    <value>Não é possível editar uma publicação eliminada.</value>
+  </data>
+  <data name="forum.post.edit.locked" xml:space="preserve">
+    <value>Esta publicação está bloqueada de ser editada.</value>
+  </data>
+  <data name="forum.post.edit.no_forum_access" xml:space="preserve">
+    <value>Um acesso ao fórum solicitado é obrigatório.</value>
+  </data>
+  <data name="forum.post.edit.not_owner" xml:space="preserve">
+    <value>Só o próprio criador é que pode editar a publicação.</value>
+  </data>
+  <data name="forum.post.edit.topic_locked" xml:space="preserve">
+    <value>Não é possível eliminares uma publicação dum tópico bloqueado.</value>
+  </data>
+  <data name="forum.post.store.play_more" xml:space="preserve">
+    <value>Tenta jogar o jogo antes de publicar nos fóruns por favor! Se tiveres um problema ao jogar, por favor publica no fórum de Ajuda e Suporte.</value>
+  </data>
+  <data name="forum.post.store.too_many_help_posts" xml:space="preserve">
+    <value>Precisas de jogar mais tempo o jogo antes de criares publicações adicionais. Se ainda estiveres a ter problemas ao jogares o jogo, envia um email para support@ppy.sh</value>
+  </data>
+  <data name="forum.topic.reply.double_post" xml:space="preserve">
+    <value>Por favor edita a tua ultima publicação em vez de publicar novamente.</value>
+  </data>
+  <data name="forum.topic.reply.locked" xml:space="preserve">
+    <value>Não é possível responderes a um segmento de mensagens bloqueado.</value>
+  </data>
+  <data name="forum.topic.reply.no_forum_access" xml:space="preserve">
+    <value>Um acesso ao fórum solicitado é obrigatório.</value>
+  </data>
+  <data name="forum.topic.reply.no_permission" xml:space="preserve">
+    <value>Não tens permissão para responder.</value>
+  </data>
+  <data name="forum.topic.reply.user.require_login" xml:space="preserve">
+    <value>Por favor inicia sessão para responder.</value>
+  </data>
+  <data name="forum.topic.reply.user.restricted" xml:space="preserve">
+    <value>Não é possível responderes enquanto estiveres restrito.</value>
+  </data>
+  <data name="forum.topic.reply.user.silenced" xml:space="preserve">
+    <value>Não é possível responderes enquanto estiveres silenciado.</value>
+  </data>
+  <data name="forum.topic.store.no_forum_access" xml:space="preserve">
+    <value>Um acesso ao fórum solicitado é obrigatório.</value>
+  </data>
+  <data name="forum.topic.store.no_permission" xml:space="preserve">
+    <value>Não tens permissão para criar um novo tópico.</value>
+  </data>
+  <data name="forum.topic.store.forum_closed" xml:space="preserve">
+    <value>O fórum está fechado e não se pode publicar nele.</value>
+  </data>
+  <data name="forum.topic.vote.no_forum_access" xml:space="preserve">
+    <value>Um acesso ao fórum solicitado é obrigatório.</value>
+  </data>
+  <data name="forum.topic.vote.over" xml:space="preserve">
+    <value>A sondagem acabou e não se pode votar mais nela.</value>
+  </data>
+  <data name="forum.topic.vote.play_more" xml:space="preserve">
+    <value>Precisas de jogar mais antes de votar no fórum.</value>
+  </data>
+  <data name="forum.topic.vote.voted" xml:space="preserve">
+    <value>A troca de voto não é permitida.</value>
+  </data>
+  <data name="forum.topic.vote.user.require_login" xml:space="preserve">
+    <value>Por favor inicia sessão para votar.</value>
+  </data>
+  <data name="forum.topic.vote.user.restricted" xml:space="preserve">
+    <value>Não é possível votares enquanto estiveres restrito.</value>
+  </data>
+  <data name="forum.topic.vote.user.silenced" xml:space="preserve">
+    <value>Não é possível votares enquanto estiveres silenciado.</value>
+  </data>
+  <data name="forum.topic.watch.no_forum_access" xml:space="preserve">
+    <value>Um acesso ao fórum solicitado é obrigatório.</value>
+  </data>
+  <data name="forum.topic_cover.edit.uneditable" xml:space="preserve">
+    <value>Capa especificada inválida.</value>
+  </data>
+  <data name="forum.topic_cover.edit.not_owner" xml:space="preserve">
+    <value>Só o proprietário é que pode editar a capa.</value>
+  </data>
+  <data name="forum.topic_cover.store.forum_not_allowed" xml:space="preserve">
+    <value>Este fórum não aceita capas de tópico.</value>
+  </data>
+  <data name="forum.view.admin_only" xml:space="preserve">
+    <value>Só o administrador é que pode ver este fórum.</value>
+  </data>
+  <data name="user.page.edit.locked" xml:space="preserve">
+    <value>A página de utilizador está bloqueada.</value>
+  </data>
+  <data name="user.page.edit.not_owner" xml:space="preserve">
+    <value>Só é possível editar a própria página de utilizador.</value>
+  </data>
+  <data name="user.page.edit.require_supporter_tag" xml:space="preserve">
+    <value>Uma etiqueta osu!supporter é necessária.</value>
+  </data>
+</root>

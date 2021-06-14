@@ -1,0 +1,323 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="invalid" xml:space="preserve">
+    <value>無効な {0} が指定されています。</value>
+  </data>
+  <data name="not_negative" xml:space="preserve">
+    <value>{0}に負の数は使用できません</value>
+  </data>
+  <data name="required" xml:space="preserve">
+    <value>{0}が必須です</value>
+  </data>
+  <data name="too_long" xml:space="preserve">
+    <value>{0}の使用文字数の制限を超えています。上限は{1}文字です。</value>
+  </data>
+  <data name="wrong_confirmation" xml:space="preserve">
+    <value>認証が一致しません。</value>
+  </data>
+  <data name="beatmapset_discussion.beatmap_missing" xml:space="preserve">
+    <value>タイムスタンプは指定されていますが、ビートマップの難易度が不足しています。</value>
+  </data>
+  <data name="beatmapset_discussion.beatmapset_no_hype" xml:space="preserve">
+    <value>このビートマップはHypeできません。</value>
+  </data>
+  <data name="beatmapset_discussion.hype_requires_null_beatmap" xml:space="preserve">
+    <value>Hypeは一般（全ての難易度）セクションで行ってください。</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmap_id" xml:space="preserve">
+    <value>無効な難易度が指定されました。</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmapset_id" xml:space="preserve">
+    <value>無効なビートマップが指定されました。</value>
+  </data>
+  <data name="beatmapset_discussion.locked" xml:space="preserve">
+    <value>ディスカッションはロックされています。</value>
+  </data>
+  <data name="beatmapset_discussion.attributes.message_type" xml:space="preserve">
+    <value>メッセージの種類</value>
+  </data>
+  <data name="beatmapset_discussion.attributes.timestamp" xml:space="preserve">
+    <value>タイムスタンプ</value>
+  </data>
+  <data name="beatmapset_discussion.hype.discussion_locked" xml:space="preserve">
+    <value>このビートマップは議論中のためロックされており、Hypeできません。</value>
+  </data>
+  <data name="beatmapset_discussion.hype.guest" xml:space="preserve">
+    <value>Hypeするにはログインが必要です。</value>
+  </data>
+  <data name="beatmapset_discussion.hype.hyped" xml:space="preserve">
+    <value>既にこのビートマップをHypeしています。</value>
+  </data>
+  <data name="beatmapset_discussion.hype.limit_exceeded" xml:space="preserve">
+    <value>Hype回数が残っていません。</value>
+  </data>
+  <data name="beatmapset_discussion.hype.not_hypeable" xml:space="preserve">
+    <value>このビートマップはHypeできません。</value>
+  </data>
+  <data name="beatmapset_discussion.hype.owner" xml:space="preserve">
+    <value>自分のビートマップはHypeできません。</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.exceeds_beatmapset_length" xml:space="preserve">
+    <value>指定されたタイムスタンプはビートマップの長さの範囲に存在しません。</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.negative" xml:space="preserve">
+    <value>タイムスタンプは負の数が使えません。</value>
+  </data>
+  <data name="beatmapset_discussion_post.discussion_locked" xml:space="preserve">
+    <value>ディスカッションはロックされています。</value>
+  </data>
+  <data name="beatmapset_discussion_post.first_post" xml:space="preserve">
+    <value>最初の投稿は削除できません。</value>
+  </data>
+  <data name="beatmapset_discussion_post.attributes.message" xml:space="preserve">
+    <value>メッセージ</value>
+  </data>
+  <data name="comment.deleted_parent" xml:space="preserve">
+    <value>削除されたコメントに返信することはできません。</value>
+  </data>
+  <data name="comment.top_only" xml:space="preserve">
+    <value>コメントの返信を固定することはできません。
+</value>
+  </data>
+  <data name="comment.attributes.message" xml:space="preserve">
+    <value>メッセージ</value>
+  </data>
+  <data name="follow.invalid" xml:space="preserve">
+    <value>無効な {0} が指定されています。</value>
+  </data>
+  <data name="forum.feature_vote.not_feature_topic" xml:space="preserve">
+    <value>機能リクエスト以外は投票できません。</value>
+  </data>
+  <data name="forum.feature_vote.not_enough_feature_votes" xml:space="preserve">
+    <value>残りの投票回数が足りません</value>
+  </data>
+  <data name="forum.poll_vote.invalid" xml:space="preserve">
+    <value>無効の選択肢が指定されています。</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_delete" xml:space="preserve">
+    <value>ビートマップのメタデータ投稿を削除することは許可されていません。</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_edit" xml:space="preserve">
+    <value>ビートマップのメタデータ投稿を編集することは許可されていません。</value>
+  </data>
+  <data name="forum.post.first_post_no_delete" xml:space="preserve">
+    <value>最初の投稿は削除できません</value>
+  </data>
+  <data name="forum.post.missing_topic" xml:space="preserve">
+    <value>トピックがありません。</value>
+  </data>
+  <data name="forum.post.only_quote" xml:space="preserve">
+    <value>あなたの返信には引用しかありません。</value>
+  </data>
+  <data name="forum.post.attributes.post_text" xml:space="preserve">
+    <value>本文を送信</value>
+  </data>
+  <data name="forum.topic.attributes.topic_title" xml:space="preserve">
+    <value>タイトル</value>
+  </data>
+  <data name="forum.topic_poll.duplicate_options" xml:space="preserve">
+    <value>選択肢の重複があります。</value>
+  </data>
+  <data name="forum.topic_poll.grace_period_expired" xml:space="preserve">
+    <value>{0}時間以上後に投票を編集できません。</value>
+  </data>
+  <data name="forum.topic_poll.hiding_results_forever" xml:space="preserve">
+    <value>投票期限が設定されていない投票の結果を隠すことはできません。</value>
+  </data>
+  <data name="forum.topic_poll.invalid_max_options" xml:space="preserve">
+    <value>選択数の上限に選択肢の数以上の数値は使用不可能です。</value>
+  </data>
+  <data name="forum.topic_poll.minimum_one_selection" xml:space="preserve">
+    <value>選択数は１が最低の数値です。</value>
+  </data>
+  <data name="forum.topic_poll.minimum_two_options" xml:space="preserve">
+    <value>選択肢は最低2つ必要です。</value>
+  </data>
+  <data name="forum.topic_poll.too_many_options" xml:space="preserve">
+    <value>選択肢の数が多すぎます。</value>
+  </data>
+  <data name="forum.topic_poll.attributes.title" xml:space="preserve">
+    <value>投票タイトル</value>
+  </data>
+  <data name="forum.topic_vote.required" xml:space="preserve">
+    <value>投票する選択肢を選んでください。</value>
+  </data>
+  <data name="forum.topic_vote.too_many" xml:space="preserve">
+    <value>許可されている選択肢より多くを選択しました。</value>
+  </data>
+  <data name="oauth.client.too_many" xml:space="preserve">
+    <value>許可されるOAuthアプリケーションの最大数を超えました。</value>
+  </data>
+  <data name="oauth.client.url" xml:space="preserve">
+    <value>有効なURLを入力してください。</value>
+  </data>
+  <data name="oauth.client.attributes.name" xml:space="preserve">
+    <value>アプリケーション名</value>
+  </data>
+  <data name="oauth.client.attributes.redirect" xml:space="preserve">
+    <value>アプリケーションコールバックURL</value>
+  </data>
+  <data name="user.contains_username" xml:space="preserve">
+    <value>ユーザー名を含んだパスワードは使用できません。</value>
+  </data>
+  <data name="user.email_already_used" xml:space="preserve">
+    <value>既に使用されているメールアドレスです。</value>
+  </data>
+  <data name="user.email_not_allowed" xml:space="preserve">
+    <value>メールアドレスが許可されていません。</value>
+  </data>
+  <data name="user.invalid_country" xml:space="preserve">
+    <value>データベースに存在しない国です。</value>
+  </data>
+  <data name="user.invalid_discord" xml:space="preserve">
+    <value>Discordのユーザー名が無効です。</value>
+  </data>
+  <data name="user.invalid_email" xml:space="preserve">
+    <value>無効なメールアドレスです。</value>
+  </data>
+  <data name="user.invalid_twitter" xml:space="preserve">
+    <value>Twitterのユーザー名が無効です。</value>
+  </data>
+  <data name="user.too_short" xml:space="preserve">
+    <value>新しいパスワードが短すぎます。</value>
+  </data>
+  <data name="user.unknown_duplicate" xml:space="preserve">
+    <value>ユーザー名かメールアドレスが既に使用されています。</value>
+  </data>
+  <data name="user.username_available_in" xml:space="preserve">
+    <value>このユーザー名は{0}で使用可能になります。</value>
+  </data>
+  <data name="user.username_available_soon" xml:space="preserve">
+    <value>このユーザー名はまもなく使用可能になります。</value>
+  </data>
+  <data name="user.username_invalid_characters" xml:space="preserve">
+    <value>指定のユーザー名に無効の文字が含まれています。</value>
+  </data>
+  <data name="user.username_in_use" xml:space="preserve">
+    <value>既に使用されているユーザー名です！</value>
+  </data>
+  <data name="user.username_locked" xml:space="preserve">
+    <value>既に使用されているユーザー名です！</value>
+  </data>
+  <data name="user.username_no_space_userscore_mix" xml:space="preserve">
+    <value>アンダーバーかスペースのどちらかに統一してください。</value>
+  </data>
+  <data name="user.username_no_spaces" xml:space="preserve">
+    <value>ユーザー名の端にスペースは使用できません。</value>
+  </data>
+  <data name="user.username_not_allowed" xml:space="preserve">
+    <value>このユーザー名の使用は許可されていません。</value>
+  </data>
+  <data name="user.username_too_short" xml:space="preserve">
+    <value>ユーザー名が短すぎます。</value>
+  </data>
+  <data name="user.username_too_long" xml:space="preserve">
+    <value>ユーザー名が長すぎます。</value>
+  </data>
+  <data name="user.weak" xml:space="preserve">
+    <value>ブラックリストに載っているパスワードです。</value>
+  </data>
+  <data name="user.wrong_current_password" xml:space="preserve">
+    <value>パスワードが間違っています。</value>
+  </data>
+  <data name="user.wrong_email_confirmation" xml:space="preserve">
+    <value>メールアドレスが一致しません。</value>
+  </data>
+  <data name="user.wrong_password_confirmation" xml:space="preserve">
+    <value>パスワードが一致しません。</value>
+  </data>
+  <data name="user.too_long" xml:space="preserve">
+    <value>使用文字数の制限を超えています。上限は{0}文字です。</value>
+  </data>
+  <data name="user.attributes.username" xml:space="preserve">
+    <value>ユーザー名</value>
+  </data>
+  <data name="user.attributes.user_email" xml:space="preserve">
+    <value>メールアドレス</value>
+  </data>
+  <data name="user.attributes.password" xml:space="preserve">
+    <value>パスワード</value>
+  </data>
+  <data name="user.change_username.restricted" xml:space="preserve">
+    <value>制限されている間は、ユーザー名を変更することはできません。</value>
+  </data>
+  <data name="user.change_username.supporter_required._" xml:space="preserve">
+    <value>{0}になったことがないと名前を変更できません！</value>
+  </data>
+  <data name="user.change_username.supporter_required.link_text" xml:space="preserve">
+    <value>サポーター</value>
+  </data>
+  <data name="user.change_username.username_is_same" xml:space="preserve">
+    <value>既に使用しているユーザー名です！</value>
+  </data>
+  <data name="user_report.reason_not_valid" xml:space="preserve">
+    <value>{0} はこのテレポートタイプでは無効です。</value>
+  </data>
+  <data name="user_report.self" xml:space="preserve">
+    <value>自分自身を報告することはできません！</value>
+  </data>
+  <data name="store.order_item.attributes.quantity" xml:space="preserve">
+    <value>個数</value>
+  </data>
+  <data name="store.order_item.attributes.cost" xml:space="preserve">
+    <value>価格</value>
+  </data>
+</root>

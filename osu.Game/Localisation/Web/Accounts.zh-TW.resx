@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="edit.title_compact" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="edit.username" xml:space="preserve">
+    <value>使用者名稱</value>
+  </data>
+  <data name="edit.avatar.title" xml:space="preserve">
+    <value>編輯頭像</value>
+  </data>
+  <data name="edit.avatar.rules" xml:space="preserve">
+    <value>請確保您的頭像符合 {0}.&lt;br/&gt;這意味著必須 &lt;strong&gt;適合所有年齡&lt;/strong&gt;. i.e. 沒有裸露，褻瀆或暗示性的內容。</value>
+  </data>
+  <data name="edit.avatar.rules_link" xml:space="preserve">
+    <value>社群規則</value>
+  </data>
+  <data name="edit.email.current" xml:space="preserve">
+    <value>目前電子郵件地址</value>
+  </data>
+  <data name="edit.email.new" xml:space="preserve">
+    <value>新電子郵件地址</value>
+  </data>
+  <data name="edit.email.new_confirmation" xml:space="preserve">
+    <value>再次輸入電子郵件地址</value>
+  </data>
+  <data name="edit.email.title" xml:space="preserve">
+    <value>電子郵件</value>
+  </data>
+  <data name="edit.password.current" xml:space="preserve">
+    <value>目前密碼</value>
+  </data>
+  <data name="edit.password.new" xml:space="preserve">
+    <value>新密碼</value>
+  </data>
+  <data name="edit.password.new_confirmation" xml:space="preserve">
+    <value>再次輸入新密碼</value>
+  </data>
+  <data name="edit.password.title" xml:space="preserve">
+    <value>密碼</value>
+  </data>
+  <data name="edit.profile.title" xml:space="preserve">
+    <value>編輯個人簡介</value>
+  </data>
+  <data name="edit.profile.user.user_from" xml:space="preserve">
+    <value>目前所在地</value>
+  </data>
+  <data name="edit.profile.user.user_interests" xml:space="preserve">
+    <value>喜好</value>
+  </data>
+  <data name="edit.profile.user.user_occ" xml:space="preserve">
+    <value>職業</value>
+  </data>
+  <data name="edit.profile.user.user_website" xml:space="preserve">
+    <value>個人網站</value>
+  </data>
+  <data name="edit.signature.title" xml:space="preserve">
+    <value>簽名</value>
+  </data>
+  <data name="edit.signature.update" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="notifications.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>在以下模式的 qualified 圖譜上接收新問題通知</value>
+  </data>
+  <data name="notifications.beatmapset_disqualify" xml:space="preserve">
+    <value>在以下模式的圖譜被標記為取消提名時收到通知</value>
+  </data>
+  <data name="notifications.comment_reply" xml:space="preserve">
+    <value>在您的留言被回覆時收到通知</value>
+  </data>
+  <data name="notifications.title" xml:space="preserve">
+    <value>通知</value>
+  </data>
+  <data name="notifications.topic_auto_subscribe" xml:space="preserve">
+    <value>自動啟用自己創建的主題的通知</value>
+  </data>
+  <data name="notifications.options._" xml:space="preserve">
+    <value>傳送選項</value>
+  </data>
+  <data name="notifications.options.beatmap_owner_change" xml:space="preserve">
+    <value>客串難度</value>
+  </data>
+  <data name="notifications.options.beatmapset:modding" xml:space="preserve">
+    <value>圖譜製作</value>
+  </data>
+  <data name="notifications.options.channel_message" xml:space="preserve">
+    <value>私人訊息</value>
+  </data>
+  <data name="notifications.options.comment_new" xml:space="preserve">
+    <value>新評論</value>
+  </data>
+  <data name="notifications.options.forum_topic_reply" xml:space="preserve">
+    <value>主題回覆</value>
+  </data>
+  <data name="notifications.options.mail" xml:space="preserve">
+    <value>郵箱</value>
+  </data>
+  <data name="notifications.options.mapping" xml:space="preserve">
+    <value>圖譜製作者</value>
+  </data>
+  <data name="notifications.options.push" xml:space="preserve">
+    <value>推送</value>
+  </data>
+  <data name="notifications.options.user_achievement_unlock" xml:space="preserve">
+    <value>成就解鎖</value>
+  </data>
+  <data name="oauth.authorized_clients" xml:space="preserve">
+    <value>已授權客戶端</value>
+  </data>
+  <data name="oauth.own_clients" xml:space="preserve">
+    <value>擁有的客戶端</value>
+  </data>
+  <data name="oauth.title" xml:space="preserve">
+    <value>OAuth</value>
+  </data>
+  <data name="options.beatmapset_show_nsfw" xml:space="preserve">
+    <value>隱藏兒童不宜圖譜的警告</value>
+  </data>
+  <data name="options.beatmapset_title_show_original" xml:space="preserve">
+    <value>以原語言顯示圖譜資料</value>
+  </data>
+  <data name="options.title" xml:space="preserve">
+    <value>選項</value>
+  </data>
+  <data name="options.beatmapset_download._" xml:space="preserve">
+    <value>預設圖譜下載類型</value>
+  </data>
+  <data name="options.beatmapset_download.all" xml:space="preserve">
+    <value>包含影片</value>
+  </data>
+  <data name="options.beatmapset_download.direct" xml:space="preserve">
+    <value>在osu!direct中查看</value>
+  </data>
+  <data name="options.beatmapset_download.no_video" xml:space="preserve">
+    <value>不包含影片</value>
+  </data>
+  <data name="playstyles.keyboard" xml:space="preserve">
+    <value>鍵盤</value>
+  </data>
+  <data name="playstyles.mouse" xml:space="preserve">
+    <value>滑鼠</value>
+  </data>
+  <data name="playstyles.tablet" xml:space="preserve">
+    <value>繪圖板</value>
+  </data>
+  <data name="playstyles.title" xml:space="preserve">
+    <value>遊戲方式</value>
+  </data>
+  <data name="playstyles.touch" xml:space="preserve">
+    <value>觸控螢幕</value>
+  </data>
+  <data name="privacy.friends_only" xml:space="preserve">
+    <value>過濾來自好友以外的訊息</value>
+  </data>
+  <data name="privacy.hide_online" xml:space="preserve">
+    <value>隱藏在線狀態</value>
+  </data>
+  <data name="privacy.title" xml:space="preserve">
+    <value>隱私政策</value>
+  </data>
+  <data name="security.current_session" xml:space="preserve">
+    <value>目前</value>
+  </data>
+  <data name="security.end_session" xml:space="preserve">
+    <value>終止會話</value>
+  </data>
+  <data name="security.end_session_confirmation" xml:space="preserve">
+    <value>你確定要立刻結束該設備上的會話嗎？</value>
+  </data>
+  <data name="security.last_active" xml:space="preserve">
+    <value>上次使用：</value>
+  </data>
+  <data name="security.title" xml:space="preserve">
+    <value>安全</value>
+  </data>
+  <data name="security.web_sessions" xml:space="preserve">
+    <value>瀏覽器會話</value>
+  </data>
+  <data name="update_email.update" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="update_password.update" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="verification_completed.text" xml:space="preserve">
+    <value>您可以關閉此選項/視窗</value>
+  </data>
+  <data name="verification_completed.title" xml:space="preserve">
+    <value>驗證已經完成</value>
+  </data>
+  <data name="verification_invalid.title" xml:space="preserve">
+    <value>無效或過期的驗證連結</value>
+  </data>
+</root>

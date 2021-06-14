@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="all_read" xml:space="preserve">
+    <value>Tất cả các thông báo đã được đọc!</value>
+  </data>
+  <data name="delete" xml:space="preserve">
+    <value>Xóa {0}</value>
+  </data>
+  <data name="loading" xml:space="preserve">
+    <value>Đang tải thông báo chưa đọc...</value>
+  </data>
+  <data name="none" xml:space="preserve">
+    <value>Không có thông báo nào</value>
+  </data>
+  <data name="see_all" xml:space="preserve">
+    <value>xem tất cả thông báo</value>
+  </data>
+  <data name="filters._" xml:space="preserve">
+    <value>tất cả</value>
+  </data>
+  <data name="filters.user" xml:space="preserve">
+    <value>trang cá nhân</value>
+  </data>
+  <data name="filters.beatmapset" xml:space="preserve">
+    <value>beatmap</value>
+  </data>
+  <data name="filters.forum_topic" xml:space="preserve">
+    <value>diễn đàn</value>
+  </data>
+  <data name="filters.news_post" xml:space="preserve">
+    <value>tin tức</value>
+  </data>
+  <data name="filters.channel" xml:space="preserve">
+    <value>chat</value>
+  </data>
+  <data name="item.beatmapset._" xml:space="preserve">
+    <value>Beatmap</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion._" xml:space="preserve">
+    <value>Góc thảo luận beatmap</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>Beatmap "{0}" đã bị khóa để thảo luận.</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock_compact" xml:space="preserve">
+    <value>Cuộc thảo luận đã được khóa</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>{0} đã đăng tin nhắn mới trong cuộc thảo luận beatmap "{1}".</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_empty" xml:space="preserve">
+    <value>Bài đăng mới trên "{0}" bởi {1}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact" xml:space="preserve">
+    <value>Bài đăng mới bởi {0}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact_empty" xml:space="preserve">
+    <value>Bài đăng mới bởi {0}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>Cuộc thảo luận trên "{0}" đã được mở khóa</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock_compact" xml:space="preserve">
+    <value>Cuộc thảo luận đã được mở khóa</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state._" xml:space="preserve">
+    <value>Trạng thái Beatmap đã thay đổi</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify" xml:space="preserve">
+    <value>"{0}" đã bị bỏ xếp hạng</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify_compact" xml:space="preserve">
+    <value>Beatmap đã bị bỏ xếp hạng</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love" xml:space="preserve">
+    <value>"{0}" đã được tiến vào danh mục Được yêu thích</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love_compact" xml:space="preserve">
+    <value>Beatmap đã được tiến vào danh mục Được yêu thích</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate" xml:space="preserve">
+    <value>"{0}" đã được đề cử</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate_compact" xml:space="preserve">
+    <value>Beatmap đã được đề cử</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify" xml:space="preserve">
+    <value>"{0}" đã nhận được đủ đề cử và tiến vào danh mục Được xếp hạng</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify_compact" xml:space="preserve">
+    <value>Beatmap đã được thêm vào hàng chờ xếp hạng</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>"{0}" đã được xếp hạng</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank_compact" xml:space="preserve">
+    <value>Beatmap đã được xếp hạng</value>
+  </data>
+  <data name="item.beatmapset.comment._" xml:space="preserve">
+    <value>Bình luận mới</value>
+  </data>
+  <data name="item.channel._" xml:space="preserve">
+    <value>Chat</value>
+  </data>
+  <data name="item.channel.channel._" xml:space="preserve">
+    <value>Tin nhắn mới</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_compact" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_group" xml:space="preserve">
+    <value>từ {0}</value>
+  </data>
+  <data name="item.build._" xml:space="preserve">
+    <value>Chi tiết thay đổi</value>
+  </data>
+  <data name="item.build.comment._" xml:space="preserve">
+    <value>Bình luận mới</value>
+  </data>
+  <data name="item.news_post._" xml:space="preserve">
+    <value>Tin tức</value>
+  </data>
+  <data name="item.news_post.comment._" xml:space="preserve">
+    <value>Bình luận mới</value>
+  </data>
+  <data name="item.forum_topic._" xml:space="preserve">
+    <value>Chủ đề của diễn đàn</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply._" xml:space="preserve">
+    <value>Bình luận mới trên forum</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>{0} đã trả lời "{1}"</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply_compact" xml:space="preserve">
+    <value>{0} đã trả lời</value>
+  </data>
+  <data name="item.legacy_pm.legacy_pm.legacy_pm" xml:space="preserve">
+    <value>{0} tin nhắn chưa đọc|{0} tin nhắn chưa đọc</value>
+  </data>
+  <data name="item.user_achievement._" xml:space="preserve">
+    <value>Huy chương</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock._" xml:space="preserve">
+    <value>Huy chương mới</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>Đã mở khóa "{0}"!</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_compact" xml:space="preserve">
+    <value>Đã mở khóa "{0}"!</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_group" xml:space="preserve">
+    <value>Đã mở khóa huy hiệu!</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>"{0}" đã được xếp hạng</value>
+  </data>
+</root>

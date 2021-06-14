@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="talking_in" xml:space="preserve">
+    <value>чат в {0}</value>
+  </data>
+  <data name="talking_with" xml:space="preserve">
+    <value>чат с {0}</value>
+  </data>
+  <data name="title_compact" xml:space="preserve">
+    <value>сообщения</value>
+  </data>
+  <data name="cannot_send.channel" xml:space="preserve">
+    <value>Вы не можете написать в данный момент. Это может быть обусловлено одной из следующих причин:</value>
+  </data>
+  <data name="cannot_send.user" xml:space="preserve">
+    <value>Вы не можете написать в данный момент. Это может быть обусловлено одной из следующих причин:</value>
+  </data>
+  <data name="cannot_send.reasons.blocked" xml:space="preserve">
+    <value>Вы в чёрном списке собеседника</value>
+  </data>
+  <data name="cannot_send.reasons.channel_moderated" xml:space="preserve">
+    <value>Этот канал модерируется</value>
+  </data>
+  <data name="cannot_send.reasons.friends_only" xml:space="preserve">
+    <value>Получатель принимает сообщения только от друзей</value>
+  </data>
+  <data name="cannot_send.reasons.not_enough_plays" xml:space="preserve">
+    <value>Вы сыграли недостаточно игр</value>
+  </data>
+  <data name="cannot_send.reasons.not_verified" xml:space="preserve">
+    <value>Ваша сессия не была подтверждена</value>
+  </data>
+  <data name="cannot_send.reasons.restricted" xml:space="preserve">
+    <value>У вас рестриктед</value>
+  </data>
+  <data name="cannot_send.reasons.silenced" xml:space="preserve">
+    <value>У вас сайленс</value>
+  </data>
+  <data name="cannot_send.reasons.target_restricted" xml:space="preserve">
+    <value>У получателя рестриктед</value>
+  </data>
+  <data name="input.disabled" xml:space="preserve">
+    <value>нельзя отправить сообщение...</value>
+  </data>
+  <data name="input.placeholder" xml:space="preserve">
+    <value>введите сообщения...</value>
+  </data>
+  <data name="input.send" xml:space="preserve">
+    <value>Отправить</value>
+  </data>
+  <data name="no-conversations.howto" xml:space="preserve">
+    <value>Начните разговор из карточки или страницы пользователя.</value>
+  </data>
+  <data name="no-conversations.lazer" xml:space="preserve">
+    <value>Общие каналы к которым вы присоединились через &lt;a href="{0}"&gt;osu!lazer&lt;/a&gt; также видны здесь.</value>
+  </data>
+  <data name="no-conversations.title" xml:space="preserve">
+    <value>диалоги пусты...</value>
+  </data>
+</root>

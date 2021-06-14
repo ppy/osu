@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authorizations.update.null_user" xml:space="preserve">
+    <value>Trebuie să fii autentificat pentru a edita.</value>
+  </data>
+  <data name="authorizations.update.system_generated" xml:space="preserve">
+    <value>Postările generate de sistem nu pot fi editate.</value>
+  </data>
+  <data name="authorizations.update.wrong_user" xml:space="preserve">
+    <value>Trebuie să fii proprietarul postării pentru a o edita.</value>
+  </data>
+  <data name="events.empty" xml:space="preserve">
+    <value>Nu s-a întâmplat nimic... încă.</value>
+  </data>
+  <data name="index.deleted_beatmap" xml:space="preserve">
+    <value>șters</value>
+  </data>
+  <data name="index.none_found" xml:space="preserve">
+    <value>Nicio discuție întâlnește criteriul acela de căutare.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Discuții despre beatmap</value>
+  </data>
+  <data name="index.form._" xml:space="preserve">
+    <value>Caută</value>
+  </data>
+  <data name="index.form.deleted" xml:space="preserve">
+    <value>Include discuțiile șterse</value>
+  </data>
+  <data name="index.form.only_unresolved" xml:space="preserve">
+    <value>Arată doar discuții nerezolvate</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Tipuri de mesaje</value>
+  </data>
+  <data name="index.form.username" xml:space="preserve">
+    <value>Nume de utilizator</value>
+  </data>
+  <data name="index.form.beatmapset_status._" xml:space="preserve">
+    <value>Status de Beatmap</value>
+  </data>
+  <data name="index.form.beatmapset_status.all" xml:space="preserve">
+    <value>Tot</value>
+  </data>
+  <data name="index.form.beatmapset_status.disqualified" xml:space="preserve">
+    <value>Descalificat</value>
+  </data>
+  <data name="index.form.beatmapset_status.never_qualified" xml:space="preserve">
+    <value>Niciodată Calificat</value>
+  </data>
+  <data name="index.form.beatmapset_status.qualified" xml:space="preserve">
+    <value>Calificat</value>
+  </data>
+  <data name="index.form.beatmapset_status.ranked" xml:space="preserve">
+    <value>Clasat</value>
+  </data>
+  <data name="index.form.user.label" xml:space="preserve">
+    <value>Utilizator</value>
+  </data>
+  <data name="index.form.user.overview" xml:space="preserve">
+    <value>Sumarul activității</value>
+  </data>
+  <data name="item.created_at" xml:space="preserve">
+    <value>Data postării</value>
+  </data>
+  <data name="item.deleted_at" xml:space="preserve">
+    <value>Data ștergerii</value>
+  </data>
+  <data name="item.message_type" xml:space="preserve">
+    <value>Tip</value>
+  </data>
+  <data name="item.permalink" xml:space="preserve">
+    <value>Link permanent</value>
+  </data>
+  <data name="nearby_posts.confirm" xml:space="preserve">
+    <value>Niciuna dintre aceste postări nu mă preocupă</value>
+  </data>
+  <data name="nearby_posts.notice" xml:space="preserve">
+    <value>Există postări în jurul {0} ({1}). Te rugăm să verifici înainte de a posta.</value>
+  </data>
+  <data name="nearby_posts.unsaved" xml:space="preserve">
+    <value>{0} în această recenzie</value>
+  </data>
+  <data name="reply.open.guest" xml:space="preserve">
+    <value>Conectează-te pentru a răspunde</value>
+  </data>
+  <data name="reply.open.user" xml:space="preserve">
+    <value>Răspunde</value>
+  </data>
+  <data name="review.block_count" xml:space="preserve">
+    <value>{0} / {1} blocuri folosite</value>
+  </data>
+  <data name="review.go_to_parent" xml:space="preserve">
+    <value>Vezi review-ul utilizatorului</value>
+  </data>
+  <data name="review.go_to_child" xml:space="preserve">
+    <value>Vezi Discuția</value>
+  </data>
+  <data name="review.validation.block_too_large" xml:space="preserve">
+    <value>fiecare bloc poate conține până la {0} caractere</value>
+  </data>
+  <data name="review.validation.external_references" xml:space="preserve">
+    <value>recenzia conține referințe la probleme care nu aparțin la această revizuire</value>
+  </data>
+  <data name="review.validation.invalid_block_type" xml:space="preserve">
+    <value>tip de block invalid</value>
+  </data>
+  <data name="review.validation.invalid_document" xml:space="preserve">
+    <value>recenzie invalidă</value>
+  </data>
+  <data name="review.validation.minimum_issues" xml:space="preserve">
+    <value>recezia trebuie să conțină un minimum de {0} problemă|recenzia trebuie să conțină un minimum de {0} probleme</value>
+  </data>
+  <data name="review.validation.missing_text" xml:space="preserve">
+    <value>block-ul e lipsit de text</value>
+  </data>
+  <data name="review.validation.too_many_blocks" xml:space="preserve">
+    <value>recenziile pot să conțină doar {0} paragrafe/probleme|recenziile pot să conțină doar până la {0} paragrafe/probleme</value>
+  </data>
+  <data name="system.resolved.true" xml:space="preserve">
+    <value>Marcat ca rezolvat de {0}</value>
+  </data>
+  <data name="system.resolved.false" xml:space="preserve">
+    <value>Redeschis de {0}</value>
+  </data>
+  <data name="timestamp_display.general" xml:space="preserve">
+    <value>general</value>
+  </data>
+  <data name="timestamp_display.general_all" xml:space="preserve">
+    <value>general (tot)</value>
+  </data>
+  <data name="user_filter.everyone" xml:space="preserve">
+    <value>Toată lumea</value>
+  </data>
+  <data name="user_filter.label" xml:space="preserve">
+    <value>Filtrează după utilizator</value>
+  </data>
+</root>

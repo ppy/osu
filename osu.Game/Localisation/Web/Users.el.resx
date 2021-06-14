@@ -1,0 +1,574 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="deleted" xml:space="preserve">
+    <value>[διαγραμμένος χρήστης]</value>
+  </data>
+  <data name="beatmapset_activities.title" xml:space="preserve">
+    <value>Ιστορικό Modding του χρήστη {0}</value>
+  </data>
+  <data name="beatmapset_activities.title_compact" xml:space="preserve">
+    <value>Εξέταση</value>
+  </data>
+  <data name="beatmapset_activities.discussions.title_recent" xml:space="preserve">
+    <value>Πρόσφατα δημιουργημένες συζητήσεις</value>
+  </data>
+  <data name="beatmapset_activities.events.title_recent" xml:space="preserve">
+    <value>Πρόσφατα γεγονότα</value>
+  </data>
+  <data name="beatmapset_activities.posts.title_recent" xml:space="preserve">
+    <value>Πρόσφατες δημοσιεύσεις</value>
+  </data>
+  <data name="beatmapset_activities.votes_received.title_most" xml:space="preserve">
+    <value>Το πιο upvoted από (τελευταίους 3 μήνες)</value>
+  </data>
+  <data name="beatmapset_activities.votes_made.title_most" xml:space="preserve">
+    <value>Το πιο upvoted (τελευταίοι 3 μήνες)</value>
+  </data>
+  <data name="blocks.banner_text" xml:space="preserve">
+    <value>Έχετε μπλοκάρει αυτόν τον χρήστη.</value>
+  </data>
+  <data name="blocks.blocked_count" xml:space="preserve">
+    <value>μπλοκαρισμένοι χρήστες ({0})</value>
+  </data>
+  <data name="blocks.hide_profile" xml:space="preserve">
+    <value>απόκρυψη προφίλ</value>
+  </data>
+  <data name="blocks.not_blocked" xml:space="preserve">
+    <value>Αυτός ο χρήστης δεν είναι μπλοκαρισμένος.</value>
+  </data>
+  <data name="blocks.show_profile" xml:space="preserve">
+    <value>εμφάνιση προφίλ</value>
+  </data>
+  <data name="blocks.too_many" xml:space="preserve">
+    <value>Φτάσατε το όριο μπλοκαρισμάτων.</value>
+  </data>
+  <data name="blocks.button.block" xml:space="preserve">
+    <value>μπλοκάρισμα</value>
+  </data>
+  <data name="blocks.button.unblock" xml:space="preserve">
+    <value>ξεμπλοκάρισμα</value>
+  </data>
+  <data name="card.loading" xml:space="preserve">
+    <value>Φόρτωση...</value>
+  </data>
+  <data name="card.send_message" xml:space="preserve">
+    <value>αποστολή μηνύματος</value>
+  </data>
+  <data name="login._" xml:space="preserve">
+    <value>Σύνδεση</value>
+  </data>
+  <data name="login.button" xml:space="preserve">
+    <value>Είσοδος</value>
+  </data>
+  <data name="login.button_posting" xml:space="preserve">
+    <value>Είσοδος...</value>
+  </data>
+  <data name="login.failed" xml:space="preserve">
+    <value>Λάθος σύνδεση</value>
+  </data>
+  <data name="login.forgot" xml:space="preserve">
+    <value>Ξεχάσατε τον κωδικό σας;</value>
+  </data>
+  <data name="login.locked_ip" xml:space="preserve">
+    <value>η διεύθυνση IP σας είναι κλειδωμένη. Παρακαλώ περιμένετε λίγα λεπτά.</value>
+  </data>
+  <data name="login.password" xml:space="preserve">
+    <value>Κωδικός</value>
+  </data>
+  <data name="login.register" xml:space="preserve">
+    <value>Δεν έχετε λογαριασμό στο osu!; Φτιάξτε ένα νέο</value>
+  </data>
+  <data name="login.remember" xml:space="preserve">
+    <value>Απομνημόνευση της σύνδεσης</value>
+  </data>
+  <data name="login.title" xml:space="preserve">
+    <value>Παρακαλώ συνδεθείτε για να συνεχίσετε</value>
+  </data>
+  <data name="login.username" xml:space="preserve">
+    <value>Όνομα χρήστη</value>
+  </data>
+  <data name="login.beta.main" xml:space="preserve">
+    <value>Η πρόσβαση στην έκδοση Beta είναι περιορισμένη σε προνομιούχους χρήστες.</value>
+  </data>
+  <data name="login.beta.small" xml:space="preserve">
+    <value>(οι osu!supporters θα έχουν πρόσβαση σύντομα)</value>
+  </data>
+  <data name="posts.title" xml:space="preserve">
+    <value>Δημοσιεύσεις του {0}</value>
+  </data>
+  <data name="anonymous.login_link" xml:space="preserve">
+    <value>κάντε κλικ για να συνδεθείτε</value>
+  </data>
+  <data name="anonymous.login_text" xml:space="preserve">
+    <value>σύνδεση</value>
+  </data>
+  <data name="anonymous.username" xml:space="preserve">
+    <value>Επισκέπτης</value>
+  </data>
+  <data name="anonymous.error" xml:space="preserve">
+    <value>Πρέπει να είστε συνδεδεμένος για να το κάνετε αυτό.</value>
+  </data>
+  <data name="logout_confirm" xml:space="preserve">
+    <value>Είστε σίγουροι ότι θέλετε να αποσυνδεθείτε; :(</value>
+  </data>
+  <data name="report.button_text" xml:space="preserve">
+    <value>αναφορά</value>
+  </data>
+  <data name="report.comments" xml:space="preserve">
+    <value>Πρόσθετα Σχόλια</value>
+  </data>
+  <data name="report.placeholder" xml:space="preserve">
+    <value>Παρακαλώ δώστε οποιαδήποτε πληροφορία πιστεύετε ότι μπορεί να είναι χρήσιμη.</value>
+  </data>
+  <data name="report.reason" xml:space="preserve">
+    <value>Λόγος</value>
+  </data>
+  <data name="report.thanks" xml:space="preserve">
+    <value>Ευχαριστούμε για την αναφορά σας!</value>
+  </data>
+  <data name="report.title" xml:space="preserve">
+    <value>Αναφορά του {0};</value>
+  </data>
+  <data name="report.actions.send" xml:space="preserve">
+    <value>Αποστολή Αναφοράς</value>
+  </data>
+  <data name="report.actions.cancel" xml:space="preserve">
+    <value>Άκυρο</value>
+  </data>
+  <data name="report.options.cheating" xml:space="preserve">
+    <value>Παράτυπος τρόπος παιχνιδιού / Κλέψιμο</value>
+  </data>
+  <data name="report.options.insults" xml:space="preserve">
+    <value>Προσβάλει εμένα / άλλους</value>
+  </data>
+  <data name="report.options.spam" xml:space="preserve">
+    <value>Spamming</value>
+  </data>
+  <data name="report.options.unwanted_content" xml:space="preserve">
+    <value>Δημοσίευση links με ακατάλληλο περιεχόμενο</value>
+  </data>
+  <data name="report.options.nonsense" xml:space="preserve">
+    <value>Ανοησίες</value>
+  </data>
+  <data name="report.options.other" xml:space="preserve">
+    <value>Άλλο (γράψτε παρακάτω)</value>
+  </data>
+  <data name="restricted_banner.title" xml:space="preserve">
+    <value>Ο λογαριασμός σας έχει περιοριστεί!</value>
+  </data>
+  <data name="restricted_banner.message" xml:space="preserve">
+    <value>Όσο βρίσκεστε υπό περιορισμό, δεν θα είστε σε θέση να αλληλεπιδράσετε με άλλους χρήστες και τα score σας θα είναι ορατά μόνο σε εσάς. Αυτό είναι αποτέλεσμα μιας αυτόματης διαδικασίας που συνήθως διαρκεί 24 ώρες. Εάν επιθυμείτε την αναίρεση του περιορισμού, παρακαλώ &lt;a href="mailto{0}@ppy.sh"&gt;επικοινωνήστε με την ομάδα υποστήριξης&lt;/a&gt;.</value>
+  </data>
+  <data name="show.age" xml:space="preserve">
+    <value>{0} ετών</value>
+  </data>
+  <data name="show.change_avatar" xml:space="preserve">
+    <value>αλλάξτε το avatar σας!</value>
+  </data>
+  <data name="show.first_members" xml:space="preserve">
+    <value>Εδώ από την αρχή</value>
+  </data>
+  <data name="show.is_developer" xml:space="preserve">
+    <value>osu!developer</value>
+  </data>
+  <data name="show.is_supporter" xml:space="preserve">
+    <value>osu!supporter</value>
+  </data>
+  <data name="show.joined_at" xml:space="preserve">
+    <value>Μέλος από {0}</value>
+  </data>
+  <data name="show.lastvisit" xml:space="preserve">
+    <value>Τελευταία φορά εμφανίστηκε στις {0}</value>
+  </data>
+  <data name="show.missingtext" xml:space="preserve">
+    <value>Ίσως να κάνατε κάποιο ορθογραφικό λάθος! (ή ο χρήστης είναι banned)</value>
+  </data>
+  <data name="show.origin_country" xml:space="preserve">
+    <value>Από {0}</value>
+  </data>
+  <data name="show.previous_usernames" xml:space="preserve">
+    <value>προηγουμένως γνωστός ως</value>
+  </data>
+  <data name="show.plays_with" xml:space="preserve">
+    <value>Παίζει με {0}</value>
+  </data>
+  <data name="show.title" xml:space="preserve">
+    <value>Το προφίλ του {0}</value>
+  </data>
+  <data name="show.edit.cover.button" xml:space="preserve">
+    <value>Αλλάξτε το Εξώφυλλο του Προφίλ σας</value>
+  </data>
+  <data name="show.edit.cover.defaults_info" xml:space="preserve">
+    <value>Περισσότερα εξώφυλλα θα είναι διαθέσιμα στο μέλλον</value>
+  </data>
+  <data name="show.edit.cover.upload.broken_file" xml:space="preserve">
+    <value>Αποτυχία επεξεργασίας εικόνας. Ελέγξτε την εικόνα και προσπαθήστε ξανά.</value>
+  </data>
+  <data name="show.edit.cover.upload.button" xml:space="preserve">
+    <value>Ανεβάστε εικόνα</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone" xml:space="preserve">
+    <value>Αφήστε εδώ για να ανεβεί</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone_info" xml:space="preserve">
+    <value>Μπορείτε επίσης να σύρετε την εικόνα σας εδώ για να ανεβεί</value>
+  </data>
+  <data name="show.edit.cover.upload.size_info" xml:space="preserve">
+    <value>Το μέγεθος του εξωφύλλου πρέπει να είναι 2400x620</value>
+  </data>
+  <data name="show.edit.cover.upload.too_large" xml:space="preserve">
+    <value>Το αρχείο είναι πολύ μεγάλο.</value>
+  </data>
+  <data name="show.edit.cover.upload.unsupported_format" xml:space="preserve">
+    <value>Μη υποστηριζόμενη μορφή.</value>
+  </data>
+  <data name="show.edit.default_playmode.is_default_tooltip" xml:space="preserve">
+    <value>προεπιλεγμένο game mode</value>
+  </data>
+  <data name="show.edit.default_playmode.set" xml:space="preserve">
+    <value>όρισε το {0} ως το προεπιλεγμένο game mode</value>
+  </data>
+  <data name="show.extra.unranked" xml:space="preserve">
+    <value>Κανένα πρόσφατο σκορ</value>
+  </data>
+  <data name="show.extra.achievements.achieved-on" xml:space="preserve">
+    <value>Επιτεύχθηκε στις {0}</value>
+  </data>
+  <data name="show.extra.achievements.locked" xml:space="preserve">
+    <value>Κλειδωμένο</value>
+  </data>
+  <data name="show.extra.achievements.title" xml:space="preserve">
+    <value>Επιτεύγματα</value>
+  </data>
+  <data name="show.extra.beatmaps.by_artist" xml:space="preserve">
+    <value>από {0}</value>
+  </data>
+  <data name="show.extra.beatmaps.title" xml:space="preserve">
+    <value>Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.favourite.title" xml:space="preserve">
+    <value>Αγαπημένα Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.graveyard.title" xml:space="preserve">
+    <value>Παρατημένα Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.loved.title" xml:space="preserve">
+    <value>Loved Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.ranked_and_approved.title" xml:space="preserve">
+    <value>Ranked &amp; Approved Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.unranked.title" xml:space="preserve">
+    <value>Εκκρεμή Beatmaps</value>
+  </data>
+  <data name="show.extra.historical.title" xml:space="preserve">
+    <value>Ιστορικό</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.title" xml:space="preserve">
+    <value>Ιστορικό Δραστηριότητας</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.count_label" xml:space="preserve">
+    <value>Προσπάθειες</value>
+  </data>
+  <data name="show.extra.historical.most_played.count" xml:space="preserve">
+    <value>φορές που παίχτηκε</value>
+  </data>
+  <data name="show.extra.historical.most_played.title" xml:space="preserve">
+    <value>Πιο πολυπαιγμένα beatmaps</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.accuracy" xml:space="preserve">
+    <value>ακρίβεια: {0}</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.title" xml:space="preserve">
+    <value>Πρόσφατα Σκορ (24ω)</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.title" xml:space="preserve">
+    <value>Ιστορικό Παρακολούθησης Replay</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.count_label" xml:space="preserve">
+    <value>Παρακολουθημένες Επαναλήψεις</value>
+  </data>
+  <data name="show.extra.kudosu.recent_entries" xml:space="preserve">
+    <value>Πρόσφατο Ιστορικό Kudosu</value>
+  </data>
+  <data name="show.extra.kudosu.title" xml:space="preserve">
+    <value>Kudosu!</value>
+  </data>
+  <data name="show.extra.kudosu.total" xml:space="preserve">
+    <value>Σύνολο Εξασφαλισμένων Kudosu</value>
+  </data>
+  <data name="show.extra.kudosu.entry.amount" xml:space="preserve">
+    <value>{0} kudosu</value>
+  </data>
+  <data name="show.extra.kudosu.entry.empty" xml:space="preserve">
+    <value>Αυτός ο χρήστης δεν έχει κερδίσει kudosu!</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.allow_kudosu.give" xml:space="preserve">
+    <value>Λάβατε {0} kudosu από την άρνηση κατάργησης για την επεξεργασία του post {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.deny_kudosu.reset" xml:space="preserve">
+    <value>Αρνήθηκε {0} από το modding της ανάρτησης {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.delete.reset" xml:space="preserve">
+    <value>Χάσατε {0} από την επεξεργασία του post {1} αφού έχει διαγραφεί</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.restore.give" xml:space="preserve">
+    <value>Λάβατε {0} από την επεξεργασία μετά την αποκατάσταση του {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.give" xml:space="preserve">
+    <value>Λάβατε {0} από την απόκτηση ψήφων στην επεξεργασία του post {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.reset" xml:space="preserve">
+    <value>Χάσατε {0} επειδή χάσατε ψήφους για την επεξεργασία του post {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.give" xml:space="preserve">
+    <value>Λάβατε {0} από επανυπολογισμό ψήφων στην επεξεργασία του post {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.reset" xml:space="preserve">
+    <value>Χάσατε {0} από επαnυπολογισμό ψήφων για την επεξεργασία του post {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.give" xml:space="preserve">
+    <value>Λάβατε {0} από τον {1} για μια ανάρτηση στο {2}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.reset" xml:space="preserve">
+    <value>Διαγράφηκαν τα Kudosu από τον {0} για το post {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.revoke" xml:space="preserve">
+    <value>Ο {0} αρνήθηκε τα kudosu για το post {1}</value>
+  </data>
+  <data name="show.extra.me.title" xml:space="preserve">
+    <value>me!</value>
+  </data>
+  <data name="show.extra.medals.empty" xml:space="preserve">
+    <value>Αυτός ο χρήστης δεν έχει πάρει κανένα ακόμα. ;_;</value>
+  </data>
+  <data name="show.extra.medals.recent" xml:space="preserve">
+    <value>Πρόσφατα</value>
+  </data>
+  <data name="show.extra.medals.title" xml:space="preserve">
+    <value>Μετάλλια</value>
+  </data>
+  <data name="show.extra.recent_activity.title" xml:space="preserve">
+    <value>Πρόσφατα</value>
+  </data>
+  <data name="show.extra.top_ranks.download_replay" xml:space="preserve">
+    <value>Λήψη Επανάληψης</value>
+  </data>
+  <data name="show.extra.top_ranks.not_ranked" xml:space="preserve">
+    <value>Μόνο τα ranked beatmaps δίνουν pp.</value>
+  </data>
+  <data name="show.extra.top_ranks.pp_weight" xml:space="preserve">
+    <value>σταθμισμένo {0}</value>
+  </data>
+  <data name="show.extra.top_ranks.title" xml:space="preserve">
+    <value>Σκορ</value>
+  </data>
+  <data name="show.extra.top_ranks.best.title" xml:space="preserve">
+    <value>Καλύτερες Eπιδόσεις</value>
+  </data>
+  <data name="show.extra.top_ranks.first.title" xml:space="preserve">
+    <value>Πρώτες Θέσεις</value>
+  </data>
+  <data name="show.extra.account_standing.title" xml:space="preserve">
+    <value>Κατάσταση λογαριασμού</value>
+  </data>
+  <data name="show.extra.account_standing.bad_standing" xml:space="preserve">
+    <value>Ο λογαριασμός του &lt;strong&gt;{0}&lt;/strong&gt; δεν βρίσκεται σε καλή κατάσταση :(</value>
+  </data>
+  <data name="show.extra.account_standing.remaining_silence" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; θα μπορεί να μιλήσει πάλι σε {1}.</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.title" xml:space="preserve">
+    <value>Πρόσφατες Παραβιάσεις</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.date" xml:space="preserve">
+    <value>ημερομηνία</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.action" xml:space="preserve">
+    <value>δράση</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length" xml:space="preserve">
+    <value>μήκος</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length_permanent" xml:space="preserve">
+    <value>Μόνιμο</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.description" xml:space="preserve">
+    <value>περιγραφή</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actor" xml:space="preserve">
+    <value>από {0}</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.restriction" xml:space="preserve">
+    <value>Αποκλεισμός</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.silence" xml:space="preserve">
+    <value>Σίγαση</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.note" xml:space="preserve">
+    <value>Σημείωση</value>
+  </data>
+  <data name="show.info.interests" xml:space="preserve">
+    <value>Ενδιαφέροντα</value>
+  </data>
+  <data name="show.info.location" xml:space="preserve">
+    <value>Τρέχουσα Τοποθεσία</value>
+  </data>
+  <data name="show.info.occupation" xml:space="preserve">
+    <value>Ενασχόληση</value>
+  </data>
+  <data name="show.info.website" xml:space="preserve">
+    <value>Ιστοσελίδα</value>
+  </data>
+  <data name="show.not_found.reason_1" xml:space="preserve">
+    <value>Μπορεί να έχει αλλάξει όνομα χρήστη.</value>
+  </data>
+  <data name="show.not_found.reason_2" xml:space="preserve">
+    <value>Ο λογαριασμός μπορεί να είναι προσωρινά μη διαθέσιμος λόγω προβλημάτων ασφάλειας η κατάχρησης.</value>
+  </data>
+  <data name="show.not_found.reason_3" xml:space="preserve">
+    <value>Μπορεί να έχετε κάνει τυπογραφικό λάθος!</value>
+  </data>
+  <data name="show.not_found.reason_header" xml:space="preserve">
+    <value>Υπάρχουν μερικοί πιθανοί λόγοι για αυτό:</value>
+  </data>
+  <data name="show.not_found.title" xml:space="preserve">
+    <value>Ο χρήστης δε βρέθηκε! ;_;</value>
+  </data>
+  <data name="show.page.button" xml:space="preserve">
+    <value>Επεξεργασία σελίδας προφίλ</value>
+  </data>
+  <data name="show.page.description" xml:space="preserve">
+    <value>To &lt;strong&gt;me!&lt;/strong&gt; είναι μια προσωπική προσαρμόσιμη περιοχή στη σελίδα του προφίλ σας.</value>
+  </data>
+  <data name="show.page.edit_big" xml:space="preserve">
+    <value>Επεξεργασία!</value>
+  </data>
+  <data name="show.page.placeholder" xml:space="preserve">
+    <value>Γράψτε το περιεχόμενο της σελίδας εδώ</value>
+  </data>
+  <data name="show.post_count._" xml:space="preserve">
+    <value>Συνεισφορά {0}</value>
+  </data>
+  <data name="show.post_count.count" xml:space="preserve">
+    <value>{0} φόρουμ ανάρτηση|{0} φόρουμ αναρτήσεις</value>
+  </data>
+  <data name="show.rank.country" xml:space="preserve">
+    <value>Κατάταξη στη χώρα για το {0}</value>
+  </data>
+  <data name="show.rank.country_simple" xml:space="preserve">
+    <value>Εθνική Κατάταξη</value>
+  </data>
+  <data name="show.rank.global" xml:space="preserve">
+    <value>Παγκόσμια κατάταξη για το {0}</value>
+  </data>
+  <data name="show.rank.global_simple" xml:space="preserve">
+    <value>Παγκόσμια Κατάταξη</value>
+  </data>
+  <data name="show.stats.hit_accuracy" xml:space="preserve">
+    <value>Ακρίβεια Ευστοχίας</value>
+  </data>
+  <data name="show.stats.level" xml:space="preserve">
+    <value>Επίπεδο {0}</value>
+  </data>
+  <data name="show.stats.level_progress" xml:space="preserve">
+    <value>Πρόοδος για επόμενο επίπεδο</value>
+  </data>
+  <data name="show.stats.maximum_combo" xml:space="preserve">
+    <value>Μέγιστο Combo</value>
+  </data>
+  <data name="show.stats.medals" xml:space="preserve">
+    <value>Μετάλλια</value>
+  </data>
+  <data name="show.stats.play_count" xml:space="preserve">
+    <value>Αριθμός Προσπαθειών</value>
+  </data>
+  <data name="show.stats.play_time" xml:space="preserve">
+    <value>Συνολικός Χρόνος Παιχνιδιού</value>
+  </data>
+  <data name="show.stats.ranked_score" xml:space="preserve">
+    <value>Ranked Σκορ</value>
+  </data>
+  <data name="show.stats.replays_watched_by_others" xml:space="preserve">
+    <value>Replays που Παρακολουθήθηκαν από Άλλους</value>
+  </data>
+  <data name="show.stats.score_ranks" xml:space="preserve">
+    <value>Κατάταξη Score</value>
+  </data>
+  <data name="show.stats.total_hits" xml:space="preserve">
+    <value>Συνολικά Hits</value>
+  </data>
+  <data name="show.stats.total_score" xml:space="preserve">
+    <value>Συνολική Βαθμολογία</value>
+  </data>
+  <data name="status.online" xml:space="preserve">
+    <value>Συνδεδεμένοι</value>
+  </data>
+  <data name="status.offline" xml:space="preserve">
+    <value>Αποσυνδεδεμένοι</value>
+  </data>
+  <data name="store.saved" xml:space="preserve">
+    <value>Ο χρήστης δημιουργήθηκε</value>
+  </data>
+  <data name="verify.title" xml:space="preserve">
+    <value>Επαλήθευση του Λογαριασμού</value>
+  </data>
+</root>

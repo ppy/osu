@@ -1,0 +1,296 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="all_read" xml:space="preserve">
+    <value>Alle varsler lest!</value>
+  </data>
+  <data name="mark_read" xml:space="preserve">
+    <value>Tøm {0}</value>
+  </data>
+  <data name="none" xml:space="preserve">
+    <value>Ingen varsler</value>
+  </data>
+  <data name="see_all" xml:space="preserve">
+    <value>se alle varsler</value>
+  </data>
+  <data name="filters._" xml:space="preserve">
+    <value>alle</value>
+  </data>
+  <data name="filters.user" xml:space="preserve">
+    <value>profil</value>
+  </data>
+  <data name="filters.beatmapset" xml:space="preserve">
+    <value>beatmapper
+</value>
+  </data>
+  <data name="filters.forum_topic" xml:space="preserve">
+    <value>forum</value>
+  </data>
+  <data name="filters.news_post" xml:space="preserve">
+    <value>nyheter</value>
+  </data>
+  <data name="filters.build" xml:space="preserve">
+    <value>versjon</value>
+  </data>
+  <data name="filters.channel" xml:space="preserve">
+    <value>chat</value>
+  </data>
+  <data name="item.beatmapset._" xml:space="preserve">
+    <value>Beatmap</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion._" xml:space="preserve">
+    <value>Beatmapdiskusjon</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>Beatmappen "{0}" har blitt låst for diskusjon.</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock_compact" xml:space="preserve">
+    <value>Diskusjonen var låst</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>{0} la til en ny melding i beatmapdiskusjonen til "{1}".</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_empty" xml:space="preserve">
+    <value>Nytt innlegg ved "{0}" av {1}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact" xml:space="preserve">
+    <value>Nytt innlegg av {0}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact_empty" xml:space="preserve">
+    <value>Nytt innlegg av {0}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_review_new" xml:space="preserve">
+    <value>Ny anmeldelse på "{0}" av {1} som inneholder problemer: {2}, forslag: {3}, ros: {4}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_review_new_compact" xml:space="preserve">
+    <value>Ny anmeldelse av {0} som inneholder problemer: {1}, forslag: {2}, ros: {3}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>Beatmappen "{0}" har blitt låst opp for diskusjon.</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock_compact" xml:space="preserve">
+    <value>Diskusjon var ulåst</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem._" xml:space="preserve">
+    <value>Kvalifisert beatmap-problem</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>Rapportert av {0} på "{1}": "{2}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_empty" xml:space="preserve">
+    <value>Rapportert av {0} ved "{1}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_compact" xml:space="preserve">
+    <value>Rapportert av {0}: "{1}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_compact_empty" xml:space="preserve">
+    <value>Rapportert av {0}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state._" xml:space="preserve">
+    <value>Beatmap status har blitt endret</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify" xml:space="preserve">
+    <value>Beatmappen "{0}" har blitt diskvalifisert av {1}.</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify_compact" xml:space="preserve">
+    <value>Beatmap var diskvalifisert</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love" xml:space="preserve">
+    <value>Beatmappen "{0}" har blitt forfremmet til elsket av {1}.</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love_compact" xml:space="preserve">
+    <value>Beatmap var promotert til elsket</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate" xml:space="preserve">
+    <value>Beatmappen "{0}" har blitt nominert av {1}.</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate_compact" xml:space="preserve">
+    <value>Beatmap var nominert</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify" xml:space="preserve">
+    <value>Beatmappen "{0}" har fått nok nominasjoner og er dermed i kø til å bli rangert.</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify_compact" xml:space="preserve">
+    <value>Beatmappen er i kø for å bli rangert</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>"{0}" har blitt rangert</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank_compact" xml:space="preserve">
+    <value>Beatmappet var rangert</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_reset_nominations" xml:space="preserve">
+    <value>Problemstilling skrevet av {0} nullstilte nominasjonen av beatmappet "{1}" </value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_reset_nominations_compact" xml:space="preserve">
+    <value>Nominasjonen ble tilbakestilt</value>
+  </data>
+  <data name="item.beatmapset.comment._" xml:space="preserve">
+    <value>Ny kommentar</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_new" xml:space="preserve">
+    <value>{0} kommenterte "{1}" på "{2}"</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} kommenterte "{1}"</value>
+  </data>
+  <data name="item.channel._" xml:space="preserve">
+    <value>Chat</value>
+  </data>
+  <data name="item.channel.channel._" xml:space="preserve">
+    <value>Ny melding</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message" xml:space="preserve">
+    <value>{0} sier "{1}"</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_compact" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_group" xml:space="preserve">
+    <value>fra {0}</value>
+  </data>
+  <data name="item.build._" xml:space="preserve">
+    <value>Endringslogg</value>
+  </data>
+  <data name="item.build.comment._" xml:space="preserve">
+    <value>Ny kommentar</value>
+  </data>
+  <data name="item.build.comment.comment_new" xml:space="preserve">
+    <value>{0} kommenterte "{1}" på "{2}"</value>
+  </data>
+  <data name="item.build.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} kommenterte "{1}"</value>
+  </data>
+  <data name="item.news_post._" xml:space="preserve">
+    <value>Nyheter</value>
+  </data>
+  <data name="item.news_post.comment._" xml:space="preserve">
+    <value>Ny kommentar</value>
+  </data>
+  <data name="item.news_post.comment.comment_new" xml:space="preserve">
+    <value>{0} kommenterte "{1}" på "{2}"</value>
+  </data>
+  <data name="item.news_post.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} kommenterte "{1}"</value>
+  </data>
+  <data name="item.forum_topic._" xml:space="preserve">
+    <value>Forumemne</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply._" xml:space="preserve">
+    <value>Nytt forum svar</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>{0} svarte på forumemne "{1}".</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply_compact" xml:space="preserve">
+    <value>{0} svarte</value>
+  </data>
+  <data name="item.legacy_pm._" xml:space="preserve">
+    <value>Eldre Forum PM</value>
+  </data>
+  <data name="item.legacy_pm.legacy_pm.legacy_pm" xml:space="preserve">
+    <value>{0} ulest melding.|{0} uleste meldinger.</value>
+  </data>
+  <data name="item.user_achievement._" xml:space="preserve">
+    <value>Medaljer</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock._" xml:space="preserve">
+    <value>Ny medalje</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>"{0}" låst opp!</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_compact" xml:space="preserve">
+    <value>"{0}" låst opp!</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>Diskusjonen om "{0}" har blitt låst</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>Diskusjonen om "{0}" har nye oppdateringer</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>Diskusjonen om "{0}" har blitt låst</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>Et nytt problem rapportert var rapportert på "{0}"</value>
+  </data>
+  <data name="mail.beatmapset.comment.comment_new" xml:space="preserve">
+    <value> Beatmap "{0}" har nye kommentarer</value>
+  </data>
+  <data name="mail.channel.channel.pm" xml:space="preserve">
+    <value>Du fått en ny melding fra {0}</value>
+  </data>
+  <data name="mail.build.comment.comment_new" xml:space="preserve">
+    <value>Endringslogg "{0}" har nye kommentarer</value>
+  </data>
+  <data name="mail.news_post.comment.comment_new" xml:space="preserve">
+    <value>Nyheter "{0}" har nye kommentarer</value>
+  </data>
+  <data name="mail.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>Det finnes nye svar i "{0}"</value>
+  </data>
+  <data name="mail.user.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>{0} har låst opp en ny medalje, "{1}"!</value>
+  </data>
+  <data name="mail.user.user_achievement_unlock.user_achievement_unlock_self" xml:space="preserve">
+    <value>Du har låst opp en ny medalje, "{0}"!</value>
+  </data>
+</root>

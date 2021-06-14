@@ -1,0 +1,388 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="audio.autoplay" xml:space="preserve">
+    <value>Putar lagu berikutnya secara otomatis</value>
+  </data>
+  <data name="defaults.page_description" xml:space="preserve">
+    <value>osu! - Rhythm is just a *click* away! Dengan berbagai mode permainan seperti Ouendan/EBA, Taiko, serta level editor yang sepenuhnya fungsional.</value>
+  </data>
+  <data name="header.admin.beatmapset" xml:space="preserve">
+    <value>set beatmap</value>
+  </data>
+  <data name="header.admin.beatmapset_covers" xml:space="preserve">
+    <value>sampul beatmap</value>
+  </data>
+  <data name="header.admin.contest" xml:space="preserve">
+    <value>kontes</value>
+  </data>
+  <data name="header.admin.contests" xml:space="preserve">
+    <value>kontes</value>
+  </data>
+  <data name="header.admin.root" xml:space="preserve">
+    <value>konsol</value>
+  </data>
+  <data name="header.admin.store_orders" xml:space="preserve">
+    <value>pengelola toko</value>
+  </data>
+  <data name="header.artists.index" xml:space="preserve">
+    <value>daftar</value>
+  </data>
+  <data name="header.changelog.index" xml:space="preserve">
+    <value>daftar</value>
+  </data>
+  <data name="header.help.index" xml:space="preserve">
+    <value>indeks</value>
+  </data>
+  <data name="header.help.sitemap" xml:space="preserve">
+    <value>Peta Situs</value>
+  </data>
+  <data name="header.store.cart" xml:space="preserve">
+    <value>keranjang</value>
+  </data>
+  <data name="header.store.orders" xml:space="preserve">
+    <value>riwayat transaksi</value>
+  </data>
+  <data name="header.store.products" xml:space="preserve">
+    <value>produk</value>
+  </data>
+  <data name="header.tournaments.index" xml:space="preserve">
+    <value>daftar</value>
+  </data>
+  <data name="header.users.modding" xml:space="preserve">
+    <value>modding</value>
+  </data>
+  <data name="header.users.show" xml:space="preserve">
+    <value>info</value>
+  </data>
+  <data name="gallery.close" xml:space="preserve">
+    <value>Tutup (Esc)</value>
+  </data>
+  <data name="gallery.fullscreen" xml:space="preserve">
+    <value>Beralih ke layar penuh</value>
+  </data>
+  <data name="gallery.zoom" xml:space="preserve">
+    <value>Perbesar/perkecil tampilan</value>
+  </data>
+  <data name="gallery.previous" xml:space="preserve">
+    <value>Sebelumnya (tombol panah kiri)</value>
+  </data>
+  <data name="gallery.next" xml:space="preserve">
+    <value>Selanjutnya (tombol panah kanan)</value>
+  </data>
+  <data name="menu.beatmaps._" xml:space="preserve">
+    <value>beatmap</value>
+  </data>
+  <data name="menu.beatmaps.artists" xml:space="preserve">
+    <value>featured artist</value>
+  </data>
+  <data name="menu.beatmaps.index" xml:space="preserve">
+    <value>daftar</value>
+  </data>
+  <data name="menu.beatmaps.packs" xml:space="preserve">
+    <value>paket</value>
+  </data>
+  <data name="menu.community._" xml:space="preserve">
+    <value>komunitas</value>
+  </data>
+  <data name="menu.community.chat" xml:space="preserve">
+    <value>chat</value>
+  </data>
+  <data name="menu.community.contests" xml:space="preserve">
+    <value>kontes</value>
+  </data>
+  <data name="menu.community.dev" xml:space="preserve">
+    <value>pengembangan</value>
+  </data>
+  <data name="menu.community.forum-forums-index" xml:space="preserve">
+    <value>forum</value>
+  </data>
+  <data name="menu.community.getlive" xml:space="preserve">
+    <value>siaran langsung</value>
+  </data>
+  <data name="menu.community.tournaments" xml:space="preserve">
+    <value>turnamen</value>
+  </data>
+  <data name="menu.help._" xml:space="preserve">
+    <value>bantuan</value>
+  </data>
+  <data name="menu.help.getabuse" xml:space="preserve">
+    <value>laporkan penyalahgunaan</value>
+  </data>
+  <data name="menu.help.getfaq" xml:space="preserve">
+    <value>faq</value>
+  </data>
+  <data name="menu.help.getrules" xml:space="preserve">
+    <value>peraturan</value>
+  </data>
+  <data name="menu.help.getsupport" xml:space="preserve">
+    <value>beneran, saya butuh bantuan!</value>
+  </data>
+  <data name="menu.help.getwiki" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="menu.home._" xml:space="preserve">
+    <value>beranda</value>
+  </data>
+  <data name="menu.home.changelog-index" xml:space="preserve">
+    <value>riwayat perubahan</value>
+  </data>
+  <data name="menu.home.getdownload" xml:space="preserve">
+    <value>unduh</value>
+  </data>
+  <data name="menu.home.news-index" xml:space="preserve">
+    <value>berita</value>
+  </data>
+  <data name="menu.home.search" xml:space="preserve">
+    <value>cari</value>
+  </data>
+  <data name="menu.home.team" xml:space="preserve">
+    <value>tim</value>
+  </data>
+  <data name="menu.rankings._" xml:space="preserve">
+    <value>peringkat</value>
+  </data>
+  <data name="menu.rankings.charts" xml:space="preserve">
+    <value>spotlights</value>
+  </data>
+  <data name="menu.rankings.country" xml:space="preserve">
+    <value>negara</value>
+  </data>
+  <data name="menu.rankings.index" xml:space="preserve">
+    <value>performa</value>
+  </data>
+  <data name="menu.rankings.kudosu" xml:space="preserve">
+    <value>kudosu</value>
+  </data>
+  <data name="menu.rankings.multiplayer" xml:space="preserve">
+    <value>multiplayer</value>
+  </data>
+  <data name="menu.rankings.score" xml:space="preserve">
+    <value>skor</value>
+  </data>
+  <data name="menu.store._" xml:space="preserve">
+    <value>toko</value>
+  </data>
+  <data name="menu.store.cart-show" xml:space="preserve">
+    <value>keranjang</value>
+  </data>
+  <data name="menu.store.getlisting" xml:space="preserve">
+    <value>daftar</value>
+  </data>
+  <data name="menu.store.orders-index" xml:space="preserve">
+    <value>riwayat transaksi</value>
+  </data>
+  <data name="footer.general._" xml:space="preserve">
+    <value>Umum</value>
+  </data>
+  <data name="footer.general.home" xml:space="preserve">
+    <value>Beranda</value>
+  </data>
+  <data name="footer.general.changelog-index" xml:space="preserve">
+    <value>Riwayat Perubahan</value>
+  </data>
+  <data name="footer.general.beatmaps" xml:space="preserve">
+    <value>Daftar Beatmap</value>
+  </data>
+  <data name="footer.general.download" xml:space="preserve">
+    <value>Unduh osu!</value>
+  </data>
+  <data name="footer.help._" xml:space="preserve">
+    <value>Bantuan &amp; Komunitas</value>
+  </data>
+  <data name="footer.help.faq" xml:space="preserve">
+    <value>Pertanyaan yang Umum Diajukan (FAQ)</value>
+  </data>
+  <data name="footer.help.forum" xml:space="preserve">
+    <value>Forum Komunitas</value>
+  </data>
+  <data name="footer.help.livestreams" xml:space="preserve">
+    <value>Siaran Langsung</value>
+  </data>
+  <data name="footer.help.report" xml:space="preserve">
+    <value>Laporkan Masalah</value>
+  </data>
+  <data name="footer.help.wiki" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="footer.legal._" xml:space="preserve">
+    <value>Hukum &amp; Status</value>
+  </data>
+  <data name="footer.legal.copyright" xml:space="preserve">
+    <value>Hak Cipta (DMCA)</value>
+  </data>
+  <data name="footer.legal.privacy" xml:space="preserve">
+    <value>Privasi</value>
+  </data>
+  <data name="footer.legal.server_status" xml:space="preserve">
+    <value>Status Server</value>
+  </data>
+  <data name="footer.legal.source_code" xml:space="preserve">
+    <value>Kode Sumber</value>
+  </data>
+  <data name="footer.legal.terms" xml:space="preserve">
+    <value>Ketentuan Layanan</value>
+  </data>
+  <data name="errors.400.error" xml:space="preserve">
+    <value>Parameter yang diminta tidak valid</value>
+  </data>
+  <data name="errors.404.error" xml:space="preserve">
+    <value>Laman Hilang</value>
+  </data>
+  <data name="errors.404.description" xml:space="preserve">
+    <value>Maaf, tapi laman yang Anda minta tidak ada di sini!</value>
+  </data>
+  <data name="errors.403.error" xml:space="preserve">
+    <value>Anda seharusnya tidak di sini.</value>
+  </data>
+  <data name="errors.403.description" xml:space="preserve">
+    <value>Anda dapat mencoba untuk kembali ke halaman sebelumnya.</value>
+  </data>
+  <data name="errors.401.error" xml:space="preserve">
+    <value>Anda seharusnya tidak di sini.</value>
+  </data>
+  <data name="errors.401.description" xml:space="preserve">
+    <value>Anda dapat mencoba untuk kembali ke halaman sebelumnya. Atau mungkin coba untuk masuk terlebih dahulu.</value>
+  </data>
+  <data name="errors.405.error" xml:space="preserve">
+    <value>Halaman Hilang</value>
+  </data>
+  <data name="errors.405.description" xml:space="preserve">
+    <value>Maaf, tapi laman yang Anda minta tidak ada di sini!</value>
+  </data>
+  <data name="errors.422.error" xml:space="preserve">
+    <value>Parameter yang diminta tidak valid</value>
+  </data>
+  <data name="errors.429.error" xml:space="preserve">
+    <value>Batas permintaan terlampaui</value>
+  </data>
+  <data name="errors.500.error" xml:space="preserve">
+    <value>Oh, tidak! Sepertinya ada sesuatu yang rusak! ;_;</value>
+  </data>
+  <data name="errors.500.description" xml:space="preserve">
+    <value>Sistem osu! akan secara otomatis memberitahukan kami setiap kali terdapat kesalahan seperti ini.</value>
+  </data>
+  <data name="errors.fatal.error" xml:space="preserve">
+    <value>Oh, tidak! Sepertinya ada sesuatu yang (sangat) rusak! ;_;</value>
+  </data>
+  <data name="errors.fatal.description" xml:space="preserve">
+    <value>Sistem osu! akan secara otomatis memberitahukan kami setiap kali terdapat kesalahan seperti ini.</value>
+  </data>
+  <data name="errors.503.error" xml:space="preserve">
+    <value>Sedang dalam pemeliharaan!</value>
+  </data>
+  <data name="errors.503.description" xml:space="preserve">
+    <value>Proses pemeliharaan utamanya dapat berlangsung dalam durasi yang cukup beragam, mulai dari 5 detik hingga lebih dari 10 menit. Jika proses pemeliharaan ternyata berlangsung lebih lama dari yang sewajarnya, harap kunjungi {0} untuk informasi lebih lanjut.</value>
+  </data>
+  <data name="errors.reference" xml:space="preserve">
+    <value>Untuk berjaga-jaga, berikut kode yang dapat Anda berikan kepada layanan dukungan kami!</value>
+  </data>
+  <data name="popup_login.button" xml:space="preserve">
+    <value>masuk / daftar</value>
+  </data>
+  <data name="popup_login.login.forgot" xml:space="preserve">
+    <value>Saya lupa identitas saya</value>
+  </data>
+  <data name="popup_login.login.password" xml:space="preserve">
+    <value>kata sandi</value>
+  </data>
+  <data name="popup_login.login.title" xml:space="preserve">
+    <value>Masuk untuk Melanjutkan</value>
+  </data>
+  <data name="popup_login.login.username" xml:space="preserve">
+    <value>nama pengguna</value>
+  </data>
+  <data name="popup_login.login.error.email" xml:space="preserve">
+    <value>Nama pengguna atau alamat email tidak ditemukan</value>
+  </data>
+  <data name="popup_login.login.error.password" xml:space="preserve">
+    <value>Kata sandi salah</value>
+  </data>
+  <data name="popup_login.register.download" xml:space="preserve">
+    <value>Unduh</value>
+  </data>
+  <data name="popup_login.register.info" xml:space="preserve">
+    <value>Unduh osu! untuk membuat akun Anda!</value>
+  </data>
+  <data name="popup_login.register.title" xml:space="preserve">
+    <value>Belum memiliki akun?</value>
+  </data>
+  <data name="popup_user.links.account-edit" xml:space="preserve">
+    <value>Pengaturan</value>
+  </data>
+  <data name="popup_user.links.follows" xml:space="preserve">
+    <value>Daftar Pantauan</value>
+  </data>
+  <data name="popup_user.links.friends" xml:space="preserve">
+    <value>Teman</value>
+  </data>
+  <data name="popup_user.links.logout" xml:space="preserve">
+    <value>Keluar</value>
+  </data>
+  <data name="popup_user.links.profile" xml:space="preserve">
+    <value>Profil Saya</value>
+  </data>
+  <data name="popup_search.initial" xml:space="preserve">
+    <value>Ketik untuk mencari!</value>
+  </data>
+  <data name="popup_search.retry" xml:space="preserve">
+    <value>Pencarian gagal. Klik untuk mencoba lagi.</value>
+  </data>
+</root>

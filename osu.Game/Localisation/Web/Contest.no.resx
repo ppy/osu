@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="header.small" xml:space="preserve">
+    <value>Konkurrer i flere måter enn bare å trykke på sirkler.</value>
+  </data>
+  <data name="header.large" xml:space="preserve">
+    <value>Fellesskapskonkurranser</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>liste</value>
+  </data>
+  <data name="voting.login_required" xml:space="preserve">
+    <value>Vennligst logg inn for å stemme.</value>
+  </data>
+  <data name="voting.over" xml:space="preserve">
+    <value>Avstemmingen for denne konkurransen har avsluttet</value>
+  </data>
+  <data name="voting.best_of.none_played" xml:space="preserve">
+    <value>Det ser ikke ut som du har spilt noen av beatmappene som kvaliseres for denne konkurransen!</value>
+  </data>
+  <data name="voting.button.add" xml:space="preserve">
+    <value>Stem</value>
+  </data>
+  <data name="voting.button.remove" xml:space="preserve">
+    <value>Fjern stemme</value>
+  </data>
+  <data name="voting.button.used_up" xml:space="preserve">
+    <value>Du har brukt opp alle stemmene dine</value>
+  </data>
+  <data name="entry._" xml:space="preserve">
+    <value>deltager</value>
+  </data>
+  <data name="entry.login_required" xml:space="preserve">
+    <value>Vennligst logg inn for å delta i konkurransen.</value>
+  </data>
+  <data name="entry.silenced_or_restricted" xml:space="preserve">
+    <value>Du kan ikke bli med i konkurranser mens du er begrenset eller stum.</value>
+  </data>
+  <data name="entry.preparation" xml:space="preserve">
+    <value>Vi driver for tiden å forbereder denne konkurransen. Vennligst vent tålmodig!</value>
+  </data>
+  <data name="entry.drop_here" xml:space="preserve">
+    <value>Slipp bidraget ditt her</value>
+  </data>
+  <data name="entry.download" xml:space="preserve">
+    <value>Last ned .osz</value>
+  </data>
+  <data name="entry.wrong_type.art" xml:space="preserve">
+    <value>Bare .jpg og .png filer er akseptert for denne konkurransen.</value>
+  </data>
+  <data name="entry.wrong_type.beatmap" xml:space="preserve">
+    <value>Bare .osu filer er akseptert for denne konkurransen.</value>
+  </data>
+  <data name="entry.wrong_type.music" xml:space="preserve">
+    <value>Bare .mp3 filer er akseptert for denne konkurransen.</value>
+  </data>
+  <data name="entry.too_big" xml:space="preserve">
+    <value>Bidrag til denne konkurransen kan maks være {0}.</value>
+  </data>
+  <data name="beatmaps.download" xml:space="preserve">
+    <value>Last ned bidraget</value>
+  </data>
+  <data name="vote.list" xml:space="preserve">
+    <value>stemmer</value>
+  </data>
+  <data name="vote.count" xml:space="preserve">
+    <value>{0} stemme|{0} stemmer</value>
+  </data>
+  <data name="vote.points" xml:space="preserve">
+    <value>{0} poeng|{0} poeng</value>
+  </data>
+  <data name="dates.ended" xml:space="preserve">
+    <value>Avsluttet {0}</value>
+  </data>
+  <data name="dates.ended_no_date" xml:space="preserve">
+    <value>Avsluttet</value>
+  </data>
+  <data name="dates.starts._" xml:space="preserve">
+    <value>Starter {0}</value>
+  </data>
+  <data name="dates.starts.soon" xml:space="preserve">
+    <value>snart™</value>
+  </data>
+  <data name="states.entry" xml:space="preserve">
+    <value>Påmelding åpen</value>
+  </data>
+  <data name="states.voting" xml:space="preserve">
+    <value>Avstemningen har begynt</value>
+  </data>
+  <data name="states.results" xml:space="preserve">
+    <value>Resultat er ute</value>
+  </data>
+</root>

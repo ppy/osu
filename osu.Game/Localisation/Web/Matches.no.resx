@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="match.beatmap-deleted" xml:space="preserve">
+    <value>slettet beatmap</value>
+  </data>
+  <data name="match.difference" xml:space="preserve">
+    <value>med {0}</value>
+  </data>
+  <data name="match.failed" xml:space="preserve">
+    <value>MISLYKTES</value>
+  </data>
+  <data name="match.header" xml:space="preserve">
+    <value>Flerspillerkamper</value>
+  </data>
+  <data name="match.in-progress" xml:space="preserve">
+    <value>(spill pågår)</value>
+  </data>
+  <data name="match.in_progress_spinner_label" xml:space="preserve">
+    <value>spill pågår</value>
+  </data>
+  <data name="match.loading-events" xml:space="preserve">
+    <value>Laster hendelser...</value>
+  </data>
+  <data name="match.winner" xml:space="preserve">
+    <value>{0} vinner</value>
+  </data>
+  <data name="match.events.player-left" xml:space="preserve">
+    <value>{0} forlot spillet</value>
+  </data>
+  <data name="match.events.player-joined" xml:space="preserve">
+    <value>{0} ble med i spillet</value>
+  </data>
+  <data name="match.events.player-kicked" xml:space="preserve">
+    <value>{0} har blitt sparket fra spillet</value>
+  </data>
+  <data name="match.events.match-created" xml:space="preserve">
+    <value>{0} opprettet spillet</value>
+  </data>
+  <data name="match.events.match-disbanded" xml:space="preserve">
+    <value>spillet ble oppløst</value>
+  </data>
+  <data name="match.events.host-changed" xml:space="preserve">
+    <value>{0} ble verten</value>
+  </data>
+  <data name="match.events.player-left-no-user" xml:space="preserve">
+    <value>en spiller forlot spillet</value>
+  </data>
+  <data name="match.events.player-joined-no-user" xml:space="preserve">
+    <value>en spiller ble med i spillet</value>
+  </data>
+  <data name="match.events.player-kicked-no-user" xml:space="preserve">
+    <value>en spiller har blitt sparket fra spillet</value>
+  </data>
+  <data name="match.events.match-created-no-user" xml:space="preserve">
+    <value>spillet ble opprettet</value>
+  </data>
+  <data name="match.events.match-disbanded-no-user" xml:space="preserve">
+    <value>spillet ble oppløst</value>
+  </data>
+  <data name="match.events.host-changed-no-user" xml:space="preserve">
+    <value>verten ble endret</value>
+  </data>
+  <data name="match.score.stats.accuracy" xml:space="preserve">
+    <value>Presisjon</value>
+  </data>
+  <data name="match.score.stats.combo" xml:space="preserve">
+    <value>Kombo</value>
+  </data>
+  <data name="match.score.stats.score" xml:space="preserve">
+    <value>Poeng</value>
+  </data>
+  <data name="match.team-types.head-to-head" xml:space="preserve">
+    <value>Alle-mot-alle</value>
+  </data>
+  <data name="match.team-types.tag-coop" xml:space="preserve">
+    <value>Tag Co-op</value>
+  </data>
+  <data name="match.team-types.team-vs" xml:space="preserve">
+    <value>Lag VS</value>
+  </data>
+  <data name="match.team-types.tag-team-vs" xml:space="preserve">
+    <value>Tag Lag VS</value>
+  </data>
+  <data name="match.teams.blue" xml:space="preserve">
+    <value>Blått lag</value>
+  </data>
+  <data name="match.teams.red" xml:space="preserve">
+    <value>Rødt lag</value>
+  </data>
+  <data name="game.scoring-type.score" xml:space="preserve">
+    <value>Høyeste poengsum</value>
+  </data>
+  <data name="game.scoring-type.accuracy" xml:space="preserve">
+    <value>Høyeste presisjon</value>
+  </data>
+  <data name="game.scoring-type.combo" xml:space="preserve">
+    <value>Høyeste combo</value>
+  </data>
+  <data name="game.scoring-type.scorev2" xml:space="preserve">
+    <value>Poengsum V2</value>
+  </data>
+</root>

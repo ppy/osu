@@ -1,0 +1,694 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="discussion-votes.update.error" xml:space="preserve">
+    <value>อัปเดตโหวตล้มเหลว</value>
+  </data>
+  <data name="discussions.allow_kudosu" xml:space="preserve">
+    <value>อนุญาตการให้ kudosu</value>
+  </data>
+  <data name="discussions.beatmap_information" xml:space="preserve">
+    <value>หน้าบีทแมพ</value>
+  </data>
+  <data name="discussions.delete" xml:space="preserve">
+    <value>ลบ</value>
+  </data>
+  <data name="discussions.deleted" xml:space="preserve">
+    <value>ถูกลบโดย {0} เมื่อเวลา {1}</value>
+  </data>
+  <data name="discussions.deny_kudosu" xml:space="preserve">
+    <value>ปฏิเสธการให้ kudosu</value>
+  </data>
+  <data name="discussions.edit" xml:space="preserve">
+    <value>แก้ไข</value>
+  </data>
+  <data name="discussions.edited" xml:space="preserve">
+    <value>แก้ไขล่าสุดโดย {0} เมื่อเวลา {1}</value>
+  </data>
+  <data name="discussions.guest" xml:space="preserve">
+    <value>ระดับความยากของแขกโดย{0}</value>
+  </data>
+  <data name="discussions.kudosu_denied" xml:space="preserve">
+    <value>ถูกปฏิเสธการให้ kudosu</value>
+  </data>
+  <data name="discussions.message_placeholder_deleted_beatmap" xml:space="preserve">
+    <value>ระดับความยากนี้ถูกลบแล้วจึงไม่ควรถูกสนทนาถึง</value>
+  </data>
+  <data name="discussions.message_placeholder_locked" xml:space="preserve">
+    <value>การสนทนาสำหรับบีทแมพนี้ถูกปิดใช้งาน</value>
+  </data>
+  <data name="discussions.message_placeholder_silenced" xml:space="preserve">
+    <value>ไม่สามารถโพสต์การสนทนาในขณะที่โดนเงียบ</value>
+  </data>
+  <data name="discussions.message_type_select" xml:space="preserve">
+    <value>เลือกประเภทความคิดเห็น</value>
+  </data>
+  <data name="discussions.reply_notice" xml:space="preserve">
+    <value>กด Enter เพื่อตอบกลับ</value>
+  </data>
+  <data name="discussions.reply_placeholder" xml:space="preserve">
+    <value>พิมพ์คำตอบกลับที่นี่</value>
+  </data>
+  <data name="discussions.require-login" xml:space="preserve">
+    <value>กรุณาเข้าสู่ระบบเพื่อโพสต์หรือตอบกลับ</value>
+  </data>
+  <data name="discussions.resolved" xml:space="preserve">
+    <value>แก้ไขแล้ว</value>
+  </data>
+  <data name="discussions.restore" xml:space="preserve">
+    <value>กู้คืน</value>
+  </data>
+  <data name="discussions.show_deleted" xml:space="preserve">
+    <value>แสดงรายการที่ถูกลบ</value>
+  </data>
+  <data name="discussions.title" xml:space="preserve">
+    <value>การสนทนา</value>
+  </data>
+  <data name="discussions.collapse.all-collapse" xml:space="preserve">
+    <value>ซ่อนทั้งหมด</value>
+  </data>
+  <data name="discussions.collapse.all-expand" xml:space="preserve">
+    <value>ขยายทั้งหมด</value>
+  </data>
+  <data name="discussions.empty.empty" xml:space="preserve">
+    <value>ยังไม่มีการสนทนา!</value>
+  </data>
+  <data name="discussions.empty.hidden" xml:space="preserve">
+    <value>ไม่มีการสนทนาตามที่คุณเลือก</value>
+  </data>
+  <data name="discussions.lock.button.lock" xml:space="preserve">
+    <value>ล็อกการสนทนา</value>
+  </data>
+  <data name="discussions.lock.button.unlock" xml:space="preserve">
+    <value>ปลดล็อกการสนทนา</value>
+  </data>
+  <data name="discussions.lock.prompt.lock" xml:space="preserve">
+    <value>เหตุผลสำหรับการล็อก</value>
+  </data>
+  <data name="discussions.lock.prompt.unlock" xml:space="preserve">
+    <value>คุณแน่ใจที่จะปลดล็อกหรือไม่?</value>
+  </data>
+  <data name="discussions.message_hint.in_general" xml:space="preserve">
+    <value>โพสต์นี้จะไปที่การสนทนาทั่วไป ถ้าอยากวิจารณ์บีทแมพนี้ เริ่มต้นข้อความของคุณด้วยช่วงเวลา (เช่น 00:12:345)</value>
+  </data>
+  <data name="discussions.message_hint.in_timeline" xml:space="preserve">
+    <value>ในการวิจารณ์หลายช่วงเวลา โพสต์หลายๆครั้ง (หนึ่งโพสต์ต่อหนึ่งช่วงเวลา)</value>
+  </data>
+  <data name="discussions.message_placeholder.general" xml:space="preserve">
+    <value>พิมพ์ตรงนี้เพื่อลงรายการบัญชีทั่วไป ({0})</value>
+  </data>
+  <data name="discussions.message_placeholder.generalall" xml:space="preserve">
+    <value>พิมพ์ตรงนี้เพื่อลงรายการบัญชีทั่วไป (ทุกระดับความยาก)</value>
+  </data>
+  <data name="discussions.message_placeholder.review" xml:space="preserve">
+    <value>เขียนที่นี่เพื่อเพิ่มบทวิจารณ์</value>
+  </data>
+  <data name="discussions.message_placeholder.timeline" xml:space="preserve">
+    <value>พิมพ์ตรงนี้เพื่อลงรายการบัญชีไปยังไทม์ไลน์ ({0})</value>
+  </data>
+  <data name="discussions.message_type.disqualify" xml:space="preserve">
+    <value>ตัดสิทธิ์</value>
+  </data>
+  <data name="discussions.message_type.hype" xml:space="preserve">
+    <value>Hype!</value>
+  </data>
+  <data name="discussions.message_type.mapper_note" xml:space="preserve">
+    <value>หมายเหตุ</value>
+  </data>
+  <data name="discussions.message_type.nomination_reset" xml:space="preserve">
+    <value>รีเซทการเสนอชื่อ</value>
+  </data>
+  <data name="discussions.message_type.praise" xml:space="preserve">
+    <value>ชื่นชม</value>
+  </data>
+  <data name="discussions.message_type.problem" xml:space="preserve">
+    <value>ข้อผิดพลาด</value>
+  </data>
+  <data name="discussions.message_type.review" xml:space="preserve">
+    <value>บทวิจารณ์</value>
+  </data>
+  <data name="discussions.message_type.suggestion" xml:space="preserve">
+    <value>ข้อเสนอแนะ</value>
+  </data>
+  <data name="discussions.mode.events" xml:space="preserve">
+    <value>ประวัติ</value>
+  </data>
+  <data name="discussions.mode.general" xml:space="preserve">
+    <value>ทั่วไป {0}</value>
+  </data>
+  <data name="discussions.mode.reviews" xml:space="preserve">
+    <value>บทวิจารณ์</value>
+  </data>
+  <data name="discussions.mode.timeline" xml:space="preserve">
+    <value>เส้นเวลา</value>
+  </data>
+  <data name="discussions.mode.scopes.general" xml:space="preserve">
+    <value>ระดับความยากนี้</value>
+  </data>
+  <data name="discussions.mode.scopes.generalall" xml:space="preserve">
+    <value>ทุกระดับความยาก</value>
+  </data>
+  <data name="discussions.new.pin" xml:space="preserve">
+    <value>ปักหมุด</value>
+  </data>
+  <data name="discussions.new.timestamp" xml:space="preserve">
+    <value>ช่วงเวลา</value>
+  </data>
+  <data name="discussions.new.timestamp_missing" xml:space="preserve">
+    <value>กด ctrl-c ในหน้าแก้ไขแมพและกดวางในข้อความของคุณเพื่อเพิ่มช่วงเวลา!</value>
+  </data>
+  <data name="discussions.new.title" xml:space="preserve">
+    <value>การสนทนาใหม่</value>
+  </data>
+  <data name="discussions.new.unpin" xml:space="preserve">
+    <value>ยกเลิกการปักหมุด</value>
+  </data>
+  <data name="discussions.review.new" xml:space="preserve">
+    <value>บทวิจารณ์ใหม่</value>
+  </data>
+  <data name="discussions.review.embed.delete" xml:space="preserve">
+    <value>ลบ</value>
+  </data>
+  <data name="discussions.review.embed.missing" xml:space="preserve">
+    <value>[ข้อความถูกลบ]</value>
+  </data>
+  <data name="discussions.review.embed.unlink" xml:space="preserve">
+    <value>เลิกการเชื่อมโยง</value>
+  </data>
+  <data name="discussions.review.embed.unsaved" xml:space="preserve">
+    <value>ยังไม่ได้บันทึก</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.all-diff" xml:space="preserve">
+    <value>โพสต์ในหมวด "ทุกระดับความยาก" จะไม่สามารถใส่ประทับเวลาได้</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.diff" xml:space="preserve">
+    <value>ถ้า {0} เริ่มต้นด้วยการประทับเวลา สิ่งเหล่านั้นจะถูกแสดงภายใต้ไทม์ไลน์</value>
+  </data>
+  <data name="discussions.review.insert-block.paragraph" xml:space="preserve">
+    <value>แทรกย่อหน้า</value>
+  </data>
+  <data name="discussions.review.insert-block.praise" xml:space="preserve">
+    <value>ชื่นชม</value>
+  </data>
+  <data name="discussions.review.insert-block.problem" xml:space="preserve">
+    <value>เพิ่มปัญหา</value>
+  </data>
+  <data name="discussions.review.insert-block.suggestion" xml:space="preserve">
+    <value>เพิ่มคำแนะนำ</value>
+  </data>
+  <data name="discussions.show.title" xml:space="preserve">
+    <value>{0} แมพโดย {1}</value>
+  </data>
+  <data name="discussions.sort.created_at" xml:space="preserve">
+    <value>เวลาที่สร้าง</value>
+  </data>
+  <data name="discussions.sort.timeline" xml:space="preserve">
+    <value>ไทม์ไลน์</value>
+  </data>
+  <data name="discussions.sort.updated_at" xml:space="preserve">
+    <value>อัปเดตล่าสุด</value>
+  </data>
+  <data name="discussions.stats.deleted" xml:space="preserve">
+    <value>ถูกลบไปแล้ว</value>
+  </data>
+  <data name="discussions.stats.mapper_notes" xml:space="preserve">
+    <value>หมายเหตุ</value>
+  </data>
+  <data name="discussions.stats.mine" xml:space="preserve">
+    <value>ของเรา</value>
+  </data>
+  <data name="discussions.stats.pending" xml:space="preserve">
+    <value>อยู่ระหว่างดำเนินการ</value>
+  </data>
+  <data name="discussions.stats.praises" xml:space="preserve">
+    <value>ชื่นชม</value>
+  </data>
+  <data name="discussions.stats.resolved" xml:space="preserve">
+    <value>แก้ไขแล้ว</value>
+  </data>
+  <data name="discussions.stats.total" xml:space="preserve">
+    <value>ทั้งหมด</value>
+  </data>
+  <data name="discussions.status-messages.approved" xml:space="preserve">
+    <value>Beatmap นี้ถูกอนุมัติในวันที่ {0}</value>
+  </data>
+  <data name="discussions.status-messages.graveyard" xml:space="preserve">
+    <value>บีทแมพนี้ไม่ถูกอัปเดตตั้งแต่ {0} และน่าจะถูกละทิ้งโดยผู้ทำแมพไปแล้ว</value>
+  </data>
+  <data name="discussions.status-messages.loved" xml:space="preserve">
+    <value>บีทแมพนี้ถูก Loved ในวันที่ {0}</value>
+  </data>
+  <data name="discussions.status-messages.ranked" xml:space="preserve">
+    <value>บีทแมพนี้ถูกจัดอันดับในวันที่ {0}</value>
+  </data>
+  <data name="discussions.status-messages.wip" xml:space="preserve">
+    <value>บีทแมพนี้ถูกทำเครื่องหมายไว้ว่าอยู่ในระหว่างการทำ</value>
+  </data>
+  <data name="discussions.votes.none.down" xml:space="preserve">
+    <value>ยังไม่มีคนไม่เห็นด้วย</value>
+  </data>
+  <data name="discussions.votes.none.up" xml:space="preserve">
+    <value>ยังไม่มีคนเห็นด้วย</value>
+  </data>
+  <data name="discussions.votes.latest.down" xml:space="preserve">
+    <value>ความคิดเห็นที่ไม่เห็นด้วยล่าสุด</value>
+  </data>
+  <data name="discussions.votes.latest.up" xml:space="preserve">
+    <value>ความคิดเห็นที่เห็นด้วยล่าสุด</value>
+  </data>
+  <data name="hype.button" xml:space="preserve">
+    <value>Hype Beatmap!</value>
+  </data>
+  <data name="hype.button_done" xml:space="preserve">
+    <value>Hype ไปแล้ว!</value>
+  </data>
+  <data name="hype.confirm" xml:space="preserve">
+    <value>แน่ใจหรอ นี่จะใช้หนึ่งใน {0} Hype ที่เหลือของคุณและไม่สามารถแก้ไขได้</value>
+  </data>
+  <data name="hype.explanation" xml:space="preserve">
+    <value>Hype บีทแมพนี้เพื่อทำให้ง่ายขึ้นต่อการเสนอชื่อและจัดอันดับ</value>
+  </data>
+  <data name="hype.explanation_guest" xml:space="preserve">
+    <value>ลงชื่อเข้าใช้และ Hype บีทแมพนี้เพื่อทำให้ง่ายขึ้นต่อการเสนอชื่อและจัดอันดับ</value>
+  </data>
+  <data name="hype.new_time" xml:space="preserve">
+    <value>คุณจะได้ Hype ใหม่ใน {0}</value>
+  </data>
+  <data name="hype.remaining" xml:space="preserve">
+    <value>คุณมี Hype เหลือ {0} อัน</value>
+  </data>
+  <data name="hype.required_text" xml:space="preserve">
+    <value>Hype: {0}/{1}</value>
+  </data>
+  <data name="hype.section_title" xml:space="preserve">
+    <value>Hype Train</value>
+  </data>
+  <data name="hype.title" xml:space="preserve">
+    <value>Hype</value>
+  </data>
+  <data name="feedback.button" xml:space="preserve">
+    <value>ฝากคำติชม</value>
+  </data>
+  <data name="nominations.delete" xml:space="preserve">
+    <value>ลบ</value>
+  </data>
+  <data name="nominations.delete_own_confirm" xml:space="preserve">
+    <value>คุณแน่ใจใช่ไหม? บีทแมพจะถูกลบและคุณจะถูกนำกลับไปยังหน้าโปรไฟล์ของคุณ</value>
+  </data>
+  <data name="nominations.delete_other_confirm" xml:space="preserve">
+    <value>คุณแน่ใจใช่ไหม? บีทแมพจะถูกลบและคุณจะถูกนำกลับไปยังหน้าโปรไฟล์ของผู้เล่น</value>
+  </data>
+  <data name="nominations.disqualification_prompt" xml:space="preserve">
+    <value>เหตุผลในการตัดสิทธิ์?</value>
+  </data>
+  <data name="nominations.disqualified_at" xml:space="preserve">
+    <value>ถูกตัดสิทธิ์เมื่อ {0} เพราะ ({1})</value>
+  </data>
+  <data name="nominations.disqualified_no_reason" xml:space="preserve">
+    <value>ไม่มีเหตุผลที่ระบุไว้</value>
+  </data>
+  <data name="nominations.disqualify" xml:space="preserve">
+    <value>ตัดสิทธิ์</value>
+  </data>
+  <data name="nominations.incorrect_state" xml:space="preserve">
+    <value>เกิดข้อผิดพลาดในการดำเนินการ ลองรีเฟรชหน้าเพจนี้ดู</value>
+  </data>
+  <data name="nominations.love" xml:space="preserve">
+    <value>Love</value>
+  </data>
+  <data name="nominations.love_confirm" xml:space="preserve">
+    <value>ชอบบีทแมพนี้หรือ?</value>
+  </data>
+  <data name="nominations.nominate" xml:space="preserve">
+    <value>เสนอชื่อ</value>
+  </data>
+  <data name="nominations.nominate_confirm" xml:space="preserve">
+    <value>เสนอชื่อบีทแมพนี้?</value>
+  </data>
+  <data name="nominations.nominated_by" xml:space="preserve">
+    <value>เสนอชื่อโดย {0}</value>
+  </data>
+  <data name="nominations.not_enough_hype" xml:space="preserve">
+    <value>ไม่มี Hype เพียงพอ</value>
+  </data>
+  <data name="nominations.remove_from_loved" xml:space="preserve">
+    <value>ถูกนำออกจาก Loved</value>
+  </data>
+  <data name="nominations.remove_from_loved_prompt" xml:space="preserve">
+    <value>เหตุผลในการถูกออกจาก Loved</value>
+  </data>
+  <data name="nominations.required_text" xml:space="preserve">
+    <value>การเสนอชื่อ: {0}/{1}</value>
+  </data>
+  <data name="nominations.reset_message_deleted" xml:space="preserve">
+    <value>ถูกลบไปแล้ว</value>
+  </data>
+  <data name="nominations.title" xml:space="preserve">
+    <value>ข้อมูลการเสนอชื่อ</value>
+  </data>
+  <data name="nominations.unresolved_issues" xml:space="preserve">
+    <value>ยังมีปัญหาที่ต้องแก้ไขให้เสร็จก่อน</value>
+  </data>
+  <data name="nominations.rank_estimate._" xml:space="preserve">
+    <value>แมพนี้จะถูก ranked  ใน {0} ถ้าไม่พบเจอปัญหาเพิ่มเติม แมพนี้อยู่ที่ #{1} ใน {2}</value>
+  </data>
+  <data name="nominations.rank_estimate.queue" xml:space="preserve">
+    <value>คิวการ rank</value>
+  </data>
+  <data name="nominations.rank_estimate.soon" xml:space="preserve">
+    <value>เร็ว ๆ นี้</value>
+  </data>
+  <data name="nominations.reset_at.nomination_reset" xml:space="preserve">
+    <value>การเสนอชื่อถูกรีเซ็ตเมื่อ {0} โดยผู้ใช้ {1} ที่มีปัญหาใหม่ {2} ({3})</value>
+  </data>
+  <data name="nominations.reset_at.disqualify" xml:space="preserve">
+    <value>ถูกตัดสิทธิ์เมื่อ {0} โดยผู้ใช้ {1} ที่มีปัญหาใหม่ {2} ({3})</value>
+  </data>
+  <data name="nominations.reset_confirm.nomination_reset" xml:space="preserve">
+    <value>คุณแน่ใจหรือ? ในการโพสต์ปัญหาใหม่จะรีเซ็ตการเสนอชื่อ</value>
+  </data>
+  <data name="nominations.reset_confirm.disqualify" xml:space="preserve">
+    <value>คุณแน่ใจใช่หรือไม่? ที่จะลบบีทแมพออกและรีเซ็ตความคืบหน้า</value>
+  </data>
+  <data name="listing.search.prompt" xml:space="preserve">
+    <value>พิมพ์คำสำคัญ...</value>
+  </data>
+  <data name="listing.search.login_required" xml:space="preserve">
+    <value>ลงชื่อเข้าใช้เพื่อค้นหา</value>
+  </data>
+  <data name="listing.search.options" xml:space="preserve">
+    <value>ตัวเลือกการค้นหาเพิ่มเติม</value>
+  </data>
+  <data name="listing.search.supporter_filter" xml:space="preserve">
+    <value>กรองโดย {0} ต้องมี osu!supporter tag ทำงานอยู่</value>
+  </data>
+  <data name="listing.search.not-found" xml:space="preserve">
+    <value>ไม่มีผลการค้นหา</value>
+  </data>
+  <data name="listing.search.not-found-quote" xml:space="preserve">
+    <value>... ไม่อ่ะ ไม่เจออะไรเลย</value>
+  </data>
+  <data name="listing.search.filters.extra" xml:space="preserve">
+    <value>เพิ่มเติม</value>
+  </data>
+  <data name="listing.search.filters.general" xml:space="preserve">
+    <value>ทั่วไป</value>
+  </data>
+  <data name="listing.search.filters.genre" xml:space="preserve">
+    <value>ประเภท</value>
+  </data>
+  <data name="listing.search.filters.language" xml:space="preserve">
+    <value>ภาษา</value>
+  </data>
+  <data name="listing.search.filters.mode" xml:space="preserve">
+    <value>โหมด</value>
+  </data>
+  <data name="listing.search.filters.nsfw" xml:space="preserve">
+    <value>เนื้อหาล่อแหลม</value>
+  </data>
+  <data name="listing.search.filters.played" xml:space="preserve">
+    <value>เคยเล่นแล้ว</value>
+  </data>
+  <data name="listing.search.filters.rank" xml:space="preserve">
+    <value>แรงค์ที่ได้รับ</value>
+  </data>
+  <data name="listing.search.filters.status" xml:space="preserve">
+    <value>หมวดหมู่</value>
+  </data>
+  <data name="listing.search.sorting.title" xml:space="preserve">
+    <value>ชื่อ</value>
+  </data>
+  <data name="listing.search.sorting.artist" xml:space="preserve">
+    <value>ศิลปิน</value>
+  </data>
+  <data name="listing.search.sorting.difficulty" xml:space="preserve">
+    <value>ระดับความยาก</value>
+  </data>
+  <data name="listing.search.sorting.favourites" xml:space="preserve">
+    <value>รายการโปรด</value>
+  </data>
+  <data name="listing.search.sorting.updated" xml:space="preserve">
+    <value>อัปเดตแล้ว</value>
+  </data>
+  <data name="listing.search.sorting.ranked" xml:space="preserve">
+    <value>จัดอันดับแล้ว</value>
+  </data>
+  <data name="listing.search.sorting.rating" xml:space="preserve">
+    <value>เรตติ้ง</value>
+  </data>
+  <data name="listing.search.sorting.plays" xml:space="preserve">
+    <value>จำนวนการเล่น</value>
+  </data>
+  <data name="listing.search.sorting.relevance" xml:space="preserve">
+    <value>ความเกี่ยวข้อง</value>
+  </data>
+  <data name="listing.search.sorting.nominations" xml:space="preserve">
+    <value>การเสนอชื่อ</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote._" xml:space="preserve">
+    <value>กรองโดย {0} ต้องมี {1} ทำงานอยู่</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote.link_text" xml:space="preserve">
+    <value>แท็กสนับสนุน</value>
+  </data>
+  <data name="general.converts" xml:space="preserve">
+    <value>รวมแมพคอนเวิรต์ด้วย</value>
+  </data>
+  <data name="general.follows" xml:space="preserve">
+    <value>ติดตามผู้ทำแมพ</value>
+  </data>
+  <data name="general.recommended" xml:space="preserve">
+    <value>ระดับความยากที่แนะนำ</value>
+  </data>
+  <data name="mode.all" xml:space="preserve">
+    <value>ทั้งหมด</value>
+  </data>
+  <data name="mode.any" xml:space="preserve">
+    <value>ไม่เจาะจง</value>
+  </data>
+  <data name="status.any" xml:space="preserve">
+    <value>ไม่เจาะจง</value>
+  </data>
+  <data name="status.approved" xml:space="preserve">
+    <value>อนุมัติ</value>
+  </data>
+  <data name="status.favourites" xml:space="preserve">
+    <value>รายการโปรด</value>
+  </data>
+  <data name="status.graveyard" xml:space="preserve">
+    <value>สุสาน</value>
+  </data>
+  <data name="status.leaderboard" xml:space="preserve">
+    <value>สถิติการจัดลำดับ</value>
+  </data>
+  <data name="status.loved" xml:space="preserve">
+    <value>Loved</value>
+  </data>
+  <data name="status.mine" xml:space="preserve">
+    <value>แมพของฉัน</value>
+  </data>
+  <data name="status.pending" xml:space="preserve">
+    <value>รอดำเนินการ &amp; WIP</value>
+  </data>
+  <data name="status.qualified" xml:space="preserve">
+    <value>Qualified</value>
+  </data>
+  <data name="status.ranked" xml:space="preserve">
+    <value>จัดอันดับแล้ว</value>
+  </data>
+  <data name="genre.any" xml:space="preserve">
+    <value>ไม่เจาะจง</value>
+  </data>
+  <data name="genre.unspecified" xml:space="preserve">
+    <value>ไม่ระบุ</value>
+  </data>
+  <data name="genre.video-game" xml:space="preserve">
+    <value>วิดีโอเกม</value>
+  </data>
+  <data name="genre.anime" xml:space="preserve">
+    <value>อนิเมะ</value>
+  </data>
+  <data name="genre.rock" xml:space="preserve">
+    <value>ร็อค</value>
+  </data>
+  <data name="genre.pop" xml:space="preserve">
+    <value>ป๊อป</value>
+  </data>
+  <data name="genre.other" xml:space="preserve">
+    <value>อื่นๆ</value>
+  </data>
+  <data name="genre.novelty" xml:space="preserve">
+    <value>นวนิยาย</value>
+  </data>
+  <data name="genre.hip-hop" xml:space="preserve">
+    <value>ฮิปฮอป</value>
+  </data>
+  <data name="genre.electronic" xml:space="preserve">
+    <value>อิเล็กทรอนิกส์</value>
+  </data>
+  <data name="genre.metal" xml:space="preserve">
+    <value>เมทัล</value>
+  </data>
+  <data name="genre.classical" xml:space="preserve">
+    <value>คลาสสิก</value>
+  </data>
+  <data name="genre.folk" xml:space="preserve">
+    <value>โฟล์ค</value>
+  </data>
+  <data name="genre.jazz" xml:space="preserve">
+    <value>แจ๊ส</value>
+  </data>
+  <data name="mods.rx" xml:space="preserve">
+    <value>ใจเย็น</value>
+  </data>
+  <data name="mods.v2" xml:space="preserve">
+    <value>Score V2</value>
+  </data>
+  <data name="language.any" xml:space="preserve">
+    <value>Any</value>
+  </data>
+  <data name="language.english" xml:space="preserve">
+    <value>อังกฤษ</value>
+  </data>
+  <data name="language.chinese" xml:space="preserve">
+    <value>จีน</value>
+  </data>
+  <data name="language.french" xml:space="preserve">
+    <value>ฝรั่งเศส</value>
+  </data>
+  <data name="language.german" xml:space="preserve">
+    <value>เยอรมัน</value>
+  </data>
+  <data name="language.italian" xml:space="preserve">
+    <value>อิตาลี</value>
+  </data>
+  <data name="language.japanese" xml:space="preserve">
+    <value>ญี่ปุ่น</value>
+  </data>
+  <data name="language.korean" xml:space="preserve">
+    <value>เกาหลี</value>
+  </data>
+  <data name="language.spanish" xml:space="preserve">
+    <value>สเปน</value>
+  </data>
+  <data name="language.swedish" xml:space="preserve">
+    <value>สวีเดน</value>
+  </data>
+  <data name="language.russian" xml:space="preserve">
+    <value>ภาษารัสเซีย</value>
+  </data>
+  <data name="language.polish" xml:space="preserve">
+    <value>ภาษาโปแลนด์</value>
+  </data>
+  <data name="language.instrumental" xml:space="preserve">
+    <value>เครื่องดนตรี</value>
+  </data>
+  <data name="language.other" xml:space="preserve">
+    <value>อื่นๆ</value>
+  </data>
+  <data name="language.unspecified" xml:space="preserve">
+    <value>ไม่ระบุภาษา</value>
+  </data>
+  <data name="nsfw.exclude" xml:space="preserve">
+    <value>ซ่อน</value>
+  </data>
+  <data name="nsfw.include" xml:space="preserve">
+    <value>แสดง</value>
+  </data>
+  <data name="played.any" xml:space="preserve">
+    <value>ไม่เจาะจง</value>
+  </data>
+  <data name="played.played" xml:space="preserve">
+    <value>เคยเล่นแล้ว</value>
+  </data>
+  <data name="played.unplayed" xml:space="preserve">
+    <value>ยังไม่เคยเล่น</value>
+  </data>
+  <data name="extra.video" xml:space="preserve">
+    <value>มีวิดีโอ</value>
+  </data>
+  <data name="extra.storyboard" xml:space="preserve">
+    <value>มี Storyboard</value>
+  </data>
+  <data name="rank.any" xml:space="preserve">
+    <value>ไม่เจาะจง</value>
+  </data>
+  <data name="rank.xh" xml:space="preserve">
+    <value>Silver SS</value>
+  </data>
+  <data name="rank.sh" xml:space="preserve">
+    <value>Silver S</value>
+  </data>
+  <data name="panel.playcount" xml:space="preserve">
+    <value>จำนวนการเล่น: {0}</value>
+  </data>
+  <data name="panel.favourites" xml:space="preserve">
+    <value>จำนวนการชื่นชอบ: {0}</value>
+  </data>
+  <data name="variant.mania.4k" xml:space="preserve">
+    <value>4K</value>
+  </data>
+  <data name="variant.mania.7k" xml:space="preserve">
+    <value>7K</value>
+  </data>
+  <data name="variant.mania.all" xml:space="preserve">
+    <value>ทั้งหมด</value>
+  </data>
+</root>

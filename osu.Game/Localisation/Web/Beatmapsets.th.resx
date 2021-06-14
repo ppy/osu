@@ -1,0 +1,391 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>บีทแมพนี้ยังไม่สามารถดาวน์โหลดได้</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>บางส่วนของบีทแมพนี้ถูกลบตามคำขอของผู้แต่งหรือผู้ถือสิทธิ์บุคคลสาม</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>เช็คที่นี่เพื่อดูรายละเอียดเพิ่มเติม</value>
+  </data>
+  <data name="availability.rule_violation" xml:space="preserve">
+    <value>เนื้อหาบางส่วนในแมพนี้ได้ถูกนำออกเนื่องจากถูกตัดสินว่าไม่เหมาะสมใน osu!</value>
+  </data>
+  <data name="download.limit_exceeded" xml:space="preserve">
+    <value>ช้าลงหน่อย เล่นมากขึ้น</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>รายการ Beatmap</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>บีทแมพ</value>
+  </data>
+  <data name="panel.empty" xml:space="preserve">
+    <value>ไม่มีบีทแมพ</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>ดาวน์โหลด</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>ดาวน์โหลดพร้อมวิดีโอ</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>ดาวน์โหลดโดยไม่มีวิดีโอ</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>เปิดใน osu!direct</value>
+  </data>
+  <data name="nominate.hybrid_requires_modes" xml:space="preserve">
+    <value>เซ็ตบีทแมพที่เป็นแบบไฮบริดจะต้องเลือกโหมดการเล่นอย่างน้อยหนึ่งโหมดที่จะเสนอชื่อให้</value>
+  </data>
+  <data name="nominate.incorrect_mode" xml:space="preserve">
+    <value>คุณไม่มีสิทธิในการเสนอชื่อในโหมด {0}</value>
+  </data>
+  <data name="nominate.full_bn_required" xml:space="preserve">
+    <value>คุณต้องเป็นผู้เสนอชื่อก่อนที่จะดำเนินการคุณสมบัตินี้ได้</value>
+  </data>
+  <data name="nominate.too_many" xml:space="preserve">
+    <value>ความต้องการเสนอชื่อได้สำเร็จแล้ว</value>
+  </data>
+  <data name="nominate.dialog.confirmation" xml:space="preserve">
+    <value>คุณแน่ใจที่จะเสนอชื่อแมพนี้ใช่ไหม</value>
+  </data>
+  <data name="nominate.dialog.header" xml:space="preserve">
+    <value>เสนอชื่อบีทแมพ</value>
+  </data>
+  <data name="nominate.dialog.hybrid_warning" xml:space="preserve">
+    <value>โน้ต: คุณสามารถเสนอชื่อได้เพียงแค่ครั้งเดียว ดังนั้นโปรดตรวจสอบให้แน่ใจว่าคุณเสนอชื่อในเกมโหมดทั้งหมดที่คุณต้องการจะเสนอชื่อ</value>
+  </data>
+  <data name="nominate.dialog.which_modes" xml:space="preserve">
+    <value>เสนอชื่อให้โหมดไหน</value>
+  </data>
+  <data name="nsfw_badge.label" xml:space="preserve">
+    <value>ไม่เหมาะสม</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>การสนทนา</value>
+  </data>
+  <data name="show.details.by_artist" xml:space="preserve">
+    <value>โดย {0}</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>กดชื่นชอบ beatmapset นี้</value>
+  </data>
+  <data name="show.details.favourite_login" xml:space="preserve">
+    <value>ลงชื่อบีทแมพนี้เป็นรายการโปรด</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>คุณต้องเข้าสู่ระบบก่อนที่จะดาวน์โหลดบีทแมพ</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>แมพโดย {0}</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>เลิก Favourite beatmapset นี้</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>อัปเดตล่าสุดเมื่อ {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>ดาวน์โหลด</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>ไม่มีวิดิโอ</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>พร้อมวิดิโอ</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>เพื่อได้รับคุณสมบัติเพิ่มเติม</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>เข้าสู่ระบบ</value>
+  </data>
+  <data name="show.details_date.approved" xml:space="preserve">
+    <value>อนุมัติ {0}</value>
+  </data>
+  <data name="show.details_date.loved" xml:space="preserve">
+    <value>loved เมื่อ {0}</value>
+  </data>
+  <data name="show.details_date.qualified" xml:space="preserve">
+    <value>qualified {0}</value>
+  </data>
+  <data name="show.details_date.ranked" xml:space="preserve">
+    <value>จัดอันดับแล้วเมื่อ {0}</value>
+  </data>
+  <data name="show.details_date.submitted" xml:space="preserve">
+    <value>ส่งเมื่อ {0}</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>อัปเดตครั้งล่าสุดเมื่อ {0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>คุณมีบีทแมพที่ชื่นชอบมากเกินไป! กรุณาเอาออกบ้างแล้วลองอีกครั้ง</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>ให้กำลังใจแมพนี้ หากคุณสนุกกับการเล่นและต้องการช่วยเหลือไปยังสถานะ &lt;strong&gt;Ranked&lt;/strong&gt;</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>แมพนี้อยู่ในระหว่าง {0}</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>อยู่ระหว่างดำเนินการ</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>qualified</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>อยู่ระหว่างดำเนินการ</value>
+  </data>
+  <data name="show.hype.disqualify._" xml:space="preserve">
+    <value>ถ้าคุณพบปัญหากับบีทแมพนี้ ให้คุณยกเลิกสถานะ Qualified ของบีทแมพนี้ไป {0}</value>
+  </data>
+  <data name="show.hype.report._" xml:space="preserve">
+    <value>ถ้าคุณพบปัญหากับบีทแมพนี้ โปรดรายงานให้เราทราบผ่าน {0}</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>รายงานปัญหา</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>ที่นี่</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>คำอธิบาย</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>ประเภท</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>ภาษา</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>ข้อมูลกำลังถูกคำนวณ...</value>
+  </data>
+  <data name="show.info.nsfw" xml:space="preserve">
+    <value>เนื้อหาไม่เหมาะสม</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>ความล้มเหลว</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>แหล่งที่มา</value>
+  </data>
+  <data name="show.info.storyboard" xml:space="preserve">
+    <value>บีทแมพนี้มี storyboard</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>อัตราการผ่าน</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>แท็ก</value>
+  </data>
+  <data name="show.info.video" xml:space="preserve">
+    <value>บีทแมพนี้มีวิดีโอ</value>
+  </data>
+  <data name="show.nsfw_warning.details" xml:space="preserve">
+    <value>บีทแมพนี้มีเนื้อหาไม่เหมาะสม, รุนแรง, หรือรบกวนใจ คุณยังจะต้องการดูมันไหม</value>
+  </data>
+  <data name="show.nsfw_warning.title" xml:space="preserve">
+    <value>เนื้อหาไม่เหมาะสม</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.disable" xml:space="preserve">
+    <value>ปิดการแจ้งเตือน</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.listing" xml:space="preserve">
+    <value>รายชื่อบีทแมพ</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.show" xml:space="preserve">
+    <value>แสดง</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>ได้รับ {0}</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>อันดับประเทศ</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>อันดับเพื่อน</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>อันดับโลก</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>คลิก &lt;a href="{0}"&gt;ที่นี่&lt;/a&gt; เพื่อดูสิ่งสวยงามทั้งหมดที่คุณได้รับ!</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>คุณต้องเป็นผู้สนับสนุนเพื่อเข้าถึงการจัดอันดับเพื่อนและประเทศ!</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>กระดานคะแนน</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>ความแม่นยำ</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>คอมโบสูงสุด</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>Miss</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>ม็อด</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>ผู้เล่น</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>อันดับ</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>คะแนนรวม</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>คะแนน</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>เวลา</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>ยังไม่มีใครในประเทศของคุณที่ทำคะแนนบนแมพนี้ได้!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>ยังไม่มีใครในเพือนของคุณที่ทำคะแนนบนแมพนี้ได้!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>ยังไม่มีคะแนน บางทีคุณอาจจะลองทำดูนะ</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>กำลังโหลดคะแนน...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>แมพที่ไม่ได้จัดอันดับ</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>นำ</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>คะแนนดีที่สุดของคุณ</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>ขนาดวงกลม</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>จำนวนคีย์</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>การลด HP</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>ความแม่นยำ</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>อัตราการเข้าใกล้</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>ระดับความยาก</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>ความยาว</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>จำนวนวงกลม</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>จำนวนสไลเดอร์</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>คะแนน</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>การกระจายคะแนนโหวต</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>การเสนอชื่อ</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>จำนวนครั้งที่เล่น</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>จัดอันดับแล้ว</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>อนุมัติ</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>Loved</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>Qualified</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>WIP</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>อยู่ระหว่างดำเนินการ</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>สุสาน</value>
+  </data>
+</root>

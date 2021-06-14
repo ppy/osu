@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="show.fallback_translation" xml:space="preserve">
+    <value>De opgevraagde pagina is nog niet vertaald naar de geselecteerde taal ({0}). Engelse versie wordt getoond.</value>
+  </data>
+  <data name="show.incomplete_or_outdated" xml:space="preserve">
+    <value>De inhoud op deze pagina is onvolledig of verouderd. Als je kunt helpen, kun je het artikel bijwerken!</value>
+  </data>
+  <data name="show.missing" xml:space="preserve">
+    <value>Gevraagde pagina "{0}" kon niet worden gevonden.</value>
+  </data>
+  <data name="show.missing_title" xml:space="preserve">
+    <value>Niet Gevonden</value>
+  </data>
+  <data name="show.missing_translation" xml:space="preserve">
+    <value>De opgevraagde pagina kon niet gevonden worden in de geselecteerde taal.</value>
+  </data>
+  <data name="show.needs_cleanup_or_rewrite" xml:space="preserve">
+    <value>Deze pagina voldoet niet aan de normen van de osu! wiki en moet worden opgeschoond of herschreven. Als u kunt helpen, overweeg dan om het artikel te updaten!</value>
+  </data>
+  <data name="show.search" xml:space="preserve">
+    <value>Zoek bestaande pagina's voor {0}.</value>
+  </data>
+  <data name="show.toc" xml:space="preserve">
+    <value>Inhoud</value>
+  </data>
+  <data name="show.edit.link" xml:space="preserve">
+    <value>Toon op GitHub</value>
+  </data>
+  <data name="show.edit.refresh" xml:space="preserve">
+    <value>Vernieuwen</value>
+  </data>
+  <data name="show.translation.legal" xml:space="preserve">
+    <value>Deze vertaling is alleen voor gemak beschikbaar. De originele {0} is de enige wettelijk bindende versie van deze tekst.</value>
+  </data>
+  <data name="show.translation.outdated" xml:space="preserve">
+    <value>Deze pagina bevat een oude vertaling van de originele inhoud. Check de {0} voor de meest accurate informatie (en overweeg de vertaling bij te werken als je wilt helpen)!</value>
+  </data>
+  <data name="show.translation.default" xml:space="preserve">
+    <value>Engelse versie</value>
+  </data>
+</root>

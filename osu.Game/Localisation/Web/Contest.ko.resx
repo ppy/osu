@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="header.small" xml:space="preserve">
+    <value>원을 클릭하는 것 말고도 더 다양한 방법으로 겨뤄보세요.</value>
+  </data>
+  <data name="header.large" xml:space="preserve">
+    <value>커뮤니티 콘테스트</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>목록</value>
+  </data>
+  <data name="voting.login_required" xml:space="preserve">
+    <value>투표하려면 로그인해주세요.</value>
+  </data>
+  <data name="voting.over" xml:space="preserve">
+    <value>이 콘테스트의 투표가 종료되었습니다.</value>
+  </data>
+  <data name="voting.show_voted_only" xml:space="preserve">
+    <value>&#x8;투표한 항목만 보기</value>
+  </data>
+  <data name="voting.best_of.none_played" xml:space="preserve">
+    <value>이 콘테스트에서 평가할 어떤 맵도 플레이하지 않으신 것 같네요.</value>
+  </data>
+  <data name="voting.button.add" xml:space="preserve">
+    <value>투표</value>
+  </data>
+  <data name="voting.button.remove" xml:space="preserve">
+    <value>투표 제거</value>
+  </data>
+  <data name="voting.button.used_up" xml:space="preserve">
+    <value>모든 투표권을 사용했습니다</value>
+  </data>
+  <data name="entry._" xml:space="preserve">
+    <value>참가</value>
+  </data>
+  <data name="entry.login_required" xml:space="preserve">
+    <value>콘테스트에 참가하려면 로그인해주세요.</value>
+  </data>
+  <data name="entry.silenced_or_restricted" xml:space="preserve">
+    <value>제한 또는 침묵 상태에서는 콘테스트에 참가할 수 없습니다.</value>
+  </data>
+  <data name="entry.preparation" xml:space="preserve">
+    <value>현재 콘테스트가 준비중에 있습니다. 인내심을 갖고 조금만 더 기다려주세요!</value>
+  </data>
+  <data name="entry.drop_here" xml:space="preserve">
+    <value>참가할 작품을 이곳에 끌어넣어주세요.</value>
+  </data>
+  <data name="entry.download" xml:space="preserve">
+    <value>.osz 파일 다운로드</value>
+  </data>
+  <data name="entry.wrong_type.art" xml:space="preserve">
+    <value>이 콘테스트에서는 .jpg 파일과 .png 파일만 등록할 수 있습니다.</value>
+  </data>
+  <data name="entry.wrong_type.beatmap" xml:space="preserve">
+    <value>이 콘테스트에서는 .osu 파일만 등록할 수 있습니다.</value>
+  </data>
+  <data name="entry.wrong_type.music" xml:space="preserve">
+    <value>이 콘테스트에서는 .mp3 파일만 등록할 수 있습니다.</value>
+  </data>
+  <data name="entry.too_big" xml:space="preserve">
+    <value>이 콘테스트의 최대 참가 가능한 작품 수는 {0}개 입니다.</value>
+  </data>
+  <data name="beatmaps.download" xml:space="preserve">
+    <value>참가작 다운로드</value>
+  </data>
+  <data name="vote.list" xml:space="preserve">
+    <value>투표</value>
+  </data>
+  <data name="vote.count" xml:space="preserve">
+    <value>{0}표</value>
+  </data>
+  <data name="vote.points" xml:space="preserve">
+    <value>{0}포인트</value>
+  </data>
+  <data name="dates.ended" xml:space="preserve">
+    <value>{0} 에 끝났습니다</value>
+  </data>
+  <data name="dates.ended_no_date" xml:space="preserve">
+    <value>종료됨</value>
+  </data>
+  <data name="dates.starts._" xml:space="preserve">
+    <value>{0} 에 시작합니다</value>
+  </data>
+  <data name="dates.starts.soon" xml:space="preserve">
+    <value>곧...™</value>
+  </data>
+  <data name="states.entry" xml:space="preserve">
+    <value>참가 작품 모집중</value>
+  </data>
+  <data name="states.voting" xml:space="preserve">
+    <value>투표 시작됨</value>
+  </data>
+  <data name="states.results" xml:space="preserve">
+    <value>결과 발표됨</value>
+  </data>
+</root>

@@ -1,0 +1,694 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="discussion-votes.update.error" xml:space="preserve">
+    <value>Oy güncelleme başarısız</value>
+  </data>
+  <data name="discussions.allow_kudosu" xml:space="preserve">
+    <value>kudosuya izin ver</value>
+  </data>
+  <data name="discussions.beatmap_information" xml:space="preserve">
+    <value>Beatmap sayfası</value>
+  </data>
+  <data name="discussions.delete" xml:space="preserve">
+    <value>sil</value>
+  </data>
+  <data name="discussions.deleted" xml:space="preserve">
+    <value>{0} tarafından {1} tarihinde silindi.</value>
+  </data>
+  <data name="discussions.deny_kudosu" xml:space="preserve">
+    <value>kudosuyu reddet</value>
+  </data>
+  <data name="discussions.edit" xml:space="preserve">
+    <value>düzenle</value>
+  </data>
+  <data name="discussions.edited" xml:space="preserve">
+    <value>En son {0} tarafından {1} tarihinde düzenlendi.</value>
+  </data>
+  <data name="discussions.guest" xml:space="preserve">
+    <value>{0} kullanıcısının konuk zorluğu</value>
+  </data>
+  <data name="discussions.kudosu_denied" xml:space="preserve">
+    <value>Kudosu almaktan mahrum bırakıldı.</value>
+  </data>
+  <data name="discussions.message_placeholder_deleted_beatmap" xml:space="preserve">
+    <value>Bu zorluk seviyesi silindi o yüzden hakkında daha fazla tartışılamaz.</value>
+  </data>
+  <data name="discussions.message_placeholder_locked" xml:space="preserve">
+    <value>Bu beatmap için tartışma devre dışı bırakıldı.</value>
+  </data>
+  <data name="discussions.message_placeholder_silenced" xml:space="preserve">
+    <value>Susturulduğunuzda tartışma gönderisi gönderemezsiniz.</value>
+  </data>
+  <data name="discussions.message_type_select" xml:space="preserve">
+    <value>Yorum Türünü Seçin</value>
+  </data>
+  <data name="discussions.reply_notice" xml:space="preserve">
+    <value>Cevaplamak için Enter tuşuna basın.</value>
+  </data>
+  <data name="discussions.reply_placeholder" xml:space="preserve">
+    <value>Yanıtınızı buraya yazın</value>
+  </data>
+  <data name="discussions.require-login" xml:space="preserve">
+    <value>Lütfen yorum yapmak ya da cevaplamak için giriş yapınız</value>
+  </data>
+  <data name="discussions.resolved" xml:space="preserve">
+    <value>Çözüldü</value>
+  </data>
+  <data name="discussions.restore" xml:space="preserve">
+    <value>restore et</value>
+  </data>
+  <data name="discussions.show_deleted" xml:space="preserve">
+    <value>Silineni göster</value>
+  </data>
+  <data name="discussions.title" xml:space="preserve">
+    <value>Tartışmalar</value>
+  </data>
+  <data name="discussions.collapse.all-collapse" xml:space="preserve">
+    <value>Tümünü küçült</value>
+  </data>
+  <data name="discussions.collapse.all-expand" xml:space="preserve">
+    <value>Tümünü genişlet</value>
+  </data>
+  <data name="discussions.empty.empty" xml:space="preserve">
+    <value>Henüz tartışma yok!</value>
+  </data>
+  <data name="discussions.empty.hidden" xml:space="preserve">
+    <value>Filtre ile eşleşen tartışma yok.</value>
+  </data>
+  <data name="discussions.lock.button.lock" xml:space="preserve">
+    <value>Tartışmayı kilitle</value>
+  </data>
+  <data name="discussions.lock.button.unlock" xml:space="preserve">
+    <value>Tartışmanın kilidini aç</value>
+  </data>
+  <data name="discussions.lock.prompt.lock" xml:space="preserve">
+    <value>Kilitleme sebebi</value>
+  </data>
+  <data name="discussions.lock.prompt.unlock" xml:space="preserve">
+    <value>Tartışmanın kilidini açmak istediğine emin misin?</value>
+  </data>
+  <data name="discussions.message_hint.in_general" xml:space="preserve">
+    <value>Bu gönderi beatmap setinin genel tartışmasına gidecek. Bu beatmapi modlamak için mesajı bir zaman damgası ile başlatın (ör: 00:12:345).</value>
+  </data>
+  <data name="discussions.message_hint.in_timeline" xml:space="preserve">
+    <value>Birden fazla zaman damgasını modlamak için, birden fazla gönderi yapın (gönderi başına bir zaman damgası).</value>
+  </data>
+  <data name="discussions.message_placeholder.general" xml:space="preserve">
+    <value>Genel'e yazmak için burayı kullanın ({0})</value>
+  </data>
+  <data name="discussions.message_placeholder.generalall" xml:space="preserve">
+    <value>Genel'e yazmak için burayı kullanın (tüm zorluklar)</value>
+  </data>
+  <data name="discussions.message_placeholder.review" xml:space="preserve">
+    <value>İnceleme göndermek için buraya yazın</value>
+  </data>
+  <data name="discussions.message_placeholder.timeline" xml:space="preserve">
+    <value>Timeline'a yazmak için burayı kullanın ({0})</value>
+  </data>
+  <data name="discussions.message_type.disqualify" xml:space="preserve">
+    <value>Diskalifiye</value>
+  </data>
+  <data name="discussions.message_type.hype" xml:space="preserve">
+    <value>Gazla!</value>
+  </data>
+  <data name="discussions.message_type.mapper_note" xml:space="preserve">
+    <value>Not</value>
+  </data>
+  <data name="discussions.message_type.nomination_reset" xml:space="preserve">
+    <value>Adaylığı Sıfırla</value>
+  </data>
+  <data name="discussions.message_type.praise" xml:space="preserve">
+    <value>Övgü</value>
+  </data>
+  <data name="discussions.message_type.problem" xml:space="preserve">
+    <value>Sorun</value>
+  </data>
+  <data name="discussions.message_type.review" xml:space="preserve">
+    <value>İnceleme</value>
+  </data>
+  <data name="discussions.message_type.suggestion" xml:space="preserve">
+    <value>Öneri</value>
+  </data>
+  <data name="discussions.mode.events" xml:space="preserve">
+    <value>Geçmiş</value>
+  </data>
+  <data name="discussions.mode.general" xml:space="preserve">
+    <value>Genel {0}</value>
+  </data>
+  <data name="discussions.mode.reviews" xml:space="preserve">
+    <value>İncelemeler</value>
+  </data>
+  <data name="discussions.mode.timeline" xml:space="preserve">
+    <value>Zaman Çizgisi</value>
+  </data>
+  <data name="discussions.mode.scopes.general" xml:space="preserve">
+    <value>Bu zorluk</value>
+  </data>
+  <data name="discussions.mode.scopes.generalall" xml:space="preserve">
+    <value>Tüm zorluklar</value>
+  </data>
+  <data name="discussions.new.pin" xml:space="preserve">
+    <value>Sabitle</value>
+  </data>
+  <data name="discussions.new.timestamp" xml:space="preserve">
+    <value>Zaman damgası</value>
+  </data>
+  <data name="discussions.new.timestamp_missing" xml:space="preserve">
+    <value>bir zaman damgası eklemek için editörde ctrl-c'ye basıp mesajınıza yapıştırın!</value>
+  </data>
+  <data name="discussions.new.title" xml:space="preserve">
+    <value>Yeni Tartışma</value>
+  </data>
+  <data name="discussions.new.unpin" xml:space="preserve">
+    <value>Sabitlemeyi kaldır</value>
+  </data>
+  <data name="discussions.review.new" xml:space="preserve">
+    <value>Yeni İnceleme</value>
+  </data>
+  <data name="discussions.review.embed.delete" xml:space="preserve">
+    <value>Sil</value>
+  </data>
+  <data name="discussions.review.embed.missing" xml:space="preserve">
+    <value>[TARTIŞMA SİLİNDİ]</value>
+  </data>
+  <data name="discussions.review.embed.unlink" xml:space="preserve">
+    <value>Bağlantıyı kaldır</value>
+  </data>
+  <data name="discussions.review.embed.unsaved" xml:space="preserve">
+    <value>Kaydedilmemiş</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.all-diff" xml:space="preserve">
+    <value>"Tüm zorluklar" kısmındaki gönderilere zaman damgası yerleştirilemez.</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.diff" xml:space="preserve">
+    <value>Eğer bu {0} bir zaman damgasıyla başlıyorsa, Zaman çizgisi altında gösterilecektir.</value>
+  </data>
+  <data name="discussions.review.insert-block.paragraph" xml:space="preserve">
+    <value>paragraf ekle</value>
+  </data>
+  <data name="discussions.review.insert-block.praise" xml:space="preserve">
+    <value>övgü ekle</value>
+  </data>
+  <data name="discussions.review.insert-block.problem" xml:space="preserve">
+    <value>sorun ekle</value>
+  </data>
+  <data name="discussions.review.insert-block.suggestion" xml:space="preserve">
+    <value>öneri ekle</value>
+  </data>
+  <data name="discussions.show.title" xml:space="preserve">
+    <value>{0} {1} tarafından yapıldı</value>
+  </data>
+  <data name="discussions.sort.created_at" xml:space="preserve">
+    <value>Oluşturulma zamanı</value>
+  </data>
+  <data name="discussions.sort.timeline" xml:space="preserve">
+    <value>Zaman Çizgisi</value>
+  </data>
+  <data name="discussions.sort.updated_at" xml:space="preserve">
+    <value>Son güncelleme</value>
+  </data>
+  <data name="discussions.stats.deleted" xml:space="preserve">
+    <value>Silindi</value>
+  </data>
+  <data name="discussions.stats.mapper_notes" xml:space="preserve">
+    <value>Notlar</value>
+  </data>
+  <data name="discussions.stats.mine" xml:space="preserve">
+    <value>Benim</value>
+  </data>
+  <data name="discussions.stats.pending" xml:space="preserve">
+    <value>Beklemede</value>
+  </data>
+  <data name="discussions.stats.praises" xml:space="preserve">
+    <value>Övgüler</value>
+  </data>
+  <data name="discussions.stats.resolved" xml:space="preserve">
+    <value>Çözüldü</value>
+  </data>
+  <data name="discussions.stats.total" xml:space="preserve">
+    <value>Hepsi</value>
+  </data>
+  <data name="discussions.status-messages.approved" xml:space="preserve">
+    <value>Bu beatmap {0} tarihinde onaylandı!</value>
+  </data>
+  <data name="discussions.status-messages.graveyard" xml:space="preserve">
+    <value>Bu beatmap {0} tarihinden beri güncellenmedi ve büyük ihtimalle yaratıcısı tarafından terk edildi...</value>
+  </data>
+  <data name="discussions.status-messages.loved" xml:space="preserve">
+    <value>Bu beatmap {0} tarihinde sevilenler kategorisine eklendi!</value>
+  </data>
+  <data name="discussions.status-messages.ranked" xml:space="preserve">
+    <value>Bu beatmap {0} tarihinde dereceli oldu!</value>
+  </data>
+  <data name="discussions.status-messages.wip" xml:space="preserve">
+    <value>Dikkat: Bu beatmap yaratıcısı tarafından yapım aşamasında olarak işaretlendi.</value>
+  </data>
+  <data name="discussions.votes.none.down" xml:space="preserve">
+    <value>Henüz negatif oy yok</value>
+  </data>
+  <data name="discussions.votes.none.up" xml:space="preserve">
+    <value>Henüz pozitif oy yok</value>
+  </data>
+  <data name="discussions.votes.latest.down" xml:space="preserve">
+    <value>En son eksi oylar</value>
+  </data>
+  <data name="discussions.votes.latest.up" xml:space="preserve">
+    <value>En son artı oylar</value>
+  </data>
+  <data name="hype.button" xml:space="preserve">
+    <value>Beatmapi Gazla!</value>
+  </data>
+  <data name="hype.button_done" xml:space="preserve">
+    <value>Çoktan Gazlandı!</value>
+  </data>
+  <data name="hype.confirm" xml:space="preserve">
+    <value>Emin misiniz? Bu işlem kalan {0} adet gaz hakkından birini kullanacak ve geriye alınamayacak.</value>
+  </data>
+  <data name="hype.explanation" xml:space="preserve">
+    <value>Bu beatmapi aday gösterilmesi ve dereceli olması için daha görünür yapmak için gazla!</value>
+  </data>
+  <data name="hype.explanation_guest" xml:space="preserve">
+    <value>Giriş yap ve bu beatmapi gazlayarak, aday gösterilmesi ve dereceli olması için daha görünür yap!</value>
+  </data>
+  <data name="hype.new_time" xml:space="preserve">
+    <value>Bir sonraki gaz {0} tarihinde gelecek.</value>
+  </data>
+  <data name="hype.remaining" xml:space="preserve">
+    <value>{0} gazınız kaldı.</value>
+  </data>
+  <data name="hype.required_text" xml:space="preserve">
+    <value>Gaz: {0}/{1}</value>
+  </data>
+  <data name="hype.section_title" xml:space="preserve">
+    <value>Gaz Treni</value>
+  </data>
+  <data name="hype.title" xml:space="preserve">
+    <value>Gaz</value>
+  </data>
+  <data name="feedback.button" xml:space="preserve">
+    <value>Geri bildirim Bırak</value>
+  </data>
+  <data name="nominations.delete" xml:space="preserve">
+    <value>Sil</value>
+  </data>
+  <data name="nominations.delete_own_confirm" xml:space="preserve">
+    <value>Emin misin? Beatmap silinecek ve profiline yönlendirileceksin.</value>
+  </data>
+  <data name="nominations.delete_other_confirm" xml:space="preserve">
+    <value>Emin misin? Beatmap silinecek ve kullanıcının profiline yönlendirileceksin.</value>
+  </data>
+  <data name="nominations.disqualification_prompt" xml:space="preserve">
+    <value>Diskalifiye sebebi nedir?</value>
+  </data>
+  <data name="nominations.disqualified_at" xml:space="preserve">
+    <value>{0}: diskalifiye edildi ({1}).</value>
+  </data>
+  <data name="nominations.disqualified_no_reason" xml:space="preserve">
+    <value>bir sebep belirtilmedi</value>
+  </data>
+  <data name="nominations.disqualify" xml:space="preserve">
+    <value>Diskalifiye</value>
+  </data>
+  <data name="nominations.incorrect_state" xml:space="preserve">
+    <value>Bu eylemi gerçekleştirirken bir hata oluştu, sayfayı yenilemeyi deneyin.</value>
+  </data>
+  <data name="nominations.love" xml:space="preserve">
+    <value>Sevilenlere ekle</value>
+  </data>
+  <data name="nominations.love_confirm" xml:space="preserve">
+    <value>Bu beatmapi seviyor musun?</value>
+  </data>
+  <data name="nominations.nominate" xml:space="preserve">
+    <value>Aday Göster</value>
+  </data>
+  <data name="nominations.nominate_confirm" xml:space="preserve">
+    <value>Beatmap aday gösterilsin mi?</value>
+  </data>
+  <data name="nominations.nominated_by" xml:space="preserve">
+    <value>{0} tarafından aday gösterildi</value>
+  </data>
+  <data name="nominations.not_enough_hype" xml:space="preserve">
+    <value>Yeterince gaz yok.</value>
+  </data>
+  <data name="nominations.remove_from_loved" xml:space="preserve">
+    <value>Sevilenlerden Çıkar</value>
+  </data>
+  <data name="nominations.remove_from_loved_prompt" xml:space="preserve">
+    <value>Sevilenlerden çıkarılma sebebi:</value>
+  </data>
+  <data name="nominations.required_text" xml:space="preserve">
+    <value>Aday Göstermeler: {0}/{1}</value>
+  </data>
+  <data name="nominations.reset_message_deleted" xml:space="preserve">
+    <value>silindi</value>
+  </data>
+  <data name="nominations.title" xml:space="preserve">
+    <value>Adaylık Durumu</value>
+  </data>
+  <data name="nominations.unresolved_issues" xml:space="preserve">
+    <value>Halen çözülmesi gereken sorunlar mevcut.</value>
+  </data>
+  <data name="nominations.rank_estimate._" xml:space="preserve">
+    <value>Herhangi bir sorun bulunmazsa mapin tahminen dereceli olacağı vakit {0}. {1} {2}. sırada bulunuyor.</value>
+  </data>
+  <data name="nominations.rank_estimate.queue" xml:space="preserve">
+    <value>Derecelendirme sırasında</value>
+  </data>
+  <data name="nominations.rank_estimate.soon" xml:space="preserve">
+    <value>çok yakın</value>
+  </data>
+  <data name="nominations.reset_at.nomination_reset" xml:space="preserve">
+    <value>Adaylık süreci {0} {1} tarafından yeni {2} ({3}) sorunu sebebiyle sıfırlandı.</value>
+  </data>
+  <data name="nominations.reset_at.disqualify" xml:space="preserve">
+    <value>{0} {1} tarafından yeni bir sorun üzerine {2} diskalifiye edildi ({3}).</value>
+  </data>
+  <data name="nominations.reset_confirm.nomination_reset" xml:space="preserve">
+    <value>Emin misin? Yeni bir sorun bildirmek aday gösterme sürecini sıfırlayacaktır.</value>
+  </data>
+  <data name="nominations.reset_confirm.disqualify" xml:space="preserve">
+    <value>Emin misiniz? Bu, beatmapin nitelikli olmasını önleyecek ve aday gösterme sürecini sıfırlayacak.</value>
+  </data>
+  <data name="listing.search.prompt" xml:space="preserve">
+    <value>anahtar kelimeler yazın...</value>
+  </data>
+  <data name="listing.search.login_required" xml:space="preserve">
+    <value>Arama yapmak için giriş yap.</value>
+  </data>
+  <data name="listing.search.options" xml:space="preserve">
+    <value>Diğer Arama Seçenekleri</value>
+  </data>
+  <data name="listing.search.supporter_filter" xml:space="preserve">
+    <value>{0} ile filtrelemek için aktif bir osu!supporter etiketi gereklidir</value>
+  </data>
+  <data name="listing.search.not-found" xml:space="preserve">
+    <value>sonuç bulunamadı</value>
+  </data>
+  <data name="listing.search.not-found-quote" xml:space="preserve">
+    <value>... yok, bir şey bulunamadı.</value>
+  </data>
+  <data name="listing.search.filters.extra" xml:space="preserve">
+    <value>ekstra</value>
+  </data>
+  <data name="listing.search.filters.general" xml:space="preserve">
+    <value>Genel</value>
+  </data>
+  <data name="listing.search.filters.genre" xml:space="preserve">
+    <value>Tür</value>
+  </data>
+  <data name="listing.search.filters.language" xml:space="preserve">
+    <value>Dil</value>
+  </data>
+  <data name="listing.search.filters.mode" xml:space="preserve">
+    <value>Mod</value>
+  </data>
+  <data name="listing.search.filters.nsfw" xml:space="preserve">
+    <value>Müstehcen İçerik</value>
+  </data>
+  <data name="listing.search.filters.played" xml:space="preserve">
+    <value>Oynanmışlık</value>
+  </data>
+  <data name="listing.search.filters.rank" xml:space="preserve">
+    <value>Alınan Derece</value>
+  </data>
+  <data name="listing.search.filters.status" xml:space="preserve">
+    <value>Kategoriler</value>
+  </data>
+  <data name="listing.search.sorting.title" xml:space="preserve">
+    <value>Başlık</value>
+  </data>
+  <data name="listing.search.sorting.artist" xml:space="preserve">
+    <value>Sanatçı</value>
+  </data>
+  <data name="listing.search.sorting.difficulty" xml:space="preserve">
+    <value>Zorluk</value>
+  </data>
+  <data name="listing.search.sorting.favourites" xml:space="preserve">
+    <value>Favoriler</value>
+  </data>
+  <data name="listing.search.sorting.updated" xml:space="preserve">
+    <value>Güncellendi</value>
+  </data>
+  <data name="listing.search.sorting.ranked" xml:space="preserve">
+    <value>Dereceli olma</value>
+  </data>
+  <data name="listing.search.sorting.rating" xml:space="preserve">
+    <value>Reyting</value>
+  </data>
+  <data name="listing.search.sorting.plays" xml:space="preserve">
+    <value>Oynamalar</value>
+  </data>
+  <data name="listing.search.sorting.relevance" xml:space="preserve">
+    <value>Alaka düzeyi</value>
+  </data>
+  <data name="listing.search.sorting.nominations" xml:space="preserve">
+    <value>Adaylıklar</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote._" xml:space="preserve">
+    <value>{0} ile filtrelemek için aktif bir {1} gerekli</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote.link_text" xml:space="preserve">
+    <value>osu!supporter etiketi</value>
+  </data>
+  <data name="general.converts" xml:space="preserve">
+    <value>Dönüştürülmüş beatmapleri dahil et</value>
+  </data>
+  <data name="general.follows" xml:space="preserve">
+    <value>Abone olunan mapperlar</value>
+  </data>
+  <data name="general.recommended" xml:space="preserve">
+    <value>Önerilen zorluk seviyesi</value>
+  </data>
+  <data name="mode.all" xml:space="preserve">
+    <value>Hepsi</value>
+  </data>
+  <data name="mode.any" xml:space="preserve">
+    <value>Hepsi</value>
+  </data>
+  <data name="status.any" xml:space="preserve">
+    <value>Hepsi</value>
+  </data>
+  <data name="status.approved" xml:space="preserve">
+    <value>Onaylı</value>
+  </data>
+  <data name="status.favourites" xml:space="preserve">
+    <value>Favoriler</value>
+  </data>
+  <data name="status.graveyard" xml:space="preserve">
+    <value>Mezarlıkta</value>
+  </data>
+  <data name="status.leaderboard" xml:space="preserve">
+    <value>Liderlik tablosu olanlar</value>
+  </data>
+  <data name="status.loved" xml:space="preserve">
+    <value>Sevilen</value>
+  </data>
+  <data name="status.mine" xml:space="preserve">
+    <value>Benim Maplerim</value>
+  </data>
+  <data name="status.pending" xml:space="preserve">
+    <value>Beklemede &amp; Yapım Aşamasında</value>
+  </data>
+  <data name="status.qualified" xml:space="preserve">
+    <value>Nitelikli</value>
+  </data>
+  <data name="status.ranked" xml:space="preserve">
+    <value>Dereceli</value>
+  </data>
+  <data name="genre.any" xml:space="preserve">
+    <value>Hepsi</value>
+  </data>
+  <data name="genre.unspecified" xml:space="preserve">
+    <value>Belirtilmemiş</value>
+  </data>
+  <data name="genre.video-game" xml:space="preserve">
+    <value>Bilgisayar Oyunu</value>
+  </data>
+  <data name="genre.anime" xml:space="preserve">
+    <value>Anime</value>
+  </data>
+  <data name="genre.rock" xml:space="preserve">
+    <value>Rock</value>
+  </data>
+  <data name="genre.pop" xml:space="preserve">
+    <value>Pop</value>
+  </data>
+  <data name="genre.other" xml:space="preserve">
+    <value>Diğer</value>
+  </data>
+  <data name="genre.novelty" xml:space="preserve">
+    <value>Novelty</value>
+  </data>
+  <data name="genre.hip-hop" xml:space="preserve">
+    <value>Hip Hop</value>
+  </data>
+  <data name="genre.electronic" xml:space="preserve">
+    <value>Elektronik</value>
+  </data>
+  <data name="genre.metal" xml:space="preserve">
+    <value>Metal</value>
+  </data>
+  <data name="genre.classical" xml:space="preserve">
+    <value>Klasik</value>
+  </data>
+  <data name="genre.folk" xml:space="preserve">
+    <value>Folk</value>
+  </data>
+  <data name="genre.jazz" xml:space="preserve">
+    <value>Caz</value>
+  </data>
+  <data name="mods.rx" xml:space="preserve">
+    <value>Relax</value>
+  </data>
+  <data name="mods.v2" xml:space="preserve">
+    <value>Skor V2</value>
+  </data>
+  <data name="language.any" xml:space="preserve">
+    <value>Herhangi biri</value>
+  </data>
+  <data name="language.english" xml:space="preserve">
+    <value>İngilizce</value>
+  </data>
+  <data name="language.chinese" xml:space="preserve">
+    <value>Çince</value>
+  </data>
+  <data name="language.french" xml:space="preserve">
+    <value>Fransızca</value>
+  </data>
+  <data name="language.german" xml:space="preserve">
+    <value>Almanca</value>
+  </data>
+  <data name="language.italian" xml:space="preserve">
+    <value>İtalyanca</value>
+  </data>
+  <data name="language.japanese" xml:space="preserve">
+    <value>Japonca</value>
+  </data>
+  <data name="language.korean" xml:space="preserve">
+    <value>Korece</value>
+  </data>
+  <data name="language.spanish" xml:space="preserve">
+    <value>İspanyolca</value>
+  </data>
+  <data name="language.swedish" xml:space="preserve">
+    <value>İsveççe</value>
+  </data>
+  <data name="language.russian" xml:space="preserve">
+    <value>Rusça</value>
+  </data>
+  <data name="language.polish" xml:space="preserve">
+    <value>Lehçe</value>
+  </data>
+  <data name="language.instrumental" xml:space="preserve">
+    <value>Enstrümantal</value>
+  </data>
+  <data name="language.other" xml:space="preserve">
+    <value>Diğer</value>
+  </data>
+  <data name="language.unspecified" xml:space="preserve">
+    <value>Belirtilmemiş</value>
+  </data>
+  <data name="nsfw.exclude" xml:space="preserve">
+    <value>Gizle</value>
+  </data>
+  <data name="nsfw.include" xml:space="preserve">
+    <value>Göster</value>
+  </data>
+  <data name="played.any" xml:space="preserve">
+    <value>Hepsi</value>
+  </data>
+  <data name="played.played" xml:space="preserve">
+    <value>Oynanmış</value>
+  </data>
+  <data name="played.unplayed" xml:space="preserve">
+    <value>Oynanmamış</value>
+  </data>
+  <data name="extra.video" xml:space="preserve">
+    <value>Videolu</value>
+  </data>
+  <data name="extra.storyboard" xml:space="preserve">
+    <value>Storyboard'lu</value>
+  </data>
+  <data name="rank.any" xml:space="preserve">
+    <value>Hepsi</value>
+  </data>
+  <data name="rank.xh" xml:space="preserve">
+    <value>Gümüş SS</value>
+  </data>
+  <data name="rank.sh" xml:space="preserve">
+    <value>Gümüş S</value>
+  </data>
+  <data name="panel.playcount" xml:space="preserve">
+    <value>Oynanma sayısı: {0}</value>
+  </data>
+  <data name="panel.favourites" xml:space="preserve">
+    <value>Favoriler: {0}</value>
+  </data>
+  <data name="variant.mania.4k" xml:space="preserve">
+    <value>4K</value>
+  </data>
+  <data name="variant.mania.7k" xml:space="preserve">
+    <value>7K</value>
+  </data>
+  <data name="variant.mania.all" xml:space="preserve">
+    <value>Tümü</value>
+  </data>
+</root>

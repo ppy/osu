@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="invalid" xml:space="preserve">
+    <value>{0} specificato invalido.</value>
+  </data>
+  <data name="not_negative" xml:space="preserve">
+    <value>{0} non può essere negativo.</value>
+  </data>
+  <data name="required" xml:space="preserve">
+    <value>{0} è richiesto.</value>
+  </data>
+  <data name="too_long" xml:space="preserve">
+    <value>{0} ha superato la lunghezza massima - può essere solo fino a {1} caratteri.</value>
+  </data>
+  <data name="wrong_confirmation" xml:space="preserve">
+    <value>La conferma non corrisponde.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmap_missing" xml:space="preserve">
+    <value>Il timestamp è specificato ma manca la beatmap.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmapset_no_hype" xml:space="preserve">
+    <value>La beatmap non può avere hype.</value>
+  </data>
+  <data name="beatmapset_discussion.hype_requires_null_beatmap" xml:space="preserve">
+    <value>Si può mettere hype nella sezione Generale (Tutte le difficoltà).</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmap_id" xml:space="preserve">
+    <value>Difficoltà specificata non valida.</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmapset_id" xml:space="preserve">
+    <value>Beatmap specificata non valida.</value>
+  </data>
+  <data name="beatmapset_discussion.locked" xml:space="preserve">
+    <value>La discussione è chiusa.</value>
+  </data>
+  <data name="beatmapset_discussion.attributes.message_type" xml:space="preserve">
+    <value>Tipo di messaggio</value>
+  </data>
+  <data name="beatmapset_discussion.attributes.timestamp" xml:space="preserve">
+    <value>Timestamp</value>
+  </data>
+  <data name="beatmapset_discussion.hype.discussion_locked" xml:space="preserve">
+    <value>Al momento questa beatmap è bloccata per le discussioni e non può avere hype</value>
+  </data>
+  <data name="beatmapset_discussion.hype.guest" xml:space="preserve">
+    <value>Devi avere effettuato il login per mettere hype.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.hyped" xml:space="preserve">
+    <value>Hai già messo hype a questa beatmap.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.limit_exceeded" xml:space="preserve">
+    <value>Hai usato tutti i tuoi hype.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.not_hypeable" xml:space="preserve">
+    <value>Questa beatmap non può avere hype</value>
+  </data>
+  <data name="beatmapset_discussion.hype.owner" xml:space="preserve">
+    <value>Non puoi mettere hype alla tua beatmap.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.exceeds_beatmapset_length" xml:space="preserve">
+    <value>Il timestamp specificato è oltre la lunghezza della beatmap.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.negative" xml:space="preserve">
+    <value>Il timestamp non può essere negativo.</value>
+  </data>
+  <data name="beatmapset_discussion_post.discussion_locked" xml:space="preserve">
+    <value>La discussione è chiusa.</value>
+  </data>
+  <data name="beatmapset_discussion_post.first_post" xml:space="preserve">
+    <value>Non si può eliminare il post iniziale.</value>
+  </data>
+  <data name="beatmapset_discussion_post.attributes.message" xml:space="preserve">
+    <value>Il messaggio</value>
+  </data>
+  <data name="comment.deleted_parent" xml:space="preserve">
+    <value>Non è permesso rispondere ad un commento eliminato.</value>
+  </data>
+  <data name="comment.top_only" xml:space="preserve">
+    <value>Non è permesso fissare una risposta.</value>
+  </data>
+  <data name="comment.attributes.message" xml:space="preserve">
+    <value>Il messaggio</value>
+  </data>
+  <data name="follow.invalid" xml:space="preserve">
+    <value>{0} specificato invalido.</value>
+  </data>
+  <data name="forum.feature_vote.not_feature_topic" xml:space="preserve">
+    <value>Puoi votare solo una richiesta di funzionalità.</value>
+  </data>
+  <data name="forum.feature_vote.not_enough_feature_votes" xml:space="preserve">
+    <value>Non hai abbastanza voti.</value>
+  </data>
+  <data name="forum.poll_vote.invalid" xml:space="preserve">
+    <value>È stata specificata un'opzione non valida.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_delete" xml:space="preserve">
+    <value>Cancellare i metadata della beatmap di un post non è consentito.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_edit" xml:space="preserve">
+    <value>Modificare i metadata della beatmap di un post non è consentito.</value>
+  </data>
+  <data name="forum.post.first_post_no_delete" xml:space="preserve">
+    <value>Non si può eliminare il post iniziale</value>
+  </data>
+  <data name="forum.post.missing_topic" xml:space="preserve">
+    <value>Il post non ha un topic</value>
+  </data>
+  <data name="forum.post.only_quote" xml:space="preserve">
+    <value>La tua risposta contiene solo una citazione.</value>
+  </data>
+  <data name="forum.post.attributes.post_text" xml:space="preserve">
+    <value>Contenuto del post</value>
+  </data>
+  <data name="forum.topic.attributes.topic_title" xml:space="preserve">
+    <value>Titolo dell'argomento</value>
+  </data>
+  <data name="forum.topic_poll.duplicate_options" xml:space="preserve">
+    <value>Non è permesso avere un'opzione duplicata.</value>
+  </data>
+  <data name="forum.topic_poll.grace_period_expired" xml:space="preserve">
+    <value>Non è possibile modificare un sondaggio dopo {0} ore.</value>
+  </data>
+  <data name="forum.topic_poll.hiding_results_forever" xml:space="preserve">
+    <value>Non è possibile nascondere i risultati di un sondaggio che non finisce mai.</value>
+  </data>
+  <data name="forum.topic_poll.invalid_max_options" xml:space="preserve">
+    <value>Le opzioni per utente non possono superare il numero di opzioni disponibili.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_one_selection" xml:space="preserve">
+    <value>È richiesto un minimo di un'opzione per utente.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_two_options" xml:space="preserve">
+    <value>Servono almeno due opzioni.</value>
+  </data>
+  <data name="forum.topic_poll.too_many_options" xml:space="preserve">
+    <value>Raggiunto il massimo numero di opzioni permesse.</value>
+  </data>
+  <data name="forum.topic_poll.attributes.title" xml:space="preserve">
+    <value>Titolo del sondaggio</value>
+  </data>
+  <data name="forum.topic_vote.required" xml:space="preserve">
+    <value>Seleziona un'opzione quando voti.</value>
+  </data>
+  <data name="forum.topic_vote.too_many" xml:space="preserve">
+    <value>Sono state selezionate più opzioni del consentito.</value>
+  </data>
+  <data name="oauth.client.too_many" xml:space="preserve">
+    <value>Superato il numero massimo di applicazioni OAuth consentite.</value>
+  </data>
+  <data name="oauth.client.url" xml:space="preserve">
+    <value>Inserisci un URL valido.</value>
+  </data>
+  <data name="oauth.client.attributes.name" xml:space="preserve">
+    <value>Nome Applicazione</value>
+  </data>
+  <data name="oauth.client.attributes.redirect" xml:space="preserve">
+    <value>URL di richiamo dell'applicazione</value>
+  </data>
+  <data name="user.contains_username" xml:space="preserve">
+    <value>La password non deve contenere il nome utente.</value>
+  </data>
+  <data name="user.email_already_used" xml:space="preserve">
+    <value>Indirizzo email già in uso.</value>
+  </data>
+  <data name="user.email_not_allowed" xml:space="preserve">
+    <value>Indirizzo email non valido.</value>
+  </data>
+  <data name="user.invalid_country" xml:space="preserve">
+    <value>Paese non presente nel database.</value>
+  </data>
+  <data name="user.invalid_discord" xml:space="preserve">
+    <value>Nome utente di Discord non valido.</value>
+  </data>
+  <data name="user.invalid_email" xml:space="preserve">
+    <value>Non sembra essere un indirizzo email valido.</value>
+  </data>
+  <data name="user.invalid_twitter" xml:space="preserve">
+    <value>Nome utente di Twitter non valido.</value>
+  </data>
+  <data name="user.too_short" xml:space="preserve">
+    <value>La nuova password è troppo corta.</value>
+  </data>
+  <data name="user.unknown_duplicate" xml:space="preserve">
+    <value>Nome utente o indirizzo email già in uso.</value>
+  </data>
+  <data name="user.username_available_in" xml:space="preserve">
+    <value>Questo nome utente sarà disponibile per l'uso tra {0}.</value>
+  </data>
+  <data name="user.username_available_soon" xml:space="preserve">
+    <value>Questo nome utente sarà disponibile per l'uso da un momento all'altro!</value>
+  </data>
+  <data name="user.username_invalid_characters" xml:space="preserve">
+    <value>Il nome utente richiesto contiene caratteri non validi.</value>
+  </data>
+  <data name="user.username_in_use" xml:space="preserve">
+    <value>Il nome utente è già in uso!</value>
+  </data>
+  <data name="user.username_locked" xml:space="preserve">
+    <value>Nome utente già in uso!</value>
+  </data>
+  <data name="user.username_no_space_userscore_mix" xml:space="preserve">
+    <value>Si prega di utilizzare caratteri di sottolineatura o spazi, non entrambi!</value>
+  </data>
+  <data name="user.username_no_spaces" xml:space="preserve">
+    <value>Il nome utente non può iniziare o finire con spazi!</value>
+  </data>
+  <data name="user.username_not_allowed" xml:space="preserve">
+    <value>La scelta di questo nome utente non è consentita.</value>
+  </data>
+  <data name="user.username_too_short" xml:space="preserve">
+    <value>Il nome utente richiesto è troppo corto.</value>
+  </data>
+  <data name="user.username_too_long" xml:space="preserve">
+    <value>Il nome utente richiesto è troppo lungo.</value>
+  </data>
+  <data name="user.weak" xml:space="preserve">
+    <value>Password bandita.</value>
+  </data>
+  <data name="user.wrong_current_password" xml:space="preserve">
+    <value>La password attuale non è corretta.</value>
+  </data>
+  <data name="user.wrong_email_confirmation" xml:space="preserve">
+    <value>La conferma della email non corrisponde.</value>
+  </data>
+  <data name="user.wrong_password_confirmation" xml:space="preserve">
+    <value>La conferma della password non corrisponde.</value>
+  </data>
+  <data name="user.too_long" xml:space="preserve">
+    <value>Lunghezza massima superata - può essere solo fino a {0} caratteri.</value>
+  </data>
+  <data name="user.attributes.username" xml:space="preserve">
+    <value>Nome utente</value>
+  </data>
+  <data name="user.attributes.user_email" xml:space="preserve">
+    <value>Indirizzo email</value>
+  </data>
+  <data name="user.attributes.password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="user.change_username.restricted" xml:space="preserve">
+    <value>Non puoi cambiare il tuo nome utente mentre sei limitato.</value>
+  </data>
+  <data name="user.change_username.supporter_required._" xml:space="preserve">
+    <value>Devi avere {0} per cambiare il tuo nome!</value>
+  </data>
+  <data name="user.change_username.supporter_required.link_text" xml:space="preserve">
+    <value>sostenuto osu!</value>
+  </data>
+  <data name="user.change_username.username_is_same" xml:space="preserve">
+    <value>Questo è già il tuo nome utente, sciocco!</value>
+  </data>
+  <data name="user_report.reason_not_valid" xml:space="preserve">
+    <value>{0} non è valido per questo tipo di segnalazione.</value>
+  </data>
+  <data name="user_report.self" xml:space="preserve">
+    <value>Non puoi segnalare te stesso!</value>
+  </data>
+  <data name="store.order_item.attributes.quantity" xml:space="preserve">
+    <value>Quantità</value>
+  </data>
+  <data name="store.order_item.attributes.cost" xml:space="preserve">
+    <value>Prezzo</value>
+  </data>
+</root>

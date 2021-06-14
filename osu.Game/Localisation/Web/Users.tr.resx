@@ -1,0 +1,721 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="deleted" xml:space="preserve">
+    <value>[silinmiş kullanıcı]</value>
+  </data>
+  <data name="beatmapset_activities.title" xml:space="preserve">
+    <value>{0}'in Modlama Geçmişi</value>
+  </data>
+  <data name="beatmapset_activities.title_compact" xml:space="preserve">
+    <value>Modlama</value>
+  </data>
+  <data name="beatmapset_activities.discussions.title_recent" xml:space="preserve">
+    <value>Yakın zamanda başlatılan tartışmalar</value>
+  </data>
+  <data name="beatmapset_activities.events.title_recent" xml:space="preserve">
+    <value>Yakın zamandaki etkinlikler</value>
+  </data>
+  <data name="beatmapset_activities.posts.title_recent" xml:space="preserve">
+    <value>Yakın zamandaki gönderiler</value>
+  </data>
+  <data name="beatmapset_activities.votes_received.title_most" xml:space="preserve">
+    <value>Tarafından en çok oylanan (son 3 ay)</value>
+  </data>
+  <data name="beatmapset_activities.votes_made.title_most" xml:space="preserve">
+    <value>En çok oylanan (son 3 ay)</value>
+  </data>
+  <data name="blocks.banner_text" xml:space="preserve">
+    <value>Bu kullanıcıyı engelledin.</value>
+  </data>
+  <data name="blocks.blocked_count" xml:space="preserve">
+    <value>engellenen kullanıcılar ({0})</value>
+  </data>
+  <data name="blocks.hide_profile" xml:space="preserve">
+    <value>profili gizle</value>
+  </data>
+  <data name="blocks.not_blocked" xml:space="preserve">
+    <value>Bu kullanıcı engellenmemiş.</value>
+  </data>
+  <data name="blocks.show_profile" xml:space="preserve">
+    <value>profili göster</value>
+  </data>
+  <data name="blocks.too_many" xml:space="preserve">
+    <value>Engelleme sınırına ulaşıldı.</value>
+  </data>
+  <data name="blocks.button.block" xml:space="preserve">
+    <value>engelle</value>
+  </data>
+  <data name="blocks.button.unblock" xml:space="preserve">
+    <value>engellemeyi kaldır</value>
+  </data>
+  <data name="card.loading" xml:space="preserve">
+    <value>Yükleniyor...</value>
+  </data>
+  <data name="card.send_message" xml:space="preserve">
+    <value>mesaj gönder</value>
+  </data>
+  <data name="disabled.title" xml:space="preserve">
+    <value>Olamaz! Görünüşe bakılırsa hesabın kilitlenmiş.</value>
+  </data>
+  <data name="disabled.warning" xml:space="preserve">
+    <value>Bir kuralı ihlal etmeniz durumunda, genellikle herhangi bir af(veya itiraz) talebini dikkate almayacağımız bir aylık bekleme süresinin olduğunu unutmayın.  Bu süreden sonra, gerekli olması halinde bizimle iletişime geçmekte özgürsünüz. Bir hesabı devre dışı bıraktıktan sonra yeni hesap oluşturmanın &lt;strong&gt;bu bir aylık bekleme süresinin uzatılmasına&lt;/strong&gt; neden olacağını lütfen unutmayın. Ayrıca &lt;strong&gt; oluşturduğunuz her hesap için kuralları daha fazla ihlal ettiğinizi &lt;/strong&gt; unutmayın. Bu yolda gitmemenizi önemle tavsiye ederiz!</value>
+  </data>
+  <data name="disabled.if_mistake._" xml:space="preserve">
+    <value>Eğer bir yanlışlık olduğunu düşünüyorsanız, bizimle ({0} adresi üzerinden veya bu sayfanın sağ-alt köşesinde bulunan "?" ikonuna tıklayarak) iletişime geçebilirsiniz. Çok sağlam verilere dayandığından, eylemlerimize her daim tamamen güvendiğimizi lütfen unutmayın. Bilerek bizimle dürüst olmadığınızı fark ettiğimizde talebinizi göz ardı etme hakkını saklı tutarız.</value>
+  </data>
+  <data name="disabled.if_mistake.email" xml:space="preserve">
+    <value>e-posta</value>
+  </data>
+  <data name="disabled.reasons.compromised" xml:space="preserve">
+    <value>Hesabınızın güvenliği ihlal edilmiş sayıldı.  Kimliği doğrulanırken geçici olarak devre dışı bırakılabilir.</value>
+  </data>
+  <data name="disabled.reasons.opening" xml:space="preserve">
+    <value>Hesabını dondurmaya sebebiyet verebilecek birtakım sebepler var:</value>
+  </data>
+  <data name="disabled.reasons.tos._" xml:space="preserve">
+    <value>Siz, {0} ya da {1} kurallarından bir veya daha fazlasını ihlal ettiniz.</value>
+  </data>
+  <data name="disabled.reasons.tos.community_rules" xml:space="preserve">
+    <value>topluluk kuralları</value>
+  </data>
+  <data name="disabled.reasons.tos.tos" xml:space="preserve">
+    <value>hizmet kullanım şartları</value>
+  </data>
+  <data name="filtering.by_game_mode" xml:space="preserve">
+    <value>Oyun moduna göre üyeler</value>
+  </data>
+  <data name="force_reactivation.reason.inactive_different_country" xml:space="preserve">
+    <value>Hesabın uzun bir zamandır kullanılmamıştır.</value>
+  </data>
+  <data name="login._" xml:space="preserve">
+    <value>Giriş Yap</value>
+  </data>
+  <data name="login.button" xml:space="preserve">
+    <value>Giriş Yap</value>
+  </data>
+  <data name="login.button_posting" xml:space="preserve">
+    <value>Giriş yapılıyor...</value>
+  </data>
+  <data name="login.email_login_disabled" xml:space="preserve">
+    <value>E-posta ile giriş yapmak şu anlık mümkün değildir. Lütfen kullanıcı adınızı kullanınız.</value>
+  </data>
+  <data name="login.failed" xml:space="preserve">
+    <value>Hatalı giriş</value>
+  </data>
+  <data name="login.forgot" xml:space="preserve">
+    <value>Şifrenizi mi unuttunuz?</value>
+  </data>
+  <data name="login.info" xml:space="preserve">
+    <value>Devam etmek için lütfen giriş yapınız</value>
+  </data>
+  <data name="login.invalid_captcha" xml:space="preserve">
+    <value>Captcha geçersiz, sayfayı yenileyip tekrar deneyin.</value>
+  </data>
+  <data name="login.locked_ip" xml:space="preserve">
+    <value>IP adresiniz kilitli. Lütfen birkaç dakika bekleyin.</value>
+  </data>
+  <data name="login.password" xml:space="preserve">
+    <value>Şifre</value>
+  </data>
+  <data name="login.register" xml:space="preserve">
+    <value>osu! hesabınız yok mu? Yeni bir tane oluşturun</value>
+  </data>
+  <data name="login.remember" xml:space="preserve">
+    <value>Bu bilgisayarı hatırla</value>
+  </data>
+  <data name="login.title" xml:space="preserve">
+    <value>Devam etmek için lütfen giriş yapın</value>
+  </data>
+  <data name="login.username" xml:space="preserve">
+    <value>Kullanıcı adı</value>
+  </data>
+  <data name="login.beta.main" xml:space="preserve">
+    <value>Beta erişimi ayrıcalıklı üyelere kısıtlandırılmıştır.</value>
+  </data>
+  <data name="login.beta.small" xml:space="preserve">
+    <value>(osu!supporterlar yakında erişebilecekler)</value>
+  </data>
+  <data name="posts.title" xml:space="preserve">
+    <value>{0}'in gönderileri</value>
+  </data>
+  <data name="anonymous.login_link" xml:space="preserve">
+    <value>giriş yapmak için tıklayın</value>
+  </data>
+  <data name="anonymous.login_text" xml:space="preserve">
+    <value>giriş yap</value>
+  </data>
+  <data name="anonymous.username" xml:space="preserve">
+    <value>Misafir</value>
+  </data>
+  <data name="anonymous.error" xml:space="preserve">
+    <value>Bunu yapmak için giriş yapmalısınız.</value>
+  </data>
+  <data name="logout_confirm" xml:space="preserve">
+    <value>Çıkış yapmak istediğinize emin misiniz? :(</value>
+  </data>
+  <data name="report.button_text" xml:space="preserve">
+    <value>şikayet et</value>
+  </data>
+  <data name="report.comments" xml:space="preserve">
+    <value>Ek yorumlar</value>
+  </data>
+  <data name="report.placeholder" xml:space="preserve">
+    <value>Lütfen kullanışlı olabileceğini düşündüğünüz her türlü bilgiyi iletin.</value>
+  </data>
+  <data name="report.reason" xml:space="preserve">
+    <value>Gerekçe</value>
+  </data>
+  <data name="report.thanks" xml:space="preserve">
+    <value>Bildirdiğiniz için teşekkürler!</value>
+  </data>
+  <data name="report.title" xml:space="preserve">
+    <value>{0} şikayet edilsin mi?</value>
+  </data>
+  <data name="report.actions.send" xml:space="preserve">
+    <value>Rapor Et</value>
+  </data>
+  <data name="report.actions.cancel" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="report.options.cheating" xml:space="preserve">
+    <value>Kuraldışı oyun / Hile</value>
+  </data>
+  <data name="report.options.insults" xml:space="preserve">
+    <value>Bana / başkalarına hakaret</value>
+  </data>
+  <data name="report.options.spam" xml:space="preserve">
+    <value>Spam yapmak</value>
+  </data>
+  <data name="report.options.unwanted_content" xml:space="preserve">
+    <value>Uygunsuz içerik paylaşma</value>
+  </data>
+  <data name="report.options.nonsense" xml:space="preserve">
+    <value>Saçmalık</value>
+  </data>
+  <data name="report.options.other" xml:space="preserve">
+    <value>Diğer (aşağıda belirtin)</value>
+  </data>
+  <data name="restricted_banner.title" xml:space="preserve">
+    <value>Hesabınız kısıtlandı!</value>
+  </data>
+  <data name="restricted_banner.message" xml:space="preserve">
+    <value>Kısıtlanmışken, diğer oyuncularla etkileşime geçemeyecek ve skorlarınızı sadece siz görebileceksiniz. Bu genellikle otomatik olan bir işlemin sonucudur ve 24 saat içerisinde kalkabilir. Kısıtlamanızın açılması için başvurmak istiyorsanız, lütfen &lt;a href="mailto{0}@ppy.sh"&gt;destek hattıyla&lt;/a&gt; iletişime geçin.</value>
+  </data>
+  <data name="show.age" xml:space="preserve">
+    <value>{0} yaşında</value>
+  </data>
+  <data name="show.change_avatar" xml:space="preserve">
+    <value>avatarını değiştir!</value>
+  </data>
+  <data name="show.first_members" xml:space="preserve">
+    <value>Başlangıçtan beri burada</value>
+  </data>
+  <data name="show.is_developer" xml:space="preserve">
+    <value>osu!geliştiricisi</value>
+  </data>
+  <data name="show.is_supporter" xml:space="preserve">
+    <value>osu!supporter</value>
+  </data>
+  <data name="show.joined_at" xml:space="preserve">
+    <value>{0} tarihinde katıldı</value>
+  </data>
+  <data name="show.lastvisit" xml:space="preserve">
+    <value>Son görülme {0}</value>
+  </data>
+  <data name="show.lastvisit_online" xml:space="preserve">
+    <value>Şu an çevrimiçi</value>
+  </data>
+  <data name="show.missingtext" xml:space="preserve">
+    <value>Yazım hatası yapmış olabilirsin! (veya bu kullanıcı banlanmış olabilir)</value>
+  </data>
+  <data name="show.origin_country" xml:space="preserve">
+    <value>Ülke: {0}</value>
+  </data>
+  <data name="show.previous_usernames" xml:space="preserve">
+    <value>nâm-ı diğer</value>
+  </data>
+  <data name="show.plays_with" xml:space="preserve">
+    <value>{0} ile oynuyor</value>
+  </data>
+  <data name="show.title" xml:space="preserve">
+    <value>{0} kullanıcısının profili</value>
+  </data>
+  <data name="show.comments_count._" xml:space="preserve">
+    <value>{0} gönderdi</value>
+  </data>
+  <data name="show.comments_count.count" xml:space="preserve">
+    <value>{0} yorum|{0} yorum</value>
+  </data>
+  <data name="show.edit.cover.button" xml:space="preserve">
+    <value>Kapak Fotoğrafını Değiştir</value>
+  </data>
+  <data name="show.edit.cover.defaults_info" xml:space="preserve">
+    <value>Diğer kapak seçenekleri gelecekte mevcut olacak</value>
+  </data>
+  <data name="show.edit.cover.upload.broken_file" xml:space="preserve">
+    <value>Resmin işlenmesi başarısız oldu. Yüklediğiniz resmi doğrulayıp tekrar deneyin.</value>
+  </data>
+  <data name="show.edit.cover.upload.button" xml:space="preserve">
+    <value>Resim yükle</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone" xml:space="preserve">
+    <value>Yüklemek için dosyayı bırak</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone_info" xml:space="preserve">
+    <value>Yüklemek için resmi buraya da bırakabilirsiniz</value>
+  </data>
+  <data name="show.edit.cover.upload.size_info" xml:space="preserve">
+    <value>Kapak boyutu 2400x620 olmalı</value>
+  </data>
+  <data name="show.edit.cover.upload.too_large" xml:space="preserve">
+    <value>Yüklenen dosya boyutu çok büyük.</value>
+  </data>
+  <data name="show.edit.cover.upload.unsupported_format" xml:space="preserve">
+    <value>Desteklenmeyen biçim.</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info._" xml:space="preserve">
+    <value>Yükleme sadece {0} için mevcut</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info.link" xml:space="preserve">
+    <value>osu!supporterlar</value>
+  </data>
+  <data name="show.edit.default_playmode.is_default_tooltip" xml:space="preserve">
+    <value>varsayılan oyun modu</value>
+  </data>
+  <data name="show.edit.default_playmode.set" xml:space="preserve">
+    <value>{0} 'ı varsayılan oyun modu olarak ayarla</value>
+  </data>
+  <data name="show.extra.none" xml:space="preserve">
+    <value>hiçbiri</value>
+  </data>
+  <data name="show.extra.unranked" xml:space="preserve">
+    <value>Son zamanlarda oynamamış</value>
+  </data>
+  <data name="show.extra.achievements.achieved-on" xml:space="preserve">
+    <value>{0} tarihinde başarıldı</value>
+  </data>
+  <data name="show.extra.achievements.locked" xml:space="preserve">
+    <value>Kilitli</value>
+  </data>
+  <data name="show.extra.achievements.title" xml:space="preserve">
+    <value>Başarımlar</value>
+  </data>
+  <data name="show.extra.beatmaps.by_artist" xml:space="preserve">
+    <value>{0} tarafından</value>
+  </data>
+  <data name="show.extra.beatmaps.title" xml:space="preserve">
+    <value>Beatmapler</value>
+  </data>
+  <data name="show.extra.beatmaps.favourite.title" xml:space="preserve">
+    <value>Favori Beatmapler</value>
+  </data>
+  <data name="show.extra.beatmaps.graveyard.title" xml:space="preserve">
+    <value>Mezarlıktaki Beatmapler</value>
+  </data>
+  <data name="show.extra.beatmaps.loved.title" xml:space="preserve">
+    <value>Sevilen Beatmapler</value>
+  </data>
+  <data name="show.extra.beatmaps.ranked_and_approved.title" xml:space="preserve">
+    <value>Dereceli &amp; Onaylı Beatmapler</value>
+  </data>
+  <data name="show.extra.beatmaps.unranked.title" xml:space="preserve">
+    <value>Beklemedeki Beatmapler</value>
+  </data>
+  <data name="show.extra.discussions.title" xml:space="preserve">
+    <value>Tartışmalar</value>
+  </data>
+  <data name="show.extra.discussions.title_longer" xml:space="preserve">
+    <value>Son Tartışmalar</value>
+  </data>
+  <data name="show.extra.discussions.show_more" xml:space="preserve">
+    <value>daha fazla tartışma gör</value>
+  </data>
+  <data name="show.extra.events.title" xml:space="preserve">
+    <value>Etkinlikler</value>
+  </data>
+  <data name="show.extra.events.title_longer" xml:space="preserve">
+    <value>Son Etkinlikler</value>
+  </data>
+  <data name="show.extra.events.show_more" xml:space="preserve">
+    <value>daha fazla etkinlik gör</value>
+  </data>
+  <data name="show.extra.historical.title" xml:space="preserve">
+    <value>Geçmiş</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.title" xml:space="preserve">
+    <value>Oyun Geçmişi</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.count_label" xml:space="preserve">
+    <value>Oynamalar</value>
+  </data>
+  <data name="show.extra.historical.most_played.count" xml:space="preserve">
+    <value>oynama sayısı</value>
+  </data>
+  <data name="show.extra.historical.most_played.title" xml:space="preserve">
+    <value>En Çok Oynanan Beatmapler</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.accuracy" xml:space="preserve">
+    <value>isabet oranı: {0}</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.title" xml:space="preserve">
+    <value>Son Oynamalar (24s)</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.title" xml:space="preserve">
+    <value>Tekrar İzlenme Geçmişi</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.count_label" xml:space="preserve">
+    <value>Tekrar İzlendi</value>
+  </data>
+  <data name="show.extra.kudosu.recent_entries" xml:space="preserve">
+    <value>Son Kudosu Geçmişi</value>
+  </data>
+  <data name="show.extra.kudosu.title" xml:space="preserve">
+    <value>Kudosu!</value>
+  </data>
+  <data name="show.extra.kudosu.total" xml:space="preserve">
+    <value>Kazanılan Toplam Kudosu</value>
+  </data>
+  <data name="show.extra.kudosu.entry.amount" xml:space="preserve">
+    <value>{0} kudosu</value>
+  </data>
+  <data name="show.extra.kudosu.entry.empty" xml:space="preserve">
+    <value>Bu kullanıcı henüz kudosu almamış!</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.allow_kudosu.give" xml:space="preserve">
+    <value>{0} mod gönderisinde kudosu red iptalinden dolayı {1} kazanıldı</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.deny_kudosu.reset" xml:space="preserve">
+    <value>{0} mod gönderisinden {1} reddedildi</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.delete.reset" xml:space="preserve">
+    <value>{0} mod gönderisi silindiğinden dolayı {1} kaybedildi</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.restore.give" xml:space="preserve">
+    <value>{0} mod gönderisinin iyileştirilmesinden dolayı {1} kazanıldı</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.give" xml:space="preserve">
+    <value>{0} mod gönderisinde alınan oylardan {1} kazanıldı</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.reset" xml:space="preserve">
+    <value>{0} mod gönderisinde kaybedilen oylardan {1} kaybedildi</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.give" xml:space="preserve">
+    <value>{0} mod gönderisinde oyların yeniden hesaplanmasından dolayı {1} kazanıldı</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.reset" xml:space="preserve">
+    <value>{0} mod gönderisinde oyların yeniden hesaplanmasından dolayı {1} kaybedildi</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.give" xml:space="preserve">
+    <value>{0} gönderisinde {1} tarafından {2} kazanıldı</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.reset" xml:space="preserve">
+    <value>{0} gönderisinde {1} tarafından kudosu sıfırlandı</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.revoke" xml:space="preserve">
+    <value>{0} gönderisinde {1} tarafından kudosu reddedildi</value>
+  </data>
+  <data name="show.extra.kudosu.total_info._" xml:space="preserve">
+    <value>Kullanıcının beatmap modlamaya yaptığı katkının miktarına bağlıdır. Daha fazla bilgi için {0} bakınız.</value>
+  </data>
+  <data name="show.extra.kudosu.total_info.link" xml:space="preserve">
+    <value>bu sayfaya</value>
+  </data>
+  <data name="show.extra.me.title" xml:space="preserve">
+    <value>ben!</value>
+  </data>
+  <data name="show.extra.medals.empty" xml:space="preserve">
+    <value>Bu kullanıcı daha hiç almamış. ;_;</value>
+  </data>
+  <data name="show.extra.medals.recent" xml:space="preserve">
+    <value>En Son</value>
+  </data>
+  <data name="show.extra.medals.title" xml:space="preserve">
+    <value>Madalyalar</value>
+  </data>
+  <data name="show.extra.posts.title" xml:space="preserve">
+    <value>Gönderiler</value>
+  </data>
+  <data name="show.extra.posts.title_longer" xml:space="preserve">
+    <value>Son Gönderiler</value>
+  </data>
+  <data name="show.extra.posts.show_more" xml:space="preserve">
+    <value>daha fazla gönderi gör</value>
+  </data>
+  <data name="show.extra.recent_activity.title" xml:space="preserve">
+    <value>Son</value>
+  </data>
+  <data name="show.extra.top_ranks.download_replay" xml:space="preserve">
+    <value>Tekrarı İndir</value>
+  </data>
+  <data name="show.extra.top_ranks.not_ranked" xml:space="preserve">
+    <value>Sadece dereceli beatmapler pp verir.</value>
+  </data>
+  <data name="show.extra.top_ranks.pp_weight" xml:space="preserve">
+    <value>{0} ağırlıklı</value>
+  </data>
+  <data name="show.extra.top_ranks.view_details" xml:space="preserve">
+    <value>Ayrıntıları Göster</value>
+  </data>
+  <data name="show.extra.top_ranks.title" xml:space="preserve">
+    <value>Dereceler</value>
+  </data>
+  <data name="show.extra.top_ranks.best.title" xml:space="preserve">
+    <value>En İyi Performans</value>
+  </data>
+  <data name="show.extra.top_ranks.first.title" xml:space="preserve">
+    <value>Birincilikler</value>
+  </data>
+  <data name="show.extra.votes.given" xml:space="preserve">
+    <value>Verilen Oylar (son 3 ayda)</value>
+  </data>
+  <data name="show.extra.votes.received" xml:space="preserve">
+    <value>Alınan Oylar (son 3 ayda)</value>
+  </data>
+  <data name="show.extra.votes.title" xml:space="preserve">
+    <value>Oylar</value>
+  </data>
+  <data name="show.extra.votes.title_longer" xml:space="preserve">
+    <value>Son Oylar</value>
+  </data>
+  <data name="show.extra.votes.vote_count" xml:space="preserve">
+    <value>{0} oy|{0} oy</value>
+  </data>
+  <data name="show.extra.account_standing.title" xml:space="preserve">
+    <value>Hesap Durumu</value>
+  </data>
+  <data name="show.extra.account_standing.bad_standing" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; kullanıcısının hesabı iyi durumda değil :(</value>
+  </data>
+  <data name="show.extra.account_standing.remaining_silence" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; {1} sonra konuşabilecek.</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.title" xml:space="preserve">
+    <value>Son İhlaller</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.date" xml:space="preserve">
+    <value>tarih</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.action" xml:space="preserve">
+    <value>eylem</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length" xml:space="preserve">
+    <value>uzunluk</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length_permanent" xml:space="preserve">
+    <value>Kalıcı</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.description" xml:space="preserve">
+    <value>açıklama</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actor" xml:space="preserve">
+    <value>{0} tarafından</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.restriction" xml:space="preserve">
+    <value>Ban</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.silence" xml:space="preserve">
+    <value>Susturma</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.note" xml:space="preserve">
+    <value>Not</value>
+  </data>
+  <data name="show.info.interests" xml:space="preserve">
+    <value>İlgi Alanları</value>
+  </data>
+  <data name="show.info.location" xml:space="preserve">
+    <value>Mevcut Konum</value>
+  </data>
+  <data name="show.info.occupation" xml:space="preserve">
+    <value>Meslek</value>
+  </data>
+  <data name="show.info.website" xml:space="preserve">
+    <value>Web sitesi</value>
+  </data>
+  <data name="show.not_found.reason_1" xml:space="preserve">
+    <value>Kullanıcı adını değiştirmiş olabilir.</value>
+  </data>
+  <data name="show.not_found.reason_2" xml:space="preserve">
+    <value>Bu hesap kötüye kullanım veya güvenlik sebepleriyle geçici olarak kullanım dışı olabilir.</value>
+  </data>
+  <data name="show.not_found.reason_3" xml:space="preserve">
+    <value>Yazım hatası yapmış olabilirsin!</value>
+  </data>
+  <data name="show.not_found.reason_header" xml:space="preserve">
+    <value>Buna sebep olan birkaç şey şunlar olabilir:</value>
+  </data>
+  <data name="show.not_found.title" xml:space="preserve">
+    <value>Kullanıcı bulunamadı! ;_;</value>
+  </data>
+  <data name="show.page.button" xml:space="preserve">
+    <value>Profili düzenle</value>
+  </data>
+  <data name="show.page.description" xml:space="preserve">
+    <value>&lt;strong&gt;ben!&lt;/strong&gt;, profil sayfanızdaki kişiselleştirilebilir bir alandır.</value>
+  </data>
+  <data name="show.page.edit_big" xml:space="preserve">
+    <value>Beni düzenle!</value>
+  </data>
+  <data name="show.page.placeholder" xml:space="preserve">
+    <value>Sayfanın içeriğini buraya yaz</value>
+  </data>
+  <data name="show.page.restriction_info._" xml:space="preserve">
+    <value>Bu özelliğin kilidini açmak için bir {0} olman lazım.</value>
+  </data>
+  <data name="show.page.restriction_info.link" xml:space="preserve">
+    <value>osu!supporter</value>
+  </data>
+  <data name="show.post_count._" xml:space="preserve">
+    <value>{0} kadar katkı</value>
+  </data>
+  <data name="show.post_count.count" xml:space="preserve">
+    <value>{0} forum gönderisi|{0} forum gönderisi</value>
+  </data>
+  <data name="show.rank.country" xml:space="preserve">
+    <value>{0} için Ülke sıralaması</value>
+  </data>
+  <data name="show.rank.country_simple" xml:space="preserve">
+    <value>Ülkesel Sıralama</value>
+  </data>
+  <data name="show.rank.global" xml:space="preserve">
+    <value>{0} için Dünya sıralaması</value>
+  </data>
+  <data name="show.rank.global_simple" xml:space="preserve">
+    <value>Küresel Sıralama</value>
+  </data>
+  <data name="show.stats.hit_accuracy" xml:space="preserve">
+    <value>Vuruş İsabeti</value>
+  </data>
+  <data name="show.stats.level" xml:space="preserve">
+    <value>{0} Seviye</value>
+  </data>
+  <data name="show.stats.level_progress" xml:space="preserve">
+    <value>Sonraki seviyeye ilerle</value>
+  </data>
+  <data name="show.stats.maximum_combo" xml:space="preserve">
+    <value>Maksimum Kombo</value>
+  </data>
+  <data name="show.stats.medals" xml:space="preserve">
+    <value>Madalyalar</value>
+  </data>
+  <data name="show.stats.play_count" xml:space="preserve">
+    <value>Toplam Oynama Sayısı</value>
+  </data>
+  <data name="show.stats.play_time" xml:space="preserve">
+    <value>Toplam Oynama Süresi</value>
+  </data>
+  <data name="show.stats.ranked_score" xml:space="preserve">
+    <value>Dereceli Skor</value>
+  </data>
+  <data name="show.stats.replays_watched_by_others" xml:space="preserve">
+    <value>Başkaları Tarafından İzlenen Tekrarlar</value>
+  </data>
+  <data name="show.stats.score_ranks" xml:space="preserve">
+    <value>Skor Dereceleri</value>
+  </data>
+  <data name="show.stats.total_hits" xml:space="preserve">
+    <value>Toplam Vuruş</value>
+  </data>
+  <data name="show.stats.total_score" xml:space="preserve">
+    <value>Toplam Skor</value>
+  </data>
+  <data name="show.stats.ranked_and_approved_beatmapset_count" xml:space="preserve">
+    <value>Dereceli ve Onaylanmış Beatmapler</value>
+  </data>
+  <data name="show.stats.loved_beatmapset_count" xml:space="preserve">
+    <value>Sevilen Beatmapler</value>
+  </data>
+  <data name="show.stats.unranked_beatmapset_count" xml:space="preserve">
+    <value>Onay Bekleyen Beatmapler</value>
+  </data>
+  <data name="show.stats.graveyard_beatmapset_count" xml:space="preserve">
+    <value>Mezarlıktaki Beatmapler</value>
+  </data>
+  <data name="silenced_banner.title" xml:space="preserve">
+    <value>Şu anda susturulmuş durumdasınız.</value>
+  </data>
+  <data name="silenced_banner.message" xml:space="preserve">
+    <value>Bazı eylemler kullanım dışı olabilir.</value>
+  </data>
+  <data name="status.all" xml:space="preserve">
+    <value>Tümü</value>
+  </data>
+  <data name="status.online" xml:space="preserve">
+    <value>Çevrimiçi</value>
+  </data>
+  <data name="status.offline" xml:space="preserve">
+    <value>Çevrimdışı</value>
+  </data>
+  <data name="store.saved" xml:space="preserve">
+    <value>Kullanıcı oluşturuldu</value>
+  </data>
+  <data name="verify.title" xml:space="preserve">
+    <value>Hesap Doğrulama</value>
+  </data>
+  <data name="view_mode.brick" xml:space="preserve">
+    <value>Tuğla görünümü</value>
+  </data>
+  <data name="view_mode.card" xml:space="preserve">
+    <value>Kart Görünümü</value>
+  </data>
+  <data name="view_mode.list" xml:space="preserve">
+    <value>Liste Görünümü</value>
+  </data>
+</root>

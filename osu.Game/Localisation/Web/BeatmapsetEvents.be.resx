@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="event.approve" xml:space="preserve">
+    <value>Ухвалена.</value>
+  </data>
+  <data name="event.discussion_delete" xml:space="preserve">
+    <value>Мадэратар выдаліў абмеркаванне «{0}».</value>
+  </data>
+  <data name="event.discussion_lock" xml:space="preserve">
+    <value>Абмеркаванне для гэтай бітмапы было адключана. ({0})</value>
+  </data>
+  <data name="event.discussion_post_delete" xml:space="preserve">
+    <value>Мадэратар выдаліў допіс з абмеркавання «{0}».</value>
+  </data>
+  <data name="event.discussion_post_restore" xml:space="preserve">
+    <value>Мадэратар аднавіў допіс у абмеркаванні «{0}».</value>
+  </data>
+  <data name="event.discussion_restore" xml:space="preserve">
+    <value>Мадэратар аднавіў абмеркаванне «{0}».</value>
+  </data>
+  <data name="event.discussion_unlock" xml:space="preserve">
+    <value>Абмеркаванне для гэтай бітмапы было ўключана.</value>
+  </data>
+  <data name="event.disqualify" xml:space="preserve">
+    <value>Дыскваліфікавана {0}. Прычына: {1} ({2}).</value>
+  </data>
+  <data name="event.disqualify_legacy" xml:space="preserve">
+    <value>Дыскваліфікавана {0}. Прычына: {1}.</value>
+  </data>
+  <data name="event.issue_reopen" xml:space="preserve">
+    <value>Праблема ў {0} вырашана нанова.</value>
+  </data>
+  <data name="event.issue_resolve" xml:space="preserve">
+    <value>Праблема ў {0} пазначана як вырашаная.</value>
+  </data>
+  <data name="event.kudosu_allow" xml:space="preserve">
+    <value>Кудосы з абмеркавання «{0}» былі выдалены.</value>
+  </data>
+  <data name="event.kudosu_deny" xml:space="preserve">
+    <value>Абмеркаванню «{0}» было адмоўлена ў кудосу.</value>
+  </data>
+  <data name="event.kudosu_gain" xml:space="preserve">
+    <value>Абмеркаванне «{0}» карыстальніка {1} атрымала дастаткова галасоў для кудосу.</value>
+  </data>
+  <data name="event.kudosu_lost" xml:space="preserve">
+    <value>Абмеркаванне {0} ад {1} страціла галасы і дадзены кудосу быў выдалены.</value>
+  </data>
+  <data name="event.kudosu_recalculate" xml:space="preserve">
+    <value>Кудосу за абмеркаванне {0} былі пералікчаны.</value>
+  </data>
+  <data name="event.love" xml:space="preserve">
+    <value>Дададзена {0} да ўлюбёных</value>
+  </data>
+  <data name="event.nominate" xml:space="preserve">
+    <value>Вылучына {0}.</value>
+  </data>
+  <data name="event.nomination_reset" xml:space="preserve">
+    <value>З-за новай праблемы {0} ({1}) стан намінацыі быў скінуты.</value>
+  </data>
+  <data name="event.qualify" xml:space="preserve">
+    <value>Гэтая бітмапа дасягнула патрабавальнай колькасці намінавання для кваліфікацыі і была кваліфікавана.</value>
+  </data>
+  <data name="event.rank" xml:space="preserve">
+    <value>Ранкавана.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Падзеі бітмап</value>
+  </data>
+  <data name="index.form.period" xml:space="preserve">
+    <value>Перыяд</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Тыпы</value>
+  </data>
+  <data name="item.content" xml:space="preserve">
+    <value>Змесціва</value>
+  </data>
+  <data name="item.discussion_deleted" xml:space="preserve">
+    <value>[выдалена]</value>
+  </data>
+  <data name="item.type" xml:space="preserve">
+    <value>Тып</value>
+  </data>
+  <data name="type.approve" xml:space="preserve">
+    <value>Ухвалена</value>
+  </data>
+  <data name="type.discussion_delete" xml:space="preserve">
+    <value>Выдаленне абмеркавання</value>
+  </data>
+  <data name="type.discussion_post_delete" xml:space="preserve">
+    <value>Выдаленне адказаў абмеркавання</value>
+  </data>
+  <data name="type.discussion_post_restore" xml:space="preserve">
+    <value>Аднаўленне адказаў абмеркавання</value>
+  </data>
+  <data name="type.discussion_restore" xml:space="preserve">
+    <value>Аднаўленне абмеркавання</value>
+  </data>
+  <data name="type.disqualify" xml:space="preserve">
+    <value>Дыскваліфікацыя</value>
+  </data>
+  <data name="type.issue_reopen" xml:space="preserve">
+    <value>Пераадкрыванне абмеркавання</value>
+  </data>
+  <data name="type.issue_resolve" xml:space="preserve">
+    <value>Абмеркаванне рашэння</value>
+  </data>
+  <data name="type.kudosu_allow" xml:space="preserve">
+    <value>Ліміт Kudosu</value>
+  </data>
+  <data name="type.kudosu_deny" xml:space="preserve">
+    <value>Адмова ў Kudosu</value>
+  </data>
+  <data name="type.kudosu_gain" xml:space="preserve">
+    <value>Атрыманне Kudosu</value>
+  </data>
+  <data name="type.kudosu_lost" xml:space="preserve">
+    <value>Згубленне Kudosu</value>
+  </data>
+  <data name="type.kudosu_recalculate" xml:space="preserve">
+    <value>Пералік Kudosu</value>
+  </data>
+  <data name="type.love" xml:space="preserve">
+    <value>Любоў</value>
+  </data>
+  <data name="type.nominate" xml:space="preserve">
+    <value>Намінацыя</value>
+  </data>
+  <data name="type.nomination_reset" xml:space="preserve">
+    <value>Скід намінацыі</value>
+  </data>
+  <data name="type.qualify" xml:space="preserve">
+    <value>Кваліфікацыя</value>
+  </data>
+  <data name="type.rank" xml:space="preserve">
+    <value>Рэйтынг</value>
+  </data>
+</root>

@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="beatmapset_update_notice.new" xml:space="preserve">
+    <value>Có cập nhật mới cho beatmap "{0}" kể từ lần truy cập cuối cùng của bạn.</value>
+  </data>
+  <data name="beatmapset_update_notice.subject" xml:space="preserve">
+    <value>Có cập nhật mới cho beatmap "{0}"</value>
+  </data>
+  <data name="beatmapset_update_notice.unwatch" xml:space="preserve">
+    <value>Nếu như bạn không còn muốn theo dõi beatmap này, bạn có thể click vào link "Bỏ theo dõi" ở phía trên của trang, hoặc từ trang danh sách theo dõi modding:</value>
+  </data>
+  <data name="beatmapset_update_notice.visit" xml:space="preserve">
+    <value>Truy cập trang thảo luận tại đây:</value>
+  </data>
+  <data name="common.closing" xml:space="preserve">
+    <value>Trân trọng,</value>
+  </data>
+  <data name="common.hello" xml:space="preserve">
+    <value>Chào {0},</value>
+  </data>
+  <data name="common.report" xml:space="preserve">
+    <value>Hãy phản hồi email này NGAY LẬP TỨC nếu như bạn không yêu cầu sự thay đổi này.</value>
+  </data>
+  <data name="donation_thanks.benefit_more" xml:space="preserve">
+    <value>Nhiều quyền lợi mới cho supporter cũng sẽ được bổ sung theo thời gian!</value>
+  </data>
+  <data name="donation_thanks.feedback" xml:space="preserve">
+    <value>Nếu như bạn có bất kì thắc mắc hay ý kiến gì, đừng ngần ngại phản hồi email này; Tôi sẽ liên lạc lại với bạn sớm nhất có thể!</value>
+  </data>
+  <data name="donation_thanks.keep_free" xml:space="preserve">
+    <value>Nhờ có những người như bạn mà osu! có thể tiếp tục giữ cho game và cộng đồng hoạt động mà không có quảng cáo hay bất kì sự thu phí bắt buộc nào.</value>
+  </data>
+  <data name="donation_thanks.keep_running" xml:space="preserve">
+    <value>Sự ủng hộ của bạn giữ cho osu! hoạt động trong khoảng {0}! Nó trông có vẻ không nhiều lắm, nhưng cùng cộng của mọi người vào thì sẽ thành nhiều :).</value>
+  </data>
+  <data name="donation_thanks.subject" xml:space="preserve">
+    <value>Cảm ơn, osu! &lt;3 bạn</value>
+  </data>
+  <data name="donation_thanks.translation" xml:space="preserve">
+    <value>Dưới đây là một bản dịch được cung cấp bởi cộng đồng:</value>
+  </data>
+  <data name="donation_thanks.benefit.gift" xml:space="preserve">
+    <value>(Những) người nhận bây giờ sẽ có quyền truy cập osu!direct và nhiều quyền lợi supporter khác.</value>
+  </data>
+  <data name="donation_thanks.benefit.self" xml:space="preserve">
+    <value>Bạn bây giờ sẽ có quyền truy cập osu!direct và nhiều quyền lợi supporter khác trong vòng {0}.</value>
+  </data>
+  <data name="donation_thanks.support._" xml:space="preserve">
+    <value>Cảm ơn rất nhiều vì {0} của bạn cho osu!.</value>
+  </data>
+  <data name="donation_thanks.support.first" xml:space="preserve">
+    <value>sự ủng hộ</value>
+  </data>
+  <data name="donation_thanks.support.repeat" xml:space="preserve">
+    <value>sự ủng hộ liên tục</value>
+  </data>
+  <data name="forum_new_reply.new" xml:space="preserve">
+    <value>Có phản hồi mới cho "{0}" kể từ lần truy cập cuối cùng của bạn.</value>
+  </data>
+  <data name="forum_new_reply.subject" xml:space="preserve">
+    <value>[osu!] Có phản hồi mới cho đề tài "{0}"</value>
+  </data>
+  <data name="forum_new_reply.unwatch" xml:space="preserve">
+    <value>Nếu như bạn không còn muốn theo dõi đề tài này, bạn có thể click vào link "Bỏ theo dõi đề tài" ở phía cuối của đề tài trên, hoặc từ trang quản lý theo dõi đề tài:</value>
+  </data>
+  <data name="forum_new_reply.visit" xml:space="preserve">
+    <value>Nhảy thẳng tới phản hồi mới nhất bằng liên kết sau đây:</value>
+  </data>
+  <data name="password_reset.code" xml:space="preserve">
+    <value>Mã xác minh của bạn là:</value>
+  </data>
+  <data name="password_reset.requested" xml:space="preserve">
+    <value>Bạn hoặc ai đó giả mạo bạn đã yêu cầu đặt lại mật khẩu cho tài khoản osu! của bạn.</value>
+  </data>
+  <data name="password_reset.subject" xml:space="preserve">
+    <value>Khôi phục tài khoản osu!</value>
+  </data>
+  <data name="store_payment_completed.prepare_shipping" xml:space="preserve">
+    <value>Chúng tôi đã nhận được thanh toán của bạn và đang chuẩn bị đơn hàng để giao hàng. Có thể mất một vài ngày để chúng tôi gửi đi, phụ thuộc vào số lượng của các đơn hàng. Bạn có thể theo dõi tiến trình đơn hàng của bạn tại đây, bao gồm cả các chi tiết theo dõi nếu có:</value>
+  </data>
+  <data name="store_payment_completed.processing" xml:space="preserve">
+    <value>Chúng tôi đã nhận được thanh toán của bạn và đang xử lý đơn hàng của bạn. Bạn có thể theo dõi tiến trình đơn hàng của bạn tại đây:</value>
+  </data>
+  <data name="store_payment_completed.questions" xml:space="preserve">
+    <value>Nếu như bạn có bất kì thắc mắc gì, đừng ngần ngại phản hồi email này.</value>
+  </data>
+  <data name="store_payment_completed.subject" xml:space="preserve">
+    <value>Chúng tôi đã nhận được đơn hàng osu!store của bạn!</value>
+  </data>
+  <data name="store_payment_completed.thank_you" xml:space="preserve">
+    <value>Cảm ơn vì đơn hàng osu!store của bạn!</value>
+  </data>
+  <data name="store_payment_completed.total" xml:space="preserve">
+    <value>Tổng cộng</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift" xml:space="preserve">
+    <value>Người tặng bạn tag này đã chọn ẩn danh, cho nên họ không được nhắc tới trong thông báo này.</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift_maybe_not" xml:space="preserve">
+    <value>Nhưng chắc bạn cũng đã biết người đó là ai rồi ;).</value>
+  </data>
+  <data name="supporter_gift.duration" xml:space="preserve">
+    <value>Nhờ họ, bạn có quyền truy cập osu!direct và các quyền lợi osu!supporter khác trong {0} tiếp theo.</value>
+  </data>
+  <data name="supporter_gift.features" xml:space="preserve">
+    <value>Bạn có thể tìm thêm thông tin về những tính năng này tại đây:</value>
+  </data>
+  <data name="supporter_gift.gifted" xml:space="preserve">
+    <value>Ai đó vừa mới tặng bạn một osu!supporter tag!</value>
+  </data>
+  <data name="supporter_gift.subject" xml:space="preserve">
+    <value>Bạn đã được tặng một osu!supporter tag!</value>
+  </data>
+  <data name="user_email_updated.changed_to" xml:space="preserve">
+    <value>Đây là một email xác nhận để thông báo với bạn rằng địa chỉ email osu! của bạn đã được đổi thành: "{0}".</value>
+  </data>
+  <data name="user_email_updated.check" xml:space="preserve">
+    <value>Xin hãy chắc chắn rằng bạn nhận được email này ở địa chỉ mới của bạn để tránh việc mất quyền truy cập tài khoản osu! của bạn trong tương lai.</value>
+  </data>
+  <data name="user_email_updated.sent" xml:space="preserve">
+    <value>Vì các lý do bảo mật, email này đã được gửi đến cả địa chỉ email mới và cũ của bạn.</value>
+  </data>
+  <data name="user_email_updated.subject" xml:space="preserve">
+    <value>Xác nhận thay đổi email osu!</value>
+  </data>
+  <data name="user_force_reactivation.main" xml:space="preserve">
+    <value>Tài khoản của bạn được nghi ngờ đã bị đánh cắp, có hoạt động đáng ngờ gần đây hoặc một mật khẩu RẤT yếu. Do đó, chúng tôi yêu cầu bạn đặt một mật khẩu mới. Xin hãy đảm bảo rằng bạn chọn một mật khẩu MẠNH.</value>
+  </data>
+  <data name="user_force_reactivation.perform_reset" xml:space="preserve">
+    <value>Bạn có thể thực hiện việc đặt lại từ {0}</value>
+  </data>
+  <data name="user_force_reactivation.reason" xml:space="preserve">
+    <value>Lý do:</value>
+  </data>
+  <data name="user_force_reactivation.subject" xml:space="preserve">
+    <value>Cần Tái kích hoạt Tài khoản osu!</value>
+  </data>
+  <data name="user_notification_digest.new" xml:space="preserve">
+    <value>Có cập nhật mới cho những thứ mà bạn đang theo dõi.</value>
+  </data>
+  <data name="user_notification_digest.settings" xml:space="preserve">
+    <value>Thay đổi tuỳ chọn thông báo email:</value>
+  </data>
+  <data name="user_notification_digest.subject" xml:space="preserve">
+    <value>Thông báo osu! mới</value>
+  </data>
+  <data name="user_password_updated.confirmation" xml:space="preserve">
+    <value>Đây chỉ là một sự xác nhận rằng mật khẩu osu! của bạn đã được thay đổi.</value>
+  </data>
+  <data name="user_password_updated.subject" xml:space="preserve">
+    <value>Xác nhận thay đổi mật khẩu osu!</value>
+  </data>
+  <data name="user_verification.code" xml:space="preserve">
+    <value>Mã xác minh của bạn là:</value>
+  </data>
+  <data name="user_verification.code_hint" xml:space="preserve">
+    <value>Bạn có thể nhập mã có hoặc không có dấu cách.</value>
+  </data>
+  <data name="user_verification.link" xml:space="preserve">
+    <value>Hoặc bạn cũng có thể truy cập liên kết này để hoàn tất xác minh:</value>
+  </data>
+  <data name="user_verification.report" xml:space="preserve">
+    <value>Nếu như bạn không yêu cầu điều này, hãy PHẢN HỒI NGAY LẬP TỨC vì tài khoản của bạn có thể đang gặp nguy hiểm.</value>
+  </data>
+  <data name="user_verification.subject" xml:space="preserve">
+    <value>Xác minh tài khoản osu!</value>
+  </data>
+  <data name="user_verification.action_from._" xml:space="preserve">
+    <value>Một thao tác ở tài khoản của bạn từ {0} cần xác minh.</value>
+  </data>
+  <data name="user_verification.action_from.unknown_country" xml:space="preserve">
+    <value>quốc gia không xác định</value>
+  </data>
+</root>

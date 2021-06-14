@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="play_more" xml:space="preserve">
+    <value>代わりにosu!で遊んでみてはどうですか？</value>
+  </data>
+  <data name="require_login" xml:space="preserve">
+    <value>続行するにはログインが必要です。</value>
+  </data>
+  <data name="require_verification" xml:space="preserve">
+    <value>続行するには認証が必要です。</value>
+  </data>
+  <data name="restricted" xml:space="preserve">
+    <value>制限されている間は実行できません。</value>
+  </data>
+  <data name="silenced" xml:space="preserve">
+    <value>サイレンス中は実行できません。</value>
+  </data>
+  <data name="unauthorized" xml:space="preserve">
+    <value>アクセスが拒否されました。</value>
+  </data>
+  <data name="beatmap_discussion.destroy.is_hype" xml:space="preserve">
+    <value>hypeは取り消し不可能です。</value>
+  </data>
+  <data name="beatmap_discussion.destroy.has_reply" xml:space="preserve">
+    <value>返信の付いているディスカッションは削除できません。</value>
+  </data>
+  <data name="beatmap_discussion.nominate.exhausted" xml:space="preserve">
+    <value>一日のノミネーションの上限に達しました。明日もう一度お試しください。</value>
+  </data>
+  <data name="beatmap_discussion.nominate.incorrect_state" xml:space="preserve">
+    <value>実行中にエラーが発生しました。ページを更新してください。</value>
+  </data>
+  <data name="beatmap_discussion.nominate.owner" xml:space="preserve">
+    <value>自分のビートマップをノミネートすることはできません。</value>
+  </data>
+  <data name="beatmap_discussion.nominate.set_metadata" xml:space="preserve">
+    <value>ノミネートする前にジャンルと言語を設定する必要があります。</value>
+  </data>
+  <data name="beatmap_discussion.resolve.not_owner" xml:space="preserve">
+    <value>スレッド作者とビートマップの所有者のみがディスカッションを解決できます。</value>
+  </data>
+  <data name="beatmap_discussion.store.mapper_note_wrong_user" xml:space="preserve">
+    <value>ビートマップの所有者か、ノミネーター/NATグループのメンバーのみマッパーノートに投稿できます。</value>
+  </data>
+  <data name="beatmap_discussion.vote.bot" xml:space="preserve">
+    <value>ボットによるディスカッションに投票できません</value>
+  </data>
+  <data name="beatmap_discussion.vote.limit_exceeded" xml:space="preserve">
+    <value>再度評価するには少し間を置いてください。</value>
+  </data>
+  <data name="beatmap_discussion.vote.owner" xml:space="preserve">
+    <value>自分のディスカッションは評価できません。</value>
+  </data>
+  <data name="beatmap_discussion.vote.wrong_beatmapset_state" xml:space="preserve">
+    <value>Pendingビートマップはディスカッションでのみ評価できます。</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.not_owner" xml:space="preserve">
+    <value>自分の投稿のみを削除できます。</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.resolved" xml:space="preserve">
+    <value>解決済みのディスカッションを削除することはできません。</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.system_generated" xml:space="preserve">
+    <value>自動生成された投稿は削除できません。</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.not_owner" xml:space="preserve">
+    <value>投稿者のみ編集できます。</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.resolved" xml:space="preserve">
+    <value>解決済みのディスカッションを編集することはできません。</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.system_generated" xml:space="preserve">
+    <value>自動生成された投稿は編集できません。</value>
+  </data>
+  <data name="beatmap_discussion_post.store.beatmapset_locked" xml:space="preserve">
+    <value>このビートマップはディスカッションのためにロックされています。</value>
+  </data>
+  <data name="beatmapset.metadata.nominated" xml:space="preserve">
+    <value>ノミネートされたビートマップのメタデータを変更することはできません。正しく設定されていないと思われる場合は、BNまたはNATのメンバーに問い合わせてください。</value>
+  </data>
+  <data name="chat.blocked" xml:space="preserve">
+    <value>あなたをブロックしているユーザーまたは、あなたがブロックしているユーザーとはメッセージをやり取りできません。</value>
+  </data>
+  <data name="chat.friends_only" xml:space="preserve">
+    <value>ユーザーはフレンドリストにいない人からのメッセージをブロックしています。</value>
+  </data>
+  <data name="chat.moderated" xml:space="preserve">
+    <value>そのチャンネルは現在制限がかかっています。</value>
+  </data>
+  <data name="chat.no_access" xml:space="preserve">
+    <value>あなたはそのチャンネルにアクセスするための権限を持っていません。</value>
+  </data>
+  <data name="chat.restricted" xml:space="preserve">
+    <value>あなたがサイレンス、制限またはBanされている間はメッセージを送信できません。</value>
+  </data>
+  <data name="chat.silenced" xml:space="preserve">
+    <value>あなたがサイレンス、制限またはBanされている間はメッセージを送信できません。</value>
+  </data>
+  <data name="comment.update.deleted" xml:space="preserve">
+    <value>削除済みの投稿は編集できません。</value>
+  </data>
+  <data name="contest.voting_over" xml:space="preserve">
+    <value>コンテストの投票期間終了後に投票先を変更することはできません。</value>
+  </data>
+  <data name="contest.entry.limit_reached" xml:space="preserve">
+    <value>このコンテストへのエントリー上限に達しました。</value>
+  </data>
+  <data name="contest.entry.over" xml:space="preserve">
+    <value>エントリーありがとうございます！このコンテストへの応募は終了し、投票がまもなく開始されます。</value>
+  </data>
+  <data name="forum.moderate.no_permission" xml:space="preserve">
+    <value>このフォーラムに制限をかける権限がありません。</value>
+  </data>
+  <data name="forum.post.delete.only_last_post" xml:space="preserve">
+    <value>最後の投稿のみ削除できます。</value>
+  </data>
+  <data name="forum.post.delete.locked" xml:space="preserve">
+    <value>ロックされたトピックの投稿は削除できません。</value>
+  </data>
+  <data name="forum.post.delete.no_forum_access" xml:space="preserve">
+    <value>要求されたフォーラムへのアクセスが必要です。</value>
+  </data>
+  <data name="forum.post.delete.not_owner" xml:space="preserve">
+    <value>投稿を削除できるのは投稿者のみです。</value>
+  </data>
+  <data name="forum.post.edit.deleted" xml:space="preserve">
+    <value>削除された投稿は編集できません。</value>
+  </data>
+  <data name="forum.post.edit.locked" xml:space="preserve">
+    <value>この投稿はロックされているので編集できません。</value>
+  </data>
+  <data name="forum.post.edit.no_forum_access" xml:space="preserve">
+    <value>要求されたフォーラムへのアクセスが必要です。</value>
+  </data>
+  <data name="forum.post.edit.not_owner" xml:space="preserve">
+    <value>投稿を編集できるのは投稿者のみです。</value>
+  </data>
+  <data name="forum.post.edit.topic_locked" xml:space="preserve">
+    <value>ロックされたトピックの投稿は編集できません。</value>
+  </data>
+  <data name="forum.post.store.play_more" xml:space="preserve">
+    <value>フォーラムに投稿をする前にゲームのプレイをお願いします。プレイする上で問題が発生した場合、Helpフォーラムにお問い合わせください。</value>
+  </data>
+  <data name="forum.post.store.too_many_help_posts" xml:space="preserve">
+    <value>追加投稿をするためにはもっとゲームをプレイする必要があります。問題が発生していてプレイができない場合、support@ppy.shにメールしてください。</value>
+  </data>
+  <data name="forum.topic.reply.double_post" xml:space="preserve">
+    <value>再投稿の代わりに最後に行った投稿を編集してください。</value>
+  </data>
+  <data name="forum.topic.reply.locked" xml:space="preserve">
+    <value>ロックされたスレッドには返信できません。</value>
+  </data>
+  <data name="forum.topic.reply.no_forum_access" xml:space="preserve">
+    <value>要求されたフォーラムへのアクセスが必要です。</value>
+  </data>
+  <data name="forum.topic.reply.no_permission" xml:space="preserve">
+    <value>返信する権限がありません。</value>
+  </data>
+  <data name="forum.topic.reply.user.require_login" xml:space="preserve">
+    <value>返信するにはログインが必要です。</value>
+  </data>
+  <data name="forum.topic.reply.user.restricted" xml:space="preserve">
+    <value>制限されている間は返信できません。</value>
+  </data>
+  <data name="forum.topic.reply.user.silenced" xml:space="preserve">
+    <value>サイレンス中は返信できません。</value>
+  </data>
+  <data name="forum.topic.store.no_forum_access" xml:space="preserve">
+    <value>要求されたフォーラムへのアクセスが必要です。</value>
+  </data>
+  <data name="forum.topic.store.no_permission" xml:space="preserve">
+    <value>トピックの新規作成が許可されていません。</value>
+  </data>
+  <data name="forum.topic.store.forum_closed" xml:space="preserve">
+    <value>フォーラムは閉鎖されています。投稿できません。</value>
+  </data>
+  <data name="forum.topic.vote.no_forum_access" xml:space="preserve">
+    <value>要求されたフォーラムへのアクセスが必要です。</value>
+  </data>
+  <data name="forum.topic.vote.over" xml:space="preserve">
+    <value>投票期間は既に終了しています。</value>
+  </data>
+  <data name="forum.topic.vote.play_more" xml:space="preserve">
+    <value>あなたはフォーラムに投票する前にもっとプレイする必要があります。</value>
+  </data>
+  <data name="forum.topic.vote.voted" xml:space="preserve">
+    <value>投票先の変更は許可されていません。</value>
+  </data>
+  <data name="forum.topic.vote.user.require_login" xml:space="preserve">
+    <value>投票するにはログインが必要です。</value>
+  </data>
+  <data name="forum.topic.vote.user.restricted" xml:space="preserve">
+    <value>制限されている間は投票できません。</value>
+  </data>
+  <data name="forum.topic.vote.user.silenced" xml:space="preserve">
+    <value>サイレンス中は投票できません。</value>
+  </data>
+  <data name="forum.topic.watch.no_forum_access" xml:space="preserve">
+    <value>要求されたフォーラムへのアクセスが必要です。</value>
+  </data>
+  <data name="forum.topic_cover.edit.uneditable" xml:space="preserve">
+    <value>指定のカバー画像は無効です。</value>
+  </data>
+  <data name="forum.topic_cover.edit.not_owner" xml:space="preserve">
+    <value>投稿者のみカバー画像を変更できます。</value>
+  </data>
+  <data name="forum.topic_cover.store.forum_not_allowed" xml:space="preserve">
+    <value>このフォーラムはトピックカバーが許可されていません。</value>
+  </data>
+  <data name="forum.view.admin_only" xml:space="preserve">
+    <value>このフォーラムは管理人のみ閲覧可能です。</value>
+  </data>
+  <data name="user.page.edit.locked" xml:space="preserve">
+    <value>ユーザーページはロックされています。</value>
+  </data>
+  <data name="user.page.edit.not_owner" xml:space="preserve">
+    <value>自分のユーザーページのみ編集できます。</value>
+  </data>
+  <data name="user.page.edit.require_supporter_tag" xml:space="preserve">
+    <value>osu!サポータータグが必要です。</value>
+  </data>
+</root>

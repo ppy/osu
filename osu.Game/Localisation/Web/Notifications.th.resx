@@ -1,0 +1,382 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="all_read" xml:space="preserve">
+    <value>อ่านการแจ้งเตือนทั้งหมดแล้ว!</value>
+  </data>
+  <data name="delete" xml:space="preserve">
+    <value>ลบ {0}</value>
+  </data>
+  <data name="loading" xml:space="preserve">
+    <value>กำลังโหลดการแจ้งเตือนที่ยังไม่ได้อ่าน...</value>
+  </data>
+  <data name="mark_read" xml:space="preserve">
+    <value>ล้าง {0}</value>
+  </data>
+  <data name="none" xml:space="preserve">
+    <value>ไม่มีการแจ้งเตือนใดๆ</value>
+  </data>
+  <data name="see_all" xml:space="preserve">
+    <value>ดูการแจ้งเตือนทั้งหมด</value>
+  </data>
+  <data name="see_channel" xml:space="preserve">
+    <value>ไปที่แชท</value>
+  </data>
+  <data name="verifying" xml:space="preserve">
+    <value>โปรดยืนยันเซสชันเพื่อดูการแจ้งเตือน</value>
+  </data>
+  <data name="filters._" xml:space="preserve">
+    <value>ทั้งหมด</value>
+  </data>
+  <data name="filters.user" xml:space="preserve">
+    <value>โปรไฟล์</value>
+  </data>
+  <data name="filters.beatmapset" xml:space="preserve">
+    <value>บีทแมพ</value>
+  </data>
+  <data name="filters.forum_topic" xml:space="preserve">
+    <value>บอร์ดข่าวสาร</value>
+  </data>
+  <data name="filters.news_post" xml:space="preserve">
+    <value>ข่าวสาร</value>
+  </data>
+  <data name="filters.build" xml:space="preserve">
+    <value>เวอร์ชั่น</value>
+  </data>
+  <data name="filters.channel" xml:space="preserve">
+    <value>แชท</value>
+  </data>
+  <data name="item.beatmapset._" xml:space="preserve">
+    <value>Beatmap</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change._" xml:space="preserve">
+    <value>ระดับความยากของแขก</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change.beatmap_owner_change" xml:space="preserve">
+    <value>ตอนนี้คุณเป็นเจ้าของระดับความยาก "{0}" สําหรับบีทแมพ "{1}"</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change.beatmap_owner_change_compact" xml:space="preserve">
+    <value>ตอนนี้คุณเป็นเจ้าของระดับความยาก "{0}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion._" xml:space="preserve">
+    <value>การสนทนาบีทแมพ</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>Beatmap "{0}" ได้ถูกปิดการใช้งานการสนทนา</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock_compact" xml:space="preserve">
+    <value>การสนทนาได้ถูกล็อกไว้</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>{0} ได้เขียนข้อความใหม่ใน "{1}" การสนทนาของ beatmap</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_empty" xml:space="preserve">
+    <value>โพสใหม่ บน {0} โดย {1}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact" xml:space="preserve">
+    <value>โพสต์ใหม่โดย {0}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact_empty" xml:space="preserve">
+    <value>โพสใหม่โดย {0}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_review_new" xml:space="preserve">
+    <value>บทวิจารณ์ใหม่บน "{0}" โดย {1} มีปัญหาอยู่ {2} ปัญหา, คำแนะนำอยู่ {3} คำแนะนำ, คำชม {4} คำชม  </value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_review_new_compact" xml:space="preserve">
+    <value>บทวิจารณ์โดย {0} มีปัญหาอยู่ {1} ปัญหา, คำแนะนำอยู่ {2} คำแนะนำ, คำชม {3} คำชม  </value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>Beatmap "{0}" ได้ถูกเปิดการใช้งานในการสนทนาแล้ว</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock_compact" xml:space="preserve">
+    <value>การสนทนาได้ถูกปลดล๊อค</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem._" xml:space="preserve">
+    <value>ปัญหา Beatmap ที่ Qualified</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>รายงานโดย {0} บน {1} {2}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_empty" xml:space="preserve">
+    <value>รายงานโดย {0} บน {1} </value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_compact" xml:space="preserve">
+    <value>รายงานโดย {0} บน {1} </value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_compact_empty" xml:space="preserve">
+    <value>รายงานโดย {0}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state._" xml:space="preserve">
+    <value>สถานะของบีทแมพถูกเปลี่ยน</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify" xml:space="preserve">
+    <value>Beatmap "{0}" ได้ถูกตัดสิทธิ์โดย {1}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify_compact" xml:space="preserve">
+    <value>Beatmap ถูกตัดสิทธ์</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love" xml:space="preserve">
+    <value>Beatmap "{0}" ได้ถูกเลื่อนขั้นให้เป็นที่ชื่นชอบโดย {1}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love_compact" xml:space="preserve">
+    <value>Beatmap โปรโมทเป็น Loved</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate" xml:space="preserve">
+    <value>Beatmap "{0}" ได้ถูกเสนอชื่อโดย {1}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate_compact" xml:space="preserve">
+    <value>Beatmap นี้ได้รับการจัดอันดับแล้ว</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify" xml:space="preserve">
+    <value>"{0}" ได้รับการเสนอชื่อเพียงพอที่จะเข้าคิวจัดอันดับ</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify_compact" xml:space="preserve">
+    <value>Beatmap ได้เข้าคิวจัดอันดับ</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>"{0}" ได้ถูกแรงค์แล้ว</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank_compact" xml:space="preserve">
+    <value>Beatmap ได้รับการจัดอันดับ</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_remove_from_loved" xml:space="preserve">
+    <value>"{0}" ได้ถูกนำออกจาก Loved</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_remove_from_loved_compact" xml:space="preserve">
+    <value>บีทแมพได้ถูกนำออกจาก Loved</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_reset_nominations" xml:space="preserve">
+    <value>ปัญหานี้โพสต์โดย {0} รีเซ็ทการเสนอชื่อของ beatmap "{1}" </value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_reset_nominations_compact" xml:space="preserve">
+    <value>การเสนอชื่อถูกรีเซ็ท</value>
+  </data>
+  <data name="item.beatmapset.comment._" xml:space="preserve">
+    <value>ความคิดเห็นใหม่</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_new" xml:space="preserve">
+    <value>{0} ได้แสดงความคิดเห็น "{1}" บน "{2}"</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} ได้แสดงความคิดเห็น "{1}"</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_reply" xml:space="preserve">
+    <value>{0} ได้ตอบกลับ "{1}" บน "{2}"</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0} ได้ตอบกลับ "{1}"</value>
+  </data>
+  <data name="item.channel._" xml:space="preserve">
+    <value>ห้องสนทนา</value>
+  </data>
+  <data name="item.channel.channel._" xml:space="preserve">
+    <value>ข้อความใหม่</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message" xml:space="preserve">
+    <value>{0} พูดถึง "{1}"</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_compact" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_group" xml:space="preserve">
+    <value>จาก {0}</value>
+  </data>
+  <data name="item.build._" xml:space="preserve">
+    <value>บันทึกการเปลี่ยนแปลง</value>
+  </data>
+  <data name="item.build.comment._" xml:space="preserve">
+    <value>ความคิดเห็นใหม่</value>
+  </data>
+  <data name="item.build.comment.comment_new" xml:space="preserve">
+    <value>{0} ได้แสดงความคิดเห็น "{1}" บน "{2}"</value>
+  </data>
+  <data name="item.build.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} ได้แสดงความคิดเห็น "{1}"</value>
+  </data>
+  <data name="item.build.comment.comment_reply" xml:space="preserve">
+    <value>{0} ได้ตอบกลับ "{1}" บน "{2}"</value>
+  </data>
+  <data name="item.build.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0} ได้ตอบกลับ "{1}"</value>
+  </data>
+  <data name="item.news_post._" xml:space="preserve">
+    <value>ข่าวสาร</value>
+  </data>
+  <data name="item.news_post.comment._" xml:space="preserve">
+    <value>ความคิดเห็นใหม่</value>
+  </data>
+  <data name="item.news_post.comment.comment_new" xml:space="preserve">
+    <value>{0} ได้แสดงความคิดเห็น "{1}" บน "{2}"</value>
+  </data>
+  <data name="item.news_post.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} ได้แสดงความคิดเห็น "{1}"</value>
+  </data>
+  <data name="item.news_post.comment.comment_reply" xml:space="preserve">
+    <value>{0} ได้ตอบกลับ "{1}" บน "{2}"</value>
+  </data>
+  <data name="item.news_post.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0} ได้ตอบกลับ "{1}"</value>
+  </data>
+  <data name="item.forum_topic._" xml:space="preserve">
+    <value>หัวข้อในฟอรัม</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply._" xml:space="preserve">
+    <value>ตอบกลับในฟอรั่มใหม่</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>{0} ได้ตอบกลับในฟอรั่ม "{1}"</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply_compact" xml:space="preserve">
+    <value>{0} ตอบกลับ</value>
+  </data>
+  <data name="item.legacy_pm._" xml:space="preserve">
+    <value>ฟอรั่ม PM</value>
+  </data>
+  <data name="item.legacy_pm.legacy_pm.legacy_pm" xml:space="preserve">
+    <value>{0} ข้อความที่ยังไม่ได้อ่าน |{0} ข้อความทั้งหมดที่ยังไม่ได้อ่าน</value>
+  </data>
+  <data name="item.user.user_beatmapset_new._" xml:space="preserve">
+    <value>บีทแมพใหม่</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new" xml:space="preserve">
+    <value>บีทแมพใหม่ "{0}" โดย {1}</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new_compact" xml:space="preserve">
+    <value>บีทแมพใหม่ "{0}"</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new_group" xml:space="preserve">
+    <value>บีทแมพใหม่โดย {0}</value>
+  </data>
+  <data name="item.user_achievement._" xml:space="preserve">
+    <value>เหรียญตรา</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock._" xml:space="preserve">
+    <value>เหรียญตราใหม่</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>ปลดล๊อค "{0}"!</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_compact" xml:space="preserve">
+    <value>ปลดล๊อค "{0}"!</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_group" xml:space="preserve">
+    <value>ปลดล็อกเหรียญตรา</value>
+  </data>
+  <data name="mail.beatmapset.beatmap_owner_change.beatmap_owner_change" xml:space="preserve">
+    <value>ตอนนี้คุณเป็นแขกของบีทแมพ "{0}"</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>การพูดคุยใน "{0}:" ได้ถูกล็อก</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>การพูดคุยใน "{0}:" มีอัปเดตใหม่</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>การพูดคุยใน "{0}:" ได้ถูกปลดล็อก</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>ปัญหาใหม่ได้ถูกแจ้งใน "{0}"</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_disqualify" xml:space="preserve">
+    <value>"{0}" ได้ถูกยกเลิกสถานะ Qualified</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_love" xml:space="preserve">
+    <value>"{0}" ได้ถูกเปลี่ยนเป็น loved</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_nominate" xml:space="preserve">
+    <value>"{0}" ได้ถูกเสนอชื่อ</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_qualify" xml:space="preserve">
+    <value>"{0}" ได้รับการเสนอชื่อเพียงพอที่จะเข้าคิวจัดอันดับ</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>"{0}" ได้ถูก ranked แล้ว</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_remove_from_loved" xml:space="preserve">
+    <value>"{0}" ได้ถูกนำออกจาก Loved</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_reset_nominations" xml:space="preserve">
+    <value>การเสนอชื่อของ "{0}" ได้ถูกรีเซ็ทแล้ว</value>
+  </data>
+  <data name="mail.beatmapset.comment.comment_new" xml:space="preserve">
+    <value> บีทแมพ "{0}" มีความคิดเห็นใหม่</value>
+  </data>
+  <data name="mail.channel.channel.pm" xml:space="preserve">
+    <value>คุณได้รับข้อความจาก {0}</value>
+  </data>
+  <data name="mail.build.comment.comment_new" xml:space="preserve">
+    <value>บันทึกการเปลี่ยนแปลง "{0}" มีความคิดเห็นใหม่</value>
+  </data>
+  <data name="mail.news_post.comment.comment_new" xml:space="preserve">
+    <value>ข่าว "{0}" มีความคิดเห็นใหม่</value>
+  </data>
+  <data name="mail.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>มีการตอบกลับใหม่ใน "{0}"</value>
+  </data>
+  <data name="mail.user.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>{0} ได้ปลดล็อกเหรียญตรา "{1}"!</value>
+  </data>
+  <data name="mail.user.user_achievement_unlock.user_achievement_unlock_self" xml:space="preserve">
+    <value>คุณได้ปลดล็อกเหรียญตรา "{0}"!</value>
+  </data>
+  <data name="mail.user.user_beatmapset_new.user_beatmapset_new" xml:space="preserve">
+    <value>{0} ได้สร้างบีทแมพใหม่</value>
+  </data>
+</root>

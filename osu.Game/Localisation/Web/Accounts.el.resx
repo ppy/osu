@@ -1,0 +1,218 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="edit.title_compact" xml:space="preserve">
+    <value>ρυθμίσεις</value>
+  </data>
+  <data name="edit.username" xml:space="preserve">
+    <value>όνομα χρήστη</value>
+  </data>
+  <data name="edit.avatar.title" xml:space="preserve">
+    <value>Avatar</value>
+  </data>
+  <data name="edit.avatar.rules" xml:space="preserve">
+    <value>Παρακαλώ βεβαιωθείτε ότι το avatar σας συμφωνεί με {0}. &lt;br/&gt;Αυτό σημαίνει ότι πρέπει να είναι &lt;strong&gt;κατάλληλο για όλες τις ηλικές&lt;/strong&gt;.</value>
+  </data>
+  <data name="edit.avatar.rules_link" xml:space="preserve">
+    <value>τους κανόνες κοινότητας</value>
+  </data>
+  <data name="edit.email.current" xml:space="preserve">
+    <value>τρέχον email</value>
+  </data>
+  <data name="edit.email.new" xml:space="preserve">
+    <value>νέο email</value>
+  </data>
+  <data name="edit.email.new_confirmation" xml:space="preserve">
+    <value>επιβεβαίωση email</value>
+  </data>
+  <data name="edit.email.title" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="edit.password.current" xml:space="preserve">
+    <value>τρέχων κωδικός</value>
+  </data>
+  <data name="edit.password.new" xml:space="preserve">
+    <value>νέος κωδικός</value>
+  </data>
+  <data name="edit.password.new_confirmation" xml:space="preserve">
+    <value>επιβεβαίωση κωδικού</value>
+  </data>
+  <data name="edit.password.title" xml:space="preserve">
+    <value>Κωδικός</value>
+  </data>
+  <data name="edit.profile.title" xml:space="preserve">
+    <value>Προφίλ</value>
+  </data>
+  <data name="edit.profile.user.user_from" xml:space="preserve">
+    <value>τρέχουσα τοποθεσία</value>
+  </data>
+  <data name="edit.profile.user.user_interests" xml:space="preserve">
+    <value>ενδιαφέροντα</value>
+  </data>
+  <data name="edit.profile.user.user_occ" xml:space="preserve">
+    <value>ενασχόληση</value>
+  </data>
+  <data name="edit.profile.user.user_website" xml:space="preserve">
+    <value>ιστοσελίδα</value>
+  </data>
+  <data name="edit.signature.title" xml:space="preserve">
+    <value>Υπογραφή</value>
+  </data>
+  <data name="edit.signature.update" xml:space="preserve">
+    <value>ενημέρωση</value>
+  </data>
+  <data name="notifications.title" xml:space="preserve">
+    <value>Ειδοποιήσεις</value>
+  </data>
+  <data name="notifications.topic_auto_subscribe" xml:space="preserve">
+    <value>αυτόματη ενεργοποίηση ειδοποιήσεων για τα νέα θέματα που δημιουργείτε στο φόρουμ</value>
+  </data>
+  <data name="notifications.options._" xml:space="preserve">
+    <value>επιλογές παράδοσης</value>
+  </data>
+  <data name="notifications.options.channel_message" xml:space="preserve">
+    <value>ιδιωτικά μηνύματα</value>
+  </data>
+  <data name="notifications.options.comment_new" xml:space="preserve">
+    <value>νέα σχόλια</value>
+  </data>
+  <data name="notifications.options.mail" xml:space="preserve">
+    <value>mail</value>
+  </data>
+  <data name="notifications.options.push" xml:space="preserve">
+    <value>push</value>
+  </data>
+  <data name="oauth.authorized_clients" xml:space="preserve">
+    <value>εγκεκριμένοι clients</value>
+  </data>
+  <data name="oauth.own_clients" xml:space="preserve">
+    <value>οι δικοί σας clients</value>
+  </data>
+  <data name="oauth.title" xml:space="preserve">
+    <value>OAuth</value>
+  </data>
+  <data name="options.title" xml:space="preserve">
+    <value>Ρυθμίσεις</value>
+  </data>
+  <data name="options.beatmapset_download.direct" xml:space="preserve">
+    <value>άνοιγμα με osu!direct</value>
+  </data>
+  <data name="options.beatmapset_download.no_video" xml:space="preserve">
+    <value>χωρίς βίντεο</value>
+  </data>
+  <data name="playstyles.keyboard" xml:space="preserve">
+    <value>πληκτρολόγιο</value>
+  </data>
+  <data name="playstyles.mouse" xml:space="preserve">
+    <value>ποντίκι</value>
+  </data>
+  <data name="playstyles.tablet" xml:space="preserve">
+    <value>γραφίδα</value>
+  </data>
+  <data name="playstyles.title" xml:space="preserve">
+    <value>Τρόπος παιχνιδιού</value>
+  </data>
+  <data name="playstyles.touch" xml:space="preserve">
+    <value>οθόνη αφής</value>
+  </data>
+  <data name="privacy.friends_only" xml:space="preserve">
+    <value>Αποκλεισμός των ιδιωτικών μηνυμάτων από άτομα που δεν βρίσκονται στη λίστα φίλων σας</value>
+  </data>
+  <data name="privacy.hide_online" xml:space="preserve">
+    <value>απόκρυψη παρουσίας</value>
+  </data>
+  <data name="privacy.title" xml:space="preserve">
+    <value>Απόρρητο</value>
+  </data>
+  <data name="security.current_session" xml:space="preserve">
+    <value>τρέχουσα</value>
+  </data>
+  <data name="security.end_session" xml:space="preserve">
+    <value>Λήξη Συνεδρίας</value>
+  </data>
+  <data name="security.end_session_confirmation" xml:space="preserve">
+    <value>Αυτό θα λήξει τη συνεδρία σας σε αυτή την συσκευή. Είστε σίγουρος;</value>
+  </data>
+  <data name="security.last_active" xml:space="preserve">
+    <value>Τελευταία ενεργός:</value>
+  </data>
+  <data name="security.title" xml:space="preserve">
+    <value>Ασφάλεια</value>
+  </data>
+  <data name="security.web_sessions" xml:space="preserve">
+    <value>συνεδρίες</value>
+  </data>
+  <data name="update_email.update" xml:space="preserve">
+    <value>ενημέρωση</value>
+  </data>
+  <data name="update_password.update" xml:space="preserve">
+    <value>ενημέρωση
+</value>
+  </data>
+  <data name="verification_completed.text" xml:space="preserve">
+    <value>Μπορείτε πλέον να κλείσετε αυτήν την καρτέλα/παραάθυρο</value>
+  </data>
+  <data name="verification_completed.title" xml:space="preserve">
+    <value>Η επαλήθευση ολοκληρώθηκε</value>
+  </data>
+  <data name="verification_invalid.title" xml:space="preserve">
+    <value>Μη έγκυρος ή ληξιπρόθεσμος σύνδεσμος</value>
+  </data>
+</root>

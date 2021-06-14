@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="cancel" xml:space="preserve">
+    <value>Mégse</value>
+  </data>
+  <data name="authorise.request" xml:space="preserve">
+    <value>engedélyt kér a fiókodhoz.</value>
+  </data>
+  <data name="authorise.scopes_title" xml:space="preserve">
+    <value>Ez az alkalmazás képes lesz a:</value>
+  </data>
+  <data name="authorise.title" xml:space="preserve">
+    <value>Hitelesítési Kérelem</value>
+  </data>
+  <data name="authorized_clients.confirm_revoke" xml:space="preserve">
+    <value>Biztosan vissza akarod vonni ezen kliens jogait?</value>
+  </data>
+  <data name="authorized_clients.scopes_title" xml:space="preserve">
+    <value>Az alkalmazás képes:</value>
+  </data>
+  <data name="authorized_clients.owned_by" xml:space="preserve">
+    <value>{0} tulajdona</value>
+  </data>
+  <data name="authorized_clients.none" xml:space="preserve">
+    <value>Nincsnek kliensek</value>
+  </data>
+  <data name="authorized_clients.revoked.false" xml:space="preserve">
+    <value>Hozzáférés visszavonása</value>
+  </data>
+  <data name="authorized_clients.revoked.true" xml:space="preserve">
+    <value>Hozzáférés visszavonva</value>
+  </data>
+  <data name="client.id" xml:space="preserve">
+    <value>Kliens ID</value>
+  </data>
+  <data name="client.name" xml:space="preserve">
+    <value>Alkalmazás neve</value>
+  </data>
+  <data name="client.redirect" xml:space="preserve">
+    <value>Az alkalmazás URL-je</value>
+  </data>
+  <data name="client.reset" xml:space="preserve">
+    <value>Ügyfél titkosításának visszavonása</value>
+  </data>
+  <data name="client.reset_failed" xml:space="preserve">
+    <value>Az ügyfél titkosításának visszavonása sikertelen</value>
+  </data>
+  <data name="client.secret" xml:space="preserve">
+    <value>Ügyfél titkos kódja</value>
+  </data>
+  <data name="client.secret_visible.false" xml:space="preserve">
+    <value>Ügyfél titkosított adatai mutatása</value>
+  </data>
+  <data name="client.secret_visible.true" xml:space="preserve">
+    <value>Ügyfél titkosítása</value>
+  </data>
+  <data name="new_client.header" xml:space="preserve">
+    <value>Regisztálj egy új OAuth alkalmazást</value>
+  </data>
+  <data name="new_client.register" xml:space="preserve">
+    <value>Regisztráld az alkalmazásodat</value>
+  </data>
+  <data name="new_client.terms_of_use._" xml:space="preserve">
+    <value>Ha az API-t használod, elfogadod a {0} feltételeit.</value>
+  </data>
+  <data name="new_client.terms_of_use.link" xml:space="preserve">
+    <value>Felhasználási feltételek</value>
+  </data>
+  <data name="own_clients.confirm_delete" xml:space="preserve">
+    <value>Biztos vagy benne, hogy törlöd ezt a klienst?</value>
+  </data>
+  <data name="own_clients.confirm_reset" xml:space="preserve">
+    <value>Biztos vagy benne, hogy törlöd az ügyfél titkositását? Ez az összes tokent eltávolitja.</value>
+  </data>
+  <data name="own_clients.new" xml:space="preserve">
+    <value>Új OAuth alkalmazás</value>
+  </data>
+  <data name="own_clients.none" xml:space="preserve">
+    <value>Nincs Kliens</value>
+  </data>
+  <data name="own_clients.revoked.false" xml:space="preserve">
+    <value>Törlés</value>
+  </data>
+  <data name="own_clients.revoked.true" xml:space="preserve">
+    <value>Törölve</value>
+  </data>
+</root>

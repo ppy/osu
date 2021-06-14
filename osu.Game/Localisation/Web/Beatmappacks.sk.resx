@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="index.description" xml:space="preserve">
+    <value>Kolekcie beatmáp s podobnou tématikou.</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>výpis</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Balíky beatmáp</value>
+  </data>
+  <data name="index.blurb.important" xml:space="preserve">
+    <value>PREČÍTAJTE SI PRED SŤAHOVANÍM</value>
+  </data>
+  <data name="index.blurb.instruction._" xml:space="preserve">
+    <value>Inštalácia: Akonáhle je balík stiahnutý, rozbaľte .rar súbor do priečinku s osu! skladbami.
+Skladby vnútri balíka sú stále v .zip a/alebo .osz formáte, takže osu! si bude musieť beatmapy rozbaliť, keď nabudúce začnete hrať.
+{0} extrahujte .zip/.osz súbory sami,
+lebo sa budú beatmapy v osu! zobrazovať nesprávne a nebudú poriadne fungovať.</value>
+  </data>
+  <data name="index.blurb.instruction.scary" xml:space="preserve">
+    <value>NE</value>
+  </data>
+  <data name="index.blurb.note._" xml:space="preserve">
+    <value>Taktiež je veľmi odporúčané {0}, keďže staré mapy sú oveľa menej kvalitné v porovnaní s tými nedávnymi.</value>
+  </data>
+  <data name="index.blurb.note.scary" xml:space="preserve">
+    <value>sťahovať balíky od najnovších po najstaršie</value>
+  </data>
+  <data name="show.download" xml:space="preserve">
+    <value>Stiahnúť</value>
+  </data>
+  <data name="show.item.cleared" xml:space="preserve">
+    <value>splnené</value>
+  </data>
+  <data name="show.item.not_cleared" xml:space="preserve">
+    <value>nesplnené</value>
+  </data>
+  <data name="mode.artist" xml:space="preserve">
+    <value>Interpret/Album</value>
+  </data>
+  <data name="mode.chart" xml:space="preserve">
+    <value>Oslňujúce</value>
+  </data>
+  <data name="mode.standard" xml:space="preserve">
+    <value>Obyčajné</value>
+  </data>
+  <data name="mode.theme" xml:space="preserve">
+    <value>Témy</value>
+  </data>
+  <data name="require_login._" xml:space="preserve">
+    <value>Aby ste mohli sťahovať musíte byť {0}</value>
+  </data>
+  <data name="require_login.link_text" xml:space="preserve">
+    <value>prihlásený</value>
+  </data>
+</root>

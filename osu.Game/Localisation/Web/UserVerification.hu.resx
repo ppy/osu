@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="box.sent" xml:space="preserve">
+    <value>{0} címre e-mailben hitelesítő kódot küldtünk. Írja be a kódot.</value>
+  </data>
+  <data name="box.title" xml:space="preserve">
+    <value>Fiók hitelesítés</value>
+  </data>
+  <data name="box.verifying" xml:space="preserve">
+    <value>Hitelesítés...</value>
+  </data>
+  <data name="box.issuing" xml:space="preserve">
+    <value>Új kód kiadása...</value>
+  </data>
+  <data name="box.info.check_spam" xml:space="preserve">
+    <value>Ellenőrizd a spam mappádat is, ha nem találod az e-mailt.</value>
+  </data>
+  <data name="box.info.recover" xml:space="preserve">
+    <value>Ha nem tudsz hozzáférni az e-mailedhez vagy elfelejtetted melyiket használtad, kérlek kövesd ezt a linket: {0}.</value>
+  </data>
+  <data name="box.info.recover_link" xml:space="preserve">
+    <value>e-mail helyreállítási folyamat itt</value>
+  </data>
+  <data name="box.info.reissue" xml:space="preserve">
+    <value>Valamint tudsz {0} vagy {1}.</value>
+  </data>
+  <data name="box.info.reissue_link" xml:space="preserve">
+    <value>másik kód kérése</value>
+  </data>
+  <data name="box.info.logout_link" xml:space="preserve">
+    <value>kijelentkezés</value>
+  </data>
+  <data name="errors.expired" xml:space="preserve">
+    <value>Érvénytelen ellenőrző kód, új visszaigazoló e-mail lett küldve.</value>
+  </data>
+  <data name="errors.incorrect_key" xml:space="preserve">
+    <value>Helytelen hitelesítő kód.</value>
+  </data>
+  <data name="errors.retries_exceeded" xml:space="preserve">
+    <value>Helytelen hitelesítő kód. Újrapróbálkozási korlát túllépve, új ellenőrző e-mail elküldve.</value>
+  </data>
+  <data name="errors.reissued" xml:space="preserve">
+    <value>Ellenőrző kód kiadva, új visszaigazoló e-mail lett küldve.</value>
+  </data>
+  <data name="errors.unknown" xml:space="preserve">
+    <value>Ismeretlen hiba történt, új visszaigazoló email küldve.</value>
+  </data>
+</root>

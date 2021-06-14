@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="event.approve" xml:space="preserve">
+    <value>Onaylı.</value>
+  </data>
+  <data name="event.beatmap_owner_change" xml:space="preserve">
+    <value>{0} zorluğunun sahibi {1} kullanıcısı ile değiştirildi.</value>
+  </data>
+  <data name="event.discussion_delete" xml:space="preserve">
+    <value>Moderatör {0} tartışmasını sildi.</value>
+  </data>
+  <data name="event.discussion_lock" xml:space="preserve">
+    <value>Bu beatmap için tartışma sağlandı</value>
+  </data>
+  <data name="event.discussion_post_delete" xml:space="preserve">
+    <value>{0} tartışmasındaki gönderi Moderatör tarafından silindi.</value>
+  </data>
+  <data name="event.discussion_post_restore" xml:space="preserve">
+    <value>{0} tartışmasındaki gönderi Moderatör tarafından restore edildi.</value>
+  </data>
+  <data name="event.discussion_restore" xml:space="preserve">
+    <value>{0} tartışması moderatör tarafından restore edildi.</value>
+  </data>
+  <data name="event.discussion_unlock" xml:space="preserve">
+    <value>Bu beatmap için tartışma sağlandı.</value>
+  </data>
+  <data name="event.disqualify" xml:space="preserve">
+    <value>{0} tarafından diskalifiye edildi. Sebep: {1} ({2}).</value>
+  </data>
+  <data name="event.disqualify_legacy" xml:space="preserve">
+    <value>{0} tarafından diskalifiye edildi. Sebep: {1}.</value>
+  </data>
+  <data name="event.genre_edit" xml:space="preserve">
+    <value>Tür {0} dan {1} ile değiştirildi.</value>
+  </data>
+  <data name="event.issue_reopen" xml:space="preserve">
+    <value>{0} tartışmasında çözülen sorun tekrar tartışmaya açıldı.</value>
+  </data>
+  <data name="event.issue_resolve" xml:space="preserve">
+    <value>{0} tartışmasındaki sorun çözüldü olarak işaretlendi.</value>
+  </data>
+  <data name="event.kudosu_allow" xml:space="preserve">
+    <value>{0} tartışmasındaki Kudosu reddi kaldırıldı.</value>
+  </data>
+  <data name="event.kudosu_deny" xml:space="preserve">
+    <value>{0} tartışmasına kudosu reddi kondu.</value>
+  </data>
+  <data name="event.kudosu_gain" xml:space="preserve">
+    <value>{0} tartışması sahibi {1} kudosu için yeterli oy topladı.</value>
+  </data>
+  <data name="event.kudosu_lost" xml:space="preserve">
+    <value>{0} tartışması sahibi {1} oy kaybetti ve aldığı kudosu kaldırıldı.</value>
+  </data>
+  <data name="event.kudosu_recalculate" xml:space="preserve">
+    <value>{0} tartışmasının aldığı kudosu tekrar hesaplandı.</value>
+  </data>
+  <data name="event.language_edit" xml:space="preserve">
+    <value>Dil {0}'dan {1}'e değiştirildi.</value>
+  </data>
+  <data name="event.love" xml:space="preserve">
+    <value>{0} tarafından sevildi</value>
+  </data>
+  <data name="event.nominate" xml:space="preserve">
+    <value>{0} tarafından aday gösterildi.</value>
+  </data>
+  <data name="event.nominate_modes" xml:space="preserve">
+    <value> {0} ({1}) tarafından aday gösterildi.</value>
+  </data>
+  <data name="event.nomination_reset" xml:space="preserve">
+    <value>Yeni sorun {0} ({1}) bir adaylık sıfırlamasını tetikledi.</value>
+  </data>
+  <data name="event.qualify" xml:space="preserve">
+    <value>Bu beatmap gerekli aday gösterilme miktarına ulaştı ve nitelikli oldu.</value>
+  </data>
+  <data name="event.rank" xml:space="preserve">
+    <value>Dereceli.</value>
+  </data>
+  <data name="event.remove_from_loved" xml:space="preserve">
+    <value>{0} tarafından Sevilenlerden çıkarıldı ({1})</value>
+  </data>
+  <data name="event.nsfw_toggle.to_0" xml:space="preserve">
+    <value>Müstehcen işareti kaldırıldı</value>
+  </data>
+  <data name="event.nsfw_toggle.to_1" xml:space="preserve">
+    <value>Müstehcen olarak işaretlendi</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmap Seti Etkinlikleri</value>
+  </data>
+  <data name="index.form.period" xml:space="preserve">
+    <value>Zaman Periyodu</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Türler</value>
+  </data>
+  <data name="item.content" xml:space="preserve">
+    <value>İçerik</value>
+  </data>
+  <data name="item.discussion_deleted" xml:space="preserve">
+    <value>[silindi]</value>
+  </data>
+  <data name="item.type" xml:space="preserve">
+    <value>Tür</value>
+  </data>
+  <data name="type.approve" xml:space="preserve">
+    <value>Onay</value>
+  </data>
+  <data name="type.beatmap_owner_change" xml:space="preserve">
+    <value>Zorluk sahibi değiştirme</value>
+  </data>
+  <data name="type.discussion_delete" xml:space="preserve">
+    <value>Tartışma silindi</value>
+  </data>
+  <data name="type.discussion_post_delete" xml:space="preserve">
+    <value>Tartışma yanıtı silme</value>
+  </data>
+  <data name="type.discussion_post_restore" xml:space="preserve">
+    <value>Tartışma yanıtı geri getirme</value>
+  </data>
+  <data name="type.discussion_restore" xml:space="preserve">
+    <value>Tartışma geri getirme</value>
+  </data>
+  <data name="type.disqualify" xml:space="preserve">
+    <value>Diskalifiye</value>
+  </data>
+  <data name="type.genre_edit" xml:space="preserve">
+    <value>Tür düzeni</value>
+  </data>
+  <data name="type.issue_reopen" xml:space="preserve">
+    <value>Tekrar açılan tartışmalar</value>
+  </data>
+  <data name="type.issue_resolve" xml:space="preserve">
+    <value>Tartışma çözümü</value>
+  </data>
+  <data name="type.kudosu_allow" xml:space="preserve">
+    <value>Kudosu avansı</value>
+  </data>
+  <data name="type.kudosu_deny" xml:space="preserve">
+    <value>Kudosu reddi</value>
+  </data>
+  <data name="type.kudosu_gain" xml:space="preserve">
+    <value>Kudosu kazancı</value>
+  </data>
+  <data name="type.kudosu_lost" xml:space="preserve">
+    <value>Kudosu kaybı</value>
+  </data>
+  <data name="type.kudosu_recalculate" xml:space="preserve">
+    <value>Kudosu tekrar hesaplama</value>
+  </data>
+  <data name="type.language_edit" xml:space="preserve">
+    <value>Dil düzeni</value>
+  </data>
+  <data name="type.love" xml:space="preserve">
+    <value>Love</value>
+  </data>
+  <data name="type.nominate" xml:space="preserve">
+    <value>Adaylık</value>
+  </data>
+  <data name="type.nomination_reset" xml:space="preserve">
+    <value>Adaylık Sıfırlama</value>
+  </data>
+  <data name="type.nsfw_toggle" xml:space="preserve">
+    <value>Müstehcen işareti</value>
+  </data>
+  <data name="type.qualify" xml:space="preserve">
+    <value>Adaylık</value>
+  </data>
+  <data name="type.rank" xml:space="preserve">
+    <value>Sıralama</value>
+  </data>
+  <data name="type.remove_from_loved" xml:space="preserve">
+    <value>Sevilenlerden çıkarma</value>
+  </data>
+</root>

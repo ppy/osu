@@ -1,0 +1,391 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>该谱面现在无法下载。</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>应 歌曲作者/第三方版权持有者 的要求，这张谱面已经下架。</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>点击这里查看更多信息。</value>
+  </data>
+  <data name="availability.rule_violation" xml:space="preserve">
+    <value>谱面中不适合 osu! 的内容已在审核后被移除。</value>
+  </data>
+  <data name="download.limit_exceeded" xml:space="preserve">
+    <value>慢一点，打几张图再回来吧。</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>谱面列表</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>谱面</value>
+  </data>
+  <data name="panel.empty" xml:space="preserve">
+    <value>没有谱面</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>下载</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>下载并包含视频</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>下载并不包含视频</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>在 osu!direct 中查看</value>
+  </data>
+  <data name="nominate.hybrid_requires_modes" xml:space="preserve">
+    <value>有多于一个模式的谱面需要选择至少一个要提名的游戏模式。</value>
+  </data>
+  <data name="nominate.incorrect_mode" xml:space="preserve">
+    <value>你没有权限为该模式提名：{0}</value>
+  </data>
+  <data name="nominate.full_bn_required" xml:space="preserve">
+    <value>你必须是正式提名人才能进行此提名。</value>
+  </data>
+  <data name="nominate.too_many" xml:space="preserve">
+    <value>提名需求已达标。</value>
+  </data>
+  <data name="nominate.dialog.confirmation" xml:space="preserve">
+    <value>你确定要提名这张谱面吗？</value>
+  </data>
+  <data name="nominate.dialog.header" xml:space="preserve">
+    <value>提名谱面</value>
+  </data>
+  <data name="nominate.dialog.hybrid_warning" xml:space="preserve">
+    <value>注意：你只能提名一次，所以请确保你的提名包含所有你想要提名的游戏模式。</value>
+  </data>
+  <data name="nominate.dialog.which_modes" xml:space="preserve">
+    <value>你要提名哪种模式？</value>
+  </data>
+  <data name="nsfw_badge.label" xml:space="preserve">
+    <value>少儿不宜</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>讨论</value>
+  </data>
+  <data name="show.details.by_artist" xml:space="preserve">
+    <value>作者：{0}</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>收藏这张谱面</value>
+  </data>
+  <data name="show.details.favourite_login" xml:space="preserve">
+    <value>登录以收藏这张谱面</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>下载谱面前请先登录！</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>作图者: {0}</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>取消收藏</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>上次更新于 {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>下载</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>不包含视频</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>包含视频</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>以使用更多的功能</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>登录</value>
+  </data>
+  <data name="show.details_date.approved" xml:space="preserve">
+    <value>approved 于 {0}</value>
+  </data>
+  <data name="show.details_date.loved" xml:space="preserve">
+    <value>loved 于 {0}</value>
+  </data>
+  <data name="show.details_date.qualified" xml:space="preserve">
+    <value>qualified 于 {0}</value>
+  </data>
+  <data name="show.details_date.ranked" xml:space="preserve">
+    <value>ranked 于 {0}</value>
+  </data>
+  <data name="show.details_date.submitted" xml:space="preserve">
+    <value>提交于 {0}</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>上次更新于 {0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>谱面收藏数超出限制，请删除一些后再试。</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>如果你觉得这张谱面很好玩，推荐它来帮助它发展到&lt;strong&gt;Ranked&lt;/strong&gt;状态。</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>这张谱面正处于 {0} 状态。</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>pending</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>qualified</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>制作中</value>
+  </data>
+  <data name="show.hype.disqualify._" xml:space="preserve">
+    <value>如果你认为此谱面有问题，可以取消提名：{0}</value>
+  </data>
+  <data name="show.hype.report._" xml:space="preserve">
+    <value>如果您发现此谱面有问题，请在 {0} 通知审核团。</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>报告问题</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>这里</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>谱面介绍</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>流派</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>语言</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>数据还在计算中。。。</value>
+  </data>
+  <data name="show.info.nsfw" xml:space="preserve">
+    <value>少儿不宜内容</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>失败位置</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>来源</value>
+  </data>
+  <data name="show.info.storyboard" xml:space="preserve">
+    <value>此谱面包含故事板</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>成功率</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>标签</value>
+  </data>
+  <data name="show.info.video" xml:space="preserve">
+    <value>此谱面包含视频</value>
+  </data>
+  <data name="show.nsfw_warning.details" xml:space="preserve">
+    <value>此谱面包含少儿不宜的、具有冒犯性的或令人不安的内容。您仍然想查看它吗？</value>
+  </data>
+  <data name="show.nsfw_warning.title" xml:space="preserve">
+    <value>少儿不宜内容</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.disable" xml:space="preserve">
+    <value>关闭警告</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.listing" xml:space="preserve">
+    <value>返回谱面列表</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.show" xml:space="preserve">
+    <value>显示</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>在 {0} 达成</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>国内/区内排名</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>好友排名</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>全球排名</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>点击 &lt;a href="{0}"&gt;这里&lt;/a&gt; 来查看你得到的精彩功能！</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>你需要成为 osu! 支持者才能查看国内/好友排名！</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>排行榜</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>准确率</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>最大连击</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>Miss</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>Mod</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>玩家</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>排名</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>得分</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>得分</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>达成时间</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>还没有玩家上传过成绩！</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>还没有好友上传成绩！</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>还没有玩家上传过成绩，来玩一把？</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>加载分数中...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>Unranked 谱面</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>领衔者</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>你的最佳成绩</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>圆圈大小</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>键位数量</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>掉血速度</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>准确率</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>缩圈速度</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>难度星级</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>长度</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>圆圈总数</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>滑条总数</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>玩家评价</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>评分情况</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>提名状态</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>游玩次数</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>Ranked</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>Loved</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>Qualified</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>WIP</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>Graveyard</value>
+  </data>
+</root>

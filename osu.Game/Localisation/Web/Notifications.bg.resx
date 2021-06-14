@@ -1,0 +1,295 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="all_read" xml:space="preserve">
+    <value>Всички известия са прочетени!</value>
+  </data>
+  <data name="mark_read" xml:space="preserve">
+    <value>Изчисти {0}</value>
+  </data>
+  <data name="none" xml:space="preserve">
+    <value>Няма известия</value>
+  </data>
+  <data name="see_all" xml:space="preserve">
+    <value>виж всички известия</value>
+  </data>
+  <data name="filters._" xml:space="preserve">
+    <value>всички</value>
+  </data>
+  <data name="filters.user" xml:space="preserve">
+    <value>профил</value>
+  </data>
+  <data name="filters.beatmapset" xml:space="preserve">
+    <value>бийтмапове</value>
+  </data>
+  <data name="filters.forum_topic" xml:space="preserve">
+    <value>форум</value>
+  </data>
+  <data name="filters.news_post" xml:space="preserve">
+    <value>новини</value>
+  </data>
+  <data name="filters.build" xml:space="preserve">
+    <value>версии</value>
+  </data>
+  <data name="filters.channel" xml:space="preserve">
+    <value>чат</value>
+  </data>
+  <data name="item.beatmapset._" xml:space="preserve">
+    <value>Бийтмап</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion._" xml:space="preserve">
+    <value>Бийтмап дискусия</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>Бийтмапът "{0}" бе заключен за дискусии</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock_compact" xml:space="preserve">
+    <value>Дискусията бе заключена</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>Нова публикация на "{0}" от {1}": "{2}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_empty" xml:space="preserve">
+    <value>Нова публикация на "{0}" от {1}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact" xml:space="preserve">
+    <value>Нова публикация от {0}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact_empty" xml:space="preserve">
+    <value>Нова публикация от {0}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_review_new" xml:space="preserve">
+    <value>Ново ревю на "{0}" от {1}, съдържащ проблеми: {2}, предложения: {3}, похвали: {4}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_review_new_compact" xml:space="preserve">
+    <value>Ново ревю от {0}, съдържащ проблеми: {1}, предложения: {2}, похвали: {3}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>Бийтмапът "{0}" бе отключен за дискусии</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock_compact" xml:space="preserve">
+    <value>Дискусията бе отключена</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem._" xml:space="preserve">
+    <value>Проблем на квалифициран бийтмап</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>Докладвано от {0} на"{1}": "{2}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_empty" xml:space="preserve">
+    <value>Докладвано от {0} на"{1}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_compact" xml:space="preserve">
+    <value>Докладвано от {0}: "{1}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_compact_empty" xml:space="preserve">
+    <value>Докладвано от {0}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state._" xml:space="preserve">
+    <value>Промяна в статуса на бийтмапа</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify" xml:space="preserve">
+    <value>"{0}" бе дисквалифициран</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify_compact" xml:space="preserve">
+    <value>Бийтмапът бе дисквалифициран</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love" xml:space="preserve">
+    <value>"{0}" бе повишен до обичан</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love_compact" xml:space="preserve">
+    <value>Бийтмапът бе повишен до обичан</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate" xml:space="preserve">
+    <value>"{0}" бе номиниран</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate_compact" xml:space="preserve">
+    <value>Бийтмапът бе номиниран</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify" xml:space="preserve">
+    <value>"{0}" получи достатъчно номинации и влезе в опашката за класиране</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify_compact" xml:space="preserve">
+    <value>Бийтмапът влезе на опашката за класиране</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>"{0}" бе класиран</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank_compact" xml:space="preserve">
+    <value>Бийтмапът бе класиран</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_remove_from_loved_compact" xml:space="preserve">
+    <value>Бийтмапът бе премахнат от Обичани</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_reset_nominations" xml:space="preserve">
+    <value>Номинацията на "{0}" бе анулирана</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_reset_nominations_compact" xml:space="preserve">
+    <value>Номинацията бе анулирана</value>
+  </data>
+  <data name="item.beatmapset.comment._" xml:space="preserve">
+    <value>Нов коментар</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_new" xml:space="preserve">
+    <value>{0} коментира "{1}" в темата "{2}"</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} коментира "{1}"</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0} отговори в темата "{1}"</value>
+  </data>
+  <data name="item.channel._" xml:space="preserve">
+    <value>Чат</value>
+  </data>
+  <data name="item.channel.channel._" xml:space="preserve">
+    <value>Ново съобщение</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message" xml:space="preserve">
+    <value>{0} казва "{1}"</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_compact" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_group" xml:space="preserve">
+    <value>от {0}</value>
+  </data>
+  <data name="item.build._" xml:space="preserve">
+    <value>Списък на промените</value>
+  </data>
+  <data name="item.build.comment._" xml:space="preserve">
+    <value>Нов коментар</value>
+  </data>
+  <data name="item.build.comment.comment_new" xml:space="preserve">
+    <value>{0} коментира "{1}" в темата "{2}"</value>
+  </data>
+  <data name="item.build.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} коментира "{1}"</value>
+  </data>
+  <data name="item.news_post._" xml:space="preserve">
+    <value>Новини</value>
+  </data>
+  <data name="item.news_post.comment._" xml:space="preserve">
+    <value>Нов коментар</value>
+  </data>
+  <data name="item.news_post.comment.comment_new" xml:space="preserve">
+    <value>{0} коментира "{1}" в темата "{2}"</value>
+  </data>
+  <data name="item.news_post.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} коментира "{1}"</value>
+  </data>
+  <data name="item.forum_topic._" xml:space="preserve">
+    <value>Тема на форума</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply._" xml:space="preserve">
+    <value>Нов форум отговор</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>{0} отговори в темата "{1}"</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply_compact" xml:space="preserve">
+    <value>{0} отговори</value>
+  </data>
+  <data name="item.legacy_pm._" xml:space="preserve">
+    <value>Стар форум за ЛС</value>
+  </data>
+  <data name="item.legacy_pm.legacy_pm.legacy_pm" xml:space="preserve">
+    <value>{0} непрочетено съобщение|{0} непрочетени съобщения</value>
+  </data>
+  <data name="item.user_achievement._" xml:space="preserve">
+    <value>Медали</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock._" xml:space="preserve">
+    <value>Нов медал</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>Отключихте "{0}"!</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_compact" xml:space="preserve">
+    <value>Отключихте "{0}"!</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_group" xml:space="preserve">
+    <value>Медали отключени!</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_remove_from_loved" xml:space="preserve">
+    <value>"{0}" бе премахнат от Обичани</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_reset_nominations" xml:space="preserve">
+    <value>Номинацията на "{0}" бе анулирана</value>
+  </data>
+  <data name="mail.beatmapset.comment.comment_new" xml:space="preserve">
+    <value>Бийтмап "{0}" има нови коментари</value>
+  </data>
+  <data name="mail.channel.channel.pm" xml:space="preserve">
+    <value>Ти получи ново съобщение от {0}</value>
+  </data>
+  <data name="mail.news_post.comment.comment_new" xml:space="preserve">
+    <value>Новини "{0}" има нови коментари </value>
+  </data>
+  <data name="mail.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>Има нови отговори от "{0}"</value>
+  </data>
+  <data name="mail.user.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>{0} отключи нов медал, "{1}"!</value>
+  </data>
+  <data name="mail.user.user_achievement_unlock.user_achievement_unlock_self" xml:space="preserve">
+    <value>Вие отключихте нов медал, "{0}"!</value>
+  </data>
+</root>

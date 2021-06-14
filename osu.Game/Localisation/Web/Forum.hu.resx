@@ -1,0 +1,541 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="pinned_topics" xml:space="preserve">
+    <value>Kitűzött Témák</value>
+  </data>
+  <data name="slogan" xml:space="preserve">
+    <value>egyedül játszani veszélyes.</value>
+  </data>
+  <data name="subforums" xml:space="preserve">
+    <value>Mellékfórumok</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>osu! fórumok</value>
+  </data>
+  <data name="covers.edit" xml:space="preserve">
+    <value>Borító szerkesztése</value>
+  </data>
+  <data name="covers.create._" xml:space="preserve">
+    <value>Borítókép megadása</value>
+  </data>
+  <data name="covers.create.button" xml:space="preserve">
+    <value>Kép feltöltése</value>
+  </data>
+  <data name="covers.create.info" xml:space="preserve">
+    <value>A boritókép mérete {0} kell hogy legyen. A kép feltöltését idehúzással is megteheted.</value>
+  </data>
+  <data name="covers.destroy._" xml:space="preserve">
+    <value>Boritókép eltávolítása</value>
+  </data>
+  <data name="covers.destroy.confirm" xml:space="preserve">
+    <value>Biztos vagy benne, hogy el szeretnéd távolítani a borítóképet?</value>
+  </data>
+  <data name="forums.latest_post" xml:space="preserve">
+    <value>Legújabb Poszt</value>
+  </data>
+  <data name="forums.index.title" xml:space="preserve">
+    <value>Fórum Index</value>
+  </data>
+  <data name="forums.topics.empty" xml:space="preserve">
+    <value>Nincsenek témák!</value>
+  </data>
+  <data name="mark_as_read.forum" xml:space="preserve">
+    <value>Fórum megjelölése olvasottként</value>
+  </data>
+  <data name="mark_as_read.forums" xml:space="preserve">
+    <value>Fórumok megjelölése olvasottként</value>
+  </data>
+  <data name="mark_as_read.busy" xml:space="preserve">
+    <value>Olvasottnak jelölés...</value>
+  </data>
+  <data name="post.confirm_destroy" xml:space="preserve">
+    <value>Biztosan törlöd a posztot?</value>
+  </data>
+  <data name="post.confirm_restore" xml:space="preserve">
+    <value>Biztosan visszaállítod a posztot?</value>
+  </data>
+  <data name="post.edited" xml:space="preserve">
+    <value>Utoljára módosítva {0} által {1}, módosítva {2} alkalommal.</value>
+  </data>
+  <data name="post.posted_at" xml:space="preserve">
+    <value>posztolva {0}</value>
+  </data>
+  <data name="post.actions.destroy" xml:space="preserve">
+    <value>Poszt törlése</value>
+  </data>
+  <data name="post.actions.edit" xml:space="preserve">
+    <value>Poszt szerkesztése</value>
+  </data>
+  <data name="post.actions.report" xml:space="preserve">
+    <value>Poszt jelentése</value>
+  </data>
+  <data name="post.actions.restore" xml:space="preserve">
+    <value>Poszt visszaállítása</value>
+  </data>
+  <data name="post.create.title.reply" xml:space="preserve">
+    <value>Új válasz</value>
+  </data>
+  <data name="post.info.post_count" xml:space="preserve">
+    <value>{0} poszt|-{0} poszt</value>
+  </data>
+  <data name="post.info.topic_starter" xml:space="preserve">
+    <value>Beszélgetés indítok</value>
+  </data>
+  <data name="search.go_to_post" xml:space="preserve">
+    <value>Ugrás a poszthoz</value>
+  </data>
+  <data name="search.post_number_input" xml:space="preserve">
+    <value>írd be a poszt számát</value>
+  </data>
+  <data name="search.total_posts" xml:space="preserve">
+    <value>{0} posztok száma</value>
+  </data>
+  <data name="topic.deleted" xml:space="preserve">
+    <value>törölt téma</value>
+  </data>
+  <data name="topic.go_to_latest" xml:space="preserve">
+    <value>utolsó poszt megtekintése</value>
+  </data>
+  <data name="topic.has_replied" xml:space="preserve">
+    <value>Feliratkoztál erre a témára</value>
+  </data>
+  <data name="topic.in_forum" xml:space="preserve">
+    <value>ide {0}</value>
+  </data>
+  <data name="topic.latest_post" xml:space="preserve">
+    <value>{0} {1} által</value>
+  </data>
+  <data name="topic.latest_reply_by" xml:space="preserve">
+    <value>legutóbbi hozzászólás: {0}</value>
+  </data>
+  <data name="topic.new_topic" xml:space="preserve">
+    <value>Új téma</value>
+  </data>
+  <data name="topic.new_topic_login" xml:space="preserve">
+    <value>Jelentkezz be új téma nyitásához</value>
+  </data>
+  <data name="topic.post_reply" xml:space="preserve">
+    <value>Poszt</value>
+  </data>
+  <data name="topic.reply_box_placeholder" xml:space="preserve">
+    <value>Ide írj a válaszoláshoz</value>
+  </data>
+  <data name="topic.reply_title_prefix" xml:space="preserve">
+    <value>Válasz</value>
+  </data>
+  <data name="topic.started_by" xml:space="preserve">
+    <value>{0} által</value>
+  </data>
+  <data name="topic.started_by_verbose" xml:space="preserve">
+    <value>{0} által indítva</value>
+  </data>
+  <data name="topic.create.close" xml:space="preserve">
+    <value>Bezár</value>
+  </data>
+  <data name="topic.create.preview" xml:space="preserve">
+    <value>Előnézet</value>
+  </data>
+  <data name="topic.create.preview_hide" xml:space="preserve">
+    <value>Ír</value>
+  </data>
+  <data name="topic.create.submit" xml:space="preserve">
+    <value>Küldés</value>
+  </data>
+  <data name="topic.create.necropost.default" xml:space="preserve">
+    <value>Ez a téma már inaktív egy ideje. Megfelelő indok hiányában ne posztolj ide.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic._" xml:space="preserve">
+    <value>Ez a téma már inaktív egy ideje. Ha nincs konkrét okod ide posztolni, kérlek {0} helyette.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic.create" xml:space="preserve">
+    <value>új téma létrehozása</value>
+  </data>
+  <data name="topic.create.placeholder.body" xml:space="preserve">
+    <value>Ide írja a tartalmat</value>
+  </data>
+  <data name="topic.create.placeholder.title" xml:space="preserve">
+    <value>Kattints ide a cím megadásához</value>
+  </data>
+  <data name="topic.jump.enter" xml:space="preserve">
+    <value>specifikus poszt szám megadásához kattints ide</value>
+  </data>
+  <data name="topic.jump.first" xml:space="preserve">
+    <value>ugrás az első poszthoz</value>
+  </data>
+  <data name="topic.jump.last" xml:space="preserve">
+    <value>ugrás az utolsó poszthoz</value>
+  </data>
+  <data name="topic.jump.next" xml:space="preserve">
+    <value>10 poszt átugrása</value>
+  </data>
+  <data name="topic.jump.previous" xml:space="preserve">
+    <value>visszalépni 10 posztot</value>
+  </data>
+  <data name="topic.post_edit.cancel" xml:space="preserve">
+    <value>Mégse</value>
+  </data>
+  <data name="topic.post_edit.post" xml:space="preserve">
+    <value>Mentés</value>
+  </data>
+  <data name="topic_watches.index.title_compact" xml:space="preserve">
+    <value>fórum feliratkozások</value>
+  </data>
+  <data name="topic_watches.index.box.total" xml:space="preserve">
+    <value>Követett témák</value>
+  </data>
+  <data name="topic_watches.index.box.unread" xml:space="preserve">
+    <value>Témák új válaszokkal</value>
+  </data>
+  <data name="topic_watches.index.info.total" xml:space="preserve">
+    <value>{0} témára vagy feliratkozva.</value>
+  </data>
+  <data name="topic_watches.index.info.unread" xml:space="preserve">
+    <value>{0} választ nem olvastál el a követett témáidban.</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.confirmation" xml:space="preserve">
+    <value>Leiratkozol a témáról?</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.title" xml:space="preserve">
+    <value>Leiratkozás</value>
+  </data>
+  <data name="topics._" xml:space="preserve">
+    <value>Témák</value>
+  </data>
+  <data name="topics.actions.login_reply" xml:space="preserve">
+    <value>Jelentkezz be a válaszoláshoz</value>
+  </data>
+  <data name="topics.actions.reply" xml:space="preserve">
+    <value>Válasz</value>
+  </data>
+  <data name="topics.actions.reply_with_quote" xml:space="preserve">
+    <value>Poszt idézése válaszhoz</value>
+  </data>
+  <data name="topics.actions.search" xml:space="preserve">
+    <value>Keresés</value>
+  </data>
+  <data name="topics.create.create_poll" xml:space="preserve">
+    <value>Szavazás Létrehozása</value>
+  </data>
+  <data name="topics.create.preview" xml:space="preserve">
+    <value>Poszt előnézet</value>
+  </data>
+  <data name="topics.create.create_poll_button.add" xml:space="preserve">
+    <value>Szavazás létrehozása</value>
+  </data>
+  <data name="topics.create.create_poll_button.remove" xml:space="preserve">
+    <value>Szavazás létrehozásának megszakítása</value>
+  </data>
+  <data name="topics.create.poll.hide_results" xml:space="preserve">
+    <value>A szavazás eredményeinek elrejtése.</value>
+  </data>
+  <data name="topics.create.poll.hide_results_info" xml:space="preserve">
+    <value>Csak a szavazás vége után fognak megjelenni.</value>
+  </data>
+  <data name="topics.create.poll.length" xml:space="preserve">
+    <value>Szavazás futtatása</value>
+  </data>
+  <data name="topics.create.poll.length_days_suffix" xml:space="preserve">
+    <value>nap</value>
+  </data>
+  <data name="topics.create.poll.length_info" xml:space="preserve">
+    <value>Hagyja üresen a soha véget nem érő szavazást</value>
+  </data>
+  <data name="topics.create.poll.max_options" xml:space="preserve">
+    <value>Felhasználónkénti beállítások</value>
+  </data>
+  <data name="topics.create.poll.max_options_info" xml:space="preserve">
+    <value>Ez a szám mutatja mennyi lehetőséget választhat egy felhasználó.</value>
+  </data>
+  <data name="topics.create.poll.options" xml:space="preserve">
+    <value>Beállítások</value>
+  </data>
+  <data name="topics.create.poll.options_info" xml:space="preserve">
+    <value>Minden opció kerüljön új sorba. 10 opciót lehet megadni.</value>
+  </data>
+  <data name="topics.create.poll.title" xml:space="preserve">
+    <value>Kérdés</value>
+  </data>
+  <data name="topics.create.poll.vote_change" xml:space="preserve">
+    <value>Újraszavazás engedélyezése.</value>
+  </data>
+  <data name="topics.create.poll.vote_change_info" xml:space="preserve">
+    <value>Ha engedélyezve van, a felhasználók változtathatják a szavazatukat.</value>
+  </data>
+  <data name="topics.edit_title.start" xml:space="preserve">
+    <value>Cím szerkesztése</value>
+  </data>
+  <data name="topics.index.feature_votes" xml:space="preserve">
+    <value>csillagos prioritás</value>
+  </data>
+  <data name="topics.index.replies" xml:space="preserve">
+    <value>válaszok</value>
+  </data>
+  <data name="topics.index.views" xml:space="preserve">
+    <value>megtekintések</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0" xml:space="preserve">
+    <value>"added" címke eltávolítása</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0_done" xml:space="preserve">
+    <value>"added" címke eltávolítva</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1" xml:space="preserve">
+    <value>“added” címke hozzáadása</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1_done" xml:space="preserve">
+    <value>“added” címke hozzáadva</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0" xml:space="preserve">
+    <value>“assigned” címke eltávolítása</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0_done" xml:space="preserve">
+    <value>“assigned” címke eltávolítva</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1" xml:space="preserve">
+    <value>“assigned” címke hozzáadása</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1_done" xml:space="preserve">
+    <value>“assigned” címke hozzáadva</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0" xml:space="preserve">
+    <value>“confirmed” címke eltávolítása</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0_done" xml:space="preserve">
+    <value>“confirmed” címke eltávolítva</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1" xml:space="preserve">
+    <value>“confirmed” címke hozzáadása</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1_done" xml:space="preserve">
+    <value>“confirmed” címke hozzáadva</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0" xml:space="preserve">
+    <value>“duplicate” címke eltávolítása</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0_done" xml:space="preserve">
+    <value>“duplicate” címke eltávolítva</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1" xml:space="preserve">
+    <value>“duplicate” címke hozzáadása</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1_done" xml:space="preserve">
+    <value>“duplicate” címke hozzáadva</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0" xml:space="preserve">
+    <value>“invalid” címke eltávolítása</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0_done" xml:space="preserve">
+    <value>“invalid” címke eltávolítva</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1" xml:space="preserve">
+    <value>“invalid” címke hozzáadása</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1_done" xml:space="preserve">
+    <value>“invalid” címke hozzáadva</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0" xml:space="preserve">
+    <value>“resolved” címke eltávolítása</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0_done" xml:space="preserve">
+    <value>“resolved” címke eltávolítva</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1" xml:space="preserve">
+    <value>“resolved” címke hozzáadása</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1_done" xml:space="preserve">
+    <value>“resolved” címke hozzáadva</value>
+  </data>
+  <data name="topics.lock.is_locked" xml:space="preserve">
+    <value>Ez a téma zárva van és nem lehet rá válaszolni</value>
+  </data>
+  <data name="topics.lock.to_0" xml:space="preserve">
+    <value>Téma feloldása</value>
+  </data>
+  <data name="topics.lock.to_0_confirm" xml:space="preserve">
+    <value>Feloldod a témát?</value>
+  </data>
+  <data name="topics.lock.to_0_done" xml:space="preserve">
+    <value>A téma fel lett oldva</value>
+  </data>
+  <data name="topics.lock.to_1" xml:space="preserve">
+    <value>Téma zárolása</value>
+  </data>
+  <data name="topics.lock.to_1_confirm" xml:space="preserve">
+    <value>Lezárod a témát?</value>
+  </data>
+  <data name="topics.lock.to_1_done" xml:space="preserve">
+    <value>A téma zárolva lett</value>
+  </data>
+  <data name="topics.moderate_move.title" xml:space="preserve">
+    <value>Másik fórumba áthelyezés</value>
+  </data>
+  <data name="topics.moderate_pin.to_0" xml:space="preserve">
+    <value>Téma kitűzésének visszavonása</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_confirm" xml:space="preserve">
+    <value>Vissza vonod a téma kitűzését?</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_done" xml:space="preserve">
+    <value>A téma kitűzése visszavonva</value>
+  </data>
+  <data name="topics.moderate_pin.to_1" xml:space="preserve">
+    <value>Téma kitűzése</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_confirm" xml:space="preserve">
+    <value>Kitűződ a témát?</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_done" xml:space="preserve">
+    <value>A téma ki lett tűzve</value>
+  </data>
+  <data name="topics.moderate_pin.to_2" xml:space="preserve">
+    <value>Téma kitűzése és bejelentésnek jelölése</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_confirm" xml:space="preserve">
+    <value>Kitűződ a témát és megjelölőd bejelentésként?</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_done" xml:space="preserve">
+    <value>Téma kitűzve és bejelentésnek jelölve</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.show" xml:space="preserve">
+    <value>Törölt posztok mutatása</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.hide" xml:space="preserve">
+    <value>Törölt posztok elrejtése</value>
+  </data>
+  <data name="topics.show.deleted-posts" xml:space="preserve">
+    <value>Törölt posztok</value>
+  </data>
+  <data name="topics.show.total_posts" xml:space="preserve">
+    <value>Összes poszt</value>
+  </data>
+  <data name="topics.show.feature_vote.current" xml:space="preserve">
+    <value>Jelenlegi prioritás: +{0}</value>
+  </data>
+  <data name="topics.show.feature_vote.do" xml:space="preserve">
+    <value>Kérés promotálása</value>
+  </data>
+  <data name="topics.show.feature_vote.info._" xml:space="preserve">
+    <value>Ez egy {0}. A funkciókérések felszavazhatóak {1} által.</value>
+  </data>
+  <data name="topics.show.feature_vote.info.feature_request" xml:space="preserve">
+    <value>funkciókérés</value>
+  </data>
+  <data name="topics.show.feature_vote.info.supporters" xml:space="preserve">
+    <value>támogatók</value>
+  </data>
+  <data name="topics.show.feature_vote.user.count" xml:space="preserve">
+    <value>{0} nincs szavazat|{1} {0} szavazat|[2,*] {0} szavazat</value>
+  </data>
+  <data name="topics.show.feature_vote.user.current" xml:space="preserve">
+    <value>Neked {0} darab szavazatod maradt.</value>
+  </data>
+  <data name="topics.show.feature_vote.user.not_enough" xml:space="preserve">
+    <value>Nincs több szavazatod</value>
+  </data>
+  <data name="topics.show.poll.edit" xml:space="preserve">
+    <value>Szavazás Szerkesztése</value>
+  </data>
+  <data name="topics.show.poll.edit_warning" xml:space="preserve">
+    <value>A szavazás szerkesztése eltörli a jelenlegi eredményeket!</value>
+  </data>
+  <data name="topics.show.poll.vote" xml:space="preserve">
+    <value>Szavazat</value>
+  </data>
+  <data name="topics.show.poll.button.change_vote" xml:space="preserve">
+    <value>Szavazás megváltoztatása</value>
+  </data>
+  <data name="topics.show.poll.button.edit" xml:space="preserve">
+    <value>Kérdőív szerkesztése</value>
+  </data>
+  <data name="topics.show.poll.button.view_results" xml:space="preserve">
+    <value>Ugrás az eredményekhez</value>
+  </data>
+  <data name="topics.show.poll.button.vote" xml:space="preserve">
+    <value>Szavaz</value>
+  </data>
+  <data name="topics.show.poll.detail.end_time" xml:space="preserve">
+    <value>Szavazás vége {0} -kor lesz</value>
+  </data>
+  <data name="topics.show.poll.detail.ended" xml:space="preserve">
+    <value>Szavazás végetért {0} -kor</value>
+  </data>
+  <data name="topics.show.poll.detail.results_hidden" xml:space="preserve">
+    <value>Az eredmények a szavazás vége után jelennek meg.</value>
+  </data>
+  <data name="topics.show.poll.detail.total" xml:space="preserve">
+    <value>Leadott szavazatok száma {0}</value>
+  </data>
+  <data name="topics.watch.to_not_watching" xml:space="preserve">
+    <value>Nincs könyvjelzőnek állítva</value>
+  </data>
+  <data name="topics.watch.to_watching" xml:space="preserve">
+    <value>Könyvjelző</value>
+  </data>
+  <data name="topics.watch.to_watching_mail" xml:space="preserve">
+    <value>Könyvjelző értesítéssel</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_disable" xml:space="preserve">
+    <value>Értesítés engedélyezve van. Ide kattintva letilthatod</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_enable" xml:space="preserve">
+    <value>Értesítés le van tiltva. Ide kattintva engedélyezheted</value>
+  </data>
+</root>

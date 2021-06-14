@@ -1,0 +1,688 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="discussion-votes.update.error" xml:space="preserve">
+    <value>Hiba a szavazat frissítése közben</value>
+  </data>
+  <data name="discussions.allow_kudosu" xml:space="preserve">
+    <value>kudosu engedélyezése</value>
+  </data>
+  <data name="discussions.beatmap_information" xml:space="preserve">
+    <value>Beatmap Oldal</value>
+  </data>
+  <data name="discussions.delete" xml:space="preserve">
+    <value>törlés</value>
+  </data>
+  <data name="discussions.deleted" xml:space="preserve">
+    <value>Eltávolítva {0} által, {1}.</value>
+  </data>
+  <data name="discussions.deny_kudosu" xml:space="preserve">
+    <value>kudosu megtagadása</value>
+  </data>
+  <data name="discussions.edit" xml:space="preserve">
+    <value>szerkesztés</value>
+  </data>
+  <data name="discussions.edited" xml:space="preserve">
+    <value>Utoljára frissítve {0} által, {1}.</value>
+  </data>
+  <data name="discussions.kudosu_denied" xml:space="preserve">
+    <value>Kudosu szerzéstől megtagadva.</value>
+  </data>
+  <data name="discussions.message_placeholder_deleted_beatmap" xml:space="preserve">
+    <value>Ez a nehézség törölve lett, ezért a beszélgetés nem lehetséges.</value>
+  </data>
+  <data name="discussions.message_placeholder_locked" xml:space="preserve">
+    <value>A beatmap megbeszélése meg lett tiltva.</value>
+  </data>
+  <data name="discussions.message_placeholder_silenced" xml:space="preserve">
+    <value>Nem posztolhatsz beszélgetést, amíg némítva vagy.</value>
+  </data>
+  <data name="discussions.message_type_select" xml:space="preserve">
+    <value>Komment-típus választása</value>
+  </data>
+  <data name="discussions.reply_notice" xml:space="preserve">
+    <value>Nyomj entert a válaszoláshoz.</value>
+  </data>
+  <data name="discussions.reply_placeholder" xml:space="preserve">
+    <value>Ide írd a válaszod</value>
+  </data>
+  <data name="discussions.require-login" xml:space="preserve">
+    <value>Kérlek jelentkezz be posztoláshoz illetve válaszoláshoz</value>
+  </data>
+  <data name="discussions.resolved" xml:space="preserve">
+    <value>Megoldott</value>
+  </data>
+  <data name="discussions.restore" xml:space="preserve">
+    <value>visszaállítás</value>
+  </data>
+  <data name="discussions.show_deleted" xml:space="preserve">
+    <value>Töröltek megjelenítése</value>
+  </data>
+  <data name="discussions.title" xml:space="preserve">
+    <value>Megbeszélések</value>
+  </data>
+  <data name="discussions.collapse.all-collapse" xml:space="preserve">
+    <value>Az összes becsukása</value>
+  </data>
+  <data name="discussions.collapse.all-expand" xml:space="preserve">
+    <value>Az összes kinyitása</value>
+  </data>
+  <data name="discussions.empty.empty" xml:space="preserve">
+    <value>Egyetlen megbeszélés sincs még!</value>
+  </data>
+  <data name="discussions.empty.hidden" xml:space="preserve">
+    <value>Egyetlen megbeszélés sem egyezik a kijelölt szűrővel.</value>
+  </data>
+  <data name="discussions.lock.button.lock" xml:space="preserve">
+    <value>Megbeszélés zárolása</value>
+  </data>
+  <data name="discussions.lock.button.unlock" xml:space="preserve">
+    <value>Megbeszélés megnyitása</value>
+  </data>
+  <data name="discussions.lock.prompt.lock" xml:space="preserve">
+    <value>Zárolás oka</value>
+  </data>
+  <data name="discussions.lock.prompt.unlock" xml:space="preserve">
+    <value>Biztos ki akarod nyitni?</value>
+  </data>
+  <data name="discussions.message_hint.in_general" xml:space="preserve">
+    <value>Ez a poszt be fog kerülni az általános beatmap szett megbeszélésébe. A beatmap modolásához időbélyeggel kezdd az üzenetet (pl.: 00:12:345).</value>
+  </data>
+  <data name="discussions.message_hint.in_timeline" xml:space="preserve">
+    <value>Több időbélyeg modolásához több poszt szükséges (egy poszt egy időbélyeghez).</value>
+  </data>
+  <data name="discussions.message_placeholder.general" xml:space="preserve">
+    <value>Írj ide az Általános ({0}) részlegbe való posztoláshoz</value>
+  </data>
+  <data name="discussions.message_placeholder.generalall" xml:space="preserve">
+    <value>Ide írj az Általánosba posztoláshoz (Összes nehézség)</value>
+  </data>
+  <data name="discussions.message_placeholder.review" xml:space="preserve">
+    <value>Ide írj, hogy hozzászólj</value>
+  </data>
+  <data name="discussions.message_placeholder.timeline" xml:space="preserve">
+    <value>Írj ide az Idővonalra ({0}) való posztoláshoz</value>
+  </data>
+  <data name="discussions.message_type.disqualify" xml:space="preserve">
+    <value>Diszkvalifikálás</value>
+  </data>
+  <data name="discussions.message_type.hype" xml:space="preserve">
+    <value>Hype!</value>
+  </data>
+  <data name="discussions.message_type.mapper_note" xml:space="preserve">
+    <value>Megjegyzés</value>
+  </data>
+  <data name="discussions.message_type.nomination_reset" xml:space="preserve">
+    <value>Nominálás Visszaállítása</value>
+  </data>
+  <data name="discussions.message_type.praise" xml:space="preserve">
+    <value>Dicséret</value>
+  </data>
+  <data name="discussions.message_type.problem" xml:space="preserve">
+    <value>Probléma</value>
+  </data>
+  <data name="discussions.message_type.review" xml:space="preserve">
+    <value>Összegzés</value>
+  </data>
+  <data name="discussions.message_type.suggestion" xml:space="preserve">
+    <value>Javaslat</value>
+  </data>
+  <data name="discussions.mode.events" xml:space="preserve">
+    <value>Előzmények</value>
+  </data>
+  <data name="discussions.mode.general" xml:space="preserve">
+    <value>Általános {0}</value>
+  </data>
+  <data name="discussions.mode.reviews" xml:space="preserve">
+    <value>Összegzések</value>
+  </data>
+  <data name="discussions.mode.timeline" xml:space="preserve">
+    <value>Idővonal</value>
+  </data>
+  <data name="discussions.mode.scopes.general" xml:space="preserve">
+    <value>Ez a nehézség</value>
+  </data>
+  <data name="discussions.mode.scopes.generalall" xml:space="preserve">
+    <value>Minden nehézség</value>
+  </data>
+  <data name="discussions.new.pin" xml:space="preserve">
+    <value>Rögzítés</value>
+  </data>
+  <data name="discussions.new.timestamp" xml:space="preserve">
+    <value>Időbélyeg</value>
+  </data>
+  <data name="discussions.new.timestamp_missing" xml:space="preserve">
+    <value>Időbélyeg hozzáadásához nyomj ctrl-c billentyűkombinációt szerkesztő módban, majd illeszd be az üzenetedbe!</value>
+  </data>
+  <data name="discussions.new.title" xml:space="preserve">
+    <value>Új beszélgetés indítása</value>
+  </data>
+  <data name="discussions.new.unpin" xml:space="preserve">
+    <value>Rögzítés feloldása</value>
+  </data>
+  <data name="discussions.review.new" xml:space="preserve">
+    <value>Új hozzászólás</value>
+  </data>
+  <data name="discussions.review.embed.delete" xml:space="preserve">
+    <value>Törlés</value>
+  </data>
+  <data name="discussions.review.embed.missing" xml:space="preserve">
+    <value>Hozzászólás törölve</value>
+  </data>
+  <data name="discussions.review.embed.unlink" xml:space="preserve">
+    <value>Leválasztás</value>
+  </data>
+  <data name="discussions.review.embed.unsaved" xml:space="preserve">
+    <value>Mentetlen</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.all-diff" xml:space="preserve">
+    <value>Az összes nehézséget tartalmazó posztra posztolni, nem lehet időjelölni.</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.diff" xml:space="preserve">
+    <value>Ha a {0} fog kezdődni, akkor az idővonal alatt fog megjelenni.</value>
+  </data>
+  <data name="discussions.review.insert-block.paragraph" xml:space="preserve">
+    <value>Bekezdés beszúrása</value>
+  </data>
+  <data name="discussions.review.insert-block.praise" xml:space="preserve">
+    <value>Dícséret beszúrása</value>
+  </data>
+  <data name="discussions.review.insert-block.problem" xml:space="preserve">
+    <value>Probléma beszúrása</value>
+  </data>
+  <data name="discussions.review.insert-block.suggestion" xml:space="preserve">
+    <value>Javaslat beszúrása</value>
+  </data>
+  <data name="discussions.show.title" xml:space="preserve">
+    <value>{0} készítette {1}</value>
+  </data>
+  <data name="discussions.sort.created_at" xml:space="preserve">
+    <value>Létrehozás ideje</value>
+  </data>
+  <data name="discussions.sort.timeline" xml:space="preserve">
+    <value>Idővonal</value>
+  </data>
+  <data name="discussions.sort.updated_at" xml:space="preserve">
+    <value>Utolsó frissítés</value>
+  </data>
+  <data name="discussions.stats.deleted" xml:space="preserve">
+    <value>Törölve</value>
+  </data>
+  <data name="discussions.stats.mapper_notes" xml:space="preserve">
+    <value>Megjegyzések</value>
+  </data>
+  <data name="discussions.stats.mine" xml:space="preserve">
+    <value>Saját</value>
+  </data>
+  <data name="discussions.stats.pending" xml:space="preserve">
+    <value>Függő</value>
+  </data>
+  <data name="discussions.stats.praises" xml:space="preserve">
+    <value>Dicséretek</value>
+  </data>
+  <data name="discussions.stats.resolved" xml:space="preserve">
+    <value>Megoldott</value>
+  </data>
+  <data name="discussions.stats.total" xml:space="preserve">
+    <value>Mind</value>
+  </data>
+  <data name="discussions.status-messages.approved" xml:space="preserve">
+    <value>Beatmap jóváhagyásának ideje: {0}!</value>
+  </data>
+  <data name="discussions.status-messages.graveyard" xml:space="preserve">
+    <value>A beatmap {0} óta nem kapott frissítést, valószínűleg el lett hanyagolva a készítő által...</value>
+  </data>
+  <data name="discussions.status-messages.loved" xml:space="preserve">
+    <value>Ez a beatmap {0} lett loved!</value>
+  </data>
+  <data name="discussions.status-messages.ranked" xml:space="preserve">
+    <value>Ez a beatmap {0} lett rangsorolt!</value>
+  </data>
+  <data name="discussions.status-messages.wip" xml:space="preserve">
+    <value>Megjegyzés: Ez a beatmap még készítés alatt áll.</value>
+  </data>
+  <data name="discussions.votes.none.down" xml:space="preserve">
+    <value>Nincsenek leértékelések</value>
+  </data>
+  <data name="discussions.votes.none.up" xml:space="preserve">
+    <value>Nincsenek felértékelések</value>
+  </data>
+  <data name="discussions.votes.latest.down" xml:space="preserve">
+    <value>Legutóbbi leértékelések</value>
+  </data>
+  <data name="discussions.votes.latest.up" xml:space="preserve">
+    <value>Legutóbbi felértékelések</value>
+  </data>
+  <data name="hype.button" xml:space="preserve">
+    <value>Beatmap Hype-olása!</value>
+  </data>
+  <data name="hype.button_done" xml:space="preserve">
+    <value>Már Hype-olt!</value>
+  </data>
+  <data name="hype.confirm" xml:space="preserve">
+    <value>Biztos vagy benne? Ezzel elhasználsz egyet a(z) {0} darab hype-odból, ami visszavonhatatlan.</value>
+  </data>
+  <data name="hype.explanation" xml:space="preserve">
+    <value>Hype-old a beatmap-et, hogy láthatóbbá tedd a jelöléshez és a rangsoroláshoz!</value>
+  </data>
+  <data name="hype.explanation_guest" xml:space="preserve">
+    <value>Jelentkezz be és hype-old a beatmap-et, hogy láthatóbbá tedd a jelöléshez és a rangsoroláshoz!</value>
+  </data>
+  <data name="hype.new_time" xml:space="preserve">
+    <value>Kapsz még egy hype-ot {0}.</value>
+  </data>
+  <data name="hype.remaining" xml:space="preserve">
+    <value>Még {0} darab hype-od maradt.</value>
+  </data>
+  <data name="hype.required_text" xml:space="preserve">
+    <value>Hype: {0}/{1}</value>
+  </data>
+  <data name="hype.section_title" xml:space="preserve">
+    <value>Hype Vonat</value>
+  </data>
+  <data name="hype.title" xml:space="preserve">
+    <value>Hype</value>
+  </data>
+  <data name="feedback.button" xml:space="preserve">
+    <value>Visszajelzés Küldése</value>
+  </data>
+  <data name="nominations.delete" xml:space="preserve">
+    <value>Törlés</value>
+  </data>
+  <data name="nominations.delete_own_confirm" xml:space="preserve">
+    <value>Biztos vagy benne? A beatmap törlésre kerül és vissza leszel irányítva a profilodra.</value>
+  </data>
+  <data name="nominations.delete_other_confirm" xml:space="preserve">
+    <value>Biztos vagy benne? A beatmap törlésre kerül és vissza leszel irányítva a felhasználó profiljára.</value>
+  </data>
+  <data name="nominations.disqualification_prompt" xml:space="preserve">
+    <value>Diszkvalifikáció oka?</value>
+  </data>
+  <data name="nominations.disqualified_at" xml:space="preserve">
+    <value>Diszkvalifikálva {0} ({1}).</value>
+  </data>
+  <data name="nominations.disqualified_no_reason" xml:space="preserve">
+    <value>nincs indok meghatározva</value>
+  </data>
+  <data name="nominations.disqualify" xml:space="preserve">
+    <value>Diszkvalifikálás</value>
+  </data>
+  <data name="nominations.incorrect_state" xml:space="preserve">
+    <value>Hiba a művelet végrehajtása közben, próbáld meg újratölteni az oldalt.</value>
+  </data>
+  <data name="nominations.love" xml:space="preserve">
+    <value>Love</value>
+  </data>
+  <data name="nominations.love_confirm" xml:space="preserve">
+    <value>Love-olod ezt a beatmap-et?</value>
+  </data>
+  <data name="nominations.nominate" xml:space="preserve">
+    <value>Nominálás</value>
+  </data>
+  <data name="nominations.nominate_confirm" xml:space="preserve">
+    <value>Nominálod ezt a beatmapot?</value>
+  </data>
+  <data name="nominations.nominated_by" xml:space="preserve">
+    <value>nominálva {0} által</value>
+  </data>
+  <data name="nominations.not_enough_hype" xml:space="preserve">
+    <value>Nincs elég hype.</value>
+  </data>
+  <data name="nominations.remove_from_loved" xml:space="preserve">
+    <value>Eltávolítás a szeretettek közül</value>
+  </data>
+  <data name="nominations.remove_from_loved_prompt" xml:space="preserve">
+    <value>Indoka a szeretettek közül való eltávolításnak:</value>
+  </data>
+  <data name="nominations.required_text" xml:space="preserve">
+    <value>Nominálások: {0}/{1}</value>
+  </data>
+  <data name="nominations.reset_message_deleted" xml:space="preserve">
+    <value>törölve</value>
+  </data>
+  <data name="nominations.title" xml:space="preserve">
+    <value>Nominálási Állapot</value>
+  </data>
+  <data name="nominations.unresolved_issues" xml:space="preserve">
+    <value>Még mindig vannak megoldatlan problémák amelyeket először kezelni kell.</value>
+  </data>
+  <data name="nominations.rank_estimate._" xml:space="preserve">
+    <value>Ez a pálya ranglistázott lesz {0} napján, ha további problémák nem merülnek fel. Jelenleg a {1}. helyen áll a {2}.</value>
+  </data>
+  <data name="nominations.rank_estimate.queue" xml:space="preserve">
+    <value>ranglistázási sorban</value>
+  </data>
+  <data name="nominations.rank_estimate.soon" xml:space="preserve">
+    <value>a közeljövő egy</value>
+  </data>
+  <data name="nominations.reset_at.nomination_reset" xml:space="preserve">
+    <value>A nominálási folyamat újraindításra került {0} {1} által: {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_at.disqualify" xml:space="preserve">
+    <value>{0} óta diszkvalifikálva {1} által egy új probléma miatt {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_confirm.nomination_reset" xml:space="preserve">
+    <value>Biztos vagy ebben? Egy új probléma posztolása alaphelyzetbe állítja a nominálási folyamatot.</value>
+  </data>
+  <data name="nominations.reset_confirm.disqualify" xml:space="preserve">
+    <value>Biztos vagy benne? Ezzel kizárod a beatmap-et a kvalifikálásból és alaphelyzetbe áll a nominálás.</value>
+  </data>
+  <data name="listing.search.prompt" xml:space="preserve">
+    <value>írj kulcsszavakat...</value>
+  </data>
+  <data name="listing.search.login_required" xml:space="preserve">
+    <value>Jelentkezz be a kereséshez.</value>
+  </data>
+  <data name="listing.search.options" xml:space="preserve">
+    <value>További Keresési Beállítások</value>
+  </data>
+  <data name="listing.search.supporter_filter" xml:space="preserve">
+    <value>A {0} általi szűrés egy aktív osu!supporter címet igényel</value>
+  </data>
+  <data name="listing.search.not-found" xml:space="preserve">
+    <value>nincs találat</value>
+  </data>
+  <data name="listing.search.not-found-quote" xml:space="preserve">
+    <value>... nope, semmit sem találtam.</value>
+  </data>
+  <data name="listing.search.filters.extra" xml:space="preserve">
+    <value>extra</value>
+  </data>
+  <data name="listing.search.filters.general" xml:space="preserve">
+    <value>Általános</value>
+  </data>
+  <data name="listing.search.filters.genre" xml:space="preserve">
+    <value>Műfaj</value>
+  </data>
+  <data name="listing.search.filters.language" xml:space="preserve">
+    <value>Nyelv</value>
+  </data>
+  <data name="listing.search.filters.mode" xml:space="preserve">
+    <value>Mód</value>
+  </data>
+  <data name="listing.search.filters.nsfw" xml:space="preserve">
+    <value>Felnőtt tartalom</value>
+  </data>
+  <data name="listing.search.filters.played" xml:space="preserve">
+    <value>Lejátszott</value>
+  </data>
+  <data name="listing.search.filters.rank" xml:space="preserve">
+    <value>Elért Rang</value>
+  </data>
+  <data name="listing.search.filters.status" xml:space="preserve">
+    <value>Kategóriák</value>
+  </data>
+  <data name="listing.search.sorting.title" xml:space="preserve">
+    <value>Cím</value>
+  </data>
+  <data name="listing.search.sorting.artist" xml:space="preserve">
+    <value>Előadó</value>
+  </data>
+  <data name="listing.search.sorting.difficulty" xml:space="preserve">
+    <value>Nehézség</value>
+  </data>
+  <data name="listing.search.sorting.favourites" xml:space="preserve">
+    <value>Kedvencek</value>
+  </data>
+  <data name="listing.search.sorting.updated" xml:space="preserve">
+    <value>Frissítve</value>
+  </data>
+  <data name="listing.search.sorting.ranked" xml:space="preserve">
+    <value>Rangsorolt</value>
+  </data>
+  <data name="listing.search.sorting.rating" xml:space="preserve">
+    <value>Értékelés</value>
+  </data>
+  <data name="listing.search.sorting.plays" xml:space="preserve">
+    <value>Játszások</value>
+  </data>
+  <data name="listing.search.sorting.relevance" xml:space="preserve">
+    <value>Relevancia</value>
+  </data>
+  <data name="listing.search.sorting.nominations" xml:space="preserve">
+    <value>Nominációk</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote._" xml:space="preserve">
+    <value>{0} általi szűrés aktív {1} igényel</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote.link_text" xml:space="preserve">
+    <value>osu!supporter cím</value>
+  </data>
+  <data name="general.converts" xml:space="preserve">
+    <value>Konvertált beatmap-ek tartalmazása</value>
+  </data>
+  <data name="general.follows" xml:space="preserve">
+    <value>Követett készítők</value>
+  </data>
+  <data name="general.recommended" xml:space="preserve">
+    <value>Ajánlott nehézség</value>
+  </data>
+  <data name="mode.all" xml:space="preserve">
+    <value>Összes</value>
+  </data>
+  <data name="mode.any" xml:space="preserve">
+    <value>Bármelyik</value>
+  </data>
+  <data name="status.any" xml:space="preserve">
+    <value>Bármelyik</value>
+  </data>
+  <data name="status.approved" xml:space="preserve">
+    <value>Jóváhagyott</value>
+  </data>
+  <data name="status.favourites" xml:space="preserve">
+    <value>Kedvencek</value>
+  </data>
+  <data name="status.graveyard" xml:space="preserve">
+    <value>Temető</value>
+  </data>
+  <data name="status.leaderboard" xml:space="preserve">
+    <value>Van Ranglistája</value>
+  </data>
+  <data name="status.loved" xml:space="preserve">
+    <value>Loved</value>
+  </data>
+  <data name="status.mine" xml:space="preserve">
+    <value>Saját mapjaim</value>
+  </data>
+  <data name="status.pending" xml:space="preserve">
+    <value>Függőben lévő &amp; WIP</value>
+  </data>
+  <data name="status.qualified" xml:space="preserve">
+    <value>Kvalifikált</value>
+  </data>
+  <data name="status.ranked" xml:space="preserve">
+    <value>Rangsorolt</value>
+  </data>
+  <data name="genre.any" xml:space="preserve">
+    <value>Bármelyik</value>
+  </data>
+  <data name="genre.unspecified" xml:space="preserve">
+    <value>Nem meghatározott</value>
+  </data>
+  <data name="genre.video-game" xml:space="preserve">
+    <value>Videojáték</value>
+  </data>
+  <data name="genre.anime" xml:space="preserve">
+    <value>Anime</value>
+  </data>
+  <data name="genre.rock" xml:space="preserve">
+    <value>Rock</value>
+  </data>
+  <data name="genre.pop" xml:space="preserve">
+    <value>Pop</value>
+  </data>
+  <data name="genre.other" xml:space="preserve">
+    <value>Egyéb</value>
+  </data>
+  <data name="genre.novelty" xml:space="preserve">
+    <value>Kortárs</value>
+  </data>
+  <data name="genre.hip-hop" xml:space="preserve">
+    <value>Hip Hop</value>
+  </data>
+  <data name="genre.electronic" xml:space="preserve">
+    <value>Elektronikus</value>
+  </data>
+  <data name="genre.metal" xml:space="preserve">
+    <value>Metál</value>
+  </data>
+  <data name="genre.classical" xml:space="preserve">
+    <value>Klasszikus</value>
+  </data>
+  <data name="genre.folk" xml:space="preserve">
+    <value>Népi</value>
+  </data>
+  <data name="genre.jazz" xml:space="preserve">
+    <value>Jazz</value>
+  </data>
+  <data name="mods.v2" xml:space="preserve">
+    <value>Score V2</value>
+  </data>
+  <data name="language.any" xml:space="preserve">
+    <value>Összes</value>
+  </data>
+  <data name="language.english" xml:space="preserve">
+    <value>Angol</value>
+  </data>
+  <data name="language.chinese" xml:space="preserve">
+    <value>Kínai</value>
+  </data>
+  <data name="language.french" xml:space="preserve">
+    <value>Francia</value>
+  </data>
+  <data name="language.german" xml:space="preserve">
+    <value>Német</value>
+  </data>
+  <data name="language.italian" xml:space="preserve">
+    <value>Olasz</value>
+  </data>
+  <data name="language.japanese" xml:space="preserve">
+    <value>Japán</value>
+  </data>
+  <data name="language.korean" xml:space="preserve">
+    <value>Koreai</value>
+  </data>
+  <data name="language.spanish" xml:space="preserve">
+    <value>Spanyol</value>
+  </data>
+  <data name="language.swedish" xml:space="preserve">
+    <value>Svéd</value>
+  </data>
+  <data name="language.russian" xml:space="preserve">
+    <value>Orosz</value>
+  </data>
+  <data name="language.polish" xml:space="preserve">
+    <value>Lengyel</value>
+  </data>
+  <data name="language.instrumental" xml:space="preserve">
+    <value>Instrumentális</value>
+  </data>
+  <data name="language.other" xml:space="preserve">
+    <value>Egyéb</value>
+  </data>
+  <data name="language.unspecified" xml:space="preserve">
+    <value>Meghatározatlan</value>
+  </data>
+  <data name="nsfw.exclude" xml:space="preserve">
+    <value>Elrejtés</value>
+  </data>
+  <data name="nsfw.include" xml:space="preserve">
+    <value>Mutasson</value>
+  </data>
+  <data name="played.any" xml:space="preserve">
+    <value>Bármelyik</value>
+  </data>
+  <data name="played.played" xml:space="preserve">
+    <value>LeJátszott</value>
+  </data>
+  <data name="played.unplayed" xml:space="preserve">
+    <value>Nem játszott</value>
+  </data>
+  <data name="extra.video" xml:space="preserve">
+    <value>Videót Tartalmaz</value>
+  </data>
+  <data name="extra.storyboard" xml:space="preserve">
+    <value>Storyboard-ot Tartalmaz</value>
+  </data>
+  <data name="rank.any" xml:space="preserve">
+    <value>Bármelyik</value>
+  </data>
+  <data name="rank.xh" xml:space="preserve">
+    <value>Ezüst SS</value>
+  </data>
+  <data name="rank.sh" xml:space="preserve">
+    <value>Ezüst S</value>
+  </data>
+  <data name="panel.playcount" xml:space="preserve">
+    <value>Játékszám: {0}</value>
+  </data>
+  <data name="panel.favourites" xml:space="preserve">
+    <value>Kedvencek: {0}</value>
+  </data>
+  <data name="variant.mania.4k" xml:space="preserve">
+    <value>4K</value>
+  </data>
+  <data name="variant.mania.7k" xml:space="preserve">
+    <value>7K</value>
+  </data>
+  <data name="variant.mania.all" xml:space="preserve">
+    <value>Összes</value>
+  </data>
+</root>

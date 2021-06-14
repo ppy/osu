@@ -1,0 +1,265 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="admin.warehouse" xml:space="preserve">
+    <value>倉庫</value>
+  </data>
+  <data name="cart.checkout" xml:space="preserve">
+    <value>支払いをする</value>
+  </data>
+  <data name="cart.info" xml:space="preserve">
+    <value>{0} 個がカート内にあります(${1})</value>
+  </data>
+  <data name="cart.more_goodies" xml:space="preserve">
+    <value>精算の前に他のグッズをチェックする。</value>
+  </data>
+  <data name="cart.shipping_fees" xml:space="preserve">
+    <value>配送料</value>
+  </data>
+  <data name="cart.title" xml:space="preserve">
+    <value>カート</value>
+  </data>
+  <data name="cart.total" xml:space="preserve">
+    <value>合計</value>
+  </data>
+  <data name="cart.errors_no_checkout.line_1" xml:space="preserve">
+    <value>カート内の商品に問題があるため、お支払いができません。</value>
+  </data>
+  <data name="cart.errors_no_checkout.line_2" xml:space="preserve">
+    <value>商品の削除か更新をして続ける。</value>
+  </data>
+  <data name="cart.empty.text" xml:space="preserve">
+    <value>カートには何もありません。</value>
+  </data>
+  <data name="cart.empty.return_link._" xml:space="preserve">
+    <value>{0}に戻って他のグッズを見つける</value>
+  </data>
+  <data name="cart.empty.return_link.link_text" xml:space="preserve">
+    <value>商品一覧</value>
+  </data>
+  <data name="checkout.cart_problems" xml:space="preserve">
+    <value>ええと、あなたのカートに問題があります！</value>
+  </data>
+  <data name="checkout.cart_problems_edit" xml:space="preserve">
+    <value>クリックで変更</value>
+  </data>
+  <data name="checkout.declined" xml:space="preserve">
+    <value>お支払いはキャンセルされました。</value>
+  </data>
+  <data name="checkout.delayed_shipping" xml:space="preserve">
+    <value>現在注文が多く大変混雑しています。注文はまだ受け付けていますが、**１～２週間ほどの遅延**が発生する可能性があります。</value>
+  </data>
+  <data name="checkout.old_cart" xml:space="preserve">
+    <value>あなたのカートは期限切れ、または再読み込みされたようです。再度お試しください。</value>
+  </data>
+  <data name="checkout.pay" xml:space="preserve">
+    <value>Paypalで支払う</value>
+  </data>
+  <data name="checkout.title_compact" xml:space="preserve">
+    <value>決済</value>
+  </data>
+  <data name="checkout.has_pending._" xml:space="preserve">
+    <value>未完了の支払いがあります。{0}をクリックして詳細を確認してください。</value>
+  </data>
+  <data name="checkout.has_pending.link_text" xml:space="preserve">
+    <value>ここ</value>
+  </data>
+  <data name="checkout.pending_checkout.line_1" xml:space="preserve">
+    <value>前回の支払いが完了しませんでした。</value>
+  </data>
+  <data name="checkout.pending_checkout.line_2" xml:space="preserve">
+    <value>お支払い方法を選択して支払いを再開する。</value>
+  </data>
+  <data name="discount" xml:space="preserve">
+    <value>{0}%の割引</value>
+  </data>
+  <data name="invoice.echeck_delay" xml:space="preserve">
+    <value>決済方法がeCheckのため、PayPalを介した支払いが完了するまで、さらに最大10日を要します。予めご了承ください。</value>
+  </data>
+  <data name="invoice.title_compact" xml:space="preserve">
+    <value>請求書</value>
+  </data>
+  <data name="invoice.status.processing.title" xml:space="preserve">
+    <value>お支払いはまだ確認されていません。</value>
+  </data>
+  <data name="invoice.status.processing.line_1" xml:space="preserve">
+    <value>既にお支払いを済ませている場合、私達は支払いを確認している最中の可能性があります。１～２分後にページの再読込をして下さい。</value>
+  </data>
+  <data name="invoice.status.processing.line_2._" xml:space="preserve">
+    <value>お支払いに関して問題がある場合: {0}</value>
+  </data>
+  <data name="invoice.status.processing.line_2.link_text" xml:space="preserve">
+    <value>ここをクリックして支払いを続ける</value>
+  </data>
+  <data name="order.cancel" xml:space="preserve">
+    <value>注文をキャンセル</value>
+  </data>
+  <data name="order.cancel_confirm" xml:space="preserve">
+    <value>この注文はキャンセルされ、支払いは受け付けられません。 選択した支払い会社は、支払いをすぐに返金しない可能性があります。よろしいですか？</value>
+  </data>
+  <data name="order.cancel_not_allowed" xml:space="preserve">
+    <value>この注文は現在キャンセルできません。</value>
+  </data>
+  <data name="order.invoice" xml:space="preserve">
+    <value>請求書を見る</value>
+  </data>
+  <data name="order.no_orders" xml:space="preserve">
+    <value>表示できる注文がありません。</value>
+  </data>
+  <data name="order.paid_on" xml:space="preserve">
+    <value>注文済み {0}</value>
+  </data>
+  <data name="order.resume" xml:space="preserve">
+    <value>支払いを再開</value>
+  </data>
+  <data name="order.shopify_expired" xml:space="preserve">
+    <value>この注文の決済リンクは期限切れとなりました。</value>
+  </data>
+  <data name="order.item.display_name.supporter_tag" xml:space="preserve">
+    <value>{0}を{1}に贈る（{2}）</value>
+  </data>
+  <data name="order.item.quantity" xml:space="preserve">
+    <value>個数</value>
+  </data>
+  <data name="order.not_modifiable_exception.cancelled" xml:space="preserve">
+    <value>キャンセル後に注文の変更は行えません。</value>
+  </data>
+  <data name="order.not_modifiable_exception.checkout" xml:space="preserve">
+    <value>発送準備中に注文の変更は行えません。</value>
+  </data>
+  <data name="order.not_modifiable_exception.default" xml:space="preserve">
+    <value>注文の変更は行えません。</value>
+  </data>
+  <data name="order.not_modifiable_exception.delivered" xml:space="preserve">
+    <value>発送後に注文の変更は行えません。</value>
+  </data>
+  <data name="order.not_modifiable_exception.paid" xml:space="preserve">
+    <value>支払い後に注文の変更は行えません。</value>
+  </data>
+  <data name="order.not_modifiable_exception.processing" xml:space="preserve">
+    <value>発送準備中に注文の変更は行えません。</value>
+  </data>
+  <data name="order.not_modifiable_exception.shipped" xml:space="preserve">
+    <value>発送後に注文の変更はできません。</value>
+  </data>
+  <data name="order.status.cancelled" xml:space="preserve">
+    <value>キャンセル済み</value>
+  </data>
+  <data name="order.status.checkout" xml:space="preserve">
+    <value>準備中</value>
+  </data>
+  <data name="order.status.delivered" xml:space="preserve">
+    <value>発送済み</value>
+  </data>
+  <data name="order.status.paid" xml:space="preserve">
+    <value>支払い済み</value>
+  </data>
+  <data name="order.status.processing" xml:space="preserve">
+    <value>承認待ち</value>
+  </data>
+  <data name="order.status.shipped" xml:space="preserve">
+    <value>発送済み</value>
+  </data>
+  <data name="product.name" xml:space="preserve">
+    <value>名前</value>
+  </data>
+  <data name="product.stock.out" xml:space="preserve">
+    <value>この商品は現在在庫がありません。また今度確認してみてください！</value>
+  </data>
+  <data name="product.stock.out_with_alternative" xml:space="preserve">
+    <value>この商品は現在在庫がありません。メニューから別の種類を選ぶか、また今度確認してみてください！</value>
+  </data>
+  <data name="product.add_to_cart" xml:space="preserve">
+    <value>カートに入れる</value>
+  </data>
+  <data name="product.notify" xml:space="preserve">
+    <value>入荷したら通知する</value>
+  </data>
+  <data name="product.notification_success" xml:space="preserve">
+    <value>入荷されたら通知を受け取ることができます。{0}からキャンセルできます</value>
+  </data>
+  <data name="product.notification_remove_text" xml:space="preserve">
+    <value>ここ</value>
+  </data>
+  <data name="product.notification_in_stock" xml:space="preserve">
+    <value>既に入荷しています！</value>
+  </data>
+  <data name="supporter_tag.gift" xml:space="preserve">
+    <value>プレイヤーにギフトを贈る</value>
+  </data>
+  <data name="supporter_tag.require_login._" xml:space="preserve">
+    <value>サポータータグを入手するには{0}が必要です！</value>
+  </data>
+  <data name="supporter_tag.require_login.link_text" xml:space="preserve">
+    <value>ログイン</value>
+  </data>
+  <data name="username_change.check" xml:space="preserve">
+    <value>名前を入力して使用可能か確認しましょう！</value>
+  </data>
+  <data name="username_change.checking" xml:space="preserve">
+    <value>{0}が使用可能か確認中・・・</value>
+  </data>
+  <data name="username_change.require_login._" xml:space="preserve">
+    <value>名前を変えるには{0}が必要です！</value>
+  </data>
+  <data name="username_change.require_login.link_text" xml:space="preserve">
+    <value>ログイン</value>
+  </data>
+</root>

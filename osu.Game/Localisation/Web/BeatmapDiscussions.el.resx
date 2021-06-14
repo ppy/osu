@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authorizations.update.null_user" xml:space="preserve">
+    <value>Πρέπει να είστε συνδεδεμένοι για να κάνετε επεξεργασία.</value>
+  </data>
+  <data name="authorizations.update.system_generated" xml:space="preserve">
+    <value>Οι δημοσιεύσεις που δημιουργήθηκαν από το σύστημα δεν μπορούν να επεξεργαστούν.</value>
+  </data>
+  <data name="authorizations.update.wrong_user" xml:space="preserve">
+    <value>Πρέπει να είστε ο δημιουργός της δημοσίευσης για να την επεξεργαστείτε.</value>
+  </data>
+  <data name="events.empty" xml:space="preserve">
+    <value>Δεν έχει συμβεί τίποτα... ακόμη.</value>
+  </data>
+  <data name="index.deleted_beatmap" xml:space="preserve">
+    <value>διαγραμμένο</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Συζητήσεις περί Beatmap</value>
+  </data>
+  <data name="index.form._" xml:space="preserve">
+    <value>Αναζήτηση</value>
+  </data>
+  <data name="index.form.deleted" xml:space="preserve">
+    <value>Συμπεριλάμβανε διαγραμμένες συζητήσεις</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Τύποι μηνυμάτων</value>
+  </data>
+  <data name="index.form.username" xml:space="preserve">
+    <value>Όνομα χρήστη</value>
+  </data>
+  <data name="index.form.beatmapset_status.all" xml:space="preserve">
+    <value>Όλα</value>
+  </data>
+  <data name="index.form.user.label" xml:space="preserve">
+    <value>Χρήστης</value>
+  </data>
+  <data name="index.form.user.overview" xml:space="preserve">
+    <value>Επισκόπηση δραστηριοτήτων</value>
+  </data>
+  <data name="item.created_at" xml:space="preserve">
+    <value>Ημερομηνία ανάρτησης</value>
+  </data>
+  <data name="item.deleted_at" xml:space="preserve">
+    <value>Ημερομηνία διαγραφής</value>
+  </data>
+  <data name="item.message_type" xml:space="preserve">
+    <value>Γράψε</value>
+  </data>
+  <data name="item.permalink" xml:space="preserve">
+    <value>Μόνιμος σύνδεσμος</value>
+  </data>
+  <data name="nearby_posts.confirm" xml:space="preserve">
+    <value>Καμία δημοσίευση δεν απαντάει στο ερώτημά μου</value>
+  </data>
+  <data name="nearby_posts.notice" xml:space="preserve">
+    <value>Υπάρχουν αναρτήσεις περίπου {0} ({1}). Παρακαλώ να τις ελέγξετε πριν αναρτήσετε.</value>
+  </data>
+  <data name="reply.open.guest" xml:space="preserve">
+    <value>Συνδεθείτε για να Aπαντήσετε</value>
+  </data>
+  <data name="reply.open.user" xml:space="preserve">
+    <value>Απαντήστε</value>
+  </data>
+  <data name="review.go_to_child" xml:space="preserve">
+    <value>Προβολή Συζήτησης</value>
+  </data>
+  <data name="review.validation.block_too_large" xml:space="preserve">
+    <value>κάθε block μπορεί να περιέχει μόνο έως {0} χαρακτήρες</value>
+  </data>
+  <data name="system.resolved.true" xml:space="preserve">
+    <value>Σημειώθηκε ως επιλυμένο από {0}</value>
+  </data>
+  <data name="system.resolved.false" xml:space="preserve">
+    <value>Ανοίχθηκε ξανά από τον {0}</value>
+  </data>
+  <data name="timestamp_display.general" xml:space="preserve">
+    <value>γενικά</value>
+  </data>
+  <data name="timestamp_display.general_all" xml:space="preserve">
+    <value>γενικά (όλα)</value>
+  </data>
+  <data name="user_filter.everyone" xml:space="preserve">
+    <value>Όλοι</value>
+  </data>
+  <data name="user_filter.label" xml:space="preserve">
+    <value>Φιλτράρισμα ανά χρήστη</value>
+  </data>
+</root>

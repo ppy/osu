@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="page_description" xml:space="preserve">
+    <value>Επιλεγμένοι καλλιτέχνες στο osu!</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>Επιλεγμένοι Kαλλιτέχνες</value>
+  </data>
+  <data name="admin.hidden" xml:space="preserve">
+    <value>Ο ΚΑΛΛΙΤΕΧΝΗΣ ΕΙΝΑΙ ΠΡΟΣ ΤΟ ΠΑΡΟΝ ΚΕΚΡΥΜΜΕΝΟΣ</value>
+  </data>
+  <data name="beatmaps._" xml:space="preserve">
+    <value>Beatmaps</value>
+  </data>
+  <data name="beatmaps.download" xml:space="preserve">
+    <value>Λήψη του προτύπου του beatmap</value>
+  </data>
+  <data name="beatmaps.download-na" xml:space="preserve">
+    <value>Το πρότυπο του beatmap δεν είναι ακόμη διαθέσιμο</value>
+  </data>
+  <data name="index.description" xml:space="preserve">
+    <value>Οι επιλεγμένοι καλλιτέχνες είναι καλλιτέχνες με τους οποίους συνεργαζόμαστε για να φέρουμε νέα και πρωτότυπη μουσική στο osu!. Αυτοί οι καλλιτέχνες και κάποια απο τα κομμάτια τους έχουν επιλεχθεί ειδικά από την ομάδα του osu! ώστε να είναι ευχάριστα στην ακρόαση και ιδανικά για mapping. Κάποιοι από αυτούς τους καλλιτέχνες έχουν επίσης δημιουργήσει καινούργια κομμάτια αποκλειστικά για το osu!.&lt;br&gt;&lt;br&gt;Όλα τα τραγούδια σε αυτή την κατηγορία παρέχονται ως αρχεία .osz με προκαθορισμένο timing και επίσημα έχουν την άδεια να χρησιμοποιηθούν στο osu! και σε περιεχόμενο γύρω από αυτό.</value>
+  </data>
+  <data name="links.osu" xml:space="preserve">
+    <value>osu! προφίλ</value>
+  </data>
+  <data name="links.site" xml:space="preserve">
+    <value>Επίσημη Ιστοσελίδα</value>
+  </data>
+  <data name="songs._" xml:space="preserve">
+    <value>Τραγούδια</value>
+  </data>
+  <data name="songs.count" xml:space="preserve">
+    <value>{0} τραγούδι|{0} τραγούδια</value>
+  </data>
+  <data name="songs.exclusive" xml:space="preserve">
+    <value>αποκλειστικό του osu!</value>
+  </data>
+  <data name="tracklist.title" xml:space="preserve">
+    <value>τίτλος</value>
+  </data>
+  <data name="tracklist.length" xml:space="preserve">
+    <value>διάρκεια</value>
+  </data>
+  <data name="tracklist.bpm" xml:space="preserve">
+    <value>bpm</value>
+  </data>
+  <data name="tracklist.genre" xml:space="preserve">
+    <value>είδος</value>
+  </data>
+</root>

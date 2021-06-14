@@ -1,0 +1,382 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="all_read" xml:space="preserve">
+    <value>Toutes les notifications ont été lues !</value>
+  </data>
+  <data name="delete" xml:space="preserve">
+    <value>Supprimer {0}</value>
+  </data>
+  <data name="loading" xml:space="preserve">
+    <value>Chargement des notifications non lues...</value>
+  </data>
+  <data name="mark_read" xml:space="preserve">
+    <value>Effacer {0}</value>
+  </data>
+  <data name="none" xml:space="preserve">
+    <value>Pas de notifications</value>
+  </data>
+  <data name="see_all" xml:space="preserve">
+    <value>voir toutes les notifications</value>
+  </data>
+  <data name="see_channel" xml:space="preserve">
+    <value>accéder au tchat</value>
+  </data>
+  <data name="verifying" xml:space="preserve">
+    <value>Veuillez vérifier la session pour voir les notifications</value>
+  </data>
+  <data name="filters._" xml:space="preserve">
+    <value>tout</value>
+  </data>
+  <data name="filters.user" xml:space="preserve">
+    <value>profil</value>
+  </data>
+  <data name="filters.beatmapset" xml:space="preserve">
+    <value>beatmaps</value>
+  </data>
+  <data name="filters.forum_topic" xml:space="preserve">
+    <value>forum</value>
+  </data>
+  <data name="filters.news_post" xml:space="preserve">
+    <value>news</value>
+  </data>
+  <data name="filters.build" xml:space="preserve">
+    <value>versions</value>
+  </data>
+  <data name="filters.channel" xml:space="preserve">
+    <value>tchat</value>
+  </data>
+  <data name="item.beatmapset._" xml:space="preserve">
+    <value>Beatmap</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change._" xml:space="preserve">
+    <value>Difficultés invités</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change.beatmap_owner_change" xml:space="preserve">
+    <value>Vous êtes maintenant propriétaire de la difficulté "{0}" pour la beatmap "{1}"</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change.beatmap_owner_change_compact" xml:space="preserve">
+    <value>Vous êtes maintenant propriétaire de la difficulté "{0}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion._" xml:space="preserve">
+    <value>Discussion de la beatmap</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>Beatmap "{0}" a été verrouillée pour la discussion</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock_compact" xml:space="preserve">
+    <value>La discussion a été verrouillée</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>Nouveau message sur "{0}" par {1} : "{2}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_empty" xml:space="preserve">
+    <value>Nouveau message sur "{0}" par {1}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact" xml:space="preserve">
+    <value>Nouveau message par {0} : "{1}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact_empty" xml:space="preserve">
+    <value>Nouveau message par {0}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_review_new" xml:space="preserve">
+    <value>Nouvelle revue sur "{0}" par {1} contenant des problèmes : {2}, suggestions : {3}, encouragements : {4}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_review_new_compact" xml:space="preserve">
+    <value>Nouvelle revue par {0} contenant des problèmes : {1}, suggestions : {2}, encouragements : {3}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>Beatmap "{0}" a été déverrouillée pour la discussion</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock_compact" xml:space="preserve">
+    <value>La discussion a été débloquée</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem._" xml:space="preserve">
+    <value>Problème de beatmap qualifiée</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>Signalé par {0} sur "{1}" : "{2}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_empty" xml:space="preserve">
+    <value>Signalé par {0} sur "{1}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_compact" xml:space="preserve">
+    <value>Signalé par {0} : "{1}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_compact_empty" xml:space="preserve">
+    <value>Signalé par {0}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state._" xml:space="preserve">
+    <value>Statut de la beatmap modifié</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify" xml:space="preserve">
+    <value>"{0}" a été disqualifiée</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify_compact" xml:space="preserve">
+    <value>La beatmap a été disqualifiée</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love" xml:space="preserve">
+    <value>"{0}" a été promu comme aimée</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love_compact" xml:space="preserve">
+    <value>La beatmap a été promue comme aimée</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate" xml:space="preserve">
+    <value>"{0}" a été nommé</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate_compact" xml:space="preserve">
+    <value>La beatmap a été nominée</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify" xml:space="preserve">
+    <value>"{0}" a obtenu suffisamment de nominations et est entré dans la file d'attente du classement</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify_compact" xml:space="preserve">
+    <value>La beatmap est entrée dans la file d’attente de classement</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>"{0}" a été classée</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank_compact" xml:space="preserve">
+    <value>La beatmap a été classée</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_remove_from_loved" xml:space="preserve">
+    <value>"{0}" a été supprimé de Loved</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_remove_from_loved_compact" xml:space="preserve">
+    <value>Beatmap a été retiré de Loved</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_reset_nominations" xml:space="preserve">
+    <value>La nomination de "{0}" a été réinitialisée</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_reset_nominations_compact" xml:space="preserve">
+    <value>La nomination a été réinitialisée</value>
+  </data>
+  <data name="item.beatmapset.comment._" xml:space="preserve">
+    <value>Nouveau commentaire</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_new" xml:space="preserve">
+    <value>{0} a commenté "{1}" sur "{2}"</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} a commenté "{1}"</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_reply" xml:space="preserve">
+    <value>{0} a répondu "{1}" sur "{2}"</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0} à répondu "{1}"</value>
+  </data>
+  <data name="item.channel._" xml:space="preserve">
+    <value>Tchat</value>
+  </data>
+  <data name="item.channel.channel._" xml:space="preserve">
+    <value>Nouveau message</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message" xml:space="preserve">
+    <value>{0} dit "{1}"</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_compact" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_group" xml:space="preserve">
+    <value>de {0}</value>
+  </data>
+  <data name="item.build._" xml:space="preserve">
+    <value>Changelog</value>
+  </data>
+  <data name="item.build.comment._" xml:space="preserve">
+    <value>Nouveau commentaire</value>
+  </data>
+  <data name="item.build.comment.comment_new" xml:space="preserve">
+    <value>{0} a commenté "{1}" sur "{2}"</value>
+  </data>
+  <data name="item.build.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} a commenté "{1}"</value>
+  </data>
+  <data name="item.build.comment.comment_reply" xml:space="preserve">
+    <value>{0} a répondu "{1}" sur "{2}"</value>
+  </data>
+  <data name="item.build.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0} a répondu "{1}"</value>
+  </data>
+  <data name="item.news_post._" xml:space="preserve">
+    <value>News</value>
+  </data>
+  <data name="item.news_post.comment._" xml:space="preserve">
+    <value>Nouveau commentaire</value>
+  </data>
+  <data name="item.news_post.comment.comment_new" xml:space="preserve">
+    <value>{0} a commenté "{1}" sur "{2}"</value>
+  </data>
+  <data name="item.news_post.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} a commenté "{1}"</value>
+  </data>
+  <data name="item.news_post.comment.comment_reply" xml:space="preserve">
+    <value>{0} a répondu "{1}" sur "{2}"</value>
+  </data>
+  <data name="item.news_post.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0} a répondu "{1}"</value>
+  </data>
+  <data name="item.forum_topic._" xml:space="preserve">
+    <value>Sujet du forum</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply._" xml:space="preserve">
+    <value>Nouvelle réponse du forum</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>{0} a répondu au sujet du forum "{1}"</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply_compact" xml:space="preserve">
+    <value>{0} a répondu</value>
+  </data>
+  <data name="item.legacy_pm._" xml:space="preserve">
+    <value>Forum de l'héritage PM</value>
+  </data>
+  <data name="item.legacy_pm.legacy_pm.legacy_pm" xml:space="preserve">
+    <value>{0} message non lu|{0} messages non lus</value>
+  </data>
+  <data name="item.user.user_beatmapset_new._" xml:space="preserve">
+    <value>Nouvelle beatmap</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new" xml:space="preserve">
+    <value>Nouvelle beatmap "{0}" par {1}</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new_compact" xml:space="preserve">
+    <value>Nouvelle beatmap "{0}"</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new_group" xml:space="preserve">
+    <value>Nouvelles beatmaps par {0}</value>
+  </data>
+  <data name="item.user_achievement._" xml:space="preserve">
+    <value>Médailles</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock._" xml:space="preserve">
+    <value>Nouvelle médaille</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>Débloqué "{0}" !</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_compact" xml:space="preserve">
+    <value>Débloqué «{0}» !</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_group" xml:space="preserve">
+    <value>Médailles débloquées !</value>
+  </data>
+  <data name="mail.beatmapset.beatmap_owner_change.beatmap_owner_change" xml:space="preserve">
+    <value>Vous êtes maintenant invité de la beatmap "{0}"</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>La discussion sur "{0}" a été verrouillée</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>La discussion sur "{0}" a de nouvelles mises à jour</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>La discussion sur "{0}" a été déverrouillée</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>Un nouveau problème a été signalé sur "{0}"</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_disqualify" xml:space="preserve">
+    <value>"{0}" a été disqualifiée</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_love" xml:space="preserve">
+    <value>"{0}" a été promue en aimée</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_nominate" xml:space="preserve">
+    <value>"{0}" a été nominée</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_qualify" xml:space="preserve">
+    <value>"{0}" a atteint suffisamment de nominations et est entrée dans la file d'attente de classement</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>"{0}" a été classée</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_remove_from_loved" xml:space="preserve">
+    <value>"{0}" a été supprimé de Loved</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_reset_nominations" xml:space="preserve">
+    <value>La nomination de "{0}" a été réinitialisée</value>
+  </data>
+  <data name="mail.beatmapset.comment.comment_new" xml:space="preserve">
+    <value>La beatmap "{0}" a de nouveaux commentaires</value>
+  </data>
+  <data name="mail.channel.channel.pm" xml:space="preserve">
+    <value>Vous avez reçu un nouveau message de {0}</value>
+  </data>
+  <data name="mail.build.comment.comment_new" xml:space="preserve">
+    <value>Les notes de mises à jour "{0}" ont de nouveaux commentaires</value>
+  </data>
+  <data name="mail.news_post.comment.comment_new" xml:space="preserve">
+    <value>L'article "{0}" a de nouveaux commentaires</value>
+  </data>
+  <data name="mail.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>Il y a de nouvelles réponses dans "{0}"</value>
+  </data>
+  <data name="mail.user.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>{0} a déverrouillé une nouvelle médaille, "{1}" !</value>
+  </data>
+  <data name="mail.user.user_achievement_unlock.user_achievement_unlock_self" xml:space="preserve">
+    <value>Vous avez déverrouillé une nouvelle médaille, "{0}" !</value>
+  </data>
+  <data name="mail.user.user_beatmapset_new.user_beatmapset_new" xml:space="preserve">
+    <value>{0} a créé de nouvelles beatmaps</value>
+  </data>
+</root>

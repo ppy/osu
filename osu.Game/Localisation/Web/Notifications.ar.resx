@@ -1,0 +1,370 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="all_read" xml:space="preserve">
+    <value>جميع الإشعارات مقروءة!</value>
+  </data>
+  <data name="delete" xml:space="preserve">
+    <value>حذف {0}</value>
+  </data>
+  <data name="loading" xml:space="preserve">
+    <value>تحميل الإشعارات الغير مقروءة...</value>
+  </data>
+  <data name="mark_read" xml:space="preserve">
+    <value>مَحو {0}</value>
+  </data>
+  <data name="none" xml:space="preserve">
+    <value>لا إشعارات</value>
+  </data>
+  <data name="see_all" xml:space="preserve">
+    <value>أِظهار جميع الإشعارات</value>
+  </data>
+  <data name="see_channel" xml:space="preserve">
+    <value>انتقل للمُحادثة</value>
+  </data>
+  <data name="verifying" xml:space="preserve">
+    <value>الرجاء التحقق من الجلسة لعرض الإشعارات</value>
+  </data>
+  <data name="filters._" xml:space="preserve">
+    <value>الكل</value>
+  </data>
+  <data name="filters.user" xml:space="preserve">
+    <value>الملف الشخصي</value>
+  </data>
+  <data name="filters.beatmapset" xml:space="preserve">
+    <value>الخرائط</value>
+  </data>
+  <data name="filters.forum_topic" xml:space="preserve">
+    <value>المنتدى</value>
+  </data>
+  <data name="filters.news_post" xml:space="preserve">
+    <value>الأخبار</value>
+  </data>
+  <data name="filters.build" xml:space="preserve">
+    <value>النُسَخ</value>
+  </data>
+  <data name="filters.channel" xml:space="preserve">
+    <value>محادثة</value>
+  </data>
+  <data name="item.beatmapset._" xml:space="preserve">
+    <value>المقطوعة</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion._" xml:space="preserve">
+    <value>منشاقشة المقطوعة</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>تم اقفال مناقشة على "{0}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock_compact" xml:space="preserve">
+    <value>المناقشة مقفلة</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>منشور جديد على "{0}" من قبل {1}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_empty" xml:space="preserve">
+    <value>منشور جديد على "{0}" من قبل {1}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact" xml:space="preserve">
+    <value>منشور جديد بواسطة {0}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact_empty" xml:space="preserve">
+    <value>منشور جديد بواسطة {0}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_review_new" xml:space="preserve">
+    <value>مراجعة جديدة على "{0}" من قبل {1} تحتوي على مشاكل: {2}, اقتراحات: {3}, تشجيع: {4}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_review_new_compact" xml:space="preserve">
+    <value>مراجعة جديدة من قبل {0} تحتوي على مشاكل: {1}, اقتراحات: {2}, تشجيع: {3}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>تم فتح قفل المناقشة على "{0}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock_compact" xml:space="preserve">
+    <value>تم الغاء قفل المناقشة</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem._" xml:space="preserve">
+    <value>مشكلة في خريطة مؤهلة</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>ابلغ عنه بواسطة {0} على "{1}": "{2}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_empty" xml:space="preserve">
+    <value>ابلغ عنه بواسطة {0} على "{1}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_compact" xml:space="preserve">
+    <value>ابلغ عنه بواسطة {0} على "{1}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_compact_empty" xml:space="preserve">
+    <value>ابلغ عنه بواسطة {0}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state._" xml:space="preserve">
+    <value>تم تغيير حالة الخريطة</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify" xml:space="preserve">
+    <value>حرُِمت "{0}" من التأهل</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify_compact" xml:space="preserve">
+    <value>تم استبعاد الخريطة</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love" xml:space="preserve">
+    <value>أرتقت "{0}" لـ خريطة محبوبة</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love_compact" xml:space="preserve">
+    <value>أرتقت  الخريطة لـ محبوبة</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate" xml:space="preserve">
+    <value>تم ترشيح "{0}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate_compact" xml:space="preserve">
+    <value>تم ترشيح الخريطة</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify" xml:space="preserve">
+    <value>"{0}" حصلت على ترشيحات كافية ودخلت حالة التصنيف</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify_compact" xml:space="preserve">
+    <value>دخلت الخريطة قائمة التصنيف</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>اصبحت "{0}" مُصنفة</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank_compact" xml:space="preserve">
+    <value>تم تصنيف الخريطة</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_remove_from_loved" xml:space="preserve">
+    <value>"{0}" تمت ازالتها من "الخرائط المحبوبة"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_remove_from_loved_compact" xml:space="preserve">
+    <value>أُزيلت الخريطة من "الخرائِط المحبوبة"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_reset_nominations" xml:space="preserve">
+    <value>تم اعادة تعيين ترشيحات "{0}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_reset_nominations_compact" xml:space="preserve">
+    <value>تم اعادة ضبط الترشيح</value>
+  </data>
+  <data name="item.beatmapset.comment._" xml:space="preserve">
+    <value>تعليق جديد</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_new" xml:space="preserve">
+    <value>{0} علق "{1}" على "{2}"</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} علق "{1}"</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_reply" xml:space="preserve">
+    <value>{0} رد "{1}" على "{2}"</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0} رد "{1}"</value>
+  </data>
+  <data name="item.channel._" xml:space="preserve">
+    <value>دردشة</value>
+  </data>
+  <data name="item.channel.channel._" xml:space="preserve">
+    <value>رسالة جديدة</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message" xml:space="preserve">
+    <value>{0} يقول {1}</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_compact" xml:space="preserve">
+    <value>العنوان:</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_group" xml:space="preserve">
+    <value>من {0}</value>
+  </data>
+  <data name="item.build._" xml:space="preserve">
+    <value>سِجل التغييرات</value>
+  </data>
+  <data name="item.build.comment._" xml:space="preserve">
+    <value>تعليق جديد</value>
+  </data>
+  <data name="item.build.comment.comment_new" xml:space="preserve">
+    <value>{0} علق "{1}" على "{2}"</value>
+  </data>
+  <data name="item.build.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} علق "{1}"</value>
+  </data>
+  <data name="item.build.comment.comment_reply" xml:space="preserve">
+    <value>{0} رد "{1}" على "{2}"</value>
+  </data>
+  <data name="item.build.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0} رد "{1}"</value>
+  </data>
+  <data name="item.news_post._" xml:space="preserve">
+    <value>الأخبار</value>
+  </data>
+  <data name="item.news_post.comment._" xml:space="preserve">
+    <value>تعليق جديد</value>
+  </data>
+  <data name="item.news_post.comment.comment_new" xml:space="preserve">
+    <value>{0} علق"{1}" على "{2}"</value>
+  </data>
+  <data name="item.news_post.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} علق "{1}"</value>
+  </data>
+  <data name="item.news_post.comment.comment_reply" xml:space="preserve">
+    <value>{0} رد "{1}" على "{2}"</value>
+  </data>
+  <data name="item.news_post.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0} رد "{1}"</value>
+  </data>
+  <data name="item.forum_topic._" xml:space="preserve">
+    <value>موضوع المنتدى</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply._" xml:space="preserve">
+    <value> رد منتدى جديد</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>{0} رد على "{1}"</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply_compact" xml:space="preserve">
+    <value>{0} قام بالرد</value>
+  </data>
+  <data name="item.legacy_pm._" xml:space="preserve">
+    <value>نظام الرسائل القديم</value>
+  </data>
+  <data name="item.legacy_pm.legacy_pm.legacy_pm" xml:space="preserve">
+    <value>{0} رسالة غير مقروءة|{0} رسائل غير مقروءة</value>
+  </data>
+  <data name="item.user.user_beatmapset_new._" xml:space="preserve">
+    <value>خريطة جديدة</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new" xml:space="preserve">
+    <value>خريطة جديدة "{0}" بواسطة {1}</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new_compact" xml:space="preserve">
+    <value>خريطة جديدة "{0}"</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new_group" xml:space="preserve">
+    <value>خرائِط جديدة بواسطة {0}</value>
+  </data>
+  <data name="item.user_achievement._" xml:space="preserve">
+    <value>الأوسِمة</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock._" xml:space="preserve">
+    <value>ميدالية جديدة</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>قمت بفتح "{0}"!</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_compact" xml:space="preserve">
+    <value>قمت بفتح "{0}"!</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_group" xml:space="preserve">
+    <value>قمت بفتح الأوسِمة!</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>تم قفل المناقشة على "{0}"</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>المناقشة حول "{0}" تحتوي على تحديثات جديدة</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>تم فتح قفل المناقشة على "{0}"</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>تم الإبلاغ عن مشكلة جديدة على "{0}"</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_disqualify" xml:space="preserve">
+    <value>حُرِمَت "{0}" من التأهُل</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_love" xml:space="preserve">
+    <value>اصبحت "{0}" محبوبة</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_nominate" xml:space="preserve">
+    <value>اصبحت "{0}" مرشحة</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_qualify" xml:space="preserve">
+    <value>"{0}" حصلت على ترشيحات كافية ودخلت حالة التصنيف</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>اصبحت "{0}" مصنفة</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_remove_from_loved" xml:space="preserve">
+    <value>"{0}" أُزيلَت مِن "الخرائط المحبوبة"</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_reset_nominations" xml:space="preserve">
+    <value>تم اعادة تعيين ترشيحات "{0}"</value>
+  </data>
+  <data name="mail.beatmapset.comment.comment_new" xml:space="preserve">
+    <value> الخريطة "{0}" تحتوي على تعليقات جديدة</value>
+  </data>
+  <data name="mail.channel.channel.pm" xml:space="preserve">
+    <value>لقد تلقيت رسالة جديدة من {0}</value>
+  </data>
+  <data name="mail.build.comment.comment_new" xml:space="preserve">
+    <value>سجل التحديثات "{0}" يحتوي على تعليقات جديدة</value>
+  </data>
+  <data name="mail.news_post.comment.comment_new" xml:space="preserve">
+    <value>الأخبار "{0}" تحتوي على تعليقات جديدة</value>
+  </data>
+  <data name="mail.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>هناك ردود جديدة في "{0}"</value>
+  </data>
+  <data name="mail.user.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>{0} فتح ميدالية جديدة، "{1}"!</value>
+  </data>
+  <data name="mail.user.user_achievement_unlock.user_achievement_unlock_self" xml:space="preserve">
+    <value>لقد فتحت ميدالية جديدة، "{0}"!</value>
+  </data>
+  <data name="mail.user.user_beatmapset_new.user_beatmapset_new" xml:space="preserve">
+    <value>قام {0} بإنشاء خرائط جديدة</value>
+  </data>
+</root>

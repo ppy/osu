@@ -1,0 +1,673 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="discussion-votes.update.error" xml:space="preserve">
+    <value>Actualizarea votului a eșuat</value>
+  </data>
+  <data name="discussions.allow_kudosu" xml:space="preserve">
+    <value>permite kudosu</value>
+  </data>
+  <data name="discussions.beatmap_information" xml:space="preserve">
+    <value>Pagină Beatmap</value>
+  </data>
+  <data name="discussions.delete" xml:space="preserve">
+    <value>șterge</value>
+  </data>
+  <data name="discussions.deleted" xml:space="preserve">
+    <value>Șters de {0} {1}.</value>
+  </data>
+  <data name="discussions.deny_kudosu" xml:space="preserve">
+    <value>refuză kudosu</value>
+  </data>
+  <data name="discussions.edit" xml:space="preserve">
+    <value>editează</value>
+  </data>
+  <data name="discussions.edited" xml:space="preserve">
+    <value>Ultima dată editat de {0} {1}.</value>
+  </data>
+  <data name="discussions.kudosu_denied" xml:space="preserve">
+    <value>A refuzat să primească kudosu.</value>
+  </data>
+  <data name="discussions.message_placeholder_deleted_beatmap" xml:space="preserve">
+    <value>Această dificultate a fost ștearsă, deci e posibil să nu mai fie discutată.</value>
+  </data>
+  <data name="discussions.message_placeholder_locked" xml:space="preserve">
+    <value>Discuție pentru acest beatmap a fost dezactivată.</value>
+  </data>
+  <data name="discussions.message_placeholder_silenced" xml:space="preserve">
+    <value>Nu poți posta atunci când ai fost redus la tăcere.</value>
+  </data>
+  <data name="discussions.message_type_select" xml:space="preserve">
+    <value>Selectează tipul comentariului</value>
+  </data>
+  <data name="discussions.reply_notice" xml:space="preserve">
+    <value>Apasă enter pentru a răspunde.</value>
+  </data>
+  <data name="discussions.reply_placeholder" xml:space="preserve">
+    <value>Scrie-ți răspunsul aici</value>
+  </data>
+  <data name="discussions.require-login" xml:space="preserve">
+    <value>Te rugăm să te conectezi pentru a posta sau a răspunde</value>
+  </data>
+  <data name="discussions.resolved" xml:space="preserve">
+    <value>Rezolvat</value>
+  </data>
+  <data name="discussions.restore" xml:space="preserve">
+    <value>restabilește</value>
+  </data>
+  <data name="discussions.show_deleted" xml:space="preserve">
+    <value>Arată șters</value>
+  </data>
+  <data name="discussions.title" xml:space="preserve">
+    <value>Discuții</value>
+  </data>
+  <data name="discussions.collapse.all-collapse" xml:space="preserve">
+    <value>Restrânge tot</value>
+  </data>
+  <data name="discussions.collapse.all-expand" xml:space="preserve">
+    <value>Extinde tot</value>
+  </data>
+  <data name="discussions.empty.empty" xml:space="preserve">
+    <value>Nicio discuție încă!</value>
+  </data>
+  <data name="discussions.empty.hidden" xml:space="preserve">
+    <value>Nicio discuție nu se potrivește cu filtrul selectat.</value>
+  </data>
+  <data name="discussions.lock.button.lock" xml:space="preserve">
+    <value>Încheie Discuția</value>
+  </data>
+  <data name="discussions.lock.button.unlock" xml:space="preserve">
+    <value>Deblochează Discuția</value>
+  </data>
+  <data name="discussions.lock.prompt.lock" xml:space="preserve">
+    <value>Motiv pentru încheiere</value>
+  </data>
+  <data name="discussions.lock.prompt.unlock" xml:space="preserve">
+    <value>Ești sigur că vrei să deblocați?</value>
+  </data>
+  <data name="discussions.message_hint.in_general" xml:space="preserve">
+    <value>Această postare va merge la discuția beatmapset generală. Pentru a modifica acest beatmap, începe mesajul cu un marcaj temporal (ex: 00:12:345).</value>
+  </data>
+  <data name="discussions.message_hint.in_timeline" xml:space="preserve">
+    <value>Pentru a modifica mai multe mărcaje de timp, postează de mai multe ori (o postare per marcaj temporal).</value>
+  </data>
+  <data name="discussions.message_placeholder.general" xml:space="preserve">
+    <value>Scrie aici pentru a posta în General ({0})</value>
+  </data>
+  <data name="discussions.message_placeholder.generalall" xml:space="preserve">
+    <value>Scrie aici pentru a posta în General (toate dificultățile)</value>
+  </data>
+  <data name="discussions.message_placeholder.review" xml:space="preserve">
+    <value>Scrie aici pentru a posta o recenzie</value>
+  </data>
+  <data name="discussions.message_placeholder.timeline" xml:space="preserve">
+    <value>Scrie aici pentru a posta în Cronologie ({0})</value>
+  </data>
+  <data name="discussions.message_type.disqualify" xml:space="preserve">
+    <value>Descalifică</value>
+  </data>
+  <data name="discussions.message_type.hype" xml:space="preserve">
+    <value>Hype!</value>
+  </data>
+  <data name="discussions.message_type.mapper_note" xml:space="preserve">
+    <value>Notă</value>
+  </data>
+  <data name="discussions.message_type.nomination_reset" xml:space="preserve">
+    <value>Resetați nominalizarea</value>
+  </data>
+  <data name="discussions.message_type.praise" xml:space="preserve">
+    <value>Laudă</value>
+  </data>
+  <data name="discussions.message_type.problem" xml:space="preserve">
+    <value>Problemă</value>
+  </data>
+  <data name="discussions.message_type.review" xml:space="preserve">
+    <value>Recenzie</value>
+  </data>
+  <data name="discussions.message_type.suggestion" xml:space="preserve">
+    <value>Sugestie</value>
+  </data>
+  <data name="discussions.mode.events" xml:space="preserve">
+    <value>Istoric</value>
+  </data>
+  <data name="discussions.mode.general" xml:space="preserve">
+    <value>General {0}</value>
+  </data>
+  <data name="discussions.mode.reviews" xml:space="preserve">
+    <value>Recenzii</value>
+  </data>
+  <data name="discussions.mode.timeline" xml:space="preserve">
+    <value>Cronologie</value>
+  </data>
+  <data name="discussions.mode.scopes.general" xml:space="preserve">
+    <value>Această dificultate</value>
+  </data>
+  <data name="discussions.mode.scopes.generalall" xml:space="preserve">
+    <value>Toate dificultățile</value>
+  </data>
+  <data name="discussions.new.pin" xml:space="preserve">
+    <value>Fixează</value>
+  </data>
+  <data name="discussions.new.timestamp" xml:space="preserve">
+    <value>Marcaj de timp</value>
+  </data>
+  <data name="discussions.new.timestamp_missing" xml:space="preserve">
+    <value>ctrl-c în modul de editare și lipește-ți mesajul pentru a adăuga un marcaj de timp!</value>
+  </data>
+  <data name="discussions.new.title" xml:space="preserve">
+    <value>Discuție nouă</value>
+  </data>
+  <data name="discussions.new.unpin" xml:space="preserve">
+    <value>DeFixează</value>
+  </data>
+  <data name="discussions.review.new" xml:space="preserve">
+    <value>Recenzie Nouă</value>
+  </data>
+  <data name="discussions.review.embed.delete" xml:space="preserve">
+    <value>Șterge</value>
+  </data>
+  <data name="discussions.review.embed.missing" xml:space="preserve">
+    <value>[DISCUȚIE ȘTEARSĂ]</value>
+  </data>
+  <data name="discussions.review.embed.unlink" xml:space="preserve">
+    <value>Dezasociați</value>
+  </data>
+  <data name="discussions.review.embed.unsaved" xml:space="preserve">
+    <value>Nesalvat</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.all-diff" xml:space="preserve">
+    <value>Postările de pe "Toate dificultățile" nu pot fi marcate.</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.diff" xml:space="preserve">
+    <value>Dacă acest {0} începe cu un marcaj, o să fie arătat sub Cronologie.</value>
+  </data>
+  <data name="discussions.review.insert-block.paragraph" xml:space="preserve">
+    <value>inserează un paragraf</value>
+  </data>
+  <data name="discussions.review.insert-block.praise" xml:space="preserve">
+    <value>inserează laudă</value>
+  </data>
+  <data name="discussions.review.insert-block.problem" xml:space="preserve">
+    <value>inserează problema</value>
+  </data>
+  <data name="discussions.review.insert-block.suggestion" xml:space="preserve">
+    <value>inserează sugestie</value>
+  </data>
+  <data name="discussions.show.title" xml:space="preserve">
+    <value>{0} mapat de {1}</value>
+  </data>
+  <data name="discussions.sort.created_at" xml:space="preserve">
+    <value>Data creării</value>
+  </data>
+  <data name="discussions.sort.timeline" xml:space="preserve">
+    <value>Cronologie</value>
+  </data>
+  <data name="discussions.sort.updated_at" xml:space="preserve">
+    <value>Ultima actualizare</value>
+  </data>
+  <data name="discussions.stats.deleted" xml:space="preserve">
+    <value>Șters</value>
+  </data>
+  <data name="discussions.stats.mapper_notes" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="discussions.stats.mine" xml:space="preserve">
+    <value>Ale mele</value>
+  </data>
+  <data name="discussions.stats.pending" xml:space="preserve">
+    <value>În așteptare</value>
+  </data>
+  <data name="discussions.stats.praises" xml:space="preserve">
+    <value>Laude</value>
+  </data>
+  <data name="discussions.stats.resolved" xml:space="preserve">
+    <value>Rezolvat</value>
+  </data>
+  <data name="discussions.stats.total" xml:space="preserve">
+    <value>Tot</value>
+  </data>
+  <data name="discussions.status-messages.approved" xml:space="preserve">
+    <value>Acest beatmap a fost aprobat pe {0}!</value>
+  </data>
+  <data name="discussions.status-messages.graveyard" xml:space="preserve">
+    <value>Acest beatmap nu a fost actualizat din {0} și este cel mai probabil abandonat de către creator...</value>
+  </data>
+  <data name="discussions.status-messages.loved" xml:space="preserve">
+    <value>Acest beatmap a fost adăugat la 'loved' pe {0}!</value>
+  </data>
+  <data name="discussions.status-messages.ranked" xml:space="preserve">
+    <value>Acest beatmap a fost clasat pe {0}!</value>
+  </data>
+  <data name="discussions.status-messages.wip" xml:space="preserve">
+    <value>Notă: Acest beatmap este marcat ca o lucrare în desfășurare de către creator.</value>
+  </data>
+  <data name="discussions.votes.none.down" xml:space="preserve">
+    <value>Niciun downvote încă</value>
+  </data>
+  <data name="discussions.votes.none.up" xml:space="preserve">
+    <value>Niciun upvote încă</value>
+  </data>
+  <data name="discussions.votes.latest.down" xml:space="preserve">
+    <value>Cele mai noi downvoturi</value>
+  </data>
+  <data name="discussions.votes.latest.up" xml:space="preserve">
+    <value>Cele mai noi upvote-uri</value>
+  </data>
+  <data name="hype.button" xml:space="preserve">
+    <value>'Hype' acest beatmap!</value>
+  </data>
+  <data name="hype.button_done" xml:space="preserve">
+    <value>Deja entuziasmat!</value>
+  </data>
+  <data name="hype.confirm" xml:space="preserve">
+    <value>Ești sigur? Acest lucru îți va folosi unul din restul tău de {0} 'hype' rămași și nu poate fi anulat.</value>
+  </data>
+  <data name="hype.explanation" xml:space="preserve">
+    <value>'Hype' acest beatmap pentru a-l face mai vizibil pentru nominalizare și clasament!</value>
+  </data>
+  <data name="hype.explanation_guest" xml:space="preserve">
+    <value>Conectează-te și 'hype' acest beatmap pentru a-l face mai vizibil pentru nominalizare și clasament!</value>
+  </data>
+  <data name="hype.new_time" xml:space="preserve">
+    <value>O să primești alt 'hype' pe {0}.</value>
+  </data>
+  <data name="hype.remaining" xml:space="preserve">
+    <value>Mai ai {0} 'hype' rămași.</value>
+  </data>
+  <data name="hype.required_text" xml:space="preserve">
+    <value>Hype: {0}/{1}</value>
+  </data>
+  <data name="hype.section_title" xml:space="preserve">
+    <value>Trenul Hype</value>
+  </data>
+  <data name="hype.title" xml:space="preserve">
+    <value>Hype</value>
+  </data>
+  <data name="feedback.button" xml:space="preserve">
+    <value>Spune-ți părerea</value>
+  </data>
+  <data name="nominations.delete" xml:space="preserve">
+    <value>Șterge</value>
+  </data>
+  <data name="nominations.delete_own_confirm" xml:space="preserve">
+    <value>Ești sigur? Acest beatmap va fi șters, iar tu vei fi redirecționat înapoi la profilul tău.</value>
+  </data>
+  <data name="nominations.delete_other_confirm" xml:space="preserve">
+    <value>Ești sigur? Acest beatmap va fi șters, iar tu vei fi redirecționat înapoi la profilul utilizatorului.</value>
+  </data>
+  <data name="nominations.disqualification_prompt" xml:space="preserve">
+    <value>Motiv pentru descalificare?</value>
+  </data>
+  <data name="nominations.disqualified_at" xml:space="preserve">
+    <value>Descalificat {0} ({1}).</value>
+  </data>
+  <data name="nominations.disqualified_no_reason" xml:space="preserve">
+    <value>niciun răspuns specificat</value>
+  </data>
+  <data name="nominations.disqualify" xml:space="preserve">
+    <value>Descalificare</value>
+  </data>
+  <data name="nominations.incorrect_state" xml:space="preserve">
+    <value>S-a produs o eroare la efectuarea acestei acțiuni, încearcă să reîmprospătezi pagina.</value>
+  </data>
+  <data name="nominations.love" xml:space="preserve">
+    <value>Love</value>
+  </data>
+  <data name="nominations.love_confirm" xml:space="preserve">
+    <value>'Love' acest beatmap?</value>
+  </data>
+  <data name="nominations.nominate" xml:space="preserve">
+    <value>Nominalizează</value>
+  </data>
+  <data name="nominations.nominate_confirm" xml:space="preserve">
+    <value>Nominalizezi acest beatmap?</value>
+  </data>
+  <data name="nominations.nominated_by" xml:space="preserve">
+    <value>nominalizat de {0}</value>
+  </data>
+  <data name="nominations.not_enough_hype" xml:space="preserve">
+    <value>Nu este suficient hype.</value>
+  </data>
+  <data name="nominations.remove_from_loved" xml:space="preserve">
+    <value>Șterge din iubit</value>
+  </data>
+  <data name="nominations.remove_from_loved_prompt" xml:space="preserve">
+    <value>Motivul pentru ștergere din iubit:</value>
+  </data>
+  <data name="nominations.required_text" xml:space="preserve">
+    <value>Nominalizări: {0}/{1}</value>
+  </data>
+  <data name="nominations.reset_message_deleted" xml:space="preserve">
+    <value>șters</value>
+  </data>
+  <data name="nominations.title" xml:space="preserve">
+    <value>Statutul de nominalizare</value>
+  </data>
+  <data name="nominations.unresolved_issues" xml:space="preserve">
+    <value>Încă există probleme nerezolvate care trebuie să fie abordate mai întâi.</value>
+  </data>
+  <data name="nominations.rank_estimate.soon" xml:space="preserve">
+    <value>curând</value>
+  </data>
+  <data name="nominations.reset_at.nomination_reset" xml:space="preserve">
+    <value>Procesul de nominalizare a fost resetat {0} de {1} cu noua problemă {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_at.disqualify" xml:space="preserve">
+    <value>Descalificat {0} de {1} cu noua problemă {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_confirm.nomination_reset" xml:space="preserve">
+    <value>Ești sigur? Postarea unei probleme noi va reseta procesul de nominalizare.</value>
+  </data>
+  <data name="nominations.reset_confirm.disqualify" xml:space="preserve">
+    <value>Ești sigur? Asta va elimina beatmap-ul din calificare și va reseta procesul de nominalizare.</value>
+  </data>
+  <data name="listing.search.prompt" xml:space="preserve">
+    <value>scrieți cuvinte cheie...</value>
+  </data>
+  <data name="listing.search.login_required" xml:space="preserve">
+    <value>Conectează-te pentru a căuta.</value>
+  </data>
+  <data name="listing.search.options" xml:space="preserve">
+    <value>Mai multe opțiuni de căutare</value>
+  </data>
+  <data name="listing.search.supporter_filter" xml:space="preserve">
+    <value>Trebuie să fii un suporter osu! pentru a putea filtra prin {0}</value>
+  </data>
+  <data name="listing.search.not-found" xml:space="preserve">
+    <value>niciun rezultat</value>
+  </data>
+  <data name="listing.search.not-found-quote" xml:space="preserve">
+    <value>... nup, nimic găsit.</value>
+  </data>
+  <data name="listing.search.filters.extra" xml:space="preserve">
+    <value>extra</value>
+  </data>
+  <data name="listing.search.filters.general" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="listing.search.filters.genre" xml:space="preserve">
+    <value>Gen</value>
+  </data>
+  <data name="listing.search.filters.language" xml:space="preserve">
+    <value>Limbă</value>
+  </data>
+  <data name="listing.search.filters.mode" xml:space="preserve">
+    <value>Mod</value>
+  </data>
+  <data name="listing.search.filters.played" xml:space="preserve">
+    <value>Jucat</value>
+  </data>
+  <data name="listing.search.filters.rank" xml:space="preserve">
+    <value>Clasament atins</value>
+  </data>
+  <data name="listing.search.filters.status" xml:space="preserve">
+    <value>Categorii</value>
+  </data>
+  <data name="listing.search.sorting.title" xml:space="preserve">
+    <value>Titlu</value>
+  </data>
+  <data name="listing.search.sorting.artist" xml:space="preserve">
+    <value>Artist</value>
+  </data>
+  <data name="listing.search.sorting.difficulty" xml:space="preserve">
+    <value>Dificultate</value>
+  </data>
+  <data name="listing.search.sorting.favourites" xml:space="preserve">
+    <value>Favorite</value>
+  </data>
+  <data name="listing.search.sorting.updated" xml:space="preserve">
+    <value>Actualizat</value>
+  </data>
+  <data name="listing.search.sorting.ranked" xml:space="preserve">
+    <value>Clasat</value>
+  </data>
+  <data name="listing.search.sorting.rating" xml:space="preserve">
+    <value>Evaluare</value>
+  </data>
+  <data name="listing.search.sorting.plays" xml:space="preserve">
+    <value>Jocuri</value>
+  </data>
+  <data name="listing.search.sorting.relevance" xml:space="preserve">
+    <value>Relevanţă</value>
+  </data>
+  <data name="listing.search.sorting.nominations" xml:space="preserve">
+    <value>Nominalizări</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote._" xml:space="preserve">
+    <value>Ai nevoie de un {0} activ pentru a filtra prin {1}</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote.link_text" xml:space="preserve">
+    <value>etichetă de suporter osu!</value>
+  </data>
+  <data name="general.converts" xml:space="preserve">
+    <value>Include beatmaps convertite</value>
+  </data>
+  <data name="general.recommended" xml:space="preserve">
+    <value>Dificultatea recomandată</value>
+  </data>
+  <data name="mode.all" xml:space="preserve">
+    <value>Toate</value>
+  </data>
+  <data name="mode.any" xml:space="preserve">
+    <value>Oricare</value>
+  </data>
+  <data name="status.any" xml:space="preserve">
+    <value>Oricare</value>
+  </data>
+  <data name="status.approved" xml:space="preserve">
+    <value>Aprobate</value>
+  </data>
+  <data name="status.favourites" xml:space="preserve">
+    <value>Favorite</value>
+  </data>
+  <data name="status.graveyard" xml:space="preserve">
+    <value>Graveyard</value>
+  </data>
+  <data name="status.leaderboard" xml:space="preserve">
+    <value>Are Clasament</value>
+  </data>
+  <data name="status.loved" xml:space="preserve">
+    <value>Loved</value>
+  </data>
+  <data name="status.mine" xml:space="preserve">
+    <value>Hărțile mele</value>
+  </data>
+  <data name="status.pending" xml:space="preserve">
+    <value>În așteptare &amp; în lucru</value>
+  </data>
+  <data name="status.qualified" xml:space="preserve">
+    <value>Calificate</value>
+  </data>
+  <data name="status.ranked" xml:space="preserve">
+    <value>Clasat</value>
+  </data>
+  <data name="genre.any" xml:space="preserve">
+    <value>Oricare</value>
+  </data>
+  <data name="genre.unspecified" xml:space="preserve">
+    <value>Nespecificat</value>
+  </data>
+  <data name="genre.video-game" xml:space="preserve">
+    <value>Joc video</value>
+  </data>
+  <data name="genre.anime" xml:space="preserve">
+    <value>Anime</value>
+  </data>
+  <data name="genre.rock" xml:space="preserve">
+    <value>Rock</value>
+  </data>
+  <data name="genre.pop" xml:space="preserve">
+    <value>Pop</value>
+  </data>
+  <data name="genre.other" xml:space="preserve">
+    <value>Altul</value>
+  </data>
+  <data name="genre.novelty" xml:space="preserve">
+    <value>Noutate</value>
+  </data>
+  <data name="genre.hip-hop" xml:space="preserve">
+    <value>Hip Hop</value>
+  </data>
+  <data name="genre.electronic" xml:space="preserve">
+    <value>Electronic</value>
+  </data>
+  <data name="genre.metal" xml:space="preserve">
+    <value>Metal</value>
+  </data>
+  <data name="genre.classical" xml:space="preserve">
+    <value>Clasice</value>
+  </data>
+  <data name="genre.folk" xml:space="preserve">
+    <value>Folclor</value>
+  </data>
+  <data name="genre.jazz" xml:space="preserve">
+    <value>Jazz</value>
+  </data>
+  <data name="mods.v2" xml:space="preserve">
+    <value>Score V2</value>
+  </data>
+  <data name="language.english" xml:space="preserve">
+    <value>Engleză</value>
+  </data>
+  <data name="language.chinese" xml:space="preserve">
+    <value>Chineză</value>
+  </data>
+  <data name="language.french" xml:space="preserve">
+    <value>Franceză</value>
+  </data>
+  <data name="language.german" xml:space="preserve">
+    <value>Germană</value>
+  </data>
+  <data name="language.italian" xml:space="preserve">
+    <value>Italiană</value>
+  </data>
+  <data name="language.japanese" xml:space="preserve">
+    <value>Japoneză</value>
+  </data>
+  <data name="language.korean" xml:space="preserve">
+    <value>Coreeană</value>
+  </data>
+  <data name="language.spanish" xml:space="preserve">
+    <value>Spaniolă</value>
+  </data>
+  <data name="language.swedish" xml:space="preserve">
+    <value>Suedeză</value>
+  </data>
+  <data name="language.russian" xml:space="preserve">
+    <value>Rusă</value>
+  </data>
+  <data name="language.polish" xml:space="preserve">
+    <value>Poloneză</value>
+  </data>
+  <data name="language.instrumental" xml:space="preserve">
+    <value>Instrumental</value>
+  </data>
+  <data name="language.other" xml:space="preserve">
+    <value>Altul</value>
+  </data>
+  <data name="language.unspecified" xml:space="preserve">
+    <value>Nespecificat</value>
+  </data>
+  <data name="nsfw.exclude" xml:space="preserve">
+    <value>Ascunde</value>
+  </data>
+  <data name="nsfw.include" xml:space="preserve">
+    <value>Arată</value>
+  </data>
+  <data name="played.any" xml:space="preserve">
+    <value>Oricare</value>
+  </data>
+  <data name="played.played" xml:space="preserve">
+    <value>Jucat</value>
+  </data>
+  <data name="played.unplayed" xml:space="preserve">
+    <value>Nejucat</value>
+  </data>
+  <data name="extra.video" xml:space="preserve">
+    <value>Cu videoclip</value>
+  </data>
+  <data name="extra.storyboard" xml:space="preserve">
+    <value>Cu storyboard</value>
+  </data>
+  <data name="rank.any" xml:space="preserve">
+    <value>Oricare</value>
+  </data>
+  <data name="rank.xh" xml:space="preserve">
+    <value>SS de argint</value>
+  </data>
+  <data name="rank.sh" xml:space="preserve">
+    <value>S de argint</value>
+  </data>
+  <data name="panel.playcount" xml:space="preserve">
+    <value>Numărul de jocuri {0}</value>
+  </data>
+  <data name="panel.favourites" xml:space="preserve">
+    <value>Favorite {0}</value>
+  </data>
+  <data name="variant.mania.4k" xml:space="preserve">
+    <value>4K</value>
+  </data>
+  <data name="variant.mania.7k" xml:space="preserve">
+    <value>7K</value>
+  </data>
+  <data name="variant.mania.all" xml:space="preserve">
+    <value>Tot</value>
+  </data>
+</root>

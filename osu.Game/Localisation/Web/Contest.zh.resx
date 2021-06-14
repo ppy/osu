@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="header.small" xml:space="preserve">
+    <value>享受游戏以外的竞赛体验。</value>
+  </data>
+  <data name="header.large" xml:space="preserve">
+    <value>社区评选</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>列表</value>
+  </data>
+  <data name="voting.login_required" xml:space="preserve">
+    <value>请登录后再投票.</value>
+  </data>
+  <data name="voting.over" xml:space="preserve">
+    <value>这场评选的投票已经结束</value>
+  </data>
+  <data name="voting.show_voted_only" xml:space="preserve">
+    <value>显示投票</value>
+  </data>
+  <data name="voting.best_of.none_played" xml:space="preserve">
+    <value>没有符合此次评选条件的谱面！</value>
+  </data>
+  <data name="voting.button.add" xml:space="preserve">
+    <value>投票</value>
+  </data>
+  <data name="voting.button.remove" xml:space="preserve">
+    <value>取消投票</value>
+  </data>
+  <data name="voting.button.used_up" xml:space="preserve">
+    <value>你已经用光了投票次数</value>
+  </data>
+  <data name="entry._" xml:space="preserve">
+    <value>列表</value>
+  </data>
+  <data name="entry.login_required" xml:space="preserve">
+    <value>请登录后再参加评选。</value>
+  </data>
+  <data name="entry.silenced_or_restricted" xml:space="preserve">
+    <value>账户受限时无法参加评选。</value>
+  </data>
+  <data name="entry.preparation" xml:space="preserve">
+    <value>我们正在准备这场评选，请耐心等待！</value>
+  </data>
+  <data name="entry.drop_here" xml:space="preserve">
+    <value>将您的参赛文件拖到此处</value>
+  </data>
+  <data name="entry.download" xml:space="preserve">
+    <value>下载 .osz</value>
+  </data>
+  <data name="entry.wrong_type.art" xml:space="preserve">
+    <value>只接受 .jpg 和 .png 格式的文件.</value>
+  </data>
+  <data name="entry.wrong_type.beatmap" xml:space="preserve">
+    <value>只接受 .osu 格式的文件.</value>
+  </data>
+  <data name="entry.wrong_type.music" xml:space="preserve">
+    <value>只接受 .mp3 格式的文件.</value>
+  </data>
+  <data name="entry.too_big" xml:space="preserve">
+    <value>参赛文件的大小不能超过 {0}.</value>
+  </data>
+  <data name="beatmaps.download" xml:space="preserve">
+    <value>下载模板</value>
+  </data>
+  <data name="vote.list" xml:space="preserve">
+    <value>票数</value>
+  </data>
+  <data name="vote.count" xml:space="preserve">
+    <value>{0} 票</value>
+  </data>
+  <data name="vote.points" xml:space="preserve">
+    <value>{0} 分</value>
+  </data>
+  <data name="dates.ended" xml:space="preserve">
+    <value>结束于 {0}</value>
+  </data>
+  <data name="dates.ended_no_date" xml:space="preserve">
+    <value>已结束</value>
+  </data>
+  <data name="dates.starts._" xml:space="preserve">
+    <value>开始于 {0}</value>
+  </data>
+  <data name="dates.starts.soon" xml:space="preserve">
+    <value>不久之后</value>
+  </data>
+  <data name="states.entry" xml:space="preserve">
+    <value>可参加</value>
+  </data>
+  <data name="states.voting" xml:space="preserve">
+    <value>投票中</value>
+  </data>
+  <data name="states.results" xml:space="preserve">
+    <value>已结束</value>
+  </data>
+</root>

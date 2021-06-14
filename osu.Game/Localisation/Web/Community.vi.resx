@@ -1,0 +1,241 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="support.convinced.title" xml:space="preserve">
+    <value>Tôi đã tin! {0}</value>
+  </data>
+  <data name="support.convinced.support" xml:space="preserve">
+    <value>hỗ trợ osu!</value>
+  </data>
+  <data name="support.convinced.gift" xml:space="preserve">
+    <value>hay gửi support đến người chơi khác</value>
+  </data>
+  <data name="support.convinced.instructions" xml:space="preserve">
+    <value>nhấp vào nút trái tim để đi đến osu!store</value>
+  </data>
+  <data name="support.why-support.title" xml:space="preserve">
+    <value>Tại sao tôi nên hỗ trợ osu!? Tiền hỗ trợ sau này sẽ đi đâu?</value>
+  </data>
+  <data name="support.why-support.team.title" xml:space="preserve">
+    <value>Hỗ trợ đội ngũ</value>
+  </data>
+  <data name="support.why-support.team.description" xml:space="preserve">
+    <value>Một nhóm nhỏ phát triển và điều hành osu!. Sự hỗ trợ của bạn giúp họ để, bạn biết rồi đấy... sống.</value>
+  </data>
+  <data name="support.why-support.infra.title" xml:space="preserve">
+    <value>Cơ sở hạ tầng máy chủ</value>
+  </data>
+  <data name="support.why-support.infra.description" xml:space="preserve">
+    <value>Phần đóng góp sẽ được sử dụng cho các máy chủ để chạy trang web, dịch vụ multiplayer, bảng xếp hạng trực tuyến, v.v.</value>
+  </data>
+  <data name="support.why-support.featured-artists.title" xml:space="preserve">
+    <value>Featured Artists</value>
+  </data>
+  <data name="support.why-support.featured-artists.description" xml:space="preserve">
+    <value>Với sự hỗ trợ của bạn, chúng tôi có thể tiếp cận thêm nhiều nghệ sĩ tuyệt vời hơn nữa và cấp phép cho âm nhạc tuyệt vời hơn để dùng trong osu!</value>
+  </data>
+  <data name="support.why-support.ads.title" xml:space="preserve">
+    <value>Giữ osu! tự duy trì</value>
+  </data>
+  <data name="support.why-support.ads.description" xml:space="preserve">
+    <value>Đóng góp của bạn giúp giữ trò chơi độc lập và hoàn toàn miễn phí từ quảng cáo và các nhà tài trợ bên ngoài.</value>
+  </data>
+  <data name="support.why-support.tournaments.title" xml:space="preserve">
+    <value>Giải đấu chính thức</value>
+  </data>
+  <data name="support.why-support.tournaments.description" xml:space="preserve">
+    <value>Giúp tài trợ cho việc điều hành (và giải thưởng cho) Giải đấu World Cup osu! chính thức.</value>
+  </data>
+  <data name="support.why-support.tournaments.link_text" xml:space="preserve">
+    <value>Khám phá giải đấu &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.bounty-program.title" xml:space="preserve">
+    <value>Chương trình thưởng mã nguồn mở</value>
+  </data>
+  <data name="support.why-support.bounty-program.description" xml:space="preserve">
+    <value>Hỗ trợ những người đóng góp cộng đồng đã dành thời gian và nỗ lực để làm osu! tốt hơn.</value>
+  </data>
+  <data name="support.why-support.bounty-program.link_text" xml:space="preserve">
+    <value>Tìm hiểu thêm &amp;raquo;</value>
+  </data>
+  <data name="support.perks.title" xml:space="preserve">
+    <value>Ồ, Vậy tôi sẽ nhận được gì?!</value>
+  </data>
+  <data name="support.perks.osu_direct.title" xml:space="preserve">
+    <value>osu!direct</value>
+  </data>
+  <data name="support.perks.osu_direct.description" xml:space="preserve">
+    <value>Truy cập nhanh và dễ dàng để tìm beatmap mà không cần thoát trò chơi.</value>
+  </data>
+  <data name="support.perks.friend_ranking.title" xml:space="preserve">
+    <value>Xếp hạng bạn bè</value>
+  </data>
+  <data name="support.perks.country_ranking.title" xml:space="preserve">
+    <value>Xếp hạng quốc gia</value>
+  </data>
+  <data name="support.perks.country_ranking.description" xml:space="preserve">
+    <value>Chinh phục đất nước của bạn trước khi bạn chinh phục thế giới.</value>
+  </data>
+  <data name="support.perks.mod_filtering.title" xml:space="preserve">
+    <value>Lọc theo Mods</value>
+  </data>
+  <data name="support.perks.mod_filtering.description" xml:space="preserve">
+    <value>Chỉ liên kết với những người chơi HDHR ư? Không vấn đề gì!</value>
+  </data>
+  <data name="support.perks.auto_downloads.title" xml:space="preserve">
+    <value>Tải Tự Động</value>
+  </data>
+  <data name="support.perks.auto_downloads.description" xml:space="preserve">
+    <value>Beatmap sẽ tự động tải khi đang chơi multiplayer, theo dõi người chơi khác, hoặc khi click vào link beatmap trong kênh chat!</value>
+  </data>
+  <data name="support.perks.upload_more.title" xml:space="preserve">
+    <value>Tải Lên Thêm</value>
+  </data>
+  <data name="support.perks.upload_more.description" xml:space="preserve">
+    <value>Thêm số lượng beatmap chờ (cho mỗi beatmap được rank) tới tối đa là 10.</value>
+  </data>
+  <data name="support.perks.early_access.title" xml:space="preserve">
+    <value>Tiếp Cận Sớm</value>
+  </data>
+  <data name="support.perks.early_access.description" xml:space="preserve">
+    <value>Tiếp cận những bản release sớm mà bạn có thể dùng thử các tính năng mới trước khi nó được ra mắt công khai!</value>
+  </data>
+  <data name="support.perks.customisation.title" xml:space="preserve">
+    <value>Tùy Biến</value>
+  </data>
+  <data name="support.perks.customisation.description" xml:space="preserve">
+    <value>Tùy biến trang cá nhân của bạn bằng cách thêm một user page đầy đủ có thể chỉnh sửa.</value>
+  </data>
+  <data name="support.perks.beatmap_filters.title" xml:space="preserve">
+    <value>Lọc Beatmap</value>
+  </data>
+  <data name="support.perks.beatmap_filters.description" xml:space="preserve">
+    <value>Tìm kiếm beatmap được lọc theo đã chơi, chưa chơi và rank đạt được (nếu có).</value>
+  </data>
+  <data name="support.perks.yellow_fellow.title" xml:space="preserve">
+    <value>Anh Bạn Màu Vàng</value>
+  </data>
+  <data name="support.perks.yellow_fellow.description" xml:space="preserve">
+    <value>Được nhận diện trong game bằng màu vàng sáng trên tên tài khoản của bạn trong chat.</value>
+  </data>
+  <data name="support.perks.speedy_downloads.title" xml:space="preserve">
+    <value>Tải Nhanh</value>
+  </data>
+  <data name="support.perks.speedy_downloads.description" xml:space="preserve">
+    <value>Tải ít bị giới hạn hơn, đặc biệt là khi dùng osu!direct.</value>
+  </data>
+  <data name="support.perks.change_username.title" xml:space="preserve">
+    <value>Đổi Tên Tài Khoản</value>
+  </data>
+  <data name="support.perks.change_username.description" xml:space="preserve">
+    <value>Được đổi tên tài khoản miễn phí. (tối đa một lần)</value>
+  </data>
+  <data name="support.perks.skinnables.title" xml:space="preserve">
+    <value>Thêm Skin</value>
+  </data>
+  <data name="support.perks.skinnables.description" xml:space="preserve">
+    <value>Thêm in-game skin, như là màn hình background ở menu chính.</value>
+  </data>
+  <data name="support.perks.feature_votes.title" xml:space="preserve">
+    <value>Bầu Chọn Tính Năng</value>
+  </data>
+  <data name="support.perks.feature_votes.description" xml:space="preserve">
+    <value>Bầu chọn cho các tính năng theo yêu cầu. (2 lần mỗi tháng)</value>
+  </data>
+  <data name="support.perks.sort_options.title" xml:space="preserve">
+    <value>Tùy Chọn Sắp Xếp</value>
+  </data>
+  <data name="support.perks.sort_options.description" xml:space="preserve">
+    <value>Cho phép xem xếp hạng theo quốc gia / bạn bè / theo-mod của beatmap trong game.</value>
+  </data>
+  <data name="support.perks.more_favourites.description" xml:space="preserve">
+    <value>Lượng beatmap tối đa bạn có thể yêu thích được tăng từ {0} &amp;rarr; {1}</value>
+  </data>
+  <data name="support.perks.more_friends.title" xml:space="preserve">
+    <value>Thêm bạn bè</value>
+  </data>
+  <data name="support.perks.more_friends.description" xml:space="preserve">
+    <value>Lượng bàn bè tối đa bạn có thể có được tăng từ {0} &amp;rarr; {1}</value>
+  </data>
+  <data name="support.perks.more_beatmaps.title" xml:space="preserve">
+    <value>Đăng tải Nhiều Beatmap hơn</value>
+  </data>
+  <data name="support.perks.more_beatmaps.description" xml:space="preserve">
+    <value>Số beatmap bạn sở hữu cùng lúc được tính từ một giá trị cơ sở cộng với lượng thưởng thêm ứng với mỗi beatmap được xếp hạng mà bạn đang có (tới một ngưỡng)&lt;br/&gt;&lt;br/&gt;Thông thường nó là {0} + {1} với mỗi beatmap được xếp hạng (lên tới {2}). Với việc làm người ủng hộ, nó sẽ tăng lên {3} + {4} với mỗi beatmap được xếp hạng (lên tới {5}).</value>
+  </data>
+  <data name="support.perks.friend_filtering.title" xml:space="preserve">
+    <value>Bảng xếp hạng Bạn bè</value>
+  </data>
+  <data name="support.supporter_status.contribution" xml:space="preserve">
+    <value>Cảm ơn về sự hỗ trợ của bạn! Bạn đã đóng góp tổng cộng {0} với {1} tag đã mua!</value>
+  </data>
+  <data name="support.supporter_status.gifted" xml:space="preserve">
+    <value>{0} tag đã mua của bạn đã được tặng (với tổng cộng {1} được tặng), thật hào phóng!</value>
+  </data>
+  <data name="support.supporter_status.not_yet" xml:space="preserve">
+    <value>Bạn chưa có supporter tag nào hết :(</value>
+  </data>
+  <data name="support.supporter_status.valid_until" xml:space="preserve">
+    <value>Supporter tag hiện tại của bạn có giá trị đến {0}!</value>
+  </data>
+  <data name="support.supporter_status.was_valid_until" xml:space="preserve">
+    <value>Supporter tag của bạn đã hết hạn vào {0}.</value>
+  </data>
+</root>

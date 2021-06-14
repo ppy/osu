@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="play_more" xml:space="preserve">
+    <value>Wat dacht je anders van osu! ?</value>
+  </data>
+  <data name="require_login" xml:space="preserve">
+    <value>Log in om verder te gaan.</value>
+  </data>
+  <data name="require_verification" xml:space="preserve">
+    <value>Gelieve te verifiëren om verder te gaan.</value>
+  </data>
+  <data name="restricted" xml:space="preserve">
+    <value>Je kan dit niet doen terwijl je restricted bent.</value>
+  </data>
+  <data name="silenced" xml:space="preserve">
+    <value>Je kunt dit niet doen terwijl je silenced bent.</value>
+  </data>
+  <data name="unauthorized" xml:space="preserve">
+    <value>Toegang geweigerd.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.is_hype" xml:space="preserve">
+    <value>Hyping kan niet ongedaan gemaakt worden.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.has_reply" xml:space="preserve">
+    <value>Je kan geen discussie met reacties verwijderen</value>
+  </data>
+  <data name="beatmap_discussion.nominate.exhausted" xml:space="preserve">
+    <value>Je hebt je dagelijkse nominatie-limiet bereikt, probeer het morgen opnieuw.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.incorrect_state" xml:space="preserve">
+    <value>Fout tijdens het uitvoeren van deze actie, probeer de pagina te herladen.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.owner" xml:space="preserve">
+    <value>Je kan je eigen beatmap niet nomineren.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.set_metadata" xml:space="preserve">
+    <value>Je moet eerst het genre en de taal instellen voor je de nominatie invoert.</value>
+  </data>
+  <data name="beatmap_discussion.resolve.not_owner" xml:space="preserve">
+    <value>Alleen de eigenaar van de thread of de eigenaar van de beatmap kan een discussie als opgelost markeren.</value>
+  </data>
+  <data name="beatmap_discussion.store.mapper_note_wrong_user" xml:space="preserve">
+    <value>Alleen de eigenaar van deze beatmap of een nominator/QAT groepslid kan mapper notities posten.</value>
+  </data>
+  <data name="beatmap_discussion.vote.bot" xml:space="preserve">
+    <value>Kan niet stemmen op discussie gemaakt door bot</value>
+  </data>
+  <data name="beatmap_discussion.vote.limit_exceeded" xml:space="preserve">
+    <value>Wacht even voor je meer stemmen indient</value>
+  </data>
+  <data name="beatmap_discussion.vote.owner" xml:space="preserve">
+    <value>Je kan niet stemmen op je eigen discussie.</value>
+  </data>
+  <data name="beatmap_discussion.vote.wrong_beatmapset_state" xml:space="preserve">
+    <value>Je kan alleen stemmen op discussies van beatmaps die in afwachting zijn.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.not_owner" xml:space="preserve">
+    <value>U kunt alleen uw eigen berichten verwijderen.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.resolved" xml:space="preserve">
+    <value>U kunt een bericht van een opgeloste discussie niet verwijderen.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.system_generated" xml:space="preserve">
+    <value>Automatisch gegenereerd bericht kan niet worden verwijderd.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.not_owner" xml:space="preserve">
+    <value>Alleen de eigenaar kan deze post bewerken.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.resolved" xml:space="preserve">
+    <value>U kunt geen bericht van een opgeloste discussie bewerken.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.system_generated" xml:space="preserve">
+    <value>Automatisch gegenereerde posts kunnen niet worden bewerkt.</value>
+  </data>
+  <data name="beatmap_discussion_post.store.beatmapset_locked" xml:space="preserve">
+    <value>Deze beatmap is vergrendeld voor discussie.</value>
+  </data>
+  <data name="beatmapset.metadata.nominated" xml:space="preserve">
+    <value>U kunt metagegevens van een nominale kaart niet wijzigen. Neem contact op met een BN of NAT lid als u denkt dat deze onjuist is ingesteld.</value>
+  </data>
+  <data name="chat.blocked" xml:space="preserve">
+    <value>Kan geen bericht versturen naar een gebruiker die jou blokkeert of die jij geblokkeerd hebt.</value>
+  </data>
+  <data name="chat.friends_only" xml:space="preserve">
+    <value>Gebruiker blokkeert berichten van mensen die niet op de vriendenlijst staan.</value>
+  </data>
+  <data name="chat.moderated" xml:space="preserve">
+    <value>Dat kanaal wordt op dit moment gemodereerd.</value>
+  </data>
+  <data name="chat.no_access" xml:space="preserve">
+    <value>Je hebt geen toegang tot dat kanaal.</value>
+  </data>
+  <data name="chat.restricted" xml:space="preserve">
+    <value>Je kunt geen berichten versturen wanneer je het zwijgen is opgelegd, wanneer je bent beperkt of verbannen.</value>
+  </data>
+  <data name="chat.silenced" xml:space="preserve">
+    <value>Je kunt geen berichten verzenden als je op stil staat, bent beperkt of bent verbannen.</value>
+  </data>
+  <data name="comment.update.deleted" xml:space="preserve">
+    <value>Je kunt geen verwijderde berichten bewerken.</value>
+  </data>
+  <data name="contest.voting_over" xml:space="preserve">
+    <value>Je kan je stem niet meer veranderen nadat de stemperiode van deze wedstrijd is afgelopen.</value>
+  </data>
+  <data name="contest.entry.limit_reached" xml:space="preserve">
+    <value>Je hebt de limiet voor inschrijvingen bereikt</value>
+  </data>
+  <data name="contest.entry.over" xml:space="preserve">
+    <value>Bedankt voor de inzendingen! Inzendingen zijn gesloten voor deze wedstrijd en de stembus gaan binnenkort open.</value>
+  </data>
+  <data name="forum.moderate.no_permission" xml:space="preserve">
+    <value>Geen rechten om dit forum de modereren.</value>
+  </data>
+  <data name="forum.post.delete.only_last_post" xml:space="preserve">
+    <value>Alleen de laatste post kan worden verwijderd.</value>
+  </data>
+  <data name="forum.post.delete.locked" xml:space="preserve">
+    <value>Je kan geen posts in een gesloten onderwerp verwijderen.</value>
+  </data>
+  <data name="forum.post.delete.no_forum_access" xml:space="preserve">
+    <value>Toegang tot dit forum is nodig.</value>
+  </data>
+  <data name="forum.post.delete.not_owner" xml:space="preserve">
+    <value>Alleen de eigenaar kan deze post verwijderen.</value>
+  </data>
+  <data name="forum.post.edit.deleted" xml:space="preserve">
+    <value>Je kan een verwijderde post niet bewerken.</value>
+  </data>
+  <data name="forum.post.edit.locked" xml:space="preserve">
+    <value>De post is afgesloten voor bewerkingen.</value>
+  </data>
+  <data name="forum.post.edit.no_forum_access" xml:space="preserve">
+    <value>Toegang tot dit forum is nodig.</value>
+  </data>
+  <data name="forum.post.edit.not_owner" xml:space="preserve">
+    <value>Alleen de eigenaar kan de post bewerken.</value>
+  </data>
+  <data name="forum.post.edit.topic_locked" xml:space="preserve">
+    <value>Kan geen post in een gesloten onderwerp bewerken.</value>
+  </data>
+  <data name="forum.post.store.play_more" xml:space="preserve">
+    <value>Probeer eerst de game te spelen voor je op de forums post! Als je een probleem hebt met te spelen, post dan alstublieft in de Help en Support forum.</value>
+  </data>
+  <data name="forum.post.store.too_many_help_posts" xml:space="preserve">
+    <value>Je moet eerst de game spelen voor je extra posts kan maken. Als je nog steeds problemen ondervindt, e-mail dan support@ppy.sh</value>
+  </data>
+  <data name="forum.topic.reply.double_post" xml:space="preserve">
+    <value>Bewerk je laatste bericht in plaats van opnieuw te posten.</value>
+  </data>
+  <data name="forum.topic.reply.locked" xml:space="preserve">
+    <value>Je kunt niet antwoorden op een gesloten onderwerp.</value>
+  </data>
+  <data name="forum.topic.reply.no_forum_access" xml:space="preserve">
+    <value>Toegang tot dit forum is nodig.</value>
+  </data>
+  <data name="forum.topic.reply.no_permission" xml:space="preserve">
+    <value>Geen toestemming om te antwoorden.</value>
+  </data>
+  <data name="forum.topic.reply.user.require_login" xml:space="preserve">
+    <value>Log in om te antwoorden.</value>
+  </data>
+  <data name="forum.topic.reply.user.restricted" xml:space="preserve">
+    <value>Je kan niet reageren terwijl je gerestricteerd bent.</value>
+  </data>
+  <data name="forum.topic.reply.user.silenced" xml:space="preserve">
+    <value>Je kan niet antwoorden wanneer je gesilenced bent.</value>
+  </data>
+  <data name="forum.topic.store.no_forum_access" xml:space="preserve">
+    <value>Toegang tot dit forum is nodig.</value>
+  </data>
+  <data name="forum.topic.store.no_permission" xml:space="preserve">
+    <value>Geen toestemming om een topic te starten.</value>
+  </data>
+  <data name="forum.topic.store.forum_closed" xml:space="preserve">
+    <value>Forum is gesloten en kan niet in gepost worden.</value>
+  </data>
+  <data name="forum.topic.vote.no_forum_access" xml:space="preserve">
+    <value>Toegang tot deze forum is nodig.</value>
+  </data>
+  <data name="forum.topic.vote.over" xml:space="preserve">
+    <value>De stemperiode is voorbij en er kan niet meer gestemd worden.</value>
+  </data>
+  <data name="forum.topic.vote.play_more" xml:space="preserve">
+    <value>Je moet meer spelen voordat je kan stemmen op het forum.</value>
+  </data>
+  <data name="forum.topic.vote.voted" xml:space="preserve">
+    <value>Je stem veranderen is niet toegestaan.</value>
+  </data>
+  <data name="forum.topic.vote.user.require_login" xml:space="preserve">
+    <value>Log in om te stemmen.</value>
+  </data>
+  <data name="forum.topic.vote.user.restricted" xml:space="preserve">
+    <value>Je kan niet stemmen als je gerestricteerd bent.</value>
+  </data>
+  <data name="forum.topic.vote.user.silenced" xml:space="preserve">
+    <value>Je kan niet stemmen wanneer je gesilenced bent.</value>
+  </data>
+  <data name="forum.topic.watch.no_forum_access" xml:space="preserve">
+    <value>Toegang tot deze forum is nodig.</value>
+  </data>
+  <data name="forum.topic_cover.edit.uneditable" xml:space="preserve">
+    <value>Foutieve cover gespecificeerd.</value>
+  </data>
+  <data name="forum.topic_cover.edit.not_owner" xml:space="preserve">
+    <value>Alleen de eigenaar kan de cover bewerken.</value>
+  </data>
+  <data name="forum.topic_cover.store.forum_not_allowed" xml:space="preserve">
+    <value>Dit forum accepteert geen topic covers.</value>
+  </data>
+  <data name="forum.view.admin_only" xml:space="preserve">
+    <value>Alleen admins kunnen dit forum zien.</value>
+  </data>
+  <data name="user.page.edit.locked" xml:space="preserve">
+    <value>Gebruikerspagina is gesloten.</value>
+  </data>
+  <data name="user.page.edit.not_owner" xml:space="preserve">
+    <value>Je kan alleen je eigen gebruikerspagina bewerken.</value>
+  </data>
+  <data name="user.page.edit.require_supporter_tag" xml:space="preserve">
+    <value>osu!supporter tag is vereist.</value>
+  </data>
+</root>

@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="beatmapsets.covers.regenerate" xml:space="preserve">
+    <value>Regenerate</value>
+  </data>
+  <data name="beatmapsets.covers.regenerating" xml:space="preserve">
+    <value>Regenerating...</value>
+  </data>
+  <data name="beatmapsets.covers.remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="beatmapsets.covers.removing" xml:space="preserve">
+    <value>Removing...</value>
+  </data>
+  <data name="beatmapsets.covers.title" xml:space="preserve">
+    <value>Beatmap covers</value>
+  </data>
+  <data name="beatmapsets.show.covers" xml:space="preserve">
+    <value>Manage Beatmap Covers</value>
+  </data>
+  <data name="beatmapsets.show.discussion._" xml:space="preserve">
+    <value>Modding v2</value>
+  </data>
+  <data name="beatmapsets.show.discussion.activate" xml:space="preserve">
+    <value>activate</value>
+  </data>
+  <data name="beatmapsets.show.discussion.activate_confirm" xml:space="preserve">
+    <value>activate modding v2 for this beatmap?</value>
+  </data>
+  <data name="beatmapsets.show.discussion.active" xml:space="preserve">
+    <value>active</value>
+  </data>
+  <data name="beatmapsets.show.discussion.inactive" xml:space="preserve">
+    <value>inactive</value>
+  </data>
+  <data name="forum.forum-covers.index.delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="forum.forum-covers.index.forum-name" xml:space="preserve">
+    <value>Forum #{0}: {1}</value>
+  </data>
+  <data name="forum.forum-covers.index.no-cover" xml:space="preserve">
+    <value>No cover set</value>
+  </data>
+  <data name="forum.forum-covers.index.submit.save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="forum.forum-covers.index.submit.update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="forum.forum-covers.index.title" xml:space="preserve">
+    <value>Forum Covers List</value>
+  </data>
+  <data name="forum.forum-covers.index.type-title.default-topic" xml:space="preserve">
+    <value>Default Topic Cover</value>
+  </data>
+  <data name="forum.forum-covers.index.type-title.main" xml:space="preserve">
+    <value>Forum Cover</value>
+  </data>
+  <data name="logs.index.title" xml:space="preserve">
+    <value>Log Viewer</value>
+  </data>
+  <data name="pages.root.sections.beatmapsets" xml:space="preserve">
+    <value>Beatmaps</value>
+  </data>
+  <data name="pages.root.sections.forum" xml:space="preserve">
+    <value>Forum</value>
+  </data>
+  <data name="pages.root.sections.general" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="pages.root.sections.store" xml:space="preserve">
+    <value>Store</value>
+  </data>
+  <data name="store.orders.index.title" xml:space="preserve">
+    <value>Order Listing</value>
+  </data>
+  <data name="users.restricted_banner.title" xml:space="preserve">
+    <value>This user is currently restricted.</value>
+  </data>
+  <data name="users.restricted_banner.message" xml:space="preserve">
+    <value>(only admins can see this)</value>
+  </data>
+</root>

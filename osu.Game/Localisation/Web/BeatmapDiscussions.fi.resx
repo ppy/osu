@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authorizations.update.null_user" xml:space="preserve">
+    <value>Kirjaudu sisään muokataksesi.</value>
+  </data>
+  <data name="authorizations.update.system_generated" xml:space="preserve">
+    <value>Automaattisesti luotua viestiä ei voi muokata.</value>
+  </data>
+  <data name="authorizations.update.wrong_user" xml:space="preserve">
+    <value>Vain aiheen omistaja pystyy muokkaamaan.</value>
+  </data>
+  <data name="events.empty" xml:space="preserve">
+    <value>Mitään ei ole tapahtunut... vielä.</value>
+  </data>
+  <data name="index.deleted_beatmap" xml:space="preserve">
+    <value>poistettu</value>
+  </data>
+  <data name="index.none_found" xml:space="preserve">
+    <value>Hakukriteereihin täsmääviä keskusteluja ei löytynyt.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmapkeskustelut</value>
+  </data>
+  <data name="index.form._" xml:space="preserve">
+    <value>Hae</value>
+  </data>
+  <data name="index.form.deleted" xml:space="preserve">
+    <value>Sisällytä poistetut keskustelut</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Viestityypit</value>
+  </data>
+  <data name="index.form.username" xml:space="preserve">
+    <value>Käyttäjänimi</value>
+  </data>
+  <data name="index.form.beatmapset_status._" xml:space="preserve">
+    <value>Beatmapin tila</value>
+  </data>
+  <data name="index.form.beatmapset_status.all" xml:space="preserve">
+    <value>Kaikki</value>
+  </data>
+  <data name="index.form.beatmapset_status.disqualified" xml:space="preserve">
+    <value>Hylätty</value>
+  </data>
+  <data name="index.form.beatmapset_status.qualified" xml:space="preserve">
+    <value>Hyväksytty</value>
+  </data>
+  <data name="index.form.user.label" xml:space="preserve">
+    <value>Käyttäjä</value>
+  </data>
+  <data name="index.form.user.overview" xml:space="preserve">
+    <value>Tapahtumakatsaus</value>
+  </data>
+  <data name="item.created_at" xml:space="preserve">
+    <value>Lähetetty</value>
+  </data>
+  <data name="item.deleted_at" xml:space="preserve">
+    <value>Poistettu</value>
+  </data>
+  <data name="item.message_type" xml:space="preserve">
+    <value>Tyyppi</value>
+  </data>
+  <data name="item.permalink" xml:space="preserve">
+    <value>Pysyvä linkki</value>
+  </data>
+  <data name="nearby_posts.confirm" xml:space="preserve">
+    <value>Mikään viesteistä ei käsittele aihettani</value>
+  </data>
+  <data name="nearby_posts.notice" xml:space="preserve">
+    <value>Aikajanalta {0} ({1}) löytyy viestejä. Tarkista ne ennen viestin lähettämistä.</value>
+  </data>
+  <data name="reply.open.guest" xml:space="preserve">
+    <value>Kirjaudu sisään vastataksesi</value>
+  </data>
+  <data name="reply.open.user" xml:space="preserve">
+    <value>Vastaa</value>
+  </data>
+  <data name="system.resolved.true" xml:space="preserve">
+    <value>{0} on merkinnyt ratkaistuksi</value>
+  </data>
+  <data name="system.resolved.false" xml:space="preserve">
+    <value>{0} avasi uudelleen</value>
+  </data>
+  <data name="timestamp_display.general" xml:space="preserve">
+    <value>yleiset</value>
+  </data>
+  <data name="timestamp_display.general_all" xml:space="preserve">
+    <value>yleiset (kaikki)</value>
+  </data>
+  <data name="user_filter.everyone" xml:space="preserve">
+    <value>Jokainen</value>
+  </data>
+  <data name="user_filter.label" xml:space="preserve">
+    <value>Suodata käyttäjien mukaan</value>
+  </data>
+</root>

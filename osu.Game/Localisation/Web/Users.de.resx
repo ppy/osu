@@ -1,0 +1,721 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="deleted" xml:space="preserve">
+    <value>[gelöschter Benutzer]</value>
+  </data>
+  <data name="beatmapset_activities.title" xml:space="preserve">
+    <value>{0} Moddingverlauf</value>
+  </data>
+  <data name="beatmapset_activities.title_compact" xml:space="preserve">
+    <value>Modding</value>
+  </data>
+  <data name="beatmapset_activities.discussions.title_recent" xml:space="preserve">
+    <value>Letztens gestartete Diskussionen</value>
+  </data>
+  <data name="beatmapset_activities.events.title_recent" xml:space="preserve">
+    <value>Neueste Events</value>
+  </data>
+  <data name="beatmapset_activities.posts.title_recent" xml:space="preserve">
+    <value>Neueste Beiträge</value>
+  </data>
+  <data name="beatmapset_activities.votes_received.title_most" xml:space="preserve">
+    <value>Meiste Stimmen von (letzten 3 Monate)</value>
+  </data>
+  <data name="beatmapset_activities.votes_made.title_most" xml:space="preserve">
+    <value>Meiste Stimmen (letzten 3 Monate)</value>
+  </data>
+  <data name="blocks.banner_text" xml:space="preserve">
+    <value>Du hast diesen Benutzer geblockt.</value>
+  </data>
+  <data name="blocks.blocked_count" xml:space="preserve">
+    <value>geblockte benutzer ({0})</value>
+  </data>
+  <data name="blocks.hide_profile" xml:space="preserve">
+    <value>Profil verbergen</value>
+  </data>
+  <data name="blocks.not_blocked" xml:space="preserve">
+    <value>Dieser Benutzer ist nicht geblockt.</value>
+  </data>
+  <data name="blocks.show_profile" xml:space="preserve">
+    <value>Profil anzeigen</value>
+  </data>
+  <data name="blocks.too_many" xml:space="preserve">
+    <value>Block-Limit erreicht.</value>
+  </data>
+  <data name="blocks.button.block" xml:space="preserve">
+    <value>Blocken</value>
+  </data>
+  <data name="blocks.button.unblock" xml:space="preserve">
+    <value>Entblocken</value>
+  </data>
+  <data name="card.loading" xml:space="preserve">
+    <value>Lädt...</value>
+  </data>
+  <data name="card.send_message" xml:space="preserve">
+    <value>Nachricht senden</value>
+  </data>
+  <data name="disabled.title" xml:space="preserve">
+    <value>Uh, oh! Anscheinend wurde dein Konto deaktiviert.</value>
+  </data>
+  <data name="disabled.warning" xml:space="preserve">
+    <value>Falls Du gegen eine Regel verstoßen hast, beachte bitte, dass es in der Regel eine Frist von einem Monat gibt, in der wir keine Anträge berücksichtigen. Nach diesem Zeitraum kannst Du uns jederzeit kontaktieren, falls Du dies für erforderlich hältst. Beachte, dass das Erstellen neuer Konten nach dem Deaktivieren eines Kontos zu einer &lt;strong&gt;Verlängerung dieser einmonatigen Frist&lt;/strong&gt; führt. Bitte beachte auch, dass du für &lt;strong&gt;jedes Konto, das du erstellst, weitere Regeln verletzt&lt;/strong&gt;. Wir empfehlen Dir dringend, diesen Weg nicht zu gehen!</value>
+  </data>
+  <data name="disabled.if_mistake._" xml:space="preserve">
+    <value>Wenn Du der Meinung bist, dass dies ein Fehler ist, kannst Du uns gerne kontaktieren (per {0} oder durch Klicken auf das "?" in der rechten unteren Ecke dieser Seite). Bitte beachte, dass wir bei unseren Handlungen immer volles Vertrauen haben, da sie auf sehr soliden Daten beruhen. Wir behalten uns das Recht vor, Deine Anfrage zu ignorieren, wenn wir das Gefühl haben, dass Du absichtlich unehrlich bist.</value>
+  </data>
+  <data name="disabled.if_mistake.email" xml:space="preserve">
+    <value>E-Mail</value>
+  </data>
+  <data name="disabled.reasons.compromised" xml:space="preserve">
+    <value>Dein Konto wurde als gefährdet eingestuft. Es kann vorübergehend deaktiviert werden, während seine Identität bestätigt wird.</value>
+  </data>
+  <data name="disabled.reasons.opening" xml:space="preserve">
+    <value>Es gibt eine Reihe von Gründen, die dazu führen können, dass Dein Konto deaktiviert wird:</value>
+  </data>
+  <data name="disabled.reasons.tos._" xml:space="preserve">
+    <value>Du hast eine oder mehr von unseren {0} oder {1} gebrochen.</value>
+  </data>
+  <data name="disabled.reasons.tos.community_rules" xml:space="preserve">
+    <value>Communityregeln</value>
+  </data>
+  <data name="disabled.reasons.tos.tos" xml:space="preserve">
+    <value>Nutzungsbedinungen</value>
+  </data>
+  <data name="filtering.by_game_mode" xml:space="preserve">
+    <value>Mitglieder nach Spielmodus</value>
+  </data>
+  <data name="force_reactivation.reason.inactive_different_country" xml:space="preserve">
+    <value>Dein Konto wurde längere Zeit nicht benutzt.</value>
+  </data>
+  <data name="login._" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="login.button" xml:space="preserve">
+    <value>Einloggen</value>
+  </data>
+  <data name="login.button_posting" xml:space="preserve">
+    <value>Einloggen...</value>
+  </data>
+  <data name="login.email_login_disabled" xml:space="preserve">
+    <value>Das Anmelden per E-Mail ist derzeit deaktiviert. Bitte benutze stattdessen Deinen Benutzernamen.</value>
+  </data>
+  <data name="login.failed" xml:space="preserve">
+    <value>Falscher Login</value>
+  </data>
+  <data name="login.forgot" xml:space="preserve">
+    <value>Passwort vergessen?</value>
+  </data>
+  <data name="login.info" xml:space="preserve">
+    <value>Bitte melde dich an, um fortzufahren</value>
+  </data>
+  <data name="login.invalid_captcha" xml:space="preserve">
+    <value>Captcha ungültig, bitte aktualisiere die Seite und versuche es erneut.</value>
+  </data>
+  <data name="login.locked_ip" xml:space="preserve">
+    <value>Deine IP-Adresse ist gesperrt. Bitte warte ein paar Minuten.</value>
+  </data>
+  <data name="login.password" xml:space="preserve">
+    <value>Passwort</value>
+  </data>
+  <data name="login.register" xml:space="preserve">
+    <value>Noch keinen osu!-Account? Erstell' einen</value>
+  </data>
+  <data name="login.remember" xml:space="preserve">
+    <value>Diesen Computer merken</value>
+  </data>
+  <data name="login.title" xml:space="preserve">
+    <value>Zum Fortfahren bitte einloggen</value>
+  </data>
+  <data name="login.username" xml:space="preserve">
+    <value>Benutzername</value>
+  </data>
+  <data name="login.beta.main" xml:space="preserve">
+    <value>Beta-Zugang ist momentan privilegierten Benutzern vorbehalten.</value>
+  </data>
+  <data name="login.beta.small" xml:space="preserve">
+    <value>(osu!supporter kommen bald dazu)</value>
+  </data>
+  <data name="posts.title" xml:space="preserve">
+    <value>Posts von {0}</value>
+  </data>
+  <data name="anonymous.login_link" xml:space="preserve">
+    <value>zum Einloggen klicken</value>
+  </data>
+  <data name="anonymous.login_text" xml:space="preserve">
+    <value>einloggen</value>
+  </data>
+  <data name="anonymous.username" xml:space="preserve">
+    <value>Gast</value>
+  </data>
+  <data name="anonymous.error" xml:space="preserve">
+    <value>Dafür musst du eingeloggt sein.</value>
+  </data>
+  <data name="logout_confirm" xml:space="preserve">
+    <value>Sicher, dass du dich ausloggen willst? :(</value>
+  </data>
+  <data name="report.button_text" xml:space="preserve">
+    <value>melden</value>
+  </data>
+  <data name="report.comments" xml:space="preserve">
+    <value>Weitere Kommentare</value>
+  </data>
+  <data name="report.placeholder" xml:space="preserve">
+    <value>Bitte stelle jegliche Infomationen zur Verfügung, die nützlich sein könnten.</value>
+  </data>
+  <data name="report.reason" xml:space="preserve">
+    <value>Grund</value>
+  </data>
+  <data name="report.thanks" xml:space="preserve">
+    <value>Danke für deine Meldung!</value>
+  </data>
+  <data name="report.title" xml:space="preserve">
+    <value>Meldung {0}?</value>
+  </data>
+  <data name="report.actions.send" xml:space="preserve">
+    <value>Meldung abschicken</value>
+  </data>
+  <data name="report.actions.cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="report.options.cheating" xml:space="preserve">
+    <value>Cheating</value>
+  </data>
+  <data name="report.options.insults" xml:space="preserve">
+    <value>Beleidigt mich / andere</value>
+  </data>
+  <data name="report.options.spam" xml:space="preserve">
+    <value>Spamming</value>
+  </data>
+  <data name="report.options.unwanted_content" xml:space="preserve">
+    <value>Verlinkt unangemessene Inhalte</value>
+  </data>
+  <data name="report.options.nonsense" xml:space="preserve">
+    <value>Unsinn</value>
+  </data>
+  <data name="report.options.other" xml:space="preserve">
+    <value>Anderes (unten angeben)</value>
+  </data>
+  <data name="restricted_banner.title" xml:space="preserve">
+    <value>Dein Account wurde restricted!</value>
+  </data>
+  <data name="restricted_banner.message" xml:space="preserve">
+    <value>Während du restricted bist, kannst du nicht mit anderen Spielern interagieren und deine Ranglistenscores sind nur für dich sichtbar. Dies passiert normalerweise durch einen automatischen Prozess und wird üblicherweise innerhalb von 24 Stunden aufgehoben. Wenn du Einspruch gegen deine Restriction erheben möchtest, wende dich bitte an &lt;a href="mailto{0}@ppy.sh"&gt;den Support&lt;/a&gt;.</value>
+  </data>
+  <data name="show.age" xml:space="preserve">
+    <value>{0} Jahre alt</value>
+  </data>
+  <data name="show.change_avatar" xml:space="preserve">
+    <value>ändere deinen avatar!</value>
+  </data>
+  <data name="show.first_members" xml:space="preserve">
+    <value>Seit dem Anfang hier</value>
+  </data>
+  <data name="show.is_developer" xml:space="preserve">
+    <value>osu!-Entwickler</value>
+  </data>
+  <data name="show.is_supporter" xml:space="preserve">
+    <value>osu!-Supporter</value>
+  </data>
+  <data name="show.joined_at" xml:space="preserve">
+    <value>{0} beigetreten</value>
+  </data>
+  <data name="show.lastvisit" xml:space="preserve">
+    <value>Zuletzt gesehen {0}</value>
+  </data>
+  <data name="show.lastvisit_online" xml:space="preserve">
+    <value>Derzeit online</value>
+  </data>
+  <data name="show.missingtext" xml:space="preserve">
+    <value>Vielleicht hast du dich verschrieben (oder der Benutzer wurde gebannt)!</value>
+  </data>
+  <data name="show.origin_country" xml:space="preserve">
+    <value>Aus {0}</value>
+  </data>
+  <data name="show.previous_usernames" xml:space="preserve">
+    <value>auch bekannt als</value>
+  </data>
+  <data name="show.plays_with" xml:space="preserve">
+    <value>Spielt mit {0}</value>
+  </data>
+  <data name="show.title" xml:space="preserve">
+    <value>Profil von {0}</value>
+  </data>
+  <data name="show.comments_count._" xml:space="preserve">
+    <value>{0} abgegeben</value>
+  </data>
+  <data name="show.comments_count.count" xml:space="preserve">
+    <value>{0} Kommentar|{0} Kommentare</value>
+  </data>
+  <data name="show.edit.cover.button" xml:space="preserve">
+    <value>Profilbanner ändern</value>
+  </data>
+  <data name="show.edit.cover.defaults_info" xml:space="preserve">
+    <value>In der Zukunft wird es mehr Optionen für das Banner geben</value>
+  </data>
+  <data name="show.edit.cover.upload.broken_file" xml:space="preserve">
+    <value>Verarbeitung des Bildes fehlgeschlagen. Überprüfe das hochgeladene Bild und versuch es erneut.</value>
+  </data>
+  <data name="show.edit.cover.upload.button" xml:space="preserve">
+    <value>Bild hochladen</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone" xml:space="preserve">
+    <value>Zum Hochladen hier ablegen</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone_info" xml:space="preserve">
+    <value>Du kannst das Bild auch hier ablegen, um es hochzuladen</value>
+  </data>
+  <data name="show.edit.cover.upload.size_info" xml:space="preserve">
+    <value>Banner sollte 2400x620 groß sein</value>
+  </data>
+  <data name="show.edit.cover.upload.too_large" xml:space="preserve">
+    <value>Datei ist zu groß.</value>
+  </data>
+  <data name="show.edit.cover.upload.unsupported_format" xml:space="preserve">
+    <value>Format wird nicht unterstützt.</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info._" xml:space="preserve">
+    <value>Hochladen nur für {0} verfügbar</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info.link" xml:space="preserve">
+    <value>osu!supporter</value>
+  </data>
+  <data name="show.edit.default_playmode.is_default_tooltip" xml:space="preserve">
+    <value>standard-spielmodus</value>
+  </data>
+  <data name="show.edit.default_playmode.set" xml:space="preserve">
+    <value>wähle {0} als standard-spielmodus</value>
+  </data>
+  <data name="show.extra.none" xml:space="preserve">
+    <value>nichts</value>
+  </data>
+  <data name="show.extra.unranked" xml:space="preserve">
+    <value>Keine Plays in letzter Zeit</value>
+  </data>
+  <data name="show.extra.achievements.achieved-on" xml:space="preserve">
+    <value>Erreicht am {0}</value>
+  </data>
+  <data name="show.extra.achievements.locked" xml:space="preserve">
+    <value>Noch nicht freigeschaltet</value>
+  </data>
+  <data name="show.extra.achievements.title" xml:space="preserve">
+    <value>Erfolge</value>
+  </data>
+  <data name="show.extra.beatmaps.by_artist" xml:space="preserve">
+    <value>von {0}</value>
+  </data>
+  <data name="show.extra.beatmaps.title" xml:space="preserve">
+    <value>Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.favourite.title" xml:space="preserve">
+    <value>Lieblingsbeatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.graveyard.title" xml:space="preserve">
+    <value>Begrabene Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.loved.title" xml:space="preserve">
+    <value>Loved Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.ranked_and_approved.title" xml:space="preserve">
+    <value>Ranked &amp; Approved Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.unranked.title" xml:space="preserve">
+    <value>Ausstehende Beatmaps</value>
+  </data>
+  <data name="show.extra.discussions.title" xml:space="preserve">
+    <value>Diskussionen</value>
+  </data>
+  <data name="show.extra.discussions.title_longer" xml:space="preserve">
+    <value>Neueste Diskussionen</value>
+  </data>
+  <data name="show.extra.discussions.show_more" xml:space="preserve">
+    <value>mehr Diskussionen anzeigen</value>
+  </data>
+  <data name="show.extra.events.title" xml:space="preserve">
+    <value>Events</value>
+  </data>
+  <data name="show.extra.events.title_longer" xml:space="preserve">
+    <value>Neueste Events</value>
+  </data>
+  <data name="show.extra.events.show_more" xml:space="preserve">
+    <value>mehr Events anzeigen</value>
+  </data>
+  <data name="show.extra.historical.title" xml:space="preserve">
+    <value>Historisch</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.title" xml:space="preserve">
+    <value>Play-Verlauf</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.count_label" xml:space="preserve">
+    <value>Spiele</value>
+  </data>
+  <data name="show.extra.historical.most_played.count" xml:space="preserve">
+    <value>mal gespielt</value>
+  </data>
+  <data name="show.extra.historical.most_played.title" xml:space="preserve">
+    <value>Meistgespielte Beatmaps</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.accuracy" xml:space="preserve">
+    <value>genauigkeit: {0}</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.title" xml:space="preserve">
+    <value>Neuliche Plays (24h)</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.title" xml:space="preserve">
+    <value>Angeschaute Wiederholungen</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.count_label" xml:space="preserve">
+    <value>Wiederholungen angeschaut</value>
+  </data>
+  <data name="show.extra.kudosu.recent_entries" xml:space="preserve">
+    <value>Kudosu-Verlauf</value>
+  </data>
+  <data name="show.extra.kudosu.title" xml:space="preserve">
+    <value>Kudosu!</value>
+  </data>
+  <data name="show.extra.kudosu.total" xml:space="preserve">
+    <value>Kudosu insgesamt</value>
+  </data>
+  <data name="show.extra.kudosu.entry.amount" xml:space="preserve">
+    <value>{0} Kudosu</value>
+  </data>
+  <data name="show.extra.kudosu.entry.empty" xml:space="preserve">
+    <value>Dieser Benutzer hat kein Kudosu erhalten!</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.allow_kudosu.give" xml:space="preserve">
+    <value>{0} durch das Zurückziehen des Kudosu-Verwehrens von {1} erhalten</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.deny_kudosu.reset" xml:space="preserve">
+    <value>{0} vom Beitrag {1} verwehrt</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.delete.reset" xml:space="preserve">
+    <value>{0} durch das Löschen des Modding-Beitrags {1} verloren</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.restore.give" xml:space="preserve">
+    <value>{0} durch die Wiederherstellung des Modding-Posts {1} erhalten</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.give" xml:space="preserve">
+    <value>{0} durch erhaltene Stimmen im Post {1} erhalten</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.reset" xml:space="preserve">
+    <value>{0} durch verlorene Stimmen im Beitrag {1} verloren</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.give" xml:space="preserve">
+    <value>{0} durch Neuberechnung der Stimmen in {1} erhalten</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.reset" xml:space="preserve">
+    <value>{0} durch Neuberechnung der Stimmen in {1} verloren</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.give" xml:space="preserve">
+    <value>{0} von {1} für einen Beitrag in {2} erhalten</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.reset" xml:space="preserve">
+    <value>Kudosu von {0} im Beitrag {1} zurückgesetzt</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.revoke" xml:space="preserve">
+    <value>Kudosu von {0} im Beitrag {1} verwehrt</value>
+  </data>
+  <data name="show.extra.kudosu.total_info._" xml:space="preserve">
+    <value>Basierend auf dem Beitrag, den der Benutzer zum Beatmap-Modding geleistet hat. Weitere Informationen auf {0}.</value>
+  </data>
+  <data name="show.extra.kudosu.total_info.link" xml:space="preserve">
+    <value>dieser Seite</value>
+  </data>
+  <data name="show.extra.me.title" xml:space="preserve">
+    <value>ich!</value>
+  </data>
+  <data name="show.extra.medals.empty" xml:space="preserve">
+    <value>Dieser Nutzer hat noch keine erhalten. ;_;</value>
+  </data>
+  <data name="show.extra.medals.recent" xml:space="preserve">
+    <value>Neueste</value>
+  </data>
+  <data name="show.extra.medals.title" xml:space="preserve">
+    <value>Medaillen</value>
+  </data>
+  <data name="show.extra.posts.title" xml:space="preserve">
+    <value>Beiträge</value>
+  </data>
+  <data name="show.extra.posts.title_longer" xml:space="preserve">
+    <value>Neueste Beiträge</value>
+  </data>
+  <data name="show.extra.posts.show_more" xml:space="preserve">
+    <value>weitere Beiträge anschauen</value>
+  </data>
+  <data name="show.extra.recent_activity.title" xml:space="preserve">
+    <value>Neulich</value>
+  </data>
+  <data name="show.extra.top_ranks.download_replay" xml:space="preserve">
+    <value>Replay herunterladen</value>
+  </data>
+  <data name="show.extra.top_ranks.not_ranked" xml:space="preserve">
+    <value>Nur Ranked Beatmaps geben PP.</value>
+  </data>
+  <data name="show.extra.top_ranks.pp_weight" xml:space="preserve">
+    <value>{0} gewichtet</value>
+  </data>
+  <data name="show.extra.top_ranks.view_details" xml:space="preserve">
+    <value>Details anzeigen</value>
+  </data>
+  <data name="show.extra.top_ranks.title" xml:space="preserve">
+    <value>Ränge</value>
+  </data>
+  <data name="show.extra.top_ranks.best.title" xml:space="preserve">
+    <value>Beste Performance</value>
+  </data>
+  <data name="show.extra.top_ranks.first.title" xml:space="preserve">
+    <value>Erster Platz</value>
+  </data>
+  <data name="show.extra.votes.given" xml:space="preserve">
+    <value>Abgegebene Stimmen (letzte 3 Monate)</value>
+  </data>
+  <data name="show.extra.votes.received" xml:space="preserve">
+    <value>Erhaltene Stimmen (letzte 3 Monate)</value>
+  </data>
+  <data name="show.extra.votes.title" xml:space="preserve">
+    <value>Stimmen</value>
+  </data>
+  <data name="show.extra.votes.title_longer" xml:space="preserve">
+    <value>Neueste Stimmen</value>
+  </data>
+  <data name="show.extra.votes.vote_count" xml:space="preserve">
+    <value>{0} Stimme|{0} Stimmen</value>
+  </data>
+  <data name="show.extra.account_standing.title" xml:space="preserve">
+    <value>Accountstatus</value>
+  </data>
+  <data name="show.extra.account_standing.bad_standing" xml:space="preserve">
+    <value>Der Account von &lt;strong&gt;{0}&lt;/strong&gt; ist zurzeit eingeschränkt :(</value>
+  </data>
+  <data name="show.extra.account_standing.remaining_silence" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; kann in {1} wieder sprechen.</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.title" xml:space="preserve">
+    <value>Neuliche Verstöße</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.date" xml:space="preserve">
+    <value>datum</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.action" xml:space="preserve">
+    <value>maßnahme</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length" xml:space="preserve">
+    <value>länge</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length_permanent" xml:space="preserve">
+    <value>Permanent</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.description" xml:space="preserve">
+    <value>beschreibung</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actor" xml:space="preserve">
+    <value>von {0}</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.restriction" xml:space="preserve">
+    <value>Bann</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.silence" xml:space="preserve">
+    <value>Silence</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.note" xml:space="preserve">
+    <value>Warnung</value>
+  </data>
+  <data name="show.info.interests" xml:space="preserve">
+    <value>Interessen</value>
+  </data>
+  <data name="show.info.location" xml:space="preserve">
+    <value>Aktueller Standort</value>
+  </data>
+  <data name="show.info.occupation" xml:space="preserve">
+    <value>Beschäftigung</value>
+  </data>
+  <data name="show.info.website" xml:space="preserve">
+    <value>Webseite</value>
+  </data>
+  <data name="show.not_found.reason_1" xml:space="preserve">
+    <value>Der gesuchte Benutzer könnte seinen Namen geändert haben.</value>
+  </data>
+  <data name="show.not_found.reason_2" xml:space="preserve">
+    <value>Der Account ist aus Sicherheitsgründen temporär nicht verfügbar.</value>
+  </data>
+  <data name="show.not_found.reason_3" xml:space="preserve">
+    <value>Du hast dich vielleicht verschrieben!</value>
+  </data>
+  <data name="show.not_found.reason_header" xml:space="preserve">
+    <value>Es gibt ein paar mögliche Gründe dafür:</value>
+  </data>
+  <data name="show.not_found.title" xml:space="preserve">
+    <value>Benutzer nicht gefunden! ;_;</value>
+  </data>
+  <data name="show.page.button" xml:space="preserve">
+    <value>Profil bearbeiten</value>
+  </data>
+  <data name="show.page.description" xml:space="preserve">
+    <value>&lt;strong&gt;me!&lt;/strong&gt; ist ein persönlicher Bereich auf deinem osu!-Profil, den du nach deinem Belieben anpassen kannst.</value>
+  </data>
+  <data name="show.page.edit_big" xml:space="preserve">
+    <value>me! bearbeiten</value>
+  </data>
+  <data name="show.page.placeholder" xml:space="preserve">
+    <value>Seiteninhalt hier eingeben</value>
+  </data>
+  <data name="show.page.restriction_info._" xml:space="preserve">
+    <value>Sie müssen ein {0} sein, um diese Funktion freizuschalten.</value>
+  </data>
+  <data name="show.page.restriction_info.link" xml:space="preserve">
+    <value>osu!supporter</value>
+  </data>
+  <data name="show.post_count._" xml:space="preserve">
+    <value>{0} beigetragen</value>
+  </data>
+  <data name="show.post_count.count" xml:space="preserve">
+    <value>{0} Forumsbeitrag|{0} Forenbeiträge</value>
+  </data>
+  <data name="show.rank.country" xml:space="preserve">
+    <value>Länderrang im Modus {0}</value>
+  </data>
+  <data name="show.rank.country_simple" xml:space="preserve">
+    <value>Landesrangliste</value>
+  </data>
+  <data name="show.rank.global" xml:space="preserve">
+    <value>Globaler Rang im Modus {0}</value>
+  </data>
+  <data name="show.rank.global_simple" xml:space="preserve">
+    <value>Globale Rangliste</value>
+  </data>
+  <data name="show.stats.hit_accuracy" xml:space="preserve">
+    <value>Genauigkeit</value>
+  </data>
+  <data name="show.stats.level" xml:space="preserve">
+    <value>Level {0}</value>
+  </data>
+  <data name="show.stats.level_progress" xml:space="preserve">
+    <value>Fortschritt bis zum nächsten Level</value>
+  </data>
+  <data name="show.stats.maximum_combo" xml:space="preserve">
+    <value>Höchste Combo</value>
+  </data>
+  <data name="show.stats.medals" xml:space="preserve">
+    <value>Medaillen</value>
+  </data>
+  <data name="show.stats.play_count" xml:space="preserve">
+    <value>Anzahl Spiele</value>
+  </data>
+  <data name="show.stats.play_time" xml:space="preserve">
+    <value>Gesamtspielzeit</value>
+  </data>
+  <data name="show.stats.ranked_score" xml:space="preserve">
+    <value>Punktzahl auf Ranglisten</value>
+  </data>
+  <data name="show.stats.replays_watched_by_others" xml:space="preserve">
+    <value>Von anderen angeschaute Wiederholungen</value>
+  </data>
+  <data name="show.stats.score_ranks" xml:space="preserve">
+    <value>Ränge durch Punkte</value>
+  </data>
+  <data name="show.stats.total_hits" xml:space="preserve">
+    <value>Anzahl Treffer</value>
+  </data>
+  <data name="show.stats.total_score" xml:space="preserve">
+    <value>Gesamtpunktzahl</value>
+  </data>
+  <data name="show.stats.ranked_and_approved_beatmapset_count" xml:space="preserve">
+    <value>Ranked &amp; Approved Beatmaps</value>
+  </data>
+  <data name="show.stats.loved_beatmapset_count" xml:space="preserve">
+    <value>Loved Beatmaps</value>
+  </data>
+  <data name="show.stats.unranked_beatmapset_count" xml:space="preserve">
+    <value>Ausstehende Beatmaps</value>
+  </data>
+  <data name="show.stats.graveyard_beatmapset_count" xml:space="preserve">
+    <value>Begrabende Beatmaps</value>
+  </data>
+  <data name="silenced_banner.title" xml:space="preserve">
+    <value>Du bist derzeit stumm.</value>
+  </data>
+  <data name="silenced_banner.message" xml:space="preserve">
+    <value>Einige Aktionen sind möglicherweise nicht verfügbar.</value>
+  </data>
+  <data name="status.all" xml:space="preserve">
+    <value>Alle</value>
+  </data>
+  <data name="status.online" xml:space="preserve">
+    <value>Online</value>
+  </data>
+  <data name="status.offline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="store.saved" xml:space="preserve">
+    <value>Benutzer erstellt</value>
+  </data>
+  <data name="verify.title" xml:space="preserve">
+    <value>Accountverifizierung</value>
+  </data>
+  <data name="view_mode.brick" xml:space="preserve">
+    <value>Ziegelansicht</value>
+  </data>
+  <data name="view_mode.card" xml:space="preserve">
+    <value>Kartenansicht</value>
+  </data>
+  <data name="view_mode.list" xml:space="preserve">
+    <value>Listenansicht</value>
+  </data>
+</root>

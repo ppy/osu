@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="event.approve" xml:space="preserve">
+    <value>Schváleno.</value>
+  </data>
+  <data name="event.discussion_delete" xml:space="preserve">
+    <value>Moderátor smazal tuto diskusi {0}.</value>
+  </data>
+  <data name="event.discussion_lock" xml:space="preserve">
+    <value>Diskuze o této mapě byly vypnuty. ({0})</value>
+  </data>
+  <data name="event.discussion_post_delete" xml:space="preserve">
+    <value>Moderátor smazal příspěvek z této diskuse {0}.</value>
+  </data>
+  <data name="event.discussion_post_restore" xml:space="preserve">
+    <value>Moderátor obnovil příspěvek z této diskuse {0}.</value>
+  </data>
+  <data name="event.discussion_restore" xml:space="preserve">
+    <value>Moderátor obnovil tuto diskusi {0}.</value>
+  </data>
+  <data name="event.discussion_unlock" xml:space="preserve">
+    <value>Diskuze o této mapě byly zapnuty.</value>
+  </data>
+  <data name="event.disqualify" xml:space="preserve">
+    <value>Diskvalifikováno uživatelem {0}. Důvod: {1} ({2}).</value>
+  </data>
+  <data name="event.disqualify_legacy" xml:space="preserve">
+    <value>Diskvalifikováno uživatelem {0}. Důvod: text.</value>
+  </data>
+  <data name="event.genre_edit" xml:space="preserve">
+    <value>Žánr změněn z {0} na {1}.</value>
+  </data>
+  <data name="event.issue_reopen" xml:space="preserve">
+    <value>Vyřešený problém {0} byl obnoven.</value>
+  </data>
+  <data name="event.issue_resolve" xml:space="preserve">
+    <value>Problém {0} byl označen jako vyřešen.</value>
+  </data>
+  <data name="event.kudosu_allow" xml:space="preserve">
+    <value>Odmítnutí kudosu pro diskuzi {0} odebráno.</value>
+  </data>
+  <data name="event.kudosu_deny" xml:space="preserve">
+    <value>Diskuse {0} nemůže přjímat kudosu.</value>
+  </data>
+  <data name="event.kudosu_gain" xml:space="preserve">
+    <value>Diskuse {0} uživatele {1} dosáhla dostatku hlasů pro kudosu.</value>
+  </data>
+  <data name="event.kudosu_lost" xml:space="preserve">
+    <value>Diskuse {0} uživatele {1} ztratila hlasy a získané kudosu byly odebrány.</value>
+  </data>
+  <data name="event.kudosu_recalculate" xml:space="preserve">
+    <value>Diskusi {0} byly získané kudosu přepočteny.</value>
+  </data>
+  <data name="event.language_edit" xml:space="preserve">
+    <value>Jazyk změněn z {0} na {1}.</value>
+  </data>
+  <data name="event.love" xml:space="preserve">
+    <value>Tuto mapu miluje {0}</value>
+  </data>
+  <data name="event.nominate" xml:space="preserve">
+    <value>Nominováno uživatelem {0}.</value>
+  </data>
+  <data name="event.nomination_reset" xml:space="preserve">
+    <value>Nový problém {0} ({1}) způsobil resetování nominace.</value>
+  </data>
+  <data name="event.qualify" xml:space="preserve">
+    <value>Tato beatmapa získala požadované množství nominací a byla kvalifikována.</value>
+  </data>
+  <data name="event.rank" xml:space="preserve">
+    <value>Hodnocené.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Události beatmapsetu</value>
+  </data>
+  <data name="index.form.period" xml:space="preserve">
+    <value>Období</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Typy</value>
+  </data>
+  <data name="item.content" xml:space="preserve">
+    <value>Obsah</value>
+  </data>
+  <data name="item.discussion_deleted" xml:space="preserve">
+    <value>[odstraněno]</value>
+  </data>
+  <data name="item.type" xml:space="preserve">
+    <value>Typ</value>
+  </data>
+  <data name="type.approve" xml:space="preserve">
+    <value>Schválení</value>
+  </data>
+  <data name="type.discussion_delete" xml:space="preserve">
+    <value>Odstranění diskuze</value>
+  </data>
+  <data name="type.discussion_post_delete" xml:space="preserve">
+    <value>Odstranění odpovědí diskuze</value>
+  </data>
+  <data name="type.discussion_post_restore" xml:space="preserve">
+    <value>Obnovení odpovědí diskuze</value>
+  </data>
+  <data name="type.discussion_restore" xml:space="preserve">
+    <value>Obnovení diskuze</value>
+  </data>
+  <data name="type.disqualify" xml:space="preserve">
+    <value>Diskvalifikace</value>
+  </data>
+  <data name="type.genre_edit" xml:space="preserve">
+    <value>Úprava žánru</value>
+  </data>
+  <data name="type.issue_reopen" xml:space="preserve">
+    <value>Znovuotevření diskuze</value>
+  </data>
+  <data name="type.issue_resolve" xml:space="preserve">
+    <value>Vyřešení diskuze</value>
+  </data>
+  <data name="type.kudosu_allow" xml:space="preserve">
+    <value>Příspěvek Kudosu</value>
+  </data>
+  <data name="type.kudosu_deny" xml:space="preserve">
+    <value>Odmítnutí Kudosu</value>
+  </data>
+  <data name="type.kudosu_gain" xml:space="preserve">
+    <value>Zisk Kudosu</value>
+  </data>
+  <data name="type.kudosu_lost" xml:space="preserve">
+    <value>Ztráta Kudosu</value>
+  </data>
+  <data name="type.kudosu_recalculate" xml:space="preserve">
+    <value>Přepočet Kudosu</value>
+  </data>
+  <data name="type.language_edit" xml:space="preserve">
+    <value>Úprava jazyka</value>
+  </data>
+  <data name="type.love" xml:space="preserve">
+    <value>Obliba</value>
+  </data>
+  <data name="type.nominate" xml:space="preserve">
+    <value>Nominace</value>
+  </data>
+  <data name="type.nomination_reset" xml:space="preserve">
+    <value>Resetování nominací</value>
+  </data>
+  <data name="type.qualify" xml:space="preserve">
+    <value>Kvalifikace</value>
+  </data>
+  <data name="type.rank" xml:space="preserve">
+    <value>Hodnocení</value>
+  </data>
+</root>

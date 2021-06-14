@@ -1,0 +1,265 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="admin.warehouse" xml:space="preserve">
+    <value>Lager</value>
+  </data>
+  <data name="cart.checkout" xml:space="preserve">
+    <value>Checka ut</value>
+  </data>
+  <data name="cart.info" xml:space="preserve">
+    <value>{0} föremål i varukorgen (${1})|{0} föremål i varukorgen (${1})</value>
+  </data>
+  <data name="cart.more_goodies" xml:space="preserve">
+    <value>Jag vill ta en titt på fler godsaker innan jag fullbordar beställningen</value>
+  </data>
+  <data name="cart.shipping_fees" xml:space="preserve">
+    <value>fraktavgifter</value>
+  </data>
+  <data name="cart.title" xml:space="preserve">
+    <value>Varukorg</value>
+  </data>
+  <data name="cart.total" xml:space="preserve">
+    <value>totalt</value>
+  </data>
+  <data name="cart.errors_no_checkout.line_1" xml:space="preserve">
+    <value>Oj då, det är problem med din varukorg som hindrar en utcheckning!</value>
+  </data>
+  <data name="cart.errors_no_checkout.line_2" xml:space="preserve">
+    <value>Ta bort eller uppdatera produkterna ovan för att fortsätta.</value>
+  </data>
+  <data name="cart.empty.text" xml:space="preserve">
+    <value>Din varukorg är tom.</value>
+  </data>
+  <data name="cart.empty.return_link._" xml:space="preserve">
+    <value>Återvänd till {0} för att hitta några godsaker!</value>
+  </data>
+  <data name="cart.empty.return_link.link_text" xml:space="preserve">
+    <value>butikslista</value>
+  </data>
+  <data name="checkout.cart_problems" xml:space="preserve">
+    <value>Oj då, det finns problem med din varukorg!</value>
+  </data>
+  <data name="checkout.cart_problems_edit" xml:space="preserve">
+    <value>Klicka här för att redigera den.</value>
+  </data>
+  <data name="checkout.declined" xml:space="preserve">
+    <value>Betalningen avbröts.</value>
+  </data>
+  <data name="checkout.delayed_shipping" xml:space="preserve">
+    <value>Vi är för nuvarande överväldigad med ordrar! Du får gärna placera din order, men kommer kanske få en **extra 1-2 veckors försening** medan vi kommer ikapp alla ordrar.</value>
+  </data>
+  <data name="checkout.old_cart" xml:space="preserve">
+    <value>Din varukorg verkar vara inaktuell och har blivit återladdad, var god försök igen.</value>
+  </data>
+  <data name="checkout.pay" xml:space="preserve">
+    <value>Betala med Paypal</value>
+  </data>
+  <data name="checkout.title_compact" xml:space="preserve">
+    <value>kassan</value>
+  </data>
+  <data name="checkout.has_pending._" xml:space="preserve">
+    <value>Du har ofullbordade transaktioner, klicka {0} för att se dem.</value>
+  </data>
+  <data name="checkout.has_pending.link_text" xml:space="preserve">
+    <value>här</value>
+  </data>
+  <data name="checkout.pending_checkout.line_1" xml:space="preserve">
+    <value>En tidigare transaktion startades men avslutades inte.</value>
+  </data>
+  <data name="checkout.pending_checkout.line_2" xml:space="preserve">
+    <value>Välj en betalmetod för att återuppta din tidigare transaktion.</value>
+  </data>
+  <data name="discount" xml:space="preserve">
+    <value>spara {0}%</value>
+  </data>
+  <data name="invoice.echeck_delay" xml:space="preserve">
+    <value>Eftersom din betalning var en eCheck, vänligen tillåt upp till 10 extra dagar för betalningen att rensas via PayPal! </value>
+  </data>
+  <data name="invoice.title_compact" xml:space="preserve">
+    <value>faktura</value>
+  </data>
+  <data name="invoice.status.processing.title" xml:space="preserve">
+    <value>Din betalning har ännu inte bekräftats!</value>
+  </data>
+  <data name="invoice.status.processing.line_1" xml:space="preserve">
+    <value>Om du redan har betalat, kan vi fortfarande vänta på att få bekräftelse på din betalning. Vänligen uppdatera denna sida om en minut eller två!</value>
+  </data>
+  <data name="invoice.status.processing.line_2._" xml:space="preserve">
+    <value>Om du stötte på ett problem i kassan, {0}</value>
+  </data>
+  <data name="invoice.status.processing.line_2.link_text" xml:space="preserve">
+    <value>klicka här för att återuppta din transaktion</value>
+  </data>
+  <data name="order.cancel" xml:space="preserve">
+    <value>Avbryt beställning</value>
+  </data>
+  <data name="order.cancel_confirm" xml:space="preserve">
+    <value>Denna beställning kommer att avbrytas och betalning kommer inte godtas. Betaltjänsten kanske inte frigör reserverade pengar direkt. Är du säker?</value>
+  </data>
+  <data name="order.cancel_not_allowed" xml:space="preserve">
+    <value>Denna beställning kan för tillfället inte avbrytas.</value>
+  </data>
+  <data name="order.invoice" xml:space="preserve">
+    <value>Visa faktura</value>
+  </data>
+  <data name="order.no_orders" xml:space="preserve">
+    <value>Inga beställningar att visa.</value>
+  </data>
+  <data name="order.paid_on" xml:space="preserve">
+    <value>Beställning slutförd {0}</value>
+  </data>
+  <data name="order.resume" xml:space="preserve">
+    <value>Återuppta transaktionen</value>
+  </data>
+  <data name="order.shopify_expired" xml:space="preserve">
+    <value>Kassalänken för denna beställning har utgått.</value>
+  </data>
+  <data name="order.item.display_name.supporter_tag" xml:space="preserve">
+    <value>{0} för {1} ({2})</value>
+  </data>
+  <data name="order.item.quantity" xml:space="preserve">
+    <value>Antal</value>
+  </data>
+  <data name="order.not_modifiable_exception.cancelled" xml:space="preserve">
+    <value>Du kan inte ändra din beställning då den har blivit avbruten.</value>
+  </data>
+  <data name="order.not_modifiable_exception.checkout" xml:space="preserve">
+    <value>Du kan inte ändra din beställning när den bearbetas.</value>
+  </data>
+  <data name="order.not_modifiable_exception.default" xml:space="preserve">
+    <value>Beställningen kan inte ändras</value>
+  </data>
+  <data name="order.not_modifiable_exception.delivered" xml:space="preserve">
+    <value>Du kan inte ändra din beställning då den redan har blivit levererad.</value>
+  </data>
+  <data name="order.not_modifiable_exception.paid" xml:space="preserve">
+    <value>Du kan inte ändra din beställning då den redan har betalats.</value>
+  </data>
+  <data name="order.not_modifiable_exception.processing" xml:space="preserve">
+    <value>Du kan inte ändra din beställning när den bearbetas.</value>
+  </data>
+  <data name="order.not_modifiable_exception.shipped" xml:space="preserve">
+    <value>Du kan inte ändra din beställning då den redan har skeppats.</value>
+  </data>
+  <data name="order.status.cancelled" xml:space="preserve">
+    <value>Avbruten</value>
+  </data>
+  <data name="order.status.checkout" xml:space="preserve">
+    <value>Förbereder</value>
+  </data>
+  <data name="order.status.delivered" xml:space="preserve">
+    <value>Levererad</value>
+  </data>
+  <data name="order.status.paid" xml:space="preserve">
+    <value>Betalt</value>
+  </data>
+  <data name="order.status.processing" xml:space="preserve">
+    <value>Väntar på bekräftelse</value>
+  </data>
+  <data name="order.status.shipped" xml:space="preserve">
+    <value>Skickad</value>
+  </data>
+  <data name="product.name" xml:space="preserve">
+    <value>Namn</value>
+  </data>
+  <data name="product.stock.out" xml:space="preserve">
+    <value>Detta föremål är för närvarande slut. Kom tillbaka senare!</value>
+  </data>
+  <data name="product.stock.out_with_alternative" xml:space="preserve">
+    <value>Denna typ är för närvarande slut i lager :(. Testa andra typer eller kolla igen snart.</value>
+  </data>
+  <data name="product.add_to_cart" xml:space="preserve">
+    <value>Lägg till i varukorgen</value>
+  </data>
+  <data name="product.notify" xml:space="preserve">
+    <value>Notifiera mig när den är tillgänglig!</value>
+  </data>
+  <data name="product.notification_success" xml:space="preserve">
+    <value>du kommer bli notifierad när vi har mer i lager. klicka {0} för att avbryta</value>
+  </data>
+  <data name="product.notification_remove_text" xml:space="preserve">
+    <value>här</value>
+  </data>
+  <data name="product.notification_in_stock" xml:space="preserve">
+    <value>Denna produkt är redan i lager!</value>
+  </data>
+  <data name="supporter_tag.gift" xml:space="preserve">
+    <value>present till spelare</value>
+  </data>
+  <data name="supporter_tag.require_login._" xml:space="preserve">
+    <value>Du behöver vara {0} för att kunna få en osu!supporter tagg!</value>
+  </data>
+  <data name="supporter_tag.require_login.link_text" xml:space="preserve">
+    <value>inloggad</value>
+  </data>
+  <data name="username_change.check" xml:space="preserve">
+    <value>Skriv in ett användarnamn för att kontrollera tillgänglighet!</value>
+  </data>
+  <data name="username_change.checking" xml:space="preserve">
+    <value>Kontrollerar om {0} är tillgängligt...</value>
+  </data>
+  <data name="username_change.require_login._" xml:space="preserve">
+    <value>Du behöver var {0} för att ändra ditt namn!</value>
+  </data>
+  <data name="username_change.require_login.link_text" xml:space="preserve">
+    <value>inloggad</value>
+  </data>
+</root>

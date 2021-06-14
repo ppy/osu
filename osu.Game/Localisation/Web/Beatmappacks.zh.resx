@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="index.description" xml:space="preserve">
+    <value>围绕某个相同主题打包好的曲包</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>列表</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>曲包</value>
+  </data>
+  <data name="index.blurb.important" xml:space="preserve">
+    <value>下载前必读</value>
+  </data>
+  <data name="index.blurb.instruction._" xml:space="preserve">
+    <value>安装步骤：下载好曲包之后，直接将压缩包解压到 osu! 的 Songs 文件夹下。
+                    所有的谱面此时都是 .zip 或 .osz 文件，osu! 会在下一次启动时自动载入这些谱面，
+                    {0} 自己解压这些谱面。
+                    否则这些谱面可能错误地显示并无法正常游玩。</value>
+  </data>
+  <data name="index.blurb.instruction.scary" xml:space="preserve">
+    <value>不要</value>
+  </data>
+  <data name="index.blurb.note._" xml:space="preserve">
+    <value>强烈建议 {0}，因为旧谱面的质量可能不如现在。</value>
+  </data>
+  <data name="index.blurb.note.scary" xml:space="preserve">
+    <value>下载最新的曲包</value>
+  </data>
+  <data name="show.download" xml:space="preserve">
+    <value>下载</value>
+  </data>
+  <data name="show.item.cleared" xml:space="preserve">
+    <value>玩过</value>
+  </data>
+  <data name="show.item.not_cleared" xml:space="preserve">
+    <value>未玩过</value>
+  </data>
+  <data name="show.no_diff_reduction._" xml:space="preserve">
+    <value>若要解锁成就，则不能使用{0}游玩谱面。</value>
+  </data>
+  <data name="show.no_diff_reduction.link" xml:space="preserve">
+    <value>降低难度的mod</value>
+  </data>
+  <data name="mode.artist" xml:space="preserve">
+    <value>艺术家/专辑</value>
+  </data>
+  <data name="mode.chart" xml:space="preserve">
+    <value>月赛</value>
+  </data>
+  <data name="mode.standard" xml:space="preserve">
+    <value>常规</value>
+  </data>
+  <data name="mode.theme" xml:space="preserve">
+    <value>主题</value>
+  </data>
+  <data name="require_login._" xml:space="preserve">
+    <value>需要 {0} 才能下载</value>
+  </data>
+  <data name="require_login.link_text" xml:space="preserve">
+    <value>登录</value>
+  </data>
+</root>

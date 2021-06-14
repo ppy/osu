@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="cancel" xml:space="preserve">
+    <value>Відмінити</value>
+  </data>
+  <data name="authorise.request" xml:space="preserve">
+    <value>запитує дозволу доступу до вашого профілю.</value>
+  </data>
+  <data name="authorise.scopes_title" xml:space="preserve">
+    <value>Цей додаток матиме змогу:</value>
+  </data>
+  <data name="authorise.title" xml:space="preserve">
+    <value>Запит авторизації</value>
+  </data>
+  <data name="authorized_clients.confirm_revoke" xml:space="preserve">
+    <value>Ви впевнені, що хочете відкликати права доступу цього клієнта?</value>
+  </data>
+  <data name="authorized_clients.scopes_title" xml:space="preserve">
+    <value>Цей додаток може:</value>
+  </data>
+  <data name="authorized_clients.owned_by" xml:space="preserve">
+    <value>Власник: {0}</value>
+  </data>
+  <data name="authorized_clients.none" xml:space="preserve">
+    <value>Немає клієнтів</value>
+  </data>
+  <data name="authorized_clients.revoked.false" xml:space="preserve">
+    <value>Відкликати доступ</value>
+  </data>
+  <data name="authorized_clients.revoked.true" xml:space="preserve">
+    <value>Доступ заборонено</value>
+  </data>
+  <data name="client.id" xml:space="preserve">
+    <value>ID клієнта</value>
+  </data>
+  <data name="client.name" xml:space="preserve">
+    <value>Назва програми</value>
+  </data>
+  <data name="client.redirect" xml:space="preserve">
+    <value>Callback URL програми</value>
+  </data>
+  <data name="client.reset" xml:space="preserve">
+    <value>Скинути секрет клієнта</value>
+  </data>
+  <data name="client.reset_failed" xml:space="preserve">
+    <value>Не вдалося скинути секрет клієнта</value>
+  </data>
+  <data name="client.secret" xml:space="preserve">
+    <value>Секретний ключ</value>
+  </data>
+  <data name="client.secret_visible.false" xml:space="preserve">
+    <value>Показати секрет клієнта</value>
+  </data>
+  <data name="client.secret_visible.true" xml:space="preserve">
+    <value>Приховати секрет клієнта</value>
+  </data>
+  <data name="new_client.header" xml:space="preserve">
+    <value>Зареєструйте новий додаток OAuth</value>
+  </data>
+  <data name="new_client.register" xml:space="preserve">
+    <value>Зареєструвати додаток</value>
+  </data>
+  <data name="new_client.terms_of_use._" xml:space="preserve">
+    <value>Використовуючи API, ви погоджуєтеся з {0}.</value>
+  </data>
+  <data name="new_client.terms_of_use.link" xml:space="preserve">
+    <value>Умови використання</value>
+  </data>
+  <data name="own_clients.confirm_delete" xml:space="preserve">
+    <value>Ви впевнені, що хочете видалити цього клієнта?</value>
+  </data>
+  <data name="own_clients.confirm_reset" xml:space="preserve">
+    <value>Ви впевнені що хочете скинути секрет клієнта? Це скасує всі токени.</value>
+  </data>
+  <data name="own_clients.new" xml:space="preserve">
+    <value>Нова програма OAuth</value>
+  </data>
+  <data name="own_clients.none" xml:space="preserve">
+    <value>Немає клієнтів</value>
+  </data>
+  <data name="own_clients.revoked.false" xml:space="preserve">
+    <value>Видалити</value>
+  </data>
+  <data name="own_clients.revoked.true" xml:space="preserve">
+    <value>Видалено</value>
+  </data>
+</root>

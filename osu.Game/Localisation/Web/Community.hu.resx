@@ -1,0 +1,255 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="support.convinced.title" xml:space="preserve">
+    <value>Meggyőztél! {0}</value>
+  </data>
+  <data name="support.convinced.support" xml:space="preserve">
+    <value>osu! támogatása!</value>
+  </data>
+  <data name="support.convinced.gift" xml:space="preserve">
+    <value>vagy ajándékozz támogatói címet más játékosoknak</value>
+  </data>
+  <data name="support.convinced.instructions" xml:space="preserve">
+    <value>kattints a szívet ábrázoló gombra, hogy továbblépj az osu!boltba</value>
+  </data>
+  <data name="support.why-support.title" xml:space="preserve">
+    <value>Miért támogatnám az osu!-t? Hova megy a pénz?</value>
+  </data>
+  <data name="support.why-support.team.title" xml:space="preserve">
+    <value>Támogasd a Csapatot</value>
+  </data>
+  <data name="support.why-support.team.description" xml:space="preserve">
+    <value>Egy kis csapat fejleszti és futtatja az osu!-t. A te támogatásod segíti őket, hogy, tudod.. éljenek.</value>
+  </data>
+  <data name="support.why-support.infra.title" xml:space="preserve">
+    <value>Szerver Infrastruktúra</value>
+  </data>
+  <data name="support.why-support.infra.description" xml:space="preserve">
+    <value>A támogatások a szerverekhez mennek amik futtatják a weboldalt, multiplayer szolgáltatásokhoz, online ranglétrákhoz, stb.</value>
+  </data>
+  <data name="support.why-support.featured-artists.title" xml:space="preserve">
+    <value>Kiemelt Előadók</value>
+  </data>
+  <data name="support.why-support.featured-artists.description" xml:space="preserve">
+    <value>A te támogatásoddal mégtöbb nagyszerű előadókat érünk el és szerződtetünk le az osu!-hoz!</value>
+  </data>
+  <data name="support.why-support.featured-artists.link_text" xml:space="preserve">
+    <value>Nézd meg a jelenlegi felállást &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.ads.title" xml:space="preserve">
+    <value>Tartsd az osu!-t önfenntartóvá</value>
+  </data>
+  <data name="support.why-support.ads.description" xml:space="preserve">
+    <value>A ti támogatásotok segíti, hogy a játék független legyen és teljesen hirdetésmentes szponzorok nélkül.</value>
+  </data>
+  <data name="support.why-support.tournaments.title" xml:space="preserve">
+    <value>Hivatalos Versenyek</value>
+  </data>
+  <data name="support.why-support.tournaments.description" xml:space="preserve">
+    <value>Támogasd a hivatalos osu! Világbajnokság rendezését (és díjait).</value>
+  </data>
+  <data name="support.why-support.tournaments.link_text" xml:space="preserve">
+    <value>Versenyek felfedezése &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.bounty-program.title" xml:space="preserve">
+    <value>Nyílt forrású bounty program</value>
+  </data>
+  <data name="support.why-support.bounty-program.description" xml:space="preserve">
+    <value>Támogasd a közösséget ami adta az idejét és az erejét, hogy az osu!-t jobbá tegyék.</value>
+  </data>
+  <data name="support.why-support.bounty-program.link_text" xml:space="preserve">
+    <value>Láss többet &amp;raquo;</value>
+  </data>
+  <data name="support.perks.title" xml:space="preserve">
+    <value>Oh? Mit is kapok?!</value>
+  </data>
+  <data name="support.perks.osu_direct.title" xml:space="preserve">
+    <value>osu!direct</value>
+  </data>
+  <data name="support.perks.osu_direct.description" xml:space="preserve">
+    <value>gyors és egyszerű beatmap keresés a játék elhagyása nélkül.</value>
+  </data>
+  <data name="support.perks.friend_ranking.title" xml:space="preserve">
+    <value>Baráti Ranglista</value>
+  </data>
+  <data name="support.perks.friend_ranking.description" xml:space="preserve">
+    <value>Nézd meg hogyan álltok a barátaiddal egy beatmapen a ranglistán a játékban, vagy akár a weboldalon is.</value>
+  </data>
+  <data name="support.perks.country_ranking.title" xml:space="preserve">
+    <value>Országos Ranglista</value>
+  </data>
+  <data name="support.perks.country_ranking.description" xml:space="preserve">
+    <value>Hódítsd meg az országod mielőtt a világot próbálnád.</value>
+  </data>
+  <data name="support.perks.mod_filtering.title" xml:space="preserve">
+    <value>Szűrés modok szerint</value>
+  </data>
+  <data name="support.perks.mod_filtering.description" xml:space="preserve">
+    <value>Csak HDHR-es emberekkel akarsz játszani? Nem probléma!</value>
+  </data>
+  <data name="support.perks.auto_downloads.title" xml:space="preserve">
+    <value>Automatikus Letöltések</value>
+  </data>
+  <data name="support.perks.auto_downloads.description" xml:space="preserve">
+    <value>Automatikus letöltés többjátékos módban, mások nézése közben, vagy linkre kattintva a chat-ben!</value>
+  </data>
+  <data name="support.perks.upload_more.title" xml:space="preserve">
+    <value>Tölts fel többet</value>
+  </data>
+  <data name="support.perks.upload_more.description" xml:space="preserve">
+    <value>Még több függőben lévő beatmap hely (rangsorolt beatmap-onként) maximum 10-ig.</value>
+  </data>
+  <data name="support.perks.early_access.title" xml:space="preserve">
+    <value>Korai Hozzáférés</value>
+  </data>
+  <data name="support.perks.early_access.description" xml:space="preserve">
+    <value>Korai hozzáférés új kiadásokhoz amikben új funkciókat próbálhatsz ki mielőtt publikusak lennének!</value>
+  </data>
+  <data name="support.perks.customisation.title" xml:space="preserve">
+    <value>Testreszabás</value>
+  </data>
+  <data name="support.perks.customisation.description" xml:space="preserve">
+    <value>Tedd egyedivé a profilod egy teljesen testre szabható felhasználói oldallal.</value>
+  </data>
+  <data name="support.perks.beatmap_filters.title" xml:space="preserve">
+    <value>Beatmap Szűrők</value>
+  </data>
+  <data name="support.perks.beatmap_filters.description" xml:space="preserve">
+    <value>Keresési szűrő játszott és nem játszott, illetve megszerzett rank által (ha van).</value>
+  </data>
+  <data name="support.perks.yellow_fellow.title" xml:space="preserve">
+    <value>Sárga Kiemelés</value>
+  </data>
+  <data name="support.perks.yellow_fellow.description" xml:space="preserve">
+    <value>Légy észrevehető játékon belül az új fényes sárga felhasználóneveddel.</value>
+  </data>
+  <data name="support.perks.speedy_downloads.title" xml:space="preserve">
+    <value>Gyors Letöltések</value>
+  </data>
+  <data name="support.perks.speedy_downloads.description" xml:space="preserve">
+    <value>Kevésbé szigorú letöltési korlátozások, főleg az osu!direct használatánál.</value>
+  </data>
+  <data name="support.perks.change_username.title" xml:space="preserve">
+    <value>Felhasználónév Csere</value>
+  </data>
+  <data name="support.perks.change_username.description" xml:space="preserve">
+    <value>Lehetőség a felhasználóneved költségmentes megváltoztatására. (maximum egyszer)</value>
+  </data>
+  <data name="support.perks.skinnables.title" xml:space="preserve">
+    <value>Skinelhetőség</value>
+  </data>
+  <data name="support.perks.skinnables.description" xml:space="preserve">
+    <value>Extra játékon belüli skinelhetőség, mint például a főmenü háttere.</value>
+  </data>
+  <data name="support.perks.feature_votes.title" xml:space="preserve">
+    <value>Funkció Szavazások</value>
+  </data>
+  <data name="support.perks.feature_votes.description" xml:space="preserve">
+    <value>Szavazások funkció kérelmekre. (havi 2)</value>
+  </data>
+  <data name="support.perks.sort_options.title" xml:space="preserve">
+    <value>Rendezési Beállítások</value>
+  </data>
+  <data name="support.perks.sort_options.description" xml:space="preserve">
+    <value>A lehetőség országos / baráti / mod-specifikus beatmap ranglétra megtekintésére játékon belül.</value>
+  </data>
+  <data name="support.perks.more_favourites.title" xml:space="preserve">
+    <value>Több Kedvenc</value>
+  </data>
+  <data name="support.perks.more_favourites.description" xml:space="preserve">
+    <value>A maximum kedvencelhető beatmapek száma megnövekedett {0} &amp;rarr; {1}</value>
+  </data>
+  <data name="support.perks.more_friends.title" xml:space="preserve">
+    <value>Több Barát</value>
+  </data>
+  <data name="support.perks.more_friends.description" xml:space="preserve">
+    <value>A maximum barátok száma megnövekedett {0} &amp;rarr; {1}</value>
+  </data>
+  <data name="support.perks.more_beatmaps.title" xml:space="preserve">
+    <value>Több Beatmap Feltöltése</value>
+  </data>
+  <data name="support.perks.more_beatmaps.description" xml:space="preserve">
+    <value>Hogy mennyi unranked mappod lehet, egy alap értéktől és egy adott bónusztól függ, minden egyes rankedelt maptól, ami jelenleg van neked (egy bizonyos korlátig).&lt;br/&gt;&lt;br/&gt; Általában ez az alap érték {0} és ez a plusz {1} rangsorolt mapponként (egészen {2}).
+Ha van támogatói címed ez megnővekszik {3} egészen {4} rangsorolt mapponként (egészen {5}). </value>
+  </data>
+  <data name="support.perks.friend_filtering.title" xml:space="preserve">
+    <value>Baráti ranglétrák</value>
+  </data>
+  <data name="support.perks.friend_filtering.description" xml:space="preserve">
+    <value>Versenyezz a barátaiddal és nézd, hogyan válsz jobbá ellenük! *&lt;br/&gt;&lt;br/&gt;&lt;small&gt;* még nem elérhető az új oldalon, hamarosan(tm)
+&lt;/small&gt;</value>
+  </data>
+  <data name="support.supporter_status.contribution" xml:space="preserve">
+    <value>Köszönjük az eddigi támogatásodat! Összesen {0} adománnyal járultál hozzá {1}: cím vásárlással!</value>
+  </data>
+  <data name="support.supporter_status.gifted" xml:space="preserve">
+    <value>A cím vételeidből {0} ajándékozott (eddig összesen {1} ajándékozott), milyen nagylelkű!</value>
+  </data>
+  <data name="support.supporter_status.not_yet" xml:space="preserve">
+    <value>Nincsen támogatói címed még :(</value>
+  </data>
+  <data name="support.supporter_status.valid_until" xml:space="preserve">
+    <value>A jelenlegi támogatói címed eddig érvényes: {0}!</value>
+  </data>
+  <data name="support.supporter_status.was_valid_until" xml:space="preserve">
+    <value>A támogatói címed eddig volt érvényes: {0}.</value>
+  </data>
+</root>

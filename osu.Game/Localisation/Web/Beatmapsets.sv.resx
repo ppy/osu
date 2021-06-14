@@ -1,0 +1,373 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>Denna beatmap är för närvarande inte tillgänglig för nedladdning.</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>Portioner av denna beatmap har blivit borttagna på förfrågan av skaparen eller en tredje-parts rättighets hållare.</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>Klicka här för mer information.</value>
+  </data>
+  <data name="availability.rule_violation" xml:space="preserve">
+    <value>Vissa delar av denna map har tagits bort då de anses vara olämpliga i osu!.</value>
+  </data>
+  <data name="download.limit_exceeded" xml:space="preserve">
+    <value>Sakta ner, spela mer.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmaps Listning</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>Beatmaps</value>
+  </data>
+  <data name="panel.empty" xml:space="preserve">
+    <value>inga beatmaps</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>ladda ner</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>ladda ner med video</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>ladda ner utan video</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>öppna i osu!direct</value>
+  </data>
+  <data name="nominate.incorrect_mode" xml:space="preserve">
+    <value>Du har inte behörighet att nominera för läge: {0}</value>
+  </data>
+  <data name="nominate.dialog.confirmation" xml:space="preserve">
+    <value>Är du säker på att du vill nominera denna Beatmap?</value>
+  </data>
+  <data name="nominate.dialog.header" xml:space="preserve">
+    <value>Nominera Beatmap</value>
+  </data>
+  <data name="nsfw_badge.label" xml:space="preserve">
+    <value>Explicit</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>Diskussion</value>
+  </data>
+  <data name="show.details.by_artist" xml:space="preserve">
+    <value>av {0}</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>Favorisera denna beatmapset</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>Du behöver logga in innan du laddar ner beatmaps!</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>skapad av {0}</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>Ta bort favorisering på denna beatmapset</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>senast ändrad {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>Ladda Ner</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>utan Video</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>med Video</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>för att komma åt fler funktioner</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>Logga in</value>
+  </data>
+  <data name="show.details_date.approved" xml:space="preserve">
+    <value>godkänd {0}</value>
+  </data>
+  <data name="show.details_date.loved" xml:space="preserve">
+    <value>älskad {0}</value>
+  </data>
+  <data name="show.details_date.qualified" xml:space="preserve">
+    <value>kvalificerat {0}</value>
+  </data>
+  <data name="show.details_date.ranked" xml:space="preserve">
+    <value>rankad {0}</value>
+  </data>
+  <data name="show.details_date.submitted" xml:space="preserve">
+    <value>skickad {0}</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>senast uppdaterat {0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>Du har för många favoriserade beatmaps! Var vänlig ta bort en favorit innan du fortsätter.</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>Hypa denna map om du gillade att spela den för att hjälpa den att utvecklas till &lt;strong&gt;Rankad&lt;/strong&gt; status.</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>Denna map är för närvarande {0}.</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>väntande</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>kvalificerad</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>under utveckling</value>
+  </data>
+  <data name="show.hype.disqualify._" xml:space="preserve">
+    <value>Om du hittar ett problem med denna beatmap, diskvalificera den {0}.</value>
+  </data>
+  <data name="show.hype.report._" xml:space="preserve">
+    <value>Om du hittar ett problem med denna beatmap, vänligen rapportera det {0} för att varna laget.</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>Rapportera problem</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>här</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>Beskrivning</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>Språk</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>Data beräknas...</value>
+  </data>
+  <data name="show.info.nsfw" xml:space="preserve">
+    <value>Explicit innehåll</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>Punkter av Misslyckande</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>Källa</value>
+  </data>
+  <data name="show.info.storyboard" xml:space="preserve">
+    <value>Denna beatmap innehåller storyboard</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>Genomsnittig Succe</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>Taggar</value>
+  </data>
+  <data name="show.info.video" xml:space="preserve">
+    <value>Denna beatmap innehåller video</value>
+  </data>
+  <data name="show.nsfw_warning.details" xml:space="preserve">
+    <value>Denna beatmap innehåller explicit, kränkande eller störande innehåll. Vill du se den ändå?</value>
+  </data>
+  <data name="show.nsfw_warning.title" xml:space="preserve">
+    <value>Explicit innehåll</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.disable" xml:space="preserve">
+    <value>Inaktivera varning</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.listing" xml:space="preserve">
+    <value>Beatmaplistningar</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.show" xml:space="preserve">
+    <value>Visa</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>uppnått {0}</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>Nationell rankning</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>Rankning bland vänner</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>Global rankning</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>Klicka &lt;a href="{0}"&gt;här&lt;/a&gt; för att se alla fina funktioner du kommer få!</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>Du behöver vara en supporter för att komma åt vän och land rankningar!</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>Resultattavla</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>Precision</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>Högsta Kombo</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>Missar</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>Tillägg</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>Spelare</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>Rank</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>Total Poäng</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>Poäng</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>Tid</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>Ingen från ditt land har satt ett poäng på denna map än!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>Ingen av dina vänner har satt ett poäng på denna map än!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>Inga poäng än. Du kanske ska försöka sätta några?</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>Laddar poäng...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>Ej rankad beatmap.</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>Leder</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>Ditt Bästa</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>Cirkel Storlek</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>Antal Tangenter</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>HP Tömning</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>Precision</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>Approach Hastighet</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>Stjärn Svårighetsgrad</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>Längd</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>Antal Cirklar</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>Antal Sliders</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>Användar Betyg</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>Betyg Spridning</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>Nomineringar</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>Speltid</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>Rankad</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>Godkänd</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>Älskad</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>Kvalificerad</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>Arbete pågår</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>Väntande</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>Kyrkogård</value>
+  </data>
+</root>

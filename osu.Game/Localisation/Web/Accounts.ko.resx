@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="edit.title_compact" xml:space="preserve">
+    <value>설정</value>
+  </data>
+  <data name="edit.username" xml:space="preserve">
+    <value>사용자 이름</value>
+  </data>
+  <data name="edit.avatar.title" xml:space="preserve">
+    <value>아바타</value>
+  </data>
+  <data name="edit.avatar.rules" xml:space="preserve">
+    <value>아바타는 {0}을 따라야 합니다.&lt;br/&gt;이는 아바타가 &lt;strong&gt;모든 연령에 적합해야 한다&lt;/strong&gt;는 것을 의미하므로, 나체, 남에게 모욕적인 표현 또는 이러한 것을 암시하는 내용이 없어야 합니다.</value>
+  </data>
+  <data name="edit.avatar.rules_link" xml:space="preserve">
+    <value>커뮤니티 규칙</value>
+  </data>
+  <data name="edit.email.current" xml:space="preserve">
+    <value>현재 이메일 주소</value>
+  </data>
+  <data name="edit.email.new" xml:space="preserve">
+    <value>새 이메일 주소</value>
+  </data>
+  <data name="edit.email.new_confirmation" xml:space="preserve">
+    <value>이메일 주소 확인</value>
+  </data>
+  <data name="edit.email.title" xml:space="preserve">
+    <value>이메일</value>
+  </data>
+  <data name="edit.password.current" xml:space="preserve">
+    <value>현재 비밀번호</value>
+  </data>
+  <data name="edit.password.new" xml:space="preserve">
+    <value>새 비밀번호</value>
+  </data>
+  <data name="edit.password.new_confirmation" xml:space="preserve">
+    <value>비밀번호 확인</value>
+  </data>
+  <data name="edit.password.title" xml:space="preserve">
+    <value>비밀번호</value>
+  </data>
+  <data name="edit.profile.title" xml:space="preserve">
+    <value>프로필</value>
+  </data>
+  <data name="edit.profile.user.user_from" xml:space="preserve">
+    <value>거주지</value>
+  </data>
+  <data name="edit.profile.user.user_interests" xml:space="preserve">
+    <value>관심 분야</value>
+  </data>
+  <data name="edit.profile.user.user_occ" xml:space="preserve">
+    <value>직업</value>
+  </data>
+  <data name="edit.profile.user.user_website" xml:space="preserve">
+    <value>웹사이트</value>
+  </data>
+  <data name="edit.signature.title" xml:space="preserve">
+    <value>서명</value>
+  </data>
+  <data name="edit.signature.update" xml:space="preserve">
+    <value>적용</value>
+  </data>
+  <data name="notifications.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>Qualified 비트맵에 문제가 생길 경우 알림을 수신할 모드</value>
+  </data>
+  <data name="notifications.beatmapset_disqualify" xml:space="preserve">
+    <value>비트맵이 Disqualified 처리됐을 때 알림을 수신할 모드</value>
+  </data>
+  <data name="notifications.comment_reply" xml:space="preserve">
+    <value>댓글에 답글이 달리면 알림 받기</value>
+  </data>
+  <data name="notifications.title" xml:space="preserve">
+    <value>알림</value>
+  </data>
+  <data name="notifications.topic_auto_subscribe" xml:space="preserve">
+    <value>새로 만드는 포럼 주제에 대한 알림을 자동으로 활성화</value>
+  </data>
+  <data name="notifications.options._" xml:space="preserve">
+    <value>수신 옵션</value>
+  </data>
+  <data name="notifications.options.beatmap_owner_change" xml:space="preserve">
+    <value>게스트 난이도</value>
+  </data>
+  <data name="notifications.options.beatmapset:modding" xml:space="preserve">
+    <value>비트맵 모딩</value>
+  </data>
+  <data name="notifications.options.channel_message" xml:space="preserve">
+    <value>개인 채팅 메시지</value>
+  </data>
+  <data name="notifications.options.comment_new" xml:space="preserve">
+    <value>새 댓글</value>
+  </data>
+  <data name="notifications.options.forum_topic_reply" xml:space="preserve">
+    <value>주제 답글</value>
+  </data>
+  <data name="notifications.options.mail" xml:space="preserve">
+    <value>메일</value>
+  </data>
+  <data name="notifications.options.mapping" xml:space="preserve">
+    <value>비트맵 제작자</value>
+  </data>
+  <data name="notifications.options.push" xml:space="preserve">
+    <value>푸시 알림</value>
+  </data>
+  <data name="notifications.options.user_achievement_unlock" xml:space="preserve">
+    <value>메달 획득</value>
+  </data>
+  <data name="oauth.authorized_clients" xml:space="preserve">
+    <value>인증된 클라이언트</value>
+  </data>
+  <data name="oauth.own_clients" xml:space="preserve">
+    <value>소유 중인 클라이언트</value>
+  </data>
+  <data name="oauth.title" xml:space="preserve">
+    <value>OAuth</value>
+  </data>
+  <data name="options.beatmapset_show_nsfw" xml:space="preserve">
+    <value>부적절한 내용의 비트맵 경고 숨기기</value>
+  </data>
+  <data name="options.beatmapset_title_show_original" xml:space="preserve">
+    <value>원본 언어로 비트맵 메타데이터 표시</value>
+  </data>
+  <data name="options.title" xml:space="preserve">
+    <value>설정</value>
+  </data>
+  <data name="options.beatmapset_download._" xml:space="preserve">
+    <value>기본 비트맵 다운로드 형식</value>
+  </data>
+  <data name="options.beatmapset_download.all" xml:space="preserve">
+    <value>가능하면 영상이 있는 비트맵으로 받기</value>
+  </data>
+  <data name="options.beatmapset_download.direct" xml:space="preserve">
+    <value>osu!direct에서 열기</value>
+  </data>
+  <data name="options.beatmapset_download.no_video" xml:space="preserve">
+    <value>영상이 없는 비트맵으로 받기</value>
+  </data>
+  <data name="playstyles.keyboard" xml:space="preserve">
+    <value>키보드</value>
+  </data>
+  <data name="playstyles.mouse" xml:space="preserve">
+    <value>마우스</value>
+  </data>
+  <data name="playstyles.tablet" xml:space="preserve">
+    <value>태블릿</value>
+  </data>
+  <data name="playstyles.title" xml:space="preserve">
+    <value>플레이 방식</value>
+  </data>
+  <data name="playstyles.touch" xml:space="preserve">
+    <value>터치스크린</value>
+  </data>
+  <data name="privacy.friends_only" xml:space="preserve">
+    <value>친구 목록에 없는 사람들이 보낸 개인 메시지를 차단</value>
+  </data>
+  <data name="privacy.hide_online" xml:space="preserve">
+    <value>온라인 상태 숨기기</value>
+  </data>
+  <data name="privacy.title" xml:space="preserve">
+    <value>개인 정보</value>
+  </data>
+  <data name="security.current_session" xml:space="preserve">
+    <value>현재 세션</value>
+  </data>
+  <data name="security.end_session" xml:space="preserve">
+    <value>세션 종료</value>
+  </data>
+  <data name="security.end_session_confirmation" xml:space="preserve">
+    <value>이 작업은 해당 장치의 세션을 즉시 종료합니다. 계속할까요?</value>
+  </data>
+  <data name="security.last_active" xml:space="preserve">
+    <value>최근 활동:</value>
+  </data>
+  <data name="security.title" xml:space="preserve">
+    <value>보안</value>
+  </data>
+  <data name="security.web_sessions" xml:space="preserve">
+    <value>웹 세션</value>
+  </data>
+  <data name="update_email.update" xml:space="preserve">
+    <value>변경</value>
+  </data>
+  <data name="update_password.update" xml:space="preserve">
+    <value>변경</value>
+  </data>
+  <data name="verification_completed.text" xml:space="preserve">
+    <value>이제 창을 닫으셔도 됩니다.</value>
+  </data>
+  <data name="verification_completed.title" xml:space="preserve">
+    <value>인증이 완료되었습니다.</value>
+  </data>
+  <data name="verification_invalid.title" xml:space="preserve">
+    <value>유효하지 않거나 만료된 인증 링크입니다.</value>
+  </data>
+</root>

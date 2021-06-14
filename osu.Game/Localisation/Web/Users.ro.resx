@@ -1,0 +1,706 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="deleted" xml:space="preserve">
+    <value>[utilizator șters]</value>
+  </data>
+  <data name="beatmapset_activities.title" xml:space="preserve">
+    <value>Istoricul modificărilor lui {0}</value>
+  </data>
+  <data name="beatmapset_activities.title_compact" xml:space="preserve">
+    <value>Modding</value>
+  </data>
+  <data name="beatmapset_activities.discussions.title_recent" xml:space="preserve">
+    <value>Discuții începute recent</value>
+  </data>
+  <data name="beatmapset_activities.events.title_recent" xml:space="preserve">
+    <value>Evenimente recente</value>
+  </data>
+  <data name="beatmapset_activities.posts.title_recent" xml:space="preserve">
+    <value>Postări recente</value>
+  </data>
+  <data name="beatmapset_activities.votes_received.title_most" xml:space="preserve">
+    <value>Cele mai aprecitate (ultimele 3 luni)</value>
+  </data>
+  <data name="beatmapset_activities.votes_made.title_most" xml:space="preserve">
+    <value>Cele mai apreciate (ultimele 3 luni)</value>
+  </data>
+  <data name="blocks.banner_text" xml:space="preserve">
+    <value>Ai blocat acest utilizator.</value>
+  </data>
+  <data name="blocks.blocked_count" xml:space="preserve">
+    <value>utilizatori blocați ({0})</value>
+  </data>
+  <data name="blocks.hide_profile" xml:space="preserve">
+    <value>ascunde profilul</value>
+  </data>
+  <data name="blocks.not_blocked" xml:space="preserve">
+    <value>Acest utilizator nu este blocat.</value>
+  </data>
+  <data name="blocks.show_profile" xml:space="preserve">
+    <value>arată profilul</value>
+  </data>
+  <data name="blocks.too_many" xml:space="preserve">
+    <value>A fost atinsă limita de blocare.</value>
+  </data>
+  <data name="blocks.button.block" xml:space="preserve">
+    <value>blochează</value>
+  </data>
+  <data name="blocks.button.unblock" xml:space="preserve">
+    <value>deblochează</value>
+  </data>
+  <data name="card.loading" xml:space="preserve">
+    <value>Se încarcă...</value>
+  </data>
+  <data name="card.send_message" xml:space="preserve">
+    <value>trimite mesaj</value>
+  </data>
+  <data name="disabled.title" xml:space="preserve">
+    <value>Uh-oh! Se pare că contul dumneavoastră a fost dezactivat.</value>
+  </data>
+  <data name="disabled.warning" xml:space="preserve">
+    <value>În cazul în care ați încălcat o regulă, vă rugăm să notați că în general este o perioadă de răcire de o lună în care vom considera orice cerere de amnesty. După această perioadă, simtete liber să ne contactezi dacă o găsești necesar. Vă rugăm să notați că după creearea unui cont nou ați avut unul dezactivat va rezulta într-un &lt;strong&gt;extesie în acestă răcire de o lună&lt;/strong&gt;. Vă rugăm să notați și că pentru &lt;strong&gt;orice cont creat, încalci regulile în continuare&lt;/strong&gt;. Vă recomandăm puternic să nu faceți asta!</value>
+  </data>
+  <data name="disabled.if_mistake._" xml:space="preserve">
+    <value>Dacă credeți că a fost o greșeală, ești bine venit să ne contactezi (prin {0} sau să dați click pe "?" din colțul-drept-jos de pe această pagină). Vă rugăm notați că suntem foarte convinși cu acțiunile noastre, care sunt bazate pe date concrete. Rezervăm dreptul să vă respingem dacă simțim că sunteți dezonest.</value>
+  </data>
+  <data name="disabled.if_mistake.email" xml:space="preserve">
+    <value>email</value>
+  </data>
+  <data name="disabled.reasons.compromised" xml:space="preserve">
+    <value>Contul dumneavoastră a fost compromis. Ar putea fi dezactivat temporar în timp ce identitatea este confirmată.</value>
+  </data>
+  <data name="disabled.reasons.opening" xml:space="preserve">
+    <value>Sunt un număr de motive care pot rezulta în contul dumneavoastră să fie dezactivat:</value>
+  </data>
+  <data name="disabled.reasons.tos._" xml:space="preserve">
+    <value>Ați încălcat una sau mai multe dintre {0} sau {1}.</value>
+  </data>
+  <data name="disabled.reasons.tos.community_rules" xml:space="preserve">
+    <value>reguli comunitate</value>
+  </data>
+  <data name="disabled.reasons.tos.tos" xml:space="preserve">
+    <value>termeni de utilizare</value>
+  </data>
+  <data name="force_reactivation.reason.inactive_different_country" xml:space="preserve">
+    <value>Contul dumneavoastră nu a fost folosit într-un timp îndelungat.</value>
+  </data>
+  <data name="login._" xml:space="preserve">
+    <value>Autentifică-te</value>
+  </data>
+  <data name="login.button" xml:space="preserve">
+    <value>Autentifică-te</value>
+  </data>
+  <data name="login.button_posting" xml:space="preserve">
+    <value>Se conectează...</value>
+  </data>
+  <data name="login.email_login_disabled" xml:space="preserve">
+    <value>Înregistrarea cu email este momentan dezactivată. Vă rugăm folosiți numele de utilizator în schimb.</value>
+  </data>
+  <data name="login.failed" xml:space="preserve">
+    <value>Conectare incorectă</value>
+  </data>
+  <data name="login.forgot" xml:space="preserve">
+    <value>Ți-ai uitat parola?</value>
+  </data>
+  <data name="login.info" xml:space="preserve">
+    <value>Pentru a continua, vă rugam să vă autentificaţi</value>
+  </data>
+  <data name="login.invalid_captcha" xml:space="preserve">
+    <value>Prea multe încercări nereușite, vă rugăm să completați captcha și să încercați din nou. (Reîmprospăta pagina dacă captcha nu este vizibilă)</value>
+  </data>
+  <data name="login.locked_ip" xml:space="preserve">
+    <value>adresa ta IP este blocată. Te rugăm să aștepți câteva minute.</value>
+  </data>
+  <data name="login.password" xml:space="preserve">
+    <value>Parolă</value>
+  </data>
+  <data name="login.register" xml:space="preserve">
+    <value>Nu ai un cont osu!? Fă-ți unul nou</value>
+  </data>
+  <data name="login.remember" xml:space="preserve">
+    <value>Ține-mă minte pe acest computer</value>
+  </data>
+  <data name="login.title" xml:space="preserve">
+    <value>Te rog autentifică-te pentru a continua</value>
+  </data>
+  <data name="login.username" xml:space="preserve">
+    <value>Nume de utilizator</value>
+  </data>
+  <data name="login.beta.main" xml:space="preserve">
+    <value>Accesul beta este momentan limitat la utilizatorii autorizați.</value>
+  </data>
+  <data name="login.beta.small" xml:space="preserve">
+    <value>(suporterii osu! vor primi acces curând)</value>
+  </data>
+  <data name="posts.title" xml:space="preserve">
+    <value>Postările lui {0}</value>
+  </data>
+  <data name="anonymous.login_link" xml:space="preserve">
+    <value>dă clic pentru a te conecta</value>
+  </data>
+  <data name="anonymous.login_text" xml:space="preserve">
+    <value>conectează-te</value>
+  </data>
+  <data name="anonymous.username" xml:space="preserve">
+    <value>Vizitator</value>
+  </data>
+  <data name="anonymous.error" xml:space="preserve">
+    <value>Trebuie să fii conectat pentru a face acest lucru.</value>
+  </data>
+  <data name="logout_confirm" xml:space="preserve">
+    <value>Ești sigur că vrei să te deconectezi? :(</value>
+  </data>
+  <data name="report.button_text" xml:space="preserve">
+    <value>raportează</value>
+  </data>
+  <data name="report.comments" xml:space="preserve">
+    <value>Comentarii suplimentare</value>
+  </data>
+  <data name="report.placeholder" xml:space="preserve">
+    <value>Te rugăm să oferi orice informație ce crezi că ar putea fi utilă.</value>
+  </data>
+  <data name="report.reason" xml:space="preserve">
+    <value>Motiv</value>
+  </data>
+  <data name="report.thanks" xml:space="preserve">
+    <value>Mulțumim pentru raportul tău!</value>
+  </data>
+  <data name="report.title" xml:space="preserve">
+    <value>Raportezi pe {0}?</value>
+  </data>
+  <data name="report.actions.send" xml:space="preserve">
+    <value>Trimite raportul</value>
+  </data>
+  <data name="report.actions.cancel" xml:space="preserve">
+    <value>Anulează</value>
+  </data>
+  <data name="report.options.cheating" xml:space="preserve">
+    <value>Cheating</value>
+  </data>
+  <data name="report.options.insults" xml:space="preserve">
+    <value>M-a insultat pe mine / pe alții</value>
+  </data>
+  <data name="report.options.spam" xml:space="preserve">
+    <value>Spam</value>
+  </data>
+  <data name="report.options.unwanted_content" xml:space="preserve">
+    <value>Partajarea unui conținut nepotrivit</value>
+  </data>
+  <data name="report.options.nonsense" xml:space="preserve">
+    <value>Nonsens</value>
+  </data>
+  <data name="report.options.other" xml:space="preserve">
+    <value>Altele (scrie mai jos)</value>
+  </data>
+  <data name="restricted_banner.title" xml:space="preserve">
+    <value>Contul tău a fost restricționat!</value>
+  </data>
+  <data name="restricted_banner.message" xml:space="preserve">
+    <value>Când ești restricționat, nu vei putea să interacționezi cu alți jucători și scorurile tale vor fi vizibile doar pentru tine. Acesta este de obicei rezultatul unui proces automat și, de obicei, în termen de 24 de ore. Dacă dorești să contești, te rugăm să &lt;a href="mailto{0}@ppy.sh"&gt;contactezi asistența&lt;/a&gt;.</value>
+  </data>
+  <data name="show.age" xml:space="preserve">
+    <value>{0} ani</value>
+  </data>
+  <data name="show.change_avatar" xml:space="preserve">
+    <value>schimbă-ți avatarul!</value>
+  </data>
+  <data name="show.first_members" xml:space="preserve">
+    <value>Aici încă de la început</value>
+  </data>
+  <data name="show.is_developer" xml:space="preserve">
+    <value>dezvoltator osu!</value>
+  </data>
+  <data name="show.is_supporter" xml:space="preserve">
+    <value>suporter osu!</value>
+  </data>
+  <data name="show.joined_at" xml:space="preserve">
+    <value>Încris {0}</value>
+  </data>
+  <data name="show.lastvisit" xml:space="preserve">
+    <value>Văzut ultima dată {0}</value>
+  </data>
+  <data name="show.lastvisit_online" xml:space="preserve">
+    <value>Momentat online</value>
+  </data>
+  <data name="show.missingtext" xml:space="preserve">
+    <value>S-ar putea să fi făcut o greșeală de scriere! (sau este posibil ca utilizatorul să fi fost restricționat)</value>
+  </data>
+  <data name="show.origin_country" xml:space="preserve">
+    <value>Din {0}</value>
+  </data>
+  <data name="show.previous_usernames" xml:space="preserve">
+    <value>cunoscut anterior ca</value>
+  </data>
+  <data name="show.plays_with" xml:space="preserve">
+    <value>Joacă cu {0}</value>
+  </data>
+  <data name="show.title" xml:space="preserve">
+    <value>Profilul lui {0}</value>
+  </data>
+  <data name="show.edit.cover.button" xml:space="preserve">
+    <value>Schimbă coperta de profil</value>
+  </data>
+  <data name="show.edit.cover.defaults_info" xml:space="preserve">
+    <value>Mai multe opțiuni de coperte vor fi disponibile în viitor</value>
+  </data>
+  <data name="show.edit.cover.upload.broken_file" xml:space="preserve">
+    <value>Imposibil de procesat imaginea. Verifică imaginea încărcată și încearcă din nou.</value>
+  </data>
+  <data name="show.edit.cover.upload.button" xml:space="preserve">
+    <value>Încarcă imaginea</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone" xml:space="preserve">
+    <value>Plasați fișiere aici pentru a le încărca</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone_info" xml:space="preserve">
+    <value>Poți, de asemenea, să-ți plasezi imaginea aici pentru a o încărca</value>
+  </data>
+  <data name="show.edit.cover.upload.size_info" xml:space="preserve">
+    <value>Dimensiunea coperții trebuie să fie de 2400x620</value>
+  </data>
+  <data name="show.edit.cover.upload.too_large" xml:space="preserve">
+    <value>Fișierul încărcat este prea mare.</value>
+  </data>
+  <data name="show.edit.cover.upload.unsupported_format" xml:space="preserve">
+    <value>Format nesuportat.</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info._" xml:space="preserve">
+    <value>Încărcare disponibilă pentru {0} doar</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info.link" xml:space="preserve">
+    <value>osu!suporteri</value>
+  </data>
+  <data name="show.edit.default_playmode.is_default_tooltip" xml:space="preserve">
+    <value>mod de joc implicit</value>
+  </data>
+  <data name="show.edit.default_playmode.set" xml:space="preserve">
+    <value>setează {0} ca modul de joc implicit al profilului</value>
+  </data>
+  <data name="show.extra.none" xml:space="preserve">
+    <value>niciunul</value>
+  </data>
+  <data name="show.extra.unranked" xml:space="preserve">
+    <value>Nu există jocuri recente</value>
+  </data>
+  <data name="show.extra.achievements.achieved-on" xml:space="preserve">
+    <value>Realizat pe {0}</value>
+  </data>
+  <data name="show.extra.achievements.locked" xml:space="preserve">
+    <value>Blocat</value>
+  </data>
+  <data name="show.extra.achievements.title" xml:space="preserve">
+    <value>Realizări</value>
+  </data>
+  <data name="show.extra.beatmaps.by_artist" xml:space="preserve">
+    <value>de {0}</value>
+  </data>
+  <data name="show.extra.beatmaps.title" xml:space="preserve">
+    <value>Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.favourite.title" xml:space="preserve">
+    <value>Beatmap-uri favorite</value>
+  </data>
+  <data name="show.extra.beatmaps.graveyard.title" xml:space="preserve">
+    <value>Beatmaps îngropate</value>
+  </data>
+  <data name="show.extra.beatmaps.loved.title" xml:space="preserve">
+    <value>Beatmaps iubite</value>
+  </data>
+  <data name="show.extra.beatmaps.ranked_and_approved.title" xml:space="preserve">
+    <value>Beatmaps clasate &amp; aprobate</value>
+  </data>
+  <data name="show.extra.beatmaps.unranked.title" xml:space="preserve">
+    <value>Beatmaps în așteptare</value>
+  </data>
+  <data name="show.extra.discussions.title" xml:space="preserve">
+    <value>Discuții</value>
+  </data>
+  <data name="show.extra.discussions.title_longer" xml:space="preserve">
+    <value>Discuții recente</value>
+  </data>
+  <data name="show.extra.discussions.show_more" xml:space="preserve">
+    <value>vedeți mai multe discuții</value>
+  </data>
+  <data name="show.extra.events.title" xml:space="preserve">
+    <value>Evenimente</value>
+  </data>
+  <data name="show.extra.events.title_longer" xml:space="preserve">
+    <value>Evenimente recente</value>
+  </data>
+  <data name="show.extra.events.show_more" xml:space="preserve">
+    <value>vedeți mai multe evenimente</value>
+  </data>
+  <data name="show.extra.historical.title" xml:space="preserve">
+    <value>Istoric</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.title" xml:space="preserve">
+    <value>Istoricul jocurilor</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.count_label" xml:space="preserve">
+    <value>Jocuri</value>
+  </data>
+  <data name="show.extra.historical.most_played.count" xml:space="preserve">
+    <value>jucat de</value>
+  </data>
+  <data name="show.extra.historical.most_played.title" xml:space="preserve">
+    <value>Cele mai jucate beatmaps</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.accuracy" xml:space="preserve">
+    <value>precizie: {0}</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.title" xml:space="preserve">
+    <value>Jocuri recente (24 de ore)</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.title" xml:space="preserve">
+    <value>Istoricul reluărilor vizionate</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.count_label" xml:space="preserve">
+    <value>Reluări vizionate</value>
+  </data>
+  <data name="show.extra.kudosu.recent_entries" xml:space="preserve">
+    <value>Istoricul Kudosu recent</value>
+  </data>
+  <data name="show.extra.kudosu.title" xml:space="preserve">
+    <value>Kudosu!</value>
+  </data>
+  <data name="show.extra.kudosu.total" xml:space="preserve">
+    <value>Suma totală de Kudosu câștigați</value>
+  </data>
+  <data name="show.extra.kudosu.entry.amount" xml:space="preserve">
+    <value>{0} kudosu</value>
+  </data>
+  <data name="show.extra.kudosu.entry.empty" xml:space="preserve">
+    <value>Acest utilizator nu a primit niciun kudosu!</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.allow_kudosu.give" xml:space="preserve">
+    <value>A primit {0} de la respringerea revocării de kudosu la postarea {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.deny_kudosu.reset" xml:space="preserve">
+    <value>A refuzat {0} de la postarea {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.delete.reset" xml:space="preserve">
+    <value>A pierdut {0} de la ștergerea postării {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.restore.give" xml:space="preserve">
+    <value>A primit {0} de la restaurarea postării {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.give" xml:space="preserve">
+    <value>A primit {0} de la obținerea de voturi în postarea din {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.reset" xml:space="preserve">
+    <value>A pierdut {0} de la pierderea de voturi în postarea din {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.give" xml:space="preserve">
+    <value>A primit {0} de la recalcularea voturilor în postarea din {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.reset" xml:space="preserve">
+    <value>A pierdut {0} de la recalucarea voturilor în postarea din {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.give" xml:space="preserve">
+    <value>A primit {0} de la {1} pentru o postare la {2}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.reset" xml:space="preserve">
+    <value>Kudosu resetați de {0} pentru postarea {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.revoke" xml:space="preserve">
+    <value>Kudosu respinși de {0} pentru postarea {1}</value>
+  </data>
+  <data name="show.extra.kudosu.total_info._" xml:space="preserve">
+    <value>Bazat pe cât de multă contribuție acest utilizator a făcut la moderarea beatmap-ului. Vezi {0} pentru mai multe informații.</value>
+  </data>
+  <data name="show.extra.kudosu.total_info.link" xml:space="preserve">
+    <value>această pagină</value>
+  </data>
+  <data name="show.extra.me.title" xml:space="preserve">
+    <value>eu!</value>
+  </data>
+  <data name="show.extra.medals.empty" xml:space="preserve">
+    <value>Acest utilizator nu a primit nici unul încă. ;_;</value>
+  </data>
+  <data name="show.extra.medals.recent" xml:space="preserve">
+    <value>Recente</value>
+  </data>
+  <data name="show.extra.medals.title" xml:space="preserve">
+    <value>Medalii</value>
+  </data>
+  <data name="show.extra.posts.title" xml:space="preserve">
+    <value>Postări</value>
+  </data>
+  <data name="show.extra.posts.title_longer" xml:space="preserve">
+    <value>Postări recente</value>
+  </data>
+  <data name="show.extra.posts.show_more" xml:space="preserve">
+    <value>vedeți mai multe postări</value>
+  </data>
+  <data name="show.extra.recent_activity.title" xml:space="preserve">
+    <value>Recent</value>
+  </data>
+  <data name="show.extra.top_ranks.download_replay" xml:space="preserve">
+    <value>Descarcă replay-ul</value>
+  </data>
+  <data name="show.extra.top_ranks.not_ranked" xml:space="preserve">
+    <value>Numai beatmaps clasate acordă pp.</value>
+  </data>
+  <data name="show.extra.top_ranks.pp_weight" xml:space="preserve">
+    <value>ponderat {0}</value>
+  </data>
+  <data name="show.extra.top_ranks.view_details" xml:space="preserve">
+    <value>Vezi detalii</value>
+  </data>
+  <data name="show.extra.top_ranks.title" xml:space="preserve">
+    <value>Clasamente</value>
+  </data>
+  <data name="show.extra.top_ranks.best.title" xml:space="preserve">
+    <value>Cele mai bune performanțe</value>
+  </data>
+  <data name="show.extra.top_ranks.first.title" xml:space="preserve">
+    <value>Primele locuri</value>
+  </data>
+  <data name="show.extra.votes.given" xml:space="preserve">
+    <value>Voturi Date (ultimele 3 luni)</value>
+  </data>
+  <data name="show.extra.votes.received" xml:space="preserve">
+    <value>Voturi Primite (ultimele 3 luni)</value>
+  </data>
+  <data name="show.extra.votes.title" xml:space="preserve">
+    <value>Voturi</value>
+  </data>
+  <data name="show.extra.votes.title_longer" xml:space="preserve">
+    <value>Voturi recente</value>
+  </data>
+  <data name="show.extra.votes.vote_count" xml:space="preserve">
+    <value>{0} vot|{0} voturi</value>
+  </data>
+  <data name="show.extra.account_standing.title" xml:space="preserve">
+    <value>Starea contului</value>
+  </data>
+  <data name="show.extra.account_standing.bad_standing" xml:space="preserve">
+    <value>Contul lui &lt;strong&gt;{0}&lt;/strong&gt; nu este într-o stare prea bună :(</value>
+  </data>
+  <data name="show.extra.account_standing.remaining_silence" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; va putea să vorbească din nou în {1}.</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.title" xml:space="preserve">
+    <value>Sancțiuni recente</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.date" xml:space="preserve">
+    <value>data</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.action" xml:space="preserve">
+    <value>acțiune</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length" xml:space="preserve">
+    <value>durată</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length_permanent" xml:space="preserve">
+    <value>Permanent</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.description" xml:space="preserve">
+    <value>descriere</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actor" xml:space="preserve">
+    <value>de {0}</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.restriction" xml:space="preserve">
+    <value>Interdicție</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.silence" xml:space="preserve">
+    <value>Amuțire</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.note" xml:space="preserve">
+    <value>Notă</value>
+  </data>
+  <data name="show.info.interests" xml:space="preserve">
+    <value>Interese</value>
+  </data>
+  <data name="show.info.location" xml:space="preserve">
+    <value>Locația curentă</value>
+  </data>
+  <data name="show.info.occupation" xml:space="preserve">
+    <value>Ocupație</value>
+  </data>
+  <data name="show.info.website" xml:space="preserve">
+    <value>Site web</value>
+  </data>
+  <data name="show.not_found.reason_1" xml:space="preserve">
+    <value>S-ar putea să-și fi schimbat numele de utilizator.</value>
+  </data>
+  <data name="show.not_found.reason_2" xml:space="preserve">
+    <value>Contul tău poate fi indisponibil momentan din cauza problemelor legate de securitate sau abuz.</value>
+  </data>
+  <data name="show.not_found.reason_3" xml:space="preserve">
+    <value>Este posibil să fi făcut o greșeală de scriere!</value>
+  </data>
+  <data name="show.not_found.reason_header" xml:space="preserve">
+    <value>Există câteva motive posibile pentru asta:</value>
+  </data>
+  <data name="show.not_found.title" xml:space="preserve">
+    <value>Utilizatorul nu a fost găsit! ;_;</value>
+  </data>
+  <data name="show.page.button" xml:space="preserve">
+    <value>Editează profilul</value>
+  </data>
+  <data name="show.page.description" xml:space="preserve">
+    <value>&lt;strong&gt;eu!&lt;/strong&gt; este o zonă personală personalizabilă în pagina ta de profil.</value>
+  </data>
+  <data name="show.page.edit_big" xml:space="preserve">
+    <value>Editează-mă!</value>
+  </data>
+  <data name="show.page.placeholder" xml:space="preserve">
+    <value>Introdu conținutul paginii aici</value>
+  </data>
+  <data name="show.page.restriction_info._" xml:space="preserve">
+    <value>Trebuie să fii un {0} să deblochezi acest feature.</value>
+  </data>
+  <data name="show.page.restriction_info.link" xml:space="preserve">
+    <value>osu!ajutător</value>
+  </data>
+  <data name="show.post_count._" xml:space="preserve">
+    <value>A contribuit la {0}</value>
+  </data>
+  <data name="show.post_count.count" xml:space="preserve">
+    <value>{0} postare pe forum|{0} posări pe forum</value>
+  </data>
+  <data name="show.rank.country" xml:space="preserve">
+    <value>Clasament pe țară pentru {0}</value>
+  </data>
+  <data name="show.rank.country_simple" xml:space="preserve">
+    <value>Clasament pe țară</value>
+  </data>
+  <data name="show.rank.global" xml:space="preserve">
+    <value>Clasament global pentru {0}</value>
+  </data>
+  <data name="show.rank.global_simple" xml:space="preserve">
+    <value>Clasament global</value>
+  </data>
+  <data name="show.stats.hit_accuracy" xml:space="preserve">
+    <value>Precizie</value>
+  </data>
+  <data name="show.stats.level" xml:space="preserve">
+    <value>Nivelul {0}</value>
+  </data>
+  <data name="show.stats.level_progress" xml:space="preserve">
+    <value>Progres până la nivelul următor</value>
+  </data>
+  <data name="show.stats.maximum_combo" xml:space="preserve">
+    <value>Combo maxim</value>
+  </data>
+  <data name="show.stats.medals" xml:space="preserve">
+    <value>Medalii</value>
+  </data>
+  <data name="show.stats.play_count" xml:space="preserve">
+    <value>Număr de jocuri</value>
+  </data>
+  <data name="show.stats.play_time" xml:space="preserve">
+    <value>Timpul total de joc</value>
+  </data>
+  <data name="show.stats.ranked_score" xml:space="preserve">
+    <value>Scor clasat</value>
+  </data>
+  <data name="show.stats.replays_watched_by_others" xml:space="preserve">
+    <value>Istoria reluărilor vizionate de alții</value>
+  </data>
+  <data name="show.stats.score_ranks" xml:space="preserve">
+    <value>Clasament de scoruri</value>
+  </data>
+  <data name="show.stats.total_hits" xml:space="preserve">
+    <value>Număr de clicuri</value>
+  </data>
+  <data name="show.stats.total_score" xml:space="preserve">
+    <value>Scor total</value>
+  </data>
+  <data name="show.stats.ranked_and_approved_beatmapset_count" xml:space="preserve">
+    <value>Beatmap-uri Clasate &amp; Aprobate</value>
+  </data>
+  <data name="show.stats.loved_beatmapset_count" xml:space="preserve">
+    <value>Beatmap-uri iubite</value>
+  </data>
+  <data name="show.stats.unranked_beatmapset_count" xml:space="preserve">
+    <value>Beatmap-uri în așteptare</value>
+  </data>
+  <data name="show.stats.graveyard_beatmapset_count" xml:space="preserve">
+    <value>Beatmap-uri Îngropate</value>
+  </data>
+  <data name="status.all" xml:space="preserve">
+    <value>Tot</value>
+  </data>
+  <data name="status.online" xml:space="preserve">
+    <value>Online</value>
+  </data>
+  <data name="status.offline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="store.saved" xml:space="preserve">
+    <value>Utilizator creat</value>
+  </data>
+  <data name="verify.title" xml:space="preserve">
+    <value>Verificarea contului</value>
+  </data>
+  <data name="view_mode.brick" xml:space="preserve">
+    <value>Vedere brick</value>
+  </data>
+  <data name="view_mode.card" xml:space="preserve">
+    <value>Vedere card</value>
+  </data>
+  <data name="view_mode.list" xml:space="preserve">
+    <value>Vedere listă</value>
+  </data>
+</root>

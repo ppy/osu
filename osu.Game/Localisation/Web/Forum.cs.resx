@@ -1,0 +1,496 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="pinned_topics" xml:space="preserve">
+    <value>Připnuté témata</value>
+  </data>
+  <data name="slogan" xml:space="preserve">
+    <value>je nebezpečné hrát sám.</value>
+  </data>
+  <data name="subforums" xml:space="preserve">
+    <value>Subfóra</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>osu! fóra</value>
+  </data>
+  <data name="covers.create._" xml:space="preserve">
+    <value>Přidat titulní obrázek</value>
+  </data>
+  <data name="covers.create.button" xml:space="preserve">
+    <value>Nahrát obrázek</value>
+  </data>
+  <data name="covers.create.info" xml:space="preserve">
+    <value>Velikost titulního obrázku by měla mít velikost {0}. Obrázek zde také můžete přetáhnout.</value>
+  </data>
+  <data name="covers.destroy._" xml:space="preserve">
+    <value>Odebrat titulní obrázek</value>
+  </data>
+  <data name="covers.destroy.confirm" xml:space="preserve">
+    <value>Jste si jist, že chcete odebrat titulní obrázek?</value>
+  </data>
+  <data name="forums.latest_post" xml:space="preserve">
+    <value>Poslední příspěvek</value>
+  </data>
+  <data name="forums.topics.empty" xml:space="preserve">
+    <value>Žádná témata!</value>
+  </data>
+  <data name="mark_as_read.forum" xml:space="preserve">
+    <value>Označit fórum jako přečtené</value>
+  </data>
+  <data name="mark_as_read.forums" xml:space="preserve">
+    <value>Označit fóra jako přečtená</value>
+  </data>
+  <data name="mark_as_read.busy" xml:space="preserve">
+    <value>Označuju jako přečtené...</value>
+  </data>
+  <data name="post.confirm_destroy" xml:space="preserve">
+    <value>Opravdu chcete příspěvek odstranit?</value>
+  </data>
+  <data name="post.confirm_restore" xml:space="preserve">
+    <value>Opravdu chcete příspěvek obnovit?</value>
+  </data>
+  <data name="post.edited" xml:space="preserve">
+    <value>Naposledy upravil {0} {1}, celkový počet úprav {2}.</value>
+  </data>
+  <data name="post.posted_at" xml:space="preserve">
+    <value>publikováno {0}</value>
+  </data>
+  <data name="post.actions.destroy" xml:space="preserve">
+    <value>Odstranit příspěvek</value>
+  </data>
+  <data name="post.actions.edit" xml:space="preserve">
+    <value>Upravit příspěvek</value>
+  </data>
+  <data name="post.actions.restore" xml:space="preserve">
+    <value>Obnovit příspěvek</value>
+  </data>
+  <data name="post.create.title.reply" xml:space="preserve">
+    <value>Nová odpověď</value>
+  </data>
+  <data name="post.info.post_count" xml:space="preserve">
+    <value>{0} příspěvek|{0} příspěvky|{0} příspěvků</value>
+  </data>
+  <data name="search.go_to_post" xml:space="preserve">
+    <value>Přejít na příspěvek</value>
+  </data>
+  <data name="search.post_number_input" xml:space="preserve">
+    <value>zadejte číslo příspěvku</value>
+  </data>
+  <data name="search.total_posts" xml:space="preserve">
+    <value>{0} počet příspěvků</value>
+  </data>
+  <data name="topic.deleted" xml:space="preserve">
+    <value>odstraněné téma</value>
+  </data>
+  <data name="topic.go_to_latest" xml:space="preserve">
+    <value>zobrazit nejnovější příspěvek</value>
+  </data>
+  <data name="topic.latest_post" xml:space="preserve">
+    <value>{0} uživatelem {1}</value>
+  </data>
+  <data name="topic.latest_reply_by" xml:space="preserve">
+    <value>poslední odpověd od {0}</value>
+  </data>
+  <data name="topic.new_topic" xml:space="preserve">
+    <value>Založit nové téma</value>
+  </data>
+  <data name="topic.new_topic_login" xml:space="preserve">
+    <value>Přihlaš se k vytvoření nového téma</value>
+  </data>
+  <data name="topic.post_reply" xml:space="preserve">
+    <value>Přidat příspěvek</value>
+  </data>
+  <data name="topic.reply_box_placeholder" xml:space="preserve">
+    <value>Pro zodpovězení klikni sem</value>
+  </data>
+  <data name="topic.reply_title_prefix" xml:space="preserve">
+    <value>Re</value>
+  </data>
+  <data name="topic.started_by" xml:space="preserve">
+    <value>od {0}</value>
+  </data>
+  <data name="topic.started_by_verbose" xml:space="preserve">
+    <value>započal {0}</value>
+  </data>
+  <data name="topic.create.close" xml:space="preserve">
+    <value>Zavřít</value>
+  </data>
+  <data name="topic.create.preview" xml:space="preserve">
+    <value>Náhled</value>
+  </data>
+  <data name="topic.create.preview_hide" xml:space="preserve">
+    <value>Psát</value>
+  </data>
+  <data name="topic.create.submit" xml:space="preserve">
+    <value>Odeslat</value>
+  </data>
+  <data name="topic.create.necropost.default" xml:space="preserve">
+    <value>Tohle téma bylo neaktivní už nějakou dobu. Napište pouze jesli k tomu máš důvod.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic._" xml:space="preserve">
+    <value>Toto téma je neaktivní už nějakou dobu. Pokud nemáte důvod k napsaní, prosím {0} radši.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic.create" xml:space="preserve">
+    <value>vytvoř nové téma</value>
+  </data>
+  <data name="topic.create.placeholder.body" xml:space="preserve">
+    <value>Zde napiš obsah příspěvku</value>
+  </data>
+  <data name="topic.create.placeholder.title" xml:space="preserve">
+    <value>Klikni sem pro nastavení názvu</value>
+  </data>
+  <data name="topic.jump.enter" xml:space="preserve">
+    <value>klikni pro zadání přesného čísla příspěvku</value>
+  </data>
+  <data name="topic.jump.first" xml:space="preserve">
+    <value>přejít na první příspěvek</value>
+  </data>
+  <data name="topic.jump.last" xml:space="preserve">
+    <value>přejít na poslední příspěvek</value>
+  </data>
+  <data name="topic.jump.next" xml:space="preserve">
+    <value>přeskočit 10 příspěvků</value>
+  </data>
+  <data name="topic.jump.previous" xml:space="preserve">
+    <value>vrátit se o 10 příspěvků</value>
+  </data>
+  <data name="topic.post_edit.cancel" xml:space="preserve">
+    <value>Zrušit</value>
+  </data>
+  <data name="topic.post_edit.post" xml:space="preserve">
+    <value>Uložit</value>
+  </data>
+  <data name="topic_watches.index.title_compact" xml:space="preserve">
+    <value>sledovaná fóra</value>
+  </data>
+  <data name="topic_watches.index.box.total" xml:space="preserve">
+    <value>Počet sledovaných témat</value>
+  </data>
+  <data name="topic_watches.index.box.unread" xml:space="preserve">
+    <value>Témata s novými odpověďmi</value>
+  </data>
+  <data name="topic_watches.index.info.total" xml:space="preserve">
+    <value>Sledujete {0} témat.</value>
+  </data>
+  <data name="topic_watches.index.info.unread" xml:space="preserve">
+    <value>Máš {0} nepřečtených odpovědí ve sledovaných tématech.</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.confirmation" xml:space="preserve">
+    <value>Přestat sledovat téma?</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.title" xml:space="preserve">
+    <value>Přestat sledovat</value>
+  </data>
+  <data name="topics._" xml:space="preserve">
+    <value>Témata</value>
+  </data>
+  <data name="topics.actions.login_reply" xml:space="preserve">
+    <value>Pro přidání odpovědi se musíte přihlásit</value>
+  </data>
+  <data name="topics.actions.reply" xml:space="preserve">
+    <value>Odpovědět</value>
+  </data>
+  <data name="topics.actions.reply_with_quote" xml:space="preserve">
+    <value>Citovat příspěvek v odpovědi</value>
+  </data>
+  <data name="topics.actions.search" xml:space="preserve">
+    <value>Vyhledat</value>
+  </data>
+  <data name="topics.create.create_poll" xml:space="preserve">
+    <value>Vytvoření ankety</value>
+  </data>
+  <data name="topics.create.preview" xml:space="preserve">
+    <value>Náhled příspěvku</value>
+  </data>
+  <data name="topics.create.create_poll_button.add" xml:space="preserve">
+    <value>Vytvořit anketu</value>
+  </data>
+  <data name="topics.create.create_poll_button.remove" xml:space="preserve">
+    <value>Zrušit vytváření ankety</value>
+  </data>
+  <data name="topics.create.poll.length" xml:space="preserve">
+    <value>Spustit anketu po dobu</value>
+  </data>
+  <data name="topics.create.poll.length_days_suffix" xml:space="preserve">
+    <value>dnů</value>
+  </data>
+  <data name="topics.create.poll.length_info" xml:space="preserve">
+    <value>Ponechte prázdné pro dobu neurčitou</value>
+  </data>
+  <data name="topics.create.poll.max_options" xml:space="preserve">
+    <value>Výběrů na uživatele</value>
+  </data>
+  <data name="topics.create.poll.max_options_info" xml:space="preserve">
+    <value>Tohle je počet možností, které může uživatel v anketě zaškrtnout.</value>
+  </data>
+  <data name="topics.create.poll.options" xml:space="preserve">
+    <value>Možnosti</value>
+  </data>
+  <data name="topics.create.poll.options_info" xml:space="preserve">
+    <value>Vložte jednu možnost na jeden řádek. Můžete vložit až 10 možností.</value>
+  </data>
+  <data name="topics.create.poll.title" xml:space="preserve">
+    <value>Otázka</value>
+  </data>
+  <data name="topics.create.poll.vote_change" xml:space="preserve">
+    <value>Povolit změnu vybrané možnosti.</value>
+  </data>
+  <data name="topics.create.poll.vote_change_info" xml:space="preserve">
+    <value>Je-li povoleno, uživatelé mohou změnit svůj hlas.</value>
+  </data>
+  <data name="topics.edit_title.start" xml:space="preserve">
+    <value>Upravit název</value>
+  </data>
+  <data name="topics.index.feature_votes" xml:space="preserve">
+    <value>priorita hvězd</value>
+  </data>
+  <data name="topics.index.replies" xml:space="preserve">
+    <value>odpovědi</value>
+  </data>
+  <data name="topics.index.views" xml:space="preserve">
+    <value>zobrazení</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0" xml:space="preserve">
+    <value>Odstranit označení "přidáno"</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0_done" xml:space="preserve">
+    <value>Odstraněno označení "přidáno"</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1" xml:space="preserve">
+    <value>Přidat označení "přidáno"</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1_done" xml:space="preserve">
+    <value>Přidáno označení "přidáno"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0" xml:space="preserve">
+    <value>Odstranit označení "přiděleno"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0_done" xml:space="preserve">
+    <value>Odstraněno označení "přiděleno"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1" xml:space="preserve">
+    <value>Přidat označení "přiděleno"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1_done" xml:space="preserve">
+    <value>Přidáno označení "přiděleno"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0" xml:space="preserve">
+    <value>Odstranit označení "potvrzeno"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0_done" xml:space="preserve">
+    <value>Odstraněno označení "potvrzeno"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1" xml:space="preserve">
+    <value>Přidat označení "potvrzeno"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1_done" xml:space="preserve">
+    <value>Přidáno označení "potrvrzeno"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0" xml:space="preserve">
+    <value>Odstranit označení "duplicitní"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0_done" xml:space="preserve">
+    <value>Odstraněno označení "duplicitní"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1" xml:space="preserve">
+    <value>Přidat označení "duplicitní"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1_done" xml:space="preserve">
+    <value>Přidáno označení "duplicitní"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0" xml:space="preserve">
+    <value>Odstranit označení "neplatný"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0_done" xml:space="preserve">
+    <value>Odstraněno označení "neplatný"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1" xml:space="preserve">
+    <value>Přidat označení "neplatný"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1_done" xml:space="preserve">
+    <value>Přidáno označení "neplatný"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0" xml:space="preserve">
+    <value>Odstranit označení "vyřešeno"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0_done" xml:space="preserve">
+    <value>Odstraněno označení "vyřešeno"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1" xml:space="preserve">
+    <value>Přidat oznaění "vyřešeno"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1_done" xml:space="preserve">
+    <value>Přidáno označení "vyřešeno"</value>
+  </data>
+  <data name="topics.lock.is_locked" xml:space="preserve">
+    <value>Toto téma je uzamčené a nelze na něj odpovědět</value>
+  </data>
+  <data name="topics.lock.to_0" xml:space="preserve">
+    <value>Odemknout téma</value>
+  </data>
+  <data name="topics.lock.to_0_done" xml:space="preserve">
+    <value>Téma bylo odemčeno</value>
+  </data>
+  <data name="topics.lock.to_1" xml:space="preserve">
+    <value>Uzamknout téma</value>
+  </data>
+  <data name="topics.lock.to_1_done" xml:space="preserve">
+    <value>Téma bylo uzamčeno</value>
+  </data>
+  <data name="topics.moderate_move.title" xml:space="preserve">
+    <value>Přesunout do jiného fóra</value>
+  </data>
+  <data name="topics.moderate_pin.to_0" xml:space="preserve">
+    <value>Odepnout téma</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_done" xml:space="preserve">
+    <value>Téma bylo odepnuto</value>
+  </data>
+  <data name="topics.moderate_pin.to_1" xml:space="preserve">
+    <value>Připnout téma</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_done" xml:space="preserve">
+    <value>Téma bylo připnuto</value>
+  </data>
+  <data name="topics.moderate_pin.to_2" xml:space="preserve">
+    <value>Připíchni téma a označ jako oznámení</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_done" xml:space="preserve">
+    <value>Téma bylo připnuto a označeno jako oznámení</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.show" xml:space="preserve">
+    <value>Zobrazit smazané příspěvky</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.hide" xml:space="preserve">
+    <value>Skrýt smazané příspěvky</value>
+  </data>
+  <data name="topics.show.deleted-posts" xml:space="preserve">
+    <value>Odstraněné příspěvky</value>
+  </data>
+  <data name="topics.show.total_posts" xml:space="preserve">
+    <value>Celkem příspěvků</value>
+  </data>
+  <data name="topics.show.feature_vote.current" xml:space="preserve">
+    <value>Aktuální priorita: +{0}</value>
+  </data>
+  <data name="topics.show.feature_vote.do" xml:space="preserve">
+    <value>Promovat tento požadavek</value>
+  </data>
+  <data name="topics.show.feature_vote.info._" xml:space="preserve">
+    <value>Tohle je {0}. Žádosti o nové funkce mohou dostávat hlasy od {1}.</value>
+  </data>
+  <data name="topics.show.feature_vote.info.feature_request" xml:space="preserve">
+    <value>žádost o novou funkci</value>
+  </data>
+  <data name="topics.show.feature_vote.info.supporters" xml:space="preserve">
+    <value>podporovatelů</value>
+  </data>
+  <data name="topics.show.feature_vote.user.count" xml:space="preserve">
+    <value>{0} žádné hlasy | {1} {0} hlas | [2,*] {0} hlasů</value>
+  </data>
+  <data name="topics.show.feature_vote.user.current" xml:space="preserve">
+    <value>Zbývá vám {0}.</value>
+  </data>
+  <data name="topics.show.feature_vote.user.not_enough" xml:space="preserve">
+    <value>Nemáte žádné další hlasy</value>
+  </data>
+  <data name="topics.show.poll.edit" xml:space="preserve">
+    <value>Upravení ankety</value>
+  </data>
+  <data name="topics.show.poll.vote" xml:space="preserve">
+    <value>Hlasovat</value>
+  </data>
+  <data name="topics.show.poll.button.change_vote" xml:space="preserve">
+    <value>Změnit hlas</value>
+  </data>
+  <data name="topics.show.poll.button.edit" xml:space="preserve">
+    <value>Upravit hlasování</value>
+  </data>
+  <data name="topics.show.poll.button.view_results" xml:space="preserve">
+    <value>Přeskočit na výsledky</value>
+  </data>
+  <data name="topics.show.poll.button.vote" xml:space="preserve">
+    <value>Hlasovat</value>
+  </data>
+  <data name="topics.show.poll.detail.end_time" xml:space="preserve">
+    <value>Hlasování skončí za {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.ended" xml:space="preserve">
+    <value>Hlasování skončilo {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.total" xml:space="preserve">
+    <value>Celkem hlasů: {0}</value>
+  </data>
+  <data name="topics.watch.to_not_watching" xml:space="preserve">
+    <value>Nezáložkováno</value>
+  </data>
+  <data name="topics.watch.to_watching" xml:space="preserve">
+    <value>Záložka</value>
+  </data>
+  <data name="topics.watch.to_watching_mail" xml:space="preserve">
+    <value>Záložka s oznámením</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_disable" xml:space="preserve">
+    <value>Notifikace je zapnutá. Klikněte pro vypnutí</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_enable" xml:space="preserve">
+    <value>Notifikace je vypnutá. Klikněte pro zapnutí</value>
+  </data>
+</root>

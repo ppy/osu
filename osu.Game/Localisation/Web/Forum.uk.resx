@@ -1,0 +1,556 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="pinned_topics" xml:space="preserve">
+    <value>Закріплені теми</value>
+  </data>
+  <data name="slogan" xml:space="preserve">
+    <value>небезпечно грати одному.</value>
+  </data>
+  <data name="subforums" xml:space="preserve">
+    <value>Підфоруми</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>osu! форуми</value>
+  </data>
+  <data name="covers.edit" xml:space="preserve">
+    <value>Редагувати обкладинку</value>
+  </data>
+  <data name="covers.create._" xml:space="preserve">
+    <value>Встановити зображення обкладинки</value>
+  </data>
+  <data name="covers.create.button" xml:space="preserve">
+    <value>Завантажити зображення</value>
+  </data>
+  <data name="covers.create.info" xml:space="preserve">
+    <value>Роздільна здатність зображення повинно бути {0}. Для завантаження зображення, ви можете просто кинути його сюди.</value>
+  </data>
+  <data name="covers.destroy._" xml:space="preserve">
+    <value>Видалити зображення обкладинки</value>
+  </data>
+  <data name="covers.destroy.confirm" xml:space="preserve">
+    <value>Ви впевнені, що хочете видалити зображення обкладинки?</value>
+  </data>
+  <data name="forums.latest_post" xml:space="preserve">
+    <value>Останній пост</value>
+  </data>
+  <data name="forums.index.title" xml:space="preserve">
+    <value>Список форумів</value>
+  </data>
+  <data name="forums.topics.empty" xml:space="preserve">
+    <value>Тем немає!</value>
+  </data>
+  <data name="mark_as_read.forum" xml:space="preserve">
+    <value>Позначити розділ як прочитаний</value>
+  </data>
+  <data name="mark_as_read.forums" xml:space="preserve">
+    <value>Позначити розділи як прочитані</value>
+  </data>
+  <data name="mark_as_read.busy" xml:space="preserve">
+    <value>Відмічається як прочитане...</value>
+  </data>
+  <data name="post.confirm_destroy" xml:space="preserve">
+    <value>Видалити відповідь?</value>
+  </data>
+  <data name="post.confirm_restore" xml:space="preserve">
+    <value>Відновити відповідь?</value>
+  </data>
+  <data name="post.edited" xml:space="preserve">
+    <value>Останній раз відредагований {0} {1}, відредагований {2} раз.</value>
+  </data>
+  <data name="post.posted_at" xml:space="preserve">
+    <value>написано {0}</value>
+  </data>
+  <data name="post.posted_by" xml:space="preserve">
+    <value>опубліковано {0}</value>
+  </data>
+  <data name="post.actions.destroy" xml:space="preserve">
+    <value>Видалити відповідь</value>
+  </data>
+  <data name="post.actions.edit" xml:space="preserve">
+    <value>Редагувати відповідь</value>
+  </data>
+  <data name="post.actions.report" xml:space="preserve">
+    <value>Звытувати пост</value>
+  </data>
+  <data name="post.actions.restore" xml:space="preserve">
+    <value>Відновити відповідь</value>
+  </data>
+  <data name="post.create.title.reply" xml:space="preserve">
+    <value>Нова відповідь</value>
+  </data>
+  <data name="post.info.post_count" xml:space="preserve">
+    <value>{0} пост|{0} постів</value>
+  </data>
+  <data name="post.info.topic_starter" xml:space="preserve">
+    <value>Автор теми</value>
+  </data>
+  <data name="search.go_to_post" xml:space="preserve">
+    <value>Перейти до відповіді</value>
+  </data>
+  <data name="search.post_number_input" xml:space="preserve">
+    <value>введіть номер відповіді</value>
+  </data>
+  <data name="search.total_posts" xml:space="preserve">
+    <value>{0} відповідей</value>
+  </data>
+  <data name="topic.confirm_destroy" xml:space="preserve">
+    <value>Дійсно видалити тему?</value>
+  </data>
+  <data name="topic.confirm_restore" xml:space="preserve">
+    <value>Дійсно відновити тему</value>
+  </data>
+  <data name="topic.deleted" xml:space="preserve">
+    <value>видалена тема</value>
+  </data>
+  <data name="topic.go_to_latest" xml:space="preserve">
+    <value>показати останню відповідь</value>
+  </data>
+  <data name="topic.has_replied" xml:space="preserve">
+    <value>Ви відповідали на цю тему</value>
+  </data>
+  <data name="topic.in_forum" xml:space="preserve">
+    <value>в {0}</value>
+  </data>
+  <data name="topic.latest_post" xml:space="preserve">
+    <value>{0} від {1}</value>
+  </data>
+  <data name="topic.latest_reply_by" xml:space="preserve">
+    <value>остання відповідь від {0}</value>
+  </data>
+  <data name="topic.new_topic" xml:space="preserve">
+    <value>Нова тема</value>
+  </data>
+  <data name="topic.new_topic_login" xml:space="preserve">
+    <value>Увійдіть, щоб створити нову тему</value>
+  </data>
+  <data name="topic.post_reply" xml:space="preserve">
+    <value>Відповісти</value>
+  </data>
+  <data name="topic.reply_box_placeholder" xml:space="preserve">
+    <value>Введіть текст для відповіді</value>
+  </data>
+  <data name="topic.reply_title_prefix" xml:space="preserve">
+    <value>Відповідь</value>
+  </data>
+  <data name="topic.started_by" xml:space="preserve">
+    <value>від {0}</value>
+  </data>
+  <data name="topic.started_by_verbose" xml:space="preserve">
+    <value>почато {0}</value>
+  </data>
+  <data name="topic.actions.destroy" xml:space="preserve">
+    <value>Видалити тему</value>
+  </data>
+  <data name="topic.actions.restore" xml:space="preserve">
+    <value>Відновити тему</value>
+  </data>
+  <data name="topic.create.close" xml:space="preserve">
+    <value>Закрити</value>
+  </data>
+  <data name="topic.create.preview" xml:space="preserve">
+    <value>Попередній перегляд</value>
+  </data>
+  <data name="topic.create.preview_hide" xml:space="preserve">
+    <value>Написати</value>
+  </data>
+  <data name="topic.create.submit" xml:space="preserve">
+    <value>Опублікувати</value>
+  </data>
+  <data name="topic.create.necropost.default" xml:space="preserve">
+    <value>Дана тема була довгий час неактивна. Додавайте сюди записи, тільки якщо у вас є на те вагома причина.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic._" xml:space="preserve">
+    <value>Дана тема була довгий час неактивна. Якщо у вас немає причин додавати сюди коментарі, будь ласка {0}.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic.create" xml:space="preserve">
+    <value>створіть нову тему</value>
+  </data>
+  <data name="topic.create.placeholder.body" xml:space="preserve">
+    <value>Введіть вміст сторінки</value>
+  </data>
+  <data name="topic.create.placeholder.title" xml:space="preserve">
+    <value>Заголовок теми</value>
+  </data>
+  <data name="topic.jump.enter" xml:space="preserve">
+    <value>натисніть для переходу до певної відповіді</value>
+  </data>
+  <data name="topic.jump.first" xml:space="preserve">
+    <value>перейти до першої відповіді</value>
+  </data>
+  <data name="topic.jump.last" xml:space="preserve">
+    <value>перейти до останньої відповіді</value>
+  </data>
+  <data name="topic.jump.next" xml:space="preserve">
+    <value>пропустити наступні 10 відповідей</value>
+  </data>
+  <data name="topic.jump.previous" xml:space="preserve">
+    <value>повернутися до попередніх 10 відповідей</value>
+  </data>
+  <data name="topic.post_edit.cancel" xml:space="preserve">
+    <value>Відмінити</value>
+  </data>
+  <data name="topic.post_edit.post" xml:space="preserve">
+    <value>Зберегти</value>
+  </data>
+  <data name="topic_watches.index.title_compact" xml:space="preserve">
+    <value>підписки на теми</value>
+  </data>
+  <data name="topic_watches.index.box.total" xml:space="preserve">
+    <value>Підписок на теми</value>
+  </data>
+  <data name="topic_watches.index.box.unread" xml:space="preserve">
+    <value>З новими відповідями</value>
+  </data>
+  <data name="topic_watches.index.info.total" xml:space="preserve">
+    <value>Всього підписок {0}.</value>
+  </data>
+  <data name="topic_watches.index.info.unread" xml:space="preserve">
+    <value>У вас {0} непрочитаних відповідей до тем, за якими ви стежите.</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.confirmation" xml:space="preserve">
+    <value>Відписатися від теми?</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.title" xml:space="preserve">
+    <value>Відписатись</value>
+  </data>
+  <data name="topics._" xml:space="preserve">
+    <value>Теми</value>
+  </data>
+  <data name="topics.actions.login_reply" xml:space="preserve">
+    <value>Увійдіть, щоб відповісти</value>
+  </data>
+  <data name="topics.actions.reply" xml:space="preserve">
+    <value>Відповісти</value>
+  </data>
+  <data name="topics.actions.reply_with_quote" xml:space="preserve">
+    <value>Відповісти з цитуванням</value>
+  </data>
+  <data name="topics.actions.search" xml:space="preserve">
+    <value>Шукати</value>
+  </data>
+  <data name="topics.create.create_poll" xml:space="preserve">
+    <value>Створення опитування</value>
+  </data>
+  <data name="topics.create.preview" xml:space="preserve">
+    <value>Попередній перегляд</value>
+  </data>
+  <data name="topics.create.create_poll_button.add" xml:space="preserve">
+    <value>Створити опитування</value>
+  </data>
+  <data name="topics.create.create_poll_button.remove" xml:space="preserve">
+    <value>Скасувати опитування</value>
+  </data>
+  <data name="topics.create.poll.hide_results" xml:space="preserve">
+    <value>Приховати результати опитування.</value>
+  </data>
+  <data name="topics.create.poll.hide_results_info" xml:space="preserve">
+    <value>Вони будуть показані тільки після закінчення опитування.</value>
+  </data>
+  <data name="topics.create.poll.length" xml:space="preserve">
+    <value>Опитування має тривати</value>
+  </data>
+  <data name="topics.create.poll.length_days_suffix" xml:space="preserve">
+    <value>днів</value>
+  </data>
+  <data name="topics.create.poll.length_info" xml:space="preserve">
+    <value>Залиште порожнім для зняття обмеження</value>
+  </data>
+  <data name="topics.create.poll.max_options" xml:space="preserve">
+    <value>Кількість відповідей</value>
+  </data>
+  <data name="topics.create.poll.max_options_info" xml:space="preserve">
+    <value>Вкажіть кількість варіантів, за які зможе проголосувати кожен користувач.</value>
+  </data>
+  <data name="topics.create.poll.options" xml:space="preserve">
+    <value>Варіанти відповіді</value>
+  </data>
+  <data name="topics.create.poll.options_info" xml:space="preserve">
+    <value>Кожен варіант в новому рядку. Ти можеш ввести до 10 варіантів.</value>
+  </data>
+  <data name="topics.create.poll.title" xml:space="preserve">
+    <value>Питання</value>
+  </data>
+  <data name="topics.create.poll.vote_change" xml:space="preserve">
+    <value>Дозволити повторну відповідь.</value>
+  </data>
+  <data name="topics.create.poll.vote_change_info" xml:space="preserve">
+    <value>Якщо включено, користувачі зможуть змінити свою відповідь.</value>
+  </data>
+  <data name="topics.edit_title.start" xml:space="preserve">
+    <value>Редагувати заголовок</value>
+  </data>
+  <data name="topics.index.feature_votes" xml:space="preserve">
+    <value>кількість голосів</value>
+  </data>
+  <data name="topics.index.replies" xml:space="preserve">
+    <value>відповідей</value>
+  </data>
+  <data name="topics.index.views" xml:space="preserve">
+    <value>переглядів</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0" xml:space="preserve">
+    <value>Прибрати тег "додано"</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0_done" xml:space="preserve">
+    <value>Прибрано тег "додано"</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1" xml:space="preserve">
+    <value>Додати тег "додано"</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1_done" xml:space="preserve">
+    <value>Додано тег "додано"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0" xml:space="preserve">
+    <value>Прибрати тег "присвоєно"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0_done" xml:space="preserve">
+    <value>Прибрано тег "присвоєно"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1" xml:space="preserve">
+    <value>Додати тег "присвоєно"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1_done" xml:space="preserve">
+    <value>Додано тег "присвоєно"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0" xml:space="preserve">
+    <value>Прибрати тег "підтверджено"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0_done" xml:space="preserve">
+    <value>Прибрано тег "підтверджено"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1" xml:space="preserve">
+    <value>Додати тег "підтверджено"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1_done" xml:space="preserve">
+    <value>Додано тег "підтверджено"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0" xml:space="preserve">
+    <value>Прибрати тег "дублікат"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0_done" xml:space="preserve">
+    <value>Прибрати тег "дублікат"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1" xml:space="preserve">
+    <value>Додати тег "дублікат"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1_done" xml:space="preserve">
+    <value>Додано тег "дублікат"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0" xml:space="preserve">
+    <value>Прибрати тег "недійсне"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0_done" xml:space="preserve">
+    <value>Прибрано тег "недійсне"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1" xml:space="preserve">
+    <value>Додати тег "недійсне"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1_done" xml:space="preserve">
+    <value>Додано тег "недійсне"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0" xml:space="preserve">
+    <value>Прибрати тег "вирішено"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0_done" xml:space="preserve">
+    <value>Прибрано тег "вирішено"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1" xml:space="preserve">
+    <value>Додати тег "вирішено"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1_done" xml:space="preserve">
+    <value>Додано тег "вирішено"</value>
+  </data>
+  <data name="topics.lock.is_locked" xml:space="preserve">
+    <value>Ця тема закрита відповідати в ній неможливо</value>
+  </data>
+  <data name="topics.lock.to_0" xml:space="preserve">
+    <value>Відкрити тему</value>
+  </data>
+  <data name="topics.lock.to_0_confirm" xml:space="preserve">
+    <value>Відкрити тему?</value>
+  </data>
+  <data name="topics.lock.to_0_done" xml:space="preserve">
+    <value>Тему відкрито</value>
+  </data>
+  <data name="topics.lock.to_1" xml:space="preserve">
+    <value>Закрити тему</value>
+  </data>
+  <data name="topics.lock.to_1_confirm" xml:space="preserve">
+    <value>Закрити тему?</value>
+  </data>
+  <data name="topics.lock.to_1_done" xml:space="preserve">
+    <value>Тему закрито</value>
+  </data>
+  <data name="topics.moderate_move.title" xml:space="preserve">
+    <value>Перемістити на інший форум</value>
+  </data>
+  <data name="topics.moderate_pin.to_0" xml:space="preserve">
+    <value>Відкріпити тему</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_confirm" xml:space="preserve">
+    <value>Вiдкрiпити тему?</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_done" xml:space="preserve">
+    <value>Тему відкріплено</value>
+  </data>
+  <data name="topics.moderate_pin.to_1" xml:space="preserve">
+    <value>Закріпити тему</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_confirm" xml:space="preserve">
+    <value>Закрiпити тему?</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_done" xml:space="preserve">
+    <value>Тему закріплено</value>
+  </data>
+  <data name="topics.moderate_pin.to_2" xml:space="preserve">
+    <value>Закріпити тему і відмітити як анонс</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_confirm" xml:space="preserve">
+    <value>Закрiпити тему і позначити як оголошення?</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_done" xml:space="preserve">
+    <value>Тему закріплено і відзначено як анонс</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.show" xml:space="preserve">
+    <value>Показати видалені пости</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.hide" xml:space="preserve">
+    <value>Приховати видалені пости</value>
+  </data>
+  <data name="topics.show.deleted-posts" xml:space="preserve">
+    <value>Видалено відповідей</value>
+  </data>
+  <data name="topics.show.total_posts" xml:space="preserve">
+    <value>Всього відповідей</value>
+  </data>
+  <data name="topics.show.feature_vote.current" xml:space="preserve">
+    <value>Поточний пріоритет: +{0}</value>
+  </data>
+  <data name="topics.show.feature_vote.do" xml:space="preserve">
+    <value>Просунути даний запит</value>
+  </data>
+  <data name="topics.show.feature_vote.info._" xml:space="preserve">
+    <value>Це {0}. За ідею можна проголосувати тільки з {1}.</value>
+  </data>
+  <data name="topics.show.feature_vote.info.feature_request" xml:space="preserve">
+    <value>запропонована ідея</value>
+  </data>
+  <data name="topics.show.feature_vote.info.supporters" xml:space="preserve">
+    <value>osu!прихильник</value>
+  </data>
+  <data name="topics.show.feature_vote.user.count" xml:space="preserve">
+    <value>{0} немає голосів|{1} {0} голос|[2,*] {0} голоси</value>
+  </data>
+  <data name="topics.show.feature_vote.user.current" xml:space="preserve">
+    <value>У вас залишилося {0} голосів.</value>
+  </data>
+  <data name="topics.show.feature_vote.user.not_enough" xml:space="preserve">
+    <value>У вас більше немає голосів</value>
+  </data>
+  <data name="topics.show.poll.edit" xml:space="preserve">
+    <value>Редагування опитування</value>
+  </data>
+  <data name="topics.show.poll.edit_warning" xml:space="preserve">
+    <value>Редагування опитування призведе до видалення поточних результатів!</value>
+  </data>
+  <data name="topics.show.poll.vote" xml:space="preserve">
+    <value>Голосувати</value>
+  </data>
+  <data name="topics.show.poll.button.change_vote" xml:space="preserve">
+    <value>Поміняти голос</value>
+  </data>
+  <data name="topics.show.poll.button.edit" xml:space="preserve">
+    <value>Редагувати опитування</value>
+  </data>
+  <data name="topics.show.poll.button.view_results" xml:space="preserve">
+    <value>Побачити результати</value>
+  </data>
+  <data name="topics.show.poll.button.vote" xml:space="preserve">
+    <value>Проголосувати</value>
+  </data>
+  <data name="topics.show.poll.detail.end_time" xml:space="preserve">
+    <value>Опитування буде закрито {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.ended" xml:space="preserve">
+    <value>Опитування завершено {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.results_hidden" xml:space="preserve">
+    <value>Результати будуть показані після закінчення опитування.</value>
+  </data>
+  <data name="topics.show.poll.detail.total" xml:space="preserve">
+    <value>Всього голосів: {0}</value>
+  </data>
+  <data name="topics.watch.to_not_watching" xml:space="preserve">
+    <value>Не в закладках</value>
+  </data>
+  <data name="topics.watch.to_watching" xml:space="preserve">
+    <value>Закладки</value>
+  </data>
+  <data name="topics.watch.to_watching_mail" xml:space="preserve">
+    <value>В закладки з оповіщенням</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_disable" xml:space="preserve">
+    <value>Оповіщення включені. Натисніть, щоб відключити</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_enable" xml:space="preserve">
+    <value>Оповіщення відключено. Натисніть, щоб включити</value>
+  </data>
+</root>

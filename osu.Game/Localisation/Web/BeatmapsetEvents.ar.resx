@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="event.approve" xml:space="preserve">
+    <value>مقبولة.</value>
+  </data>
+  <data name="event.beatmap_owner_change" xml:space="preserve">
+    <value>مالك الصعوبة {0} تغير إلى {1}.</value>
+  </data>
+  <data name="event.discussion_delete" xml:space="preserve">
+    <value>المشرف حذف المناقشة {0}.</value>
+  </data>
+  <data name="event.discussion_lock" xml:space="preserve">
+    <value>تم ايقاف المناقشة لهذه الخريطة. ({0})</value>
+  </data>
+  <data name="event.discussion_post_delete" xml:space="preserve">
+    <value>المشرف حذف منشور من المناقشة {0}.</value>
+  </data>
+  <data name="event.discussion_post_restore" xml:space="preserve">
+    <value>المشرف اِستعاد منشور من المناقشة {0}.</value>
+  </data>
+  <data name="event.discussion_restore" xml:space="preserve">
+    <value>اِستعاد المشرف المناقشة {0}.</value>
+  </data>
+  <data name="event.discussion_unlock" xml:space="preserve">
+    <value>تم تشغيل المناقشة لهذه الخريطة.</value>
+  </data>
+  <data name="event.disqualify" xml:space="preserve">
+    <value>استبعدت بواسطة {0}. السبب:{1} ({2}).</value>
+  </data>
+  <data name="event.disqualify_legacy" xml:space="preserve">
+    <value>استبعدت بواسطة {0}. السبب:{1}.</value>
+  </data>
+  <data name="event.genre_edit" xml:space="preserve">
+    <value>تم تغيير النوع من {0} الى {1}.</value>
+  </data>
+  <data name="event.issue_reopen" xml:space="preserve">
+    <value>اُعيد فتح المشكلة {0} المحلولة مسبقاََ.</value>
+  </data>
+  <data name="event.issue_resolve" xml:space="preserve">
+    <value>المشكلة {0} عُلمت كـ محلولة.</value>
+  </data>
+  <data name="event.kudosu_allow" xml:space="preserve">
+    <value>لقد تمت إزالة الحرمان من كودوسو للمناقشة {0}.</value>
+  </data>
+  <data name="event.kudosu_deny" xml:space="preserve">
+    <value>المناقشة {0} حُرِمت من كودوسو.</value>
+  </data>
+  <data name="event.kudosu_gain" xml:space="preserve">
+    <value>المناشقة {0} بواسطة {1} حصلت على اصوات كافية للكودوسو.</value>
+  </data>
+  <data name="event.kudosu_lost" xml:space="preserve">
+    <value>المناقشة {0} بواسطة {1} خسرت اصواتاََ وتم حذف كودوسو.</value>
+  </data>
+  <data name="event.kudosu_recalculate" xml:space="preserve">
+    <value>المناقشة {0} حصلت على اعادة حساب الكودوسو.</value>
+  </data>
+  <data name="event.language_edit" xml:space="preserve">
+    <value>تم تغيير اللغة من {0} الى {1}.</value>
+  </data>
+  <data name="event.love" xml:space="preserve">
+    <value>حُبِبت بواسطة {0}</value>
+  </data>
+  <data name="event.nominate" xml:space="preserve">
+    <value>رُشحت بواسطة {0}.</value>
+  </data>
+  <data name="event.nominate_modes" xml:space="preserve">
+    <value>تم ترشيحها بواسطة {0} ({1}).</value>
+  </data>
+  <data name="event.nomination_reset" xml:space="preserve">
+    <value>اثارت المشكلة {0} ({1}) اِعادة تعيين الترشيح.</value>
+  </data>
+  <data name="event.qualify" xml:space="preserve">
+    <value>هذه الخريطة وصلت إلى العدد المطلوب من الترشيحات وتأهلت.</value>
+  </data>
+  <data name="event.rank" xml:space="preserve">
+    <value>مصفوفة.</value>
+  </data>
+  <data name="event.remove_from_loved" xml:space="preserve">
+    <value>تمت إزالتها من "المحبوبة" من قِبَل {0}. ({1})</value>
+  </data>
+  <data name="event.nsfw_toggle.to_0" xml:space="preserve">
+    <value>تصيف "محتوى حساس" مَلغي</value>
+  </data>
+  <data name="event.nsfw_toggle.to_1" xml:space="preserve">
+    <value>مٌصنف كـ "محتوى حساس"</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>أحداث الخريطة</value>
+  </data>
+  <data name="index.form.period" xml:space="preserve">
+    <value>الفترة</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>الأنواع</value>
+  </data>
+  <data name="item.content" xml:space="preserve">
+    <value>المحتوى</value>
+  </data>
+  <data name="item.discussion_deleted" xml:space="preserve">
+    <value>[deleted]</value>
+  </data>
+  <data name="item.type" xml:space="preserve">
+    <value>النوع</value>
+  </data>
+  <data name="type.approve" xml:space="preserve">
+    <value>موافقة</value>
+  </data>
+  <data name="type.beatmap_owner_change" xml:space="preserve">
+    <value>تغير مالك صعوبة</value>
+  </data>
+  <data name="type.discussion_delete" xml:space="preserve">
+    <value>حذف مناقشة</value>
+  </data>
+  <data name="type.discussion_post_delete" xml:space="preserve">
+    <value>حذف رد مناقشة</value>
+  </data>
+  <data name="type.discussion_post_restore" xml:space="preserve">
+    <value>إعادة رد مناقشة</value>
+  </data>
+  <data name="type.discussion_restore" xml:space="preserve">
+    <value>إعادة مناقشة</value>
+  </data>
+  <data name="type.disqualify" xml:space="preserve">
+    <value>فقدان أهلية</value>
+  </data>
+  <data name="type.genre_edit" xml:space="preserve">
+    <value>تعديل نوع</value>
+  </data>
+  <data name="type.issue_reopen" xml:space="preserve">
+    <value>إعادة فتح باب مناقشة</value>
+  </data>
+  <data name="type.issue_resolve" xml:space="preserve">
+    <value>حل مناقشة</value>
+  </data>
+  <data name="type.kudosu_allow" xml:space="preserve">
+    <value>سماح كودوسو</value>
+  </data>
+  <data name="type.kudosu_deny" xml:space="preserve">
+    <value>رفض كودوسو</value>
+  </data>
+  <data name="type.kudosu_gain" xml:space="preserve">
+    <value>كسب كودوسو</value>
+  </data>
+  <data name="type.kudosu_lost" xml:space="preserve">
+    <value>خسارة كودوسو</value>
+  </data>
+  <data name="type.kudosu_recalculate" xml:space="preserve">
+    <value>حساب كودوسو</value>
+  </data>
+  <data name="type.language_edit" xml:space="preserve">
+    <value>تعديل اللغة</value>
+  </data>
+  <data name="type.love" xml:space="preserve">
+    <value>حُب</value>
+  </data>
+  <data name="type.nominate" xml:space="preserve">
+    <value>ترشيح</value>
+  </data>
+  <data name="type.nomination_reset" xml:space="preserve">
+    <value>إعادة تعيين الترشيح</value>
+  </data>
+  <data name="type.nsfw_toggle" xml:space="preserve">
+    <value>تصنيف حساس</value>
+  </data>
+  <data name="type.qualify" xml:space="preserve">
+    <value>المؤهل</value>
+  </data>
+  <data name="type.rank" xml:space="preserve">
+    <value>الترتيب</value>
+  </data>
+  <data name="type.remove_from_loved" xml:space="preserve">
+    <value>اِزبالة من "المحبوبة"</value>
+  </data>
+</root>

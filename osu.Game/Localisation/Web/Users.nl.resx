@@ -1,0 +1,721 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="deleted" xml:space="preserve">
+    <value>[verwijderde gebruiker]</value>
+  </data>
+  <data name="beatmapset_activities.title" xml:space="preserve">
+    <value>{0}'s modding geschiedenis</value>
+  </data>
+  <data name="beatmapset_activities.title_compact" xml:space="preserve">
+    <value>Modding</value>
+  </data>
+  <data name="beatmapset_activities.discussions.title_recent" xml:space="preserve">
+    <value>Recent gestarte discussies</value>
+  </data>
+  <data name="beatmapset_activities.events.title_recent" xml:space="preserve">
+    <value>Recente gebeurtenissen</value>
+  </data>
+  <data name="beatmapset_activities.posts.title_recent" xml:space="preserve">
+    <value>Recente berichten</value>
+  </data>
+  <data name="beatmapset_activities.votes_received.title_most" xml:space="preserve">
+    <value>Meest geupvote door (laatste 3 maanden)</value>
+  </data>
+  <data name="beatmapset_activities.votes_made.title_most" xml:space="preserve">
+    <value>Meest geupvote (laatste 3 maanden)</value>
+  </data>
+  <data name="blocks.banner_text" xml:space="preserve">
+    <value>U hebt deze gebruiker geblokkeerd.</value>
+  </data>
+  <data name="blocks.blocked_count" xml:space="preserve">
+    <value>geblokkeerde gebruikers ({0})</value>
+  </data>
+  <data name="blocks.hide_profile" xml:space="preserve">
+    <value>profiel verbergen</value>
+  </data>
+  <data name="blocks.not_blocked" xml:space="preserve">
+    <value>Deze gebruiker is niet geblokkeerd.</value>
+  </data>
+  <data name="blocks.show_profile" xml:space="preserve">
+    <value>profiel weergeven</value>
+  </data>
+  <data name="blocks.too_many" xml:space="preserve">
+    <value>Blok limiet bereikt.</value>
+  </data>
+  <data name="blocks.button.block" xml:space="preserve">
+    <value>blokkeren</value>
+  </data>
+  <data name="blocks.button.unblock" xml:space="preserve">
+    <value>deblokkeren</value>
+  </data>
+  <data name="card.loading" xml:space="preserve">
+    <value>Bezig met laden...</value>
+  </data>
+  <data name="card.send_message" xml:space="preserve">
+    <value>stuur bericht</value>
+  </data>
+  <data name="disabled.title" xml:space="preserve">
+    <value>Uh-oh! Het lijkt erop dat je account is uitgeschakeld.</value>
+  </data>
+  <data name="disabled.warning" xml:space="preserve">
+    <value>In het geval dat je een regel hebt overtreden, houd er rekening mee dat er over het algemeen een afkoelperiode van één maand is waarin we geen amnestieverzoeken in behandeling nemen. Na deze periode kunt u contact met ons opnemen als je dit nodig vind. Houd er rekening mee dat het maken van nieuwe accounts nadat uw account is uitgeschakeld, resulteert in een &lt;strong&gt; verlenging van deze cool-down van een maand &lt;/strong&gt;. Houd er ook rekening mee dat voor &lt;strong&gt; elk account dat je maakt, je de regels verder overtreedt &lt;/strong&gt;. We raden je ten zeerste aan om dit niet te doen!</value>
+  </data>
+  <data name="disabled.if_mistake._" xml:space="preserve">
+    <value>Als je denkt dat dit een vergissing is, ben je welkom om ons te contacteren (via {0} of door te klikken op "? in de rechter onderhoek van deze pagina). Houd er rekening mee dat we altijd volledig vertrouwen hebben in onze acties, aangezien deze gebaseerd zijn op zeer solide gegevens. We behouden ons het recht voor om je verzoek te negeren als we het gevoel hebben dat je opzettelijk oneerlijk bent.</value>
+  </data>
+  <data name="disabled.if_mistake.email" xml:space="preserve">
+    <value>e-mail</value>
+  </data>
+  <data name="disabled.reasons.compromised" xml:space="preserve">
+    <value>Uw account is beschadigd. Het kan tijdelijk worden uitgeschakeld terwijl de identiteit wordt bevestigd.</value>
+  </data>
+  <data name="disabled.reasons.opening" xml:space="preserve">
+    <value>Er zijn een aantal redenen die ertoe kunnen leiden dat uw account wordt uitgeschakeld:</value>
+  </data>
+  <data name="disabled.reasons.tos._" xml:space="preserve">
+    <value>Je hebt een of meer van onze {0} of {1} overtreden.</value>
+  </data>
+  <data name="disabled.reasons.tos.community_rules" xml:space="preserve">
+    <value>community regels</value>
+  </data>
+  <data name="disabled.reasons.tos.tos" xml:space="preserve">
+    <value>algemene voorwaarden</value>
+  </data>
+  <data name="filtering.by_game_mode" xml:space="preserve">
+    <value>Leden per spelmodus</value>
+  </data>
+  <data name="force_reactivation.reason.inactive_different_country" xml:space="preserve">
+    <value>Je account is lange tijd niet gebruikt.</value>
+  </data>
+  <data name="login._" xml:space="preserve">
+    <value>Inloggen</value>
+  </data>
+  <data name="login.button" xml:space="preserve">
+    <value>Inloggen</value>
+  </data>
+  <data name="login.button_posting" xml:space="preserve">
+    <value>Inloggen...</value>
+  </data>
+  <data name="login.email_login_disabled" xml:space="preserve">
+    <value>Inloggen met e-mail is momenteel uitgeschakeld. Gebruik in plaats daarvan de gebruikersnaam.</value>
+  </data>
+  <data name="login.failed" xml:space="preserve">
+    <value>Verkeerde login</value>
+  </data>
+  <data name="login.forgot" xml:space="preserve">
+    <value>Wachtwoord vergeten?</value>
+  </data>
+  <data name="login.info" xml:space="preserve">
+    <value>Log in om verder te gaan</value>
+  </data>
+  <data name="login.invalid_captcha" xml:space="preserve">
+    <value>Captcha ongeldig, vernieuw de pagina en probeer het opnieuw.</value>
+  </data>
+  <data name="login.locked_ip" xml:space="preserve">
+    <value>je IP adres is vergrendeld. Wacht enkele minuten.</value>
+  </data>
+  <data name="login.password" xml:space="preserve">
+    <value>Wachtwoord</value>
+  </data>
+  <data name="login.register" xml:space="preserve">
+    <value>Heb je geen osu! account? Maak een nieuwe</value>
+  </data>
+  <data name="login.remember" xml:space="preserve">
+    <value>Onthoud deze computer</value>
+  </data>
+  <data name="login.title" xml:space="preserve">
+    <value>Log in om verder te gaan</value>
+  </data>
+  <data name="login.username" xml:space="preserve">
+    <value>Gebruikersnaam</value>
+  </data>
+  <data name="login.beta.main" xml:space="preserve">
+    <value>Beta toegang is momenteel beperkt voor bepaalde gebruikers.</value>
+  </data>
+  <data name="login.beta.small" xml:space="preserve">
+    <value>(osu!supporters krijgen binnenkort in)</value>
+  </data>
+  <data name="posts.title" xml:space="preserve">
+    <value>{0}'s berichten</value>
+  </data>
+  <data name="anonymous.login_link" xml:space="preserve">
+    <value>klik om in te loggen</value>
+  </data>
+  <data name="anonymous.login_text" xml:space="preserve">
+    <value>log in</value>
+  </data>
+  <data name="anonymous.username" xml:space="preserve">
+    <value>Gast</value>
+  </data>
+  <data name="anonymous.error" xml:space="preserve">
+    <value>Je moet ingelogd zijn om dit te doen.</value>
+  </data>
+  <data name="logout_confirm" xml:space="preserve">
+    <value>Weet je zeker dat je wilt uitloggen? :(</value>
+  </data>
+  <data name="report.button_text" xml:space="preserve">
+    <value>rapporteer</value>
+  </data>
+  <data name="report.comments" xml:space="preserve">
+    <value>Aanvullende opmerkingen</value>
+  </data>
+  <data name="report.placeholder" xml:space="preserve">
+    <value>Geef alstublieft informatie die je denkt te kunnen gebruiken.</value>
+  </data>
+  <data name="report.reason" xml:space="preserve">
+    <value>Reden</value>
+  </data>
+  <data name="report.thanks" xml:space="preserve">
+    <value>Bedankt voor je melding!</value>
+  </data>
+  <data name="report.title" xml:space="preserve">
+    <value>Rapporteer {0}?</value>
+  </data>
+  <data name="report.actions.send" xml:space="preserve">
+    <value>Stuur rapport</value>
+  </data>
+  <data name="report.actions.cancel" xml:space="preserve">
+    <value>Annuleren</value>
+  </data>
+  <data name="report.options.cheating" xml:space="preserve">
+    <value>Valsspelen</value>
+  </data>
+  <data name="report.options.insults" xml:space="preserve">
+    <value>Beledigen van mij / anderen</value>
+  </data>
+  <data name="report.options.spam" xml:space="preserve">
+    <value>Spammen</value>
+  </data>
+  <data name="report.options.unwanted_content" xml:space="preserve">
+    <value>Linken van ongepaste inhoud</value>
+  </data>
+  <data name="report.options.nonsense" xml:space="preserve">
+    <value>Nonsense</value>
+  </data>
+  <data name="report.options.other" xml:space="preserve">
+    <value>Anders (type hieronder)</value>
+  </data>
+  <data name="restricted_banner.title" xml:space="preserve">
+    <value>Je account is gerestrict!</value>
+  </data>
+  <data name="restricted_banner.message" xml:space="preserve">
+    <value>Zolang je gerestrict bent, kan je niet communiceren met andere spelers en kan enkel jij je scores zien. Meestal is dit het resultaat van een geautomatiseerd proces en wordt het binnen 24 uur verwijderd. Als je in beroep wil gaan, &lt;a href="mailto{0}@ppy.sh"&gt;contacteer dan support&lt;/a&gt;.</value>
+  </data>
+  <data name="show.age" xml:space="preserve">
+    <value>{0} jaar oud</value>
+  </data>
+  <data name="show.change_avatar" xml:space="preserve">
+    <value>verander je avatar!</value>
+  </data>
+  <data name="show.first_members" xml:space="preserve">
+    <value>Hier sinds het begin</value>
+  </data>
+  <data name="show.is_developer" xml:space="preserve">
+    <value>osu!developer</value>
+  </data>
+  <data name="show.is_supporter" xml:space="preserve">
+    <value>osu!supporter</value>
+  </data>
+  <data name="show.joined_at" xml:space="preserve">
+    <value>Werd lid op {0}</value>
+  </data>
+  <data name="show.lastvisit" xml:space="preserve">
+    <value>Laatst gezien op {0}</value>
+  </data>
+  <data name="show.lastvisit_online" xml:space="preserve">
+    <value>Momenteel online</value>
+  </data>
+  <data name="show.missingtext" xml:space="preserve">
+    <value>Je hebt misschien een typfout gemaakt! (of de gebruiker is verbannen)</value>
+  </data>
+  <data name="show.origin_country" xml:space="preserve">
+    <value>Uit {0}</value>
+  </data>
+  <data name="show.previous_usernames" xml:space="preserve">
+    <value>vroeger bekend als</value>
+  </data>
+  <data name="show.plays_with" xml:space="preserve">
+    <value>Speelt met {0}</value>
+  </data>
+  <data name="show.title" xml:space="preserve">
+    <value>Profiel van {0}</value>
+  </data>
+  <data name="show.comments_count._" xml:space="preserve">
+    <value>Geplaatst op {0}</value>
+  </data>
+  <data name="show.comments_count.count" xml:space="preserve">
+    <value>{0} commentaar:{0} reacties</value>
+  </data>
+  <data name="show.edit.cover.button" xml:space="preserve">
+    <value>Verander Profiel Cover</value>
+  </data>
+  <data name="show.edit.cover.defaults_info" xml:space="preserve">
+    <value>In de toekomst zullen er meer cover opties beschikbaar zijn</value>
+  </data>
+  <data name="show.edit.cover.upload.broken_file" xml:space="preserve">
+    <value>Afbeelding verwerken mislukt. Controleer de geüploade afbeelding en probeer opnieuw.</value>
+  </data>
+  <data name="show.edit.cover.upload.button" xml:space="preserve">
+    <value>Upload afbeelding</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone" xml:space="preserve">
+    <value>Drop hier om te uploaden</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone_info" xml:space="preserve">
+    <value>Je kunt je afbeelding ook hier droppen om te uploaden</value>
+  </data>
+  <data name="show.edit.cover.upload.size_info" xml:space="preserve">
+    <value>Cover grootte moet 2400x620 zijn</value>
+  </data>
+  <data name="show.edit.cover.upload.too_large" xml:space="preserve">
+    <value>Het geüploade bestand is te groot.</value>
+  </data>
+  <data name="show.edit.cover.upload.unsupported_format" xml:space="preserve">
+    <value>Niet ondersteund formaat.</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info._" xml:space="preserve">
+    <value>Upload beschikbaar alleen voor {0}</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info.link" xml:space="preserve">
+    <value>osu!supporters</value>
+  </data>
+  <data name="show.edit.default_playmode.is_default_tooltip" xml:space="preserve">
+    <value>standaard spelmode</value>
+  </data>
+  <data name="show.edit.default_playmode.set" xml:space="preserve">
+    <value>zet {0} als standaard profiel spelmode</value>
+  </data>
+  <data name="show.extra.none" xml:space="preserve">
+    <value>geen</value>
+  </data>
+  <data name="show.extra.unranked" xml:space="preserve">
+    <value>Geen recente plays</value>
+  </data>
+  <data name="show.extra.achievements.achieved-on" xml:space="preserve">
+    <value>Behaald op {0}</value>
+  </data>
+  <data name="show.extra.achievements.locked" xml:space="preserve">
+    <value>Vergrendeld</value>
+  </data>
+  <data name="show.extra.achievements.title" xml:space="preserve">
+    <value>Prestaties</value>
+  </data>
+  <data name="show.extra.beatmaps.by_artist" xml:space="preserve">
+    <value>door {0}</value>
+  </data>
+  <data name="show.extra.beatmaps.title" xml:space="preserve">
+    <value>Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.favourite.title" xml:space="preserve">
+    <value>Favoriete Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.graveyard.title" xml:space="preserve">
+    <value>Beatmaps in het kerkhof</value>
+  </data>
+  <data name="show.extra.beatmaps.loved.title" xml:space="preserve">
+    <value>Loved Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.ranked_and_approved.title" xml:space="preserve">
+    <value>Gerankte &amp; Goedgekeurde Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.unranked.title" xml:space="preserve">
+    <value>Afwachtende Beatmaps</value>
+  </data>
+  <data name="show.extra.discussions.title" xml:space="preserve">
+    <value>Discussies</value>
+  </data>
+  <data name="show.extra.discussions.title_longer" xml:space="preserve">
+    <value>Recente discussies</value>
+  </data>
+  <data name="show.extra.discussions.show_more" xml:space="preserve">
+    <value>zie meer discussies</value>
+  </data>
+  <data name="show.extra.events.title" xml:space="preserve">
+    <value>Gebeurtenissen</value>
+  </data>
+  <data name="show.extra.events.title_longer" xml:space="preserve">
+    <value>Recente gebeurtenissen</value>
+  </data>
+  <data name="show.extra.events.show_more" xml:space="preserve">
+    <value>meer gebeurtenissen zien</value>
+  </data>
+  <data name="show.extra.historical.title" xml:space="preserve">
+    <value>Historisch</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.title" xml:space="preserve">
+    <value>Speelgeschiedenis</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.count_label" xml:space="preserve">
+    <value>Aantal keer gespeeld</value>
+  </data>
+  <data name="show.extra.historical.most_played.count" xml:space="preserve">
+    <value>keer gespeeld</value>
+  </data>
+  <data name="show.extra.historical.most_played.title" xml:space="preserve">
+    <value>Meest Gespeelde Beatmaps</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.accuracy" xml:space="preserve">
+    <value>precisie: {0}</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.title" xml:space="preserve">
+    <value>Recent gespeeld</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.title" xml:space="preserve">
+    <value>Replays Gekeken Geschiedenis</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.count_label" xml:space="preserve">
+    <value>Replays Bekeken</value>
+  </data>
+  <data name="show.extra.kudosu.recent_entries" xml:space="preserve">
+    <value>Recente Kudosu Geschiedenis</value>
+  </data>
+  <data name="show.extra.kudosu.title" xml:space="preserve">
+    <value>Kudosu!</value>
+  </data>
+  <data name="show.extra.kudosu.total" xml:space="preserve">
+    <value>Totaal Aantal Kudosu Verdiend</value>
+  </data>
+  <data name="show.extra.kudosu.entry.amount" xml:space="preserve">
+    <value>{0} kudosu</value>
+  </data>
+  <data name="show.extra.kudosu.entry.empty" xml:space="preserve">
+    <value>Deze gebruiker heeft nog geen kudosu ontvangen!</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.allow_kudosu.give" xml:space="preserve">
+    <value>Kreeg {0} kudosu voor in beroep gaan van afwijzing in modding post {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.deny_kudosu.reset" xml:space="preserve">
+    <value>{0} ontkend voor modding bericht {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.delete.reset" xml:space="preserve">
+    <value>{0} verloren vanwege verwijdering modding post {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.restore.give" xml:space="preserve">
+    <value>Kreeg {0} voor modding post {1} the herstellen</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.give" xml:space="preserve">
+    <value>Kreeg {0} via stemmen in modding post {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.reset" xml:space="preserve">
+    <value>Verloor {0} uit verliezende stemmen van post {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.give" xml:space="preserve">
+    <value>Kreeg {0} uit stemming hertelling in modding post van {0}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.reset" xml:space="preserve">
+    <value>Verloor {0} uit stemming hertelling in modding post van {0}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.give" xml:space="preserve">
+    <value>{0} ontvangen van {1} voor {2}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.reset" xml:space="preserve">
+    <value>Kudosu reset door {0} voor de post {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.revoke" xml:space="preserve">
+    <value>Kudosu geweigerd door {0} voor {1}</value>
+  </data>
+  <data name="show.extra.kudosu.total_info._" xml:space="preserve">
+    <value>Op basis van hoeveel bijdrage de gebruiker heeft geleverd aan beatmap moderatie. Zie {0} voor meer informatie.</value>
+  </data>
+  <data name="show.extra.kudosu.total_info.link" xml:space="preserve">
+    <value>deze pagina</value>
+  </data>
+  <data name="show.extra.me.title" xml:space="preserve">
+    <value>ik!</value>
+  </data>
+  <data name="show.extra.medals.empty" xml:space="preserve">
+    <value>Deze gebruiker heeft er nog geen ;_;</value>
+  </data>
+  <data name="show.extra.medals.recent" xml:space="preserve">
+    <value>Recent</value>
+  </data>
+  <data name="show.extra.medals.title" xml:space="preserve">
+    <value>Medailles</value>
+  </data>
+  <data name="show.extra.posts.title" xml:space="preserve">
+    <value>Berichten</value>
+  </data>
+  <data name="show.extra.posts.title_longer" xml:space="preserve">
+    <value>Recente berichten</value>
+  </data>
+  <data name="show.extra.posts.show_more" xml:space="preserve">
+    <value>bekijk meer berichten</value>
+  </data>
+  <data name="show.extra.recent_activity.title" xml:space="preserve">
+    <value>Recent</value>
+  </data>
+  <data name="show.extra.top_ranks.download_replay" xml:space="preserve">
+    <value>Download Replay</value>
+  </data>
+  <data name="show.extra.top_ranks.not_ranked" xml:space="preserve">
+    <value>Enkel gerankte beatmaps geven pp.</value>
+  </data>
+  <data name="show.extra.top_ranks.pp_weight" xml:space="preserve">
+    <value>gewogen {0}</value>
+  </data>
+  <data name="show.extra.top_ranks.view_details" xml:space="preserve">
+    <value>Details Bekijken</value>
+  </data>
+  <data name="show.extra.top_ranks.title" xml:space="preserve">
+    <value>Ranks</value>
+  </data>
+  <data name="show.extra.top_ranks.best.title" xml:space="preserve">
+    <value>Beste Prestatie</value>
+  </data>
+  <data name="show.extra.top_ranks.first.title" xml:space="preserve">
+    <value>Eerste Ranks</value>
+  </data>
+  <data name="show.extra.votes.given" xml:space="preserve">
+    <value>Gegeven stemmen (de afgelopen 3 maanden)</value>
+  </data>
+  <data name="show.extra.votes.received" xml:space="preserve">
+    <value>Ontvangen stemmen (laatste 3 maanden)</value>
+  </data>
+  <data name="show.extra.votes.title" xml:space="preserve">
+    <value>Stemmen</value>
+  </data>
+  <data name="show.extra.votes.title_longer" xml:space="preserve">
+    <value>Recente stemmen</value>
+  </data>
+  <data name="show.extra.votes.vote_count" xml:space="preserve">
+    <value>{0} stemmen|{0} stemmen</value>
+  </data>
+  <data name="show.extra.account_standing.title" xml:space="preserve">
+    <value>Account Reputatie</value>
+  </data>
+  <data name="show.extra.account_standing.bad_standing" xml:space="preserve">
+    <value>&lt;strong&gt;{0}'s&lt;/strong&gt; account heeft geen goede reputatie :(</value>
+  </data>
+  <data name="show.extra.account_standing.remaining_silence" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; kan terug spreken in {1}.</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.title" xml:space="preserve">
+    <value>Recente Overtredingen</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.date" xml:space="preserve">
+    <value>datum</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.action" xml:space="preserve">
+    <value>actie</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length" xml:space="preserve">
+    <value>lengte</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length_permanent" xml:space="preserve">
+    <value>Permanent</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.description" xml:space="preserve">
+    <value>omschrijving</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actor" xml:space="preserve">
+    <value>door {0}</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.restriction" xml:space="preserve">
+    <value>Ban</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.silence" xml:space="preserve">
+    <value>Silence</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.note" xml:space="preserve">
+    <value>Opmerking</value>
+  </data>
+  <data name="show.info.interests" xml:space="preserve">
+    <value>Interesses</value>
+  </data>
+  <data name="show.info.location" xml:space="preserve">
+    <value>Huidige Locatie</value>
+  </data>
+  <data name="show.info.occupation" xml:space="preserve">
+    <value>Beroep</value>
+  </data>
+  <data name="show.info.website" xml:space="preserve">
+    <value>Website</value>
+  </data>
+  <data name="show.not_found.reason_1" xml:space="preserve">
+    <value>Misschien is hun gebruikersnaam veranderd.</value>
+  </data>
+  <data name="show.not_found.reason_2" xml:space="preserve">
+    <value>Het account kan tijdelijk onbeschikbaar zijn vanwege beveiligingsredenen of misbruik.</value>
+  </data>
+  <data name="show.not_found.reason_3" xml:space="preserve">
+    <value>Misschien heb je een typefout gemaakt!</value>
+  </data>
+  <data name="show.not_found.reason_header" xml:space="preserve">
+    <value>Er enkele mogelijke redenen hiervoor:</value>
+  </data>
+  <data name="show.not_found.title" xml:space="preserve">
+    <value>Gebruiker niet gevonden! ;_;</value>
+  </data>
+  <data name="show.page.button" xml:space="preserve">
+    <value>Profielpagina bewerken</value>
+  </data>
+  <data name="show.page.description" xml:space="preserve">
+    <value>&lt;strong&gt;ik!&lt;/strong&gt; is een persoonlijk bewerkbaar gedeelte van je profiel.</value>
+  </data>
+  <data name="show.page.edit_big" xml:space="preserve">
+    <value>Bewerk me!</value>
+  </data>
+  <data name="show.page.placeholder" xml:space="preserve">
+    <value>Typ pagina inhoud hier</value>
+  </data>
+  <data name="show.page.restriction_info._" xml:space="preserve">
+    <value>U moet een {0} zijn om deze functie te ontgrendelen.</value>
+  </data>
+  <data name="show.page.restriction_info.link" xml:space="preserve">
+    <value>osu!supporter</value>
+  </data>
+  <data name="show.post_count._" xml:space="preserve">
+    <value>Plaatste {0}</value>
+  </data>
+  <data name="show.post_count.count" xml:space="preserve">
+    <value>{0} forum bericht|{0} forum berichten</value>
+  </data>
+  <data name="show.rank.country" xml:space="preserve">
+    <value>Landelijke rank voor {0}</value>
+  </data>
+  <data name="show.rank.country_simple" xml:space="preserve">
+    <value>Landelijke Ranking</value>
+  </data>
+  <data name="show.rank.global" xml:space="preserve">
+    <value>Globale rank voor {0}</value>
+  </data>
+  <data name="show.rank.global_simple" xml:space="preserve">
+    <value>Wereldwijde Ranking</value>
+  </data>
+  <data name="show.stats.hit_accuracy" xml:space="preserve">
+    <value>Hit Precisie</value>
+  </data>
+  <data name="show.stats.level" xml:space="preserve">
+    <value>Level {0}</value>
+  </data>
+  <data name="show.stats.level_progress" xml:space="preserve">
+    <value>Voortgang naar volgend level</value>
+  </data>
+  <data name="show.stats.maximum_combo" xml:space="preserve">
+    <value>Hoogste Combo</value>
+  </data>
+  <data name="show.stats.medals" xml:space="preserve">
+    <value>Medailles</value>
+  </data>
+  <data name="show.stats.play_count" xml:space="preserve">
+    <value>Play Count</value>
+  </data>
+  <data name="show.stats.play_time" xml:space="preserve">
+    <value>Totale Speeltijd</value>
+  </data>
+  <data name="show.stats.ranked_score" xml:space="preserve">
+    <value>Gerankte Score</value>
+  </data>
+  <data name="show.stats.replays_watched_by_others" xml:space="preserve">
+    <value>Replays Bekeken door Anderen</value>
+  </data>
+  <data name="show.stats.score_ranks" xml:space="preserve">
+    <value>Score Ranks</value>
+  </data>
+  <data name="show.stats.total_hits" xml:space="preserve">
+    <value>Totaal Aantal Hits</value>
+  </data>
+  <data name="show.stats.total_score" xml:space="preserve">
+    <value>Totale Score</value>
+  </data>
+  <data name="show.stats.ranked_and_approved_beatmapset_count" xml:space="preserve">
+    <value>Gerankte &amp; Goedgekeurde Beatmaps</value>
+  </data>
+  <data name="show.stats.loved_beatmapset_count" xml:space="preserve">
+    <value>Loved Beatmaps</value>
+  </data>
+  <data name="show.stats.unranked_beatmapset_count" xml:space="preserve">
+    <value>Afwachtende Beatmaps</value>
+  </data>
+  <data name="show.stats.graveyard_beatmapset_count" xml:space="preserve">
+    <value>Graveyarded Beatmaps</value>
+  </data>
+  <data name="silenced_banner.title" xml:space="preserve">
+    <value>Je bent momenteel gedempt.</value>
+  </data>
+  <data name="silenced_banner.message" xml:space="preserve">
+    <value>Sommige acties zijn mogelijk niet beschikbaar.</value>
+  </data>
+  <data name="status.all" xml:space="preserve">
+    <value>Alle</value>
+  </data>
+  <data name="status.online" xml:space="preserve">
+    <value>Online</value>
+  </data>
+  <data name="status.offline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="store.saved" xml:space="preserve">
+    <value>Door gebruiker gemaakt</value>
+  </data>
+  <data name="verify.title" xml:space="preserve">
+    <value>Accountverificatie</value>
+  </data>
+  <data name="view_mode.brick" xml:space="preserve">
+    <value>Baksteen weergave</value>
+  </data>
+  <data name="view_mode.card" xml:space="preserve">
+    <value>Kaartweergave</value>
+  </data>
+  <data name="view_mode.list" xml:space="preserve">
+    <value>Lijst weergave</value>
+  </data>
+</root>

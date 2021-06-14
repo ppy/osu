@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="index.description" xml:space="preserve">
+    <value>Coleções temáticas pré-compactadas.</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>listagem</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Pacotes de Beatmaps</value>
+  </data>
+  <data name="index.blurb.important" xml:space="preserve">
+    <value>LEIA ISSO ANTES DE BAIXAR</value>
+  </data>
+  <data name="index.blurb.instruction._" xml:space="preserve">
+    <value>Instalação: Assim que terminar de baixar um pacote, extraia o .rar na pasta Songs, no seu diretório do osu!.
+                    Todos os arquivos estão compactados dentro do pacote, então o osu! precisará extrair os beatmaps por sí só na próxima vez que você entrar no jogo.
+                    {0} tente descompactar os arquivos sozinho,
+                    ou os beatmaps não funcionarão corretamente quando tentar abrí-los.</value>
+  </data>
+  <data name="index.blurb.instruction.scary" xml:space="preserve">
+    <value>NÃO</value>
+  </data>
+  <data name="index.blurb.note._" xml:space="preserve">
+    <value>Lembre-se que é altamente recomendado {0}, já que beatmaps mais antigos tem uma qualidade muito menor do que os mais recentes.</value>
+  </data>
+  <data name="index.blurb.note.scary" xml:space="preserve">
+    <value>baixar os pacotes de beatmaps dos mais recentes para os mais antigos</value>
+  </data>
+  <data name="show.download" xml:space="preserve">
+    <value>Baixar</value>
+  </data>
+  <data name="show.item.cleared" xml:space="preserve">
+    <value>finalizado</value>
+  </data>
+  <data name="show.item.not_cleared" xml:space="preserve">
+    <value>não finalizado</value>
+  </data>
+  <data name="show.no_diff_reduction._" xml:space="preserve">
+    <value>{0} não pode ser usado para completar este pacote.</value>
+  </data>
+  <data name="show.no_diff_reduction.link" xml:space="preserve">
+    <value>Mods de redução de dificuldade</value>
+  </data>
+  <data name="mode.artist" xml:space="preserve">
+    <value>Artista/Álbum</value>
+  </data>
+  <data name="mode.chart" xml:space="preserve">
+    <value>Destaques</value>
+  </data>
+  <data name="mode.standard" xml:space="preserve">
+    <value>Standard</value>
+  </data>
+  <data name="mode.theme" xml:space="preserve">
+    <value>Tema</value>
+  </data>
+  <data name="require_login._" xml:space="preserve">
+    <value>Você precisa estar {0} para baixar</value>
+  </data>
+  <data name="require_login.link_text" xml:space="preserve">
+    <value>conectado</value>
+  </data>
+</root>

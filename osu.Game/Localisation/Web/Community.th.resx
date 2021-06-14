@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="support.convinced.title" xml:space="preserve">
+    <value>โอเค จัดไป {0}</value>
+  </data>
+  <data name="support.convinced.support" xml:space="preserve">
+    <value>สนับสนุน osu!</value>
+  </data>
+  <data name="support.convinced.gift" xml:space="preserve">
+    <value>หรือให้แท็กสนับสนุนแก่ผู้เล่นอื่น ๆ</value>
+  </data>
+  <data name="support.convinced.instructions" xml:space="preserve">
+    <value>คลิกที่ปุ่มหัวใจเพื่อดำเนินต่อไปที่ร้านของ osu!</value>
+  </data>
+  <data name="support.why-support.title" xml:space="preserve">
+    <value>ทำไมจึงควรสนับสนุน osu! และเงินที่ให้จะไปไหนบ้าง</value>
+  </data>
+  <data name="support.why-support.team.title" xml:space="preserve">
+    <value>ช่วยเหลือทีมงาน</value>
+  </data>
+  <data name="support.why-support.team.description" xml:space="preserve">
+    <value>ทีมงานที่คอยพัฒนา osu! การช่วยเหลือก็..ตามนั้นแหละ..ค่ากินค่าอยู่อะนะ</value>
+  </data>
+  <data name="support.why-support.infra.title" xml:space="preserve">
+    <value>เซิร์ฟเวอร์และโครงสร้างพื้นฐาน</value>
+  </data>
+  <data name="support.why-support.infra.description" xml:space="preserve">
+    <value>เงินที่บริจาคจะไปช่วยค่าเซิร์ฟเวอร์ที่เว็บนี้รันอยู่ รวมถึงระบบการเล่นหลายคน กระดานคะแนนออนไลน์ ฯลฯ</value>
+  </data>
+  <data name="support.why-support.featured-artists.title" xml:space="preserve">
+    <value>ศิลปินโดดเด่น</value>
+  </data>
+  <data name="support.why-support.featured-artists.description" xml:space="preserve">
+    <value>ด้วยการสนับสนุนของคุณ ทางเราจะสามารถซื้อสิทธิ์จากค่ายเพลงสุดมันส์มาใช้ใน osu! ได้มากขึ้น</value>
+  </data>
+  <data name="support.why-support.featured-artists.link_text" xml:space="preserve">
+    <value>ดูรายการค่ายเพลงปัจจุบันที่ทางเราซื้อสิทธิ์มาอย่างถูกต้อง &amp;raquo; </value>
+  </data>
+  <data name="support.why-support.ads.title" xml:space="preserve">
+    <value>ช่วยให้ osu! อยู่ได้</value>
+  </data>
+  <data name="support.why-support.ads.description" xml:space="preserve">
+    <value>ความช่วยเหลือของคุณช่วยให้เกมนี้ไม่พึ่งพาใคร และไร้โฆษณาจากคนภายนอก</value>
+  </data>
+  <data name="support.why-support.tournaments.title" xml:space="preserve">
+    <value>ทัวร์นาเมนต์แข่งขันอย่างเป็นทางการ</value>
+  </data>
+  <data name="support.why-support.tournaments.description" xml:space="preserve">
+    <value>ช่วยเงินค่าดำเนินการ (และรางวัล) ทัวร์นาเมนต์ osu! World Cup</value>
+  </data>
+  <data name="support.why-support.tournaments.link_text" xml:space="preserve">
+    <value>ดูรายการทัวร์นาเมนต์ทั้งหมด &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.bounty-program.title" xml:space="preserve">
+    <value>โครงการเขียนโค้ดล่ารางวัล</value>
+  </data>
+  <data name="support.why-support.bounty-program.description" xml:space="preserve">
+    <value>ช่วยเหลือนักพัฒนาที่สละเวลาเพื่อให้ osu! ดีขึ้น</value>
+  </data>
+  <data name="support.why-support.bounty-program.link_text" xml:space="preserve">
+    <value>อ่านเพิ่มเติม &amp;raquo;</value>
+  </data>
+  <data name="support.perks.title" xml:space="preserve">
+    <value>โอ? ฉันได้อะไรบ้างเหรอ?!</value>
+  </data>
+  <data name="support.perks.osu_direct.title" xml:space="preserve">
+    <value>osu!direct</value>
+  </data>
+  <data name="support.perks.osu_direct.description" xml:space="preserve">
+    <value>ระบบหาบีทแมพที่ง่ายและเร็วโดยไม่ต้องออกจากเกม</value>
+  </data>
+  <data name="support.perks.friend_ranking.title" xml:space="preserve">
+    <value>อันดับคะแนนของเพื่อน</value>
+  </data>
+  <data name="support.perks.friend_ranking.description" xml:space="preserve">
+    <value>ดูว่าคะแนนบีทแมพของตัวเองกับเพื่อนใครเจ๋งกว่ากัน ทั้งในเกมและบนเว็บ</value>
+  </data>
+  <data name="support.perks.country_ranking.title" xml:space="preserve">
+    <value>อันดับคะแนนประเทศ</value>
+  </data>
+  <data name="support.perks.country_ranking.description" xml:space="preserve">
+    <value>ครองประเทศ แล้วค่อยไปครองโลก</value>
+  </data>
+  <data name="support.perks.mod_filtering.title" xml:space="preserve">
+    <value>กรองตามม็อด</value>
+  </data>
+  <data name="support.perks.mod_filtering.description" xml:space="preserve">
+    <value>อยากเล่นกับคนเล่น HDHR ใช่มั้ย จัดไป</value>
+  </data>
+  <data name="support.perks.auto_downloads.title" xml:space="preserve">
+    <value>การดาวน์โหลดอัตโนมัติ</value>
+  </data>
+  <data name="support.perks.auto_downloads.description" xml:space="preserve">
+    <value>โหลดบีทแมพอัตโนมัติตอนเล่นหลายคน ดูคนอื่นเล่น หรือแค่กดลิงก์ในช่องแชต</value>
+  </data>
+  <data name="support.perks.upload_more.title" xml:space="preserve">
+    <value>อัปโหลดบีทแมพเพิ่ม</value>
+  </data>
+  <data name="support.perks.upload_more.description" xml:space="preserve">
+    <value>ช่องอัปโหลดบีทแมพเพิ่มเติม (ต่อแมพจัดอันดับที่มีอยู่) มากถึง 10 แมพ</value>
+  </data>
+  <data name="support.perks.early_access.title" xml:space="preserve">
+    <value>เข้าเล่นช่วงพัฒนา</value>
+  </data>
+  <data name="support.perks.early_access.description" xml:space="preserve">
+    <value>สามารถเข้าเล่นช่วงพัฒนาได้ โดยคุณสามารถทดลองระบบใหม่ๆได้ก่อนที่มันจะมาจริงๆ!</value>
+  </data>
+  <data name="support.perks.customisation.title" xml:space="preserve">
+    <value>ปรับแต่งหน้าผู้ใช้</value>
+  </data>
+  <data name="support.perks.customisation.description" xml:space="preserve">
+    <value>ปรับแต่งโปรไฟล์ของคุณโดยการเพิ่มหน้า Userpage ที่ปรับแต่งได้อย่างสมบูรณ์</value>
+  </data>
+  <data name="support.perks.beatmap_filters.title" xml:space="preserve">
+    <value>ตัวกรองบีทแมพ</value>
+  </data>
+  <data name="support.perks.beatmap_filters.description" xml:space="preserve">
+    <value>กรองบีทแมพที่เล่นแล้ว/ยังไม่เล่น และแรงก์ที่เคยได้</value>
+  </data>
+  <data name="support.perks.yellow_fellow.title" xml:space="preserve">
+    <value>สีเหลืองสดใส</value>
+  </data>
+  <data name="support.perks.yellow_fellow.description" xml:space="preserve">
+    <value>ใคร ๆ ก็รู้ว่าเราเป็นผู้สนับสนุนด้วยชื่อสีเหลืองสดใส</value>
+  </data>
+  <data name="support.perks.speedy_downloads.title" xml:space="preserve">
+    <value>ดาวน์โหลดเร็วทันใจ</value>
+  </data>
+  <data name="support.perks.speedy_downloads.description" xml:space="preserve">
+    <value>การจำกัดดาวน์โหลดผ่อนปรนมากขึ้น โดยเฉพาะตอนใช้ osu!direct</value>
+  </data>
+  <data name="support.perks.change_username.title" xml:space="preserve">
+    <value>เปลี่ยนชื่อผู้ใช้</value>
+  </data>
+  <data name="support.perks.change_username.description" xml:space="preserve">
+    <value>เปลี่ยนชื่อผู้เล่นคุณโดยไม่เสียเงิน (ได้ครั้งเดียว)</value>
+  </data>
+  <data name="support.perks.skinnables.title" xml:space="preserve">
+    <value>การสกินเพิ่มเติม</value>
+  </data>
+  <data name="support.perks.skinnables.description" xml:space="preserve">
+    <value>ส่วนที่สกินได้เพิ่มเติม เช่นพื้นหลังของเมนูหลัก</value>
+  </data>
+  <data name="support.perks.feature_votes.title" xml:space="preserve">
+    <value>โหวตระบบ</value>
+  </data>
+  <data name="support.perks.feature_votes.description" xml:space="preserve">
+    <value>โหวตให้ระบบใหม่ๆ (สูงสุด 2 ครั้งต่อเดือน)</value>
+  </data>
+  <data name="support.perks.sort_options.title" xml:space="preserve">
+    <value>ตัวเลือกการเรียงลำดับ</value>
+  </data>
+  <data name="support.perks.sort_options.description" xml:space="preserve">
+    <value>ดูรายการคะแนนของประเทศ/เพื่อน/ม็อดที่เลือกในเกม</value>
+  </data>
+  <data name="support.perks.more_favourites.title" xml:space="preserve">
+    <value>เพิ่มจำนวนบีทแมพที่คุณสามารถเลือกเป็นรายการโปรด</value>
+  </data>
+  <data name="support.perks.more_favourites.description" xml:space="preserve">
+    <value>จำนวนบีทแมพที่คุณชื่นชอบได้เพิ่มจาก {0} &amp;rarr; {1}</value>
+  </data>
+  <data name="support.perks.more_friends.title" xml:space="preserve">
+    <value>เพิ่มจำนวนเพื่อนที่คุณสามารถมีได้</value>
+  </data>
+  <data name="support.perks.more_friends.description" xml:space="preserve">
+    <value>จำนวนเพื่อนที่คุณมีได้สูงสุดเพิ่มจาก {0} &amp;rarr; {1}</value>
+  </data>
+  <data name="support.perks.more_beatmaps.title" xml:space="preserve">
+    <value>อัปโหลดบีทแมพเพิ่ม</value>
+  </data>
+  <data name="support.perks.more_beatmaps.description" xml:space="preserve">
+    <value>จำนวนบีทแมพที่ไม่ได้จัดอันดับ ณ เวลาใด ๆ จะขึ้นกับค่าเริ่มต้น + โบนัสต่อจำนวนบีทแมพที่ได้จัดอันดับ (สูงสุดตามขีดจำกัดที่มี)&lt;br/&gt;&lt;br/&gt;ปกติแล้วคือ {0} + {1} บีทแมพต่อบีทแมพที่ได้จัดอันดับ (สูงสุด {2}) หากเป็นผู้สนับสนุน จะกลายเป็น {3} + {4} บีทแมพ (สูงสุด {5})</value>
+  </data>
+  <data name="support.perks.friend_filtering.title" xml:space="preserve">
+    <value>อันดับคะแนนเพื่อน</value>
+  </data>
+  <data name="support.perks.friend_filtering.description" xml:space="preserve">
+    <value>แข่งกับเพื่อนว่าใครเก่งกว่ากัน &lt;br/&gt;&lt;br/&gt;&lt;small&gt;*ยังไม่ขึ้นเว็บใหม่ แต่ก็ที่นี่ เร็ว ๆ นี้ย์(tm)&lt;/small&gt;</value>
+  </data>
+  <data name="support.supporter_status.contribution" xml:space="preserve">
+    <value>ขอบคุณสำหรับการสนับสนุนของคุณ! คุณได้สนับสนุนเป็นเงินรวม {0} จากการซิ้อแท็ก {1} อัน!</value>
+  </data>
+  <data name="support.supporter_status.gifted" xml:space="preserve">
+    <value>คุณได้ซื้อแท็ก {0} อันสำหรับเป็นของขวัญ (มูลค่า {1}) ใจกว้างมาก!</value>
+  </data>
+  <data name="support.supporter_status.not_yet" xml:space="preserve">
+    <value>คุณยังไม่มีแท็กสนับสนุน :(</value>
+  </data>
+  <data name="support.supporter_status.valid_until" xml:space="preserve">
+    <value>แท็กสนับสนุนของคุณใช้ได้จนถึง {0}!</value>
+  </data>
+  <data name="support.supporter_status.was_valid_until" xml:space="preserve">
+    <value>แท็กสนับสนุนคุณหมดอายุเมื่อ {0}</value>
+  </data>
+</root>

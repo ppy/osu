@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="edit.title_compact" xml:space="preserve">
+    <value>beállítások</value>
+  </data>
+  <data name="edit.username" xml:space="preserve">
+    <value>felhasználónév</value>
+  </data>
+  <data name="edit.avatar.title" xml:space="preserve">
+    <value>Avatár</value>
+  </data>
+  <data name="edit.avatar.rules" xml:space="preserve">
+    <value>Kérjük, ellenőrizze, hogy az avatár illeszkedik-e ehhez {0}.&lt;br/&gt;Ez azt jelenti, hogy &lt;strong&gt;minden korosztály számára alkalmasnak kell lennie&lt;/strong&gt;. Vagyis nincs meztelenség, mások számára elfogadhatatlan vagy szuggesztív tartalom.</value>
+  </data>
+  <data name="edit.avatar.rules_link" xml:space="preserve">
+    <value>a közösségi szabályok</value>
+  </data>
+  <data name="edit.email.current" xml:space="preserve">
+    <value>jelenlegi e-mail cím</value>
+  </data>
+  <data name="edit.email.new" xml:space="preserve">
+    <value>új e-mail cím</value>
+  </data>
+  <data name="edit.email.new_confirmation" xml:space="preserve">
+    <value>e-mail cím megerősítése</value>
+  </data>
+  <data name="edit.email.title" xml:space="preserve">
+    <value>E-Mail</value>
+  </data>
+  <data name="edit.password.current" xml:space="preserve">
+    <value>jelenlegi jelszó</value>
+  </data>
+  <data name="edit.password.new" xml:space="preserve">
+    <value>új jelszó</value>
+  </data>
+  <data name="edit.password.new_confirmation" xml:space="preserve">
+    <value>jelszó megerősítése</value>
+  </data>
+  <data name="edit.password.title" xml:space="preserve">
+    <value>Jelszó</value>
+  </data>
+  <data name="edit.profile.title" xml:space="preserve">
+    <value>Profil</value>
+  </data>
+  <data name="edit.profile.user.user_from" xml:space="preserve">
+    <value>tartózkodási hely</value>
+  </data>
+  <data name="edit.profile.user.user_interests" xml:space="preserve">
+    <value>érdeklődés</value>
+  </data>
+  <data name="edit.profile.user.user_occ" xml:space="preserve">
+    <value>foglalkozás</value>
+  </data>
+  <data name="edit.profile.user.user_website" xml:space="preserve">
+    <value>weboldal</value>
+  </data>
+  <data name="edit.signature.title" xml:space="preserve">
+    <value>Aláírás</value>
+  </data>
+  <data name="edit.signature.update" xml:space="preserve">
+    <value>mentés</value>
+  </data>
+  <data name="notifications.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>Értesítések kérése minősített beatmapok problémáival kapcsolatban a következő módokból</value>
+  </data>
+  <data name="notifications.beatmapset_disqualify" xml:space="preserve">
+    <value>értesíts, ha a következő játékmódok egy beatmapje diszkvalifikálva lett</value>
+  </data>
+  <data name="notifications.comment_reply" xml:space="preserve">
+    <value>értesítések küldése a kommentjeidre érkezett válaszokról</value>
+  </data>
+  <data name="notifications.title" xml:space="preserve">
+    <value>Értesítések</value>
+  </data>
+  <data name="notifications.topic_auto_subscribe" xml:space="preserve">
+    <value>az általad létrehozott új fórum témák értesítéseinek automatikus bekapcsolása</value>
+  </data>
+  <data name="notifications.options._" xml:space="preserve">
+    <value>Szállítási lehetőségek</value>
+  </data>
+  <data name="notifications.options.beatmap_owner_change" xml:space="preserve">
+    <value>vendég nehézség</value>
+  </data>
+  <data name="notifications.options.beatmapset:modding" xml:space="preserve">
+    <value>beatmap modolás</value>
+  </data>
+  <data name="notifications.options.channel_message" xml:space="preserve">
+    <value>Privát üzenetek</value>
+  </data>
+  <data name="notifications.options.comment_new" xml:space="preserve">
+    <value>Új megjegyzések</value>
+  </data>
+  <data name="notifications.options.forum_topic_reply" xml:space="preserve">
+    <value>Válaszolj erre a témára</value>
+  </data>
+  <data name="notifications.options.mail" xml:space="preserve">
+    <value>e-mail</value>
+  </data>
+  <data name="notifications.options.mapping" xml:space="preserve">
+    <value>beatmap készítő</value>
+  </data>
+  <data name="notifications.options.push" xml:space="preserve">
+    <value>Elöjövő</value>
+  </data>
+  <data name="notifications.options.user_achievement_unlock" xml:space="preserve">
+    <value>Medál feloldva</value>
+  </data>
+  <data name="oauth.authorized_clients" xml:space="preserve">
+    <value>felhatalmazott kliensek</value>
+  </data>
+  <data name="oauth.own_clients" xml:space="preserve">
+    <value>külső alkalmazások</value>
+  </data>
+  <data name="oauth.title" xml:space="preserve">
+    <value>OAuth</value>
+  </data>
+  <data name="options.beatmapset_show_nsfw" xml:space="preserve">
+    <value>beatmapekben lévő felnőtt tartalmakra vonatkozó figyelmeztetések elrejtése</value>
+  </data>
+  <data name="options.beatmapset_title_show_original" xml:space="preserve">
+    <value>A beatmap metaadatai megjelenítése eredeti nyelven</value>
+  </data>
+  <data name="options.title" xml:space="preserve">
+    <value>Beállítások</value>
+  </data>
+  <data name="options.beatmapset_download._" xml:space="preserve">
+    <value>Alapértelmezett beatmap letöltés típusa</value>
+  </data>
+  <data name="options.beatmapset_download.all" xml:space="preserve">
+    <value>Videóval, ha elérhető</value>
+  </data>
+  <data name="options.beatmapset_download.direct" xml:space="preserve">
+    <value>Megnyitás osu!direct-ben</value>
+  </data>
+  <data name="options.beatmapset_download.no_video" xml:space="preserve">
+    <value>Videó nélkül</value>
+  </data>
+  <data name="playstyles.keyboard" xml:space="preserve">
+    <value>billentyűzet</value>
+  </data>
+  <data name="playstyles.mouse" xml:space="preserve">
+    <value>egér</value>
+  </data>
+  <data name="playstyles.tablet" xml:space="preserve">
+    <value>tablet</value>
+  </data>
+  <data name="playstyles.title" xml:space="preserve">
+    <value>Játékstílusok</value>
+  </data>
+  <data name="playstyles.touch" xml:space="preserve">
+    <value>érintőképernyő</value>
+  </data>
+  <data name="privacy.friends_only" xml:space="preserve">
+    <value>privát üzenetek tiltása olyan személyektől, akik nincsenek a baráti listádon</value>
+  </data>
+  <data name="privacy.hide_online" xml:space="preserve">
+    <value>online állapot elrejtése</value>
+  </data>
+  <data name="privacy.title" xml:space="preserve">
+    <value>Adatvédelem</value>
+  </data>
+  <data name="security.current_session" xml:space="preserve">
+    <value>jelenlegi</value>
+  </data>
+  <data name="security.end_session" xml:space="preserve">
+    <value>Munkamenet befejezése</value>
+  </data>
+  <data name="security.end_session_confirmation" xml:space="preserve">
+    <value>Ez azonnal befejezi a munkamenetet az eszközön. Biztos vagy benne?</value>
+  </data>
+  <data name="security.last_active" xml:space="preserve">
+    <value>Utoljára aktív:</value>
+  </data>
+  <data name="security.title" xml:space="preserve">
+    <value>Biztonság</value>
+  </data>
+  <data name="security.web_sessions" xml:space="preserve">
+    <value>webes munkamenetek</value>
+  </data>
+  <data name="update_email.update" xml:space="preserve">
+    <value>mentés</value>
+  </data>
+  <data name="update_password.update" xml:space="preserve">
+    <value>mentés</value>
+  </data>
+  <data name="verification_completed.text" xml:space="preserve">
+    <value>Mostmár bezárhatod ezt az oldalt</value>
+  </data>
+  <data name="verification_completed.title" xml:space="preserve">
+    <value>Az ellenőrzés befejeződött</value>
+  </data>
+  <data name="verification_invalid.title" xml:space="preserve">
+    <value>Érvénytelen vagy lejárt ellenőrző link</value>
+  </data>
+</root>

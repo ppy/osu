@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="_" xml:space="preserve">
+    <value>Trier par</value>
+  </data>
+  <data name="all" xml:space="preserve">
+    <value>Tous</value>
+  </data>
+  <data name="friends" xml:space="preserve">
+    <value>Amis</value>
+  </data>
+  <data name="last_visit" xml:space="preserve">
+    <value>Récemment actif</value>
+  </data>
+  <data name="new" xml:space="preserve">
+    <value>Récent</value>
+  </data>
+  <data name="old" xml:space="preserve">
+    <value>Ancien</value>
+  </data>
+  <data name="rank" xml:space="preserve">
+    <value>Rang</value>
+  </data>
+  <data name="top" xml:space="preserve">
+    <value>Meilleurs</value>
+  </data>
+  <data name="username" xml:space="preserve">
+    <value>Nom d’utilisateur</value>
+  </data>
+  <data name="forum_posts.created" xml:space="preserve">
+    <value>Heure de publication</value>
+  </data>
+  <data name="forum_posts.relevance" xml:space="preserve">
+    <value>Pertinence</value>
+  </data>
+  <data name="forum_topics.feature_votes" xml:space="preserve">
+    <value>Priorité d'étoiles</value>
+  </data>
+  <data name="forum_topics.new" xml:space="preserve">
+    <value>Dernière réponse</value>
+  </data>
+  <data name="users.relevance" xml:space="preserve">
+    <value>Pertinence</value>
+  </data>
+  <data name="users.username" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+</root>

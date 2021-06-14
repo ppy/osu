@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="support.convinced.title" xml:space="preserve">
+    <value>いいですね！</value>
+  </data>
+  <data name="support.convinced.support" xml:space="preserve">
+    <value>osu!をサポートする！</value>
+  </data>
+  <data name="support.convinced.gift" xml:space="preserve">
+    <value>もしくはギフトを贈る</value>
+  </data>
+  <data name="support.convinced.instructions" xml:space="preserve">
+    <value>ハートボタンをクリックでosu!storeに飛びます(英語)</value>
+  </data>
+  <data name="support.why-support.title" xml:space="preserve">
+    <value>なぜosu!を支援する必要があるの？お金はどう使われるの？</value>
+  </data>
+  <data name="support.why-support.team.title" xml:space="preserve">
+    <value>チームを支援する</value>
+  </data>
+  <data name="support.why-support.team.description" xml:space="preserve">
+    <value>osu!は小規模なチームによって開発されています。あなたのサポートがチームを助けます。</value>
+  </data>
+  <data name="support.why-support.infra.title" xml:space="preserve">
+    <value>サーバーインフラ</value>
+  </data>
+  <data name="support.why-support.infra.description" xml:space="preserve">
+    <value>寄付はウェブサイト、マルチプレイサービス、オンラインリーダーボードを実行するサーバーの為に使われます。</value>
+  </data>
+  <data name="support.why-support.featured-artists.title" xml:space="preserve">
+    <value>注目アーティスト</value>
+  </data>
+  <data name="support.why-support.featured-artists.description" xml:space="preserve">
+    <value>あなたのサポートで私達は素晴らしいアーティストにアプローチして、osu!で使用するための素晴らしい音楽をライセンスすることができます。</value>
+  </data>
+  <data name="support.why-support.featured-artists.link_text" xml:space="preserve">
+    <value>現在の一覧を見る &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.ads.title" xml:space="preserve">
+    <value>osu!の独立性を保つ</value>
+  </data>
+  <data name="support.why-support.ads.description" xml:space="preserve">
+    <value>あなたの貢献によってゲームは独立し、広告や外部のスポンサーから自由になることができます。</value>
+  </data>
+  <data name="support.why-support.tournaments.title" xml:space="preserve">
+    <value>公式トーナメント</value>
+  </data>
+  <data name="support.why-support.tournaments.description" xml:space="preserve">
+    <value>公式osu!ワールドカップトーナメントに資金（および賞品）を提供してください！</value>
+  </data>
+  <data name="support.why-support.tournaments.link_text" xml:space="preserve">
+    <value>トーナメントを検索 &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.bounty-program.title" xml:space="preserve">
+    <value>オープンソースバウンティプログラム</value>
+  </data>
+  <data name="support.why-support.bounty-program.description" xml:space="preserve">
+    <value>osu!を改善するために時間と労力を費やしてきたコミュニティの貢献者を支援します。</value>
+  </data>
+  <data name="support.why-support.bounty-program.link_text" xml:space="preserve">
+    <value>詳細を見る &amp;raquo;</value>
+  </data>
+  <data name="support.perks.title" xml:space="preserve">
+    <value>特典って？</value>
+  </data>
+  <data name="support.perks.osu_direct.title" xml:space="preserve">
+    <value>osu!direct</value>
+  </data>
+  <data name="support.perks.osu_direct.description" xml:space="preserve">
+    <value>ゲームから離れることなくビートマップを素早くダウンロード。</value>
+  </data>
+  <data name="support.perks.friend_ranking.title" xml:space="preserve">
+    <value>フレンドランキング</value>
+  </data>
+  <data name="support.perks.friend_ranking.description" xml:space="preserve">
+    <value>ゲーム内とウェブサイトのリーダーボードで、フレンドと競い合う方法をご覧ください。</value>
+  </data>
+  <data name="support.perks.country_ranking.title" xml:space="preserve">
+    <value>国別ランキング</value>
+  </data>
+  <data name="support.perks.country_ranking.description" xml:space="preserve">
+    <value>世界征服の前にまずは君の国で一番を目指そう。</value>
+  </data>
+  <data name="support.perks.mod_filtering.title" xml:space="preserve">
+    <value>Modsで絞り込む</value>
+  </data>
+  <data name="support.perks.mod_filtering.description" xml:space="preserve">
+    <value>HDHRをプレイする人と関連付けますか？問題ありません！</value>
+  </data>
+  <data name="support.perks.auto_downloads.title" xml:space="preserve">
+    <value>自動ダウンロード</value>
+  </data>
+  <data name="support.perks.auto_downloads.description" xml:space="preserve">
+    <value>観戦やマルチプレイをする時に自動的にビートマップをダウンロードします。リンクもクリックだけで終わります。</value>
+  </data>
+  <data name="support.perks.upload_more.title" xml:space="preserve">
+    <value>アップロード上限数の増加</value>
+  </data>
+  <data name="support.perks.upload_more.description" xml:space="preserve">
+    <value>Pendingのビートマップをアップロードできる数が増えます。（Rankedビートマップ一つあたり）上限は10個です。</value>
+  </data>
+  <data name="support.perks.early_access.title" xml:space="preserve">
+    <value>早期アクセス</value>
+  </data>
+  <data name="support.perks.early_access.description" xml:space="preserve">
+    <value>テスト段階の機能が使えるベータ版のクライアントが利用できるようになります。</value>
+  </data>
+  <data name="support.perks.customisation.title" xml:space="preserve">
+    <value>カスタマイズ</value>
+  </data>
+  <data name="support.perks.customisation.description" xml:space="preserve">
+    <value>自分のユーザーページに自由に編集できる領域が追加されます。</value>
+  </data>
+  <data name="support.perks.beatmap_filters.title" xml:space="preserve">
+    <value>ビートマップの検索フィルター</value>
+  </data>
+  <data name="support.perks.beatmap_filters.description" xml:space="preserve">
+    <value>ビートマップがプレイ・未プレイや取得したランクで検索できるようになります。</value>
+  </data>
+  <data name="support.perks.yellow_fellow.title" xml:space="preserve">
+    <value>イエローフェロー</value>
+  </data>
+  <data name="support.perks.yellow_fellow.description" xml:space="preserve">
+    <value>ゲーム内チャットで名前の色が明るい黄色で表示されるようになります。</value>
+  </data>
+  <data name="support.perks.speedy_downloads.title" xml:space="preserve">
+    <value>高速ダウンロード</value>
+  </data>
+  <data name="support.perks.speedy_downloads.description" xml:space="preserve">
+    <value>ダウンロードの制限が緩くなります。</value>
+  </data>
+  <data name="support.perks.change_username.title" xml:space="preserve">
+    <value>ユーザー名の変更</value>
+  </data>
+  <data name="support.perks.change_username.description" xml:space="preserve">
+    <value>ユーザー名の変更を一回だけ追加料金なしで利用できます。</value>
+  </data>
+  <data name="support.perks.skinnables.title" xml:space="preserve">
+    <value>スキンの拡張</value>
+  </data>
+  <data name="support.perks.skinnables.description" xml:space="preserve">
+    <value>メインメニューの背景のような追加スキンを変更できるようになります。</value>
+  </data>
+  <data name="support.perks.feature_votes.title" xml:space="preserve">
+    <value>機能リクエスト</value>
+  </data>
+  <data name="support.perks.feature_votes.description" xml:space="preserve">
+    <value>機能リクエストに投票できるようになります。（月あたり２回）</value>
+  </data>
+  <data name="support.perks.sort_options.title" xml:space="preserve">
+    <value>並び替えオプション</value>
+  </data>
+  <data name="support.perks.sort_options.description" xml:space="preserve">
+    <value>ゲーム内でビートマップの国別・フレンド・Mod別ランキングが利用できるようになります。</value>
+  </data>
+  <data name="support.perks.more_favourites.title" xml:space="preserve">
+    <value>その他のお気に入り</value>
+  </data>
+  <data name="support.perks.more_favourites.description" xml:space="preserve">
+    <value>お気に入りに登録できるビートマップの数は{0} &amp;rarr; {1}に増加します</value>
+  </data>
+  <data name="support.perks.more_friends.title" xml:space="preserve">
+    <value>その他のフレンド</value>
+  </data>
+  <data name="support.perks.more_friends.description" xml:space="preserve">
+    <value>登録できるフレンドの数は{0} &amp;rarr; {1}に増加します</value>
+  </data>
+  <data name="support.perks.more_beatmaps.title" xml:space="preserve">
+    <value>他のビートマップをアップロード</value>
+  </data>
+  <data name="support.perks.more_beatmaps.description" xml:space="preserve">
+    <value>一度に保持できるRankedされていないビートマップ数は、基準値とRankedされたビートマップの追加ボーナス値から計算されます。&lt;br/&gt;&lt;br/&gt;通常これは{0}つで、Rankedされたビートマップごとに{1}つ追加されます。（最大 {2}）サポーターになると、{3}つになりRankedされるごとに{4}つ追加されます。（最大 {5}）</value>
+  </data>
+  <data name="support.perks.friend_filtering.title" xml:space="preserve">
+    <value>フレンドリーダーボード</value>
+  </data>
+  <data name="support.perks.friend_filtering.description" xml:space="preserve">
+    <value>フレンドとランキングを競うことができます！</value>
+  </data>
+  <data name="support.supporter_status.contribution" xml:space="preserve">
+    <value>osu!をサポートしてくれてありがとうございます！今までに{0}で{1}個のタグを購入しました！</value>
+  </data>
+  <data name="support.supporter_status.gifted" xml:space="preserve">
+    <value>今まで購入したサポータータグのうち{0}個がギフト（ギフト合計金額：{1}）として送られました。あなたの寛大さに拍手！</value>
+  </data>
+  <data name="support.supporter_status.not_yet" xml:space="preserve">
+    <value>osu!サポータータグをまだ持っていません :(</value>
+  </data>
+  <data name="support.supporter_status.valid_until" xml:space="preserve">
+    <value>あなたのosu!サポータータグは{0}まで有効です！</value>
+  </data>
+  <data name="support.supporter_status.was_valid_until" xml:space="preserve">
+    <value>あなたのosu!サポータータグは{0}に期限切れになりました。</value>
+  </data>
+</root>

@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="landing.download" xml:space="preserve">
+    <value>지금 바로 다운로드하기</value>
+  </data>
+  <data name="landing.online" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt;명이 현재 접속 중이며, &lt;strong&gt;{1}&lt;/strong&gt;개의 게임이 개설되어 있습니다.</value>
+  </data>
+  <data name="landing.peak" xml:space="preserve">
+    <value>최다 동시 접속자 수: {0}명</value>
+  </data>
+  <data name="landing.players" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt;명이 가입되어 있고</value>
+  </data>
+  <data name="landing.title" xml:space="preserve">
+    <value>환영합니다</value>
+  </data>
+  <data name="landing.see_more_news" xml:space="preserve">
+    <value>소식 더 보기</value>
+  </data>
+  <data name="landing.slogan.main" xml:space="preserve">
+    <value>최고의 무료 리듬 게임</value>
+  </data>
+  <data name="landing.slogan.sub" xml:space="preserve">
+    <value>리듬은 이미, 그 손끝에</value>
+  </data>
+  <data name="search.advanced_link" xml:space="preserve">
+    <value>고급 검색</value>
+  </data>
+  <data name="search.button" xml:space="preserve">
+    <value>검색</value>
+  </data>
+  <data name="search.empty_result" xml:space="preserve">
+    <value>아무것도 찾지 못했습니다!</value>
+  </data>
+  <data name="search.keyword_required" xml:space="preserve">
+    <value>검색 키워드가 필요합니다</value>
+  </data>
+  <data name="search.placeholder" xml:space="preserve">
+    <value>검색어를 입력해주세요</value>
+  </data>
+  <data name="search.title" xml:space="preserve">
+    <value>검색</value>
+  </data>
+  <data name="search.beatmapset.login_required" xml:space="preserve">
+    <value>비트맵을 검색하기 위해서 로그인</value>
+  </data>
+  <data name="search.beatmapset.more" xml:space="preserve">
+    <value>{0}개의 비트맵 검색 결과 더 보기</value>
+  </data>
+  <data name="search.beatmapset.more_simple" xml:space="preserve">
+    <value>비트맵 검색 결과 더 보기</value>
+  </data>
+  <data name="search.beatmapset.title" xml:space="preserve">
+    <value>비트맵</value>
+  </data>
+  <data name="search.forum_post.all" xml:space="preserve">
+    <value>모든 포럼</value>
+  </data>
+  <data name="search.forum_post.link" xml:space="preserve">
+    <value>포럼 검색하기</value>
+  </data>
+  <data name="search.forum_post.login_required" xml:space="preserve">
+    <value>포럼을 검색하기 위해서 로그인</value>
+  </data>
+  <data name="search.forum_post.more_simple" xml:space="preserve">
+    <value>포럼 검색 결과 더 보기</value>
+  </data>
+  <data name="search.forum_post.title" xml:space="preserve">
+    <value>포럼</value>
+  </data>
+  <data name="search.forum_post.label.forum" xml:space="preserve">
+    <value>포럼에서 검색하기</value>
+  </data>
+  <data name="search.forum_post.label.forum_children" xml:space="preserve">
+    <value>서브포럼을 포함하여 검색</value>
+  </data>
+  <data name="search.forum_post.label.topic_id" xml:space="preserve">
+    <value>주제 #</value>
+  </data>
+  <data name="search.forum_post.label.username" xml:space="preserve">
+    <value>글쓴이</value>
+  </data>
+  <data name="search.mode.all" xml:space="preserve">
+    <value>모두</value>
+  </data>
+  <data name="search.mode.beatmapset" xml:space="preserve">
+    <value>비트맵</value>
+  </data>
+  <data name="search.mode.forum_post" xml:space="preserve">
+    <value>포럼</value>
+  </data>
+  <data name="search.mode.user" xml:space="preserve">
+    <value>플레이어</value>
+  </data>
+  <data name="search.mode.wiki_page" xml:space="preserve">
+    <value>위키</value>
+  </data>
+  <data name="search.user.login_required" xml:space="preserve">
+    <value>사용자를 검색하기 위해서 로그인</value>
+  </data>
+  <data name="search.user.more" xml:space="preserve">
+    <value>{0}명의 플레이어 검색 결과 더 보기</value>
+  </data>
+  <data name="search.user.more_simple" xml:space="preserve">
+    <value>플레이어 검색 결과 더 보기</value>
+  </data>
+  <data name="search.user.more_hidden" xml:space="preserve">
+    <value>플레이어 검색은 최대 {0}명 까지 가능합니다. 다른 검색어로 시도해보세요.</value>
+  </data>
+  <data name="search.user.title" xml:space="preserve">
+    <value>플레이어</value>
+  </data>
+  <data name="search.wiki_page.link" xml:space="preserve">
+    <value>위키에서 검색하기</value>
+  </data>
+  <data name="search.wiki_page.more_simple" xml:space="preserve">
+    <value>위키 검색 결과 더 보기</value>
+  </data>
+  <data name="search.wiki_page.title" xml:space="preserve">
+    <value>위키</value>
+  </data>
+  <data name="download.tagline" xml:space="preserve">
+    <value>시작해봐요!</value>
+  </data>
+  <data name="download.action" xml:space="preserve">
+    <value>osu! 다운로드</value>
+  </data>
+  <data name="download.help._" xml:space="preserve">
+    <value>게임을 시작하거나 계정을 등록하는데 문제가 있다면, {0} 하거나 {1} 해보세요.</value>
+  </data>
+  <data name="download.help.help_forum_link" xml:space="preserve">
+    <value>도움말 포럼을 확인</value>
+  </data>
+  <data name="download.help.support_button" xml:space="preserve">
+    <value>지원 팀에 연락</value>
+  </data>
+  <data name="download.os.windows" xml:space="preserve">
+    <value>Windows 용</value>
+  </data>
+  <data name="download.os.macos" xml:space="preserve">
+    <value>macOS 용</value>
+  </data>
+  <data name="download.os.linux" xml:space="preserve">
+    <value>Linux 용</value>
+  </data>
+  <data name="download.mirror" xml:space="preserve">
+    <value>미러</value>
+  </data>
+  <data name="download.macos-fallback" xml:space="preserve">
+    <value>macOS 사용자</value>
+  </data>
+  <data name="download.steps.register.title" xml:space="preserve">
+    <value>계정 만들기</value>
+  </data>
+  <data name="download.steps.register.description" xml:space="preserve">
+    <value>게임을 시작하면 로그인하거나 계정을 만드는 절차를 따라주세요.</value>
+  </data>
+  <data name="download.steps.download.title" xml:space="preserve">
+    <value>게임 다운로드!</value>
+  </data>
+  <data name="download.steps.download.description" xml:space="preserve">
+    <value>위 버튼을 눌러 설치 프로그램을 다운받고, 실행하세요!</value>
+  </data>
+  <data name="download.steps.beatmaps.title" xml:space="preserve">
+    <value>비트맵 받기</value>
+  </data>
+  <data name="download.steps.beatmaps.description._" xml:space="preserve">
+    <value>유저들이 만든 비트맵의 광대한 라이브러리를 {0}하고 시작해 보세요!</value>
+  </data>
+  <data name="download.steps.beatmaps.description.browse" xml:space="preserve">
+    <value>탐색</value>
+  </data>
+  <data name="download.video-guide" xml:space="preserve">
+    <value>영상 가이드</value>
+  </data>
+  <data name="user.title" xml:space="preserve">
+    <value>대시보드</value>
+  </data>
+  <data name="user.news.title" xml:space="preserve">
+    <value>소식</value>
+  </data>
+  <data name="user.news.error" xml:space="preserve">
+    <value>소식을 불러오는 도중 문제가 발생했습니다, 페이지를 한 번 새로고침 해보시겠어요?...</value>
+  </data>
+  <data name="user.header.stats.friends" xml:space="preserve">
+    <value>접속 중인 친구</value>
+  </data>
+  <data name="user.header.stats.games" xml:space="preserve">
+    <value>게임 수</value>
+  </data>
+  <data name="user.header.stats.online" xml:space="preserve">
+    <value>접속 중인 플레이어</value>
+  </data>
+  <data name="user.beatmaps.new" xml:space="preserve">
+    <value>새로 Ranked된 비트맵</value>
+  </data>
+  <data name="user.beatmaps.popular" xml:space="preserve">
+    <value>인기 비트맵</value>
+  </data>
+  <data name="user.beatmaps.by_user" xml:space="preserve">
+    <value>{0} 님이 만듦</value>
+  </data>
+  <data name="user.buttons.download" xml:space="preserve">
+    <value>osu! 다운로드</value>
+  </data>
+  <data name="user.buttons.support" xml:space="preserve">
+    <value>osu! 지원하기</value>
+  </data>
+  <data name="user.buttons.store" xml:space="preserve">
+    <value>osu!store</value>
+  </data>
+  <data name="support-osu.title" xml:space="preserve">
+    <value>와!</value>
+  </data>
+  <data name="support-osu.subtitle" xml:space="preserve">
+    <value>즐거운 시간을 보내고 계신 것 같네요! {0}</value>
+  </data>
+  <data name="support-osu.body.part-1" xml:space="preserve">
+    <value>osu!가 아무런 광고 수익 없이, 사용자들의 지원으로만 개발 / 운영된다는 사실, 알고 계신가요?</value>
+  </data>
+  <data name="support-osu.body.part-2" xml:space="preserve">
+    <value>그리고 또, osu!를 지원하면 게임 내 자동 다운로드 같은 다양한 유용한 기능들을 이용할 수 있다는 점도 알고 계세요?</value>
+  </data>
+  <data name="support-osu.find-out-more" xml:space="preserve">
+    <value>더 알아보려면 여기를 눌러주세요!</value>
+  </data>
+  <data name="support-osu.download-starting" xml:space="preserve">
+    <value>아, 걱정은 하지마세요 - 요청하신 다운로드는 이미 시작됐으니까요 ;)</value>
+  </data>
+</root>

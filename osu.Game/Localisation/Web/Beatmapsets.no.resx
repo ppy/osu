@@ -1,0 +1,346 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>Dette beatmappet er for øyeblikket ikke tilgjengelig for nedlastning.</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>Deler av dette beatmappet har blitt fjernet etter forespørsel av skaperen eller en tredjepart rettighetshaver.</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>Klikk her for mer informasjon.</value>
+  </data>
+  <data name="download.limit_exceeded" xml:space="preserve">
+    <value>Ro ned, spill mer.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmapsliste</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>Beatmaps</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>last ned</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>last ned med video</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>last ned med video</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>åpne i osu!direct</value>
+  </data>
+  <data name="nominate.incorrect_mode" xml:space="preserve">
+    <value>Du har ikke tillatelse til å nominere for modus: {0}</value>
+  </data>
+  <data name="nominate.too_many" xml:space="preserve">
+    <value>Nominasjonskravet er allerede oppfylt.</value>
+  </data>
+  <data name="nominate.dialog.which_modes" xml:space="preserve">
+    <value>Nominer for hvilke moduser?</value>
+  </data>
+  <data name="nsfw_badge.label" xml:space="preserve">
+    <value>Eksplisitt</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>Diskusjon</value>
+  </data>
+  <data name="show.details.by_artist" xml:space="preserve">
+    <value>av {0}</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>Marker dette beatmapsettet som en favoritt</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>Du må logge inn før du kan laste ned beatmaps!</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>mappet av {0}</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>Fjern dette beatmapsettet som en favoritt</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>sist oppdatert {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>Last ned</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>uten Video</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>med Video</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>for å få tilgang til flere funksjoner</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>Logg inn</value>
+  </data>
+  <data name="show.details_date.approved" xml:space="preserve">
+    <value>godkjent {0}</value>
+  </data>
+  <data name="show.details_date.loved" xml:space="preserve">
+    <value>elsket {0}</value>
+  </data>
+  <data name="show.details_date.qualified" xml:space="preserve">
+    <value>kvalifisert {0}</value>
+  </data>
+  <data name="show.details_date.ranked" xml:space="preserve">
+    <value>rangert {0}</value>
+  </data>
+  <data name="show.details_date.submitted" xml:space="preserve">
+    <value>sent inn {0}</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>sist oppdatert {0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>Du har lagt til for mange beatmaps som favoritter! Vennligst fjern noen av favorittene dine før du prøver igjen.</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>Hype denne mappen hvis du likte å spille den, for å hjelpe den å nå &lt;strong&gt;Rangert&lt;/strong&gt; status.</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>Dette mappet er for øyeblikket {0}.</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>ventende</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>kvalifisert</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>under konstruksjon</value>
+  </data>
+  <data name="show.hype.disqualify._" xml:space="preserve">
+    <value>Hvis du finner et problem med dette beatmappet, vennligst diskvalifiser det {0}.</value>
+  </data>
+  <data name="show.hype.report._" xml:space="preserve">
+    <value>Hvis du finner et problem med dette beatmappet, vennligst rapporter det {0} for å varsle teamet.</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>Rapporter Problem</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>her</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>Beskrivelse</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>Sjanger</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>Språk</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>Data blir fortsatt kalkulert...</value>
+  </data>
+  <data name="show.info.nsfw" xml:space="preserve">
+    <value>Eksplisitt innhold</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>Feilpunkter</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>Kilde</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>Suksessrate</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>Stikkord</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>oppnådd {0}</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>Landsrangering</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>Vennerangering</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>Global Rangering</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>Klikk &lt;a href="{0}"&gt;her&lt;/a&gt; for å se alle de fancy funskjonene du får tildelt!</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>Du må være en osu!supporter for å ha tilgang til venne- og landsrangering!</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>Poengliste</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>Presisjon</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>Maks Kombo</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>Bom</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>Modifikasjoner</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>Spiller</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>Rang</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>Total Poengsum</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>Poengsum</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>Tid</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>Ingen fra landet ditt har satt en poengsum på denne mappen enda!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>Ingen av vennene dine har satt en poengsum på denne mappen enda!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>Ingen poengsummer enda. Kanskje du skulle prøve å sette noen?</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>Laster poengsummer...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>Urangert beatmap.</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>I ledelsen</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>Ditt beste</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>Sirkel Størrelse</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>Antall Tangenter</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>HP Drenering</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>Presisjon</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>Tilnærmingsrate</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>Vanskelighetsgrad (*)</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>Lengde</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>Antall Sirkler</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>Antall Glidere</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>Brukervurderinger</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>Vurderingsskjema</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>Nominasjoner</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>Spillforsøk</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>Rangert</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>Godkjent</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>Elsket</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>Kvalifisert</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>Arbeid pågår</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>Avventes</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>Gravplassert</value>
+  </data>
+</root>

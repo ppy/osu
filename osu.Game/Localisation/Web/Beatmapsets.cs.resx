@@ -1,0 +1,340 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>Tato beatmapa není momentálně dostupná ke stažení.</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>Část této beatmapy byla smazána na žádost tvůrce nebo vlastníka třetí strany.</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>Pro více informací klikněte zde.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Seznam Beatmap</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>Beatmapy</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>stáhnout</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>stáhnout s videem</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>stáhnout bez videa</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>otevřít v osu!direct</value>
+  </data>
+  <data name="nsfw_badge.label" xml:space="preserve">
+    <value>Explicitní</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>Diskuze</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>Přidat do mých oblíbených</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>Pro stahování beatmap musíš být přihlášen!</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>beatmapu vytvořil {0}</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>Odebrat z mých oblíbených</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>naposledy aktualizováno {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>Stáhnout</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>bez Videa</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>s Videem</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>pro přístup k dalším funkcím</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>Přihlašte se</value>
+  </data>
+  <data name="show.details_date.approved" xml:space="preserve">
+    <value>schváleno {0}</value>
+  </data>
+  <data name="show.details_date.qualified" xml:space="preserve">
+    <value>kvalifikováno {0}</value>
+  </data>
+  <data name="show.details_date.submitted" xml:space="preserve">
+    <value>odesláno {0}</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>naposledy aktualizováno {0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>Máte příliš map v oblibených! Než to budete zkoušet znova, nějakou odstraňte.</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>Dejte Hype téhle mapě, pokud jste si užili její hraní a pomocte jí se dostat do &lt;strong&gt;Hodnoceného&lt;/strong&gt; stavu.</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>Tato mapa je právě {0}.</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>čekající</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>kvalifikované</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>rozpracované</value>
+  </data>
+  <data name="show.hype.disqualify._" xml:space="preserve">
+    <value>Pokud najdete problém s touto mapou, diskvalifikujte ji prosím {0}.</value>
+  </data>
+  <data name="show.hype.report._" xml:space="preserve">
+    <value>Pokud najdete problém s touto mapou, nahlaste jej {0} k upozornění týmu.</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>Nahlásit problém</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>zde</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>Popis</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>Žánr</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>Jazyk</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>Data se vypočítávají...</value>
+  </data>
+  <data name="show.info.nsfw" xml:space="preserve">
+    <value>Explicitní obsah</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>Body neúspěchů</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>Zdroj</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>Úspěšnost</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>Tagy</value>
+  </data>
+  <data name="show.nsfw_warning.details" xml:space="preserve">
+    <value>Tato beatmapa obsahuje explicitní, urážlivý nebo rušivý obsah. Chcete ji přesto zobrazit?</value>
+  </data>
+  <data name="show.nsfw_warning.title" xml:space="preserve">
+    <value>Explicitní obsah</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.disable" xml:space="preserve">
+    <value>Vypnout varování</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.listing" xml:space="preserve">
+    <value>Seznam beatmap</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.show" xml:space="preserve">
+    <value>Zobrazit</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>dosaženo {0}</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>Státní žebříčky</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>Žebříček přátel</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>Celosvětové žebříčky</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>Klikněte &lt;a href="{0}"&gt;zde&lt;/a&gt; pro zobrazení všech výhod, které dostanete!</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>Pro zobrazení státních a žebříčků přátel potřebujete funkci Supportera!</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>Tabulka výsledků</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>Přesnost</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>Maximální Kombo</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>Minuto</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>Módy</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>Hráč</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>Umístění</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>Celkové skóre</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>Skóre</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>Čas</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>Nikdo ve vaší zemi na této mapě zatím žádné skóre nenahrál!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>Nikdo z vašich přátel na této mapě zatím žádné skóre nenahrál!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>Zatím žádné skóre. Možná by ses o to měl pokusit!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>Načítání skóre...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>Nehodnocená beatmapa.</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>V čele</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>Vaše nejlepší</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>Velikost koleček</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>Počet kláves</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>Vysávání životů</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>Přesnost</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>Rychlost zjevování koleček</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>Počet hvězd</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>Délka</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>Počet koleček</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>Počet sliderů</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>Uživatelské hodnocení</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>Graf hodnocení</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>Nominace</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>Počet zahrání</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>Hodnocené</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>Schválené</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>Oblíbené</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>Kvalifikované</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>Nedodělané</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>Nevyřízené</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>Hřbitov</value>
+  </data>
+</root>

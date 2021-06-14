@@ -1,0 +1,721 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="deleted" xml:space="preserve">
+    <value>[törölt felhasználó]</value>
+  </data>
+  <data name="beatmapset_activities.title" xml:space="preserve">
+    <value>{0} Modolási Történelme</value>
+  </data>
+  <data name="beatmapset_activities.title_compact" xml:space="preserve">
+    <value>Modolás</value>
+  </data>
+  <data name="beatmapset_activities.discussions.title_recent" xml:space="preserve">
+    <value>Legutóbb kezdett beszélgetések</value>
+  </data>
+  <data name="beatmapset_activities.events.title_recent" xml:space="preserve">
+    <value>Legutóbbi események</value>
+  </data>
+  <data name="beatmapset_activities.posts.title_recent" xml:space="preserve">
+    <value>Legutóbbi hozzászólások</value>
+  </data>
+  <data name="beatmapset_activities.votes_received.title_most" xml:space="preserve">
+    <value>A legmagasabbra értékelt (az előző 3 hónap alapján)</value>
+  </data>
+  <data name="beatmapset_activities.votes_made.title_most" xml:space="preserve">
+    <value>A legmagasabbra értékelt (az előző 3 hónap alapján)</value>
+  </data>
+  <data name="blocks.banner_text" xml:space="preserve">
+    <value>Blokkoltad ezt a felhasználót.</value>
+  </data>
+  <data name="blocks.blocked_count" xml:space="preserve">
+    <value>({0}) blokkolt felhasználók</value>
+  </data>
+  <data name="blocks.hide_profile" xml:space="preserve">
+    <value>profil elrejtése</value>
+  </data>
+  <data name="blocks.not_blocked" xml:space="preserve">
+    <value>Ez a felhasználó nincs blokkolva.</value>
+  </data>
+  <data name="blocks.show_profile" xml:space="preserve">
+    <value>profil megjelenítése</value>
+  </data>
+  <data name="blocks.too_many" xml:space="preserve">
+    <value>Blokkolási limit elérve.</value>
+  </data>
+  <data name="blocks.button.block" xml:space="preserve">
+    <value>tiltás</value>
+  </data>
+  <data name="blocks.button.unblock" xml:space="preserve">
+    <value>tiltás feloldása</value>
+  </data>
+  <data name="card.loading" xml:space="preserve">
+    <value>Betöltés...</value>
+  </data>
+  <data name="card.send_message" xml:space="preserve">
+    <value>üzenet küldése</value>
+  </data>
+  <data name="disabled.title" xml:space="preserve">
+    <value>Uh-oh! Úgy tűnik a fiókod le lett tiltva.</value>
+  </data>
+  <data name="disabled.warning" xml:space="preserve">
+    <value>Abban az esetben, ha megszegsz egy szabályt, kérlek vedd figyelembe, hogy van egy általános egy hónapos időszak, amiben nem fogadunk el amnesztiával kapcsolatos kéréseket. Ezután az időszak után, szabadon kapcsolatba léphetsz velünk, ha szükségesnek láttod. Kérlek vedd figyelembe, hogy ha egy új fiókot hozol létre, ha már volt legalább egy letiltott fiókod, ez egy újabb hónap meghosszabitást eredményez. Vedd azt is figyelembe, hogy minnél több fiókot hozol létre, annál több büntetésed lesz. Nagyon ajánljuk, hogy ne menj el ebbe az írányba!</value>
+  </data>
+  <data name="disabled.if_mistake._" xml:space="preserve">
+    <value>Ha hibát észleltél, nyugodtan lépj kapcsolatba velünk (itt {0} vagy kattints a ? ikonra a jobb alsó sarokba az oldalon). Fontos, hogy mi mindig magabiztosak vagyunk abban mit teszünk, mivel nagyon magabiztos adatokból dolgozunk. Továbbá fent tartjuk azt a jogot, hogy a becstelen  vagy sértő a kéréseket figyelmen kivül hagyjuk.</value>
+  </data>
+  <data name="disabled.if_mistake.email" xml:space="preserve">
+    <value>email</value>
+  </data>
+  <data name="disabled.reasons.compromised" xml:space="preserve">
+    <value>A fiókod veszélyeztetettnek tekinthető. Idéglenesen lehet nem lesz elérhető, addig amíg a valódi személyazonosság megerősítésre nem kerül.</value>
+  </data>
+  <data name="disabled.reasons.opening" xml:space="preserve">
+    <value>Számtalan indok van, amiért a fiókod tiltva lett:</value>
+  </data>
+  <data name="disabled.reasons.tos._" xml:space="preserve">
+    <value>Megszegtél egy vagy több szabályt az előírásainkból {0} vagy {1}.</value>
+  </data>
+  <data name="disabled.reasons.tos.community_rules" xml:space="preserve">
+    <value>közösségi szabályok</value>
+  </data>
+  <data name="disabled.reasons.tos.tos" xml:space="preserve">
+    <value>felhasználási feltételek</value>
+  </data>
+  <data name="filtering.by_game_mode" xml:space="preserve">
+    <value>Felhasználók játékmód szerint</value>
+  </data>
+  <data name="force_reactivation.reason.inactive_different_country" xml:space="preserve">
+    <value>A fiókod hosszú ideje nem volt használva.</value>
+  </data>
+  <data name="login._" xml:space="preserve">
+    <value>Bejelentkezés</value>
+  </data>
+  <data name="login.button" xml:space="preserve">
+    <value>Bejelentkezés</value>
+  </data>
+  <data name="login.button_posting" xml:space="preserve">
+    <value>Bejelentkezés...</value>
+  </data>
+  <data name="login.email_login_disabled" xml:space="preserve">
+    <value>Az email-el való belépés jelenleg le van tiltva. Kérlek használd a felhasználó neved helyette.</value>
+  </data>
+  <data name="login.failed" xml:space="preserve">
+    <value>Hibás adatok</value>
+  </data>
+  <data name="login.forgot" xml:space="preserve">
+    <value>Elfelejtetted a jelszavad?</value>
+  </data>
+  <data name="login.info" xml:space="preserve">
+    <value>Jelentkezz be a folytatáshoz</value>
+  </data>
+  <data name="login.invalid_captcha" xml:space="preserve">
+    <value>Túl sok sikertelen belépési kísérlet, kérlek töltsd ki a captcha-t és próbáld újra. (Ha a captcha nem látszik, frissítsd az oldalt)</value>
+  </data>
+  <data name="login.locked_ip" xml:space="preserve">
+    <value>Az IP címed zárolva van. Kérjük várj egy pár percet.</value>
+  </data>
+  <data name="login.password" xml:space="preserve">
+    <value>Jelszó</value>
+  </data>
+  <data name="login.register" xml:space="preserve">
+    <value>Nincs osu! felhasználód? Regisztrálj egyet!</value>
+  </data>
+  <data name="login.remember" xml:space="preserve">
+    <value>Számítógép megjegyzése</value>
+  </data>
+  <data name="login.title" xml:space="preserve">
+    <value>Kérlek, jelentkezz be a folytatáshoz</value>
+  </data>
+  <data name="login.username" xml:space="preserve">
+    <value>Felhasználónév</value>
+  </data>
+  <data name="login.beta.main" xml:space="preserve">
+    <value>Beta hozzáférés jelenleg csak kiváltságos felhasználóknak elérhető.</value>
+  </data>
+  <data name="login.beta.small" xml:space="preserve">
+    <value>(osu!támogatók hamarosan bejutnak)</value>
+  </data>
+  <data name="posts.title" xml:space="preserve">
+    <value>{0} hozzászólásai</value>
+  </data>
+  <data name="anonymous.login_link" xml:space="preserve">
+    <value>kattints a bejelentkezéshez</value>
+  </data>
+  <data name="anonymous.login_text" xml:space="preserve">
+    <value>bejelentkezés</value>
+  </data>
+  <data name="anonymous.username" xml:space="preserve">
+    <value>Vendég</value>
+  </data>
+  <data name="anonymous.error" xml:space="preserve">
+    <value>Be kell jelentkezned, hogy ezt csináld.</value>
+  </data>
+  <data name="logout_confirm" xml:space="preserve">
+    <value>Biztosan ki akarsz jelentkezni? :(</value>
+  </data>
+  <data name="report.button_text" xml:space="preserve">
+    <value>jelentés</value>
+  </data>
+  <data name="report.comments" xml:space="preserve">
+    <value>További megjegyzések</value>
+  </data>
+  <data name="report.placeholder" xml:space="preserve">
+    <value>Kérlek minden információt adj meg, amiről úgy gondolod hogy hasznos lehet.</value>
+  </data>
+  <data name="report.reason" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="report.thanks" xml:space="preserve">
+    <value>Köszönjük a jelentést!</value>
+  </data>
+  <data name="report.title" xml:space="preserve">
+    <value>{0} jelentése?</value>
+  </data>
+  <data name="report.actions.send" xml:space="preserve">
+    <value>Jelentés küldése</value>
+  </data>
+  <data name="report.actions.cancel" xml:space="preserve">
+    <value>Mégse</value>
+  </data>
+  <data name="report.options.cheating" xml:space="preserve">
+    <value>Tisztességtelen játék / Csalás</value>
+  </data>
+  <data name="report.options.insults" xml:space="preserve">
+    <value>Engem / másokat sérteget</value>
+  </data>
+  <data name="report.options.spam" xml:space="preserve">
+    <value>Spam</value>
+  </data>
+  <data name="report.options.unwanted_content" xml:space="preserve">
+    <value>Nem megfelelő tartalom linkelése</value>
+  </data>
+  <data name="report.options.nonsense" xml:space="preserve">
+    <value>Nonszensz</value>
+  </data>
+  <data name="report.options.other" xml:space="preserve">
+    <value>Egyéb (alá írd)</value>
+  </data>
+  <data name="restricted_banner.title" xml:space="preserve">
+    <value>A felhasználói fiókod korlátozva lett!</value>
+  </data>
+  <data name="restricted_banner.message" xml:space="preserve">
+    <value>Korlátozva nem leszel képes más játékosokkal kapcsolatba lépni és a pontjaid csak neked lesznek láthatóak. Ez az eredménye egy automatikus folyamatnak és általában fel lesz oldva 24 órán belül. Amennyiben fellebbezni szeretnél, légyszíves lépj kapcsolatba a &lt;a href="mailto{0}@ppy.sh"&gt;support&lt;/a&gt;-al.</value>
+  </data>
+  <data name="show.age" xml:space="preserve">
+    <value>{0} éves</value>
+  </data>
+  <data name="show.change_avatar" xml:space="preserve">
+    <value>változtasd meg a profilképed!</value>
+  </data>
+  <data name="show.first_members" xml:space="preserve">
+    <value>Itt van a kezdetek óta</value>
+  </data>
+  <data name="show.is_developer" xml:space="preserve">
+    <value>osu!fejlesztő</value>
+  </data>
+  <data name="show.is_supporter" xml:space="preserve">
+    <value>osu!támogató</value>
+  </data>
+  <data name="show.joined_at" xml:space="preserve">
+    <value>Regisztrált: {0}</value>
+  </data>
+  <data name="show.lastvisit" xml:space="preserve">
+    <value>Legutóbb online: {0}</value>
+  </data>
+  <data name="show.lastvisit_online" xml:space="preserve">
+    <value>Jelenleg elérhető</value>
+  </data>
+  <data name="show.missingtext" xml:space="preserve">
+    <value>Véletlenül elüthettél valamit! (vagy a felhasználó tiltva van)</value>
+  </data>
+  <data name="show.origin_country" xml:space="preserve">
+    <value>Innen: {0}</value>
+  </data>
+  <data name="show.previous_usernames" xml:space="preserve">
+    <value>korábbi nevén</value>
+  </data>
+  <data name="show.plays_with" xml:space="preserve">
+    <value>Ezekkel játszik: {0}</value>
+  </data>
+  <data name="show.title" xml:space="preserve">
+    <value>{0} profilja</value>
+  </data>
+  <data name="show.comments_count._" xml:space="preserve">
+    <value>{0} posztolva</value>
+  </data>
+  <data name="show.comments_count.count" xml:space="preserve">
+    <value>{0} komment|{0} komment</value>
+  </data>
+  <data name="show.edit.cover.button" xml:space="preserve">
+    <value>Profil Borító Változtatása</value>
+  </data>
+  <data name="show.edit.cover.defaults_info" xml:space="preserve">
+    <value>További borító lehetőségek a jövőben lesznek elérhetőek</value>
+  </data>
+  <data name="show.edit.cover.upload.broken_file" xml:space="preserve">
+    <value>Kép feldolgozása sikertelen. Ellenőrizd a feltöltött képet és próbáld meg újra.</value>
+  </data>
+  <data name="show.edit.cover.upload.button" xml:space="preserve">
+    <value>Kép feltöltése</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone" xml:space="preserve">
+    <value>Húzd ide a feltöltendő fájlokat</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone_info" xml:space="preserve">
+    <value>Feltöltéshez ide is dobhatod a képed</value>
+  </data>
+  <data name="show.edit.cover.upload.size_info" xml:space="preserve">
+    <value>A borítónak 2400x620-asnak kellene lennie</value>
+  </data>
+  <data name="show.edit.cover.upload.too_large" xml:space="preserve">
+    <value>A feltöltött fájl túl nagy.</value>
+  </data>
+  <data name="show.edit.cover.upload.unsupported_format" xml:space="preserve">
+    <value>Nem támogatott formátum.</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info._" xml:space="preserve">
+    <value>Feltöltés csak {0} -hez elérhető</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info.link" xml:space="preserve">
+    <value>osu!támogatók</value>
+  </data>
+  <data name="show.edit.default_playmode.is_default_tooltip" xml:space="preserve">
+    <value>alapértelmezett játékmód</value>
+  </data>
+  <data name="show.edit.default_playmode.set" xml:space="preserve">
+    <value>{0} beállítása alapértelmezettnek</value>
+  </data>
+  <data name="show.extra.none" xml:space="preserve">
+    <value>semmi</value>
+  </data>
+  <data name="show.extra.unranked" xml:space="preserve">
+    <value>Nem játszott mostanában</value>
+  </data>
+  <data name="show.extra.achievements.achieved-on" xml:space="preserve">
+    <value>Elérte: {0}</value>
+  </data>
+  <data name="show.extra.achievements.locked" xml:space="preserve">
+    <value>Zárolt</value>
+  </data>
+  <data name="show.extra.achievements.title" xml:space="preserve">
+    <value>Trófeák</value>
+  </data>
+  <data name="show.extra.beatmaps.by_artist" xml:space="preserve">
+    <value>{0} által</value>
+  </data>
+  <data name="show.extra.beatmaps.title" xml:space="preserve">
+    <value>Beatmap-ek</value>
+  </data>
+  <data name="show.extra.beatmaps.favourite.title" xml:space="preserve">
+    <value>Kedvenc Beatmapek</value>
+  </data>
+  <data name="show.extra.beatmaps.graveyard.title" xml:space="preserve">
+    <value>Eltemetett Beatmap-ek</value>
+  </data>
+  <data name="show.extra.beatmaps.loved.title" xml:space="preserve">
+    <value>Szeretett Beatmap-ek</value>
+  </data>
+  <data name="show.extra.beatmaps.ranked_and_approved.title" xml:space="preserve">
+    <value>Ranked &amp; Approved Beatmap-ek</value>
+  </data>
+  <data name="show.extra.beatmaps.unranked.title" xml:space="preserve">
+    <value>Pending Beatmap-ek</value>
+  </data>
+  <data name="show.extra.discussions.title" xml:space="preserve">
+    <value>Hozzászólások</value>
+  </data>
+  <data name="show.extra.discussions.title_longer" xml:space="preserve">
+    <value>Legújabb beszélgetések</value>
+  </data>
+  <data name="show.extra.discussions.show_more" xml:space="preserve">
+    <value>további beszélgetések mutatása</value>
+  </data>
+  <data name="show.extra.events.title" xml:space="preserve">
+    <value>Események</value>
+  </data>
+  <data name="show.extra.events.title_longer" xml:space="preserve">
+    <value>Legutóbbi Események</value>
+  </data>
+  <data name="show.extra.events.show_more" xml:space="preserve">
+    <value>további események</value>
+  </data>
+  <data name="show.extra.historical.title" xml:space="preserve">
+    <value>Történelem</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.title" xml:space="preserve">
+    <value>Játék előzmények</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.count_label" xml:space="preserve">
+    <value>Játszások</value>
+  </data>
+  <data name="show.extra.historical.most_played.count" xml:space="preserve">
+    <value>alkalommal lejátszva</value>
+  </data>
+  <data name="show.extra.historical.most_played.title" xml:space="preserve">
+    <value>Legtöbbet Játszott Beatmap-ek</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.accuracy" xml:space="preserve">
+    <value>pontosság: {0}</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.title" xml:space="preserve">
+    <value>Legutóbb Játszott (24ó)</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.title" xml:space="preserve">
+    <value>Visszajátszás megtekintések előzménye</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.count_label" xml:space="preserve">
+    <value>Megnézett Visszajátszások</value>
+  </data>
+  <data name="show.extra.kudosu.recent_entries" xml:space="preserve">
+    <value>Legutóbbi Kudosu történelem</value>
+  </data>
+  <data name="show.extra.kudosu.title" xml:space="preserve">
+    <value>Kudosu!</value>
+  </data>
+  <data name="show.extra.kudosu.total" xml:space="preserve">
+    <value>Összesen megszerzett Kudosu</value>
+  </data>
+  <data name="show.extra.kudosu.entry.amount" xml:space="preserve">
+    <value>{0} kudosu</value>
+  </data>
+  <data name="show.extra.kudosu.entry.empty" xml:space="preserve">
+    <value>Ez a felhasználó még nem kapott kudosu-t!</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.allow_kudosu.give" xml:space="preserve">
+    <value>{0} kudosu szerezve a {1} lévő kudosu megvonás megcáfolására</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.deny_kudosu.reset" xml:space="preserve">
+    <value>{0} visszavonva a {1} modolási posztról</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.delete.reset" xml:space="preserve">
+    <value>{0} elvesztve a {1} lévő modolási poszt törlődése miatt</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.restore.give" xml:space="preserve">
+    <value>{0} szerezve {1} lévő modolási poszt visszaállítása miatt</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.give" xml:space="preserve">
+    <value>{0} szerezve a {1} lévő modolási poszton elért szavazatokért</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.reset" xml:space="preserve">
+    <value>{0} elvesztve a {1} lévő modolási posztról elvesztett szavazatokért</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.give" xml:space="preserve">
+    <value>{0} szerezve a {1} lévő modolási poszt szavazatainak újraszámolásáért</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.reset" xml:space="preserve">
+    <value>{0} elvesztve a {1} lévő modolási poszt szavazatainak újraszámolásáért</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.give" xml:space="preserve">
+    <value>{0} szerezve {1} által egy {2} lévő posztra</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.reset" xml:space="preserve">
+    <value>Kudosu visszaállítás {0} által a posztra {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.revoke" xml:space="preserve">
+    <value>Elutasitott kudosu {0} által a {1} posztra</value>
+  </data>
+  <data name="show.extra.kudosu.total_info._" xml:space="preserve">
+    <value>Annak alapján, hogy a felhasználó milyen mértékben járult hozzá egy beatmap moderálásához. További információkért kattints a linkre. {0}.</value>
+  </data>
+  <data name="show.extra.kudosu.total_info.link" xml:space="preserve">
+    <value>ez az oldal</value>
+  </data>
+  <data name="show.extra.me.title" xml:space="preserve">
+    <value>rólam!</value>
+  </data>
+  <data name="show.extra.medals.empty" xml:space="preserve">
+    <value>Ez a felhasználó még nem rendelkezik egyel sem. ;_;</value>
+  </data>
+  <data name="show.extra.medals.recent" xml:space="preserve">
+    <value>Legújabb</value>
+  </data>
+  <data name="show.extra.medals.title" xml:space="preserve">
+    <value>Medálok</value>
+  </data>
+  <data name="show.extra.posts.title" xml:space="preserve">
+    <value>Bejegyzések</value>
+  </data>
+  <data name="show.extra.posts.title_longer" xml:space="preserve">
+    <value>Legutóbbi bejegyzések</value>
+  </data>
+  <data name="show.extra.posts.show_more" xml:space="preserve">
+    <value>láss további bejegyzéseket</value>
+  </data>
+  <data name="show.extra.recent_activity.title" xml:space="preserve">
+    <value>Legutóbbi</value>
+  </data>
+  <data name="show.extra.top_ranks.download_replay" xml:space="preserve">
+    <value>Replay letöltése</value>
+  </data>
+  <data name="show.extra.top_ranks.not_ranked" xml:space="preserve">
+    <value>Kizárólag rangsorolt beatmap adhat pp-t.</value>
+  </data>
+  <data name="show.extra.top_ranks.pp_weight" xml:space="preserve">
+    <value>súlyozott {0}</value>
+  </data>
+  <data name="show.extra.top_ranks.view_details" xml:space="preserve">
+    <value>Részletek mutatása</value>
+  </data>
+  <data name="show.extra.top_ranks.title" xml:space="preserve">
+    <value>Rangok</value>
+  </data>
+  <data name="show.extra.top_ranks.best.title" xml:space="preserve">
+    <value>Legjobb eredmények</value>
+  </data>
+  <data name="show.extra.top_ranks.first.title" xml:space="preserve">
+    <value>Első Helyezéses Eredmények</value>
+  </data>
+  <data name="show.extra.votes.given" xml:space="preserve">
+    <value>Szavazatok Leadva (legutóbbi 3 hónap)</value>
+  </data>
+  <data name="show.extra.votes.received" xml:space="preserve">
+    <value>Beérkezett Szavazatok (legutóbbi 3 hónap)</value>
+  </data>
+  <data name="show.extra.votes.title" xml:space="preserve">
+    <value>Szavazatok</value>
+  </data>
+  <data name="show.extra.votes.title_longer" xml:space="preserve">
+    <value>Legutóbbi Szavazatok</value>
+  </data>
+  <data name="show.extra.votes.vote_count" xml:space="preserve">
+    <value>{0}  szavazás{0} szavazatok</value>
+  </data>
+  <data name="show.extra.account_standing.title" xml:space="preserve">
+    <value>Fiók Állása</value>
+  </data>
+  <data name="show.extra.account_standing.bad_standing" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; fiókja nincs jó helyzetben. :(</value>
+  </data>
+  <data name="show.extra.account_standing.remaining_silence" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; ismét képes lesz a beszédre {1} időn belül.</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.title" xml:space="preserve">
+    <value>Legutóbbi szabálysértések</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.date" xml:space="preserve">
+    <value>dátum</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.action" xml:space="preserve">
+    <value>művelet</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length" xml:space="preserve">
+    <value>hossz</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length_permanent" xml:space="preserve">
+    <value>Végleges</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.description" xml:space="preserve">
+    <value>leírás</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actor" xml:space="preserve">
+    <value>{0} által</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.restriction" xml:space="preserve">
+    <value>Kitiltás</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.silence" xml:space="preserve">
+    <value>Némítás</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.note" xml:space="preserve">
+    <value>Megjegyzés</value>
+  </data>
+  <data name="show.info.interests" xml:space="preserve">
+    <value>Érdekeltségek</value>
+  </data>
+  <data name="show.info.location" xml:space="preserve">
+    <value>Tartózkodási hely</value>
+  </data>
+  <data name="show.info.occupation" xml:space="preserve">
+    <value>Foglalkozás</value>
+  </data>
+  <data name="show.info.website" xml:space="preserve">
+    <value>Honlap</value>
+  </data>
+  <data name="show.not_found.reason_1" xml:space="preserve">
+    <value>Talán megváltoztatta a felhasználónevét.</value>
+  </data>
+  <data name="show.not_found.reason_2" xml:space="preserve">
+    <value>Ez a fiók jelenleg nem elérhető biztonsági vagy visszaélési okokból.</value>
+  </data>
+  <data name="show.not_found.reason_3" xml:space="preserve">
+    <value>Lehet, hogy elírtál valamit!</value>
+  </data>
+  <data name="show.not_found.reason_header" xml:space="preserve">
+    <value>Fennáll egy pár lehetséges ok erre:</value>
+  </data>
+  <data name="show.not_found.title" xml:space="preserve">
+    <value>Felhasználó nem található! ;_;</value>
+  </data>
+  <data name="show.page.button" xml:space="preserve">
+    <value>Profil szerkesztése</value>
+  </data>
+  <data name="show.page.description" xml:space="preserve">
+    <value>&lt;strong&gt;Rólam!&lt;/strong&gt; egy személyre szabható része a profilodnak.</value>
+  </data>
+  <data name="show.page.edit_big" xml:space="preserve">
+    <value>A rólam! szerkesztése!</value>
+  </data>
+  <data name="show.page.placeholder" xml:space="preserve">
+    <value>Írd ide az oldal tartalmát</value>
+  </data>
+  <data name="show.page.restriction_info._" xml:space="preserve">
+    <value>Ennek a szolgáltatásnak a feloldásához egy linknek kell lennie. {0}.</value>
+  </data>
+  <data name="show.page.restriction_info.link" xml:space="preserve">
+    <value>osu!támogató</value>
+  </data>
+  <data name="show.post_count._" xml:space="preserve">
+    <value>Hozzájárult {0}</value>
+  </data>
+  <data name="show.post_count.count" xml:space="preserve">
+    <value>{0} fórum poszt|{0} fórum posztok</value>
+  </data>
+  <data name="show.rank.country" xml:space="preserve">
+    <value>Országos rank a/az {0}/re</value>
+  </data>
+  <data name="show.rank.country_simple" xml:space="preserve">
+    <value>Országos Rangsor</value>
+  </data>
+  <data name="show.rank.global" xml:space="preserve">
+    <value>Globális rank a {0}/re</value>
+  </data>
+  <data name="show.rank.global_simple" xml:space="preserve">
+    <value>Globális Rangsor</value>
+  </data>
+  <data name="show.stats.hit_accuracy" xml:space="preserve">
+    <value>Találati Pontosság</value>
+  </data>
+  <data name="show.stats.level" xml:space="preserve">
+    <value>Szint: {0}</value>
+  </data>
+  <data name="show.stats.level_progress" xml:space="preserve">
+    <value>Haladás a következő szintre</value>
+  </data>
+  <data name="show.stats.maximum_combo" xml:space="preserve">
+    <value>Legmagasabb Kombó</value>
+  </data>
+  <data name="show.stats.medals" xml:space="preserve">
+    <value>Medálok</value>
+  </data>
+  <data name="show.stats.play_count" xml:space="preserve">
+    <value>Játékszám</value>
+  </data>
+  <data name="show.stats.play_time" xml:space="preserve">
+    <value>Teljes játékidő</value>
+  </data>
+  <data name="show.stats.ranked_score" xml:space="preserve">
+    <value>Rangsorolt Pontszám</value>
+  </data>
+  <data name="show.stats.replays_watched_by_others" xml:space="preserve">
+    <value>Mások Által Megtekintett Visszajátszások</value>
+  </data>
+  <data name="show.stats.score_ranks" xml:space="preserve">
+    <value>Eredmény Rangok</value>
+  </data>
+  <data name="show.stats.total_hits" xml:space="preserve">
+    <value>Találatok Száma</value>
+  </data>
+  <data name="show.stats.total_score" xml:space="preserve">
+    <value>Összpontszám</value>
+  </data>
+  <data name="show.stats.ranked_and_approved_beatmapset_count" xml:space="preserve">
+    <value>Rankedelt &amp; jóváhagyott beatmapek</value>
+  </data>
+  <data name="show.stats.loved_beatmapset_count" xml:space="preserve">
+    <value>Kedvelt beatmapek</value>
+  </data>
+  <data name="show.stats.unranked_beatmapset_count" xml:space="preserve">
+    <value>Függőben lévő beatmapek</value>
+  </data>
+  <data name="show.stats.graveyard_beatmapset_count" xml:space="preserve">
+    <value>Eltemetett beatmapek</value>
+  </data>
+  <data name="silenced_banner.title" xml:space="preserve">
+    <value>Jelenleg el vagy némítva.</value>
+  </data>
+  <data name="silenced_banner.message" xml:space="preserve">
+    <value>Egyes műveletek lehet, hogy nem érhetők el.</value>
+  </data>
+  <data name="status.all" xml:space="preserve">
+    <value>Összes</value>
+  </data>
+  <data name="status.online" xml:space="preserve">
+    <value>Elérhető</value>
+  </data>
+  <data name="status.offline" xml:space="preserve">
+    <value>Nem elérhető</value>
+  </data>
+  <data name="store.saved" xml:space="preserve">
+    <value>Felhasználó létrehozva</value>
+  </data>
+  <data name="verify.title" xml:space="preserve">
+    <value>Fiók megerősítése</value>
+  </data>
+  <data name="view_mode.brick" xml:space="preserve">
+    <value>Tégla nézet</value>
+  </data>
+  <data name="view_mode.card" xml:space="preserve">
+    <value>Kártya nézet</value>
+  </data>
+  <data name="view_mode.list" xml:space="preserve">
+    <value>Lista nézet</value>
+  </data>
+</root>

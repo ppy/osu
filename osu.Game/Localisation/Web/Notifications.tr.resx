@@ -1,0 +1,382 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="all_read" xml:space="preserve">
+    <value>Tüm bildirimler okundu!</value>
+  </data>
+  <data name="delete" xml:space="preserve">
+    <value>{0} sil</value>
+  </data>
+  <data name="loading" xml:space="preserve">
+    <value>Okunmamış bildirimler yükleniyor...</value>
+  </data>
+  <data name="mark_read" xml:space="preserve">
+    <value>{0} temizle</value>
+  </data>
+  <data name="none" xml:space="preserve">
+    <value>Bildirim yok</value>
+  </data>
+  <data name="see_all" xml:space="preserve">
+    <value>tüm bildirimleri gör</value>
+  </data>
+  <data name="see_channel" xml:space="preserve">
+    <value>sohbete git</value>
+  </data>
+  <data name="verifying" xml:space="preserve">
+    <value>Bildirimleri görüntülemek için lütfen oturumunuzu doğrulayın</value>
+  </data>
+  <data name="filters._" xml:space="preserve">
+    <value>hepsi</value>
+  </data>
+  <data name="filters.user" xml:space="preserve">
+    <value>profil</value>
+  </data>
+  <data name="filters.beatmapset" xml:space="preserve">
+    <value>beatmapler</value>
+  </data>
+  <data name="filters.forum_topic" xml:space="preserve">
+    <value>forum</value>
+  </data>
+  <data name="filters.news_post" xml:space="preserve">
+    <value>gelişmeler</value>
+  </data>
+  <data name="filters.build" xml:space="preserve">
+    <value>sürümler</value>
+  </data>
+  <data name="filters.channel" xml:space="preserve">
+    <value>sohbet</value>
+  </data>
+  <data name="item.beatmapset._" xml:space="preserve">
+    <value>Beatmap</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change._" xml:space="preserve">
+    <value>Konuk zorluk</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change.beatmap_owner_change" xml:space="preserve">
+    <value>Artık "{0}" beatmapindeki "{1}" zorluğunun sahibisiniz</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change.beatmap_owner_change_compact" xml:space="preserve">
+    <value>Artık "{0}" zorluğunun sahibisiniz</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion._" xml:space="preserve">
+    <value>Beatmap tartışması</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>"{0}" setinin tartışması kilitlendi</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock_compact" xml:space="preserve">
+    <value>Tartışma kilitlenmiş</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>"{0}" setinde {1} tarafından yeni bir gönderi mevcut: "{2}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_empty" xml:space="preserve">
+    <value>"{0}" setinde {1} tarafından yeni gönderi</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact" xml:space="preserve">
+    <value>{0} tarafından yeni gönderi: "{1}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact_empty" xml:space="preserve">
+    <value>{0} tarafından yeni gönderi</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_review_new" xml:space="preserve">
+    <value>"{0}" için {1} tarafından yeni inceleme, {2} sorun, {3} öneri, {4} övgü içeriyor</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_review_new_compact" xml:space="preserve">
+    <value>{0} tarafından yeni inceleme, {1} sorun, {2} öneri, {3} övgü içeriyor</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>"{0}" setinin tartışmasının kilidi kaldırıldı</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock_compact" xml:space="preserve">
+    <value>Tartışmanın kilidi kaldırılmış</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem._" xml:space="preserve">
+    <value>Nitelikli Beatmap sorunu</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>{0} tarafından bildirildi "{1}": "{2}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_empty" xml:space="preserve">
+    <value>{0} tarafından bildirildi "{1}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_compact" xml:space="preserve">
+    <value>{0} tarafından rapor edildi: "{1}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_compact_empty" xml:space="preserve">
+    <value>{0} tarafından rapor edildi</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state._" xml:space="preserve">
+    <value>Beatmap durumu değişti</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify" xml:space="preserve">
+    <value>"{0}" diskalifiye edildi</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify_compact" xml:space="preserve">
+    <value>Beatmap diskalifiye edildi</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love" xml:space="preserve">
+    <value>"{0}" sevilenlere yükseltildi</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love_compact" xml:space="preserve">
+    <value>Beatmap sevilenlere yükseltildi</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate" xml:space="preserve">
+    <value>"{0}" aday gösterildi</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate_compact" xml:space="preserve">
+    <value>Beatmap aday gösterildi</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify" xml:space="preserve">
+    <value>"{0}" yeterli aday gösterimi aldı ve derecelendirme sırasına girdi</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify_compact" xml:space="preserve">
+    <value>Beatmap derecelendirme sırasına girdi</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>"{0}" dereceli oldu</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank_compact" xml:space="preserve">
+    <value>Beatmap dereceli oldu</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_remove_from_loved" xml:space="preserve">
+    <value>"{0}" Sevilenlerden çıkarıldı</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_remove_from_loved_compact" xml:space="preserve">
+    <value>Beatmap Sevilenlerden çıkarıldı</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_reset_nominations" xml:space="preserve">
+    <value>"{0}" setinin aday gösterimi sıfırlandı</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_reset_nominations_compact" xml:space="preserve">
+    <value>Aday gösterim sıfırlandı</value>
+  </data>
+  <data name="item.beatmapset.comment._" xml:space="preserve">
+    <value>Yeni yorum</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_new" xml:space="preserve">
+    <value>{0} "{1}" üzerinde "{2}" yorumunu yaptı</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} "{1}" yorumunu yaptı</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_reply" xml:space="preserve">
+    <value>{0} "{1}" üzerinde "{2}" yanıtını verdi</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0} "{1}" yanıtını verdi</value>
+  </data>
+  <data name="item.channel._" xml:space="preserve">
+    <value>Sohbet</value>
+  </data>
+  <data name="item.channel.channel._" xml:space="preserve">
+    <value>Yeni mesaj</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message" xml:space="preserve">
+    <value>{0} "{1}" diyor</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_compact" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_group" xml:space="preserve">
+    <value>{0} tarafından</value>
+  </data>
+  <data name="item.build._" xml:space="preserve">
+    <value>Değişiklik kayıtları</value>
+  </data>
+  <data name="item.build.comment._" xml:space="preserve">
+    <value>Yeni yorum</value>
+  </data>
+  <data name="item.build.comment.comment_new" xml:space="preserve">
+    <value>{0} "{1}" üzerinde "{2}" yorumunu yaptı</value>
+  </data>
+  <data name="item.build.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} "{1}" yorumunu yaptı</value>
+  </data>
+  <data name="item.build.comment.comment_reply" xml:space="preserve">
+    <value>{0} "{1}" üzerinde "{2}" yanıtını verdi</value>
+  </data>
+  <data name="item.build.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0} "{1}" yanıtını verdi</value>
+  </data>
+  <data name="item.news_post._" xml:space="preserve">
+    <value>Gelişmeler</value>
+  </data>
+  <data name="item.news_post.comment._" xml:space="preserve">
+    <value>Yeni yorum</value>
+  </data>
+  <data name="item.news_post.comment.comment_new" xml:space="preserve">
+    <value>{0} "{1}" üzerinde "{2}" yorumunu yaptı</value>
+  </data>
+  <data name="item.news_post.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} "{1}" yorumunu yaptı</value>
+  </data>
+  <data name="item.news_post.comment.comment_reply" xml:space="preserve">
+    <value>{0} "{1}" üzerinde "{2}" yanıtını verdi</value>
+  </data>
+  <data name="item.news_post.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0} "{1}" yanıtını verdi</value>
+  </data>
+  <data name="item.forum_topic._" xml:space="preserve">
+    <value>Forum konusu</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply._" xml:space="preserve">
+    <value>Yeni forum yanıtı</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>{0} "{1}" konusuna yanıt verdi.</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply_compact" xml:space="preserve">
+    <value>{0} yanıt verdi</value>
+  </data>
+  <data name="item.legacy_pm._" xml:space="preserve">
+    <value>Legacy Forum PM</value>
+  </data>
+  <data name="item.legacy_pm.legacy_pm.legacy_pm" xml:space="preserve">
+    <value>{0} okunmamış mesaj.|{0} okunmamış mesaj</value>
+  </data>
+  <data name="item.user.user_beatmapset_new._" xml:space="preserve">
+    <value>Yeni beatmap</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new" xml:space="preserve">
+    <value>{0} tarafından yeni beatmap "{1}"</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new_compact" xml:space="preserve">
+    <value>Yeni beatmap "{0}"</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new_group" xml:space="preserve">
+    <value> {0} tarafından yapılmış yeni beatmapler</value>
+  </data>
+  <data name="item.user_achievement._" xml:space="preserve">
+    <value>Madalyalar</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock._" xml:space="preserve">
+    <value>Yeni madalya</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>"{0}" 'ın kilidi açıldı!</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_compact" xml:space="preserve">
+    <value>"{0}" 'ın kilidi açıldı!</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_group" xml:space="preserve">
+    <value>Madalyalar açıldı!</value>
+  </data>
+  <data name="mail.beatmapset.beatmap_owner_change.beatmap_owner_change" xml:space="preserve">
+    <value>Artık "{0}" beatmapinin bir konuğusunuz</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>"{0}" setinin tartışması kilitlendi</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>"{0}" setinin tartışmasında yeni güncellemeler mevcut</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>"{0}" setinin tartışmasının kilidi kaldırıldı</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>"{0}" setinde yeni bir sorun bildirildi</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_disqualify" xml:space="preserve">
+    <value>"{0}" diskalifiye edildi</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_love" xml:space="preserve">
+    <value>"{0}" sevilenlere yükseltildi</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_nominate" xml:space="preserve">
+    <value>"{0}" aday gösterildi</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_qualify" xml:space="preserve">
+    <value>"{0}" yeterli aday gösterimi aldı ve derecelendirme sırasına girdi</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>"{0}" dereceli oldu</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_remove_from_loved" xml:space="preserve">
+    <value>"{0}" Sevilenlerden çıkarıldı</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_reset_nominations" xml:space="preserve">
+    <value>"{0}" setinin aday gösterimi sıfırlandı</value>
+  </data>
+  <data name="mail.beatmapset.comment.comment_new" xml:space="preserve">
+    <value>"{0}" beatmapinde yeni yorumlar mevcut</value>
+  </data>
+  <data name="mail.channel.channel.pm" xml:space="preserve">
+    <value>{0} kullanıcısından yeni bir mesaj geldi</value>
+  </data>
+  <data name="mail.build.comment.comment_new" xml:space="preserve">
+    <value>"{0}" değişiklik kaydında yeni yorumlar mevcut</value>
+  </data>
+  <data name="mail.news_post.comment.comment_new" xml:space="preserve">
+    <value>"{0}" haber göndersinde yeni yorumlar mevcut</value>
+  </data>
+  <data name="mail.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>"{0}" konusunda yeni yanıtlar mevcut</value>
+  </data>
+  <data name="mail.user.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>{0} yeni bir madalya açtı, "{1}"!</value>
+  </data>
+  <data name="mail.user.user_achievement_unlock.user_achievement_unlock_self" xml:space="preserve">
+    <value>Yeni bir madalya açtınız, "{0}"!</value>
+  </data>
+  <data name="mail.user.user_beatmapset_new.user_beatmapset_new" xml:space="preserve">
+    <value>{0} yeni beatmapler yaptı</value>
+  </data>
+</root>

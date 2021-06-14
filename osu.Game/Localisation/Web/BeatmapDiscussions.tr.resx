@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authorizations.update.null_user" xml:space="preserve">
+    <value>Düzenlemek için giriş yapılmış olmalı.</value>
+  </data>
+  <data name="authorizations.update.system_generated" xml:space="preserve">
+    <value>Sistem tarafından oluşturulmuş gönderiler düzenlenemez.</value>
+  </data>
+  <data name="authorizations.update.wrong_user" xml:space="preserve">
+    <value>Düzenlemek için gönderinin sahibi olmalısınız.</value>
+  </data>
+  <data name="events.empty" xml:space="preserve">
+    <value>Hiçbir şey olmadı... henüz.</value>
+  </data>
+  <data name="index.deleted_beatmap" xml:space="preserve">
+    <value>silindi</value>
+  </data>
+  <data name="index.none_found" xml:space="preserve">
+    <value>Kriterlere uyan bir tartışma sonucu bulunamadı.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmap Tartışmaları</value>
+  </data>
+  <data name="index.form._" xml:space="preserve">
+    <value>Ara</value>
+  </data>
+  <data name="index.form.deleted" xml:space="preserve">
+    <value>Silinmiş tartışmaları içer</value>
+  </data>
+  <data name="index.form.mode" xml:space="preserve">
+    <value>Beatmap modu</value>
+  </data>
+  <data name="index.form.only_unresolved" xml:space="preserve">
+    <value>Sadece çözülmemiş tartışmaları göster</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Mesaj türü</value>
+  </data>
+  <data name="index.form.username" xml:space="preserve">
+    <value>Kullanıcı adı</value>
+  </data>
+  <data name="index.form.beatmapset_status._" xml:space="preserve">
+    <value>Beatmap Durumu</value>
+  </data>
+  <data name="index.form.beatmapset_status.all" xml:space="preserve">
+    <value>Tümü</value>
+  </data>
+  <data name="index.form.beatmapset_status.disqualified" xml:space="preserve">
+    <value>Diskalifiye edildi</value>
+  </data>
+  <data name="index.form.beatmapset_status.never_qualified" xml:space="preserve">
+    <value>Niteliklendirilmedi</value>
+  </data>
+  <data name="index.form.beatmapset_status.qualified" xml:space="preserve">
+    <value>Nitelikli</value>
+  </data>
+  <data name="index.form.beatmapset_status.ranked" xml:space="preserve">
+    <value>Dereceli</value>
+  </data>
+  <data name="index.form.user.label" xml:space="preserve">
+    <value>Kullanıcı</value>
+  </data>
+  <data name="index.form.user.overview" xml:space="preserve">
+    <value>Etkinliğe genel bakış</value>
+  </data>
+  <data name="item.created_at" xml:space="preserve">
+    <value>Gönderim tarihi</value>
+  </data>
+  <data name="item.deleted_at" xml:space="preserve">
+    <value>Silinme tarihi</value>
+  </data>
+  <data name="item.message_type" xml:space="preserve">
+    <value>Tür</value>
+  </data>
+  <data name="item.permalink" xml:space="preserve">
+    <value>Kalıcı bağlantı</value>
+  </data>
+  <data name="nearby_posts.confirm" xml:space="preserve">
+    <value>Bu gönderilerin hiçbiri sorunumla ilgili değil</value>
+  </data>
+  <data name="nearby_posts.notice" xml:space="preserve">
+    <value>{0} ({1}) civarında gönderilmiş mesajlar var. Göndermeden önce lütfen onlara bir göz atın.</value>
+  </data>
+  <data name="nearby_posts.unsaved" xml:space="preserve">
+    <value>bu incelemede {0}</value>
+  </data>
+  <data name="owner_editor.button" xml:space="preserve">
+    <value>Zorluk Sahibi</value>
+  </data>
+  <data name="owner_editor.reset_confirm" xml:space="preserve">
+    <value>Bu zorluğun sahibi sıfırlansın mı?</value>
+  </data>
+  <data name="owner_editor.user" xml:space="preserve">
+    <value>Sahip</value>
+  </data>
+  <data name="owner_editor.version" xml:space="preserve">
+    <value>Zorluk</value>
+  </data>
+  <data name="reply.open.guest" xml:space="preserve">
+    <value>Yanıtlamak için Giriş yapın</value>
+  </data>
+  <data name="reply.open.user" xml:space="preserve">
+    <value>Yanıtla</value>
+  </data>
+  <data name="review.block_count" xml:space="preserve">
+    <value>{0} / {1} blok kullanıldı</value>
+  </data>
+  <data name="review.go_to_parent" xml:space="preserve">
+    <value>İnceleme Gönderisini Görüntüle</value>
+  </data>
+  <data name="review.go_to_child" xml:space="preserve">
+    <value>Tartışmayı Görüntüle</value>
+  </data>
+  <data name="review.validation.block_too_large" xml:space="preserve">
+    <value>her blok en fazla {0} karakter içerebilir</value>
+  </data>
+  <data name="review.validation.external_references" xml:space="preserve">
+    <value>incelemede, bu incelemeye ait olmayan sorunlara göndermeler mevcut</value>
+  </data>
+  <data name="review.validation.invalid_block_type" xml:space="preserve">
+    <value>geçersiz blok türü</value>
+  </data>
+  <data name="review.validation.invalid_document" xml:space="preserve">
+    <value>geçersiz inceleme</value>
+  </data>
+  <data name="review.validation.minimum_issues" xml:space="preserve">
+    <value>inceleme en az {0} sorun içermelidir|inceleme en az {0} sorun içermelidir</value>
+  </data>
+  <data name="review.validation.missing_text" xml:space="preserve">
+    <value>blokta yazı eksik</value>
+  </data>
+  <data name="review.validation.too_many_blocks" xml:space="preserve">
+    <value>incelemeler yalnızca {0} paragraf/sorun içerebilir|incelemeler sadece en fazla {0} paragraf/sorun içerebilir</value>
+  </data>
+  <data name="system.resolved.true" xml:space="preserve">
+    <value>{0} tarafından çözüldü olarak işaretlendi</value>
+  </data>
+  <data name="system.resolved.false" xml:space="preserve">
+    <value>{0} tarafından yeniden açıldı</value>
+  </data>
+  <data name="timestamp_display.general" xml:space="preserve">
+    <value>genel</value>
+  </data>
+  <data name="timestamp_display.general_all" xml:space="preserve">
+    <value>genel (hepsi)</value>
+  </data>
+  <data name="user_filter.everyone" xml:space="preserve">
+    <value>Herkes</value>
+  </data>
+  <data name="user_filter.label" xml:space="preserve">
+    <value>Kullanıcıya göre filtrele</value>
+  </data>
+</root>

@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="show.fallback_translation" xml:space="preserve">
+    <value>请求的页面还没有没有被翻译为您的语言（{0}）。 正在显示其英文版本。</value>
+  </data>
+  <data name="show.incomplete_or_outdated" xml:space="preserve">
+    <value>此页面的内容不完整或已过时。如果你能帮忙，请一起更新这篇文章！</value>
+  </data>
+  <data name="show.missing" xml:space="preserve">
+    <value>请求的页面 {0} 未找到。</value>
+  </data>
+  <data name="show.missing_title" xml:space="preserve">
+    <value>未找到</value>
+  </data>
+  <data name="show.missing_translation" xml:space="preserve">
+    <value>请求的页面没有当前语言的版本</value>
+  </data>
+  <data name="show.needs_cleanup_or_rewrite" xml:space="preserve">
+    <value>此页面不符合 osu! wiki 的标准，需要清理或重写。 欢迎你帮助更新这篇文章 ！</value>
+  </data>
+  <data name="show.search" xml:space="preserve">
+    <value>在 wiki 中搜索 {0} 。</value>
+  </data>
+  <data name="show.toc" xml:space="preserve">
+    <value>目录</value>
+  </data>
+  <data name="show.edit.link" xml:space="preserve">
+    <value>在 GitHub 上显示</value>
+  </data>
+  <data name="show.edit.refresh" xml:space="preserve">
+    <value>刷新</value>
+  </data>
+  <data name="show.translation.legal" xml:space="preserve">
+    <value>本翻译仅为方便阅读，只有原始的 {0} 才是唯一具有法律效力的版本。</value>
+  </data>
+  <data name="show.translation.outdated" xml:space="preserve">
+    <value>本文是原始内容的过期翻译，请查阅 {0} 以获得最准确的信息（欢迎你来帮助更新翻译）！</value>
+  </data>
+  <data name="show.translation.default" xml:space="preserve">
+    <value>英文版本</value>
+  </data>
+</root>

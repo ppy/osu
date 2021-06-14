@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="index.description" xml:space="preserve">
+    <value>แพ็คคอลเล็คชั่นของเพลงที่อยู่ในประเภทเดียวกัน</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>รายการ</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>แพ็คเกจบีทแมพ</value>
+  </data>
+  <data name="index.blurb.important" xml:space="preserve">
+    <value>กรุณาอ่านก่อนทำการดาวน์โหลด</value>
+  </data>
+  <data name="index.blurb.instruction._" xml:space="preserve">
+    <value>การติดตั้ง : หลังจากคุณดาวน์โหลดไฟล์แล้ว, ให้แตกไฟล์นามสกุล .rar ลงไปในไฟล์ osu!\Songs 
+                    ไฟล์เพลงในแพ็คที่คุณโหลดมาจะติดนามสกุล .zip'd หรือ .osz'd ดังนั้น osu! จะทำการแตกไฟล์ beatmap เองครั้งต่อไปที่คุณเข้าไปเล่น
+                    {0} ทำการแตกไฟล์ zip's/osz's ด้วยตัวคุณเอง
+                    ไม่เช่นนั้น beatmap ที่คุณติดตั้งมาจะไม่สามารถเข้าเล่นได้</value>
+  </data>
+  <data name="index.blurb.instruction.scary" xml:space="preserve">
+    <value>อย่า</value>
+  </data>
+  <data name="index.blurb.note._" xml:space="preserve">
+    <value>แล้วก็ทางเราแนะนำให้คุณ {0}, เนื่องจากคุณภาพของบีทแมพสมัยก่อนนั้นต่ำกว่าในสมัยนี้</value>
+  </data>
+  <data name="index.blurb.note.scary" xml:space="preserve">
+    <value>ดาวน์โหลดไฟล์จากล่าสุดไปเก่าสุด</value>
+  </data>
+  <data name="show.download" xml:space="preserve">
+    <value>ดาวน์โหลด</value>
+  </data>
+  <data name="show.item.cleared" xml:space="preserve">
+    <value>ผ่านแล้ว</value>
+  </data>
+  <data name="show.item.not_cleared" xml:space="preserve">
+    <value>ยังไม่ผ่าน</value>
+  </data>
+  <data name="show.no_diff_reduction._" xml:space="preserve">
+    <value>{0} ไม่สามารถใช้เคลียร์แพ็คนี้ได้</value>
+  </data>
+  <data name="show.no_diff_reduction.link" xml:space="preserve">
+    <value>ม็อดที่ลดความยาก</value>
+  </data>
+  <data name="mode.artist" xml:space="preserve">
+    <value>ศิลปิน/ผู้แต่ง</value>
+  </data>
+  <data name="mode.chart" xml:space="preserve">
+    <value>โดดเด่น</value>
+  </data>
+  <data name="mode.standard" xml:space="preserve">
+    <value>ทั่วไป</value>
+  </data>
+  <data name="mode.theme" xml:space="preserve">
+    <value>ธีม</value>
+  </data>
+  <data name="require_login._" xml:space="preserve">
+    <value>คุณต้องทำการ {0} เพื่อดาวน์โหลด</value>
+  </data>
+  <data name="require_login.link_text" xml:space="preserve">
+    <value>ลงชื่อเข้าใช้แล้ว</value>
+  </data>
+</root>

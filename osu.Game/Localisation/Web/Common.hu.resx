@@ -1,0 +1,355 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="confirmation" xml:space="preserve">
+    <value>Biztos vagy benne?</value>
+  </data>
+  <data name="confirmation_unsaved" xml:space="preserve">
+    <value>A nem mentett változtatások elvesznek. Biztos vagy benne?</value>
+  </data>
+  <data name="saved" xml:space="preserve">
+    <value>Mentve</value>
+  </data>
+  <data name="array_and.words_connector" xml:space="preserve">
+    <value>, </value>
+  </data>
+  <data name="array_and.two_words_connector" xml:space="preserve">
+    <value> és </value>
+  </data>
+  <data name="array_and.last_word_connector" xml:space="preserve">
+    <value>, és </value>
+  </data>
+  <data name="badges.new" xml:space="preserve">
+    <value>ÚJ</value>
+  </data>
+  <data name="buttons.admin" xml:space="preserve">
+    <value>Admin</value>
+  </data>
+  <data name="buttons.authorise" xml:space="preserve">
+    <value>Engedélyezés</value>
+  </data>
+  <data name="buttons.authorising" xml:space="preserve">
+    <value>Engedélyezés...</value>
+  </data>
+  <data name="buttons.back_to_previous" xml:space="preserve">
+    <value>Vissza az előző pozícióra</value>
+  </data>
+  <data name="buttons.back_to_top" xml:space="preserve">
+    <value>Vissza a lap tetejére</value>
+  </data>
+  <data name="buttons.cancel" xml:space="preserve">
+    <value>Mégse</value>
+  </data>
+  <data name="buttons.change" xml:space="preserve">
+    <value>változtat</value>
+  </data>
+  <data name="buttons.clear" xml:space="preserve">
+    <value>Törlés</value>
+  </data>
+  <data name="buttons.click_to_copy" xml:space="preserve">
+    <value>kattints ide a vágólapra helyezéshez</value>
+  </data>
+  <data name="buttons.click_to_copy_copied" xml:space="preserve">
+    <value>vágólapra helyezve!</value>
+  </data>
+  <data name="buttons.close" xml:space="preserve">
+    <value>Bezárás</value>
+  </data>
+  <data name="buttons.collapse" xml:space="preserve">
+    <value>összecsuk</value>
+  </data>
+  <data name="buttons.delete" xml:space="preserve">
+    <value>Törlés</value>
+  </data>
+  <data name="buttons.edit" xml:space="preserve">
+    <value>Szerkesztés</value>
+  </data>
+  <data name="buttons.expand" xml:space="preserve">
+    <value>kibont</value>
+  </data>
+  <data name="buttons.hide" xml:space="preserve">
+    <value>elrejtés</value>
+  </data>
+  <data name="buttons.permalink" xml:space="preserve">
+    <value>állandó hivatkozás</value>
+  </data>
+  <data name="buttons.pin" xml:space="preserve">
+    <value>kitűzés</value>
+  </data>
+  <data name="buttons.post" xml:space="preserve">
+    <value>Küldés</value>
+  </data>
+  <data name="buttons.read_more" xml:space="preserve">
+    <value>tudj meg többet</value>
+  </data>
+  <data name="buttons.reply" xml:space="preserve">
+    <value>Válasz</value>
+  </data>
+  <data name="buttons.reply_reopen" xml:space="preserve">
+    <value>Válaszolás és újranyitás</value>
+  </data>
+  <data name="buttons.reply_resolve" xml:space="preserve">
+    <value>Válaszolás és megoldás</value>
+  </data>
+  <data name="buttons.reset" xml:space="preserve">
+    <value>Visszaállítás</value>
+  </data>
+  <data name="buttons.restore" xml:space="preserve">
+    <value>Visszaállítás</value>
+  </data>
+  <data name="buttons.save" xml:space="preserve">
+    <value>Mentés</value>
+  </data>
+  <data name="buttons.saving" xml:space="preserve">
+    <value>Mentés...</value>
+  </data>
+  <data name="buttons.search" xml:space="preserve">
+    <value>Keresés</value>
+  </data>
+  <data name="buttons.see_more" xml:space="preserve">
+    <value>továbbiak mutatása</value>
+  </data>
+  <data name="buttons.show" xml:space="preserve">
+    <value>mutat</value>
+  </data>
+  <data name="buttons.show_deleted" xml:space="preserve">
+    <value>Töröltek megjelenítése</value>
+  </data>
+  <data name="buttons.show_less" xml:space="preserve">
+    <value>kevesebb mutatása</value>
+  </data>
+  <data name="buttons.show_more" xml:space="preserve">
+    <value>több megjelenítése</value>
+  </data>
+  <data name="buttons.show_more_options" xml:space="preserve">
+    <value>további opciók mutatása</value>
+  </data>
+  <data name="buttons.unpin" xml:space="preserve">
+    <value>rögzítés feloldása</value>
+  </data>
+  <data name="buttons.update" xml:space="preserve">
+    <value>Frissítés</value>
+  </data>
+  <data name="buttons.upload_image" xml:space="preserve">
+    <value>kép feltöltése</value>
+  </data>
+  <data name="buttons.watch.to_0" xml:space="preserve">
+    <value>Követés megszüntetése</value>
+  </data>
+  <data name="buttons.watch.to_1" xml:space="preserve">
+    <value>Követés</value>
+  </data>
+  <data name="count.badges" xml:space="preserve">
+    <value>{0} jelvény|{0} jelvény</value>
+  </data>
+  <data name="count.days" xml:space="preserve">
+    <value>{0} nap|{0} nap</value>
+  </data>
+  <data name="count.hour_short_unit" xml:space="preserve">
+    <value>ó|ó</value>
+  </data>
+  <data name="count.hours" xml:space="preserve">
+    <value>{0} óra|{0} óra</value>
+  </data>
+  <data name="count.item" xml:space="preserve">
+    <value>{0} egység|{0} egység</value>
+  </data>
+  <data name="count.minute_short_unit" xml:space="preserve">
+    <value>p|p</value>
+  </data>
+  <data name="count.minutes" xml:space="preserve">
+    <value>{0} perc |{0} percek</value>
+  </data>
+  <data name="count.months" xml:space="preserve">
+    <value>{0} hónap|{0} hónap</value>
+  </data>
+  <data name="count.notifications" xml:space="preserve">
+    <value>{0} értesítés|{0} értesítések</value>
+  </data>
+  <data name="count.plus_others" xml:space="preserve">
+    <value>+ {0} más!|+ {0} mások!</value>
+  </data>
+  <data name="count.post" xml:space="preserve">
+    <value>{0} poszt|{0} posztok</value>
+  </data>
+  <data name="count.second_short_unit" xml:space="preserve">
+    <value>mp|mp</value>
+  </data>
+  <data name="count.star_priority" xml:space="preserve">
+    <value>{0}: csillag prioritás|{0} csillag prioritások</value>
+  </data>
+  <data name="count.update" xml:space="preserve">
+    <value>{0} frissítés|{0} frissítések</value>
+  </data>
+  <data name="count.view" xml:space="preserve">
+    <value>{0} megtekintés|{0} megtekintések</value>
+  </data>
+  <data name="count.years" xml:space="preserve">
+    <value>{0} év|{0} év</value>
+  </data>
+  <data name="countdown.days" xml:space="preserve">
+    <value>nap</value>
+  </data>
+  <data name="countdown.hours" xml:space="preserve">
+    <value>óra</value>
+  </data>
+  <data name="countdown.minutes" xml:space="preserve">
+    <value>perc</value>
+  </data>
+  <data name="countdown.seconds" xml:space="preserve">
+    <value>másodperc</value>
+  </data>
+  <data name="datetime.year_month.moment" xml:space="preserve">
+    <value>YYYY MMMM</value>
+  </data>
+  <data name="datetime.year_month.php" xml:space="preserve">
+    <value>y MMMM</value>
+  </data>
+  <data name="datetime.year_month_short.moment" xml:space="preserve">
+    <value>YYYY MMM</value>
+  </data>
+  <data name="device.keyboard" xml:space="preserve">
+    <value>Billentyűzet</value>
+  </data>
+  <data name="device.mouse" xml:space="preserve">
+    <value>Egér</value>
+  </data>
+  <data name="device.tablet" xml:space="preserve">
+    <value>Tablet</value>
+  </data>
+  <data name="device.touch" xml:space="preserve">
+    <value>Érintőképernyő</value>
+  </data>
+  <data name="dropzone.target" xml:space="preserve">
+    <value>húzd ide a feltöltéshez</value>
+  </data>
+  <data name="input.search" xml:space="preserve">
+    <value>keresés...</value>
+  </data>
+  <data name="pagination.previous" xml:space="preserve">
+    <value>előző</value>
+  </data>
+  <data name="pagination.next" xml:space="preserve">
+    <value>következő</value>
+  </data>
+  <data name="score_count.count_100" xml:space="preserve">
+    <value>100</value>
+  </data>
+  <data name="score_count.count_300" xml:space="preserve">
+    <value>300</value>
+  </data>
+  <data name="score_count.count_50" xml:space="preserve">
+    <value>50</value>
+  </data>
+  <data name="score_count.count_katu" xml:space="preserve">
+    <value>200</value>
+  </data>
+  <data name="score_count.count_miss" xml:space="preserve">
+    <value>Miss</value>
+  </data>
+  <data name="scoreboard_time.d" xml:space="preserve">
+    <value>%d nap</value>
+  </data>
+  <data name="scoreboard_time.dd" xml:space="preserve">
+    <value>%d nap</value>
+  </data>
+  <data name="scoreboard_time.h" xml:space="preserve">
+    <value>%d óra</value>
+  </data>
+  <data name="scoreboard_time.hh" xml:space="preserve">
+    <value>%d óra</value>
+  </data>
+  <data name="scoreboard_time.m" xml:space="preserve">
+    <value>%d hónap</value>
+  </data>
+  <data name="scoreboard_time.mm" xml:space="preserve">
+    <value>%d hónap</value>
+  </data>
+  <data name="scoreboard_time.s" xml:space="preserve">
+    <value>%d perc másodperc</value>
+  </data>
+  <data name="scoreboard_time.y" xml:space="preserve">
+    <value>%d év</value>
+  </data>
+  <data name="scoreboard_time.yy" xml:space="preserve">
+    <value>%d év</value>
+  </data>
+  <data name="time.days_ago" xml:space="preserve">
+    <value>{0} napja|{0} napja</value>
+  </data>
+  <data name="time.hours_ago" xml:space="preserve">
+    <value>{0} órája|{0} órája</value>
+  </data>
+  <data name="time.now" xml:space="preserve">
+    <value>most</value>
+  </data>
+  <data name="time.remaining" xml:space="preserve">
+    <value>Hátralévő Idő</value>
+  </data>
+  <data name="title.notice" xml:space="preserve">
+    <value>Értesítés</value>
+  </data>
+  <data name="wrong_user._" xml:space="preserve">
+    <value>Bejelntkezve mint {0}. {1}.</value>
+  </data>
+  <data name="wrong_user.logout_link" xml:space="preserve">
+    <value>Kattints ide a bejelentkezéshez más felhasználóként</value>
+  </data>
+</root>

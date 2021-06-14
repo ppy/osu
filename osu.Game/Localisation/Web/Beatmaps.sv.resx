@@ -1,0 +1,685 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="discussion-votes.update.error" xml:space="preserve">
+    <value>Kunde ej uppdatera röst</value>
+  </data>
+  <data name="discussions.allow_kudosu" xml:space="preserve">
+    <value>tillåt kudosu</value>
+  </data>
+  <data name="discussions.beatmap_information" xml:space="preserve">
+    <value>Beatmap Sida</value>
+  </data>
+  <data name="discussions.delete" xml:space="preserve">
+    <value>radera</value>
+  </data>
+  <data name="discussions.deleted" xml:space="preserve">
+    <value>Raderad av {0} {1}.</value>
+  </data>
+  <data name="discussions.deny_kudosu" xml:space="preserve">
+    <value>neka kudosu</value>
+  </data>
+  <data name="discussions.edit" xml:space="preserve">
+    <value>redigera</value>
+  </data>
+  <data name="discussions.edited" xml:space="preserve">
+    <value>Senast redigerad av {0} {1}.</value>
+  </data>
+  <data name="discussions.kudosu_denied" xml:space="preserve">
+    <value>Nekad från att skaffa kudosu.</value>
+  </data>
+  <data name="discussions.message_placeholder_deleted_beatmap" xml:space="preserve">
+    <value>Denna svårighetsgrad har tagits bort så den kan inte längre diskuteras.</value>
+  </data>
+  <data name="discussions.message_placeholder_locked" xml:space="preserve">
+    <value>Diskussioner för denna beatmap har inaktiverats.</value>
+  </data>
+  <data name="discussions.message_placeholder_silenced" xml:space="preserve">
+    <value>Kan inte lägga upp diskussionen som tystad.</value>
+  </data>
+  <data name="discussions.message_type_select" xml:space="preserve">
+    <value>Välj Kommentarstyp</value>
+  </data>
+  <data name="discussions.reply_notice" xml:space="preserve">
+    <value>Tryck enter för att svara.</value>
+  </data>
+  <data name="discussions.reply_placeholder" xml:space="preserve">
+    <value>Skriv ditt svar här</value>
+  </data>
+  <data name="discussions.require-login" xml:space="preserve">
+    <value>Var vänlig logga in för att skicka inlägg eller svara</value>
+  </data>
+  <data name="discussions.resolved" xml:space="preserve">
+    <value>Löst</value>
+  </data>
+  <data name="discussions.restore" xml:space="preserve">
+    <value>återställ</value>
+  </data>
+  <data name="discussions.show_deleted" xml:space="preserve">
+    <value>Visa borttagna</value>
+  </data>
+  <data name="discussions.title" xml:space="preserve">
+    <value>Diskussioner</value>
+  </data>
+  <data name="discussions.collapse.all-collapse" xml:space="preserve">
+    <value>Kollapsa allt</value>
+  </data>
+  <data name="discussions.collapse.all-expand" xml:space="preserve">
+    <value>Expandera allt</value>
+  </data>
+  <data name="discussions.empty.empty" xml:space="preserve">
+    <value>Inga diskussioner ännu!</value>
+  </data>
+  <data name="discussions.empty.hidden" xml:space="preserve">
+    <value>Inga diskussioner matchar valt filter.</value>
+  </data>
+  <data name="discussions.lock.button.lock" xml:space="preserve">
+    <value>Lås diskussionen</value>
+  </data>
+  <data name="discussions.lock.button.unlock" xml:space="preserve">
+    <value>Lås upp diskussionen</value>
+  </data>
+  <data name="discussions.lock.prompt.lock" xml:space="preserve">
+    <value>Orsak till låsning</value>
+  </data>
+  <data name="discussions.lock.prompt.unlock" xml:space="preserve">
+    <value>Är du säker på att du vill låsa upp diskussionen?</value>
+  </data>
+  <data name="discussions.message_hint.in_general" xml:space="preserve">
+    <value>Detta inlägg kommer att gå till allmän beatmapset diskussion. För att modifiera denna beatmap, starta meddelande med tidsstämpel (t.ex. 00:12:345).</value>
+  </data>
+  <data name="discussions.message_hint.in_timeline" xml:space="preserve">
+    <value>För att modda flera tidsstämplar, lägg upp flera inlägg (ett inlägg för varje tidsstämpel).</value>
+  </data>
+  <data name="discussions.message_placeholder.general" xml:space="preserve">
+    <value>Skriv här för att posta till General ({0})</value>
+  </data>
+  <data name="discussions.message_placeholder.generalall" xml:space="preserve">
+    <value>Skriv här för att posta till General (Alla svårighetsgrader)</value>
+  </data>
+  <data name="discussions.message_placeholder.review" xml:space="preserve">
+    <value>Skriv här för att posta en recension</value>
+  </data>
+  <data name="discussions.message_placeholder.timeline" xml:space="preserve">
+    <value>Skriv här för att posta till Tidslinjen ({0})</value>
+  </data>
+  <data name="discussions.message_type.disqualify" xml:space="preserve">
+    <value>Diskvalificera</value>
+  </data>
+  <data name="discussions.message_type.hype" xml:space="preserve">
+    <value>Hype!</value>
+  </data>
+  <data name="discussions.message_type.mapper_note" xml:space="preserve">
+    <value>Anteckning</value>
+  </data>
+  <data name="discussions.message_type.nomination_reset" xml:space="preserve">
+    <value>Återställ Nominering</value>
+  </data>
+  <data name="discussions.message_type.praise" xml:space="preserve">
+    <value>Beröm</value>
+  </data>
+  <data name="discussions.message_type.problem" xml:space="preserve">
+    <value>Problem</value>
+  </data>
+  <data name="discussions.message_type.review" xml:space="preserve">
+    <value>Recension</value>
+  </data>
+  <data name="discussions.message_type.suggestion" xml:space="preserve">
+    <value>Förslag</value>
+  </data>
+  <data name="discussions.mode.events" xml:space="preserve">
+    <value>Historik</value>
+  </data>
+  <data name="discussions.mode.general" xml:space="preserve">
+    <value>Allmänt {0}</value>
+  </data>
+  <data name="discussions.mode.reviews" xml:space="preserve">
+    <value>Recensioner</value>
+  </data>
+  <data name="discussions.mode.timeline" xml:space="preserve">
+    <value>Tidslinje</value>
+  </data>
+  <data name="discussions.mode.scopes.general" xml:space="preserve">
+    <value>Denna svårighetsgrad</value>
+  </data>
+  <data name="discussions.mode.scopes.generalall" xml:space="preserve">
+    <value>Alla svårighetsgrader</value>
+  </data>
+  <data name="discussions.new.pin" xml:space="preserve">
+    <value>Fäst</value>
+  </data>
+  <data name="discussions.new.timestamp" xml:space="preserve">
+    <value>Tidsstämpel</value>
+  </data>
+  <data name="discussions.new.timestamp_missing" xml:space="preserve">
+    <value>Tryck ctrl-c i redigeringsläget och klistra in ditt meddelande för att lägga till en tidsstämpel!</value>
+  </data>
+  <data name="discussions.new.title" xml:space="preserve">
+    <value>Ny Diskussion</value>
+  </data>
+  <data name="discussions.new.unpin" xml:space="preserve">
+    <value>Lossa</value>
+  </data>
+  <data name="discussions.review.new" xml:space="preserve">
+    <value>Ny Recension</value>
+  </data>
+  <data name="discussions.review.embed.delete" xml:space="preserve">
+    <value>Radera</value>
+  </data>
+  <data name="discussions.review.embed.missing" xml:space="preserve">
+    <value>[DISKUSSION RADERAD]</value>
+  </data>
+  <data name="discussions.review.embed.unlink" xml:space="preserve">
+    <value>Ta bort länk</value>
+  </data>
+  <data name="discussions.review.embed.unsaved" xml:space="preserve">
+    <value>Ej sparad</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.all-diff" xml:space="preserve">
+    <value>Inlägg med "Alla svårighetsgrader" kan inte tidsstämplas.</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.diff" xml:space="preserve">
+    <value>Om denna {0} börjar med en tidsstämpel, visas den under Tidslinje.</value>
+  </data>
+  <data name="discussions.review.insert-block.paragraph" xml:space="preserve">
+    <value>infoga paragraf</value>
+  </data>
+  <data name="discussions.review.insert-block.praise" xml:space="preserve">
+    <value>infoga beröm</value>
+  </data>
+  <data name="discussions.review.insert-block.problem" xml:space="preserve">
+    <value>infoga problem</value>
+  </data>
+  <data name="discussions.review.insert-block.suggestion" xml:space="preserve">
+    <value>infoga förslag</value>
+  </data>
+  <data name="discussions.show.title" xml:space="preserve">
+    <value>{0} mappad av {1}</value>
+  </data>
+  <data name="discussions.sort.created_at" xml:space="preserve">
+    <value>Skapelsedatum</value>
+  </data>
+  <data name="discussions.sort.timeline" xml:space="preserve">
+    <value>Tidslinje</value>
+  </data>
+  <data name="discussions.sort.updated_at" xml:space="preserve">
+    <value>Senaste uppdatering</value>
+  </data>
+  <data name="discussions.stats.deleted" xml:space="preserve">
+    <value>Raderad</value>
+  </data>
+  <data name="discussions.stats.mapper_notes" xml:space="preserve">
+    <value>Anteckningar</value>
+  </data>
+  <data name="discussions.stats.mine" xml:space="preserve">
+    <value>Min</value>
+  </data>
+  <data name="discussions.stats.pending" xml:space="preserve">
+    <value>Avvaktar</value>
+  </data>
+  <data name="discussions.stats.praises" xml:space="preserve">
+    <value>Beröm</value>
+  </data>
+  <data name="discussions.stats.resolved" xml:space="preserve">
+    <value>Löst</value>
+  </data>
+  <data name="discussions.stats.total" xml:space="preserve">
+    <value>Alla</value>
+  </data>
+  <data name="discussions.status-messages.approved" xml:space="preserve">
+    <value>This beatmap was approved on {0}!</value>
+  </data>
+  <data name="discussions.status-messages.graveyard" xml:space="preserve">
+    <value>Denna beatmap har inte blivit uppdaterad sen {0} och har mest troligast blivit övergiven av skaparen...</value>
+  </data>
+  <data name="discussions.status-messages.loved" xml:space="preserve">
+    <value>Denna beatmap blev tillagd i älskad {0}!</value>
+  </data>
+  <data name="discussions.status-messages.ranked" xml:space="preserve">
+    <value>Denna beatmap blev rankad {0}!</value>
+  </data>
+  <data name="discussions.status-messages.wip" xml:space="preserve">
+    <value>Notera: Denna beatmap är markerad som pågående arbete av skaparen.</value>
+  </data>
+  <data name="discussions.votes.none.down" xml:space="preserve">
+    <value>Inga nedröster ännu</value>
+  </data>
+  <data name="discussions.votes.none.up" xml:space="preserve">
+    <value>Inga uppröster ännu</value>
+  </data>
+  <data name="discussions.votes.latest.down" xml:space="preserve">
+    <value>Senaste nedröster</value>
+  </data>
+  <data name="discussions.votes.latest.up" xml:space="preserve">
+    <value>Senaste uppröster</value>
+  </data>
+  <data name="hype.button" xml:space="preserve">
+    <value>Hype Beatmap!</value>
+  </data>
+  <data name="hype.button_done" xml:space="preserve">
+    <value>Redan hypad!</value>
+  </data>
+  <data name="hype.confirm" xml:space="preserve">
+    <value>Är du säker? Detta kommer att använda en av dina återstånde {0} hypes och kan inte tas tillbaka.</value>
+  </data>
+  <data name="hype.explanation" xml:space="preserve">
+    <value>Att lägga till beröm ❤ kommer höja denna beatmaps hype, vilket gör den mer synlig för nominering och rankning!</value>
+  </data>
+  <data name="hype.explanation_guest" xml:space="preserve">
+    <value>Logga in och hypa denna beatmap för att göra den mer synlig för nomineringar och rankning!</value>
+  </data>
+  <data name="hype.new_time" xml:space="preserve">
+    <value>Du kommer att få en till hype {0}.</value>
+  </data>
+  <data name="hype.remaining" xml:space="preserve">
+    <value>Du har {0} hypes kvar.</value>
+  </data>
+  <data name="hype.required_text" xml:space="preserve">
+    <value>Hype: {0}/{1}</value>
+  </data>
+  <data name="hype.section_title" xml:space="preserve">
+    <value>Hype Tåg</value>
+  </data>
+  <data name="hype.title" xml:space="preserve">
+    <value>Hype</value>
+  </data>
+  <data name="feedback.button" xml:space="preserve">
+    <value>Lämna Feedback</value>
+  </data>
+  <data name="nominations.delete" xml:space="preserve">
+    <value>Radera</value>
+  </data>
+  <data name="nominations.delete_own_confirm" xml:space="preserve">
+    <value>Är du säker? Beatmapen kommer att raderas och du kommer att omdirigeras tillbaka till din profil.</value>
+  </data>
+  <data name="nominations.delete_other_confirm" xml:space="preserve">
+    <value>Är du säker? Beatmapen kommer att raderas och du kommer att omdirigeras tillbaka till användarens profil.</value>
+  </data>
+  <data name="nominations.disqualification_prompt" xml:space="preserve">
+    <value>Anledning för diskvalificering?</value>
+  </data>
+  <data name="nominations.disqualified_at" xml:space="preserve">
+    <value>Diskvalificerad {0} ({1}).</value>
+  </data>
+  <data name="nominations.disqualified_no_reason" xml:space="preserve">
+    <value>inget anledning specificerad</value>
+  </data>
+  <data name="nominations.disqualify" xml:space="preserve">
+    <value>Diskvalificera</value>
+  </data>
+  <data name="nominations.incorrect_state" xml:space="preserve">
+    <value>Ett fel uppstod, pröva att uppdatera sidan.</value>
+  </data>
+  <data name="nominations.love" xml:space="preserve">
+    <value>Kärlek</value>
+  </data>
+  <data name="nominations.love_confirm" xml:space="preserve">
+    <value>Älskar du denna beatmap?</value>
+  </data>
+  <data name="nominations.nominate" xml:space="preserve">
+    <value>Nominera</value>
+  </data>
+  <data name="nominations.nominate_confirm" xml:space="preserve">
+    <value>Nominera denna beatmap?</value>
+  </data>
+  <data name="nominations.nominated_by" xml:space="preserve">
+    <value>nominerad av {0}</value>
+  </data>
+  <data name="nominations.not_enough_hype" xml:space="preserve">
+    <value>Det finns inte tillräckligt med hype.</value>
+  </data>
+  <data name="nominations.remove_from_loved" xml:space="preserve">
+    <value>Ta bort från Älskad</value>
+  </data>
+  <data name="nominations.remove_from_loved_prompt" xml:space="preserve">
+    <value>Anledning till borttagandet från Älskad:</value>
+  </data>
+  <data name="nominations.required_text" xml:space="preserve">
+    <value>Nomineringar: {0}/{1}</value>
+  </data>
+  <data name="nominations.reset_message_deleted" xml:space="preserve">
+    <value>raderad</value>
+  </data>
+  <data name="nominations.title" xml:space="preserve">
+    <value>Nominering Status</value>
+  </data>
+  <data name="nominations.unresolved_issues" xml:space="preserve">
+    <value>Det finns fortfarande olösta problem som måste tas hand om först.</value>
+  </data>
+  <data name="nominations.rank_estimate._" xml:space="preserve">
+    <value>Denna map uppskattas vara rankad den {0}, så länge inga fel uppstår. Den är #{1} i kön {2}.</value>
+  </data>
+  <data name="nominations.rank_estimate.queue" xml:space="preserve">
+    <value>rankkö</value>
+  </data>
+  <data name="nominations.rank_estimate.soon" xml:space="preserve">
+    <value>snart</value>
+  </data>
+  <data name="nominations.reset_at.nomination_reset" xml:space="preserve">
+    <value>Nomineringsprocessen återställdes {0} av {1} med ett nytt problem {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_at.disqualify" xml:space="preserve">
+    <value>Diskvalificerad {0} av {1} med ett nytt problem {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_confirm.nomination_reset" xml:space="preserve">
+    <value>Är du säker? Lägga upp ett nytt problem kommer återställa nomineringar.</value>
+  </data>
+  <data name="nominations.reset_confirm.disqualify" xml:space="preserve">
+    <value>Är du säker? Detta kommer att ta bort beatmap från kvalificering och återställa nomineringsprocessen.</value>
+  </data>
+  <data name="listing.search.prompt" xml:space="preserve">
+    <value>skriv in nyckelord...</value>
+  </data>
+  <data name="listing.search.login_required" xml:space="preserve">
+    <value>Logga in för att söka.</value>
+  </data>
+  <data name="listing.search.options" xml:space="preserve">
+    <value>Mer Sök Alternativ</value>
+  </data>
+  <data name="listing.search.supporter_filter" xml:space="preserve">
+    <value>Filtrering av {0} kräver en aktiv osu!supporter tagg</value>
+  </data>
+  <data name="listing.search.not-found" xml:space="preserve">
+    <value>inga resultat</value>
+  </data>
+  <data name="listing.search.not-found-quote" xml:space="preserve">
+    <value>... nope, ingenting hittades.</value>
+  </data>
+  <data name="listing.search.filters.extra" xml:space="preserve">
+    <value>extra</value>
+  </data>
+  <data name="listing.search.filters.general" xml:space="preserve">
+    <value>Allmänt</value>
+  </data>
+  <data name="listing.search.filters.genre" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+  <data name="listing.search.filters.language" xml:space="preserve">
+    <value>Språk</value>
+  </data>
+  <data name="listing.search.filters.mode" xml:space="preserve">
+    <value>Läge</value>
+  </data>
+  <data name="listing.search.filters.nsfw" xml:space="preserve">
+    <value>Explicit innehåll</value>
+  </data>
+  <data name="listing.search.filters.played" xml:space="preserve">
+    <value>Spelade</value>
+  </data>
+  <data name="listing.search.filters.rank" xml:space="preserve">
+    <value>Rank Uppnådd</value>
+  </data>
+  <data name="listing.search.filters.status" xml:space="preserve">
+    <value>Kategorier</value>
+  </data>
+  <data name="listing.search.sorting.title" xml:space="preserve">
+    <value>Titel</value>
+  </data>
+  <data name="listing.search.sorting.artist" xml:space="preserve">
+    <value>Artist</value>
+  </data>
+  <data name="listing.search.sorting.difficulty" xml:space="preserve">
+    <value>Svårighetsgrad</value>
+  </data>
+  <data name="listing.search.sorting.favourites" xml:space="preserve">
+    <value>Favoriter</value>
+  </data>
+  <data name="listing.search.sorting.updated" xml:space="preserve">
+    <value>Uppdaterad</value>
+  </data>
+  <data name="listing.search.sorting.ranked" xml:space="preserve">
+    <value>Rankad</value>
+  </data>
+  <data name="listing.search.sorting.rating" xml:space="preserve">
+    <value>Omdöme</value>
+  </data>
+  <data name="listing.search.sorting.plays" xml:space="preserve">
+    <value>Spelningar</value>
+  </data>
+  <data name="listing.search.sorting.relevance" xml:space="preserve">
+    <value>Relevans</value>
+  </data>
+  <data name="listing.search.sorting.nominations" xml:space="preserve">
+    <value>Nomineringar</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote._" xml:space="preserve">
+    <value>Filtrering av {0} kräver en aktiv {1}</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote.link_text" xml:space="preserve">
+    <value>osu!supporter tagg</value>
+  </data>
+  <data name="general.converts" xml:space="preserve">
+    <value>Inkludera konverterade beatmaps</value>
+  </data>
+  <data name="general.recommended" xml:space="preserve">
+    <value>Rekommenderad svårighetsgrad</value>
+  </data>
+  <data name="mode.all" xml:space="preserve">
+    <value>Alla</value>
+  </data>
+  <data name="mode.any" xml:space="preserve">
+    <value>Alla</value>
+  </data>
+  <data name="status.any" xml:space="preserve">
+    <value>Alla</value>
+  </data>
+  <data name="status.approved" xml:space="preserve">
+    <value>Godkänd</value>
+  </data>
+  <data name="status.favourites" xml:space="preserve">
+    <value>Favoriter</value>
+  </data>
+  <data name="status.graveyard" xml:space="preserve">
+    <value>Kyrkogård</value>
+  </data>
+  <data name="status.leaderboard" xml:space="preserve">
+    <value>Har Topplista</value>
+  </data>
+  <data name="status.loved" xml:space="preserve">
+    <value>Älskad</value>
+  </data>
+  <data name="status.mine" xml:space="preserve">
+    <value>Mina Maps</value>
+  </data>
+  <data name="status.pending" xml:space="preserve">
+    <value>Pågående &amp; WIP</value>
+  </data>
+  <data name="status.qualified" xml:space="preserve">
+    <value>Kvalificerad</value>
+  </data>
+  <data name="status.ranked" xml:space="preserve">
+    <value>Rankad</value>
+  </data>
+  <data name="genre.any" xml:space="preserve">
+    <value>Alla</value>
+  </data>
+  <data name="genre.unspecified" xml:space="preserve">
+    <value>Ospecificerad</value>
+  </data>
+  <data name="genre.video-game" xml:space="preserve">
+    <value>Spel</value>
+  </data>
+  <data name="genre.anime" xml:space="preserve">
+    <value>Anime</value>
+  </data>
+  <data name="genre.rock" xml:space="preserve">
+    <value>Rock</value>
+  </data>
+  <data name="genre.pop" xml:space="preserve">
+    <value>Pop</value>
+  </data>
+  <data name="genre.other" xml:space="preserve">
+    <value>Annan</value>
+  </data>
+  <data name="genre.novelty" xml:space="preserve">
+    <value>Novelty</value>
+  </data>
+  <data name="genre.hip-hop" xml:space="preserve">
+    <value>Hip Hop</value>
+  </data>
+  <data name="genre.electronic" xml:space="preserve">
+    <value>Elektronisk</value>
+  </data>
+  <data name="genre.metal" xml:space="preserve">
+    <value>Metal</value>
+  </data>
+  <data name="genre.classical" xml:space="preserve">
+    <value>Klassisk</value>
+  </data>
+  <data name="genre.folk" xml:space="preserve">
+    <value>Folk</value>
+  </data>
+  <data name="genre.jazz" xml:space="preserve">
+    <value>Jazz</value>
+  </data>
+  <data name="mods.v2" xml:space="preserve">
+    <value>Score V2</value>
+  </data>
+  <data name="language.any" xml:space="preserve">
+    <value>Alla</value>
+  </data>
+  <data name="language.english" xml:space="preserve">
+    <value>Engelska</value>
+  </data>
+  <data name="language.chinese" xml:space="preserve">
+    <value>Kinesiska</value>
+  </data>
+  <data name="language.french" xml:space="preserve">
+    <value>Franska</value>
+  </data>
+  <data name="language.german" xml:space="preserve">
+    <value>Tyska</value>
+  </data>
+  <data name="language.italian" xml:space="preserve">
+    <value>Italienska</value>
+  </data>
+  <data name="language.japanese" xml:space="preserve">
+    <value>Japanska</value>
+  </data>
+  <data name="language.korean" xml:space="preserve">
+    <value>Koreanska</value>
+  </data>
+  <data name="language.spanish" xml:space="preserve">
+    <value>Spanska</value>
+  </data>
+  <data name="language.swedish" xml:space="preserve">
+    <value>Svenska</value>
+  </data>
+  <data name="language.russian" xml:space="preserve">
+    <value>Ryska</value>
+  </data>
+  <data name="language.polish" xml:space="preserve">
+    <value>Polska</value>
+  </data>
+  <data name="language.instrumental" xml:space="preserve">
+    <value>Instrumental</value>
+  </data>
+  <data name="language.other" xml:space="preserve">
+    <value>Annat</value>
+  </data>
+  <data name="language.unspecified" xml:space="preserve">
+    <value>Ospecificerat</value>
+  </data>
+  <data name="nsfw.exclude" xml:space="preserve">
+    <value>Dölj</value>
+  </data>
+  <data name="nsfw.include" xml:space="preserve">
+    <value>Visa</value>
+  </data>
+  <data name="played.any" xml:space="preserve">
+    <value>Alla</value>
+  </data>
+  <data name="played.played" xml:space="preserve">
+    <value>Spelade</value>
+  </data>
+  <data name="played.unplayed" xml:space="preserve">
+    <value>Ej spelade</value>
+  </data>
+  <data name="extra.video" xml:space="preserve">
+    <value>Har Video</value>
+  </data>
+  <data name="extra.storyboard" xml:space="preserve">
+    <value>Har Storyboard</value>
+  </data>
+  <data name="rank.any" xml:space="preserve">
+    <value>Alla</value>
+  </data>
+  <data name="rank.xh" xml:space="preserve">
+    <value>Silver SS</value>
+  </data>
+  <data name="rank.sh" xml:space="preserve">
+    <value>Silver S</value>
+  </data>
+  <data name="panel.playcount" xml:space="preserve">
+    <value>Antal spelade: {0}</value>
+  </data>
+  <data name="panel.favourites" xml:space="preserve">
+    <value>Favoriter: {0}</value>
+  </data>
+  <data name="variant.mania.4k" xml:space="preserve">
+    <value>4K</value>
+  </data>
+  <data name="variant.mania.7k" xml:space="preserve">
+    <value>7K</value>
+  </data>
+  <data name="variant.mania.all" xml:space="preserve">
+    <value>Alla</value>
+  </data>
+</root>

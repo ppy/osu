@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="event.approve" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="event.beatmap_owner_change" xml:space="preserve">
+    <value>難易度{0}の所有者が{1}に変更されました。</value>
+  </data>
+  <data name="event.discussion_delete" xml:space="preserve">
+    <value>モデレーターが{0}を削除しました。</value>
+  </data>
+  <data name="event.discussion_lock" xml:space="preserve">
+    <value>このビートマップに関するディスカッションは無効になっています。 （{0}）</value>
+  </data>
+  <data name="event.discussion_post_delete" xml:space="preserve">
+    <value>モデレーターが{0}から投稿を削除しました。</value>
+  </data>
+  <data name="event.discussion_post_restore" xml:space="preserve">
+    <value>モデレーターが{0}から投稿を復元しました。</value>
+  </data>
+  <data name="event.discussion_restore" xml:space="preserve">
+    <value>モデレーターが{0}を復元しました。</value>
+  </data>
+  <data name="event.discussion_unlock" xml:space="preserve">
+    <value>このビートマップに関するディスカッションは有効になりました。</value>
+  </data>
+  <data name="event.disqualify" xml:space="preserve">
+    <value>{0}によってDisqualifyされました。理由：{1} （{2}）</value>
+  </data>
+  <data name="event.disqualify_legacy" xml:space="preserve">
+    <value>{0}によってDisqualifyされました。理由：{1}。</value>
+  </data>
+  <data name="event.genre_edit" xml:space="preserve">
+    <value>ジャンルが {0} から {1} に変更されました。</value>
+  </data>
+  <data name="event.issue_reopen" xml:space="preserve">
+    <value>解決済みの{0}が再開されました。</value>
+  </data>
+  <data name="event.issue_resolve" xml:space="preserve">
+    <value>問題{0}が解決しました。</value>
+  </data>
+  <data name="event.kudosu_allow" xml:space="preserve">
+    <value>{0}に対するkudosuの拒否は削除されました。</value>
+  </data>
+  <data name="event.kudosu_deny" xml:space="preserve">
+    <value>{0}はkudosuにより拒否されました。</value>
+  </data>
+  <data name="event.kudosu_gain" xml:space="preserve">
+    <value>{0}の{1}がkudosuに十分な評価を得ました。</value>
+  </data>
+  <data name="event.kudosu_lost" xml:space="preserve">
+    <value>{0}の{1}は投票を失ったため、獲得したkudosuは削除されました。</value>
+  </data>
+  <data name="event.kudosu_recalculate" xml:space="preserve">
+    <value>{0}の取得kudosuが再計算されました。</value>
+  </data>
+  <data name="event.language_edit" xml:space="preserve">
+    <value>言語が {0} から {1} に変更されました。</value>
+  </data>
+  <data name="event.love" xml:space="preserve">
+    <value>{0}がLovedに追加しました。</value>
+  </data>
+  <data name="event.nominate" xml:space="preserve">
+    <value>{0}がノミネートしました。</value>
+  </data>
+  <data name="event.nominate_modes" xml:space="preserve">
+    <value>{0}({1})がノミネートしました。</value>
+  </data>
+  <data name="event.nomination_reset" xml:space="preserve">
+    <value>新しい問題 {0} ({1})によりノミネートがリセットされました。</value>
+  </data>
+  <data name="event.qualify" xml:space="preserve">
+    <value>このビートマップは既に必要なノミネーション数に達しており、Qualifiedされています。</value>
+  </data>
+  <data name="event.rank" xml:space="preserve">
+    <value>Rankedされました。</value>
+  </data>
+  <data name="event.remove_from_loved" xml:space="preserve">
+    <value>{0}によってLovedから削除されました。({1})</value>
+  </data>
+  <data name="event.nsfw_toggle.to_0" xml:space="preserve">
+    <value>露骨マークを削除しました</value>
+  </data>
+  <data name="event.nsfw_toggle.to_1" xml:space="preserve">
+    <value>露骨であるとマークする</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>ビートマップセットイベント</value>
+  </data>
+  <data name="index.form.period" xml:space="preserve">
+    <value>期間</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>タイプ</value>
+  </data>
+  <data name="item.content" xml:space="preserve">
+    <value>目次</value>
+  </data>
+  <data name="item.discussion_deleted" xml:space="preserve">
+    <value>[削除済み]</value>
+  </data>
+  <data name="item.type" xml:space="preserve">
+    <value>タイプ</value>
+  </data>
+  <data name="type.approve" xml:space="preserve">
+    <value>承認</value>
+  </data>
+  <data name="type.beatmap_owner_change" xml:space="preserve">
+    <value>難易度の所有者変更</value>
+  </data>
+  <data name="type.discussion_delete" xml:space="preserve">
+    <value>ディスカッションの削除</value>
+  </data>
+  <data name="type.discussion_post_delete" xml:space="preserve">
+    <value>ディスカッションの返信を削除</value>
+  </data>
+  <data name="type.discussion_post_restore" xml:space="preserve">
+    <value>ディスカッションの返信を復元</value>
+  </data>
+  <data name="type.discussion_restore" xml:space="preserve">
+    <value>ディスカッションの復元</value>
+  </data>
+  <data name="type.disqualify" xml:space="preserve">
+    <value>Disqualification</value>
+  </data>
+  <data name="type.genre_edit" xml:space="preserve">
+    <value>ジャンル編集</value>
+  </data>
+  <data name="type.issue_reopen" xml:space="preserve">
+    <value>ディスカッションを再開する</value>
+  </data>
+  <data name="type.issue_resolve" xml:space="preserve">
+    <value>ディスカッションを解決する</value>
+  </data>
+  <data name="type.kudosu_allow" xml:space="preserve">
+    <value>Kudosuを許可</value>
+  </data>
+  <data name="type.kudosu_deny" xml:space="preserve">
+    <value>Kudosuを拒否</value>
+  </data>
+  <data name="type.kudosu_gain" xml:space="preserve">
+    <value>Kudosuを獲得</value>
+  </data>
+  <data name="type.kudosu_lost" xml:space="preserve">
+    <value>Kudosuを失う</value>
+  </data>
+  <data name="type.kudosu_recalculate" xml:space="preserve">
+    <value>Kudosuの再計算</value>
+  </data>
+  <data name="type.language_edit" xml:space="preserve">
+    <value>言語編集</value>
+  </data>
+  <data name="type.love" xml:space="preserve">
+    <value>Love</value>
+  </data>
+  <data name="type.nominate" xml:space="preserve">
+    <value>ノミネーション</value>
+  </data>
+  <data name="type.nomination_reset" xml:space="preserve">
+    <value>ノミネーションのリセット</value>
+  </data>
+  <data name="type.nsfw_toggle" xml:space="preserve">
+    <value>露骨マーク</value>
+  </data>
+  <data name="type.qualify" xml:space="preserve">
+    <value>Qualification</value>
+  </data>
+  <data name="type.rank" xml:space="preserve">
+    <value>ランキング</value>
+  </data>
+  <data name="type.remove_from_loved" xml:space="preserve">
+    <value>Loved削除</value>
+  </data>
+</root>

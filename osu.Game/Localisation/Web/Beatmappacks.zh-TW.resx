@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="index.description" xml:space="preserve">
+    <value>相同主題的圖譜合集壓縮檔</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>列表</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>圖譜壓縮檔</value>
+  </data>
+  <data name="index.blurb.important" xml:space="preserve">
+    <value>下載前必讀</value>
+  </data>
+  <data name="index.blurb.instruction._" xml:space="preserve">
+    <value>安裝方式：當您下載好壓縮檔之後,請將壓縮檔 .rar 解壓到您 osu! 安裝目錄下的 Songs 資料夾內。
+                    解壓出來的圖譜檔案皆是 .zip 或 .osz 檔案, osu! 會在你下一次啟動時自動載入這些圖譜。
+                    因此請 {0} 自行解壓這些圖譜檔案，否則恐導致無法正常遊戲。</value>
+  </data>
+  <data name="index.blurb.instruction.scary" xml:space="preserve">
+    <value>不要</value>
+  </data>
+  <data name="index.blurb.note._" xml:space="preserve">
+    <value>強烈建議您 {0}，因為舊圖譜的品質可能不如現在。</value>
+  </data>
+  <data name="index.blurb.note.scary" xml:space="preserve">
+    <value>下載最新的圖譜壓縮檔</value>
+  </data>
+  <data name="show.download" xml:space="preserve">
+    <value>下載</value>
+  </data>
+  <data name="show.item.cleared" xml:space="preserve">
+    <value>玩過</value>
+  </data>
+  <data name="show.item.not_cleared" xml:space="preserve">
+    <value>未玩</value>
+  </data>
+  <data name="show.no_diff_reduction.link" xml:space="preserve">
+    <value>降低難度的 mod</value>
+  </data>
+  <data name="mode.artist" xml:space="preserve">
+    <value>藝術家/專輯</value>
+  </data>
+  <data name="mode.chart" xml:space="preserve">
+    <value>頭條</value>
+  </data>
+  <data name="mode.standard" xml:space="preserve">
+    <value>標準</value>
+  </data>
+  <data name="mode.theme" xml:space="preserve">
+    <value>主題</value>
+  </data>
+  <data name="require_login._" xml:space="preserve">
+    <value>您需要 {0} 才能下載</value>
+  </data>
+  <data name="require_login.link_text" xml:space="preserve">
+    <value>登入</value>
+  </data>
+</root>

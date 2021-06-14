@@ -1,0 +1,277 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="play_more" xml:space="preserve">
+    <value>Thay vào đó, hay là chơi osu! một chút nhỉ?</value>
+  </data>
+  <data name="require_login" xml:space="preserve">
+    <value>Vui lòng đăng nhập để tiếp tục.</value>
+  </data>
+  <data name="require_verification" xml:space="preserve">
+    <value>Vui lòng xác minh để tiếp tục.</value>
+  </data>
+  <data name="restricted" xml:space="preserve">
+    <value>Không thể làm việc đó trong khi bị hạn chế.</value>
+  </data>
+  <data name="silenced" xml:space="preserve">
+    <value>Không thể làm việc đó trong khi bị cấm nói.</value>
+  </data>
+  <data name="unauthorized" xml:space="preserve">
+    <value>Truy cập bị từ chối.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.is_hype" xml:space="preserve">
+    <value>Không thể hủy bỏ hype.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.has_reply" xml:space="preserve">
+    <value>Không thể xóa cuộc thảo luận có trả lời trong đó</value>
+  </data>
+  <data name="beatmap_discussion.nominate.exhausted" xml:space="preserve">
+    <value>Bạn đã đạt giới hạn số lần đề cử của hôm nay, hãy thử lại vào ngày mai.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.incorrect_state" xml:space="preserve">
+    <value>Có lỗi khi thực hiện, hãy thử tải lại trang.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.owner" xml:space="preserve">
+    <value>Bạn không thể đề cử beatmap của bạn.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.set_metadata" xml:space="preserve">
+    <value>Bạn phải chọn thể loại nhạc và ngôn ngữ trước khi nominating.</value>
+  </data>
+  <data name="beatmap_discussion.resolve.not_owner" xml:space="preserve">
+    <value>Chỉ có người mở thread và chủ beatmap mới có thể đánh dấu cuộc thảo luận là đã được giải quyết.</value>
+  </data>
+  <data name="beatmap_discussion.store.mapper_note_wrong_user" xml:space="preserve">
+    <value>Chỉ chủ beatmap hoặc người đề cử beatmap/thành viên của NAT mới có thể đăng ghi chú.</value>
+  </data>
+  <data name="beatmap_discussion.vote.bot" xml:space="preserve">
+    <value>Không thể bầu trên thảo luận tạo bởi bot</value>
+  </data>
+  <data name="beatmap_discussion.vote.limit_exceeded" xml:space="preserve">
+    <value>Vui lòng đợi một lúc trước khi bình chọn thêm</value>
+  </data>
+  <data name="beatmap_discussion.vote.owner" xml:space="preserve">
+    <value>Không thể bình chọn cuộc thảo luận của bạn.</value>
+  </data>
+  <data name="beatmap_discussion.vote.wrong_beatmapset_state" xml:space="preserve">
+    <value>Chỉ có thể bình chọn cuộc thảo luận của beatmap ở trạng thái pending.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.not_owner" xml:space="preserve">
+    <value>Bạn chỉ có thể xóa bài đăng của chính mình.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.resolved" xml:space="preserve">
+    <value>Bạn không thể xoá một bài đăng về một thảo luận đã được giải quyết.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.system_generated" xml:space="preserve">
+    <value>Không thể xóa bài đăng được tạo tự động.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.not_owner" xml:space="preserve">
+    <value>Bài đăng chỉ có thể được chỉnh sửa bởi người đăng.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.resolved" xml:space="preserve">
+    <value>Bạn không thể sửa một bài đăng về một thảo luận đã được giải quyết.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.system_generated" xml:space="preserve">
+    <value>Không thể chỉnh sửa bài đăng được tạo tự động.</value>
+  </data>
+  <data name="beatmap_discussion_post.store.beatmapset_locked" xml:space="preserve">
+    <value>Thảo luận bị khóa cho beatmap này.</value>
+  </data>
+  <data name="beatmapset.metadata.nominated" xml:space="preserve">
+    <value>Bạn không thể thay đổi metadata của map đã được nominated. Liên hệ với một BN hoặc NAT nếu bạn thấy metadata bị sai.</value>
+  </data>
+  <data name="chat.blocked" xml:space="preserve">
+    <value>Không thể nhắn tin cho người dùng đã chặn bạn hoặc nếu bạn đã chặn người đó.</value>
+  </data>
+  <data name="chat.friends_only" xml:space="preserve">
+    <value>Người dùng này đang chặn tin nhắn từ những người không trong danh sách bạn của họ.</value>
+  </data>
+  <data name="chat.moderated" xml:space="preserve">
+    <value>Kênh hiện đang được kiểm duyệt.</value>
+  </data>
+  <data name="chat.no_access" xml:space="preserve">
+    <value>Bạn không có quyền truy cập vào kênh này.</value>
+  </data>
+  <data name="chat.restricted" xml:space="preserve">
+    <value>Bạn không thể gửi tin nhắn trong khi bị silenced, bị hạn chế hoặc bị cấm (ban).</value>
+  </data>
+  <data name="comment.update.deleted" xml:space="preserve">
+    <value>Không thể chỉnh sửa bài đăng đã bị xóa.</value>
+  </data>
+  <data name="contest.voting_over" xml:space="preserve">
+    <value>Bạn không thể đổi phiếu bầu sau khi giai đoạn bầu chọn của cuộc thi này kết thúc.</value>
+  </data>
+  <data name="contest.entry.limit_reached" xml:space="preserve">
+    <value>Bạn đã đạt giới hạn bài dự thi cho cuộc thi này</value>
+  </data>
+  <data name="contest.entry.over" xml:space="preserve">
+    <value>Cảm ơn về bài dự thi của bạn! Cuộc thi đã không còn nhận thêm mục nào nữa và sẽ sớm mở bình chọn.</value>
+  </data>
+  <data name="forum.moderate.no_permission" xml:space="preserve">
+    <value>Bạn không có quyền chỉnh sửa forum này.</value>
+  </data>
+  <data name="forum.post.delete.only_last_post" xml:space="preserve">
+    <value>Chỉ có thể xóa bài đăng cuối cùng.</value>
+  </data>
+  <data name="forum.post.delete.locked" xml:space="preserve">
+    <value>Không thể xóa bài đăng của một topic bị khóa.</value>
+  </data>
+  <data name="forum.post.delete.no_forum_access" xml:space="preserve">
+    <value>Yêu cầu quyền truy cập vào forum mong muốn.</value>
+  </data>
+  <data name="forum.post.delete.not_owner" xml:space="preserve">
+    <value>Chỉ người đăng mới có thể xóa bài đăng.</value>
+  </data>
+  <data name="forum.post.edit.deleted" xml:space="preserve">
+    <value>Không thể chỉnh sửa bài đăng đã bị xóa.</value>
+  </data>
+  <data name="forum.post.edit.locked" xml:space="preserve">
+    <value>Bài đăng đã bị khóa chỉnh sửa.</value>
+  </data>
+  <data name="forum.post.edit.no_forum_access" xml:space="preserve">
+    <value>Yêu cầu quyền truy cập vào forum mong muốn.</value>
+  </data>
+  <data name="forum.post.edit.not_owner" xml:space="preserve">
+    <value>Chỉ có người đăng mới có thể chỉnh sửa bài đăng.</value>
+  </data>
+  <data name="forum.post.edit.topic_locked" xml:space="preserve">
+    <value>Không thể chỉnh sửa bài đăng của một chủ đề bị khóa.</value>
+  </data>
+  <data name="forum.post.store.play_more" xml:space="preserve">
+    <value>Vui lòng thử chơi game này trước khi đăng bài lên diễn đàn! Nếu bạn gặp vấn đề khi chơi, Vui lòng đăng bài lên diễn đàn Trợ Giúp và Hỗ Trợ (Help and Support).</value>
+  </data>
+  <data name="forum.post.store.too_many_help_posts" xml:space="preserve">
+    <value>Bạn cần phải chơi game này nhiều hơn trước khi bạn tạo thêm bài đăng. Nếu bạn vẫn còn gặp vấn đề khi chơi game, hãy gửi email tới địa chỉ support@ppy.sh</value>
+  </data>
+  <data name="forum.topic.reply.double_post" xml:space="preserve">
+    <value>Vui lòng chỉnh sửa bài đăng cuối cùng của bạn thay vì đăng thêm lần nữa.</value>
+  </data>
+  <data name="forum.topic.reply.locked" xml:space="preserve">
+    <value>Không thể trả lời một thread bị khóa.</value>
+  </data>
+  <data name="forum.topic.reply.no_forum_access" xml:space="preserve">
+    <value>Yêu cầu quyền truy cập vào forum mong muốn.</value>
+  </data>
+  <data name="forum.topic.reply.no_permission" xml:space="preserve">
+    <value>Không có quyền trả lời.</value>
+  </data>
+  <data name="forum.topic.reply.user.require_login" xml:space="preserve">
+    <value>Vui lòng đăng nhập để trả lời.</value>
+  </data>
+  <data name="forum.topic.reply.user.restricted" xml:space="preserve">
+    <value>Không thể trả lời trong khi bị hạn chế.</value>
+  </data>
+  <data name="forum.topic.reply.user.silenced" xml:space="preserve">
+    <value>Không thể trả lời trong khi bị im lặng.</value>
+  </data>
+  <data name="forum.topic.store.no_forum_access" xml:space="preserve">
+    <value>Yêu cầu quyền truy cập vào forum mong muốn.</value>
+  </data>
+  <data name="forum.topic.store.no_permission" xml:space="preserve">
+    <value>Không có quyền tạo topic mới.</value>
+  </data>
+  <data name="forum.topic.store.forum_closed" xml:space="preserve">
+    <value>Forum này đã bị đóng và không thể đăng thêm bài.</value>
+  </data>
+  <data name="forum.topic.vote.no_forum_access" xml:space="preserve">
+    <value>Yêu cầu quyền truy cập vào forum mong muốn.</value>
+  </data>
+  <data name="forum.topic.vote.over" xml:space="preserve">
+    <value>Đã kết thúc bỏ phiếu và không thể bình chọn nữa.</value>
+  </data>
+  <data name="forum.topic.vote.play_more" xml:space="preserve">
+    <value>Bạn cần chơi nhiều hơn trước khi bỏ phiếu trên diễn đàn.</value>
+  </data>
+  <data name="forum.topic.vote.voted" xml:space="preserve">
+    <value>Không cho phép đổi phiếu bầu.</value>
+  </data>
+  <data name="forum.topic.vote.user.require_login" xml:space="preserve">
+    <value>Vui lòng đăng nhập để bình chọn.</value>
+  </data>
+  <data name="forum.topic.vote.user.restricted" xml:space="preserve">
+    <value>Không thể bình chọn trong khi bị hạn chế</value>
+  </data>
+  <data name="forum.topic.vote.user.silenced" xml:space="preserve">
+    <value>Không thể bình chọn khi im lặng</value>
+  </data>
+  <data name="forum.topic.watch.no_forum_access" xml:space="preserve">
+    <value>Yêu cầu quyền truy cập vào forum mong muốn.</value>
+  </data>
+  <data name="forum.topic_cover.edit.uneditable" xml:space="preserve">
+    <value>Ảnh bìa đã chỉ định không hợp lệ.</value>
+  </data>
+  <data name="forum.topic_cover.edit.not_owner" xml:space="preserve">
+    <value>Chỉ có người đăng mới có thể chỉnh sửa ảnh bìa.</value>
+  </data>
+  <data name="forum.topic_cover.store.forum_not_allowed" xml:space="preserve">
+    <value>Forum này không chấp thuận topic cover.</value>
+  </data>
+  <data name="forum.view.admin_only" xml:space="preserve">
+    <value>Chỉ có admin mới có thể xem diễn đàn này.</value>
+  </data>
+  <data name="user.page.edit.locked" xml:space="preserve">
+    <value>Trang người dùng này đã bị khóa.</value>
+  </data>
+  <data name="user.page.edit.not_owner" xml:space="preserve">
+    <value>Chỉ có thể chỉnh sửa trang người dùng của bạn.</value>
+  </data>
+  <data name="user.page.edit.require_supporter_tag" xml:space="preserve">
+    <value>phải có osu!supporter.</value>
+  </data>
+</root>

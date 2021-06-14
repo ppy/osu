@@ -1,0 +1,391 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>Bu beatmap henüz indirilmeye açık değil.</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>Bu beatmapin bazı bölümleri içerik oluşturucunun ya da üçüncü parti hak sahibinin isteği üzerine kaldırılmıştır.</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>Daha fazla bilgi için buraya göz atın.</value>
+  </data>
+  <data name="availability.rule_violation" xml:space="preserve">
+    <value>Bu beatmap üzerinde yer alan bazı varlıklar osu!'da kullanıma uygun olmadığına karar verildikten sonra kaldırıldı.</value>
+  </data>
+  <data name="download.limit_exceeded" xml:space="preserve">
+    <value>Yavaş ol, daha çok oyna.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmap Kataloğu</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>Beatmapler</value>
+  </data>
+  <data name="panel.empty" xml:space="preserve">
+    <value>beatmap yok</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>indir</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>video ile indir</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>videosuz indir</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>osu!direct'de aç</value>
+  </data>
+  <data name="nominate.hybrid_requires_modes" xml:space="preserve">
+    <value>Karma bir beatmap seti, adaylık için en az bir oyun modu seçmenizi gerektirir.</value>
+  </data>
+  <data name="nominate.incorrect_mode" xml:space="preserve">
+    <value>{0} modunu aday göstermek için izniniz yok.</value>
+  </data>
+  <data name="nominate.full_bn_required" xml:space="preserve">
+    <value>Bu niteliklendirme aday gösterimini gerçekleştirebilmeniz için tam aday gösterici olmanız gerekmektedir.</value>
+  </data>
+  <data name="nominate.too_many" xml:space="preserve">
+    <value>Adaylık şartı zaten yerine getirildi.</value>
+  </data>
+  <data name="nominate.dialog.confirmation" xml:space="preserve">
+    <value>Bu beatmapi aday göstermek istediğinize emin misiniz?</value>
+  </data>
+  <data name="nominate.dialog.header" xml:space="preserve">
+    <value>Beatmap aday gösterin</value>
+  </data>
+  <data name="nominate.dialog.hybrid_warning" xml:space="preserve">
+    <value>not: sadece bir kez aday gösterebilirsiniz, bu yüzden lütfen istediğiniz tüm oyun modlarını aday gösterdiğinizden emin olun</value>
+  </data>
+  <data name="nominate.dialog.which_modes" xml:space="preserve">
+    <value>Hangi modlar için aday gösterilsin?</value>
+  </data>
+  <data name="nsfw_badge.label" xml:space="preserve">
+    <value>Müstehcen</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>Tartışma</value>
+  </data>
+  <data name="show.details.by_artist" xml:space="preserve">
+    <value>{0} tarafından</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>Beatmap setini favorilere ekle</value>
+  </data>
+  <data name="show.details.favourite_login" xml:space="preserve">
+    <value>Beatmapi favorilere eklemek için giriş yap</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>Herhangi bir beatmapi indirmeden önce giriş yapmalısınız!</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>{0} tarafından yapıldı</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>Beatmap setini favorilerden çıkar</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>son güncelleme: {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>İndir</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>Video olmadan</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>Video ile</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>daha fazla özelliğe erişmek için</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>Giriş Yap</value>
+  </data>
+  <data name="show.details_date.approved" xml:space="preserve">
+    <value>onaylandı: {0}</value>
+  </data>
+  <data name="show.details_date.loved" xml:space="preserve">
+    <value>sevilenlere eklendi: {0}</value>
+  </data>
+  <data name="show.details_date.qualified" xml:space="preserve">
+    <value>nitelikli oldu: {0}</value>
+  </data>
+  <data name="show.details_date.ranked" xml:space="preserve">
+    <value>dereceli oldu: {0}</value>
+  </data>
+  <data name="show.details_date.submitted" xml:space="preserve">
+    <value>gönderildi: {0}</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>son güncelleme: {0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>Favorilerinizde çok fazla beatmap'iniz var! Lütfen devam etmeden önce birini çıkartın.</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>Eğer beğendiyseniz &lt;strong&gt;Dereceli&lt;/strong&gt; statüsüne erişmesine yardımcı olmak için bu mapi gazlayın.</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>Bu map şu anda {0}.</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>beklemede</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>nitelikli</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>yapım aşamasında</value>
+  </data>
+  <data name="show.hype.disqualify._" xml:space="preserve">
+    <value>Eğer bu beatmapte bir sorun bulduysanız, lütfen {0} diskalifiye edin.</value>
+  </data>
+  <data name="show.hype.report._" xml:space="preserve">
+    <value>Eğer bu beatmapte bir sorun bulduysanız, takımı uyarmak için lütfen {0} bildirin.</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>Sorun Bildir</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>buradan</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>Açıklama</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>Tür</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>Dil</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>Veriler hala hesaplanıyor...</value>
+  </data>
+  <data name="show.info.nsfw" xml:space="preserve">
+    <value>Müstehcen içerik</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>Başarısız Olunan Kısımlar</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>Kaynak</value>
+  </data>
+  <data name="show.info.storyboard" xml:space="preserve">
+    <value>Bu beatmap storyboard içeriyor</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>Başarı Oranı</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>Etiketler</value>
+  </data>
+  <data name="show.info.video" xml:space="preserve">
+    <value>Bu beatmap video içeriyor</value>
+  </data>
+  <data name="show.nsfw_warning.details" xml:space="preserve">
+    <value>Bu beatmap müstehcen, ofansif, veya rahatsız edici içerik içermektedir. Yine de görüntülemek istiyor musunuz?</value>
+  </data>
+  <data name="show.nsfw_warning.title" xml:space="preserve">
+    <value>Müstehcen İçerik</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.disable" xml:space="preserve">
+    <value>Uyarıyı devre dışı bırak</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.listing" xml:space="preserve">
+    <value>Beatmap kataloğu</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.show" xml:space="preserve">
+    <value>Göster</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>{0} oynandı</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>Ülke Sıralaması</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>Arkadaş Sıralaması</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>Dünya Sıralaması</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>Aldığınız tüm süslü özellikleri görmek için buraya &lt;a href="{0}"&gt;tıklayın&lt;/a&gt;!</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>Arkadaş ve ülke sıralamasına erişebilmek için osu!supporter olman gerekiyor!</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>Skor tahtası</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>İSABETLİLİK</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>Maks Kombo</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>Iska</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>Modlar</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>Oyuncu</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>Sıralama</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>Toplam Skor</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>Skor</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>Zaman</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>Ülkenizde hiç kimse henüz bu mapte bir skora sahip değil!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>Hiçbir arkadaşın henüz bu mapte bir skora sahip değil!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>Henüz skor yok. Biraz skor yapmaya ne dersin?</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>Skorlar yükleniyor...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>Derecelendirilmemiş beatmap.</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>Lider</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>En İyi Skorun</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>Daire Boyutu</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>Tuş Sayısı</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>HP Drain</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>İsabetlilik</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>Yaklaşım Oranı</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>Zorluk</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>Uzunluk</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>Daire Sayısı</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>Slider Sayısı</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>Kullanıcı Reytingi</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>Reyting Dağılımı</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>Adaylıklar</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>Oynama sayısı</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>Dereceli</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>Onaylı</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>Sevilen</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>Nitelikli</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>Yapım Aşamasında</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>Beklemede</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>Mezarlıkta</value>
+  </data>
+</root>

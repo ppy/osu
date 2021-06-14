@@ -1,0 +1,388 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="audio.autoplay" xml:space="preserve">
+    <value>自動播放下一首曲目</value>
+  </data>
+  <data name="defaults.page_description" xml:space="preserve">
+    <value>osu! - Rhythm is just a *click* away!  With Ouendan/EBA, Taiko and original gameplay modes, as well as a fully functional level editor.</value>
+  </data>
+  <data name="header.admin.beatmapset" xml:space="preserve">
+    <value>圖譜</value>
+  </data>
+  <data name="header.admin.beatmapset_covers" xml:space="preserve">
+    <value>圖譜封面</value>
+  </data>
+  <data name="header.admin.contest" xml:space="preserve">
+    <value>比賽</value>
+  </data>
+  <data name="header.admin.contests" xml:space="preserve">
+    <value>競賽</value>
+  </data>
+  <data name="header.admin.root" xml:space="preserve">
+    <value>控制中心</value>
+  </data>
+  <data name="header.admin.store_orders" xml:space="preserve">
+    <value>商店管理</value>
+  </data>
+  <data name="header.artists.index" xml:space="preserve">
+    <value>清單</value>
+  </data>
+  <data name="header.changelog.index" xml:space="preserve">
+    <value>列表</value>
+  </data>
+  <data name="header.help.index" xml:space="preserve">
+    <value>主頁</value>
+  </data>
+  <data name="header.help.sitemap" xml:space="preserve">
+    <value>網站地圖</value>
+  </data>
+  <data name="header.store.cart" xml:space="preserve">
+    <value>購物車</value>
+  </data>
+  <data name="header.store.orders" xml:space="preserve">
+    <value>訂單記錄</value>
+  </data>
+  <data name="header.store.products" xml:space="preserve">
+    <value>商品</value>
+  </data>
+  <data name="header.tournaments.index" xml:space="preserve">
+    <value>清單</value>
+  </data>
+  <data name="header.users.modding" xml:space="preserve">
+    <value>摸圖</value>
+  </data>
+  <data name="header.users.show" xml:space="preserve">
+    <value>資訊</value>
+  </data>
+  <data name="gallery.close" xml:space="preserve">
+    <value>關閉 (Esc)</value>
+  </data>
+  <data name="gallery.fullscreen" xml:space="preserve">
+    <value>切換全螢幕</value>
+  </data>
+  <data name="gallery.zoom" xml:space="preserve">
+    <value>放大/縮小</value>
+  </data>
+  <data name="gallery.previous" xml:space="preserve">
+    <value>前一個（左箭頭）</value>
+  </data>
+  <data name="gallery.next" xml:space="preserve">
+    <value>下一個（右箭頭）</value>
+  </data>
+  <data name="menu.beatmaps._" xml:space="preserve">
+    <value>圖譜</value>
+  </data>
+  <data name="menu.beatmaps.artists" xml:space="preserve">
+    <value>精選藝術家</value>
+  </data>
+  <data name="menu.beatmaps.index" xml:space="preserve">
+    <value>圖譜列表</value>
+  </data>
+  <data name="menu.beatmaps.packs" xml:space="preserve">
+    <value>圖譜壓縮檔</value>
+  </data>
+  <data name="menu.community._" xml:space="preserve">
+    <value>社群</value>
+  </data>
+  <data name="menu.community.chat" xml:space="preserve">
+    <value>聊天</value>
+  </data>
+  <data name="menu.community.contests" xml:space="preserve">
+    <value>評選</value>
+  </data>
+  <data name="menu.community.dev" xml:space="preserve">
+    <value>開發</value>
+  </data>
+  <data name="menu.community.forum-forums-index" xml:space="preserve">
+    <value>論壇</value>
+  </data>
+  <data name="menu.community.getlive" xml:space="preserve">
+    <value>直播</value>
+  </data>
+  <data name="menu.community.tournaments" xml:space="preserve">
+    <value>官方比賽</value>
+  </data>
+  <data name="menu.help._" xml:space="preserve">
+    <value>幫助</value>
+  </data>
+  <data name="menu.help.getabuse" xml:space="preserve">
+    <value>檢舉違規行為</value>
+  </data>
+  <data name="menu.help.getfaq" xml:space="preserve">
+    <value>常見問題</value>
+  </data>
+  <data name="menu.help.getrules" xml:space="preserve">
+    <value>規則</value>
+  </data>
+  <data name="menu.help.getsupport" xml:space="preserve">
+    <value>支援服務</value>
+  </data>
+  <data name="menu.help.getwiki" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="menu.home._" xml:space="preserve">
+    <value>首頁</value>
+  </data>
+  <data name="menu.home.changelog-index" xml:space="preserve">
+    <value>更新日誌</value>
+  </data>
+  <data name="menu.home.getdownload" xml:space="preserve">
+    <value>下載</value>
+  </data>
+  <data name="menu.home.news-index" xml:space="preserve">
+    <value>新聞</value>
+  </data>
+  <data name="menu.home.search" xml:space="preserve">
+    <value>搜尋</value>
+  </data>
+  <data name="menu.home.team" xml:space="preserve">
+    <value>團隊</value>
+  </data>
+  <data name="menu.rankings._" xml:space="preserve">
+    <value>排行榜</value>
+  </data>
+  <data name="menu.rankings.charts" xml:space="preserve">
+    <value>月賽</value>
+  </data>
+  <data name="menu.rankings.country" xml:space="preserve">
+    <value>國家</value>
+  </data>
+  <data name="menu.rankings.index" xml:space="preserve">
+    <value>成績</value>
+  </data>
+  <data name="menu.rankings.kudosu" xml:space="preserve">
+    <value>kudosu</value>
+  </data>
+  <data name="menu.rankings.multiplayer" xml:space="preserve">
+    <value>多人遊戲</value>
+  </data>
+  <data name="menu.rankings.score" xml:space="preserve">
+    <value>總分</value>
+  </data>
+  <data name="menu.store._" xml:space="preserve">
+    <value>商店</value>
+  </data>
+  <data name="menu.store.cart-show" xml:space="preserve">
+    <value>購物車</value>
+  </data>
+  <data name="menu.store.getlisting" xml:space="preserve">
+    <value>商品列表</value>
+  </data>
+  <data name="menu.store.orders-index" xml:space="preserve">
+    <value>訂單記錄</value>
+  </data>
+  <data name="footer.general._" xml:space="preserve">
+    <value>網站地圖</value>
+  </data>
+  <data name="footer.general.home" xml:space="preserve">
+    <value>首頁</value>
+  </data>
+  <data name="footer.general.changelog-index" xml:space="preserve">
+    <value>更新日誌</value>
+  </data>
+  <data name="footer.general.beatmaps" xml:space="preserve">
+    <value>圖譜列表</value>
+  </data>
+  <data name="footer.general.download" xml:space="preserve">
+    <value>下載 osu!</value>
+  </data>
+  <data name="footer.help._" xml:space="preserve">
+    <value>幫助 &amp; 社區</value>
+  </data>
+  <data name="footer.help.faq" xml:space="preserve">
+    <value>常見問題</value>
+  </data>
+  <data name="footer.help.forum" xml:space="preserve">
+    <value>論壇</value>
+  </data>
+  <data name="footer.help.livestreams" xml:space="preserve">
+    <value>直播</value>
+  </data>
+  <data name="footer.help.report" xml:space="preserve">
+    <value>問題回報</value>
+  </data>
+  <data name="footer.help.wiki" xml:space="preserve">
+    <value>維基</value>
+  </data>
+  <data name="footer.legal._" xml:space="preserve">
+    <value>法律 &amp; 狀態</value>
+  </data>
+  <data name="footer.legal.copyright" xml:space="preserve">
+    <value>版權（DMCA）</value>
+  </data>
+  <data name="footer.legal.privacy" xml:space="preserve">
+    <value>隱私政策</value>
+  </data>
+  <data name="footer.legal.server_status" xml:space="preserve">
+    <value>伺服器狀態</value>
+  </data>
+  <data name="footer.legal.source_code" xml:space="preserve">
+    <value>原始碼</value>
+  </data>
+  <data name="footer.legal.terms" xml:space="preserve">
+    <value>服務條款</value>
+  </data>
+  <data name="errors.400.error" xml:space="preserve">
+    <value>請求參數無效</value>
+  </data>
+  <data name="errors.404.error" xml:space="preserve">
+    <value>無法找到網頁</value>
+  </data>
+  <data name="errors.404.description" xml:space="preserve">
+    <value>很抱歉，您訪問的頁面不存在...請返回到上一個頁面</value>
+  </data>
+  <data name="errors.403.error" xml:space="preserve">
+    <value>沒有權限</value>
+  </data>
+  <data name="errors.403.description" xml:space="preserve">
+    <value>沒有權限訪問該頁面，建議檢查一下再試，或者返回到上一個頁面</value>
+  </data>
+  <data name="errors.401.error" xml:space="preserve">
+    <value>沒有權限</value>
+  </data>
+  <data name="errors.401.description" xml:space="preserve">
+    <value>沒有權限訪問該頁面，建議檢查一下再試，或者返回到上一個頁面（說不定因為沒登入）</value>
+  </data>
+  <data name="errors.405.error" xml:space="preserve">
+    <value>無法找到網頁</value>
+  </data>
+  <data name="errors.405.description" xml:space="preserve">
+    <value>很抱歉，您訪問的頁面不存在...請返回到上一個頁面</value>
+  </data>
+  <data name="errors.422.error" xml:space="preserve">
+    <value>請求參數無效</value>
+  </data>
+  <data name="errors.429.error" xml:space="preserve">
+    <value>已達速率限制</value>
+  </data>
+  <data name="errors.500.error" xml:space="preserve">
+    <value>糟糕，伺服器崩潰了</value>
+  </data>
+  <data name="errors.500.description" xml:space="preserve">
+    <value>我們會自動回報任何一個錯誤，請返回到上一個頁面。</value>
+  </data>
+  <data name="errors.fatal.error" xml:space="preserve">
+    <value>哎呀，服務器被外星人帶走了</value>
+  </data>
+  <data name="errors.fatal.description" xml:space="preserve">
+    <value>我們會自動回報任何一個錯誤，請返回到上一個頁面。</value>
+  </data>
+  <data name="errors.503.error" xml:space="preserve">
+    <value>啊...伺服器正在維護中</value>
+  </data>
+  <data name="errors.503.description" xml:space="preserve">
+    <value>每次維護需要5秒到10分鐘的時間。如果維護時間太長，查看 {0} 以取得更多資訊。</value>
+  </data>
+  <data name="errors.reference" xml:space="preserve">
+    <value>以防萬一，你可以將這裡的代碼發給我們！</value>
+  </data>
+  <data name="popup_login.button" xml:space="preserve">
+    <value>登入/註冊</value>
+  </data>
+  <data name="popup_login.login.forgot" xml:space="preserve">
+    <value>忘記登入資訊？</value>
+  </data>
+  <data name="popup_login.login.password" xml:space="preserve">
+    <value>密碼</value>
+  </data>
+  <data name="popup_login.login.title" xml:space="preserve">
+    <value>登入以繼續</value>
+  </data>
+  <data name="popup_login.login.username" xml:space="preserve">
+    <value>使用者名稱</value>
+  </data>
+  <data name="popup_login.login.error.email" xml:space="preserve">
+    <value>用戶名或郵箱不存在</value>
+  </data>
+  <data name="popup_login.login.error.password" xml:space="preserve">
+    <value>密碼錯誤</value>
+  </data>
+  <data name="popup_login.register.download" xml:space="preserve">
+    <value>下載</value>
+  </data>
+  <data name="popup_login.register.info" xml:space="preserve">
+    <value>點擊下方的註冊按鈕以成為 osu! 大家庭中的一員！</value>
+  </data>
+  <data name="popup_login.register.title" xml:space="preserve">
+    <value>沒有帳號？</value>
+  </data>
+  <data name="popup_user.links.account-edit" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="popup_user.links.follows" xml:space="preserve">
+    <value>追蹤清單</value>
+  </data>
+  <data name="popup_user.links.friends" xml:space="preserve">
+    <value>好友</value>
+  </data>
+  <data name="popup_user.links.logout" xml:space="preserve">
+    <value>登出</value>
+  </data>
+  <data name="popup_user.links.profile" xml:space="preserve">
+    <value>我的資料</value>
+  </data>
+  <data name="popup_search.initial" xml:space="preserve">
+    <value>請輸入以搜尋!</value>
+  </data>
+  <data name="popup_search.retry" xml:space="preserve">
+    <value>搜索失敗，點擊以重試。</value>
+  </data>
+</root>

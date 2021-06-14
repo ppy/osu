@@ -1,0 +1,388 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="audio.autoplay" xml:space="preserve">
+    <value>다음 트랙 자동 재생</value>
+  </data>
+  <data name="defaults.page_description" xml:space="preserve">
+    <value>osu! - 리듬은 단순한 *클릭*만으로도 만들어질 수 있습니다! 응원단/리듬히어로, 태고와 이외 독자적인 게임플레이 모드, 완벽한 기능을 갖춘 맵 에디터까지 준비되어 있습니다.</value>
+  </data>
+  <data name="header.admin.beatmapset" xml:space="preserve">
+    <value>비트맵셋</value>
+  </data>
+  <data name="header.admin.beatmapset_covers" xml:space="preserve">
+    <value>비트맵셋 커버</value>
+  </data>
+  <data name="header.admin.contest" xml:space="preserve">
+    <value>콘테스트</value>
+  </data>
+  <data name="header.admin.contests" xml:space="preserve">
+    <value>콘테스트</value>
+  </data>
+  <data name="header.admin.root" xml:space="preserve">
+    <value>콘솔</value>
+  </data>
+  <data name="header.admin.store_orders" xml:space="preserve">
+    <value>상점 관리자</value>
+  </data>
+  <data name="header.artists.index" xml:space="preserve">
+    <value>목록</value>
+  </data>
+  <data name="header.changelog.index" xml:space="preserve">
+    <value>목록</value>
+  </data>
+  <data name="header.help.index" xml:space="preserve">
+    <value>목록</value>
+  </data>
+  <data name="header.help.sitemap" xml:space="preserve">
+    <value>사이트맵</value>
+  </data>
+  <data name="header.store.cart" xml:space="preserve">
+    <value>장바구니</value>
+  </data>
+  <data name="header.store.orders" xml:space="preserve">
+    <value>주문 내역</value>
+  </data>
+  <data name="header.store.products" xml:space="preserve">
+    <value>상품</value>
+  </data>
+  <data name="header.tournaments.index" xml:space="preserve">
+    <value>목록</value>
+  </data>
+  <data name="header.users.modding" xml:space="preserve">
+    <value>모딩</value>
+  </data>
+  <data name="header.users.show" xml:space="preserve">
+    <value>정보</value>
+  </data>
+  <data name="gallery.close" xml:space="preserve">
+    <value>닫기 (Esc)</value>
+  </data>
+  <data name="gallery.fullscreen" xml:space="preserve">
+    <value>전체화면 전환</value>
+  </data>
+  <data name="gallery.zoom" xml:space="preserve">
+    <value>확대 / 축소</value>
+  </data>
+  <data name="gallery.previous" xml:space="preserve">
+    <value>이전 (왼쪽 방향키)</value>
+  </data>
+  <data name="gallery.next" xml:space="preserve">
+    <value>다음 (오른쪽 방향키)</value>
+  </data>
+  <data name="menu.beatmaps._" xml:space="preserve">
+    <value>비트맵</value>
+  </data>
+  <data name="menu.beatmaps.artists" xml:space="preserve">
+    <value>공식 아티스트</value>
+  </data>
+  <data name="menu.beatmaps.index" xml:space="preserve">
+    <value>목록</value>
+  </data>
+  <data name="menu.beatmaps.packs" xml:space="preserve">
+    <value>맵팩</value>
+  </data>
+  <data name="menu.community._" xml:space="preserve">
+    <value>커뮤니티</value>
+  </data>
+  <data name="menu.community.chat" xml:space="preserve">
+    <value>채팅</value>
+  </data>
+  <data name="menu.community.contests" xml:space="preserve">
+    <value>콘테스트</value>
+  </data>
+  <data name="menu.community.dev" xml:space="preserve">
+    <value>개발</value>
+  </data>
+  <data name="menu.community.forum-forums-index" xml:space="preserve">
+    <value>포럼</value>
+  </data>
+  <data name="menu.community.getlive" xml:space="preserve">
+    <value>라이브 스트림</value>
+  </data>
+  <data name="menu.community.tournaments" xml:space="preserve">
+    <value>토너먼트</value>
+  </data>
+  <data name="menu.help._" xml:space="preserve">
+    <value>도움말</value>
+  </data>
+  <data name="menu.help.getabuse" xml:space="preserve">
+    <value>악용 사례 신고</value>
+  </data>
+  <data name="menu.help.getfaq" xml:space="preserve">
+    <value>FAQ</value>
+  </data>
+  <data name="menu.help.getrules" xml:space="preserve">
+    <value>규칙</value>
+  </data>
+  <data name="menu.help.getsupport" xml:space="preserve">
+    <value>지원 센터</value>
+  </data>
+  <data name="menu.help.getwiki" xml:space="preserve">
+    <value>위키</value>
+  </data>
+  <data name="menu.home._" xml:space="preserve">
+    <value>메인</value>
+  </data>
+  <data name="menu.home.changelog-index" xml:space="preserve">
+    <value>변경 사항</value>
+  </data>
+  <data name="menu.home.getdownload" xml:space="preserve">
+    <value>다운로드</value>
+  </data>
+  <data name="menu.home.news-index" xml:space="preserve">
+    <value>소식</value>
+  </data>
+  <data name="menu.home.search" xml:space="preserve">
+    <value>검색</value>
+  </data>
+  <data name="menu.home.team" xml:space="preserve">
+    <value>운영진</value>
+  </data>
+  <data name="menu.rankings._" xml:space="preserve">
+    <value>순위</value>
+  </data>
+  <data name="menu.rankings.charts" xml:space="preserve">
+    <value>스포트라이트</value>
+  </data>
+  <data name="menu.rankings.country" xml:space="preserve">
+    <value>국가</value>
+  </data>
+  <data name="menu.rankings.index" xml:space="preserve">
+    <value>퍼포먼스</value>
+  </data>
+  <data name="menu.rankings.kudosu" xml:space="preserve">
+    <value>kudosu</value>
+  </data>
+  <data name="menu.rankings.multiplayer" xml:space="preserve">
+    <value>멀티플레이어</value>
+  </data>
+  <data name="menu.rankings.score" xml:space="preserve">
+    <value>점수</value>
+  </data>
+  <data name="menu.store._" xml:space="preserve">
+    <value>상점</value>
+  </data>
+  <data name="menu.store.cart-show" xml:space="preserve">
+    <value>장바구니</value>
+  </data>
+  <data name="menu.store.getlisting" xml:space="preserve">
+    <value>목록</value>
+  </data>
+  <data name="menu.store.orders-index" xml:space="preserve">
+    <value>주문 내역</value>
+  </data>
+  <data name="footer.general._" xml:space="preserve">
+    <value>일반</value>
+  </data>
+  <data name="footer.general.home" xml:space="preserve">
+    <value>메인</value>
+  </data>
+  <data name="footer.general.changelog-index" xml:space="preserve">
+    <value>변경 사항</value>
+  </data>
+  <data name="footer.general.beatmaps" xml:space="preserve">
+    <value>비트맵 목록</value>
+  </data>
+  <data name="footer.general.download" xml:space="preserve">
+    <value>osu! 다운로드</value>
+  </data>
+  <data name="footer.help._" xml:space="preserve">
+    <value>도움말 &amp; 커뮤니티</value>
+  </data>
+  <data name="footer.help.faq" xml:space="preserve">
+    <value>자주 묻는 질문</value>
+  </data>
+  <data name="footer.help.forum" xml:space="preserve">
+    <value>커뮤니티 포럼</value>
+  </data>
+  <data name="footer.help.livestreams" xml:space="preserve">
+    <value>라이브 스트림</value>
+  </data>
+  <data name="footer.help.report" xml:space="preserve">
+    <value>문제 신고하기</value>
+  </data>
+  <data name="footer.help.wiki" xml:space="preserve">
+    <value>위키</value>
+  </data>
+  <data name="footer.legal._" xml:space="preserve">
+    <value>법률 &amp; 상태</value>
+  </data>
+  <data name="footer.legal.copyright" xml:space="preserve">
+    <value>저작권 (DMCA)</value>
+  </data>
+  <data name="footer.legal.privacy" xml:space="preserve">
+    <value>개인 정보 보호 정책</value>
+  </data>
+  <data name="footer.legal.server_status" xml:space="preserve">
+    <value>서버 상태 확인</value>
+  </data>
+  <data name="footer.legal.source_code" xml:space="preserve">
+    <value>소스 코드</value>
+  </data>
+  <data name="footer.legal.terms" xml:space="preserve">
+    <value>서비스 이용약관</value>
+  </data>
+  <data name="errors.400.error" xml:space="preserve">
+    <value>요청 매개변수가 올바르지 않습니다</value>
+  </data>
+  <data name="errors.404.error" xml:space="preserve">
+    <value>페이지를 찾을 수 없음</value>
+  </data>
+  <data name="errors.404.description" xml:space="preserve">
+    <value>죄송하지만, 저희는 요청하신 페이지를 갖고있질 않네요!</value>
+  </data>
+  <data name="errors.403.error" xml:space="preserve">
+    <value>여기 계시면 안됩니다.</value>
+  </data>
+  <data name="errors.403.description" xml:space="preserve">
+    <value>다시 돌아가보세요.</value>
+  </data>
+  <data name="errors.401.error" xml:space="preserve">
+    <value>여기 계시면 안됩니다.</value>
+  </data>
+  <data name="errors.401.description" xml:space="preserve">
+    <value>다시 돌아가보세요. 로그인하시면 해결될지도요...</value>
+  </data>
+  <data name="errors.405.error" xml:space="preserve">
+    <value>페이지를 찾을 수 없음</value>
+  </data>
+  <data name="errors.405.description" xml:space="preserve">
+    <value>죄송하지만, 저희는 요청하신 페이지를 갖고있질 않네요!</value>
+  </data>
+  <data name="errors.422.error" xml:space="preserve">
+    <value>요청 매개변수가 올바르지 않습니다.</value>
+  </data>
+  <data name="errors.429.error" xml:space="preserve">
+    <value>요청 제한 초과됨</value>
+  </data>
+  <data name="errors.500.error" xml:space="preserve">
+    <value>이런! 뭔가 잘못 되었네요! ;_;</value>
+  </data>
+  <data name="errors.500.description" xml:space="preserve">
+    <value>저희는 모든 오류를 자동으로 보고받고 있습니다.</value>
+  </data>
+  <data name="errors.fatal.error" xml:space="preserve">
+    <value>이런! 뭔가 잘못 되었네요! (심각한데요...) ;_;</value>
+  </data>
+  <data name="errors.fatal.description" xml:space="preserve">
+    <value>저희는 모든 오류를 자동으로 보고받고 있습니다.</value>
+  </data>
+  <data name="errors.503.error" xml:space="preserve">
+    <value>서비스 점검중입니다!</value>
+  </data>
+  <data name="errors.503.description" xml:space="preserve">
+    <value>점검은 보통 5분 내지 10분 동안 이루어집니다. 만약 더 오래 걸린다면 {0}에서 더 많은 정보를 확인하실 수 있습니다.</value>
+  </data>
+  <data name="errors.reference" xml:space="preserve">
+    <value>만약을 위해, 지원팀에게 보낼 수 있는 코드를 알려드릴게요!</value>
+  </data>
+  <data name="popup_login.button" xml:space="preserve">
+    <value>로그인 / 등록</value>
+  </data>
+  <data name="popup_login.login.forgot" xml:space="preserve">
+    <value>계정 정보를 잊어버렸어요.</value>
+  </data>
+  <data name="popup_login.login.password" xml:space="preserve">
+    <value>비밀번호</value>
+  </data>
+  <data name="popup_login.login.title" xml:space="preserve">
+    <value>로그인하여 계속하기</value>
+  </data>
+  <data name="popup_login.login.username" xml:space="preserve">
+    <value>사용자 이름</value>
+  </data>
+  <data name="popup_login.login.error.email" xml:space="preserve">
+    <value>존재하지 않는 유저이름 또는 이메일입니다.</value>
+  </data>
+  <data name="popup_login.login.error.password" xml:space="preserve">
+    <value>잘못된 비밀번호입니다.</value>
+  </data>
+  <data name="popup_login.register.download" xml:space="preserve">
+    <value>다운로드</value>
+  </data>
+  <data name="popup_login.register.info" xml:space="preserve">
+    <value>osu!를 다운로드하여 계정을 만들어보세요.</value>
+  </data>
+  <data name="popup_login.register.title" xml:space="preserve">
+    <value>아직 계정이 없으신가요?</value>
+  </data>
+  <data name="popup_user.links.account-edit" xml:space="preserve">
+    <value>설정</value>
+  </data>
+  <data name="popup_user.links.follows" xml:space="preserve">
+    <value>관심 목록</value>
+  </data>
+  <data name="popup_user.links.friends" xml:space="preserve">
+    <value>친구</value>
+  </data>
+  <data name="popup_user.links.logout" xml:space="preserve">
+    <value>로그아웃</value>
+  </data>
+  <data name="popup_user.links.profile" xml:space="preserve">
+    <value>내 프로필</value>
+  </data>
+  <data name="popup_search.initial" xml:space="preserve">
+    <value>검색어를 입력해주세요!</value>
+  </data>
+  <data name="popup_search.retry" xml:space="preserve">
+    <value>검색에 실패했습니다. 다시 시도하려면 클릭해주세요.</value>
+  </data>
+</root>

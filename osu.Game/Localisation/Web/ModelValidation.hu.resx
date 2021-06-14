@@ -1,0 +1,316 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="invalid" xml:space="preserve">
+    <value>Érvénytelen {0} megadva.</value>
+  </data>
+  <data name="not_negative" xml:space="preserve">
+    <value>{0} nem lehet negatív.</value>
+  </data>
+  <data name="required" xml:space="preserve">
+    <value>{0} kötelező.</value>
+  </data>
+  <data name="too_long" xml:space="preserve">
+    <value>{0} elérte a maximális hosszt - csak {1} karakter hosszú lehet.</value>
+  </data>
+  <data name="wrong_confirmation" xml:space="preserve">
+    <value>A megerősítés nem egyezik.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmap_missing" xml:space="preserve">
+    <value>Időbélyeg meg van adva, de a beatmap hiányzik.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmapset_no_hype" xml:space="preserve">
+    <value>A beatmap-et nem lehet hype-olni.</value>
+  </data>
+  <data name="beatmapset_discussion.hype_requires_null_beatmap" xml:space="preserve">
+    <value>A Hype-olás az Általános (összes nehézség) szekcióban végzendő.</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmap_id" xml:space="preserve">
+    <value>Érvénytelen nehézség lett megadva.</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmapset_id" xml:space="preserve">
+    <value>Érvénytelen beatmap lett megadva.</value>
+  </data>
+  <data name="beatmapset_discussion.locked" xml:space="preserve">
+    <value>A megbeszélés zárolva van.</value>
+  </data>
+  <data name="beatmapset_discussion.attributes.message_type" xml:space="preserve">
+    <value>Üzenet típus</value>
+  </data>
+  <data name="beatmapset_discussion.attributes.timestamp" xml:space="preserve">
+    <value>Időbélyeg</value>
+  </data>
+  <data name="beatmapset_discussion.hype.discussion_locked" xml:space="preserve">
+    <value>Ez a beatmap jelenleg nem elérhető kommentelésre és hypolásra</value>
+  </data>
+  <data name="beatmapset_discussion.hype.guest" xml:space="preserve">
+    <value>A hype-oláshoz bejelentkezve kell lenned.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.hyped" xml:space="preserve">
+    <value>Már hype-oltad ezt a beatmap-et.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.limit_exceeded" xml:space="preserve">
+    <value>Az összes hype-odat elhasználtad.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.not_hypeable" xml:space="preserve">
+    <value>Ezt a beatmap-et nem lehet hype-olni</value>
+  </data>
+  <data name="beatmapset_discussion.hype.owner" xml:space="preserve">
+    <value>Saját beatmap-et nem lehet hype-olni.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.exceeds_beatmapset_length" xml:space="preserve">
+    <value>A megadott időbélyeg későbbi mint a beatmap hossza.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.negative" xml:space="preserve">
+    <value>Időbélyeg nem lehet negatív.</value>
+  </data>
+  <data name="beatmapset_discussion_post.discussion_locked" xml:space="preserve">
+    <value>A megbeszélés zárolva van.</value>
+  </data>
+  <data name="beatmapset_discussion_post.first_post" xml:space="preserve">
+    <value>Nem lehet a kezdő posztot törölni.</value>
+  </data>
+  <data name="beatmapset_discussion_post.attributes.message" xml:space="preserve">
+    <value>Az üzenet</value>
+  </data>
+  <data name="comment.deleted_parent" xml:space="preserve">
+    <value>Törölt hozzászólásokra nem lehet válaszolni.</value>
+  </data>
+  <data name="comment.top_only" xml:space="preserve">
+    <value>Visszajátszási kommentek kitűzése nem engedélyezett.</value>
+  </data>
+  <data name="comment.attributes.message" xml:space="preserve">
+    <value>Az üzenet</value>
+  </data>
+  <data name="follow.invalid" xml:space="preserve">
+    <value>Érvénytelen {0} lett megadva.</value>
+  </data>
+  <data name="forum.feature_vote.not_feature_topic" xml:space="preserve">
+    <value>Csak jövőbeli feature-re lehet szavazni.</value>
+  </data>
+  <data name="forum.feature_vote.not_enough_feature_votes" xml:space="preserve">
+    <value>Nincs elég szavazat.</value>
+  </data>
+  <data name="forum.poll_vote.invalid" xml:space="preserve">
+    <value>Érvénytelen beállítás lett megadva.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_delete" xml:space="preserve">
+    <value>Beatmap metaadat törlése nem engedélyezett.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_edit" xml:space="preserve">
+    <value>Beatmap metaadat poszt szerkesztése nem engedélyezett.</value>
+  </data>
+  <data name="forum.post.only_quote" xml:space="preserve">
+    <value>A válaszod csak egy idézetet tartalmaz.</value>
+  </data>
+  <data name="forum.post.attributes.post_text" xml:space="preserve">
+    <value>Poszt felület</value>
+  </data>
+  <data name="forum.topic.attributes.topic_title" xml:space="preserve">
+    <value>Téma cím</value>
+  </data>
+  <data name="forum.topic_poll.duplicate_options" xml:space="preserve">
+    <value>Duplikálás nem engedélyezett.</value>
+  </data>
+  <data name="forum.topic_poll.grace_period_expired" xml:space="preserve">
+    <value>Nem lehet szerkeszteni a szavazást több mint {0} óra után</value>
+  </data>
+  <data name="forum.topic_poll.hiding_results_forever" xml:space="preserve">
+    <value>Egy végtelen szavazás eredményeit nem lehet elrejteni.</value>
+  </data>
+  <data name="forum.topic_poll.invalid_max_options" xml:space="preserve">
+    <value>Felhasználónkénti opciók száma nem haladhatja meg az elérhető opciók mennyiségét.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_one_selection" xml:space="preserve">
+    <value>Minimum egy opció kell felhasználónként.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_two_options" xml:space="preserve">
+    <value>Legalább 2 választási lehetőség kell.</value>
+  </data>
+  <data name="forum.topic_poll.too_many_options" xml:space="preserve">
+    <value>Elérted a maximum opciók számát.</value>
+  </data>
+  <data name="forum.topic_poll.attributes.title" xml:space="preserve">
+    <value>Szavazás címe</value>
+  </data>
+  <data name="forum.topic_vote.required" xml:space="preserve">
+    <value>Válassz egy opciót szavazásnál.</value>
+  </data>
+  <data name="forum.topic_vote.too_many" xml:space="preserve">
+    <value>Az engedélyezettnél több opciót választottál.</value>
+  </data>
+  <data name="oauth.client.too_many" xml:space="preserve">
+    <value>Elérted a maximum OAuth applikációk számát.</value>
+  </data>
+  <data name="oauth.client.url" xml:space="preserve">
+    <value>Kérjük adjon meg egy helyes URL-t.</value>
+  </data>
+  <data name="oauth.client.attributes.name" xml:space="preserve">
+    <value>Alkalmazás neve</value>
+  </data>
+  <data name="oauth.client.attributes.redirect" xml:space="preserve">
+    <value>Alkalmazás Visszahívási URL</value>
+  </data>
+  <data name="user.contains_username" xml:space="preserve">
+    <value>A jelszó nem tartalmazhat felhasználónevet.</value>
+  </data>
+  <data name="user.email_already_used" xml:space="preserve">
+    <value>Ez az e-mail cím már használatban van.</value>
+  </data>
+  <data name="user.email_not_allowed" xml:space="preserve">
+    <value>Nem megengedett e-mail cím.</value>
+  </data>
+  <data name="user.invalid_country" xml:space="preserve">
+    <value>Az ország nincs az adatbázisban.</value>
+  </data>
+  <data name="user.invalid_discord" xml:space="preserve">
+    <value>Érvénytelen Discord felhasználónév.</value>
+  </data>
+  <data name="user.invalid_email" xml:space="preserve">
+    <value>Nem úgy néz ki, hogy ez érvényes e-mail cím lenne.</value>
+  </data>
+  <data name="user.invalid_twitter" xml:space="preserve">
+    <value>Érvénytelen Twitter felhasználónév.</value>
+  </data>
+  <data name="user.too_short" xml:space="preserve">
+    <value>Az új jelszó túl rövid.</value>
+  </data>
+  <data name="user.unknown_duplicate" xml:space="preserve">
+    <value>Ez a felhasználónév vagy e-mail cím már használatban van.</value>
+  </data>
+  <data name="user.username_available_in" xml:space="preserve">
+    <value>Ez a felhasználónév elérhető lesz {0} időn belül.</value>
+  </data>
+  <data name="user.username_available_soon" xml:space="preserve">
+    <value>Ez a felhasználónév bármelyik pillanatban elérhető lehet!</value>
+  </data>
+  <data name="user.username_invalid_characters" xml:space="preserve">
+    <value>A kért felhasználónév nem felhasználható karaktereket tartalmaz.</value>
+  </data>
+  <data name="user.username_in_use" xml:space="preserve">
+    <value>Foglalt felhasználónév!</value>
+  </data>
+  <data name="user.username_locked" xml:space="preserve">
+    <value>A név már használatban van!</value>
+  </data>
+  <data name="user.username_no_space_userscore_mix" xml:space="preserve">
+    <value>Vagy alsóvonalat használj, vagy space gomb lenyomásával üres teret, nem menő mind a kettő!</value>
+  </data>
+  <data name="user.username_no_spaces" xml:space="preserve">
+    <value>A felhasználóneved nem kezdődhet és nem is végződhet üres hellyel!</value>
+  </data>
+  <data name="user.username_not_allowed" xml:space="preserve">
+    <value>Ez a felhasználónév nem engedett.</value>
+  </data>
+  <data name="user.username_too_short" xml:space="preserve">
+    <value>A kért felhasználónév túl rövid.</value>
+  </data>
+  <data name="user.username_too_long" xml:space="preserve">
+    <value>A kért felhasználónév túl hosszú.</value>
+  </data>
+  <data name="user.weak" xml:space="preserve">
+    <value>Feketelistás jelszó.</value>
+  </data>
+  <data name="user.wrong_current_password" xml:space="preserve">
+    <value>A jelenlegi jelszó nem megfelelő.</value>
+  </data>
+  <data name="user.wrong_email_confirmation" xml:space="preserve">
+    <value>Email megerősítés nem egyezik.</value>
+  </data>
+  <data name="user.wrong_password_confirmation" xml:space="preserve">
+    <value>Jelszó megerősítés nem egyezik.</value>
+  </data>
+  <data name="user.too_long" xml:space="preserve">
+    <value>Elérted a maximum hosszúságot - maximum {0} karaktert használhatsz.</value>
+  </data>
+  <data name="user.attributes.username" xml:space="preserve">
+    <value>Felhasználónév</value>
+  </data>
+  <data name="user.attributes.user_email" xml:space="preserve">
+    <value>E-mail cím</value>
+  </data>
+  <data name="user.attributes.password" xml:space="preserve">
+    <value>Jelszó</value>
+  </data>
+  <data name="user.change_username.restricted" xml:space="preserve">
+    <value>Felfüggesztett állapotban nem változtathatsz felhasználónevet.</value>
+  </data>
+  <data name="user.change_username.supporter_required._" xml:space="preserve">
+    <value>{0} szükséges a névváltoztatáshoz!</value>
+  </data>
+  <data name="user.change_username.supporter_required.link_text" xml:space="preserve">
+    <value>támogatta osu!-t</value>
+  </data>
+  <data name="user.change_username.username_is_same" xml:space="preserve">
+    <value>Már ez a felhasználóneved te butus!</value>
+  </data>
+  <data name="user_report.reason_not_valid" xml:space="preserve">
+    <value>ez a jelentés nem megfelelő, ehhez a jelentés fajtához.{0}.</value>
+  </data>
+  <data name="user_report.self" xml:space="preserve">
+    <value>Nem jelentheted magadat!</value>
+  </data>
+  <data name="store.order_item.attributes.quantity" xml:space="preserve">
+    <value>Mennyiség</value>
+  </data>
+  <data name="store.order_item.attributes.cost" xml:space="preserve">
+    <value>Ár</value>
+  </data>
+</root>

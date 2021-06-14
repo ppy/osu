@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="support.convinced.title" xml:space="preserve">
+    <value>太棒了，买买买！OwO</value>
+  </data>
+  <data name="support.convinced.support" xml:space="preserve">
+    <value>支持 osu!</value>
+  </data>
+  <data name="support.convinced.gift" xml:space="preserve">
+    <value>或者以礼物方式赠送给其它玩家</value>
+  </data>
+  <data name="support.convinced.instructions" xml:space="preserve">
+    <value>点击爱心前往 osu! 商店</value>
+  </data>
+  <data name="support.why-support.title" xml:space="preserve">
+    <value>为什么支持 osu!？钱将用往何处？</value>
+  </data>
+  <data name="support.why-support.team.title" xml:space="preserve">
+    <value>支持开发团队</value>
+  </data>
+  <data name="support.why-support.team.description" xml:space="preserve">
+    <value>一个小团队开发并维护着 osu!，你的支持可以帮助他们继续下去。</value>
+  </data>
+  <data name="support.why-support.infra.title" xml:space="preserve">
+    <value>维护服务器</value>
+  </data>
+  <data name="support.why-support.infra.description" xml:space="preserve">
+    <value>资金将用于维护网站和在线游玩、排行榜等服务</value>
+  </data>
+  <data name="support.why-support.featured-artists.title" xml:space="preserve">
+    <value>精选艺术家</value>
+  </data>
+  <data name="support.why-support.featured-artists.description" xml:space="preserve">
+    <value>在你的支持下，我们可以与更多艺术家合作为 osu! 带来更多的绝佳音乐。</value>
+  </data>
+  <data name="support.why-support.featured-artists.link_text" xml:space="preserve">
+    <value>查看当前列表 &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.ads.title" xml:space="preserve">
+    <value>维持 osu! 自给自足</value>
+  </data>
+  <data name="support.why-support.ads.description" xml:space="preserve">
+    <value>你的帮助可以让游戏保持独立并远离广告，不受外部赞助商的控制。</value>
+  </data>
+  <data name="support.why-support.tournaments.title" xml:space="preserve">
+    <value>官方比赛</value>
+  </data>
+  <data name="support.why-support.tournaments.description" xml:space="preserve">
+    <value>为运营 osu! 世界杯筹集资金（及奖励）。</value>
+  </data>
+  <data name="support.why-support.tournaments.link_text" xml:space="preserve">
+    <value>探索比赛 &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.bounty-program.title" xml:space="preserve">
+    <value>开源赏金计划</value>
+  </data>
+  <data name="support.why-support.bounty-program.description" xml:space="preserve">
+    <value>支持那些花费时间与精力来帮助 osu! 变得更好的社区贡献者。</value>
+  </data>
+  <data name="support.why-support.bounty-program.link_text" xml:space="preserve">
+    <value>了解更多 &amp;raquo;</value>
+  </data>
+  <data name="support.perks.title" xml:space="preserve">
+    <value>Wow，Awesome！那么我能得到什么？</value>
+  </data>
+  <data name="support.perks.osu_direct.title" xml:space="preserve">
+    <value>osu!direct</value>
+  </data>
+  <data name="support.perks.osu_direct.description" xml:space="preserve">
+    <value>在游戏客户端内搜索和下载谱面。</value>
+  </data>
+  <data name="support.perks.friend_ranking.title" xml:space="preserve">
+    <value>好友排名</value>
+  </data>
+  <data name="support.perks.friend_ranking.description" xml:space="preserve">
+    <value>在游戏内与网站上查看谱面排行榜，了解你与好友孰强孰弱。</value>
+  </data>
+  <data name="support.perks.country_ranking.title" xml:space="preserve">
+    <value>国内/区内排名</value>
+  </data>
+  <data name="support.perks.country_ranking.description" xml:space="preserve">
+    <value>在征服世界前，先征服你所在的地方吧。</value>
+  </data>
+  <data name="support.perks.mod_filtering.title" xml:space="preserve">
+    <value>按 Mod 筛选</value>
+  </data>
+  <data name="support.perks.mod_filtering.description" xml:space="preserve">
+    <value>只和玩 HDHR 的玩家打？没问题！</value>
+  </data>
+  <data name="support.perks.auto_downloads.title" xml:space="preserve">
+    <value>自动下载</value>
+  </data>
+  <data name="support.perks.auto_downloads.description" xml:space="preserve">
+    <value>本地没有需要的谱面时，osu! 会自动下载！</value>
+  </data>
+  <data name="support.perks.upload_more.title" xml:space="preserve">
+    <value>上传更多谱面</value>
+  </data>
+  <data name="support.perks.upload_more.description" xml:space="preserve">
+    <value>谱面集中 Pending 谱面上限增加到 10 张。</value>
+  </data>
+  <data name="support.perks.early_access.title" xml:space="preserve">
+    <value>抢先体验</value>
+  </data>
+  <data name="support.perks.early_access.description" xml:space="preserve">
+    <value>抢先体验正在测试中的新特性！&lt;br/&gt;&lt;br/&gt;同时还包含网站的新功能！</value>
+  </data>
+  <data name="support.perks.customisation.title" xml:space="preserve">
+    <value>个性化</value>
+  </data>
+  <data name="support.perks.customisation.description" xml:space="preserve">
+    <value>自定义个人资料页。</value>
+  </data>
+  <data name="support.perks.beatmap_filters.title" xml:space="preserve">
+    <value>筛选谱面</value>
+  </data>
+  <data name="support.perks.beatmap_filters.description" xml:space="preserve">
+    <value>可在搜索谱面时以更多调件筛选，例如游玩状态和得分评价。</value>
+  </data>
+  <data name="support.perks.yellow_fellow.title" xml:space="preserve">
+    <value>用户名高亮</value>
+  </data>
+  <data name="support.perks.yellow_fellow.description" xml:space="preserve">
+    <value>聊天时，用户名会变成亮黄色。</value>
+  </data>
+  <data name="support.perks.speedy_downloads.title" xml:space="preserve">
+    <value>高速下载</value>
+  </data>
+  <data name="support.perks.speedy_downloads.description" xml:space="preserve">
+    <value>更快的下载速度。使用 osu!direct 的话甚至会更快。</value>
+  </data>
+  <data name="support.perks.change_username.title" xml:space="preserve">
+    <value>修改用户名</value>
+  </data>
+  <data name="support.perks.change_username.description" xml:space="preserve">
+    <value>你能得到一次免费修改用户名的机会。</value>
+  </data>
+  <data name="support.perks.skinnables.title" xml:space="preserve">
+    <value>更多的皮肤</value>
+  </data>
+  <data name="support.perks.skinnables.description" xml:space="preserve">
+    <value>自定义更多的游戏界面元素，例如主菜单的背景。</value>
+  </data>
+  <data name="support.perks.feature_votes.title" xml:space="preserve">
+    <value>新特性投票</value>
+  </data>
+  <data name="support.perks.feature_votes.description" xml:space="preserve">
+    <value>为新功能投票（每月 2 票）。</value>
+  </data>
+  <data name="support.perks.sort_options.title" xml:space="preserve">
+    <value>详细的排名</value>
+  </data>
+  <data name="support.perks.sort_options.description" xml:space="preserve">
+    <value>查看排名时可按 国家或地区/好友/所选MOD 进行排名。</value>
+  </data>
+  <data name="support.perks.more_favourites.title" xml:space="preserve">
+    <value>更大的收藏夹</value>
+  </data>
+  <data name="support.perks.more_favourites.description" xml:space="preserve">
+    <value>你的谱面收藏夹容量将从 {0} 个增加到 {1} 个</value>
+  </data>
+  <data name="support.perks.more_friends.title" xml:space="preserve">
+    <value>更多好友位</value>
+  </data>
+  <data name="support.perks.more_friends.description" xml:space="preserve">
+    <value>你的好友位数量将从 {0} 增加到 {1}</value>
+  </data>
+  <data name="support.perks.more_beatmaps.title" xml:space="preserve">
+    <value>上传更多谱面，肝更多谱</value>
+  </data>
+  <data name="support.perks.more_beatmaps.description" xml:space="preserve">
+    <value>同一时间你能拥有的未 ranked 的谱面数量由一个基数值和附加奖励相加得到，附加奖励根据你已 ranked 的谱面数量而定，并且有一个上限。&lt;br/&gt;&lt;br/&gt;通常情况下，基数为4，每多一张 ranked 的谱面会增加 1，最多增加 2。当你是支持者时，基数变为8，每张 ranked 的谱面会增加 1，最多增加 12。</value>
+  </data>
+  <data name="support.perks.friend_filtering.title" xml:space="preserve">
+    <value>好友排行榜</value>
+  </data>
+  <data name="support.perks.friend_filtering.description" xml:space="preserve">
+    <value>和你的朋友们一起比赛，看看你如何超过他们的排名！*&lt;br/&gt;&lt;br/&gt;&lt;small&gt;* 在新版网站上目前尚不支持此功能，即将上线 (tm)&lt;/small&gt;</value>
+  </data>
+  <data name="support.supporter_status.contribution" xml:space="preserve">
+    <value>感谢你一直以来的支持！你已经捐赠了 {0} 并购买了 {1} 次支持者标签！</value>
+  </data>
+  <data name="support.supporter_status.gifted" xml:space="preserve">
+    <value>你已经捐赠了 {0} 次支持者标签（花费了 {1} ），真慷慨啊！</value>
+  </data>
+  <data name="support.supporter_status.not_yet" xml:space="preserve">
+    <value>你还没有支持者标签 :(</value>
+  </data>
+  <data name="support.supporter_status.valid_until" xml:space="preserve">
+    <value>你的支持者标签将在 {0} 到期</value>
+  </data>
+  <data name="support.supporter_status.was_valid_until" xml:space="preserve">
+    <value>你的支持者标签已于 {0} 到期</value>
+  </data>
+</root>

@@ -1,0 +1,200 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authorizations.update.null_user" xml:space="preserve">
+    <value>Ви повинні увійти для редагування.</value>
+  </data>
+  <data name="authorizations.update.system_generated" xml:space="preserve">
+    <value>Системне повідомлення не може бути змінено.</value>
+  </data>
+  <data name="authorizations.update.wrong_user" xml:space="preserve">
+    <value>Ви повинні бути автором даної публікації для редагування.</value>
+  </data>
+  <data name="events.empty" xml:space="preserve">
+    <value>Нічого не відбувається... поки що.</value>
+  </data>
+  <data name="index.deleted_beatmap" xml:space="preserve">
+    <value>видалено</value>
+  </data>
+  <data name="index.none_found" xml:space="preserve">
+    <value>Не знайдено жодної дискусії, що відповідають критеріям пошуку.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Обговорення карти</value>
+  </data>
+  <data name="index.form._" xml:space="preserve">
+    <value>Пошук</value>
+  </data>
+  <data name="index.form.deleted" xml:space="preserve">
+    <value>Включаючи видалені обговорення</value>
+  </data>
+  <data name="index.form.mode" xml:space="preserve">
+    <value>Режим карт</value>
+  </data>
+  <data name="index.form.only_unresolved" xml:space="preserve">
+    <value>Показувати тільки невирішені обговорення</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Типи повідомлень</value>
+  </data>
+  <data name="index.form.username" xml:space="preserve">
+    <value>Ім'я користувача</value>
+  </data>
+  <data name="index.form.beatmapset_status._" xml:space="preserve">
+    <value>Статус карти</value>
+  </data>
+  <data name="index.form.beatmapset_status.all" xml:space="preserve">
+    <value>Усі</value>
+  </data>
+  <data name="index.form.beatmapset_status.disqualified" xml:space="preserve">
+    <value>Дискваліфікований</value>
+  </data>
+  <data name="index.form.beatmapset_status.never_qualified" xml:space="preserve">
+    <value>Жодного разу не кваліфікований</value>
+  </data>
+  <data name="index.form.beatmapset_status.qualified" xml:space="preserve">
+    <value>Кваліфікований</value>
+  </data>
+  <data name="index.form.beatmapset_status.ranked" xml:space="preserve">
+    <value>Ранкнутий</value>
+  </data>
+  <data name="index.form.user.label" xml:space="preserve">
+    <value>Користувач</value>
+  </data>
+  <data name="index.form.user.overview" xml:space="preserve">
+    <value>Перегляд активності</value>
+  </data>
+  <data name="item.created_at" xml:space="preserve">
+    <value>Дата публікації</value>
+  </data>
+  <data name="item.deleted_at" xml:space="preserve">
+    <value>Дата видалення</value>
+  </data>
+  <data name="item.message_type" xml:space="preserve">
+    <value>Тип</value>
+  </data>
+  <data name="item.permalink" xml:space="preserve">
+    <value>Постійне посилання</value>
+  </data>
+  <data name="nearby_posts.confirm" xml:space="preserve">
+    <value>Жоден з постів не вирішує про мою проблему</value>
+  </data>
+  <data name="nearby_posts.notice" xml:space="preserve">
+    <value>Є повідомлення між {0} ({1}). Перевірте їх перед публікацією.</value>
+  </data>
+  <data name="nearby_posts.unsaved" xml:space="preserve">
+    <value>{0} в цьому відгуку</value>
+  </data>
+  <data name="reply.open.guest" xml:space="preserve">
+    <value>Увійдіть, щоб відповісти</value>
+  </data>
+  <data name="reply.open.user" xml:space="preserve">
+    <value>Відповісти</value>
+  </data>
+  <data name="review.block_count" xml:space="preserve">
+    <value>{0} / {1} блоків використано</value>
+  </data>
+  <data name="review.go_to_parent" xml:space="preserve">
+    <value>Побачити відгук</value>
+  </data>
+  <data name="review.go_to_child" xml:space="preserve">
+    <value>Побачити обговорення</value>
+  </data>
+  <data name="review.validation.block_too_large" xml:space="preserve">
+    <value>кожен блок може містити лише {0} символів</value>
+  </data>
+  <data name="review.validation.external_references" xml:space="preserve">
+    <value>відгук містить посилання на проблеми, не отсоящіеся до цього відкликанню</value>
+  </data>
+  <data name="review.validation.invalid_block_type" xml:space="preserve">
+    <value>недопустимий тип блоку</value>
+  </data>
+  <data name="review.validation.invalid_document" xml:space="preserve">
+    <value>недопустимий відгук</value>
+  </data>
+  <data name="review.validation.minimum_issues" xml:space="preserve">
+    <value>відгук повинен містити як мінімум {0} проблему | відгук повинен містити як мінімум {0} проблеми | відгук повинен містити як мінімум {0} проблем
+</value>
+  </data>
+  <data name="review.validation.missing_text" xml:space="preserve">
+    <value>в блоці відсутній текст</value>
+  </data>
+  <data name="review.validation.too_many_blocks" xml:space="preserve">
+    <value>відгуки можуть містити лише {0} параграф/проблему|відгуки можуть містити лише до {0} параграфів/проблем</value>
+  </data>
+  <data name="system.resolved.true" xml:space="preserve">
+    <value>Позначено вирішеним користувачем {0}</value>
+  </data>
+  <data name="system.resolved.false" xml:space="preserve">
+    <value>Повторно відкрито користувачем {0}</value>
+  </data>
+  <data name="timestamp_display.general" xml:space="preserve">
+    <value>загальні</value>
+  </data>
+  <data name="timestamp_display.general_all" xml:space="preserve">
+    <value>загальні (усі)</value>
+  </data>
+  <data name="user_filter.everyone" xml:space="preserve">
+    <value>Усі</value>
+  </data>
+  <data name="user_filter.label" xml:space="preserve">
+    <value>Сортувати по користувачах</value>
+  </data>
+</root>

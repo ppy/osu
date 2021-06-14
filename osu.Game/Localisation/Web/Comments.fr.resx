@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="deleted" xml:space="preserve">
+    <value>supprimé</value>
+  </data>
+  <data name="deleted_count" xml:space="preserve">
+    <value>{0} commentaire supprimé|{0} commentaires supprimés</value>
+  </data>
+  <data name="edited" xml:space="preserve">
+    <value>édité par {0} il y a {1}</value>
+  </data>
+  <data name="pinned" xml:space="preserve">
+    <value>épinglé</value>
+  </data>
+  <data name="empty" xml:space="preserve">
+    <value>Il n’y a pas encore de commentaires.</value>
+  </data>
+  <data name="load_replies" xml:space="preserve">
+    <value>charger les réponses</value>
+  </data>
+  <data name="replies_count" xml:space="preserve">
+    <value>{0} réponse|{0} réponses</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>Commentaires</value>
+  </data>
+  <data name="commentable_name.beatmapset" xml:space="preserve">
+    <value>Beatmap</value>
+  </data>
+  <data name="commentable_name.build" xml:space="preserve">
+    <value>Changelog</value>
+  </data>
+  <data name="commentable_name.news_post" xml:space="preserve">
+    <value>News</value>
+  </data>
+  <data name="commentable_name._deleted" xml:space="preserve">
+    <value>Élément supprimé</value>
+  </data>
+  <data name="editor.textarea_hint._" xml:space="preserve">
+    <value>Appuyez sur entrée pour {0}. Utilisez shift+entrée pour une nouvelle ligne.</value>
+  </data>
+  <data name="editor.textarea_hint.edit" xml:space="preserve">
+    <value>sauvegarder</value>
+  </data>
+  <data name="editor.textarea_hint.new" xml:space="preserve">
+    <value>post</value>
+  </data>
+  <data name="editor.textarea_hint.reply" xml:space="preserve">
+    <value>répondre</value>
+  </data>
+  <data name="guest_button.new" xml:space="preserve">
+    <value>Connectez-vous pour commenter</value>
+  </data>
+  <data name="guest_button.reply" xml:space="preserve">
+    <value>Connectez-vous pour répondre</value>
+  </data>
+  <data name="index.nav_comments" xml:space="preserve">
+    <value>commentaires</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>liste</value>
+  </data>
+  <data name="index.no_comments" xml:space="preserve">
+    <value>aucun commentaire trouvé...</value>
+  </data>
+  <data name="placeholder.edit" xml:space="preserve">
+    <value>Éditer le commentaire ici</value>
+  </data>
+  <data name="placeholder.new" xml:space="preserve">
+    <value>Tapez le nouveau commentaire ici</value>
+  </data>
+  <data name="placeholder.reply" xml:space="preserve">
+    <value>Tapez votre réponse ici</value>
+  </data>
+  <data name="show.nav_title" xml:space="preserve">
+    <value>commentaires</value>
+  </data>
+</root>

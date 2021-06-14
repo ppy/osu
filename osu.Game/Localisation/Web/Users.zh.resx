@@ -1,0 +1,721 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="deleted" xml:space="preserve">
+    <value>[被删除的用户]</value>
+  </data>
+  <data name="beatmapset_activities.title" xml:space="preserve">
+    <value>{0} 的摸图历史</value>
+  </data>
+  <data name="beatmapset_activities.title_compact" xml:space="preserve">
+    <value>摸图</value>
+  </data>
+  <data name="beatmapset_activities.discussions.title_recent" xml:space="preserve">
+    <value>最近打开的讨论</value>
+  </data>
+  <data name="beatmapset_activities.events.title_recent" xml:space="preserve">
+    <value>最近事件</value>
+  </data>
+  <data name="beatmapset_activities.posts.title_recent" xml:space="preserve">
+    <value>最近帖子</value>
+  </data>
+  <data name="beatmapset_activities.votes_received.title_most" xml:space="preserve">
+    <value>得赞最多（最近三个月）</value>
+  </data>
+  <data name="beatmapset_activities.votes_made.title_most" xml:space="preserve">
+    <value>赞数最多（最近三个月）</value>
+  </data>
+  <data name="blocks.banner_text" xml:space="preserve">
+    <value>你已经屏蔽此用户。</value>
+  </data>
+  <data name="blocks.blocked_count" xml:space="preserve">
+    <value>被屏蔽的用户 ({0})</value>
+  </data>
+  <data name="blocks.hide_profile" xml:space="preserve">
+    <value>隐藏用户资料</value>
+  </data>
+  <data name="blocks.not_blocked" xml:space="preserve">
+    <value>此用户未被屏蔽。</value>
+  </data>
+  <data name="blocks.show_profile" xml:space="preserve">
+    <value>显示用户资料</value>
+  </data>
+  <data name="blocks.too_many" xml:space="preserve">
+    <value>屏蔽用户数量达到最大限制。</value>
+  </data>
+  <data name="blocks.button.block" xml:space="preserve">
+    <value>屏蔽</value>
+  </data>
+  <data name="blocks.button.unblock" xml:space="preserve">
+    <value>解除屏蔽</value>
+  </data>
+  <data name="card.loading" xml:space="preserve">
+    <value>加载中...</value>
+  </data>
+  <data name="card.send_message" xml:space="preserve">
+    <value>发送消息</value>
+  </data>
+  <data name="disabled.title" xml:space="preserve">
+    <value>哎呀！看起来您的帐户已被禁用。</value>
+  </data>
+  <data name="disabled.warning" xml:space="preserve">
+    <value>如果您违反了规则，我们原则上在一个月的期限以内不会考虑解禁您的帐户。在此之后，您如果需要，可以随时联系我们。请注意，在一个帐户被封后创建新帐户会&lt;strong&gt;使您的封禁期限被延长&lt;/strong&gt;。您更需要注意&lt;strong&gt;您每创建一个新帐户都会更严重地违反规则&lt;/strong&gt;。我们强烈建议您不要误入歧途。</value>
+  </data>
+  <data name="disabled.if_mistake._" xml:space="preserve">
+    <value>如果你觉得我们误封了你的账号，你可以通过电子邮件（{0}）或者点击本页面右下方的问号来联系我们。一般来说，我们犯错的几率是很低的。我们只以可靠的数据为参考进行这一类的操作。如果你执意违反规则，我们保留拒绝你的请求的权利。</value>
+  </data>
+  <data name="disabled.if_mistake.email" xml:space="preserve">
+    <value>电子邮件</value>
+  </data>
+  <data name="disabled.reasons.compromised" xml:space="preserve">
+    <value>我们认为你的帐户已被盗用。在确认身份期间，该帐户会被暂时停用。</value>
+  </data>
+  <data name="disabled.reasons.opening" xml:space="preserve">
+    <value>您的账户可能由于这几种原因被禁用：</value>
+  </data>
+  <data name="disabled.reasons.tos._" xml:space="preserve">
+    <value>您已经违反了一条或多条 {0} 或是 {1}</value>
+  </data>
+  <data name="disabled.reasons.tos.community_rules" xml:space="preserve">
+    <value>社区规则</value>
+  </data>
+  <data name="disabled.reasons.tos.tos" xml:space="preserve">
+    <value>服务条款</value>
+  </data>
+  <data name="filtering.by_game_mode" xml:space="preserve">
+    <value>成员按游戏模式筛选</value>
+  </data>
+  <data name="force_reactivation.reason.inactive_different_country" xml:space="preserve">
+    <value>您已经很长时间没有使用您的账户了。</value>
+  </data>
+  <data name="login._" xml:space="preserve">
+    <value>登录</value>
+  </data>
+  <data name="login.button" xml:space="preserve">
+    <value>登录</value>
+  </data>
+  <data name="login.button_posting" xml:space="preserve">
+    <value>登录中...</value>
+  </data>
+  <data name="login.email_login_disabled" xml:space="preserve">
+    <value>当前不可以使用电子邮件登陆。请使用您的用户名。</value>
+  </data>
+  <data name="login.failed" xml:space="preserve">
+    <value>登录失败</value>
+  </data>
+  <data name="login.forgot" xml:space="preserve">
+    <value>忘记密码？</value>
+  </data>
+  <data name="login.info" xml:space="preserve">
+    <value>请登录以继续</value>
+  </data>
+  <data name="login.invalid_captcha" xml:space="preserve">
+    <value>验证码无效，请刷新页面后重试。</value>
+  </data>
+  <data name="login.locked_ip" xml:space="preserve">
+    <value>IP 已被锁定，请稍等几分钟</value>
+  </data>
+  <data name="login.password" xml:space="preserve">
+    <value>密码</value>
+  </data>
+  <data name="login.register" xml:space="preserve">
+    <value>没有 osu! 账户？现在就注册一个！</value>
+  </data>
+  <data name="login.remember" xml:space="preserve">
+    <value>记住此电脑</value>
+  </data>
+  <data name="login.title" xml:space="preserve">
+    <value>登录以继续</value>
+  </data>
+  <data name="login.username" xml:space="preserve">
+    <value>用户名</value>
+  </data>
+  <data name="login.beta.main" xml:space="preserve">
+    <value>Beta 仅限于特定用户访问</value>
+  </data>
+  <data name="login.beta.small" xml:space="preserve">
+    <value>（在不久后将对 osu!支持者 开放）</value>
+  </data>
+  <data name="posts.title" xml:space="preserve">
+    <value>{0} 的帖子</value>
+  </data>
+  <data name="anonymous.login_link" xml:space="preserve">
+    <value>点击登录</value>
+  </data>
+  <data name="anonymous.login_text" xml:space="preserve">
+    <value>登录</value>
+  </data>
+  <data name="anonymous.username" xml:space="preserve">
+    <value>游客</value>
+  </data>
+  <data name="anonymous.error" xml:space="preserve">
+    <value>请先登录</value>
+  </data>
+  <data name="logout_confirm" xml:space="preserve">
+    <value>确定要退出吗？o(TヘTo)</value>
+  </data>
+  <data name="report.button_text" xml:space="preserve">
+    <value>举报</value>
+  </data>
+  <data name="report.comments" xml:space="preserve">
+    <value>附加信息</value>
+  </data>
+  <data name="report.placeholder" xml:space="preserve">
+    <value>请提供你认为可能有用的所有信息。</value>
+  </data>
+  <data name="report.reason" xml:space="preserve">
+    <value>原因</value>
+  </data>
+  <data name="report.thanks" xml:space="preserve">
+    <value>感谢你的报告！</value>
+  </data>
+  <data name="report.title" xml:space="preserve">
+    <value>举报 {0} ？</value>
+  </data>
+  <data name="report.actions.send" xml:space="preserve">
+    <value>发送报告</value>
+  </data>
+  <data name="report.actions.cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="report.options.cheating" xml:space="preserve">
+    <value>违规 / 作弊</value>
+  </data>
+  <data name="report.options.insults" xml:space="preserve">
+    <value>侮辱 我/其他人</value>
+  </data>
+  <data name="report.options.spam" xml:space="preserve">
+    <value>刷屏/垃圾广告</value>
+  </data>
+  <data name="report.options.unwanted_content" xml:space="preserve">
+    <value>发布包含不当内容的链接</value>
+  </data>
+  <data name="report.options.nonsense" xml:space="preserve">
+    <value>无意义内容</value>
+  </data>
+  <data name="report.options.other" xml:space="preserve">
+    <value>其他（在下方输入原因）</value>
+  </data>
+  <data name="restricted_banner.title" xml:space="preserve">
+    <value>账户进入限制模式！</value>
+  </data>
+  <data name="restricted_banner.message" xml:space="preserve">
+    <value>在被限制时，无法与其他玩家互动，分数只有自己可见。该限制通常由系统自动给予，并将在24小时内解除。需要申诉？请&lt;a href="mailto{0}@ppy.sh"&gt;联系支持团队&lt;/a&gt;.</value>
+  </data>
+  <data name="show.age" xml:space="preserve">
+    <value>{0} 岁</value>
+  </data>
+  <data name="show.change_avatar" xml:space="preserve">
+    <value>更换头像！</value>
+  </data>
+  <data name="show.first_members" xml:space="preserve">
+    <value>元老玩家</value>
+  </data>
+  <data name="show.is_developer" xml:space="preserve">
+    <value>osu! 开发者</value>
+  </data>
+  <data name="show.is_supporter" xml:space="preserve">
+    <value>osu!supporter</value>
+  </data>
+  <data name="show.joined_at" xml:space="preserve">
+    <value>注册时间：{0}</value>
+  </data>
+  <data name="show.lastvisit" xml:space="preserve">
+    <value>上次登录：{0}</value>
+  </data>
+  <data name="show.lastvisit_online" xml:space="preserve">
+    <value>当前在线</value>
+  </data>
+  <data name="show.missingtext" xml:space="preserve">
+    <value>你可能打错字了！（或者该用户已经被封禁）</value>
+  </data>
+  <data name="show.origin_country" xml:space="preserve">
+    <value>来自 {0}</value>
+  </data>
+  <data name="show.previous_usernames" xml:space="preserve">
+    <value>曾用名</value>
+  </data>
+  <data name="show.plays_with" xml:space="preserve">
+    <value>惯用 {0}</value>
+  </data>
+  <data name="show.title" xml:space="preserve">
+    <value>{0} 的个人资料</value>
+  </data>
+  <data name="show.comments_count._" xml:space="preserve">
+    <value>发表了 {0}</value>
+  </data>
+  <data name="show.comments_count.count" xml:space="preserve">
+    <value>{0} 条评论</value>
+  </data>
+  <data name="show.edit.cover.button" xml:space="preserve">
+    <value>更换个人资料头图</value>
+  </data>
+  <data name="show.edit.cover.defaults_info" xml:space="preserve">
+    <value>在将来会有更多头图可用</value>
+  </data>
+  <data name="show.edit.cover.upload.broken_file" xml:space="preserve">
+    <value>上传失败.请检查上传的图片然后重试.</value>
+  </data>
+  <data name="show.edit.cover.upload.button" xml:space="preserve">
+    <value>上传图片</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone" xml:space="preserve">
+    <value>拖拽到此处</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone_info" xml:space="preserve">
+    <value>将图片拖动到这里也可以上传</value>
+  </data>
+  <data name="show.edit.cover.upload.size_info" xml:space="preserve">
+    <value>图片大小最好是 2400x620 像素</value>
+  </data>
+  <data name="show.edit.cover.upload.too_large" xml:space="preserve">
+    <value>上传的图片过大。</value>
+  </data>
+  <data name="show.edit.cover.upload.unsupported_format" xml:space="preserve">
+    <value>不支持的格式。</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info._" xml:space="preserve">
+    <value>自定义头图只有 {0} 可用</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info.link" xml:space="preserve">
+    <value>osu! 支持者</value>
+  </data>
+  <data name="show.edit.default_playmode.is_default_tooltip" xml:space="preserve">
+    <value>默认游戏模式</value>
+  </data>
+  <data name="show.edit.default_playmode.set" xml:space="preserve">
+    <value>设置 {0} 为个人资料的默认游戏模式</value>
+  </data>
+  <data name="show.extra.none" xml:space="preserve">
+    <value>无</value>
+  </data>
+  <data name="show.extra.unranked" xml:space="preserve">
+    <value>最近没有玩过</value>
+  </data>
+  <data name="show.extra.achievements.achieved-on" xml:space="preserve">
+    <value>达成于 {0}</value>
+  </data>
+  <data name="show.extra.achievements.locked" xml:space="preserve">
+    <value>锁定</value>
+  </data>
+  <data name="show.extra.achievements.title" xml:space="preserve">
+    <value>成就</value>
+  </data>
+  <data name="show.extra.beatmaps.by_artist" xml:space="preserve">
+    <value>by {0}</value>
+  </data>
+  <data name="show.extra.beatmaps.title" xml:space="preserve">
+    <value>谱面</value>
+  </data>
+  <data name="show.extra.beatmaps.favourite.title" xml:space="preserve">
+    <value>收藏的谱面</value>
+  </data>
+  <data name="show.extra.beatmaps.graveyard.title" xml:space="preserve">
+    <value>坟场里的谱面</value>
+  </data>
+  <data name="show.extra.beatmaps.loved.title" xml:space="preserve">
+    <value>Loved 的谱面</value>
+  </data>
+  <data name="show.extra.beatmaps.ranked_and_approved.title" xml:space="preserve">
+    <value>Ranked &amp; Approved 的谱面</value>
+  </data>
+  <data name="show.extra.beatmaps.unranked.title" xml:space="preserve">
+    <value>Pending 的谱面</value>
+  </data>
+  <data name="show.extra.discussions.title" xml:space="preserve">
+    <value>讨论</value>
+  </data>
+  <data name="show.extra.discussions.title_longer" xml:space="preserve">
+    <value>最近讨论</value>
+  </data>
+  <data name="show.extra.discussions.show_more" xml:space="preserve">
+    <value>查看更多讨论</value>
+  </data>
+  <data name="show.extra.events.title" xml:space="preserve">
+    <value>事件</value>
+  </data>
+  <data name="show.extra.events.title_longer" xml:space="preserve">
+    <value>最近事件</value>
+  </data>
+  <data name="show.extra.events.show_more" xml:space="preserve">
+    <value>查看更多事件</value>
+  </data>
+  <data name="show.extra.historical.title" xml:space="preserve">
+    <value>历史记录</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.title" xml:space="preserve">
+    <value>游玩记录</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.count_label" xml:space="preserve">
+    <value>游玩次数</value>
+  </data>
+  <data name="show.extra.historical.most_played.count" xml:space="preserve">
+    <value>游玩次数</value>
+  </data>
+  <data name="show.extra.historical.most_played.title" xml:space="preserve">
+    <value>玩得最多的谱面</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.accuracy" xml:space="preserve">
+    <value>准确率：{0}</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.title" xml:space="preserve">
+    <value>最近24小时游玩</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.title" xml:space="preserve">
+    <value>回放被观看记录</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.count_label" xml:space="preserve">
+    <value>回放被观看次数</value>
+  </data>
+  <data name="show.extra.kudosu.recent_entries" xml:space="preserve">
+    <value>最近 Kudosu 记录</value>
+  </data>
+  <data name="show.extra.kudosu.title" xml:space="preserve">
+    <value>Kudosu!</value>
+  </data>
+  <data name="show.extra.kudosu.total" xml:space="preserve">
+    <value>总共获得 kudosu</value>
+  </data>
+  <data name="show.extra.kudosu.entry.amount" xml:space="preserve">
+    <value>{0} kudosu</value>
+  </data>
+  <data name="show.extra.kudosu.entry.empty" xml:space="preserve">
+    <value>该用户还没有收到过 kudosu ！</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.allow_kudosu.give" xml:space="preserve">
+    <value>因讨论帖 {0} 的 kudosu 移除操作的撤销而获得 {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.deny_kudosu.reset" xml:space="preserve">
+    <value>在讨论帖 {0} 中被移除 {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.delete.reset" xml:space="preserve">
+    <value>因讨论帖 {0} 被删除而失去 {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.restore.give" xml:space="preserve">
+    <value>因讨论帖 {0} 被恢复而获得 {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.give" xml:space="preserve">
+    <value>因在讨论帖 {0} 中得到了足够票数而获得 {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.reset" xml:space="preserve">
+    <value>因在讨论帖 {0} 中丢失了票数而失去 {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.give" xml:space="preserve">
+    <value>因讨论帖 {0} 的投票重新计算而获得 {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.reset" xml:space="preserve">
+    <value>因讨论帖 {0} 的投票重新计算而失去 {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.give" xml:space="preserve">
+    <value>在帖子 {0} 中被 {1} 给予 {2} </value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.reset" xml:space="preserve">
+    <value>在帖子 {0} 中被 {1} 重置 kudosu </value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.revoke" xml:space="preserve">
+    <value>在帖子 {0} 中被 {1} 移除 kudosu </value>
+  </data>
+  <data name="show.extra.kudosu.total_info._" xml:space="preserve">
+    <value>取决于你对制谱的贡献如何。查看 {0} 获得更多信息。</value>
+  </data>
+  <data name="show.extra.kudosu.total_info.link" xml:space="preserve">
+    <value>这个页面</value>
+  </data>
+  <data name="show.extra.me.title" xml:space="preserve">
+    <value>个人介绍</value>
+  </data>
+  <data name="show.extra.medals.empty" xml:space="preserve">
+    <value>该用户还没有获得成就。;_;</value>
+  </data>
+  <data name="show.extra.medals.recent" xml:space="preserve">
+    <value>最近取得</value>
+  </data>
+  <data name="show.extra.medals.title" xml:space="preserve">
+    <value>成就</value>
+  </data>
+  <data name="show.extra.posts.title" xml:space="preserve">
+    <value>回复</value>
+  </data>
+  <data name="show.extra.posts.title_longer" xml:space="preserve">
+    <value>最近回复</value>
+  </data>
+  <data name="show.extra.posts.show_more" xml:space="preserve">
+    <value>查看更多回复</value>
+  </data>
+  <data name="show.extra.recent_activity.title" xml:space="preserve">
+    <value>最近活动</value>
+  </data>
+  <data name="show.extra.top_ranks.download_replay" xml:space="preserve">
+    <value>下载回放</value>
+  </data>
+  <data name="show.extra.top_ranks.not_ranked" xml:space="preserve">
+    <value>只有 ranked 谱面才能得到 pp。</value>
+  </data>
+  <data name="show.extra.top_ranks.pp_weight" xml:space="preserve">
+    <value>权重：{0}</value>
+  </data>
+  <data name="show.extra.top_ranks.view_details" xml:space="preserve">
+    <value>查看详情</value>
+  </data>
+  <data name="show.extra.top_ranks.title" xml:space="preserve">
+    <value>成绩</value>
+  </data>
+  <data name="show.extra.top_ranks.best.title" xml:space="preserve">
+    <value>最好成绩</value>
+  </data>
+  <data name="show.extra.top_ranks.first.title" xml:space="preserve">
+    <value>第一名</value>
+  </data>
+  <data name="show.extra.votes.given" xml:space="preserve">
+    <value>给予投票（最近三个月）</value>
+  </data>
+  <data name="show.extra.votes.received" xml:space="preserve">
+    <value>所得投票（最近三个月）</value>
+  </data>
+  <data name="show.extra.votes.title" xml:space="preserve">
+    <value>投票</value>
+  </data>
+  <data name="show.extra.votes.title_longer" xml:space="preserve">
+    <value>最近投票</value>
+  </data>
+  <data name="show.extra.votes.vote_count" xml:space="preserve">
+    <value>{0} 票</value>
+  </data>
+  <data name="show.extra.account_standing.title" xml:space="preserve">
+    <value>帐号状态</value>
+  </data>
+  <data name="show.extra.account_standing.bad_standing" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; 的帐号存在不良记录 :(</value>
+  </data>
+  <data name="show.extra.account_standing.remaining_silence" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; 的禁言将在 {1} 解除</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.title" xml:space="preserve">
+    <value>最近记录</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.date" xml:space="preserve">
+    <value>时间</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.action" xml:space="preserve">
+    <value>处理</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length" xml:space="preserve">
+    <value>时长</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length_permanent" xml:space="preserve">
+    <value>永久</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.description" xml:space="preserve">
+    <value>原因</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actor" xml:space="preserve">
+    <value>裁决者： {0}</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.restriction" xml:space="preserve">
+    <value>封禁</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.silence" xml:space="preserve">
+    <value>禁言</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.note" xml:space="preserve">
+    <value>注释</value>
+  </data>
+  <data name="show.info.interests" xml:space="preserve">
+    <value>兴趣爱好</value>
+  </data>
+  <data name="show.info.location" xml:space="preserve">
+    <value>所在地</value>
+  </data>
+  <data name="show.info.occupation" xml:space="preserve">
+    <value>职业</value>
+  </data>
+  <data name="show.info.website" xml:space="preserve">
+    <value>网站</value>
+  </data>
+  <data name="show.not_found.reason_1" xml:space="preserve">
+    <value>他可能换了用户名。</value>
+  </data>
+  <data name="show.not_found.reason_2" xml:space="preserve">
+    <value>该帐号由于安全或滥用问题暂时不可用。</value>
+  </data>
+  <data name="show.not_found.reason_3" xml:space="preserve">
+    <value>你可能输错用户名了！</value>
+  </data>
+  <data name="show.not_found.reason_header" xml:space="preserve">
+    <value>可能是由于以下原因：</value>
+  </data>
+  <data name="show.not_found.title" xml:space="preserve">
+    <value>找不到指定的用户</value>
+  </data>
+  <data name="show.page.button" xml:space="preserve">
+    <value>修改资料页面</value>
+  </data>
+  <data name="show.page.description" xml:space="preserve">
+    <value>&lt;strong&gt;个人介绍&lt;/strong&gt; 是您可以自定义的展示区.</value>
+  </data>
+  <data name="show.page.edit_big" xml:space="preserve">
+    <value>编辑</value>
+  </data>
+  <data name="show.page.placeholder" xml:space="preserve">
+    <value>在这里编辑</value>
+  </data>
+  <data name="show.page.restriction_info._" xml:space="preserve">
+    <value>你需要成为 {0} 才能使用此功能。</value>
+  </data>
+  <data name="show.page.restriction_info.link" xml:space="preserve">
+    <value>osu!支持者</value>
+  </data>
+  <data name="show.post_count._" xml:space="preserve">
+    <value>发表了 {0}</value>
+  </data>
+  <data name="show.post_count.count" xml:space="preserve">
+    <value>{0} 篇帖子</value>
+  </data>
+  <data name="show.rank.country" xml:space="preserve">
+    <value>{0} 模式的国内/区内排名</value>
+  </data>
+  <data name="show.rank.country_simple" xml:space="preserve">
+    <value>国内/区内排名</value>
+  </data>
+  <data name="show.rank.global" xml:space="preserve">
+    <value>{0} 模式的全球排名</value>
+  </data>
+  <data name="show.rank.global_simple" xml:space="preserve">
+    <value>全球排名</value>
+  </data>
+  <data name="show.stats.hit_accuracy" xml:space="preserve">
+    <value>准确率</value>
+  </data>
+  <data name="show.stats.level" xml:space="preserve">
+    <value>等级 {0}</value>
+  </data>
+  <data name="show.stats.level_progress" xml:space="preserve">
+    <value>到下一级的进度</value>
+  </data>
+  <data name="show.stats.maximum_combo" xml:space="preserve">
+    <value>最大连击</value>
+  </data>
+  <data name="show.stats.medals" xml:space="preserve">
+    <value>奖章</value>
+  </data>
+  <data name="show.stats.play_count" xml:space="preserve">
+    <value>游戏次数</value>
+  </data>
+  <data name="show.stats.play_time" xml:space="preserve">
+    <value>游戏时间</value>
+  </data>
+  <data name="show.stats.ranked_score" xml:space="preserve">
+    <value>Ranked 谱面总分</value>
+  </data>
+  <data name="show.stats.replays_watched_by_others" xml:space="preserve">
+    <value>回放被观看次数</value>
+  </data>
+  <data name="show.stats.score_ranks" xml:space="preserve">
+    <value>得分等级</value>
+  </data>
+  <data name="show.stats.total_hits" xml:space="preserve">
+    <value>总命中次数</value>
+  </data>
+  <data name="show.stats.total_score" xml:space="preserve">
+    <value>总分</value>
+  </data>
+  <data name="show.stats.ranked_and_approved_beatmapset_count" xml:space="preserve">
+    <value>Ranked &amp; Approved 的谱面</value>
+  </data>
+  <data name="show.stats.loved_beatmapset_count" xml:space="preserve">
+    <value>Loved 的谱面</value>
+  </data>
+  <data name="show.stats.unranked_beatmapset_count" xml:space="preserve">
+    <value>Pending 的谱面</value>
+  </data>
+  <data name="show.stats.graveyard_beatmapset_count" xml:space="preserve">
+    <value>坟场里的谱面</value>
+  </data>
+  <data name="silenced_banner.title" xml:space="preserve">
+    <value>你已被禁言。</value>
+  </data>
+  <data name="silenced_banner.message" xml:space="preserve">
+    <value>部分操作将不可用。</value>
+  </data>
+  <data name="status.all" xml:space="preserve">
+    <value>所有</value>
+  </data>
+  <data name="status.online" xml:space="preserve">
+    <value>在线</value>
+  </data>
+  <data name="status.offline" xml:space="preserve">
+    <value>离线</value>
+  </data>
+  <data name="store.saved" xml:space="preserve">
+    <value>账户已创建</value>
+  </data>
+  <data name="verify.title" xml:space="preserve">
+    <value>账户认证</value>
+  </data>
+  <data name="view_mode.brick" xml:space="preserve">
+    <value>方块视图</value>
+  </data>
+  <data name="view_mode.card" xml:space="preserve">
+    <value>卡片检视</value>
+  </data>
+  <data name="view_mode.list" xml:space="preserve">
+    <value>列表检视</value>
+  </data>
+</root>

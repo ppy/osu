@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="beatmapset_update_notice.new" xml:space="preserve">
+    <value>就是要提醒您谱面 "{0}" 在您上次访问之后有了新动态。</value>
+  </data>
+  <data name="beatmapset_update_notice.subject" xml:space="preserve">
+    <value>谱面 “{0}” 有新动态</value>
+  </data>
+  <data name="beatmapset_update_notice.unwatch" xml:space="preserve">
+    <value>如果您不想再关注该谱面，您可以点击之前页面或谱面关注列表中的 “取消关注” 链接：</value>
+  </data>
+  <data name="beatmapset_update_notice.visit" xml:space="preserve">
+    <value>点击此处访问讨论区</value>
+  </data>
+  <data name="common.closing" xml:space="preserve">
+    <value>祝您生活顺利</value>
+  </data>
+  <data name="common.hello" xml:space="preserve">
+    <value>您好 {0} ，</value>
+  </data>
+  <data name="common.report" xml:space="preserve">
+    <value>如果您没有进行此操作，请立刻回复此邮件！</value>
+  </data>
+  <data name="donation_thanks.benefit_more" xml:space="preserve">
+    <value>将来还会有更多的支持者的独有功能！</value>
+  </data>
+  <data name="donation_thanks.feedback" xml:space="preserve">
+    <value>如果您有什么问题，或者有什么意见的话，您可以直接回复这封邮件。我会尽快回应的！</value>
+  </data>
+  <data name="donation_thanks.keep_free" xml:space="preserve">
+    <value>正是因为您这样的人的存在，osu! 和 osu! 社区才能够在没有讨厌的广告和强制付款的环境中稳定运行。感谢您的支持！</value>
+  </data>
+  <data name="donation_thanks.keep_running" xml:space="preserve">
+    <value>您的捐赠能够维持 osu! 持续运转 {0}！虽然看起来不多，但是江海来源于小流，不是么。:)</value>
+  </data>
+  <data name="donation_thanks.subject" xml:space="preserve">
+    <value>非常感谢， osu! 爱你哦~</value>
+  </data>
+  <data name="donation_thanks.translation" xml:space="preserve">
+    <value>以下是社区提供的翻译，仅供参考：</value>
+  </data>
+  <data name="donation_thanks.benefit.gift" xml:space="preserve">
+    <value>您的受赠者将会享受到 osu!direct 等其他 osu! 支持者所享有的的特权。</value>
+  </data>
+  <data name="donation_thanks.benefit.self" xml:space="preserve">
+    <value>您现在可以享受 osu!direct 和其他支持者奖励直到 {0}。</value>
+  </data>
+  <data name="donation_thanks.support._" xml:space="preserve">
+    <value>感谢您向 osu! 付出的{0}！</value>
+  </data>
+  <data name="donation_thanks.support.first" xml:space="preserve">
+    <value>支持</value>
+  </data>
+  <data name="donation_thanks.support.repeat" xml:space="preserve">
+    <value>持续支持</value>
+  </data>
+  <data name="forum_new_reply.new" xml:space="preserve">
+    <value>就是要提醒您，自上次浏览以来谱面 {0} 的话题下又有了新的回复。</value>
+  </data>
+  <data name="forum_new_reply.subject" xml:space="preserve">
+    <value>[osu!] 主题 "{0}" 有新回复</value>
+  </data>
+  <data name="forum_new_reply.unwatch" xml:space="preserve">
+    <value>如果您不想再关注本主题，您可以点击主题页下面的 “取消关注该主题” 链接，或者从订阅管理页面中取消订阅。</value>
+  </data>
+  <data name="forum_new_reply.visit" xml:space="preserve">
+    <value>点击下面的链接跳转到最新的回复：</value>
+  </data>
+  <data name="password_reset.code" xml:space="preserve">
+    <value>您的验证码是：</value>
+  </data>
+  <data name="password_reset.requested" xml:space="preserve">
+    <value>您（或者他人）请求重置您 osu! 账户的密码。</value>
+  </data>
+  <data name="password_reset.subject" xml:space="preserve">
+    <value>osu! 账户找回</value>
+  </data>
+  <data name="store_payment_completed.prepare_shipping" xml:space="preserve">
+    <value>我们收到了您的付款，正在准备发货。通常来说，这可能需要几天时间。发货日期取决于订单的数量。您可以在这里检查您的订单详情：</value>
+  </data>
+  <data name="store_payment_completed.processing" xml:space="preserve">
+    <value>我们已收到您的付款，目前正在处理您的订单。您可以在这里关注您的订单进度：</value>
+  </data>
+  <data name="store_payment_completed.questions" xml:space="preserve">
+    <value>如果您有什么问题的话，您可以直接回复这封邮件。</value>
+  </data>
+  <data name="store_payment_completed.shipping" xml:space="preserve">
+    <value>配送</value>
+  </data>
+  <data name="store_payment_completed.subject" xml:space="preserve">
+    <value>我们已收到你的 osu!store 订单！</value>
+  </data>
+  <data name="store_payment_completed.thank_you" xml:space="preserve">
+    <value>感谢您在 osu!store 的购买！</value>
+  </data>
+  <data name="store_payment_completed.total" xml:space="preserve">
+    <value>总计</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift" xml:space="preserve">
+    <value>赠予您支持者标签的人想要保持匿名，所以在这封邮件中并没有提到他（们）。</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift_maybe_not" xml:space="preserve">
+    <value>话虽如此，不过您可能已经猜到是谁啦嘿嘿嘿~</value>
+  </data>
+  <data name="supporter_gift.duration" xml:space="preserve">
+    <value>感谢赠送者，您可以在接下来的 {0} 内享受到 osu!direct 等 osu! 支持者所享有的特权。</value>
+  </data>
+  <data name="supporter_gift.features" xml:space="preserve">
+    <value>您可以在此处找到更多关于特权的信息：</value>
+  </data>
+  <data name="supporter_gift.gifted" xml:space="preserve">
+    <value>有人刚刚赠予您 osu!supporter 标签！</value>
+  </data>
+  <data name="supporter_gift.subject" xml:space="preserve">
+    <value>你收到了一份礼物：osu!supporter 标签。</value>
+  </data>
+  <data name="user_email_updated.changed_to" xml:space="preserve">
+    <value>您 osu! 账户绑定的邮箱地址已被更改为 {0} 。</value>
+  </data>
+  <data name="user_email_updated.check" xml:space="preserve">
+    <value>请确认您修改后的新邮箱收到了此邮件，以防绑定失败导致您以后无法再登录 osu! 账户。</value>
+  </data>
+  <data name="user_email_updated.sent" xml:space="preserve">
+    <value>为了保证账户安全，我们将此邮件发送给了您的原邮箱和修改后的邮箱地址。</value>
+  </data>
+  <data name="user_email_updated.subject" xml:space="preserve">
+    <value>osu! 帐户邮箱更改确认</value>
+  </data>
+  <data name="user_force_reactivation.main" xml:space="preserve">
+    <value>您的账户可能已经被泄露。可能是您的账户最近出现了可疑活动，或者密码实在是太弱了。我们强烈要求您更新密码，并确保这个密码足够安全。</value>
+  </data>
+  <data name="user_force_reactivation.perform_reset" xml:space="preserve">
+    <value>您可以点击该链接来重置密码：{0}</value>
+  </data>
+  <data name="user_force_reactivation.reason" xml:space="preserve">
+    <value>原因：</value>
+  </data>
+  <data name="user_force_reactivation.subject" xml:space="preserve">
+    <value>您需要重新激活您的 osu! 账户</value>
+  </data>
+  <data name="user_notification_digest.new" xml:space="preserve">
+    <value>只是想提醒你一下，你关注的项目有新的更新。</value>
+  </data>
+  <data name="user_notification_digest.settings" xml:space="preserve">
+    <value>更改邮件通知设置：</value>
+  </data>
+  <data name="user_notification_digest.subject" xml:space="preserve">
+    <value>新 osu! 通知</value>
+  </data>
+  <data name="user_password_updated.confirmation" xml:space="preserve">
+    <value>您的 osu! 账户密码已被修改。</value>
+  </data>
+  <data name="user_password_updated.subject" xml:space="preserve">
+    <value>osu! 帐户密码更改确认</value>
+  </data>
+  <data name="user_verification.code" xml:space="preserve">
+    <value>您的验证码是：</value>
+  </data>
+  <data name="user_verification.code_hint" xml:space="preserve">
+    <value>您可以带/不带空格地输入该验证码。</value>
+  </data>
+  <data name="user_verification.link" xml:space="preserve">
+    <value>如果您无法完成验证，您还可以访问下面的链接来完成验证。</value>
+  </data>
+  <data name="user_verification.report" xml:space="preserve">
+    <value>如果您没有进行此操作，请立刻回复此邮件！您的账户信息可能遭到了泄漏。</value>
+  </data>
+  <data name="user_verification.subject" xml:space="preserve">
+    <value>osu! 账户认证</value>
+  </data>
+  <data name="user_verification.action_from._" xml:space="preserve">
+    <value>您的帐号有一个来自 {0} 的操作需要验证。</value>
+  </data>
+  <data name="user_verification.action_from.unknown_country" xml:space="preserve">
+    <value>未知国家</value>
+  </data>
+</root>

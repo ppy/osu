@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>Beatmap ei ole tällä hetkellä saatavilla.</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>Joitain osia tästä beatmapista on poistettu joko sen tekijän tai kolmannen osapuolen oikeuksien omaavan pyynnöstä.</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>Klikkaa nähdäksesi lisätietoja.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmapit</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>Beatmapit</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>lataa</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>lataa videon kanssa</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>lataa ilman videota</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>avaa osu!directissä</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>Keskustelu</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>Lisää tämä beatmap-setti suosikkeihin</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>Sinun täytyy kirjautua sisään ladataksesi beatmappeja!</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>luonut: {0}</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>Poista tämä beatmapkokoelma suosikeista</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>päivitetty viimeksi {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>Lataa</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>ilman videota</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>videon kanssa</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>lisäomimaisuuksien käyttämiseen</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>Kirjaudu sisään</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>Sinulla on liian monta lempikappaletta! Poista joitain suosikeistasi ennen uudelleenyrittämistä.</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>Jos nautit tästä kartasta, hurraa sitä edistääksesi sen siirtymistä &lt;strong&gt;Hyväksyttyyn&lt;/strong&gt; tilaan.</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>Tämä kartta on {0}.</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>vireillä</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>hyväksytty</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>keskeneräinen</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>Ilmoita Ongelma</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>Kuvaus</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>Tyylilaji</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>Kieli</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>Dataa lasketaan...</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>Epäonnistumiskohdat</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>Lähde</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>Läpäisyprosentti</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>Tunnisteet</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.show" xml:space="preserve">
+    <value>Näytä</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>saavutettu {0}</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>Maakohtaiset sijoitukset</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>Kavereiden sijoitukset</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>Maailmanlaajuiset sijoitukset</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>Klikkaa &lt;a href="{0}"&gt;tästä&lt;/a&gt; nähdäksesi kaikki hienot ominaisuudet mitä saat!</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>Sinun täytyy olla Tukija nähdäksesi maa- ja ystäväkohtaiset sijoitukset!</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>Tulokset</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>Tarkkuus</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>Maksimikombo</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>Ohi</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>Modit</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>Pelaaja</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>Sijoitus</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>Kokonaispisteet</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>Pisteet</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>Aika</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>Kartasta ei vielä löydy maansisäisiä tuloksia!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>Kukaan kavereistasi ei vielä ole saanut tulosta tässä mapissa!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>Tuloksia ei ole. Voisit hankkia niitä.</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>Ladataan tuloksia...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>Beatmap ei ole hyväksytyssä tilassa.</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>Johdossa</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>Sinun parhaasi</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>Ympyräkoko</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>Näppäinten määrä</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>HP Drain</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>Tarkkuus</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>Lähestymisnopeus</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>Vaikeustaso</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>Pituus</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>Ympyröiden määrä</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>Slidereiden määrä</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>Käyttäjien arvio</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>Arvioiden jakauma</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>Suositukset</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>Pelikertojen määrä</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>Esihyväksytty</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>Työn alla</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>Hautausmaa</value>
+  </data>
+</root>

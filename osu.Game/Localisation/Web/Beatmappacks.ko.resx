@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="index.description" xml:space="preserve">
+    <value>비슷한 테마를 기준으로 모아놓은 비트맵 모음집입니다.</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>목록</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>비트맵 팩</value>
+  </data>
+  <data name="index.blurb.important" xml:space="preserve">
+    <value>[[ 다운로드 하기 전에 읽어주세요 ]]</value>
+  </data>
+  <data name="index.blurb.instruction._" xml:space="preserve">
+    <value>설치 방법: 맵팩 다운로드가 끝나면 .rar 파일을 osu!의 Songs 폴더에 압축 해제하세요.
+                    맵팩에 동봉된 모든 곡은 .zip 또는 .osz로 압축된 상태입니다. 플레이하기 전 osu!가 직접 비트맵들을 압축 해제할 것입니다.
+                    {0} 여러분이 직접 압축을 해제하지 마세요. 그렇게 되면
+                    osu!가 이를 비정상적으로 받아들이고 제대로 작동하지 않을 수 있습니다.</value>
+  </data>
+  <data name="index.blurb.instruction.scary" xml:space="preserve">
+    <value>절대</value>
+  </data>
+  <data name="index.blurb.note._" xml:space="preserve">
+    <value>옛날 맵들은 최신 맵보다 질적으로 떨어질 수 있기 때문에 저희는 {0}을 강력히 추천합니다.</value>
+  </data>
+  <data name="index.blurb.note.scary" xml:space="preserve">
+    <value>최근에 나온 맵팩 순으로 내려받는 것</value>
+  </data>
+  <data name="show.download" xml:space="preserve">
+    <value>다운로드</value>
+  </data>
+  <data name="show.item.cleared" xml:space="preserve">
+    <value>클리어한 맵</value>
+  </data>
+  <data name="show.item.not_cleared" xml:space="preserve">
+    <value>클리어 기록 없음</value>
+  </data>
+  <data name="show.no_diff_reduction._" xml:space="preserve">
+    <value>{0}는 이 팩을 지우는 데 사용할 수 없습니다.</value>
+  </data>
+  <data name="show.no_diff_reduction.link" xml:space="preserve">
+    <value>난이도 감소 모드</value>
+  </data>
+  <data name="mode.artist" xml:space="preserve">
+    <value>아티스트/앨범</value>
+  </data>
+  <data name="mode.chart" xml:space="preserve">
+    <value>스포트라이트</value>
+  </data>
+  <data name="mode.standard" xml:space="preserve">
+    <value>표준</value>
+  </data>
+  <data name="mode.theme" xml:space="preserve">
+    <value>테마</value>
+  </data>
+  <data name="require_login._" xml:space="preserve">
+    <value>다운로드하려면 {0}하셔야 합니다</value>
+  </data>
+  <data name="require_login.link_text" xml:space="preserve">
+    <value>로그인</value>
+  </data>
+</root>

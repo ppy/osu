@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="event.approve" xml:space="preserve">
+    <value>Aprobat.</value>
+  </data>
+  <data name="event.discussion_delete" xml:space="preserve">
+    <value>Un moderator a șters discuția {0}.</value>
+  </data>
+  <data name="event.discussion_lock" xml:space="preserve">
+    <value>Discuție pentru acest beatmap a fost dezactivată. ({0})</value>
+  </data>
+  <data name="event.discussion_post_delete" xml:space="preserve">
+    <value>Un moderator a șters postarea din discuția {0}.</value>
+  </data>
+  <data name="event.discussion_post_restore" xml:space="preserve">
+    <value>Un moderator a restaurat postarea din discuția {0}.</value>
+  </data>
+  <data name="event.discussion_restore" xml:space="preserve">
+    <value>Un moderator a restaurat discuția {0}.</value>
+  </data>
+  <data name="event.discussion_unlock" xml:space="preserve">
+    <value>Discuție pentru acest beatmap a fost activată.</value>
+  </data>
+  <data name="event.disqualify" xml:space="preserve">
+    <value>Descalificat de {0}. Motiv: {1} ({2}).</value>
+  </data>
+  <data name="event.disqualify_legacy" xml:space="preserve">
+    <value>Descalificat de {0}. Motiv {1}.</value>
+  </data>
+  <data name="event.genre_edit" xml:space="preserve">
+    <value>Genul s-a schimbat de la {0} la {1}.</value>
+  </data>
+  <data name="event.issue_reopen" xml:space="preserve">
+    <value>Problema rezolvată {0} s-a redeschis.</value>
+  </data>
+  <data name="event.issue_resolve" xml:space="preserve">
+    <value>Problema {0} a fost marcată ca rezolvată.</value>
+  </data>
+  <data name="event.kudosu_allow" xml:space="preserve">
+    <value>Negocierea de kudosu pentru discuția {0} a fost eliminată.</value>
+  </data>
+  <data name="event.kudosu_deny" xml:space="preserve">
+    <value>Discuția {0} a fost respinsă pentru kudosu.</value>
+  </data>
+  <data name="event.kudosu_gain" xml:space="preserve">
+    <value>Discuția {0} de {1} a obținut destule voturi pentru kudosu.</value>
+  </data>
+  <data name="event.kudosu_lost" xml:space="preserve">
+    <value>Discuția {0} de {1} a pierdut voturi și kudosu acordați au fost eliminați.</value>
+  </data>
+  <data name="event.kudosu_recalculate" xml:space="preserve">
+    <value>Numărul de kudosu acordat pentru discuția {0} a fost recalculat.</value>
+  </data>
+  <data name="event.language_edit" xml:space="preserve">
+    <value>Limba s-a schimbat de la {0} la {1}.</value>
+  </data>
+  <data name="event.love" xml:space="preserve">
+    <value>Loved de către {0}</value>
+  </data>
+  <data name="event.nominate" xml:space="preserve">
+    <value>Nominalizat de {0}.</value>
+  </data>
+  <data name="event.nomination_reset" xml:space="preserve">
+    <value>O problemă nouă {0} ({1}) a declanșat reluarea unei nominalizări.</value>
+  </data>
+  <data name="event.qualify" xml:space="preserve">
+    <value>Acest beatmap a atins numărul limită de nominalizări și s-a calificat.</value>
+  </data>
+  <data name="event.rank" xml:space="preserve">
+    <value>Clasat.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Evenimente beatmapset</value>
+  </data>
+  <data name="index.form.period" xml:space="preserve">
+    <value>Perioadă</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Tipuri</value>
+  </data>
+  <data name="item.content" xml:space="preserve">
+    <value>Conținut</value>
+  </data>
+  <data name="item.discussion_deleted" xml:space="preserve">
+    <value>[deleted]</value>
+  </data>
+  <data name="item.type" xml:space="preserve">
+    <value>Tip</value>
+  </data>
+  <data name="type.approve" xml:space="preserve">
+    <value>Aprobare</value>
+  </data>
+  <data name="type.discussion_delete" xml:space="preserve">
+    <value>Ștergerea discuției</value>
+  </data>
+  <data name="type.discussion_post_delete" xml:space="preserve">
+    <value>Ștergerea răspunsului</value>
+  </data>
+  <data name="type.discussion_post_restore" xml:space="preserve">
+    <value>Restaurarea răspunsului</value>
+  </data>
+  <data name="type.discussion_restore" xml:space="preserve">
+    <value>Restaurarea discuției</value>
+  </data>
+  <data name="type.disqualify" xml:space="preserve">
+    <value>Descalificare</value>
+  </data>
+  <data name="type.genre_edit" xml:space="preserve">
+    <value>Edit genre</value>
+  </data>
+  <data name="type.issue_reopen" xml:space="preserve">
+    <value>Redeschiderea discuției</value>
+  </data>
+  <data name="type.issue_resolve" xml:space="preserve">
+    <value>Rezolvarea discuției</value>
+  </data>
+  <data name="type.kudosu_allow" xml:space="preserve">
+    <value>Alocația de kudosu</value>
+  </data>
+  <data name="type.kudosu_deny" xml:space="preserve">
+    <value>Respingere de kudosu</value>
+  </data>
+  <data name="type.kudosu_gain" xml:space="preserve">
+    <value>Câștigare de kudosu</value>
+  </data>
+  <data name="type.kudosu_lost" xml:space="preserve">
+    <value>Pierdere de kudosu</value>
+  </data>
+  <data name="type.kudosu_recalculate" xml:space="preserve">
+    <value>Recalcularea kudosu</value>
+  </data>
+  <data name="type.language_edit" xml:space="preserve">
+    <value>Edit limbă</value>
+  </data>
+  <data name="type.love" xml:space="preserve">
+    <value>Love</value>
+  </data>
+  <data name="type.nominate" xml:space="preserve">
+    <value>Nominalizare</value>
+  </data>
+  <data name="type.nomination_reset" xml:space="preserve">
+    <value>Resetarea nominalizărilor</value>
+  </data>
+  <data name="type.qualify" xml:space="preserve">
+    <value>Calificare</value>
+  </data>
+  <data name="type.rank" xml:space="preserve">
+    <value>Clasament</value>
+  </data>
+  <data name="type.remove_from_loved" xml:space="preserve">
+    <value>Scoaterea din iubit</value>
+  </data>
+</root>

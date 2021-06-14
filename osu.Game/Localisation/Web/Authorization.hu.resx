@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="play_more" xml:space="preserve">
+    <value>Mit szólsz ahhoz, hogy ha egy kis osu!-t játszanál inkább?</value>
+  </data>
+  <data name="require_login" xml:space="preserve">
+    <value>Kérlek jelentkezz be a folytatáshoz.</value>
+  </data>
+  <data name="require_verification" xml:space="preserve">
+    <value>Kérlek, hagyd jóvá a folytatáshoz.</value>
+  </data>
+  <data name="restricted" xml:space="preserve">
+    <value>Felfüggesztett állapotban erre nem vagy képes.</value>
+  </data>
+  <data name="silenced" xml:space="preserve">
+    <value>Némított állapotban erre nem vagy képes.</value>
+  </data>
+  <data name="unauthorized" xml:space="preserve">
+    <value>Hozzáférés megtagadva.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.is_hype" xml:space="preserve">
+    <value>A hype-olást nem lehet visszavonni.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.has_reply" xml:space="preserve">
+    <value>Nem lehet hozzászólásokkal rendelkező beszélgetést törölni</value>
+  </data>
+  <data name="beatmap_discussion.nominate.exhausted" xml:space="preserve">
+    <value>Elérted a napi ajánlási limited, próbáld újra holnap.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.incorrect_state" xml:space="preserve">
+    <value>Hiba történt a művelet végrehajtása közben, próbáld frissíteni az oldalt.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.owner" xml:space="preserve">
+    <value>Saját beatmap-et nem lehet ajánlani.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.set_metadata" xml:space="preserve">
+    <value>Mielőtt kijelölné, a műfajt és a nyelvet meg kell adnod</value>
+  </data>
+  <data name="beatmap_discussion.resolve.not_owner" xml:space="preserve">
+    <value>Csak a poszt szerzője és a beatmap készítője tudja megoldottnak jelölni az adott problémát.</value>
+  </data>
+  <data name="beatmap_discussion.store.mapper_note_wrong_user" xml:space="preserve">
+    <value>Csak a beatmap tulajdonos vagy jelölő/QAT csoporttag posztolhat készítői megjegyzést.</value>
+  </data>
+  <data name="beatmap_discussion.vote.bot" xml:space="preserve">
+    <value>A bot által létrehozott megbszélésre nem szavazhatsz</value>
+  </data>
+  <data name="beatmap_discussion.vote.limit_exceeded" xml:space="preserve">
+    <value>Kérlek várj egy keveset újabb szavazat leadása előtt</value>
+  </data>
+  <data name="beatmap_discussion.vote.owner" xml:space="preserve">
+    <value>Nem szavazhatsz a saját posztodra.</value>
+  </data>
+  <data name="beatmap_discussion.vote.wrong_beatmapset_state" xml:space="preserve">
+    <value>Csak függő beatmap beszélgetéseken lehet szavazni.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.not_owner" xml:space="preserve">
+    <value>Csak a saját posztjaidat tudod törölni.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.resolved" xml:space="preserve">
+    <value>Nem törölhetsz bejegyzést egy megbeszélt témában.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.system_generated" xml:space="preserve">
+    <value>Az automatikusan generált posztok nem törölhetőek.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.not_owner" xml:space="preserve">
+    <value>Csak a posztoló tudja szerkeszteni a posztot.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.resolved" xml:space="preserve">
+    <value>Nem szerkeszthetsz bejegyzést egy megbeszélt témában.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.system_generated" xml:space="preserve">
+    <value>Automatikusan generált posztot nem lehet szerkeszteni.</value>
+  </data>
+  <data name="beatmap_discussion_post.store.beatmapset_locked" xml:space="preserve">
+    <value>Ez a beatmap megbeszélés miatt zárolva.</value>
+  </data>
+  <data name="beatmapset.metadata.nominated" xml:space="preserve">
+    <value>Nem változtathatod meg egy map metaadatait. Ha úgy gondolod valami nincs rendben, lépj kapcsolatba egy BN vagy egy NAT taggal.</value>
+  </data>
+  <data name="chat.blocked" xml:space="preserve">
+    <value>Nem küldhetsz üzenetet olyan felhasználónak akiket letiltottál, vagy téged tiltottak le.</value>
+  </data>
+  <data name="chat.friends_only" xml:space="preserve">
+    <value>A felhasználó letiltotta a baráti listáján nem szereplő emberek üzeneteinek fogadását.</value>
+  </data>
+  <data name="chat.moderated" xml:space="preserve">
+    <value>A csatorna jelenleg moderálva van.</value>
+  </data>
+  <data name="chat.no_access" xml:space="preserve">
+    <value>Nincs hozzáférésed a csatornához.</value>
+  </data>
+  <data name="chat.restricted" xml:space="preserve">
+    <value>Nem küldhetsz üzeneteket némított, felfüggesztett vagy kitiltott állapotban.</value>
+  </data>
+  <data name="chat.silenced" xml:space="preserve">
+    <value>Némítva, felfüggesztve vagy kitiltva nem küldhetsz üzeneteket.</value>
+  </data>
+  <data name="comment.update.deleted" xml:space="preserve">
+    <value>Törölt posztot nem lehet szerkeszteni.</value>
+  </data>
+  <data name="contest.voting_over" xml:space="preserve">
+    <value>Nem változtathatod meg a szavazatod, mert ennek a versenynek a szavazási ideje lejárt.</value>
+  </data>
+  <data name="contest.entry.limit_reached" xml:space="preserve">
+    <value>Elérted a jelentkezési limited erre a versenyre</value>
+  </data>
+  <data name="contest.entry.over" xml:space="preserve">
+    <value>Köszönjük a jelentkezéseidet! A beküldési lehetőség lezárult erre a versenyre és a szavazás hamarosan indul.</value>
+  </data>
+  <data name="forum.moderate.no_permission" xml:space="preserve">
+    <value>Nincs engedélyed ennek a fórumnak a moderálására.</value>
+  </data>
+  <data name="forum.post.delete.only_last_post" xml:space="preserve">
+    <value>Csak az utolsó posztot lehet törölni.</value>
+  </data>
+  <data name="forum.post.delete.locked" xml:space="preserve">
+    <value>Lezárt téma posztját nem lehet törölni.</value>
+  </data>
+  <data name="forum.post.delete.no_forum_access" xml:space="preserve">
+    <value>A kért fórumhoz hozzáférési jog szükséges.</value>
+  </data>
+  <data name="forum.post.delete.not_owner" xml:space="preserve">
+    <value>Csak a szerző törölheti a posztot.</value>
+  </data>
+  <data name="forum.post.edit.deleted" xml:space="preserve">
+    <value>Törölt posztot nem lehet szerkeszteni.</value>
+  </data>
+  <data name="forum.post.edit.locked" xml:space="preserve">
+    <value>A posztot nem lehet szerkeszteni.</value>
+  </data>
+  <data name="forum.post.edit.no_forum_access" xml:space="preserve">
+    <value>A kért fórumhoz hozzáférési jog szükséges.</value>
+  </data>
+  <data name="forum.post.edit.not_owner" xml:space="preserve">
+    <value>Csak a szerző szerkesztheti a posztot.</value>
+  </data>
+  <data name="forum.post.edit.topic_locked" xml:space="preserve">
+    <value>Lezárt téma posztját nem lehet szerkeszteni.</value>
+  </data>
+  <data name="forum.post.store.play_more" xml:space="preserve">
+    <value>Kérlek próbáld ki a játékot mielőtt a fórumra posztolnál! Ha valami problémád merül fel játék közben, kérlek írj egy posztot a "Help" vagy a "Support" fórumra.</value>
+  </data>
+  <data name="forum.post.store.too_many_help_posts" xml:space="preserve">
+    <value>Többet kell játszanod a játékkal további posztolás előtt. Ha még mindig nehézségeid merülnek fel a játék kapcsán, írj egy e-mailt erre a címre: support@ppy.sh</value>
+  </data>
+  <data name="forum.topic.reply.double_post" xml:space="preserve">
+    <value>Kérlek módosítsd az utolsó posztodat az újraposztolás helyett.</value>
+  </data>
+  <data name="forum.topic.reply.locked" xml:space="preserve">
+    <value>Nem lehet válaszolni egy lezárt témára.</value>
+  </data>
+  <data name="forum.topic.reply.no_forum_access" xml:space="preserve">
+    <value>A kért fórumra belépési engedély szükséges.</value>
+  </data>
+  <data name="forum.topic.reply.no_permission" xml:space="preserve">
+    <value>Nincs jogosultságod válaszolni.</value>
+  </data>
+  <data name="forum.topic.reply.user.require_login" xml:space="preserve">
+    <value>Kérlek jelentkezz be, hogy válaszolni tudj.</value>
+  </data>
+  <data name="forum.topic.reply.user.restricted" xml:space="preserve">
+    <value>Nem válaszolhatsz felfüggesztett állapotban.</value>
+  </data>
+  <data name="forum.topic.reply.user.silenced" xml:space="preserve">
+    <value>Nem válaszolhatsz némított állapotban.</value>
+  </data>
+  <data name="forum.topic.store.no_forum_access" xml:space="preserve">
+    <value>A kért fórumhoz hozzáférési jog szükséges.</value>
+  </data>
+  <data name="forum.topic.store.no_permission" xml:space="preserve">
+    <value>Nincs engedélyed új téma létrehozására.</value>
+  </data>
+  <data name="forum.topic.store.forum_closed" xml:space="preserve">
+    <value>A fórum le van zárva, és nem lehet posztolni bele.</value>
+  </data>
+  <data name="forum.topic.vote.no_forum_access" xml:space="preserve">
+    <value>A kért fórumhoz hozzáférési jog szükséges.</value>
+  </data>
+  <data name="forum.topic.vote.over" xml:space="preserve">
+    <value>A szavazás lejárt, és többé nem szavazhatsz rá.</value>
+  </data>
+  <data name="forum.topic.vote.play_more" xml:space="preserve">
+    <value>Többet kell játszanod mielőtt szavazhatnál a fórumon.</value>
+  </data>
+  <data name="forum.topic.vote.voted" xml:space="preserve">
+    <value>A szavazat megváltoztatása nem engedélyezett.</value>
+  </data>
+  <data name="forum.topic.vote.user.require_login" xml:space="preserve">
+    <value>Kérlek jelentkezz be, hogy tudj szavazni.</value>
+  </data>
+  <data name="forum.topic.vote.user.restricted" xml:space="preserve">
+    <value>Nem szavazhatsz felfüggesztett állapotban.</value>
+  </data>
+  <data name="forum.topic.vote.user.silenced" xml:space="preserve">
+    <value>Nem szavazhatsz némított állapotban.</value>
+  </data>
+  <data name="forum.topic.watch.no_forum_access" xml:space="preserve">
+    <value>A kért fórumhoz hozzáférési jog szükséges.</value>
+  </data>
+  <data name="forum.topic_cover.edit.uneditable" xml:space="preserve">
+    <value>Érvénytelen borítót adtál meg.</value>
+  </data>
+  <data name="forum.topic_cover.edit.not_owner" xml:space="preserve">
+    <value>Csak a szerző változtathatja a borítót.</value>
+  </data>
+  <data name="forum.topic_cover.store.forum_not_allowed" xml:space="preserve">
+    <value>Ez a fórum nem fogad téma fejléceket.</value>
+  </data>
+  <data name="forum.view.admin_only" xml:space="preserve">
+    <value>Csak admin láthatja ezt a fórumot.</value>
+  </data>
+  <data name="user.page.edit.locked" xml:space="preserve">
+    <value>Felhasználói oldal lezárva.</value>
+  </data>
+  <data name="user.page.edit.not_owner" xml:space="preserve">
+    <value>Csak a saját felhasználói oldaladat szerkesztheted.</value>
+  </data>
+  <data name="user.page.edit.require_supporter_tag" xml:space="preserve">
+    <value>osu!támogatói cím szükséges.</value>
+  </data>
+</root>

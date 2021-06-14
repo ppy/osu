@@ -1,0 +1,640 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="deleted" xml:space="preserve">
+    <value>[odstraněný uživatel]</value>
+  </data>
+  <data name="beatmapset_activities.title" xml:space="preserve">
+    <value>{0}'s modding historie</value>
+  </data>
+  <data name="beatmapset_activities.title_compact" xml:space="preserve">
+    <value>Módování</value>
+  </data>
+  <data name="beatmapset_activities.discussions.title_recent" xml:space="preserve">
+    <value>Nedávno zahájená diskuze</value>
+  </data>
+  <data name="beatmapset_activities.events.title_recent" xml:space="preserve">
+    <value>Nedávné události</value>
+  </data>
+  <data name="beatmapset_activities.posts.title_recent" xml:space="preserve">
+    <value>Poslední příspěvky</value>
+  </data>
+  <data name="beatmapset_activities.votes_received.title_most" xml:space="preserve">
+    <value>Nejlépe hodnocený za (poslední 3 měsíce)</value>
+  </data>
+  <data name="beatmapset_activities.votes_made.title_most" xml:space="preserve">
+    <value>Nejlépe hodnocený (poslední 3 měsíce)</value>
+  </data>
+  <data name="blocks.banner_text" xml:space="preserve">
+    <value>Uživatel byl zablokován.</value>
+  </data>
+  <data name="blocks.blocked_count" xml:space="preserve">
+    <value>blokovaných uživatelů ({0})</value>
+  </data>
+  <data name="blocks.hide_profile" xml:space="preserve">
+    <value>skrýt profil</value>
+  </data>
+  <data name="blocks.not_blocked" xml:space="preserve">
+    <value>Tento uživatel není blokován.</value>
+  </data>
+  <data name="blocks.show_profile" xml:space="preserve">
+    <value>zobrazit profil</value>
+  </data>
+  <data name="blocks.too_many" xml:space="preserve">
+    <value>Byl dosažen limit blockovaných uživatelů.</value>
+  </data>
+  <data name="blocks.button.block" xml:space="preserve">
+    <value>blokovat</value>
+  </data>
+  <data name="blocks.button.unblock" xml:space="preserve">
+    <value>odblokovat</value>
+  </data>
+  <data name="card.loading" xml:space="preserve">
+    <value>Načítání...</value>
+  </data>
+  <data name="card.send_message" xml:space="preserve">
+    <value>odeslat zprávu</value>
+  </data>
+  <data name="disabled.if_mistake.email" xml:space="preserve">
+    <value>e-mail</value>
+  </data>
+  <data name="disabled.reasons.tos.community_rules" xml:space="preserve">
+    <value>pravidla komunity</value>
+  </data>
+  <data name="disabled.reasons.tos.tos" xml:space="preserve">
+    <value>smluvní podmínky</value>
+  </data>
+  <data name="login._" xml:space="preserve">
+    <value>Přihlásit se</value>
+  </data>
+  <data name="login.button" xml:space="preserve">
+    <value>Přihlásit se</value>
+  </data>
+  <data name="login.button_posting" xml:space="preserve">
+    <value>Probíhá přihlášení...</value>
+  </data>
+  <data name="login.failed" xml:space="preserve">
+    <value>Nesprávné přihlášení</value>
+  </data>
+  <data name="login.forgot" xml:space="preserve">
+    <value>Zapoměl jsi heslo?</value>
+  </data>
+  <data name="login.info" xml:space="preserve">
+    <value>Prosím přihlaste se pro pokračování</value>
+  </data>
+  <data name="login.locked_ip" xml:space="preserve">
+    <value>vaše IP adresa je uzamčena. Počkejte, prosím, několik minut.</value>
+  </data>
+  <data name="login.password" xml:space="preserve">
+    <value>Heslo</value>
+  </data>
+  <data name="login.register" xml:space="preserve">
+    <value>Nemáš osu! účet? Vytvoř si ho</value>
+  </data>
+  <data name="login.remember" xml:space="preserve">
+    <value>Pamatovat si tento počítač</value>
+  </data>
+  <data name="login.title" xml:space="preserve">
+    <value>Pro pokračování se prosím přihlašte</value>
+  </data>
+  <data name="login.username" xml:space="preserve">
+    <value>Uživatelské jméno</value>
+  </data>
+  <data name="login.beta.main" xml:space="preserve">
+    <value>Beta přístup je momentálně omezen na oprávněné uživatele.</value>
+  </data>
+  <data name="login.beta.small" xml:space="preserve">
+    <value>(brzy pro podporovatele)</value>
+  </data>
+  <data name="posts.title" xml:space="preserve">
+    <value>{0}'s příspěvky</value>
+  </data>
+  <data name="anonymous.login_link" xml:space="preserve">
+    <value>klikněte pro přihlášení</value>
+  </data>
+  <data name="anonymous.login_text" xml:space="preserve">
+    <value>přihlásit se</value>
+  </data>
+  <data name="anonymous.username" xml:space="preserve">
+    <value>Návštěvník</value>
+  </data>
+  <data name="anonymous.error" xml:space="preserve">
+    <value>Pro tuto akci musíte být přihlášeni.</value>
+  </data>
+  <data name="logout_confirm" xml:space="preserve">
+    <value>Opravdu se chceš odhlásit? :(</value>
+  </data>
+  <data name="report.button_text" xml:space="preserve">
+    <value>nahlásit</value>
+  </data>
+  <data name="report.comments" xml:space="preserve">
+    <value>Přídavné komentáře</value>
+  </data>
+  <data name="report.placeholder" xml:space="preserve">
+    <value>Prosím uveďte jakékoliv informace které si myslíte že by mohly být užitečně.</value>
+  </data>
+  <data name="report.reason" xml:space="preserve">
+    <value>Důvod</value>
+  </data>
+  <data name="report.thanks" xml:space="preserve">
+    <value>Děkují za vaše nahlášení!</value>
+  </data>
+  <data name="report.title" xml:space="preserve">
+    <value>Nahlásit {0}?</value>
+  </data>
+  <data name="report.actions.send" xml:space="preserve">
+    <value>Poslat Nahlášení</value>
+  </data>
+  <data name="report.actions.cancel" xml:space="preserve">
+    <value>Zrušit</value>
+  </data>
+  <data name="report.options.cheating" xml:space="preserve">
+    <value>Faulové hráni / Podvádění</value>
+  </data>
+  <data name="report.options.insults" xml:space="preserve">
+    <value>Uráží mě / jiné</value>
+  </data>
+  <data name="report.options.spam" xml:space="preserve">
+    <value>Spamování</value>
+  </data>
+  <data name="report.options.unwanted_content" xml:space="preserve">
+    <value>Linkovaní nebezpečného obsahu</value>
+  </data>
+  <data name="report.options.nonsense" xml:space="preserve">
+    <value>Nesmysl</value>
+  </data>
+  <data name="report.options.other" xml:space="preserve">
+    <value>Ostatní (napište dolů)</value>
+  </data>
+  <data name="restricted_banner.title" xml:space="preserve">
+    <value>Tvůj účet byl omezen!</value>
+  </data>
+  <data name="restricted_banner.message" xml:space="preserve">
+    <value>Zatímco jsi v omezeném režimu, nebudeš moci komunikovat s ostatními hráči a tvá skóre budou viditelná pouze pro tebe. Toto je obvykle výsledkem automatického procesu který by se měl sám vyřešit do nejpozději 24 hodin. Pokud si přeješ odvolat tvé omezení, prosím &lt;a href="mailto{0}@ppy.sh"&gt;kontaktujte podporu&lt;/a&gt;.</value>
+  </data>
+  <data name="show.age" xml:space="preserve">
+    <value>{0} let</value>
+  </data>
+  <data name="show.change_avatar" xml:space="preserve">
+    <value>změňte si avatar!</value>
+  </data>
+  <data name="show.first_members" xml:space="preserve">
+    <value>Zde od počátku</value>
+  </data>
+  <data name="show.is_developer" xml:space="preserve">
+    <value>osu!vývojář</value>
+  </data>
+  <data name="show.is_supporter" xml:space="preserve">
+    <value>osu!supporter</value>
+  </data>
+  <data name="show.joined_at" xml:space="preserve">
+    <value>Členem od {0}</value>
+  </data>
+  <data name="show.lastvisit" xml:space="preserve">
+    <value>Naposledy spatřen {0}</value>
+  </data>
+  <data name="show.lastvisit_online" xml:space="preserve">
+    <value>Momentálně aktivní</value>
+  </data>
+  <data name="show.missingtext" xml:space="preserve">
+    <value>Možná jste se přepsal! (nebo byl uživatel zabanován)</value>
+  </data>
+  <data name="show.origin_country" xml:space="preserve">
+    <value>Z {0}</value>
+  </data>
+  <data name="show.previous_usernames" xml:space="preserve">
+    <value>dříve znám jako</value>
+  </data>
+  <data name="show.plays_with" xml:space="preserve">
+    <value>Hraje s {0}</value>
+  </data>
+  <data name="show.title" xml:space="preserve">
+    <value>profil uživatele {0}</value>
+  </data>
+  <data name="show.edit.cover.button" xml:space="preserve">
+    <value>Změnit záhlaví profilu</value>
+  </data>
+  <data name="show.edit.cover.defaults_info" xml:space="preserve">
+    <value>Více možností záhlaví bude k dispozici v budoucnu</value>
+  </data>
+  <data name="show.edit.cover.upload.broken_file" xml:space="preserve">
+    <value>Zpracování obrázku selhalo. Ověř si obrázek a zkus to znovu.</value>
+  </data>
+  <data name="show.edit.cover.upload.button" xml:space="preserve">
+    <value>Nahrát obrázek</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone" xml:space="preserve">
+    <value>Přetáhni sem pro nahrání</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone_info" xml:space="preserve">
+    <value>Můžeš také přetánout sem pro nahrání</value>
+  </data>
+  <data name="show.edit.cover.upload.size_info" xml:space="preserve">
+    <value>Velikost záhlaví by měla být 2400x620</value>
+  </data>
+  <data name="show.edit.cover.upload.too_large" xml:space="preserve">
+    <value>Nahraný soubor je příliš velký.</value>
+  </data>
+  <data name="show.edit.cover.upload.unsupported_format" xml:space="preserve">
+    <value>Nepodporovaný formát.</value>
+  </data>
+  <data name="show.edit.default_playmode.is_default_tooltip" xml:space="preserve">
+    <value>výchozí herní mód</value>
+  </data>
+  <data name="show.edit.default_playmode.set" xml:space="preserve">
+    <value>nastavit {0} jako výchozí herní mód profilu</value>
+  </data>
+  <data name="show.extra.none" xml:space="preserve">
+    <value>nic</value>
+  </data>
+  <data name="show.extra.unranked" xml:space="preserve">
+    <value>Žádné poslední údaje o hraní</value>
+  </data>
+  <data name="show.extra.achievements.achieved-on" xml:space="preserve">
+    <value>Dosaženo {0}</value>
+  </data>
+  <data name="show.extra.achievements.locked" xml:space="preserve">
+    <value>Uzamknuto</value>
+  </data>
+  <data name="show.extra.achievements.title" xml:space="preserve">
+    <value>Úspěchy</value>
+  </data>
+  <data name="show.extra.beatmaps.by_artist" xml:space="preserve">
+    <value>autora {0}</value>
+  </data>
+  <data name="show.extra.beatmaps.title" xml:space="preserve">
+    <value>Beatmapy</value>
+  </data>
+  <data name="show.extra.beatmaps.favourite.title" xml:space="preserve">
+    <value>Oblíbené Beatmapy</value>
+  </data>
+  <data name="show.extra.beatmaps.graveyard.title" xml:space="preserve">
+    <value>Pohřbené Beatmapy</value>
+  </data>
+  <data name="show.extra.beatmaps.loved.title" xml:space="preserve">
+    <value>Oblíbené Beatmapy</value>
+  </data>
+  <data name="show.extra.beatmaps.ranked_and_approved.title" xml:space="preserve">
+    <value>Hodnocené &amp; Schválené Beatmapy</value>
+  </data>
+  <data name="show.extra.beatmaps.unranked.title" xml:space="preserve">
+    <value>Čekající Beatmapy</value>
+  </data>
+  <data name="show.extra.discussions.title" xml:space="preserve">
+    <value>Diskuze</value>
+  </data>
+  <data name="show.extra.discussions.title_longer" xml:space="preserve">
+    <value>Poslední diskuze</value>
+  </data>
+  <data name="show.extra.discussions.show_more" xml:space="preserve">
+    <value>zobrazit více diskuzí</value>
+  </data>
+  <data name="show.extra.events.title" xml:space="preserve">
+    <value>Události</value>
+  </data>
+  <data name="show.extra.events.title_longer" xml:space="preserve">
+    <value>Poslední údálosti</value>
+  </data>
+  <data name="show.extra.events.show_more" xml:space="preserve">
+    <value>zobrazit více eventů</value>
+  </data>
+  <data name="show.extra.historical.title" xml:space="preserve">
+    <value>Historické</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.title" xml:space="preserve">
+    <value>Herní historie</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.count_label" xml:space="preserve">
+    <value>Her</value>
+  </data>
+  <data name="show.extra.historical.most_played.count" xml:space="preserve">
+    <value>odehraný čas</value>
+  </data>
+  <data name="show.extra.historical.most_played.title" xml:space="preserve">
+    <value>Nejhranější mapy</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.accuracy" xml:space="preserve">
+    <value>přesnost: {0}</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.title" xml:space="preserve">
+    <value>Nedávno zahráno (24h)</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.title" xml:space="preserve">
+    <value>Historie zhlédnutí replayů</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.count_label" xml:space="preserve">
+    <value>Záznamů přehráno</value>
+  </data>
+  <data name="show.extra.kudosu.recent_entries" xml:space="preserve">
+    <value>Nedávná Kudosu historie</value>
+  </data>
+  <data name="show.extra.kudosu.title" xml:space="preserve">
+    <value>Kudosu!</value>
+  </data>
+  <data name="show.extra.kudosu.total" xml:space="preserve">
+    <value>Celkově získané Kudosu</value>
+  </data>
+  <data name="show.extra.kudosu.entry.amount" xml:space="preserve">
+    <value>{0} kudosu</value>
+  </data>
+  <data name="show.extra.kudosu.entry.empty" xml:space="preserve">
+    <value>Tento uživatel zatím neobdržel žádné kudosu!</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.allow_kudosu.give" xml:space="preserve">
+    <value>Obdržel jsi {0} kudosu z kudosu odmítnutí, z módding příspěvku {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.deny_kudosu.reset" xml:space="preserve">
+    <value>Bylo odepřeno {0} z modding příspěvku {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.delete.reset" xml:space="preserve">
+    <value>Ztraceno {0} kvůli smazání modding příspěvku {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.restore.give" xml:space="preserve">
+    <value>Obdrženo {0} za obnovení modding příspěvku {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.give" xml:space="preserve">
+    <value>Obdrženo {0} za získání hlasů u modding příspěvku {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.reset" xml:space="preserve">
+    <value>Ztraceno {0} za ztrátu hlasů u modding příspěvku {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.give" xml:space="preserve">
+    <value>Obdrženo {0} za přepočítání hlasů u modding příspěvku {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.reset" xml:space="preserve">
+    <value>Ztraceno {0} za přepočítání hlasů u modding příspěvku {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.give" xml:space="preserve">
+    <value>Obdrženo {0} od {1} za příspěvek u {2}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.reset" xml:space="preserve">
+    <value>Kudosu bylo obnoveno od {0} za příspěvek {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.revoke" xml:space="preserve">
+    <value>Odepřeno kudosu od {0} za příspěvek {1}</value>
+  </data>
+  <data name="show.extra.kudosu.total_info.link" xml:space="preserve">
+    <value>tuto stránku</value>
+  </data>
+  <data name="show.extra.me.title" xml:space="preserve">
+    <value>já!</value>
+  </data>
+  <data name="show.extra.medals.empty" xml:space="preserve">
+    <value>Tento uživatel zatím žádné neobdržel ;_;</value>
+  </data>
+  <data name="show.extra.medals.recent" xml:space="preserve">
+    <value>Nejnovější</value>
+  </data>
+  <data name="show.extra.medals.title" xml:space="preserve">
+    <value>Medaile</value>
+  </data>
+  <data name="show.extra.posts.title" xml:space="preserve">
+    <value>Příspěvky</value>
+  </data>
+  <data name="show.extra.posts.title_longer" xml:space="preserve">
+    <value>Poslední příspěvky</value>
+  </data>
+  <data name="show.extra.posts.show_more" xml:space="preserve">
+    <value>zobrazit více příspěvků</value>
+  </data>
+  <data name="show.extra.recent_activity.title" xml:space="preserve">
+    <value>Nedávné</value>
+  </data>
+  <data name="show.extra.top_ranks.download_replay" xml:space="preserve">
+    <value>Stáhnout záznam</value>
+  </data>
+  <data name="show.extra.top_ranks.not_ranked" xml:space="preserve">
+    <value>Pouze hodnocené mapy vydávají pp.</value>
+  </data>
+  <data name="show.extra.top_ranks.pp_weight" xml:space="preserve">
+    <value>váženo na {0}</value>
+  </data>
+  <data name="show.extra.top_ranks.title" xml:space="preserve">
+    <value>Umístění</value>
+  </data>
+  <data name="show.extra.top_ranks.best.title" xml:space="preserve">
+    <value>Nejlepší výkon</value>
+  </data>
+  <data name="show.extra.top_ranks.first.title" xml:space="preserve">
+    <value>Umístění na prvním místě</value>
+  </data>
+  <data name="show.extra.votes.title" xml:space="preserve">
+    <value>Hlasy</value>
+  </data>
+  <data name="show.extra.votes.title_longer" xml:space="preserve">
+    <value>Poslední hlasy</value>
+  </data>
+  <data name="show.extra.account_standing.title" xml:space="preserve">
+    <value>Stav účtu</value>
+  </data>
+  <data name="show.extra.account_standing.bad_standing" xml:space="preserve">
+    <value>účet uživatele &lt;strong&gt;{0}&lt;/strong&gt; není v dobré reputaci :(</value>
+  </data>
+  <data name="show.extra.account_standing.remaining_silence" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; bude znovu moci mluvit za {1}.</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.title" xml:space="preserve">
+    <value>Nedávné incidenty</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.date" xml:space="preserve">
+    <value>datum</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.action" xml:space="preserve">
+    <value>trest</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length" xml:space="preserve">
+    <value>délka</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length_permanent" xml:space="preserve">
+    <value>Permanentní</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.description" xml:space="preserve">
+    <value>popis</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actor" xml:space="preserve">
+    <value>od {0}</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.restriction" xml:space="preserve">
+    <value>Ban</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.silence" xml:space="preserve">
+    <value>Ztlumení</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.note" xml:space="preserve">
+    <value>Poznámka</value>
+  </data>
+  <data name="show.info.interests" xml:space="preserve">
+    <value>Zájmy</value>
+  </data>
+  <data name="show.info.location" xml:space="preserve">
+    <value>Současná poloha</value>
+  </data>
+  <data name="show.info.occupation" xml:space="preserve">
+    <value>Povolání</value>
+  </data>
+  <data name="show.info.website" xml:space="preserve">
+    <value>Webové stránky</value>
+  </data>
+  <data name="show.not_found.reason_1" xml:space="preserve">
+    <value>Možná si změnil uživatelské jméno.</value>
+  </data>
+  <data name="show.not_found.reason_2" xml:space="preserve">
+    <value>Účet může být dočasně nedostupný z důvodu problémů s bezpečností, nebo zneužitím.</value>
+  </data>
+  <data name="show.not_found.reason_3" xml:space="preserve">
+    <value>Možná jste se přepsal!</value>
+  </data>
+  <data name="show.not_found.reason_header" xml:space="preserve">
+    <value>Existuje několik možných důvodů:</value>
+  </data>
+  <data name="show.not_found.title" xml:space="preserve">
+    <value>Uživatel nebyl nalezen! ;_;</value>
+  </data>
+  <data name="show.page.button" xml:space="preserve">
+    <value>Upravit stránku profilu</value>
+  </data>
+  <data name="show.page.description" xml:space="preserve">
+    <value>&lt;strong&gt;já!&lt;/strong&gt; je osobní přizpůsobitelná plocha na vašem profilu.</value>
+  </data>
+  <data name="show.page.edit_big" xml:space="preserve">
+    <value>Uprav mě!</value>
+  </data>
+  <data name="show.page.placeholder" xml:space="preserve">
+    <value>Zde napiš obsah stánky</value>
+  </data>
+  <data name="show.page.restriction_info.link" xml:space="preserve">
+    <value>osu!supporter</value>
+  </data>
+  <data name="show.post_count._" xml:space="preserve">
+    <value>Přispěl {0}</value>
+  </data>
+  <data name="show.post_count.count" xml:space="preserve">
+    <value>{0} příspěvkem na fóru|{0} příspěvky na fóru</value>
+  </data>
+  <data name="show.rank.country" xml:space="preserve">
+    <value>Státní pozice pro {0}</value>
+  </data>
+  <data name="show.rank.country_simple" xml:space="preserve">
+    <value>Místní hodnocení</value>
+  </data>
+  <data name="show.rank.global" xml:space="preserve">
+    <value>Globální pozice pro {0}</value>
+  </data>
+  <data name="show.rank.global_simple" xml:space="preserve">
+    <value>Světové hodnocení</value>
+  </data>
+  <data name="show.stats.hit_accuracy" xml:space="preserve">
+    <value>Přesnost zásahů</value>
+  </data>
+  <data name="show.stats.level" xml:space="preserve">
+    <value>Úroveň {0}</value>
+  </data>
+  <data name="show.stats.level_progress" xml:space="preserve">
+    <value>Postup do dalšího levelu</value>
+  </data>
+  <data name="show.stats.maximum_combo" xml:space="preserve">
+    <value>Maximální Combo</value>
+  </data>
+  <data name="show.stats.medals" xml:space="preserve">
+    <value>Medaile</value>
+  </data>
+  <data name="show.stats.play_count" xml:space="preserve">
+    <value>Počet zahrání</value>
+  </data>
+  <data name="show.stats.play_time" xml:space="preserve">
+    <value>Celkový čas hraní</value>
+  </data>
+  <data name="show.stats.ranked_score" xml:space="preserve">
+    <value>Hodnocené skóre</value>
+  </data>
+  <data name="show.stats.replays_watched_by_others" xml:space="preserve">
+    <value>Replaye zhlédnuty ostatními</value>
+  </data>
+  <data name="show.stats.score_ranks" xml:space="preserve">
+    <value>Umístění podle skóre</value>
+  </data>
+  <data name="show.stats.total_hits" xml:space="preserve">
+    <value>Celkově zásahů</value>
+  </data>
+  <data name="show.stats.total_score" xml:space="preserve">
+    <value>Celkové skóre</value>
+  </data>
+  <data name="show.stats.loved_beatmapset_count" xml:space="preserve">
+    <value>Oblíbené Beatmapy</value>
+  </data>
+  <data name="show.stats.unranked_beatmapset_count" xml:space="preserve">
+    <value>Čekající Beatmapy</value>
+  </data>
+  <data name="status.all" xml:space="preserve">
+    <value>Všichni</value>
+  </data>
+  <data name="status.online" xml:space="preserve">
+    <value>Online</value>
+  </data>
+  <data name="status.offline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="store.saved" xml:space="preserve">
+    <value>Uživatelem vytvořen</value>
+  </data>
+  <data name="verify.title" xml:space="preserve">
+    <value>Ověření účtu</value>
+  </data>
+</root>

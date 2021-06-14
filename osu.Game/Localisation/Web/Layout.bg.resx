@@ -1,0 +1,376 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="audio.autoplay" xml:space="preserve">
+    <value>Пусни следващата песен автоматично</value>
+  </data>
+  <data name="defaults.page_description" xml:space="preserve">
+    <value>osu! - Ритъмът е само на *клик* от вас! Със специални режими на игра като Ouendan/EBA и Taiko, както и напълно фунциониращ редактор на бийтмапове.</value>
+  </data>
+  <data name="header.admin.beatmapset" xml:space="preserve">
+    <value>бийтмап сет</value>
+  </data>
+  <data name="header.admin.beatmapset_covers" xml:space="preserve">
+    <value>бийтмап сет корици</value>
+  </data>
+  <data name="header.admin.contest" xml:space="preserve">
+    <value>конкурс</value>
+  </data>
+  <data name="header.admin.contests" xml:space="preserve">
+    <value>конкурси</value>
+  </data>
+  <data name="header.admin.root" xml:space="preserve">
+    <value>конзола</value>
+  </data>
+  <data name="header.admin.store_orders" xml:space="preserve">
+    <value>админ на магазина</value>
+  </data>
+  <data name="header.artists.index" xml:space="preserve">
+    <value>списък</value>
+  </data>
+  <data name="header.changelog.index" xml:space="preserve">
+    <value>списък</value>
+  </data>
+  <data name="header.help.index" xml:space="preserve">
+    <value>индекс</value>
+  </data>
+  <data name="header.help.sitemap" xml:space="preserve">
+    <value>Карта на сайта</value>
+  </data>
+  <data name="header.store.cart" xml:space="preserve">
+    <value>количка</value>
+  </data>
+  <data name="header.store.orders" xml:space="preserve">
+    <value>история на поръчките</value>
+  </data>
+  <data name="header.store.products" xml:space="preserve">
+    <value>продукти</value>
+  </data>
+  <data name="header.tournaments.index" xml:space="preserve">
+    <value>списък</value>
+  </data>
+  <data name="header.users.modding" xml:space="preserve">
+    <value>modding</value>
+  </data>
+  <data name="header.users.show" xml:space="preserve">
+    <value>инфо</value>
+  </data>
+  <data name="gallery.close" xml:space="preserve">
+    <value>Затвори (Esc)</value>
+  </data>
+  <data name="gallery.fullscreen" xml:space="preserve">
+    <value>Превключване на цял екран</value>
+  </data>
+  <data name="gallery.zoom" xml:space="preserve">
+    <value>Приближаване/отдалечаване</value>
+  </data>
+  <data name="gallery.previous" xml:space="preserve">
+    <value>Предишно (лява стрелка)</value>
+  </data>
+  <data name="gallery.next" xml:space="preserve">
+    <value>Следващо (дясна стрелка)</value>
+  </data>
+  <data name="menu.beatmaps._" xml:space="preserve">
+    <value>бийтмапове</value>
+  </data>
+  <data name="menu.beatmaps.artists" xml:space="preserve">
+    <value>препоръчани изпълнители</value>
+  </data>
+  <data name="menu.beatmaps.index" xml:space="preserve">
+    <value>списък</value>
+  </data>
+  <data name="menu.beatmaps.packs" xml:space="preserve">
+    <value>пакети</value>
+  </data>
+  <data name="menu.community._" xml:space="preserve">
+    <value>колектив</value>
+  </data>
+  <data name="menu.community.chat" xml:space="preserve">
+    <value>чат</value>
+  </data>
+  <data name="menu.community.contests" xml:space="preserve">
+    <value>конкурси</value>
+  </data>
+  <data name="menu.community.dev" xml:space="preserve">
+    <value>разработка</value>
+  </data>
+  <data name="menu.community.forum-forums-index" xml:space="preserve">
+    <value>форуми</value>
+  </data>
+  <data name="menu.community.getlive" xml:space="preserve">
+    <value>на живо</value>
+  </data>
+  <data name="menu.community.tournaments" xml:space="preserve">
+    <value>турнири</value>
+  </data>
+  <data name="menu.help._" xml:space="preserve">
+    <value>помощ</value>
+  </data>
+  <data name="menu.help.getfaq" xml:space="preserve">
+    <value>чзв</value>
+  </data>
+  <data name="menu.help.getrules" xml:space="preserve">
+    <value>правилник</value>
+  </data>
+  <data name="menu.help.getsupport" xml:space="preserve">
+    <value>не, наистина, имам нужда от помощ!</value>
+  </data>
+  <data name="menu.help.getwiki" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="menu.home._" xml:space="preserve">
+    <value>начало</value>
+  </data>
+  <data name="menu.home.changelog-index" xml:space="preserve">
+    <value>списък на промените</value>
+  </data>
+  <data name="menu.home.getdownload" xml:space="preserve">
+    <value>изтегли</value>
+  </data>
+  <data name="menu.home.news-index" xml:space="preserve">
+    <value>новини</value>
+  </data>
+  <data name="menu.home.search" xml:space="preserve">
+    <value>търсене</value>
+  </data>
+  <data name="menu.home.team" xml:space="preserve">
+    <value>отбор</value>
+  </data>
+  <data name="menu.rankings._" xml:space="preserve">
+    <value>класации</value>
+  </data>
+  <data name="menu.rankings.charts" xml:space="preserve">
+    <value>препоръчани</value>
+  </data>
+  <data name="menu.rankings.country" xml:space="preserve">
+    <value>държава</value>
+  </data>
+  <data name="menu.rankings.index" xml:space="preserve">
+    <value>изпълнение</value>
+  </data>
+  <data name="menu.rankings.kudosu" xml:space="preserve">
+    <value>kudosu</value>
+  </data>
+  <data name="menu.rankings.multiplayer" xml:space="preserve">
+    <value>мултиплейър</value>
+  </data>
+  <data name="menu.rankings.score" xml:space="preserve">
+    <value>резултат</value>
+  </data>
+  <data name="menu.store._" xml:space="preserve">
+    <value>магазин</value>
+  </data>
+  <data name="menu.store.cart-show" xml:space="preserve">
+    <value>количка</value>
+  </data>
+  <data name="menu.store.getlisting" xml:space="preserve">
+    <value>списък</value>
+  </data>
+  <data name="menu.store.orders-index" xml:space="preserve">
+    <value>история на поръчките</value>
+  </data>
+  <data name="footer.general._" xml:space="preserve">
+    <value>Общо</value>
+  </data>
+  <data name="footer.general.home" xml:space="preserve">
+    <value>Начало</value>
+  </data>
+  <data name="footer.general.changelog-index" xml:space="preserve">
+    <value>Списък на промените</value>
+  </data>
+  <data name="footer.general.beatmaps" xml:space="preserve">
+    <value>Списък с бийтмапове</value>
+  </data>
+  <data name="footer.general.download" xml:space="preserve">
+    <value>Изтеглете osu!</value>
+  </data>
+  <data name="footer.help._" xml:space="preserve">
+    <value>Помощ и Колектив</value>
+  </data>
+  <data name="footer.help.faq" xml:space="preserve">
+    <value>Често Задавани Въпроси</value>
+  </data>
+  <data name="footer.help.forum" xml:space="preserve">
+    <value>Обществени форуми</value>
+  </data>
+  <data name="footer.help.livestreams" xml:space="preserve">
+    <value>Живи Потоци</value>
+  </data>
+  <data name="footer.help.report" xml:space="preserve">
+    <value>Подайте сигнал за проблем</value>
+  </data>
+  <data name="footer.help.wiki" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="footer.legal._" xml:space="preserve">
+    <value>Легалности и статус</value>
+  </data>
+  <data name="footer.legal.copyright" xml:space="preserve">
+    <value>Авторски права (DMCA)</value>
+  </data>
+  <data name="footer.legal.privacy" xml:space="preserve">
+    <value>Поверителност</value>
+  </data>
+  <data name="footer.legal.server_status" xml:space="preserve">
+    <value>Състояние на сървърите</value>
+  </data>
+  <data name="footer.legal.source_code" xml:space="preserve">
+    <value>Програмен код</value>
+  </data>
+  <data name="footer.legal.terms" xml:space="preserve">
+    <value>Условия за ползване</value>
+  </data>
+  <data name="errors.400.error" xml:space="preserve">
+    <value>Невалиден параметър на заявка</value>
+  </data>
+  <data name="errors.404.error" xml:space="preserve">
+    <value>Страницата липсва</value>
+  </data>
+  <data name="errors.404.description" xml:space="preserve">
+    <value>Извиняваме се, но страницата която търсите не е тук!</value>
+  </data>
+  <data name="errors.403.error" xml:space="preserve">
+    <value>Вие не трябва да сте тук.</value>
+  </data>
+  <data name="errors.403.description" xml:space="preserve">
+    <value>Можете да опитате да се върнете назад.</value>
+  </data>
+  <data name="errors.401.error" xml:space="preserve">
+    <value>Вие не трябва да сте тук.</value>
+  </data>
+  <data name="errors.401.description" xml:space="preserve">
+    <value>Може да опитате да се върнете назад. Или да влезете в профила си.</value>
+  </data>
+  <data name="errors.405.error" xml:space="preserve">
+    <value>Страницата липсва</value>
+  </data>
+  <data name="errors.405.description" xml:space="preserve">
+    <value>Извиняваме се, но страницата която търсите не е тук!</value>
+  </data>
+  <data name="errors.422.error" xml:space="preserve">
+    <value>Невалиден параметър на заявка</value>
+  </data>
+  <data name="errors.500.error" xml:space="preserve">
+    <value>Ох не, нещо се счупи! Т - Т</value>
+  </data>
+  <data name="errors.500.description" xml:space="preserve">
+    <value>Ние сме автоматично осведомени за всяка неизправност.</value>
+  </data>
+  <data name="errors.fatal.error" xml:space="preserve">
+    <value>Ох не, нещо се счупи! (доста зле) Т - Т</value>
+  </data>
+  <data name="errors.fatal.description" xml:space="preserve">
+    <value>Ние сме автоматично осведомени за всяка неизправност.</value>
+  </data>
+  <data name="errors.503.error" xml:space="preserve">
+    <value>Спрян за профилактика!</value>
+  </data>
+  <data name="errors.503.description" xml:space="preserve">
+    <value>Профилактиката обикновено трае от 5 секунди до 10 минути. В случай че стане повече от 10 минути, проверете {0} за повече информация.</value>
+  </data>
+  <data name="errors.reference" xml:space="preserve">
+    <value>За всеки случай, това е код, които може да дадете на поддръжка при неизправност!</value>
+  </data>
+  <data name="popup_login.login.forgot" xml:space="preserve">
+    <value>Забравих си данните</value>
+  </data>
+  <data name="popup_login.login.password" xml:space="preserve">
+    <value>парола</value>
+  </data>
+  <data name="popup_login.login.title" xml:space="preserve">
+    <value>Влезте, за да продължите</value>
+  </data>
+  <data name="popup_login.login.username" xml:space="preserve">
+    <value>потребителско име</value>
+  </data>
+  <data name="popup_login.login.error.email" xml:space="preserve">
+    <value>Потребителското име или имейл адресът не съществуват</value>
+  </data>
+  <data name="popup_login.login.error.password" xml:space="preserve">
+    <value>Грешна парола</value>
+  </data>
+  <data name="popup_login.register.download" xml:space="preserve">
+    <value>Изтегли</value>
+  </data>
+  <data name="popup_login.register.info" xml:space="preserve">
+    <value>Трябва ди акаунт, господине. Защо все още нямате един?</value>
+  </data>
+  <data name="popup_login.register.title" xml:space="preserve">
+    <value>Нямате акаунт?</value>
+  </data>
+  <data name="popup_user.links.account-edit" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="popup_user.links.friends" xml:space="preserve">
+    <value>Приятели</value>
+  </data>
+  <data name="popup_user.links.logout" xml:space="preserve">
+    <value>Изход</value>
+  </data>
+  <data name="popup_user.links.profile" xml:space="preserve">
+    <value>Моят профил</value>
+  </data>
+  <data name="popup_search.initial" xml:space="preserve">
+    <value>Пишете тук за търсене!</value>
+  </data>
+  <data name="popup_search.retry" xml:space="preserve">
+    <value>Търсенето неуспешно. Щракнете, за да опитате отново.</value>
+  </data>
+</root>

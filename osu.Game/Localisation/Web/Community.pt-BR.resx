@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="support.convinced.title" xml:space="preserve">
+    <value>Estou convencido! {0}</value>
+  </data>
+  <data name="support.convinced.support" xml:space="preserve">
+    <value>ajude o osu!</value>
+  </data>
+  <data name="support.convinced.gift" xml:space="preserve">
+    <value>ou envie de presente para outros jogadores</value>
+  </data>
+  <data name="support.convinced.instructions" xml:space="preserve">
+    <value>clique no coração para continuar para a osu!store</value>
+  </data>
+  <data name="support.why-support.title" xml:space="preserve">
+    <value>Por que eu deveria apoiar osu!? Para onde vai o dinheiro?</value>
+  </data>
+  <data name="support.why-support.team.title" xml:space="preserve">
+    <value>Apoie a Equipe</value>
+  </data>
+  <data name="support.why-support.team.description" xml:space="preserve">
+    <value>Um pequeno time de desenvolvedores desenvolve e mantém o osu! rodando. Seu apoio vai permitir que eles possam, você sabe... viver.</value>
+  </data>
+  <data name="support.why-support.infra.title" xml:space="preserve">
+    <value>Infraestrutura do Servidor</value>
+  </data>
+  <data name="support.why-support.infra.description" xml:space="preserve">
+    <value>Contribuições são diretamente utilizadas para o funcionamento do website, serviços multiplayer, tabelas de classificações, etc.</value>
+  </data>
+  <data name="support.why-support.featured-artists.title" xml:space="preserve">
+    <value>Artistas em Destaque</value>
+  </data>
+  <data name="support.why-support.featured-artists.description" xml:space="preserve">
+    <value>Com sua ajuda, podemos nos aproximar de ainda mais artistas talentosos e podemos licenciar ainda mais musicas incríveis para serem utilizadas no osu!</value>
+  </data>
+  <data name="support.why-support.featured-artists.link_text" xml:space="preserve">
+    <value>Veja a lista atual &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.ads.title" xml:space="preserve">
+    <value>Mantenha o osu! auto-sustentável</value>
+  </data>
+  <data name="support.why-support.ads.description" xml:space="preserve">
+    <value>Suas contribuições ajudam o jogo a se manter independente e completamente livre de anúncios ou de patrocinadores externos.</value>
+  </data>
+  <data name="support.why-support.tournaments.title" xml:space="preserve">
+    <value>Torneios Oficiais</value>
+  </data>
+  <data name="support.why-support.tournaments.description" xml:space="preserve">
+    <value>Ajude a financiar os torneios oficiais do osu! e suas premiações.</value>
+  </data>
+  <data name="support.why-support.tournaments.link_text" xml:space="preserve">
+    <value>Explore os torneios &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.bounty-program.title" xml:space="preserve">
+    <value>Programa de Recompensas Open Source</value>
+  </data>
+  <data name="support.why-support.bounty-program.description" xml:space="preserve">
+    <value>Apoie os contribuidores da comunidade que dedicaram seu tempo e esforço para tornar o osu! melhor.</value>
+  </data>
+  <data name="support.why-support.bounty-program.link_text" xml:space="preserve">
+    <value>Entenda mais &amp;raquo;</value>
+  </data>
+  <data name="support.perks.title" xml:space="preserve">
+    <value>Hã? O que eu ganho?!</value>
+  </data>
+  <data name="support.perks.osu_direct.title" xml:space="preserve">
+    <value>osu!direct</value>
+  </data>
+  <data name="support.perks.osu_direct.description" xml:space="preserve">
+    <value>Acesso fácil e rápido a beatmaps sem sair do jogo.</value>
+  </data>
+  <data name="support.perks.friend_ranking.title" xml:space="preserve">
+    <value>Ranking de Amigos</value>
+  </data>
+  <data name="support.perks.friend_ranking.description" xml:space="preserve">
+    <value>Veja como você se sai contra seus amigos nas classificações dos beatmaps, tanto in-game quanto pelo website.</value>
+  </data>
+  <data name="support.perks.country_ranking.title" xml:space="preserve">
+    <value>Ranking Nacional</value>
+  </data>
+  <data name="support.perks.country_ranking.description" xml:space="preserve">
+    <value>Conquiste seu país antes de conquistar o mundo.</value>
+  </data>
+  <data name="support.perks.mod_filtering.title" xml:space="preserve">
+    <value>Filtrar por Mods</value>
+  </data>
+  <data name="support.perks.mod_filtering.description" xml:space="preserve">
+    <value>Mostrar apenas as pessoas que jogaram de HDHR? Sem problema!</value>
+  </data>
+  <data name="support.perks.auto_downloads.title" xml:space="preserve">
+    <value>Downloads Automáticos</value>
+  </data>
+  <data name="support.perks.auto_downloads.description" xml:space="preserve">
+    <value>Downloads automáticos quando jogando no multiplayer, assistindo outros jogadores ou clicando em links no chat!</value>
+  </data>
+  <data name="support.perks.upload_more.title" xml:space="preserve">
+    <value>Envie Mais</value>
+  </data>
+  <data name="support.perks.upload_more.description" xml:space="preserve">
+    <value>Espaços adicionais para beatmaps pendentes (por beatmap ranqueado) até um máximo de 10.</value>
+  </data>
+  <data name="support.perks.early_access.title" xml:space="preserve">
+    <value>Acesso Antecipado</value>
+  </data>
+  <data name="support.perks.early_access.description" xml:space="preserve">
+    <value>Acesso a lançamentos mais cedo, onde você pode testar novas funcionalidades antes de irem ao público!</value>
+  </data>
+  <data name="support.perks.customisation.title" xml:space="preserve">
+    <value>Personalização</value>
+  </data>
+  <data name="support.perks.customisation.description" xml:space="preserve">
+    <value>Personalize o seu perfil adicionando uma página de usuário totalmente editável.</value>
+  </data>
+  <data name="support.perks.beatmap_filters.title" xml:space="preserve">
+    <value>Filtros de Beatmaps</value>
+  </data>
+  <data name="support.perks.beatmap_filters.description" xml:space="preserve">
+    <value>Filtre buscas de beatmaps por beatmaps jogados ou não jogados e ranques alcançados (se tiver).</value>
+  </data>
+  <data name="support.perks.yellow_fellow.title" xml:space="preserve">
+    <value>Camarada Amarelo</value>
+  </data>
+  <data name="support.perks.yellow_fellow.description" xml:space="preserve">
+    <value>Seja reconhecido dentro do jogo com a sua nova cor de nome de usuário amarela.</value>
+  </data>
+  <data name="support.perks.speedy_downloads.title" xml:space="preserve">
+    <value>Downloads Mais Rápidos</value>
+  </data>
+  <data name="support.perks.speedy_downloads.description" xml:space="preserve">
+    <value>Restrições de download mais leves, especialmente quando usando osu!direct.</value>
+  </data>
+  <data name="support.perks.change_username.title" xml:space="preserve">
+    <value>Alteração de Nome de Usuário</value>
+  </data>
+  <data name="support.perks.change_username.description" xml:space="preserve">
+    <value>A capacidade de alterar seu nome de usuário sem custos adicionais. (uma vez)</value>
+  </data>
+  <data name="support.perks.skinnables.title" xml:space="preserve">
+    <value>Customização</value>
+  </data>
+  <data name="support.perks.skinnables.description" xml:space="preserve">
+    <value>Maior função para skins, como a habilidade de alterar o fundo do menu principal.</value>
+  </data>
+  <data name="support.perks.feature_votes.title" xml:space="preserve">
+    <value>Votos de Recursos</value>
+  </data>
+  <data name="support.perks.feature_votes.description" xml:space="preserve">
+    <value>Ganhe votos todo mês para votar em novas funcionalidades. (2 por mês)</value>
+  </data>
+  <data name="support.perks.sort_options.title" xml:space="preserve">
+    <value>Opções de Organização</value>
+  </data>
+  <data name="support.perks.sort_options.description" xml:space="preserve">
+    <value>A capacidade de ver classificações por país / amigos / mods específicos dentro do jogo.</value>
+  </data>
+  <data name="support.perks.more_favourites.title" xml:space="preserve">
+    <value>Mais Favoritos</value>
+  </data>
+  <data name="support.perks.more_favourites.description" xml:space="preserve">
+    <value>O número máximo de beatmaps que você pode favoritar é aumentado de {0} &amp;rarr; {1}</value>
+  </data>
+  <data name="support.perks.more_friends.title" xml:space="preserve">
+    <value>Mais Amigos</value>
+  </data>
+  <data name="support.perks.more_friends.description" xml:space="preserve">
+    <value>O número máximo de amigos que pode ter é aumentado de {0} &amp;rarr; {1}</value>
+  </data>
+  <data name="support.perks.more_beatmaps.title" xml:space="preserve">
+    <value>Envie Mais Beatmaps</value>
+  </data>
+  <data name="support.perks.more_beatmaps.description" xml:space="preserve">
+    <value>A quantidade máxima de beatmaps não-ranqueados que você pode ter é calculado com base em um valor padrão (normalmente 4) +1 adicional para cada beatmap ranqueado que você possui (max. 2).&lt;br/&gt;&lt;br/&gt; Com osu!supporter, esse limite é aumentado para 8 + 1 adicional para cada beatmap ranqueado (max. 12).</value>
+  </data>
+  <data name="support.perks.friend_filtering.title" xml:space="preserve">
+    <value>Classificação de Amigos</value>
+  </data>
+  <data name="support.perks.friend_filtering.description" xml:space="preserve">
+    <value>Dispute com seus amigos e veja como se sai contra eles!* &lt;br/&gt;&lt;br/&gt;&lt;small&gt;* ainda não disponível no novo site, embreve(tm)&lt;/small&gt;</value>
+  </data>
+  <data name="support.supporter_status.contribution" xml:space="preserve">
+    <value>Obrigado pelo o seu apoio! Você contribuiu com um total de {0} em {1} compras de tags!</value>
+  </data>
+  <data name="support.supporter_status.gifted" xml:space="preserve">
+    <value>{0} de suas compras de tag foram presenteadas (um total de {1} presenteados), que generoso!</value>
+  </data>
+  <data name="support.supporter_status.not_yet" xml:space="preserve">
+    <value>Você ainda não tem uma supporter tag :(</value>
+  </data>
+  <data name="support.supporter_status.valid_until" xml:space="preserve">
+    <value>Sua supporter tag atual é válida até {0}!</value>
+  </data>
+  <data name="support.supporter_status.was_valid_until" xml:space="preserve">
+    <value>Sua supporter tag era válida até {0}.</value>
+  </data>
+</root>

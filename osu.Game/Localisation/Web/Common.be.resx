@@ -1,0 +1,274 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="confirmation" xml:space="preserve">
+    <value>Вы ўпэўнены?</value>
+  </data>
+  <data name="confirmation_unsaved" xml:space="preserve">
+    <value>Незахаваныя змены будуць страчаны. Вы ўпэўнены?</value>
+  </data>
+  <data name="saved" xml:space="preserve">
+    <value>Захавана</value>
+  </data>
+  <data name="array_and.words_connector" xml:space="preserve">
+    <value>, </value>
+  </data>
+  <data name="array_and.two_words_connector" xml:space="preserve">
+    <value> і </value>
+  </data>
+  <data name="array_and.last_word_connector" xml:space="preserve">
+    <value>, і </value>
+  </data>
+  <data name="buttons.admin" xml:space="preserve">
+    <value>Кіраўнік</value>
+  </data>
+  <data name="buttons.back_to_previous" xml:space="preserve">
+    <value>Вярнуцца ў папярэднюю пазіцыю</value>
+  </data>
+  <data name="buttons.back_to_top" xml:space="preserve">
+    <value>Вярнуцца ў пачатак</value>
+  </data>
+  <data name="buttons.cancel" xml:space="preserve">
+    <value>Скасаваць</value>
+  </data>
+  <data name="buttons.change" xml:space="preserve">
+    <value>змяніць</value>
+  </data>
+  <data name="buttons.click_to_copy" xml:space="preserve">
+    <value>націсніце, каб скапіяваць</value>
+  </data>
+  <data name="buttons.click_to_copy_copied" xml:space="preserve">
+    <value>скапіявана!</value>
+  </data>
+  <data name="buttons.collapse" xml:space="preserve">
+    <value>згарнуць</value>
+  </data>
+  <data name="buttons.delete" xml:space="preserve">
+    <value>Выдаліць</value>
+  </data>
+  <data name="buttons.edit" xml:space="preserve">
+    <value>Рэдагаваць</value>
+  </data>
+  <data name="buttons.expand" xml:space="preserve">
+    <value>разгарнуць</value>
+  </data>
+  <data name="buttons.hide" xml:space="preserve">
+    <value>схаваць</value>
+  </data>
+  <data name="buttons.permalink" xml:space="preserve">
+    <value>нязменная спасылка</value>
+  </data>
+  <data name="buttons.post" xml:space="preserve">
+    <value>Размясціць</value>
+  </data>
+  <data name="buttons.reply" xml:space="preserve">
+    <value>Адказаць</value>
+  </data>
+  <data name="buttons.reply_reopen" xml:space="preserve">
+    <value>Адказаць і пераадкрыць</value>
+  </data>
+  <data name="buttons.reply_resolve" xml:space="preserve">
+    <value>Адказаць і вырашыць</value>
+  </data>
+  <data name="buttons.reset" xml:space="preserve">
+    <value>Скінуць</value>
+  </data>
+  <data name="buttons.restore" xml:space="preserve">
+    <value>Аднавіць</value>
+  </data>
+  <data name="buttons.save" xml:space="preserve">
+    <value>Захаваць</value>
+  </data>
+  <data name="buttons.saving" xml:space="preserve">
+    <value>Захаванне...</value>
+  </data>
+  <data name="buttons.search" xml:space="preserve">
+    <value>Пошук</value>
+  </data>
+  <data name="buttons.see_more" xml:space="preserve">
+    <value>глядзець больш</value>
+  </data>
+  <data name="buttons.show" xml:space="preserve">
+    <value>паказаць</value>
+  </data>
+  <data name="buttons.show_deleted" xml:space="preserve">
+    <value>Паказ выдаленыя</value>
+  </data>
+  <data name="buttons.show_more" xml:space="preserve">
+    <value>паказаць больш</value>
+  </data>
+  <data name="buttons.show_more_options" xml:space="preserve">
+    <value>паказаць больш параметраў</value>
+  </data>
+  <data name="buttons.upload_image" xml:space="preserve">
+    <value>запампаваць выяву</value>
+  </data>
+  <data name="buttons.watch.to_0" xml:space="preserve">
+    <value>Адпісацца</value>
+  </data>
+  <data name="buttons.watch.to_1" xml:space="preserve">
+    <value>Падпісацца</value>
+  </data>
+  <data name="count.badges" xml:space="preserve">
+    <value>{0} значок|{0} значкі|{0} значкоў</value>
+  </data>
+  <data name="count.days" xml:space="preserve">
+    <value>{0} дзень|{0} дні|{0} дзён</value>
+  </data>
+  <data name="count.hour_short_unit" xml:space="preserve">
+    <value>гадз</value>
+  </data>
+  <data name="count.hours" xml:space="preserve">
+    <value>{0} гадз</value>
+  </data>
+  <data name="count.item" xml:space="preserve">
+    <value>{0} адзінка|{0} адзінкі|{0} адзінак</value>
+  </data>
+  <data name="count.minute_short_unit" xml:space="preserve">
+    <value>хв</value>
+  </data>
+  <data name="count.minutes" xml:space="preserve">
+    <value>{0} хвіліна|{0} хвіліны |{0} хвілін</value>
+  </data>
+  <data name="count.months" xml:space="preserve">
+    <value>{0} месяц|{0} месяцаў</value>
+  </data>
+  <data name="count.second_short_unit" xml:space="preserve">
+    <value>сек</value>
+  </data>
+  <data name="count.update" xml:space="preserve">
+    <value>{0} абнаўленне|{0} абнаўленняў</value>
+  </data>
+  <data name="count.years" xml:space="preserve">
+    <value>{0} год|{0} гады|{0} гадоў</value>
+  </data>
+  <data name="countdown.days" xml:space="preserve">
+    <value>дзён</value>
+  </data>
+  <data name="countdown.hours" xml:space="preserve">
+    <value>часоў</value>
+  </data>
+  <data name="countdown.minutes" xml:space="preserve">
+    <value>хвілін</value>
+  </data>
+  <data name="countdown.seconds" xml:space="preserve">
+    <value>секунд</value>
+  </data>
+  <data name="datetime.year_month.moment" xml:space="preserve">
+    <value>MMMM YYYY</value>
+  </data>
+  <data name="datetime.year_month.php" xml:space="preserve">
+    <value>MMMM y</value>
+  </data>
+  <data name="datetime.year_month_short.moment" xml:space="preserve">
+    <value>MMM YYYY</value>
+  </data>
+  <data name="device.keyboard" xml:space="preserve">
+    <value>Клавіятура</value>
+  </data>
+  <data name="device.mouse" xml:space="preserve">
+    <value>Мыш</value>
+  </data>
+  <data name="device.tablet" xml:space="preserve">
+    <value>Планшэт</value>
+  </data>
+  <data name="device.touch" xml:space="preserve">
+    <value>Сэнсарным экранам</value>
+  </data>
+  <data name="dropzone.target" xml:space="preserve">
+    <value>каб загрузіць, перацягніце сюды</value>
+  </data>
+  <data name="pagination.previous" xml:space="preserve">
+    <value>папер.</value>
+  </data>
+  <data name="pagination.next" xml:space="preserve">
+    <value>наст.</value>
+  </data>
+  <data name="score_count.count_100" xml:space="preserve">
+    <value>100</value>
+  </data>
+  <data name="score_count.count_300" xml:space="preserve">
+    <value>300</value>
+  </data>
+  <data name="score_count.count_50" xml:space="preserve">
+    <value>50</value>
+  </data>
+  <data name="score_count.count_katu" xml:space="preserve">
+    <value>200</value>
+  </data>
+  <data name="score_count.count_miss" xml:space="preserve">
+    <value>Промах</value>
+  </data>
+  <data name="time.days_ago" xml:space="preserve">
+    <value>{0} дзень таму|{0} дні таму|{0} дзён таму</value>
+  </data>
+  <data name="time.hours_ago" xml:space="preserve">
+    <value>{0} гадзіну таму|{0} гадзіны таму|{0} гадзін таму</value>
+  </data>
+  <data name="time.now" xml:space="preserve">
+    <value>зараз</value>
+  </data>
+  <data name="time.remaining" xml:space="preserve">
+    <value>Засталося часу</value>
+  </data>
+  <data name="title.notice" xml:space="preserve">
+    <value>Заўвага</value>
+  </data>
+</root>

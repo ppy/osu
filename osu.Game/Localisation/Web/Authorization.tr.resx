@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="play_more" xml:space="preserve">
+    <value>Bunun yerine biraz osu! oynamaya ne dersiniz?</value>
+  </data>
+  <data name="require_login" xml:space="preserve">
+    <value>Devam etmek için lütfen giriş yapın.</value>
+  </data>
+  <data name="require_verification" xml:space="preserve">
+    <value>Devam etmek için lütfen doğrulama işlemini tamamlayın.</value>
+  </data>
+  <data name="restricted" xml:space="preserve">
+    <value>Kısıtlanmışken bunu yapamazsınız.</value>
+  </data>
+  <data name="silenced" xml:space="preserve">
+    <value>Susturulmuşken bunu yapamazsınız.</value>
+  </data>
+  <data name="unauthorized" xml:space="preserve">
+    <value>Erişim engellendi.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.is_hype" xml:space="preserve">
+    <value>Verilen gaz geri alınamaz.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.has_reply" xml:space="preserve">
+    <value>Cevaplara sahip tartışmalar silinemez</value>
+  </data>
+  <data name="beatmap_discussion.nominate.exhausted" xml:space="preserve">
+    <value>Bugünkü aday gösterme sınırınıza ulaştınız, lütfen yarın tekrar deneyin.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.incorrect_state" xml:space="preserve">
+    <value>Bu işlemi gerçekleştirirken hata oluştu, sayfayı yenilemeyi deneyin.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.owner" xml:space="preserve">
+    <value>Kendi beatmapinizi aday gösteremezsiniz.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.set_metadata" xml:space="preserve">
+    <value>Aday göstermeden önce türü ve dili ayarlamalısınız.</value>
+  </data>
+  <data name="beatmap_discussion.resolve.not_owner" xml:space="preserve">
+    <value>Yalnızca başlık sahibi ile beatmap sahibi bir tartışmayı sonlandırabilir.</value>
+  </data>
+  <data name="beatmap_discussion.store.mapper_note_wrong_user" xml:space="preserve">
+    <value>Yalnızca beatmap sahibi ya da aday gösterici/NAT grup üyesi mapper notu gönderebilir.</value>
+  </data>
+  <data name="beatmap_discussion.vote.bot" xml:space="preserve">
+    <value>Bot tarafından açılan tartışmada oy kullanılamaz</value>
+  </data>
+  <data name="beatmap_discussion.vote.limit_exceeded" xml:space="preserve">
+    <value>Lütfen daha fazla oy vermeden önce bir süre bekleyin</value>
+  </data>
+  <data name="beatmap_discussion.vote.owner" xml:space="preserve">
+    <value>Kendi tartışmanıza oy veremezsiniz.</value>
+  </data>
+  <data name="beatmap_discussion.vote.wrong_beatmapset_state" xml:space="preserve">
+    <value>Yalnızca beklemede olan beatmaplerin tartışmalarında oy kullanabilirsiniz.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.not_owner" xml:space="preserve">
+    <value>Yalnızca kendi gönderilerinizi silebilirsiniz.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.resolved" xml:space="preserve">
+    <value>Çözülmüş bir tartışmanın gönderisini silemezsiniz.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.system_generated" xml:space="preserve">
+    <value>Otomatik olarak oluşturulan gönderiler silinemez.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.not_owner" xml:space="preserve">
+    <value>Gönderileri yalnızca gönderen düzenleyebilir.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.resolved" xml:space="preserve">
+    <value>Çözülmüş bir tartışmanın gönderisini düzenleyemezsiniz.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.system_generated" xml:space="preserve">
+    <value>Otomatik olarak oluşturulmuş gönderiler düzenlenemez.</value>
+  </data>
+  <data name="beatmap_discussion_post.store.beatmapset_locked" xml:space="preserve">
+    <value>Bu beatmap tartışma için kilitlenmiş.</value>
+  </data>
+  <data name="beatmapset.metadata.nominated" xml:space="preserve">
+    <value>Aday gösterilen bir mapin metaverisini değiştiremezsiniz. Hatalı ayarlandığını düşünüyorsanız bir BN ya da NAT üyesiyle iletişime geçiniz.</value>
+  </data>
+  <data name="chat.blocked" xml:space="preserve">
+    <value>Sizi engelleyen ya da sizin engellediğiniz bir kullanıcıya mesaj gönderemezsiniz.</value>
+  </data>
+  <data name="chat.friends_only" xml:space="preserve">
+    <value>Kullanıcı arkadaş listesinde bulunmayan kişilerden gelen mesajları engelliyor.</value>
+  </data>
+  <data name="chat.moderated" xml:space="preserve">
+    <value>Bu kanal şu anda modere ediliyor.</value>
+  </data>
+  <data name="chat.no_access" xml:space="preserve">
+    <value>Bu kanala erişiminiz yok.</value>
+  </data>
+  <data name="chat.restricted" xml:space="preserve">
+    <value>Susturulmuş, kısıtlanmış ya da banlanmış iken mesaj gönderemezsiniz.</value>
+  </data>
+  <data name="chat.silenced" xml:space="preserve">
+    <value>Susturulmuşken, kısıtlıyken veya banlıyken mesaj gönderemezsiniz.</value>
+  </data>
+  <data name="comment.update.deleted" xml:space="preserve">
+    <value>Silinmiş gönderi düzenlenemez.</value>
+  </data>
+  <data name="contest.voting_over" xml:space="preserve">
+    <value>Yarışma için oylama süresi bittikten sonra oyunuzu değiştiremezsiniz.</value>
+  </data>
+  <data name="contest.entry.limit_reached" xml:space="preserve">
+    <value>Bu yarışma için girdi sınırına ulaştınız</value>
+  </data>
+  <data name="contest.entry.over" xml:space="preserve">
+    <value>Girdileriniz için teşekkürler! Bu yarışma için gönderiler kapandı ve yakında oylamalara açılacak.</value>
+  </data>
+  <data name="forum.moderate.no_permission" xml:space="preserve">
+    <value>Bu forumu modere etme yetkiniz yok.</value>
+  </data>
+  <data name="forum.post.delete.only_last_post" xml:space="preserve">
+    <value>Yalnızca son gönderi silinebilir.</value>
+  </data>
+  <data name="forum.post.delete.locked" xml:space="preserve">
+    <value>Kilitli bir konunun gönderisini silemezsiniz.</value>
+  </data>
+  <data name="forum.post.delete.no_forum_access" xml:space="preserve">
+    <value>İstenilen foruma erişim gereklidir.</value>
+  </data>
+  <data name="forum.post.delete.not_owner" xml:space="preserve">
+    <value>Gönderi yalnızca gönderen tarafından silinebilir.</value>
+  </data>
+  <data name="forum.post.edit.deleted" xml:space="preserve">
+    <value>Silinmiş gönderi düzenlenemez.</value>
+  </data>
+  <data name="forum.post.edit.locked" xml:space="preserve">
+    <value>Bu gönderi için düzenleme yasaklanmıştır.</value>
+  </data>
+  <data name="forum.post.edit.no_forum_access" xml:space="preserve">
+    <value>İstenilen foruma erişim gereklidir.</value>
+  </data>
+  <data name="forum.post.edit.not_owner" xml:space="preserve">
+    <value>Gönderi yalnızca gönderen tarafından düzenlenebilir.</value>
+  </data>
+  <data name="forum.post.edit.topic_locked" xml:space="preserve">
+    <value>Kilitli bir konunun gönderisini düzenleyemezsiniz.</value>
+  </data>
+  <data name="forum.post.store.play_more" xml:space="preserve">
+    <value>Lütfen forumlara başlık açmadan önce oyunu oynamayı deneyin! Eğer oynamakla ilgili bir sorununuz varsa, Help and Support forumuna başlık açın.</value>
+  </data>
+  <data name="forum.post.store.too_many_help_posts" xml:space="preserve">
+    <value>Başka başlıklar açmadan önce oyunu daha fazla oynamalısınız. Eğer hala oyunu oynamakta sorun yaşıyorsanız, support@ppy.sh adresine e-posta atın</value>
+  </data>
+  <data name="forum.topic.reply.double_post" xml:space="preserve">
+    <value>Lütfen yeni gönderi yerine son gönderinizi düzenleyin.</value>
+  </data>
+  <data name="forum.topic.reply.locked" xml:space="preserve">
+    <value>Kilitli bir başlığa cevap yazamazsınız.</value>
+  </data>
+  <data name="forum.topic.reply.no_forum_access" xml:space="preserve">
+    <value>İstenilen foruma erişim gereklidir.</value>
+  </data>
+  <data name="forum.topic.reply.no_permission" xml:space="preserve">
+    <value>Cevaplama izni yok.</value>
+  </data>
+  <data name="forum.topic.reply.user.require_login" xml:space="preserve">
+    <value>Cevaplamak için lütfen giriş yapın.</value>
+  </data>
+  <data name="forum.topic.reply.user.restricted" xml:space="preserve">
+    <value>Kısıtlanmışken cevap yazamazsınız.</value>
+  </data>
+  <data name="forum.topic.reply.user.silenced" xml:space="preserve">
+    <value>Susturulmuşken cevap yazamazsınız.</value>
+  </data>
+  <data name="forum.topic.store.no_forum_access" xml:space="preserve">
+    <value>İstenilen foruma erişim gereklidir.</value>
+  </data>
+  <data name="forum.topic.store.no_permission" xml:space="preserve">
+    <value>Yeni başlık açmak için izniniz yok.</value>
+  </data>
+  <data name="forum.topic.store.forum_closed" xml:space="preserve">
+    <value>Forum kapalıdır ve gönderi yapılamaz.</value>
+  </data>
+  <data name="forum.topic.vote.no_forum_access" xml:space="preserve">
+    <value>İstenilen foruma erişim gereklidir.</value>
+  </data>
+  <data name="forum.topic.vote.over" xml:space="preserve">
+    <value>Oylama bitti ve artık oy verilemez.</value>
+  </data>
+  <data name="forum.topic.vote.play_more" xml:space="preserve">
+    <value>Forumda oylama yapmadan önce daha çok oynamanız gerekmektedir.</value>
+  </data>
+  <data name="forum.topic.vote.voted" xml:space="preserve">
+    <value>Oy değiştirmek yasaktır.</value>
+  </data>
+  <data name="forum.topic.vote.user.require_login" xml:space="preserve">
+    <value>Oy vermek için lütfen giriş yapın.</value>
+  </data>
+  <data name="forum.topic.vote.user.restricted" xml:space="preserve">
+    <value>Kısıtlanmışken oy veremezsiniz.</value>
+  </data>
+  <data name="forum.topic.vote.user.silenced" xml:space="preserve">
+    <value>Susturulmuşken oy veremezsiniz.</value>
+  </data>
+  <data name="forum.topic.watch.no_forum_access" xml:space="preserve">
+    <value>İstenilen foruma erişim gereklidir.</value>
+  </data>
+  <data name="forum.topic_cover.edit.uneditable" xml:space="preserve">
+    <value>Geçersiz kapak belirtildi.</value>
+  </data>
+  <data name="forum.topic_cover.edit.not_owner" xml:space="preserve">
+    <value>Yalnızca başlık sahibi kapağı değiştirebilir.</value>
+  </data>
+  <data name="forum.topic_cover.store.forum_not_allowed" xml:space="preserve">
+    <value>Bu forum kapak resmi kabul etmemektedir.</value>
+  </data>
+  <data name="forum.view.admin_only" xml:space="preserve">
+    <value>Yalnızca yönetici bu forumu görüntüleyebilir.</value>
+  </data>
+  <data name="user.page.edit.locked" xml:space="preserve">
+    <value>Kullanıcı sayfası kilitli.</value>
+  </data>
+  <data name="user.page.edit.not_owner" xml:space="preserve">
+    <value>Yalnızca kendi kullanıcı sayfanızı düzenleyebilirsiniz.</value>
+  </data>
+  <data name="user.page.edit.require_supporter_tag" xml:space="preserve">
+    <value>osu!supporter etiketi gereklidir.</value>
+  </data>
+</root>

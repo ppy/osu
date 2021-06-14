@@ -1,0 +1,388 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="audio.autoplay" xml:space="preserve">
+    <value>Következő zene automatikus lejátszása</value>
+  </data>
+  <data name="defaults.page_description" xml:space="preserve">
+    <value>osu! - Ritmus csak egy *kattintásra*! Quendan/EBA, Taiko és más eredeti játékmódok, emellett egy teljes pálya szerkesztő.</value>
+  </data>
+  <data name="header.admin.beatmapset" xml:space="preserve">
+    <value>beatmapset</value>
+  </data>
+  <data name="header.admin.beatmapset_covers" xml:space="preserve">
+    <value>beatmapset események</value>
+  </data>
+  <data name="header.admin.contest" xml:space="preserve">
+    <value>verseny</value>
+  </data>
+  <data name="header.admin.contests" xml:space="preserve">
+    <value>versenyek</value>
+  </data>
+  <data name="header.admin.root" xml:space="preserve">
+    <value>konzol</value>
+  </data>
+  <data name="header.admin.store_orders" xml:space="preserve">
+    <value>admin bolt</value>
+  </data>
+  <data name="header.artists.index" xml:space="preserve">
+    <value>listázás</value>
+  </data>
+  <data name="header.changelog.index" xml:space="preserve">
+    <value>listázás</value>
+  </data>
+  <data name="header.help.index" xml:space="preserve">
+    <value>index</value>
+  </data>
+  <data name="header.help.sitemap" xml:space="preserve">
+    <value>Oldaltérkép</value>
+  </data>
+  <data name="header.store.cart" xml:space="preserve">
+    <value>kosár</value>
+  </data>
+  <data name="header.store.orders" xml:space="preserve">
+    <value>rendelési előzmények</value>
+  </data>
+  <data name="header.store.products" xml:space="preserve">
+    <value>termékek</value>
+  </data>
+  <data name="header.tournaments.index" xml:space="preserve">
+    <value>listázás</value>
+  </data>
+  <data name="header.users.modding" xml:space="preserve">
+    <value>modolás</value>
+  </data>
+  <data name="header.users.show" xml:space="preserve">
+    <value>információ</value>
+  </data>
+  <data name="gallery.close" xml:space="preserve">
+    <value>Bezár (Esc)</value>
+  </data>
+  <data name="gallery.fullscreen" xml:space="preserve">
+    <value>Teljes képernyő be/ki</value>
+  </data>
+  <data name="gallery.zoom" xml:space="preserve">
+    <value>Nagyítás/kicsinyítés</value>
+  </data>
+  <data name="gallery.previous" xml:space="preserve">
+    <value>Előző (bal kurzor)</value>
+  </data>
+  <data name="gallery.next" xml:space="preserve">
+    <value>Következő (jobb kurzor)</value>
+  </data>
+  <data name="menu.beatmaps._" xml:space="preserve">
+    <value>beatmap-ek</value>
+  </data>
+  <data name="menu.beatmaps.artists" xml:space="preserve">
+    <value>kiemelt előadók</value>
+  </data>
+  <data name="menu.beatmaps.index" xml:space="preserve">
+    <value>lista</value>
+  </data>
+  <data name="menu.beatmaps.packs" xml:space="preserve">
+    <value>csomagok</value>
+  </data>
+  <data name="menu.community._" xml:space="preserve">
+    <value>közösség</value>
+  </data>
+  <data name="menu.community.chat" xml:space="preserve">
+    <value>chat</value>
+  </data>
+  <data name="menu.community.contests" xml:space="preserve">
+    <value>versenyek</value>
+  </data>
+  <data name="menu.community.dev" xml:space="preserve">
+    <value>fejlesztés</value>
+  </data>
+  <data name="menu.community.forum-forums-index" xml:space="preserve">
+    <value>fórumok</value>
+  </data>
+  <data name="menu.community.getlive" xml:space="preserve">
+    <value>élő</value>
+  </data>
+  <data name="menu.community.tournaments" xml:space="preserve">
+    <value>versenyek</value>
+  </data>
+  <data name="menu.help._" xml:space="preserve">
+    <value>segítség</value>
+  </data>
+  <data name="menu.help.getabuse" xml:space="preserve">
+    <value>visszaélés jelentése</value>
+  </data>
+  <data name="menu.help.getfaq" xml:space="preserve">
+    <value>gyik</value>
+  </data>
+  <data name="menu.help.getrules" xml:space="preserve">
+    <value>szabályok</value>
+  </data>
+  <data name="menu.help.getsupport" xml:space="preserve">
+    <value>nem, tényleg segítség kell!</value>
+  </data>
+  <data name="menu.help.getwiki" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="menu.home._" xml:space="preserve">
+    <value>főoldal</value>
+  </data>
+  <data name="menu.home.changelog-index" xml:space="preserve">
+    <value>változtatások</value>
+  </data>
+  <data name="menu.home.getdownload" xml:space="preserve">
+    <value>letöltés</value>
+  </data>
+  <data name="menu.home.news-index" xml:space="preserve">
+    <value>újdonságok</value>
+  </data>
+  <data name="menu.home.search" xml:space="preserve">
+    <value>keresés</value>
+  </data>
+  <data name="menu.home.team" xml:space="preserve">
+    <value>csapat</value>
+  </data>
+  <data name="menu.rankings._" xml:space="preserve">
+    <value>rangsor</value>
+  </data>
+  <data name="menu.rankings.charts" xml:space="preserve">
+    <value>kiemeltek</value>
+  </data>
+  <data name="menu.rankings.country" xml:space="preserve">
+    <value>ország</value>
+  </data>
+  <data name="menu.rankings.index" xml:space="preserve">
+    <value>teljesítmény</value>
+  </data>
+  <data name="menu.rankings.kudosu" xml:space="preserve">
+    <value>kudosu</value>
+  </data>
+  <data name="menu.rankings.multiplayer" xml:space="preserve">
+    <value>többjátékos</value>
+  </data>
+  <data name="menu.rankings.score" xml:space="preserve">
+    <value>pontszám</value>
+  </data>
+  <data name="menu.store._" xml:space="preserve">
+    <value>áruház</value>
+  </data>
+  <data name="menu.store.cart-show" xml:space="preserve">
+    <value>kosár</value>
+  </data>
+  <data name="menu.store.getlisting" xml:space="preserve">
+    <value>lista</value>
+  </data>
+  <data name="menu.store.orders-index" xml:space="preserve">
+    <value>rendelési előzmények</value>
+  </data>
+  <data name="footer.general._" xml:space="preserve">
+    <value>Általános</value>
+  </data>
+  <data name="footer.general.home" xml:space="preserve">
+    <value>Főoldal</value>
+  </data>
+  <data name="footer.general.changelog-index" xml:space="preserve">
+    <value>Változtatások</value>
+  </data>
+  <data name="footer.general.beatmaps" xml:space="preserve">
+    <value>Beatmap Lista</value>
+  </data>
+  <data name="footer.general.download" xml:space="preserve">
+    <value>osu! letöltése</value>
+  </data>
+  <data name="footer.help._" xml:space="preserve">
+    <value>Segítség &amp; Közösség</value>
+  </data>
+  <data name="footer.help.faq" xml:space="preserve">
+    <value>Gyakran Ismételt Kérdések</value>
+  </data>
+  <data name="footer.help.forum" xml:space="preserve">
+    <value>Közösségi Fórumok</value>
+  </data>
+  <data name="footer.help.livestreams" xml:space="preserve">
+    <value>Élő közvetítések</value>
+  </data>
+  <data name="footer.help.report" xml:space="preserve">
+    <value>Hiba Jelentése</value>
+  </data>
+  <data name="footer.help.wiki" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="footer.legal._" xml:space="preserve">
+    <value>Jogok és Állapot</value>
+  </data>
+  <data name="footer.legal.copyright" xml:space="preserve">
+    <value>Szerzői jog (DMCA)</value>
+  </data>
+  <data name="footer.legal.privacy" xml:space="preserve">
+    <value>Adatvédelem</value>
+  </data>
+  <data name="footer.legal.server_status" xml:space="preserve">
+    <value>Szerver Állapot</value>
+  </data>
+  <data name="footer.legal.source_code" xml:space="preserve">
+    <value>Forráskód</value>
+  </data>
+  <data name="footer.legal.terms" xml:space="preserve">
+    <value>Felhasználási Feltételek</value>
+  </data>
+  <data name="errors.400.error" xml:space="preserve">
+    <value>Érvénytelen lekérési paraméterek</value>
+  </data>
+  <data name="errors.404.error" xml:space="preserve">
+    <value>Hiányzó Oldal</value>
+  </data>
+  <data name="errors.404.description" xml:space="preserve">
+    <value>Bocsi, de a kért oldal nem itt van!</value>
+  </data>
+  <data name="errors.403.error" xml:space="preserve">
+    <value>Nem kellene itt lenned.</value>
+  </data>
+  <data name="errors.403.description" xml:space="preserve">
+    <value>Megpróbálhatnál talán visszamenni.</value>
+  </data>
+  <data name="errors.401.error" xml:space="preserve">
+    <value>Nem kellene itt lenned.</value>
+  </data>
+  <data name="errors.401.description" xml:space="preserve">
+    <value>Megpróbálhatnál talán visszamenni. Vagy bejelentkezni.</value>
+  </data>
+  <data name="errors.405.error" xml:space="preserve">
+    <value>Hiányzó Oldal</value>
+  </data>
+  <data name="errors.405.description" xml:space="preserve">
+    <value>Bocsi, de a kért oldal nem itt van!</value>
+  </data>
+  <data name="errors.422.error" xml:space="preserve">
+    <value>Érvénytelen lekérési paraméterek</value>
+  </data>
+  <data name="errors.429.error" xml:space="preserve">
+    <value>Ráta korlát túllépve</value>
+  </data>
+  <data name="errors.500.error" xml:space="preserve">
+    <value>Jaj ne! Valami elromlott! ;_;</value>
+  </data>
+  <data name="errors.500.description" xml:space="preserve">
+    <value>Automatikusan értesítve vagyunk minden hibáról.</value>
+  </data>
+  <data name="errors.fatal.error" xml:space="preserve">
+    <value>Jaj ne! Valami (nagyon) elromlott! ;_;</value>
+  </data>
+  <data name="errors.fatal.description" xml:space="preserve">
+    <value>Automatikusan értesítve vagyunk minden hibáról.</value>
+  </data>
+  <data name="errors.503.error" xml:space="preserve">
+    <value>Karbantartás miatt szünetel!</value>
+  </data>
+  <data name="errors.503.description" xml:space="preserve">
+    <value>A karbantartás általában 5 másodperc és 10 perc közötti időt vesz igénybe. Ha esetleg tovább tartana, lásd {0} bővebb információért.</value>
+  </data>
+  <data name="errors.reference" xml:space="preserve">
+    <value>Mindenesetre itt egy kód amit az ügyfélszolgálatnak tudsz adni!</value>
+  </data>
+  <data name="popup_login.button" xml:space="preserve">
+    <value>bejelentkezés / regisztráció</value>
+  </data>
+  <data name="popup_login.login.forgot" xml:space="preserve">
+    <value>Elfelejtettem az adataimat</value>
+  </data>
+  <data name="popup_login.login.password" xml:space="preserve">
+    <value>jelszó</value>
+  </data>
+  <data name="popup_login.login.title" xml:space="preserve">
+    <value>Jelentkezz Be A Folytatáshoz</value>
+  </data>
+  <data name="popup_login.login.username" xml:space="preserve">
+    <value>felhasználónév</value>
+  </data>
+  <data name="popup_login.login.error.email" xml:space="preserve">
+    <value>A felhasználónév vagy e-mail cím nem létezik</value>
+  </data>
+  <data name="popup_login.login.error.password" xml:space="preserve">
+    <value>Hibás jelszó</value>
+  </data>
+  <data name="popup_login.register.download" xml:space="preserve">
+    <value>Letöltés</value>
+  </data>
+  <data name="popup_login.register.info" xml:space="preserve">
+    <value>Önnek szüksége van egy fiókra uram. Miért nem rendelkezik még egyel?</value>
+  </data>
+  <data name="popup_login.register.title" xml:space="preserve">
+    <value>Nincs még fiókod?</value>
+  </data>
+  <data name="popup_user.links.account-edit" xml:space="preserve">
+    <value>Beállítások</value>
+  </data>
+  <data name="popup_user.links.follows" xml:space="preserve">
+    <value>Figyelőlisták</value>
+  </data>
+  <data name="popup_user.links.friends" xml:space="preserve">
+    <value>Barátok</value>
+  </data>
+  <data name="popup_user.links.logout" xml:space="preserve">
+    <value>Kijelentkezés</value>
+  </data>
+  <data name="popup_user.links.profile" xml:space="preserve">
+    <value>Profilom</value>
+  </data>
+  <data name="popup_search.initial" xml:space="preserve">
+    <value>Keresendő szöveg!</value>
+  </data>
+  <data name="popup_search.retry" xml:space="preserve">
+    <value>A keresés eredménytelen. Kattintson az ismételt próbálkozáshoz.</value>
+  </data>
+</root>

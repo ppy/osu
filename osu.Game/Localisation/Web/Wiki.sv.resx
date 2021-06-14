@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="show.fallback_translation" xml:space="preserve">
+    <value>Den begärda sidan är inte översatt till det valda språket ({0}). Visar den Engelska versionen.</value>
+  </data>
+  <data name="show.incomplete_or_outdated" xml:space="preserve">
+    <value>Innehållet på denna sidan är ofullständigt eller föråldrat. Om du har möjligheten att hjälpa till, vänligen överväg att uppdatera artikeln!</value>
+  </data>
+  <data name="show.missing" xml:space="preserve">
+    <value>Begärd sida kunde ej hittas.</value>
+  </data>
+  <data name="show.missing_title" xml:space="preserve">
+    <value>Hittades inte</value>
+  </data>
+  <data name="show.missing_translation" xml:space="preserve">
+    <value>Den begärda sidan kunde inte hittas för nuvarande valt språk.</value>
+  </data>
+  <data name="show.needs_cleanup_or_rewrite" xml:space="preserve">
+    <value>Denna sidan lever inte upp till standarden för osu! wikin och behöver städas upp eller omskrivas. Om du har möjlighet att hjälpa till, vänligen överväg att uppdatera artikeln!</value>
+  </data>
+  <data name="show.search" xml:space="preserve">
+    <value>Sök befintliga sidor för: länk.</value>
+  </data>
+  <data name="show.toc" xml:space="preserve">
+    <value>Innehåll</value>
+  </data>
+  <data name="show.edit.link" xml:space="preserve">
+    <value>Visa på GitHub</value>
+  </data>
+  <data name="show.edit.refresh" xml:space="preserve">
+    <value>Ladda om</value>
+  </data>
+  <data name="show.translation.legal" xml:space="preserve">
+    <value>Den här översättningen tillhandahålls endast för bekvämlighets skull. Originalet {0} är den enda juridiskt bindande versionen av denna text.</value>
+  </data>
+  <data name="show.translation.outdated" xml:space="preserve">
+    <value>Denna sidan innehåller en föråldrad översättning av det ursprungliga innehållet. Vänligen se {0} för den mest exakta informationen (och överväg att uppdatera översättningen om du har möjligheten att hjälpa till)!</value>
+  </data>
+  <data name="show.translation.default" xml:space="preserve">
+    <value>Engelsk version</value>
+  </data>
+</root>

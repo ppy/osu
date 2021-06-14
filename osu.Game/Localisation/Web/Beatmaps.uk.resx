@@ -1,0 +1,688 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="discussion-votes.update.error" xml:space="preserve">
+    <value>Не вдається оновити відповідь</value>
+  </data>
+  <data name="discussions.allow_kudosu" xml:space="preserve">
+    <value>дозволити кудосу</value>
+  </data>
+  <data name="discussions.beatmap_information" xml:space="preserve">
+    <value>Сторінка карти</value>
+  </data>
+  <data name="discussions.delete" xml:space="preserve">
+    <value>видалити</value>
+  </data>
+  <data name="discussions.deleted" xml:space="preserve">
+    <value>Видалено {0} {1}.</value>
+  </data>
+  <data name="discussions.deny_kudosu" xml:space="preserve">
+    <value>заборонити кудосу</value>
+  </data>
+  <data name="discussions.edit" xml:space="preserve">
+    <value>змінити</value>
+  </data>
+  <data name="discussions.edited" xml:space="preserve">
+    <value>Останній раз змінено {0} {1}.</value>
+  </data>
+  <data name="discussions.kudosu_denied" xml:space="preserve">
+    <value>Відмовлено в отриманні кудосу.</value>
+  </data>
+  <data name="discussions.message_placeholder_deleted_beatmap" xml:space="preserve">
+    <value>Ця складність була видалена і відгукуватися про неї не можна.</value>
+  </data>
+  <data name="discussions.message_placeholder_locked" xml:space="preserve">
+    <value>Обговорення цієї карти відключено.</value>
+  </data>
+  <data name="discussions.message_placeholder_silenced" xml:space="preserve">
+    <value>Не можна коментувати поки заглушений.</value>
+  </data>
+  <data name="discussions.message_type_select" xml:space="preserve">
+    <value>Вибрати тип коментаря</value>
+  </data>
+  <data name="discussions.reply_notice" xml:space="preserve">
+    <value>Натисніть Enter для відповіді.</value>
+  </data>
+  <data name="discussions.reply_placeholder" xml:space="preserve">
+    <value>Введіть відповідь тут</value>
+  </data>
+  <data name="discussions.require-login" xml:space="preserve">
+    <value>Зайдіть для публікації або відповіді</value>
+  </data>
+  <data name="discussions.resolved" xml:space="preserve">
+    <value>Вирішено</value>
+  </data>
+  <data name="discussions.restore" xml:space="preserve">
+    <value>відновити</value>
+  </data>
+  <data name="discussions.show_deleted" xml:space="preserve">
+    <value>Показати видалені</value>
+  </data>
+  <data name="discussions.title" xml:space="preserve">
+    <value>Обговорення</value>
+  </data>
+  <data name="discussions.collapse.all-collapse" xml:space="preserve">
+    <value>Приховати все</value>
+  </data>
+  <data name="discussions.collapse.all-expand" xml:space="preserve">
+    <value>Показати все</value>
+  </data>
+  <data name="discussions.empty.empty" xml:space="preserve">
+    <value>Ще немає обговорень!</value>
+  </data>
+  <data name="discussions.empty.hidden" xml:space="preserve">
+    <value>Жодне обговорення не відповідає вибраному фільтру.</value>
+  </data>
+  <data name="discussions.lock.button.lock" xml:space="preserve">
+    <value>Заблокувати можливість обговорення</value>
+  </data>
+  <data name="discussions.lock.button.unlock" xml:space="preserve">
+    <value>Розблокувати можливість обговорення</value>
+  </data>
+  <data name="discussions.lock.prompt.lock" xml:space="preserve">
+    <value>Причина блокування</value>
+  </data>
+  <data name="discussions.lock.prompt.unlock" xml:space="preserve">
+    <value>Ви впевнені, що хочете розблокувати обговорення?</value>
+  </data>
+  <data name="discussions.message_hint.in_general" xml:space="preserve">
+    <value>Цей пост піде в загальну гілку обговорень. Щоб змінити цю карту, почніть своє повідомлення з зазначенням часу (наприклад 00:12:345).</value>
+  </data>
+  <data name="discussions.message_hint.in_timeline" xml:space="preserve">
+    <value>Для зміни декількох позначок, опублікуйте кілька позначок (одна публікація на позначку).</value>
+  </data>
+  <data name="discussions.message_placeholder.general" xml:space="preserve">
+    <value>Напишіть тут, щоб розмістити повідомлення в Загальний ({0})</value>
+  </data>
+  <data name="discussions.message_placeholder.generalall" xml:space="preserve">
+    <value>Введіть тут, щоб запостити в Загальний (Всі складності)</value>
+  </data>
+  <data name="discussions.message_placeholder.review" xml:space="preserve">
+    <value>Введіть тут, щоб залишити відгук</value>
+  </data>
+  <data name="discussions.message_placeholder.timeline" xml:space="preserve">
+    <value>Введіть тут, щоб запостити в шкалу часу ({0})</value>
+  </data>
+  <data name="discussions.message_type.disqualify" xml:space="preserve">
+    <value>Дискваліфікувати</value>
+  </data>
+  <data name="discussions.message_type.hype" xml:space="preserve">
+    <value>Хайп!</value>
+  </data>
+  <data name="discussions.message_type.mapper_note" xml:space="preserve">
+    <value>Замітка</value>
+  </data>
+  <data name="discussions.message_type.nomination_reset" xml:space="preserve">
+    <value>Зняти номінацію</value>
+  </data>
+  <data name="discussions.message_type.praise" xml:space="preserve">
+    <value>Хвала</value>
+  </data>
+  <data name="discussions.message_type.problem" xml:space="preserve">
+    <value>Проблема</value>
+  </data>
+  <data name="discussions.message_type.review" xml:space="preserve">
+    <value>Відгук</value>
+  </data>
+  <data name="discussions.message_type.suggestion" xml:space="preserve">
+    <value>Пропозиція</value>
+  </data>
+  <data name="discussions.mode.events" xml:space="preserve">
+    <value>Історія</value>
+  </data>
+  <data name="discussions.mode.general" xml:space="preserve">
+    <value>Загальні {0}</value>
+  </data>
+  <data name="discussions.mode.reviews" xml:space="preserve">
+    <value>Відгуки</value>
+  </data>
+  <data name="discussions.mode.timeline" xml:space="preserve">
+    <value>Графік</value>
+  </data>
+  <data name="discussions.mode.scopes.general" xml:space="preserve">
+    <value>Ця складність</value>
+  </data>
+  <data name="discussions.mode.scopes.generalall" xml:space="preserve">
+    <value>Всі складності</value>
+  </data>
+  <data name="discussions.new.pin" xml:space="preserve">
+    <value>Закріпити</value>
+  </data>
+  <data name="discussions.new.timestamp" xml:space="preserve">
+    <value>Мітка часу</value>
+  </data>
+  <data name="discussions.new.timestamp_missing" xml:space="preserve">
+    <value>натисніть ctrl-c в редакторі щоб скопіювати мітку часу!</value>
+  </data>
+  <data name="discussions.new.title" xml:space="preserve">
+    <value>Нове обговорення</value>
+  </data>
+  <data name="discussions.new.unpin" xml:space="preserve">
+    <value>Відкріпити</value>
+  </data>
+  <data name="discussions.review.new" xml:space="preserve">
+    <value>Новий відгук</value>
+  </data>
+  <data name="discussions.review.embed.delete" xml:space="preserve">
+    <value>Видалити</value>
+  </data>
+  <data name="discussions.review.embed.missing" xml:space="preserve">
+    <value>[ТЕМА ВИДАЛЕНА]</value>
+  </data>
+  <data name="discussions.review.embed.unlink" xml:space="preserve">
+    <value>Відв'язати</value>
+  </data>
+  <data name="discussions.review.embed.unsaved" xml:space="preserve">
+    <value>Не збережено</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.all-diff" xml:space="preserve">
+    <value>Записи для всіх складнощів не можуть мати тимчасових відміток.</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.diff" xml:space="preserve">
+    <value>Якщо {0} починається з тимчасової позначки, воно буде показано в Тимчасової шкалою.</value>
+  </data>
+  <data name="discussions.review.insert-block.paragraph" xml:space="preserve">
+    <value>вставити абзац</value>
+  </data>
+  <data name="discussions.review.insert-block.praise" xml:space="preserve">
+    <value>вставити похвалу</value>
+  </data>
+  <data name="discussions.review.insert-block.problem" xml:space="preserve">
+    <value>вставити проблему</value>
+  </data>
+  <data name="discussions.review.insert-block.suggestion" xml:space="preserve">
+    <value>вставити пропозицію</value>
+  </data>
+  <data name="discussions.show.title" xml:space="preserve">
+    <value>{0} від {1}</value>
+  </data>
+  <data name="discussions.sort.created_at" xml:space="preserve">
+    <value>Час створення</value>
+  </data>
+  <data name="discussions.sort.timeline" xml:space="preserve">
+    <value>Хронологія</value>
+  </data>
+  <data name="discussions.sort.updated_at" xml:space="preserve">
+    <value>Останнє оновлення</value>
+  </data>
+  <data name="discussions.stats.deleted" xml:space="preserve">
+    <value>Видалено</value>
+  </data>
+  <data name="discussions.stats.mapper_notes" xml:space="preserve">
+    <value>Примітки</value>
+  </data>
+  <data name="discussions.stats.mine" xml:space="preserve">
+    <value>Мої</value>
+  </data>
+  <data name="discussions.stats.pending" xml:space="preserve">
+    <value>В очікуванні</value>
+  </data>
+  <data name="discussions.stats.praises" xml:space="preserve">
+    <value>Похвала</value>
+  </data>
+  <data name="discussions.stats.resolved" xml:space="preserve">
+    <value>Вирішено</value>
+  </data>
+  <data name="discussions.stats.total" xml:space="preserve">
+    <value>Всі</value>
+  </data>
+  <data name="discussions.status-messages.approved" xml:space="preserve">
+    <value>Ця карта була схвалена {0}!</value>
+  </data>
+  <data name="discussions.status-messages.graveyard" xml:space="preserve">
+    <value>Ця карта не оновлювалася з {0} здається автор її закинув...</value>
+  </data>
+  <data name="discussions.status-messages.loved" xml:space="preserve">
+    <value>Ця карта була визнана "улюбленою" {0}!</value>
+  </data>
+  <data name="discussions.status-messages.ranked" xml:space="preserve">
+    <value>Ця карта стала ранговою {0}!</value>
+  </data>
+  <data name="discussions.status-messages.wip" xml:space="preserve">
+    <value>Примітка: Ця карта була позначена автором як незавершена.</value>
+  </data>
+  <data name="discussions.votes.none.down" xml:space="preserve">
+    <value>Голосів "проти" немає</value>
+  </data>
+  <data name="discussions.votes.none.up" xml:space="preserve">
+    <value>Голосів "за" немає</value>
+  </data>
+  <data name="discussions.votes.latest.down" xml:space="preserve">
+    <value>Останні голоси "проти"</value>
+  </data>
+  <data name="discussions.votes.latest.up" xml:space="preserve">
+    <value>Останні голоси "за"</value>
+  </data>
+  <data name="hype.button" xml:space="preserve">
+    <value>Хайпнути карту!</value>
+  </data>
+  <data name="hype.button_done" xml:space="preserve">
+    <value>Вже хайпнута!</value>
+  </data>
+  <data name="hype.confirm" xml:space="preserve">
+    <value>Ви впевнені? Ця дія відбере один з {0} хайпів і не може бути скасованою.</value>
+  </data>
+  <data name="hype.explanation" xml:space="preserve">
+    <value>Це зробить карту більш помітною для номінації та рейтингу!</value>
+  </data>
+  <data name="hype.explanation_guest" xml:space="preserve">
+    <value>Увійдіть, щоб зробити карту доступною для номінування!</value>
+  </data>
+  <data name="hype.new_time" xml:space="preserve">
+    <value>Ви отримаєте інший хайп {0}.</value>
+  </data>
+  <data name="hype.remaining" xml:space="preserve">
+    <value>У вас залишилося {0} хайпу.</value>
+  </data>
+  <data name="hype.required_text" xml:space="preserve">
+    <value>Хайп: {0}/{1}</value>
+  </data>
+  <data name="hype.section_title" xml:space="preserve">
+    <value>Прогрес хайпу</value>
+  </data>
+  <data name="hype.title" xml:space="preserve">
+    <value>Хайп</value>
+  </data>
+  <data name="feedback.button" xml:space="preserve">
+    <value>Залишити відгук</value>
+  </data>
+  <data name="nominations.delete" xml:space="preserve">
+    <value>Видалити</value>
+  </data>
+  <data name="nominations.delete_own_confirm" xml:space="preserve">
+    <value>Ви впевнені? Карта буде видалена, а вас буде перенаправлено назад в профіль.</value>
+  </data>
+  <data name="nominations.delete_other_confirm" xml:space="preserve">
+    <value>Ви впевнені? Карта буде видалена, а вас буде перенаправлено назад в профіль.</value>
+  </data>
+  <data name="nominations.disqualification_prompt" xml:space="preserve">
+    <value>Причина для дискваліфікації?</value>
+  </data>
+  <data name="nominations.disqualified_at" xml:space="preserve">
+    <value>Дискваліфікований {0} ({1}).</value>
+  </data>
+  <data name="nominations.disqualified_no_reason" xml:space="preserve">
+    <value>не вказано причини</value>
+  </data>
+  <data name="nominations.disqualify" xml:space="preserve">
+    <value>Дискваліфікувати</value>
+  </data>
+  <data name="nominations.incorrect_state" xml:space="preserve">
+    <value>Помилка під час виконання цих дій, спробуйте оновити сторінку.</value>
+  </data>
+  <data name="nominations.love" xml:space="preserve">
+    <value>Улюблені</value>
+  </data>
+  <data name="nominations.love_confirm" xml:space="preserve">
+    <value>Відмітити карту як улюблену?</value>
+  </data>
+  <data name="nominations.nominate" xml:space="preserve">
+    <value>Номінувати</value>
+  </data>
+  <data name="nominations.nominate_confirm" xml:space="preserve">
+    <value>Номінувати цю карту?</value>
+  </data>
+  <data name="nominations.nominated_by" xml:space="preserve">
+    <value>номінована {0}</value>
+  </data>
+  <data name="nominations.not_enough_hype" xml:space="preserve">
+    <value>Недостатньо хайпа.</value>
+  </data>
+  <data name="nominations.remove_from_loved" xml:space="preserve">
+    <value>Вилучено з категорії Loved</value>
+  </data>
+  <data name="nominations.remove_from_loved_prompt" xml:space="preserve">
+    <value>Причина вилучення від категорії Loved:</value>
+  </data>
+  <data name="nominations.required_text" xml:space="preserve">
+    <value>Номінації: {0}/{1}</value>
+  </data>
+  <data name="nominations.reset_message_deleted" xml:space="preserve">
+    <value>видалено</value>
+  </data>
+  <data name="nominations.title" xml:space="preserve">
+    <value>Статус номінації</value>
+  </data>
+  <data name="nominations.unresolved_issues" xml:space="preserve">
+    <value>Є ще деякі проблеми, які потребують вирішення.</value>
+  </data>
+  <data name="nominations.rank_estimate._" xml:space="preserve">
+    <value>Ця карта стане рейтинговою {0}, якщо ніяких проблем не буде знайдено. Вона #{1} в #{2}.</value>
+  </data>
+  <data name="nominations.rank_estimate.queue" xml:space="preserve">
+    <value>рейтинговому списку</value>
+  </data>
+  <data name="nominations.rank_estimate.soon" xml:space="preserve">
+    <value>скоро</value>
+  </data>
+  <data name="nominations.reset_at.nomination_reset" xml:space="preserve">
+    <value>{0} скинув прогрес номінації {1} через нову проблему {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_at.disqualify" xml:space="preserve">
+    <value>{0} дискваліфікував {1} через нову проблему {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_confirm.nomination_reset" xml:space="preserve">
+    <value>Ви впевнені? Повідомлення про нову проблему скине прогрес номінації.</value>
+  </data>
+  <data name="nominations.reset_confirm.disqualify" xml:space="preserve">
+    <value>Впевнені? Карта буде знята з кваліфікації і прогрес номінування буде скинуто.</value>
+  </data>
+  <data name="listing.search.prompt" xml:space="preserve">
+    <value>почніть вводити ключові слова...</value>
+  </data>
+  <data name="listing.search.login_required" xml:space="preserve">
+    <value>Увійдіть, щоб шукати.</value>
+  </data>
+  <data name="listing.search.options" xml:space="preserve">
+    <value>Більше параметрів пошуку</value>
+  </data>
+  <data name="listing.search.supporter_filter" xml:space="preserve">
+    <value>Фільтрація по {0} потребує наявності osu!supporter</value>
+  </data>
+  <data name="listing.search.not-found" xml:space="preserve">
+    <value>немає результатів</value>
+  </data>
+  <data name="listing.search.not-found-quote" xml:space="preserve">
+    <value>... на жаль, нічого не знайдено.</value>
+  </data>
+  <data name="listing.search.filters.extra" xml:space="preserve">
+    <value>додатково</value>
+  </data>
+  <data name="listing.search.filters.general" xml:space="preserve">
+    <value>Загальні</value>
+  </data>
+  <data name="listing.search.filters.genre" xml:space="preserve">
+    <value>Жанр</value>
+  </data>
+  <data name="listing.search.filters.language" xml:space="preserve">
+    <value>Мова</value>
+  </data>
+  <data name="listing.search.filters.mode" xml:space="preserve">
+    <value>Режим</value>
+  </data>
+  <data name="listing.search.filters.nsfw" xml:space="preserve">
+    <value>Відвертий вміст</value>
+  </data>
+  <data name="listing.search.filters.played" xml:space="preserve">
+    <value>Зіграно</value>
+  </data>
+  <data name="listing.search.filters.rank" xml:space="preserve">
+    <value>Досягнутий ранг</value>
+  </data>
+  <data name="listing.search.filters.status" xml:space="preserve">
+    <value>Категорії</value>
+  </data>
+  <data name="listing.search.sorting.title" xml:space="preserve">
+    <value>назві</value>
+  </data>
+  <data name="listing.search.sorting.artist" xml:space="preserve">
+    <value>виконавцю</value>
+  </data>
+  <data name="listing.search.sorting.difficulty" xml:space="preserve">
+    <value>складністю</value>
+  </data>
+  <data name="listing.search.sorting.favourites" xml:space="preserve">
+    <value>Вибране</value>
+  </data>
+  <data name="listing.search.sorting.updated" xml:space="preserve">
+    <value>датою оновлення</value>
+  </data>
+  <data name="listing.search.sorting.ranked" xml:space="preserve">
+    <value>рангу</value>
+  </data>
+  <data name="listing.search.sorting.rating" xml:space="preserve">
+    <value>рейтингу</value>
+  </data>
+  <data name="listing.search.sorting.plays" xml:space="preserve">
+    <value>кількістю ігор</value>
+  </data>
+  <data name="listing.search.sorting.relevance" xml:space="preserve">
+    <value>релевантності</value>
+  </data>
+  <data name="listing.search.sorting.nominations" xml:space="preserve">
+    <value>номінаціями</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote._" xml:space="preserve">
+    <value>Фільтрація по {0} вимагає {1}</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote.link_text" xml:space="preserve">
+    <value>тег osu!supporter</value>
+  </data>
+  <data name="general.converts" xml:space="preserve">
+    <value>показувати конвертовані карти</value>
+  </data>
+  <data name="general.follows" xml:space="preserve">
+    <value>Маппери на яких ви підписані</value>
+  </data>
+  <data name="general.recommended" xml:space="preserve">
+    <value>рекомендована складність</value>
+  </data>
+  <data name="mode.all" xml:space="preserve">
+    <value>Всі</value>
+  </data>
+  <data name="mode.any" xml:space="preserve">
+    <value>Всі</value>
+  </data>
+  <data name="status.any" xml:space="preserve">
+    <value>Всі</value>
+  </data>
+  <data name="status.approved" xml:space="preserve">
+    <value>Схвалені</value>
+  </data>
+  <data name="status.favourites" xml:space="preserve">
+    <value>Вибрані</value>
+  </data>
+  <data name="status.graveyard" xml:space="preserve">
+    <value>Закинуті</value>
+  </data>
+  <data name="status.leaderboard" xml:space="preserve">
+    <value>З таблицею рекордів</value>
+  </data>
+  <data name="status.loved" xml:space="preserve">
+    <value>Улюблені</value>
+  </data>
+  <data name="status.mine" xml:space="preserve">
+    <value>Мої карти</value>
+  </data>
+  <data name="status.pending" xml:space="preserve">
+    <value>Очікуючі і в процесі розробки</value>
+  </data>
+  <data name="status.qualified" xml:space="preserve">
+    <value>Кваліфіковані</value>
+  </data>
+  <data name="status.ranked" xml:space="preserve">
+    <value>Ранкнуті</value>
+  </data>
+  <data name="genre.any" xml:space="preserve">
+    <value>Всі</value>
+  </data>
+  <data name="genre.unspecified" xml:space="preserve">
+    <value>Не визначений</value>
+  </data>
+  <data name="genre.video-game" xml:space="preserve">
+    <value>Відеоігри</value>
+  </data>
+  <data name="genre.anime" xml:space="preserve">
+    <value>Аніме</value>
+  </data>
+  <data name="genre.rock" xml:space="preserve">
+    <value>Рок</value>
+  </data>
+  <data name="genre.pop" xml:space="preserve">
+    <value>Поп</value>
+  </data>
+  <data name="genre.other" xml:space="preserve">
+    <value>Інші</value>
+  </data>
+  <data name="genre.novelty" xml:space="preserve">
+    <value>Нові</value>
+  </data>
+  <data name="genre.hip-hop" xml:space="preserve">
+    <value>Хіп-хоп</value>
+  </data>
+  <data name="genre.electronic" xml:space="preserve">
+    <value>Електро</value>
+  </data>
+  <data name="genre.metal" xml:space="preserve">
+    <value>Метал</value>
+  </data>
+  <data name="genre.classical" xml:space="preserve">
+    <value>Класична</value>
+  </data>
+  <data name="genre.folk" xml:space="preserve">
+    <value>Народна</value>
+  </data>
+  <data name="genre.jazz" xml:space="preserve">
+    <value>Джаз</value>
+  </data>
+  <data name="mods.v2" xml:space="preserve">
+    <value>Score V2</value>
+  </data>
+  <data name="language.any" xml:space="preserve">
+    <value>Будь-які</value>
+  </data>
+  <data name="language.english" xml:space="preserve">
+    <value>Англійська</value>
+  </data>
+  <data name="language.chinese" xml:space="preserve">
+    <value>Китайська</value>
+  </data>
+  <data name="language.french" xml:space="preserve">
+    <value>Французька</value>
+  </data>
+  <data name="language.german" xml:space="preserve">
+    <value>Німецька</value>
+  </data>
+  <data name="language.italian" xml:space="preserve">
+    <value>Італійська</value>
+  </data>
+  <data name="language.japanese" xml:space="preserve">
+    <value>Японська</value>
+  </data>
+  <data name="language.korean" xml:space="preserve">
+    <value>Корейська</value>
+  </data>
+  <data name="language.spanish" xml:space="preserve">
+    <value>Іспанська</value>
+  </data>
+  <data name="language.swedish" xml:space="preserve">
+    <value>Шведська</value>
+  </data>
+  <data name="language.russian" xml:space="preserve">
+    <value>Російська</value>
+  </data>
+  <data name="language.polish" xml:space="preserve">
+    <value>Польська</value>
+  </data>
+  <data name="language.instrumental" xml:space="preserve">
+    <value>Інструментальна</value>
+  </data>
+  <data name="language.other" xml:space="preserve">
+    <value>Інше</value>
+  </data>
+  <data name="language.unspecified" xml:space="preserve">
+    <value>Не визначений</value>
+  </data>
+  <data name="nsfw.exclude" xml:space="preserve">
+    <value>Приховати</value>
+  </data>
+  <data name="nsfw.include" xml:space="preserve">
+    <value>Показати</value>
+  </data>
+  <data name="played.any" xml:space="preserve">
+    <value>Всі</value>
+  </data>
+  <data name="played.played" xml:space="preserve">
+    <value>Зіграно</value>
+  </data>
+  <data name="played.unplayed" xml:space="preserve">
+    <value>Не зіграно</value>
+  </data>
+  <data name="extra.video" xml:space="preserve">
+    <value>З відео</value>
+  </data>
+  <data name="extra.storyboard" xml:space="preserve">
+    <value>Є сторіборди</value>
+  </data>
+  <data name="rank.any" xml:space="preserve">
+    <value>Всі</value>
+  </data>
+  <data name="rank.xh" xml:space="preserve">
+    <value>Срібний SS</value>
+  </data>
+  <data name="rank.sh" xml:space="preserve">
+    <value>Срібний S</value>
+  </data>
+  <data name="panel.playcount" xml:space="preserve">
+    <value>Кількість ігор: {0}</value>
+  </data>
+  <data name="panel.favourites" xml:space="preserve">
+    <value>В улюблених: {0}</value>
+  </data>
+  <data name="variant.mania.4k" xml:space="preserve">
+    <value>4K</value>
+  </data>
+  <data name="variant.mania.7k" xml:space="preserve">
+    <value>7K</value>
+  </data>
+  <data name="variant.mania.all" xml:space="preserve">
+    <value>Усі</value>
+  </data>
+</root>

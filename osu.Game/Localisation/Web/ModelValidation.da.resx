@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="invalid" xml:space="preserve">
+    <value>Ugyldigt {0} angivet.</value>
+  </data>
+  <data name="not_negative" xml:space="preserve">
+    <value>{0} kan ikke være negativ.</value>
+  </data>
+  <data name="required" xml:space="preserve">
+    <value>{0} er påkrævet.</value>
+  </data>
+  <data name="too_long" xml:space="preserve">
+    <value>{0} overskrider maksimal længde - kan højest være op til {1} karakterer.</value>
+  </data>
+  <data name="wrong_confirmation" xml:space="preserve">
+    <value>Bekræftelseskoden matchede ikke.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmap_missing" xml:space="preserve">
+    <value>Tidsstempel er angivet, men beatmap mangler.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmapset_no_hype" xml:space="preserve">
+    <value>Beatmappet kan ikke hypes.</value>
+  </data>
+  <data name="beatmapset_discussion.hype_requires_null_beatmap" xml:space="preserve">
+    <value>Hype skal gøres i afsnittet General (alle sværhedsgrader).</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmap_id" xml:space="preserve">
+    <value>Ugyldig sværhedsgrad angivet.</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmapset_id" xml:space="preserve">
+    <value>Ugyldig beatmap angivet.</value>
+  </data>
+  <data name="beatmapset_discussion.locked" xml:space="preserve">
+    <value>Diskussion er låst.</value>
+  </data>
+  <data name="beatmapset_discussion.attributes.message_type" xml:space="preserve">
+    <value>Meddelelsestype</value>
+  </data>
+  <data name="beatmapset_discussion.attributes.timestamp" xml:space="preserve">
+    <value>Tidsstempel</value>
+  </data>
+  <data name="beatmapset_discussion.hype.discussion_locked" xml:space="preserve">
+    <value>Denne beatmap er i øjeblikket låst og kan ikke blive hyped</value>
+  </data>
+  <data name="beatmapset_discussion.hype.guest" xml:space="preserve">
+    <value>Du skal være logget ind for at kunne hype.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.hyped" xml:space="preserve">
+    <value>Du har allerede hypet dette beatmap.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.limit_exceeded" xml:space="preserve">
+    <value>Du har brugt alt dit hype.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.not_hypeable" xml:space="preserve">
+    <value>Dette beatmap kan ikke blive hyped</value>
+  </data>
+  <data name="beatmapset_discussion.hype.owner" xml:space="preserve">
+    <value>Du kan ikke hype din egen beatmap.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.exceeds_beatmapset_length" xml:space="preserve">
+    <value>Det angivne tidsstempel er længere end længden af beatmappet.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.negative" xml:space="preserve">
+    <value>Tidsstempel kan ikke være negativt.</value>
+  </data>
+  <data name="beatmapset_discussion_post.discussion_locked" xml:space="preserve">
+    <value>Diskussion er låst.</value>
+  </data>
+  <data name="beatmapset_discussion_post.first_post" xml:space="preserve">
+    <value>Kan ikke slette det startende opslag.</value>
+  </data>
+  <data name="beatmapset_discussion_post.attributes.message" xml:space="preserve">
+    <value>Beskeden</value>
+  </data>
+  <data name="comment.deleted_parent" xml:space="preserve">
+    <value>Besvarelse af slettede kommentar er ikke tilladt.</value>
+  </data>
+  <data name="comment.top_only" xml:space="preserve">
+    <value>At fastgøre kommentar svar er ikke tilladt. </value>
+  </data>
+  <data name="comment.attributes.message" xml:space="preserve">
+    <value>Beskeden</value>
+  </data>
+  <data name="follow.invalid" xml:space="preserve">
+    <value>Ugyldig {0} angivet.</value>
+  </data>
+  <data name="forum.feature_vote.not_feature_topic" xml:space="preserve">
+    <value>Kan kun stemme på et funktionalitets-foreslag.</value>
+  </data>
+  <data name="forum.feature_vote.not_enough_feature_votes" xml:space="preserve">
+    <value>Ikke nok stemmer.</value>
+  </data>
+  <data name="forum.poll_vote.invalid" xml:space="preserve">
+    <value>Ugyldig valgmulighed valgt.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_delete" xml:space="preserve">
+    <value>Sletning af beatmap metadata opslag er ikke tilladt.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_edit" xml:space="preserve">
+    <value>Redigering af beatmap metadata opslag er ikke tilladt.</value>
+  </data>
+  <data name="forum.post.first_post_no_delete" xml:space="preserve">
+    <value>Kan ikke slette det startende opslag</value>
+  </data>
+  <data name="forum.post.missing_topic" xml:space="preserve">
+    <value>Indlæg mangler emne</value>
+  </data>
+  <data name="forum.post.only_quote" xml:space="preserve">
+    <value>Dit svar indeholder kun et quotationstegn.</value>
+  </data>
+  <data name="forum.post.attributes.post_text" xml:space="preserve">
+    <value>Hovedtekst</value>
+  </data>
+  <data name="forum.topic.attributes.topic_title" xml:space="preserve">
+    <value>Emnetitel</value>
+  </data>
+  <data name="forum.topic_poll.duplicate_options" xml:space="preserve">
+    <value>Duplikeret valgmulighed er ikke tilladt.</value>
+  </data>
+  <data name="forum.topic_poll.grace_period_expired" xml:space="preserve">
+    <value>Kan ikke redigere en afstemning efter mere end {0} timer</value>
+  </data>
+  <data name="forum.topic_poll.hiding_results_forever" xml:space="preserve">
+    <value>Kan ikke gemme resultaterne for en afstemning som aldrig slutter.</value>
+  </data>
+  <data name="forum.topic_poll.invalid_max_options" xml:space="preserve">
+    <value>Valgmuligheder pr. bruger må ikke overskride antallet af valgmuligheder i alt.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_one_selection" xml:space="preserve">
+    <value>Et minimum af en valgmulighed pr. bruger er nødvendigt.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_two_options" xml:space="preserve">
+    <value>Der skal være mindst 2 valgmuligheder.</value>
+  </data>
+  <data name="forum.topic_poll.too_many_options" xml:space="preserve">
+    <value>Overskrider det maksimale antal tilladte valgmuligheder.</value>
+  </data>
+  <data name="forum.topic_poll.attributes.title" xml:space="preserve">
+    <value>Afstemningstitel</value>
+  </data>
+  <data name="forum.topic_vote.required" xml:space="preserve">
+    <value>Vælg mindst en valgmulighed før du stemmer.</value>
+  </data>
+  <data name="forum.topic_vote.too_many" xml:space="preserve">
+    <value>Valgte flere valgmuliheder end tilladt.</value>
+  </data>
+  <data name="oauth.client.too_many" xml:space="preserve">
+    <value>Overskrider det maksimale antal tilladte OAuth applikationer.</value>
+  </data>
+  <data name="oauth.client.url" xml:space="preserve">
+    <value>Indtast venligst en gyldig URL.</value>
+  </data>
+  <data name="oauth.client.attributes.name" xml:space="preserve">
+    <value>Applikationsnavn</value>
+  </data>
+  <data name="oauth.client.attributes.redirect" xml:space="preserve">
+    <value>Applikation Callback URL</value>
+  </data>
+  <data name="user.contains_username" xml:space="preserve">
+    <value>Adgangskoden må ikke indholde et brugernavn.</value>
+  </data>
+  <data name="user.email_already_used" xml:space="preserve">
+    <value>Email-adressen er allerede i brug.</value>
+  </data>
+  <data name="user.email_not_allowed" xml:space="preserve">
+    <value>E-mail er ikke gyldig.</value>
+  </data>
+  <data name="user.invalid_country" xml:space="preserve">
+    <value>Landet er ikke i databasen.</value>
+  </data>
+  <data name="user.invalid_discord" xml:space="preserve">
+    <value>Ugyldigt Discord brugernavn.</value>
+  </data>
+  <data name="user.invalid_email" xml:space="preserve">
+    <value>Dette ligner ikke en email-adresse...</value>
+  </data>
+  <data name="user.invalid_twitter" xml:space="preserve">
+    <value>Ugyldigt Twitter brugernavn.</value>
+  </data>
+  <data name="user.too_short" xml:space="preserve">
+    <value>Den nye adgangskode er for kort.</value>
+  </data>
+  <data name="user.unknown_duplicate" xml:space="preserve">
+    <value>Brugernavnet eller email-adressen er allerede i brug.</value>
+  </data>
+  <data name="user.username_available_in" xml:space="preserve">
+    <value>Dette brugernavn vil være til rådighed om {0}.</value>
+  </data>
+  <data name="user.username_available_soon" xml:space="preserve">
+    <value>Dette brugernavn burde være tilgængeligt hvert øjeblik lige nu!</value>
+  </data>
+  <data name="user.username_invalid_characters" xml:space="preserve">
+    <value>Det anmodede brugernavn indeholder ugyldige tegn.</value>
+  </data>
+  <data name="user.username_in_use" xml:space="preserve">
+    <value>Brugernavn er allerede i brug!</value>
+  </data>
+  <data name="user.username_locked" xml:space="preserve">
+    <value>Brugernavn er allerede i brug!</value>
+  </data>
+  <data name="user.username_no_space_userscore_mix" xml:space="preserve">
+    <value>Brug enten understreg eller mellemrum, ikke begge dele!</value>
+  </data>
+  <data name="user.username_no_spaces" xml:space="preserve">
+    <value>Brugernavn kan ikke starte eller ende med mellemrum!</value>
+  </data>
+  <data name="user.username_not_allowed" xml:space="preserve">
+    <value>Dette brugernavn er ikke tilladt.</value>
+  </data>
+  <data name="user.username_too_short" xml:space="preserve">
+    <value>Det anmodede brugernavn er for kort.</value>
+  </data>
+  <data name="user.username_too_long" xml:space="preserve">
+    <value>Det anmodede brugernavn er for langt.</value>
+  </data>
+  <data name="user.weak" xml:space="preserve">
+    <value>Blacklistet adgangskode.</value>
+  </data>
+  <data name="user.wrong_current_password" xml:space="preserve">
+    <value>Den nuværende adgangskode er ugyldig.</value>
+  </data>
+  <data name="user.wrong_email_confirmation" xml:space="preserve">
+    <value>Emailbekræftelsen er forkert.</value>
+  </data>
+  <data name="user.wrong_password_confirmation" xml:space="preserve">
+    <value>Adgangskode-felterne matcher ikke.</value>
+  </data>
+  <data name="user.too_long" xml:space="preserve">
+    <value>Overskrider maksimale længde - kan højest være op til {0} karakterer.</value>
+  </data>
+  <data name="user.attributes.username" xml:space="preserve">
+    <value>Brugernavn</value>
+  </data>
+  <data name="user.attributes.user_email" xml:space="preserve">
+    <value>Mail addresse</value>
+  </data>
+  <data name="user.attributes.password" xml:space="preserve">
+    <value>Adgangskode</value>
+  </data>
+  <data name="user.change_username.restricted" xml:space="preserve">
+    <value>Du kan ikke ændre dit brugernavn mens du er tilbageholdt.</value>
+  </data>
+  <data name="user.change_username.supporter_required._" xml:space="preserve">
+    <value>Du skal have {0} for at ændre dit navn!</value>
+  </data>
+  <data name="user.change_username.supporter_required.link_text" xml:space="preserve">
+    <value>støttede osu!</value>
+  </data>
+  <data name="user.change_username.username_is_same" xml:space="preserve">
+    <value>Det her er allerede dit Brugernavn, fjollehoved!</value>
+  </data>
+  <data name="user_report.reason_not_valid" xml:space="preserve">
+    <value>{0} er ikke gyldt for denne type anmeldelse.</value>
+  </data>
+  <data name="user_report.self" xml:space="preserve">
+    <value>Du kan ikke rapportere dig selv!</value>
+  </data>
+  <data name="store.order_item.attributes.quantity" xml:space="preserve">
+    <value>Antal</value>
+  </data>
+  <data name="store.order_item.attributes.cost" xml:space="preserve">
+    <value>Pris</value>
+  </data>
+</root>

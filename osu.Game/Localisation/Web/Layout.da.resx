@@ -1,0 +1,385 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="audio.autoplay" xml:space="preserve">
+    <value>Afspil næste sang automatisk</value>
+  </data>
+  <data name="defaults.page_description" xml:space="preserve">
+    <value>osu! - Rytme er kun et *klik* væk!  Med Ouendan/EBA, Taiko og originale spil-modes, såvel som en fuld funktionel level-editor.</value>
+  </data>
+  <data name="header.admin.beatmapset" xml:space="preserve">
+    <value>beatmapset</value>
+  </data>
+  <data name="header.admin.beatmapset_covers" xml:space="preserve">
+    <value>beatmapset covers</value>
+  </data>
+  <data name="header.admin.contest" xml:space="preserve">
+    <value>konkurrence</value>
+  </data>
+  <data name="header.admin.contests" xml:space="preserve">
+    <value>konkurrencer</value>
+  </data>
+  <data name="header.admin.root" xml:space="preserve">
+    <value>konsol</value>
+  </data>
+  <data name="header.admin.store_orders" xml:space="preserve">
+    <value>butik admin</value>
+  </data>
+  <data name="header.artists.index" xml:space="preserve">
+    <value>katalog</value>
+  </data>
+  <data name="header.changelog.index" xml:space="preserve">
+    <value>katalog</value>
+  </data>
+  <data name="header.help.index" xml:space="preserve">
+    <value>indeks</value>
+  </data>
+  <data name="header.help.sitemap" xml:space="preserve">
+    <value>Sitemap</value>
+  </data>
+  <data name="header.store.cart" xml:space="preserve">
+    <value>indkøbskurv</value>
+  </data>
+  <data name="header.store.orders" xml:space="preserve">
+    <value>ordrehistorik</value>
+  </data>
+  <data name="header.store.products" xml:space="preserve">
+    <value>produkter</value>
+  </data>
+  <data name="header.tournaments.index" xml:space="preserve">
+    <value>katalog</value>
+  </data>
+  <data name="header.users.modding" xml:space="preserve">
+    <value>modding</value>
+  </data>
+  <data name="header.users.show" xml:space="preserve">
+    <value>info</value>
+  </data>
+  <data name="gallery.close" xml:space="preserve">
+    <value>Luk (Esc)</value>
+  </data>
+  <data name="gallery.fullscreen" xml:space="preserve">
+    <value>Skift til fuldskærm</value>
+  </data>
+  <data name="gallery.zoom" xml:space="preserve">
+    <value>Zoom ind/ud</value>
+  </data>
+  <data name="gallery.previous" xml:space="preserve">
+    <value>Forrige (højre pil)</value>
+  </data>
+  <data name="gallery.next" xml:space="preserve">
+    <value>Næste (ventre pil)</value>
+  </data>
+  <data name="menu.beatmaps._" xml:space="preserve">
+    <value>beatmaps</value>
+  </data>
+  <data name="menu.beatmaps.artists" xml:space="preserve">
+    <value>udvalgte kunstnere</value>
+  </data>
+  <data name="menu.beatmaps.index" xml:space="preserve">
+    <value>liste</value>
+  </data>
+  <data name="menu.beatmaps.packs" xml:space="preserve">
+    <value>pakker</value>
+  </data>
+  <data name="menu.community._" xml:space="preserve">
+    <value>fællesskab</value>
+  </data>
+  <data name="menu.community.chat" xml:space="preserve">
+    <value>chat</value>
+  </data>
+  <data name="menu.community.contests" xml:space="preserve">
+    <value>konkurrencer</value>
+  </data>
+  <data name="menu.community.dev" xml:space="preserve">
+    <value>udvikling</value>
+  </data>
+  <data name="menu.community.forum-forums-index" xml:space="preserve">
+    <value>forummer</value>
+  </data>
+  <data name="menu.community.getlive" xml:space="preserve">
+    <value>live</value>
+  </data>
+  <data name="menu.community.tournaments" xml:space="preserve">
+    <value>turneringer</value>
+  </data>
+  <data name="menu.help._" xml:space="preserve">
+    <value>hjælp</value>
+  </data>
+  <data name="menu.help.getabuse" xml:space="preserve">
+    <value>anmeld misbrug</value>
+  </data>
+  <data name="menu.help.getfaq" xml:space="preserve">
+    <value>faq</value>
+  </data>
+  <data name="menu.help.getrules" xml:space="preserve">
+    <value>regler</value>
+  </data>
+  <data name="menu.help.getsupport" xml:space="preserve">
+    <value>nej, jeg behøver virkelig noget hjælp!</value>
+  </data>
+  <data name="menu.help.getwiki" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="menu.home._" xml:space="preserve">
+    <value>hjem</value>
+  </data>
+  <data name="menu.home.changelog-index" xml:space="preserve">
+    <value>ændringsoversigt</value>
+  </data>
+  <data name="menu.home.getdownload" xml:space="preserve">
+    <value>download</value>
+  </data>
+  <data name="menu.home.news-index" xml:space="preserve">
+    <value>nyheder</value>
+  </data>
+  <data name="menu.home.search" xml:space="preserve">
+    <value>søg</value>
+  </data>
+  <data name="menu.home.team" xml:space="preserve">
+    <value>team</value>
+  </data>
+  <data name="menu.rankings._" xml:space="preserve">
+    <value>rangering</value>
+  </data>
+  <data name="menu.rankings.charts" xml:space="preserve">
+    <value>spotlights</value>
+  </data>
+  <data name="menu.rankings.country" xml:space="preserve">
+    <value>land</value>
+  </data>
+  <data name="menu.rankings.index" xml:space="preserve">
+    <value>præstation</value>
+  </data>
+  <data name="menu.rankings.kudosu" xml:space="preserve">
+    <value>kudosu</value>
+  </data>
+  <data name="menu.rankings.multiplayer" xml:space="preserve">
+    <value>multiplayer</value>
+  </data>
+  <data name="menu.rankings.score" xml:space="preserve">
+    <value>score</value>
+  </data>
+  <data name="menu.store._" xml:space="preserve">
+    <value>butik</value>
+  </data>
+  <data name="menu.store.cart-show" xml:space="preserve">
+    <value>indkøbskurv</value>
+  </data>
+  <data name="menu.store.getlisting" xml:space="preserve">
+    <value>katalog</value>
+  </data>
+  <data name="menu.store.orders-index" xml:space="preserve">
+    <value>ordrehistorik</value>
+  </data>
+  <data name="footer.general._" xml:space="preserve">
+    <value>Generelt</value>
+  </data>
+  <data name="footer.general.home" xml:space="preserve">
+    <value>Hjem</value>
+  </data>
+  <data name="footer.general.changelog-index" xml:space="preserve">
+    <value>Changelog</value>
+  </data>
+  <data name="footer.general.beatmaps" xml:space="preserve">
+    <value>Beatmap Lister</value>
+  </data>
+  <data name="footer.general.download" xml:space="preserve">
+    <value>Download osu!</value>
+  </data>
+  <data name="footer.help._" xml:space="preserve">
+    <value>Hjælp og Fællesskab</value>
+  </data>
+  <data name="footer.help.faq" xml:space="preserve">
+    <value>Ofte Stillede Spørgsmål</value>
+  </data>
+  <data name="footer.help.forum" xml:space="preserve">
+    <value>Fællesskabsforummer</value>
+  </data>
+  <data name="footer.help.livestreams" xml:space="preserve">
+    <value>Live Streams</value>
+  </data>
+  <data name="footer.help.report" xml:space="preserve">
+    <value>Rapportér en Fejl</value>
+  </data>
+  <data name="footer.help.wiki" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="footer.legal._" xml:space="preserve">
+    <value>Legal &amp; Status</value>
+  </data>
+  <data name="footer.legal.copyright" xml:space="preserve">
+    <value>Copyright (DMCA)</value>
+  </data>
+  <data name="footer.legal.privacy" xml:space="preserve">
+    <value>Privatliv</value>
+  </data>
+  <data name="footer.legal.server_status" xml:space="preserve">
+    <value>Server Status</value>
+  </data>
+  <data name="footer.legal.source_code" xml:space="preserve">
+    <value>Kildekode</value>
+  </data>
+  <data name="footer.legal.terms" xml:space="preserve">
+    <value>Betingelser for Brug</value>
+  </data>
+  <data name="errors.400.error" xml:space="preserve">
+    <value>Ugyldigt forespørgselsparametre</value>
+  </data>
+  <data name="errors.404.error" xml:space="preserve">
+    <value>Siden findes ikke</value>
+  </data>
+  <data name="errors.404.description" xml:space="preserve">
+    <value>Beklager, men siden du forsøger at finde, eksisterer ikke!</value>
+  </data>
+  <data name="errors.403.error" xml:space="preserve">
+    <value>Du burde ikke være her.</value>
+  </data>
+  <data name="errors.403.description" xml:space="preserve">
+    <value>Du kunne prøve at gå tilbage igen, okay?</value>
+  </data>
+  <data name="errors.401.error" xml:space="preserve">
+    <value>Du burde ikke være her.</value>
+  </data>
+  <data name="errors.401.description" xml:space="preserve">
+    <value>Du kunne prøve at gå tilbage igen, okay? Eller bare logge ind måske.</value>
+  </data>
+  <data name="errors.405.error" xml:space="preserve">
+    <value>Siden findes ikke</value>
+  </data>
+  <data name="errors.405.description" xml:space="preserve">
+    <value>Beklager, men siden, du forsøger at finde, eksisterer ikke!!</value>
+  </data>
+  <data name="errors.422.error" xml:space="preserve">
+    <value>Ugyldige forespørgselsparametre</value>
+  </data>
+  <data name="errors.500.error" xml:space="preserve">
+    <value>Åh nej! Der er noget galt! ;_;</value>
+  </data>
+  <data name="errors.500.description" xml:space="preserve">
+    <value>Vi er blevet informeret om fejlen.</value>
+  </data>
+  <data name="errors.fatal.error" xml:space="preserve">
+    <value>Åh nej! Der er noget (voldsomt) galt! ;_;</value>
+  </data>
+  <data name="errors.fatal.description" xml:space="preserve">
+    <value>Vi er blevet informeret om fejlen.</value>
+  </data>
+  <data name="errors.503.error" xml:space="preserve">
+    <value>Under Vedligeholdelse!</value>
+  </data>
+  <data name="errors.503.description" xml:space="preserve">
+    <value>Vedligeholdelse tager som regel mellem 5 sekunder og 10 minutter. Hvis siden er nede i længere tid, se {0} for mere information.</value>
+  </data>
+  <data name="errors.reference" xml:space="preserve">
+    <value>Her er en kode, som du kan sige videre til support, hvis du vil!</value>
+  </data>
+  <data name="popup_login.button" xml:space="preserve">
+    <value>log ind / Tilmeld</value>
+  </data>
+  <data name="popup_login.login.forgot" xml:space="preserve">
+    <value>Jeg har glemt min login-info</value>
+  </data>
+  <data name="popup_login.login.password" xml:space="preserve">
+    <value>adgangskode</value>
+  </data>
+  <data name="popup_login.login.title" xml:space="preserve">
+    <value>Log ind for at fortsætte</value>
+  </data>
+  <data name="popup_login.login.username" xml:space="preserve">
+    <value>brugernavn</value>
+  </data>
+  <data name="popup_login.login.error.email" xml:space="preserve">
+    <value>Brugernavn eller email-addresse eksisterer ikke</value>
+  </data>
+  <data name="popup_login.login.error.password" xml:space="preserve">
+    <value>Forkert adgangskode</value>
+  </data>
+  <data name="popup_login.register.download" xml:space="preserve">
+    <value>Hent</value>
+  </data>
+  <data name="popup_login.register.info" xml:space="preserve">
+    <value>Du skal have en konto, min gode mand! Hvor har du ikke én endnu?</value>
+  </data>
+  <data name="popup_login.register.title" xml:space="preserve">
+    <value>Har du ikke en konto?</value>
+  </data>
+  <data name="popup_user.links.account-edit" xml:space="preserve">
+    <value>Indstillinger</value>
+  </data>
+  <data name="popup_user.links.follows" xml:space="preserve">
+    <value>Overvågningsliste</value>
+  </data>
+  <data name="popup_user.links.friends" xml:space="preserve">
+    <value>Venner</value>
+  </data>
+  <data name="popup_user.links.logout" xml:space="preserve">
+    <value>Log ud</value>
+  </data>
+  <data name="popup_user.links.profile" xml:space="preserve">
+    <value>Min Profil</value>
+  </data>
+  <data name="popup_search.initial" xml:space="preserve">
+    <value>Skriv for at søge!</value>
+  </data>
+  <data name="popup_search.retry" xml:space="preserve">
+    <value>Søgningen fejlede. Prøv igen.</value>
+  </data>
+</root>

@@ -1,0 +1,250 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="not_negative" xml:space="preserve">
+    <value>το {0} δε μπορεί να δοθεί.</value>
+  </data>
+  <data name="required" xml:space="preserve">
+    <value>το {0} απαιτείται.</value>
+  </data>
+  <data name="too_long" xml:space="preserve">
+    <value>το {0} υπερβαίνει το μέγιστο όριο χαρακτήρων - μπορεί να είναι μέχρι {1} χαρακτήρες.</value>
+  </data>
+  <data name="wrong_confirmation" xml:space="preserve">
+    <value>Η βεβαίωση δεν ταιριάζει.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmap_missing" xml:space="preserve">
+    <value>Η χρονική σήμανση έχει καθοριστεί αλλά το beatmap λείπει.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmapset_no_hype" xml:space="preserve">
+    <value>Το beatmap δε μπορεί να γίνει hyped.</value>
+  </data>
+  <data name="beatmapset_discussion.hype_requires_null_beatmap" xml:space="preserve">
+    <value>Το hype πρέπει να γίνει στην Γενική (όλες οι δυσκολίες) ενότητα.</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmap_id" xml:space="preserve">
+    <value>Προσδιορίστηκε μη έγκυρη δυσκολία.</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmapset_id" xml:space="preserve">
+    <value>Προσδιορίστηκε μη έγκυρο beatmap.</value>
+  </data>
+  <data name="beatmapset_discussion.locked" xml:space="preserve">
+    <value>Η συζήτηση είναι κλειδωμένη.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.guest" xml:space="preserve">
+    <value>Πρέπει να είστε συνδεδεμένοι για να κάνετε hype.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.hyped" xml:space="preserve">
+    <value>Έχετε κάνει ήδη hype αυτό το beatmap.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.limit_exceeded" xml:space="preserve">
+    <value>Έχετε χρησιμοποιήσει όλο το hype σας.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.not_hypeable" xml:space="preserve">
+    <value>Δε μπορεί να γίνει hype σε αυτό το betamap</value>
+  </data>
+  <data name="beatmapset_discussion.hype.owner" xml:space="preserve">
+    <value>Δε μπορείτε να κάνετε hype το beatmap σας.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.exceeds_beatmapset_length" xml:space="preserve">
+    <value>Το καθορισμένο timestamp είναι πέρα από τη διάρκεια του beatmap.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.negative" xml:space="preserve">
+    <value>Η χρονική σήμανση δε μπορεί να είναι αρνητική.</value>
+  </data>
+  <data name="beatmapset_discussion_post.discussion_locked" xml:space="preserve">
+    <value>Η συζήτηση έχει κλειδωθεί.</value>
+  </data>
+  <data name="beatmapset_discussion_post.first_post" xml:space="preserve">
+    <value>Το αρχικό post δε μπορεί να διαγραφεί.</value>
+  </data>
+  <data name="comment.deleted_parent" xml:space="preserve">
+    <value>Δεν επιτρέπεται η απάντηση σε διαγραμμένο σχόλιο.</value>
+  </data>
+  <data name="forum.feature_vote.not_feature_topic" xml:space="preserve">
+    <value>Μπορείτε να ψηφίσετε μόνο ένα αίτημα χαρακτηριστικών.</value>
+  </data>
+  <data name="forum.feature_vote.not_enough_feature_votes" xml:space="preserve">
+    <value>Δε συγκεντρώθηκαν αρκετοί ψήφοι.</value>
+  </data>
+  <data name="forum.poll_vote.invalid" xml:space="preserve">
+    <value>Προσδιορίστηκε μη έγκυρη επιλογή.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_delete" xml:space="preserve">
+    <value>Η διαγραφή του post για τα μεταδεδομένα το beatmap δεν είναι επιτρεπτή.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_edit" xml:space="preserve">
+    <value>Η επεξεργασία του post για τα μεταδεδομένα το beatmap δεν είναι επιτρεπτή.</value>
+  </data>
+  <data name="forum.post.only_quote" xml:space="preserve">
+    <value>Η απάντησή σας περιέχει μόνο μία αναφορά.</value>
+  </data>
+  <data name="forum.topic.attributes.topic_title" xml:space="preserve">
+    <value>Τίτλος Θέματος</value>
+  </data>
+  <data name="forum.topic_poll.duplicate_options" xml:space="preserve">
+    <value>Η επιλογή για διπλασιασμό δεν είναι επιτρεπτή.</value>
+  </data>
+  <data name="forum.topic_poll.grace_period_expired" xml:space="preserve">
+    <value>Δεν είναι δυνατή επεξεργασία δημοσκόπησης μετά από {0} + ώρες</value>
+  </data>
+  <data name="forum.topic_poll.hiding_results_forever" xml:space="preserve">
+    <value>Δεν μπορείτε να αποκρύψετε τα αποτελέσματα μιας ψηφοφορίας που δεν τελειώνει ποτέ.</value>
+  </data>
+  <data name="forum.topic_poll.invalid_max_options" xml:space="preserve">
+    <value>Η επιλογή ανά χρήστη ίσως υπερβαίνει τον αριθμό των διαθέσιμων επιλογών.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_one_selection" xml:space="preserve">
+    <value>Το ελάχιστο που απαιτείται είναι μία επιλογή ανά χρήστη.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_two_options" xml:space="preserve">
+    <value>Χρειάζονται τουλάχιστον δύο επιλογές.</value>
+  </data>
+  <data name="forum.topic_poll.too_many_options" xml:space="preserve">
+    <value>Υπερβήκατε το μέγιστο αριθμό επιλογών που επιτρέπεται.</value>
+  </data>
+  <data name="forum.topic_vote.required" xml:space="preserve">
+    <value>Επιλέξτε μία επιλογή όταν ψηφίζετε.</value>
+  </data>
+  <data name="forum.topic_vote.too_many" xml:space="preserve">
+    <value>Επιλέχθηκαν περισσότερες επιλογές από το επιτρεπόμενο όριο.</value>
+  </data>
+  <data name="user.contains_username" xml:space="preserve">
+    <value>Ο κωδικός δεν πρέπει να περιέχει το όνομα χρήστη.</value>
+  </data>
+  <data name="user.email_already_used" xml:space="preserve">
+    <value>Το email είναι ήδη σε χρήση.</value>
+  </data>
+  <data name="user.invalid_country" xml:space="preserve">
+    <value>Η χώρα δεν υπάρχει στη βάση δεδομένων.</value>
+  </data>
+  <data name="user.invalid_discord" xml:space="preserve">
+    <value>Το όνομα χρήστη στο Discord δεν είναι έγκυρο.</value>
+  </data>
+  <data name="user.invalid_email" xml:space="preserve">
+    <value>Δε φαίνεται να είναι ένα έγκυρο email.</value>
+  </data>
+  <data name="user.too_short" xml:space="preserve">
+    <value>Ο καινούργιος κωδικός είναι πολύ μικρός.</value>
+  </data>
+  <data name="user.unknown_duplicate" xml:space="preserve">
+    <value>Το όνομα χρήστη ή το email είναι ήδη σε χρήση.</value>
+  </data>
+  <data name="user.username_available_in" xml:space="preserve">
+    <value>Αυτό το όνομα χρήστη θα είναι διαθέσιμο σε {0} μέρες.</value>
+  </data>
+  <data name="user.username_available_soon" xml:space="preserve">
+    <value>Αυτό το όνομα χρήστη θα είναι διαθέσιμο σύντομα!</value>
+  </data>
+  <data name="user.username_invalid_characters" xml:space="preserve">
+    <value>Το ζητούμενο όνομα χρήστη περιέχει μη έγκυρους χαρακτήρες.</value>
+  </data>
+  <data name="user.username_in_use" xml:space="preserve">
+    <value>Το όνομα χρήστη χρησιμοποιείται ήδη!</value>
+  </data>
+  <data name="user.username_locked" xml:space="preserve">
+    <value>Το όνομα χρήστη χρησιμοποιείται ήδη!</value>
+  </data>
+  <data name="user.username_no_space_userscore_mix" xml:space="preserve">
+    <value>Παρακαλώ χρησιμοποιείστε κάτω παύλες ή κενά, όχι και τα δύο!</value>
+  </data>
+  <data name="user.username_no_spaces" xml:space="preserve">
+    <value>Το όνομα χρήστη δε μπορεί να ξεκινάει ή να τελειώνει με κενά!</value>
+  </data>
+  <data name="user.username_not_allowed" xml:space="preserve">
+    <value>Η επιλογή αυτού του ονόματος χρήστη δεν επιτρέπεται.</value>
+  </data>
+  <data name="user.username_too_short" xml:space="preserve">
+    <value>Το ζητούμενο όνομα είναι πολύ μικρό.</value>
+  </data>
+  <data name="user.username_too_long" xml:space="preserve">
+    <value>Το ζητούμενο όνομα χρήστη είναι πολύ μεγάλο.</value>
+  </data>
+  <data name="user.weak" xml:space="preserve">
+    <value>Απαγορευμένος κωδικός.</value>
+  </data>
+  <data name="user.wrong_current_password" xml:space="preserve">
+    <value>Ο παρών κωδικός είναι λανθασμένος.</value>
+  </data>
+  <data name="user.wrong_email_confirmation" xml:space="preserve">
+    <value>Η πιστοποίηση του email δεν ταιριάζει.</value>
+  </data>
+  <data name="user.wrong_password_confirmation" xml:space="preserve">
+    <value>Η πιστοποίηση του κωδικού δεν ταιριάζει.</value>
+  </data>
+  <data name="user.too_long" xml:space="preserve">
+    <value>Έχετε υπερβεί το μέγιστο όριο - μπορεί να είναι μέχρι {0} χαρακτήρες.</value>
+  </data>
+  <data name="user.change_username.restricted" xml:space="preserve">
+    <value>Δεν μπορείτε να αλλάξετε όνομα χρήστη ενώ είστε restricted.</value>
+  </data>
+  <data name="user.change_username.supporter_required._" xml:space="preserve">
+    <value>Πρέπει να έχεις {0} για να αλλάξεις το όνομα χρήστη σου!</value>
+  </data>
+  <data name="user.change_username.supporter_required.link_text" xml:space="preserve">
+    <value>υποστήριξε το osu!</value>
+  </data>
+  <data name="user.change_username.username_is_same" xml:space="preserve">
+    <value>Αυτό είναι ήδη το όνομα χρήστη σου, χαζούλη!</value>
+  </data>
+  <data name="user_report.self" xml:space="preserve">
+    <value>Δεν μπορείτε να αποκλέισετε τον εαυτό σας!</value>
+  </data>
+</root>

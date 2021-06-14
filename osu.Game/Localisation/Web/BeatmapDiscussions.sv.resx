@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authorizations.update.null_user" xml:space="preserve">
+    <value>Måste vara inloggad för att kunna redigera.</value>
+  </data>
+  <data name="authorizations.update.system_generated" xml:space="preserve">
+    <value>Systemgenererade inlägg kan inte redigeras.</value>
+  </data>
+  <data name="authorizations.update.wrong_user" xml:space="preserve">
+    <value>Måste vara ägare till inlägget för att kunna redigera.</value>
+  </data>
+  <data name="events.empty" xml:space="preserve">
+    <value>Inget har hänt... ännu.</value>
+  </data>
+  <data name="index.deleted_beatmap" xml:space="preserve">
+    <value>raderad</value>
+  </data>
+  <data name="index.none_found" xml:space="preserve">
+    <value>Inga diskussioner som matchar det sökkriteriet hittades.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmap diskussioner</value>
+  </data>
+  <data name="index.form._" xml:space="preserve">
+    <value>Sök</value>
+  </data>
+  <data name="index.form.deleted" xml:space="preserve">
+    <value>Inkludera raderade diskussioner</value>
+  </data>
+  <data name="index.form.mode" xml:space="preserve">
+    <value>Beatmapläge</value>
+  </data>
+  <data name="index.form.only_unresolved" xml:space="preserve">
+    <value>Visa bara olösta diskussioner</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Typ av meddelande</value>
+  </data>
+  <data name="index.form.username" xml:space="preserve">
+    <value>Användarnamn</value>
+  </data>
+  <data name="index.form.beatmapset_status._" xml:space="preserve">
+    <value>Beatmap-status</value>
+  </data>
+  <data name="index.form.beatmapset_status.all" xml:space="preserve">
+    <value>Alla</value>
+  </data>
+  <data name="index.form.beatmapset_status.disqualified" xml:space="preserve">
+    <value>Diskvalificerad</value>
+  </data>
+  <data name="index.form.beatmapset_status.never_qualified" xml:space="preserve">
+    <value>Aldrig kvalificerad</value>
+  </data>
+  <data name="index.form.beatmapset_status.qualified" xml:space="preserve">
+    <value>Kvalificerad</value>
+  </data>
+  <data name="index.form.beatmapset_status.ranked" xml:space="preserve">
+    <value>Rankad</value>
+  </data>
+  <data name="index.form.user.label" xml:space="preserve">
+    <value>Användare</value>
+  </data>
+  <data name="index.form.user.overview" xml:space="preserve">
+    <value>Aktivitetsöversikt</value>
+  </data>
+  <data name="item.created_at" xml:space="preserve">
+    <value>Inläggningsdatum</value>
+  </data>
+  <data name="item.deleted_at" xml:space="preserve">
+    <value>Raderingsdatum</value>
+  </data>
+  <data name="item.message_type" xml:space="preserve">
+    <value>Typ</value>
+  </data>
+  <data name="item.permalink" xml:space="preserve">
+    <value>Permalänk</value>
+  </data>
+  <data name="nearby_posts.confirm" xml:space="preserve">
+    <value>Inget av inläggen tar upp min oro</value>
+  </data>
+  <data name="nearby_posts.notice" xml:space="preserve">
+    <value>Det finns inlägg runt {0} ({1}). Var vänlig kontrollera detta innan du lägger upp ett inlägg.</value>
+  </data>
+  <data name="nearby_posts.unsaved" xml:space="preserve">
+    <value>{0} i denna recension</value>
+  </data>
+  <data name="reply.open.guest" xml:space="preserve">
+    <value>Logga in för att svara</value>
+  </data>
+  <data name="reply.open.user" xml:space="preserve">
+    <value>Svara</value>
+  </data>
+  <data name="review.go_to_parent" xml:space="preserve">
+    <value>Visa granskningsinlägg</value>
+  </data>
+  <data name="review.go_to_child" xml:space="preserve">
+    <value>Visa diskussion</value>
+  </data>
+  <data name="review.validation.block_too_large" xml:space="preserve">
+    <value>varje block får endast innehålla upp till {0} tecken</value>
+  </data>
+  <data name="review.validation.external_references" xml:space="preserve">
+    <value>granskningen innehåller referenser till problem som inte hör till denna recension</value>
+  </data>
+  <data name="review.validation.invalid_block_type" xml:space="preserve">
+    <value>ogiltig blocktyp</value>
+  </data>
+  <data name="review.validation.invalid_document" xml:space="preserve">
+    <value>ogiltig granskning</value>
+  </data>
+  <data name="review.validation.minimum_issues" xml:space="preserve">
+    <value>granskningen måste innehålla minst {0} problem|granskningen måste innehålla minst {0} problem</value>
+  </data>
+  <data name="review.validation.missing_text" xml:space="preserve">
+    <value>blocket saknar text</value>
+  </data>
+  <data name="review.validation.too_many_blocks" xml:space="preserve">
+    <value>granskningarna måste endast innehålla {0} stycke/problem granskningarna får endast innehålla upp till {0} stycken/problem</value>
+  </data>
+  <data name="system.resolved.true" xml:space="preserve">
+    <value>Markerad som löst av {0}</value>
+  </data>
+  <data name="system.resolved.false" xml:space="preserve">
+    <value>Återöppnad av {0}</value>
+  </data>
+  <data name="timestamp_display.general" xml:space="preserve">
+    <value>allmänt</value>
+  </data>
+  <data name="timestamp_display.general_all" xml:space="preserve">
+    <value>allmänt (alla)</value>
+  </data>
+  <data name="user_filter.everyone" xml:space="preserve">
+    <value>Allihopa</value>
+  </data>
+  <data name="user_filter.label" xml:space="preserve">
+    <value>Filtrera efter användare</value>
+  </data>
+</root>

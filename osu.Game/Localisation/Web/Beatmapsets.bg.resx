@@ -1,0 +1,325 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>Този бийтмап в момента не може да бъде итеглен.</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>Части от този бийтмап са премахнати по искане на създателя или притежателя на авторските права.</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>Щракнете тук за още информация.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Списък с бийтмапове</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>Бийтмапове</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>изтегли</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>изтегли с видео</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>изтегли без видео</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>отвори в osu!direct</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>Дискусия</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>Харесай този бийтмап сет</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>Трябва да сте влезли в акаунта си преди да е възможно да теглите бийтмапове!</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>съпоставено от {0}</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>Премахни от харесани бийтмап сетове</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>последно актуализиран {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>Изтегли</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>без видео</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>с видео</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>за достъп до повече функции</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>Влизане</value>
+  </data>
+  <data name="show.details_date.approved" xml:space="preserve">
+    <value>одобрен {0}</value>
+  </data>
+  <data name="show.details_date.loved" xml:space="preserve">
+    <value>обичан {0}</value>
+  </data>
+  <data name="show.details_date.qualified" xml:space="preserve">
+    <value>квалифициран {0}</value>
+  </data>
+  <data name="show.details_date.ranked" xml:space="preserve">
+    <value>класиран {0}</value>
+  </data>
+  <data name="show.details_date.submitted" xml:space="preserve">
+    <value>публикуван {0}</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>последно актуализиран {0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>Имате прекалено много харесани бийтмапове. Моля махнете няколко от списъка и опитайте отново.</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>Надъхай този бийтмап ако ви е харесал и искате да помогнете за развитието и &lt;strong&gt;класирането&lt;/strong&gt; му.</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>Този мап в момента е {0}.</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>изчакващ</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>квалифициран</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>в процес на разработка</value>
+  </data>
+  <data name="show.hype.disqualify._" xml:space="preserve">
+    <value>Ако откриете проблем с този бийтмап, моля дисквалифицирайте го {0}.</value>
+  </data>
+  <data name="show.hype.report._" xml:space="preserve">
+    <value>Ако откриете проблем с този бийтмап, моля докладвайте го {0}, за да уведомите отбора ни.</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>Докладвай проблем</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>тук</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>Описание</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>Жанр</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>Език</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>Информацията все още се обработва...</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>Връхни точки на провал</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>Източник</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>Степен на успех (%)</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>Тагове</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>постигнато на {0}</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>Класиране в страната</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>Приятелско класиране</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>Глобално класиране</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>Щракнете &lt;a href="{0}"&gt;тук&lt;/a&gt;, за да видите всички хубави екстри, които получаваш!</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>Трябва да сте osu!supporter, за да имате достъп до държавното и приятелско класиране!</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>Табло за точки</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>Прецизност</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>Макс комбо</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>Пропуски</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>Модове</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>Играч</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>Ранг</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>Общ брой точки</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>Точки</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>Време</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>Никой от твоята държава не е играл тази карта все още!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>Никой от твоите приятели не е играл тази карта все още!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>Все още няма резултати. Може би се пробвайте да зададете няколко?</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>Зареждане на резултатите...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>Некласиран бийтмап.</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>Начело</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>Твоят най-добър</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>Големина на кръгчетата</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>Брой клавиши</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>HP Изтощаване</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>Прецизност</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>Скорост на наближаване</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>Трудност</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>Продължителност</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>Брой кръгчета</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>Брой слайдери</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>Потребителски рейтинг</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>Разпределение на рейтинга</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>Номинации</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>Брой игри</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>Класиран</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>Одобрени</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>Обичан</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>Квалифициран</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>WIP</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>Предстоящ</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>Гробище</value>
+  </data>
+</root>

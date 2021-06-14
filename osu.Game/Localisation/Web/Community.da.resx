@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="support.convinced.title" xml:space="preserve">
+    <value>Jeg er overbevist! {0}</value>
+  </data>
+  <data name="support.convinced.support" xml:space="preserve">
+    <value>støt osu!</value>
+  </data>
+  <data name="support.convinced.gift" xml:space="preserve">
+    <value>eller giv det som en gave til en anden</value>
+  </data>
+  <data name="support.convinced.instructions" xml:space="preserve">
+    <value>klik på hjertet for at gå videre til osu!store</value>
+  </data>
+  <data name="support.why-support.title" xml:space="preserve">
+    <value>Hvorfor skulle jeg støtte osu!? Hvad går pengene til?</value>
+  </data>
+  <data name="support.why-support.team.title" xml:space="preserve">
+    <value>Støt holdet bag osu!</value>
+  </data>
+  <data name="support.why-support.team.description" xml:space="preserve">
+    <value>Et lille hold udvikler og holder osu! kørende. Din støtte hjælper dem til at, du ved... leve.</value>
+  </data>
+  <data name="support.why-support.infra.title" xml:space="preserve">
+    <value>Server Infrastruktur</value>
+  </data>
+  <data name="support.why-support.infra.description" xml:space="preserve">
+    <value>Bidrag går til at holde servere kørende for hjemmesiden, multiplayer services, online ranglister, m.m.</value>
+  </data>
+  <data name="support.why-support.featured-artists.title" xml:space="preserve">
+    <value>Udvalgte Kunstnere</value>
+  </data>
+  <data name="support.why-support.featured-artists.description" xml:space="preserve">
+    <value>Med din hjælp kan vi komme i kontakt med flere fede artister og licensere endnu mere fedt musik til brug i osu!</value>
+  </data>
+  <data name="support.why-support.featured-artists.link_text" xml:space="preserve">
+    <value>Vis nuværende hold &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.ads.title" xml:space="preserve">
+    <value>Hold osu! selvforsynende</value>
+  </data>
+  <data name="support.why-support.ads.description" xml:space="preserve">
+    <value>Din støtter hjælper med at holde spillet uafhængigt og helt frit fra reklamer eller andre sponsorer.</value>
+  </data>
+  <data name="support.why-support.tournaments.title" xml:space="preserve">
+    <value>Officielle Turneringer</value>
+  </data>
+  <data name="support.why-support.tournaments.description" xml:space="preserve">
+    <value>Hjælp med at finansiere afholdelsen af (og præmierne til) de officielle osu! Verdensmesterskaber.</value>
+  </data>
+  <data name="support.why-support.tournaments.link_text" xml:space="preserve">
+    <value>Udforsk turneringer &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.bounty-program.title" xml:space="preserve">
+    <value>Open Source Dusør Program</value>
+  </data>
+  <data name="support.why-support.bounty-program.description" xml:space="preserve">
+    <value>Støt de folk der bidrager deres tid og dedikation til at gøre osu! bedre.</value>
+  </data>
+  <data name="support.why-support.bounty-program.link_text" xml:space="preserve">
+    <value>Find ud af mere &amp;raquo;</value>
+  </data>
+  <data name="support.perks.title" xml:space="preserve">
+    <value>Uhh, hvad får jeg så?!</value>
+  </data>
+  <data name="support.perks.osu_direct.title" xml:space="preserve">
+    <value>osu!direct</value>
+  </data>
+  <data name="support.perks.osu_direct.description" xml:space="preserve">
+    <value>Få hurtig og nem adgang til søgning efter beatmaps uden at forlade spillet.</value>
+  </data>
+  <data name="support.perks.friend_ranking.title" xml:space="preserve">
+    <value>Placering ift. venner</value>
+  </data>
+  <data name="support.perks.friend_ranking.description" xml:space="preserve">
+    <value>Se hvordan du hamler op mod dine venner på en beatmap's rangliste, både i spillet og på hjemmesiden.</value>
+  </data>
+  <data name="support.perks.country_ranking.title" xml:space="preserve">
+    <value>Lande Rang</value>
+  </data>
+  <data name="support.perks.country_ranking.description" xml:space="preserve">
+    <value>Erobr dit land før du overtager verden.</value>
+  </data>
+  <data name="support.perks.mod_filtering.title" xml:space="preserve">
+    <value>Filtrer efter Mods</value>
+  </data>
+  <data name="support.perks.mod_filtering.description" xml:space="preserve">
+    <value>Associerer du kun med folk som spiller HDHR? Intet problem!</value>
+  </data>
+  <data name="support.perks.auto_downloads.title" xml:space="preserve">
+    <value>Automatiske Downloads</value>
+  </data>
+  <data name="support.perks.auto_downloads.description" xml:space="preserve">
+    <value>Automatiske downloads når du spiller mulitplayer, ser på andre spille, eller når du klikker på links i chatten.</value>
+  </data>
+  <data name="support.perks.upload_more.title" xml:space="preserve">
+    <value>Upload Mere</value>
+  </data>
+  <data name="support.perks.upload_more.description" xml:space="preserve">
+    <value>Ekstra plads til afventende beatmap (per ranked beatmap) op til et maksimum af 10.</value>
+  </data>
+  <data name="support.perks.early_access.title" xml:space="preserve">
+    <value>Early Access</value>
+  </data>
+  <data name="support.perks.early_access.description" xml:space="preserve">
+    <value>Få adgang til splinternye versioner, hvor du kan prøve alle de nye funktioner inden de bliver udgivet!&lt;br/&gt;&lt;br/&gt;Dette gælder også nye funktioner på hjemmesiden!</value>
+  </data>
+  <data name="support.perks.customisation.title" xml:space="preserve">
+    <value>Mere Tilpasning</value>
+  </data>
+  <data name="support.perks.customisation.description" xml:space="preserve">
+    <value>Skil dig ud ved at lave dit eget coverbillede eller ved at lave din helt egen fuldt-tilpasselige 'me!'-sektion på din profil.</value>
+  </data>
+  <data name="support.perks.beatmap_filters.title" xml:space="preserve">
+    <value>Beatmap Filtre</value>
+  </data>
+  <data name="support.perks.beatmap_filters.description" xml:space="preserve">
+    <value>Filtrér beatmaps efter spillede, ikke-spillede eller rang opnået.</value>
+  </data>
+  <data name="support.perks.yellow_fellow.title" xml:space="preserve">
+    <value>Cool Gul</value>
+  </data>
+  <data name="support.perks.yellow_fellow.description" xml:space="preserve">
+    <value>Bliv genkendt i spillet med din fabelagtige nye gule farve i chatten.</value>
+  </data>
+  <data name="support.perks.speedy_downloads.title" xml:space="preserve">
+    <value>Hurtigere Downloads</value>
+  </data>
+  <data name="support.perks.speedy_downloads.description" xml:space="preserve">
+    <value>Færre download-restriktioner, især når du bruger osu!direct.</value>
+  </data>
+  <data name="support.perks.change_username.title" xml:space="preserve">
+    <value>Skift Brugernavn</value>
+  </data>
+  <data name="support.perks.change_username.description" xml:space="preserve">
+    <value>Muligheden for at skifte brugernavn uden ekstra omkostninger. (max en gang)</value>
+  </data>
+  <data name="support.perks.skinnables.title" xml:space="preserve">
+    <value>Skinnables</value>
+  </data>
+  <data name="support.perks.skinnables.description" xml:space="preserve">
+    <value>Ekstra skin elementer som kan tilpasses indeni spillet, f. eks. baggrundsbilledet i menuen.</value>
+  </data>
+  <data name="support.perks.feature_votes.title" xml:space="preserve">
+    <value>Funktionalitets-stemmer</value>
+  </data>
+  <data name="support.perks.feature_votes.description" xml:space="preserve">
+    <value>Stem på ny funktionalitet for fremtidens osu!. (max. 2 pr. måned)</value>
+  </data>
+  <data name="support.perks.sort_options.title" xml:space="preserve">
+    <value>Sorteringsmuligheder</value>
+  </data>
+  <data name="support.perks.sort_options.description" xml:space="preserve">
+    <value>Muligheden for at sortere ranglister for beatmaps efter land-, venne- og mod-rangeringer inde i spillet.</value>
+  </data>
+  <data name="support.perks.more_favourites.title" xml:space="preserve">
+    <value>Flere Favoritter</value>
+  </data>
+  <data name="support.perks.more_favourites.description" xml:space="preserve">
+    <value>Det maksimale antal af beatmaps du kan have some favoritter vokser fra {0} &amp;rarr; {1}</value>
+  </data>
+  <data name="support.perks.more_friends.title" xml:space="preserve">
+    <value>Flere Venner</value>
+  </data>
+  <data name="support.perks.more_friends.description" xml:space="preserve">
+    <value>Det maksimale antal af venner du kan have vokser fra {0} &amp;rarr; {1}</value>
+  </data>
+  <data name="support.perks.more_beatmaps.title" xml:space="preserve">
+    <value>Upload Flere Beatmaps</value>
+  </data>
+  <data name="support.perks.more_beatmaps.description" xml:space="preserve">
+    <value>Hvor mange non-ranked beatmaps du kan have på en gang er beregnet ud fra en basisværdi plus en yderligere bonus for hver ranked beatmap du har (op til et maksimum).&lt;br/&gt;&lt;br/&gt;Normalt er dette 4 plus 1 per ranked beatmap (op til 2). Med supporter vokser dette til 8 plus 1 per ranked beatmap (op til 12).</value>
+  </data>
+  <data name="support.perks.friend_filtering.title" xml:space="preserve">
+    <value>Venne-Rangliste</value>
+  </data>
+  <data name="support.perks.friend_filtering.description" xml:space="preserve">
+    <value>Konkurrer mod dine venner og se hvordan du hamler op imod dem!*&lt;br/&gt;&lt;br/&gt;&lt;small&gt;* endnu ikke tilgængelig på den nye side, kommersnart(tm)&lt;/small&gt;</value>
+  </data>
+  <data name="support.supporter_status.contribution" xml:space="preserve">
+    <value>Tak for din støtte indtilvidere! Du har bidraget med {0} over {1} supporter-tag indkøb!</value>
+  </data>
+  <data name="support.supporter_status.gifted" xml:space="preserve">
+    <value>{0} af dine supporter-tag indkøb var givet som gave (for et samlet antal af {1}), hvor generøst!</value>
+  </data>
+  <data name="support.supporter_status.not_yet" xml:space="preserve">
+    <value>Du har ikke et supporter-tag endnu :(</value>
+  </data>
+  <data name="support.supporter_status.valid_until" xml:space="preserve">
+    <value>Dit nuværende supporter-tag gælder indtil den {0}!</value>
+  </data>
+  <data name="support.supporter_status.was_valid_until" xml:space="preserve">
+    <value>Dit supporter-tag var gyldigt til den {0}.</value>
+  </data>
+</root>

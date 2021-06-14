@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="index.description" xml:space="preserve">
+    <value>共通のテーマを有するビートマップを集めたパックです。</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>一覧</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>ビートマップパック</value>
+  </data>
+  <data name="index.blurb.important" xml:space="preserve">
+    <value>ダウンロード前に必ず読んでください</value>
+  </data>
+  <data name="index.blurb.instruction._" xml:space="preserve">
+    <value>インストールするには：ダウンロードが完了次第.rarファイルをosu!のSongsフォルダに中身を解凍してください。
+                    osu!が次回ビートマップの読み込みを開始する時に圧縮されているビートマップファイル（zip/osz）を自動的に取り込みます。
+                    {0}にzip/oszファイルを手動で解凍しないでください。ビートマップの取り込みに失敗して正常にビートマップが表示されなくなります。</value>
+  </data>
+  <data name="index.blurb.instruction.scary" xml:space="preserve">
+    <value>絶対</value>
+  </data>
+  <data name="index.blurb.note._" xml:space="preserve">
+    <value>{0}作成日時が古いビートマップはクオリティが低い可能性があります。</value>
+  </data>
+  <data name="index.blurb.note.scary" xml:space="preserve">
+    <value>最新のビートマップを優先してダウンロードしてください。</value>
+  </data>
+  <data name="show.download" xml:space="preserve">
+    <value>ダウンロード</value>
+  </data>
+  <data name="show.item.cleared" xml:space="preserve">
+    <value>削除済み</value>
+  </data>
+  <data name="show.item.not_cleared" xml:space="preserve">
+    <value>未クリア</value>
+  </data>
+  <data name="show.no_diff_reduction._" xml:space="preserve">
+    <value>{0} はこのパックをクリアするのに使用できません。</value>
+  </data>
+  <data name="show.no_diff_reduction.link" xml:space="preserve">
+    <value>難易度低下mod</value>
+  </data>
+  <data name="mode.artist" xml:space="preserve">
+    <value>アーティスト/アルバム</value>
+  </data>
+  <data name="mode.chart" xml:space="preserve">
+    <value>スポットライト</value>
+  </data>
+  <data name="mode.standard" xml:space="preserve">
+    <value>スタンダードパック</value>
+  </data>
+  <data name="mode.theme" xml:space="preserve">
+    <value>テーマ</value>
+  </data>
+  <data name="require_login._" xml:space="preserve">
+    <value>ダウンロードするには{0}が必要です</value>
+  </data>
+  <data name="require_login.link_text" xml:space="preserve">
+    <value>ログイン</value>
+  </data>
+</root>

@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="header.small" xml:space="preserve">
+    <value>Yalnızca dairelere tıklamaktan başka yollarda yarışın.</value>
+  </data>
+  <data name="header.large" xml:space="preserve">
+    <value>Topluluk Yarışmaları</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>katalog</value>
+  </data>
+  <data name="voting.login_required" xml:space="preserve">
+    <value>Oylamak için lütfen giriş yapınız.</value>
+  </data>
+  <data name="voting.over" xml:space="preserve">
+    <value>Bu yarışma için oylama sona erdi</value>
+  </data>
+  <data name="voting.show_voted_only" xml:space="preserve">
+    <value>Oy verilenleri göster</value>
+  </data>
+  <data name="voting.best_of.none_played" xml:space="preserve">
+    <value>Bu yarışma için geçerli olan hiçbir beatmapi oynamamışsınız!</value>
+  </data>
+  <data name="voting.button.add" xml:space="preserve">
+    <value>Oyla</value>
+  </data>
+  <data name="voting.button.remove" xml:space="preserve">
+    <value>Oyu Kaldır</value>
+  </data>
+  <data name="voting.button.used_up" xml:space="preserve">
+    <value>Tüm oylarını kullandın</value>
+  </data>
+  <data name="entry._" xml:space="preserve">
+    <value>girdi</value>
+  </data>
+  <data name="entry.login_required" xml:space="preserve">
+    <value>Yarışmaya katılmak için giriş yapınız.</value>
+  </data>
+  <data name="entry.silenced_or_restricted" xml:space="preserve">
+    <value>Kısıtlanmış veya susturulmuşken yarışmalara katılamazsınız.</value>
+  </data>
+  <data name="entry.preparation" xml:space="preserve">
+    <value>Şu an bu yarışmayı hazırlıyoruz. Lütfen sabırla bekleyiniz!</value>
+  </data>
+  <data name="entry.drop_here" xml:space="preserve">
+    <value>Girdinizi buraya bırakın</value>
+  </data>
+  <data name="entry.download" xml:space="preserve">
+    <value>.osz indir</value>
+  </data>
+  <data name="entry.wrong_type.art" xml:space="preserve">
+    <value>Bu yarışma için sadece .jpg ve .png dosyaları kabul edilir.</value>
+  </data>
+  <data name="entry.wrong_type.beatmap" xml:space="preserve">
+    <value>Bu yarışma için sadece .osu dosyaları kabul edilir.</value>
+  </data>
+  <data name="entry.wrong_type.music" xml:space="preserve">
+    <value>Bu yarışma için sadece .mp3 dosyaları kabul edilir.</value>
+  </data>
+  <data name="entry.too_big" xml:space="preserve">
+    <value>Bu yarışma için {0} girdi gönderilebilir.</value>
+  </data>
+  <data name="beatmaps.download" xml:space="preserve">
+    <value>Girdiyi İndir</value>
+  </data>
+  <data name="vote.list" xml:space="preserve">
+    <value>oylar</value>
+  </data>
+  <data name="vote.count" xml:space="preserve">
+    <value>{0} oy|{0} oy</value>
+  </data>
+  <data name="vote.points" xml:space="preserve">
+    <value>{0} puan|{0} puan</value>
+  </data>
+  <data name="dates.ended" xml:space="preserve">
+    <value>{0} tarihinde sona erdi</value>
+  </data>
+  <data name="dates.ended_no_date" xml:space="preserve">
+    <value>Sona erdi</value>
+  </data>
+  <data name="dates.starts._" xml:space="preserve">
+    <value>Başlangıç {0}</value>
+  </data>
+  <data name="dates.starts.soon" xml:space="preserve">
+    <value>yakında™</value>
+  </data>
+  <data name="states.entry" xml:space="preserve">
+    <value>Girişler Açık</value>
+  </data>
+  <data name="states.voting" xml:space="preserve">
+    <value>Oylama Başladı</value>
+  </data>
+  <data name="states.results" xml:space="preserve">
+    <value>Sonuçlar Çıktı</value>
+  </data>
+</root>

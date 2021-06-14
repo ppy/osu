@@ -1,0 +1,229 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="support.convinced.title" xml:space="preserve">
+    <value>Vakuutuin! {0}</value>
+  </data>
+  <data name="support.convinced.support" xml:space="preserve">
+    <value>tue osua!</value>
+  </data>
+  <data name="support.convinced.gift" xml:space="preserve">
+    <value>tai lahjoita Tukija toiselle pelaajalle</value>
+  </data>
+  <data name="support.convinced.instructions" xml:space="preserve">
+    <value>klikkaa sydäntä jatkaaksesi osu!kauppaan</value>
+  </data>
+  <data name="support.why-support.title" xml:space="preserve">
+    <value>Miksi minun pitäisi tukea osu!{0}? Mihin rahat menevät?</value>
+  </data>
+  <data name="support.why-support.team.title" xml:space="preserve">
+    <value>Tue Tiimiä</value>
+  </data>
+  <data name="support.why-support.team.description" xml:space="preserve">
+    <value>Pieni tiimi huolehtii osu!'n kehittämistä ja ylläpitoa. Tukesi auttaa heitä pysymään, siis... elossa.</value>
+  </data>
+  <data name="support.why-support.infra.title" xml:space="preserve">
+    <value>Palvelininfrastruktuuri</value>
+  </data>
+  <data name="support.why-support.infra.description" xml:space="preserve">
+    <value>Avustukset menevät palvelimiin, joilla ylläpidetään verkkosivustoa, moninpelipalveluita, online-pistetaulukoita jne.</value>
+  </data>
+  <data name="support.why-support.featured-artists.title" xml:space="preserve">
+    <value>Esittelyssä olevat Artistit</value>
+  </data>
+  <data name="support.why-support.featured-artists.description" xml:space="preserve">
+    <value>Sinun tuella voimme lähestyä mahtavia artisteja vielä enemmän ja lisensoida lisää hienoa musiikkia käytettäväksi osu!{0}</value>
+  </data>
+  <data name="support.why-support.featured-artists.link_text" xml:space="preserve">
+    <value>Näytä nykyinen lista &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.ads.title" xml:space="preserve">
+    <value>Pidä osu! itsekestävänä</value>
+  </data>
+  <data name="support.why-support.ads.description" xml:space="preserve">
+    <value>Lahjoituksesi auttavat pitämään pelin itsenäisenä ja täysin vapaana mainoksista ja ulkopuolisista sponsoreista.</value>
+  </data>
+  <data name="support.why-support.tournaments.title" xml:space="preserve">
+    <value>Viralliset Turnaukset</value>
+  </data>
+  <data name="support.why-support.tournaments.description" xml:space="preserve">
+    <value>Auta osu! World Cup -turnausten ylläpidon (sekä palkintojen) rahoittamista.</value>
+  </data>
+  <data name="support.why-support.bounty-program.link_text" xml:space="preserve">
+    <value>Lue lisää &amp;raquo;</value>
+  </data>
+  <data name="support.perks.title" xml:space="preserve">
+    <value>Aha. No mitä minä sitten saan?!</value>
+  </data>
+  <data name="support.perks.osu_direct.title" xml:space="preserve">
+    <value>osu!direct</value>
+  </data>
+  <data name="support.perks.osu_direct.description" xml:space="preserve">
+    <value>Nopea ja helppo tapa etsiä beatmappejä ilman tarvetta poistua pelistä.</value>
+  </data>
+  <data name="support.perks.friend_ranking.title" xml:space="preserve">
+    <value>Kavereiden sijoituksia</value>
+  </data>
+  <data name="support.perks.country_ranking.title" xml:space="preserve">
+    <value>Maakohtaiset sijoitukset</value>
+  </data>
+  <data name="support.perks.country_ranking.description" xml:space="preserve">
+    <value>Valloita maasi ennen kuin valloitat maailman.</value>
+  </data>
+  <data name="support.perks.mod_filtering.description" xml:space="preserve">
+    <value>Viihdytkö vain HDHR-pelaajien kanssa? Ei hätää!</value>
+  </data>
+  <data name="support.perks.auto_downloads.title" xml:space="preserve">
+    <value>Automaattilataukset</value>
+  </data>
+  <data name="support.perks.auto_downloads.description" xml:space="preserve">
+    <value>Automaattilataus moninpelissä, katsoessa muita pelaajia tai klikatessa linkkejä keskusteluissa!</value>
+  </data>
+  <data name="support.perks.upload_more.title" xml:space="preserve">
+    <value>Lataa enemmän</value>
+  </data>
+  <data name="support.perks.upload_more.description" xml:space="preserve">
+    <value>Lisäpaikkoja vireillä oleville beatmapeille jokaista hyväksyttyä beatmappiä vastaan. (Max. 10)</value>
+  </data>
+  <data name="support.perks.early_access.title" xml:space="preserve">
+    <value>Ennakkojulkaisut</value>
+  </data>
+  <data name="support.perks.early_access.description" xml:space="preserve">
+    <value>Pääsy uusimpiin versioihin, joissa voit kokeilla uusia ominaisuuksia ennen niiden julkaisua!</value>
+  </data>
+  <data name="support.perks.customisation.title" xml:space="preserve">
+    <value>Mukauttaminen</value>
+  </data>
+  <data name="support.perks.customisation.description" xml:space="preserve">
+    <value>Tee profiilistasi omalaatuinen lisäämällä täysin muokattava käyttäjä-sivu.</value>
+  </data>
+  <data name="support.perks.beatmap_filters.title" xml:space="preserve">
+    <value>Beatmap Suodattimet</value>
+  </data>
+  <data name="support.perks.beatmap_filters.description" xml:space="preserve">
+    <value>Suodata beatmappien hakua pelatun, pelaamattoman sekä kartassa saavutetun luokituksen mukaan.</value>
+  </data>
+  <data name="support.perks.yellow_fellow.title" xml:space="preserve">
+    <value>Keltainen Kaveri</value>
+  </data>
+  <data name="support.perks.yellow_fellow.description" xml:space="preserve">
+    <value>Saat pelinsisäisiin keskusteluihin keltaisen käyttäjänimen, jolla sinut otetaan varmasti huomioon.</value>
+  </data>
+  <data name="support.perks.speedy_downloads.title" xml:space="preserve">
+    <value>Nopeat lataukset</value>
+  </data>
+  <data name="support.perks.speedy_downloads.description" xml:space="preserve">
+    <value>Suvaitsevaisemmat latausrajoitukset, erityisesti käyttäessä osu!directiä.</value>
+  </data>
+  <data name="support.perks.change_username.title" xml:space="preserve">
+    <value>Vaihda käyttäjänimeä</value>
+  </data>
+  <data name="support.perks.change_username.description" xml:space="preserve">
+    <value>Voit vaihtaa käyttäjänimesi ilman ylimääräisiä kuluja. (vain kerran)</value>
+  </data>
+  <data name="support.perks.skinnables.title" xml:space="preserve">
+    <value>Ulkonäöllisyyksiä</value>
+  </data>
+  <data name="support.perks.skinnables.description" xml:space="preserve">
+    <value>Lisää muokattavia pelinsisäisiä kohteita, kuten esimerkiksi päävalikon taustakuva.</value>
+  </data>
+  <data name="support.perks.feature_votes.title" xml:space="preserve">
+    <value>Äänestä ominaisuuksista</value>
+  </data>
+  <data name="support.perks.feature_votes.description" xml:space="preserve">
+    <value>Äänestä kahdesti kuukaudessa uusista ominaisuuksista.</value>
+  </data>
+  <data name="support.perks.sort_options.title" xml:space="preserve">
+    <value>Lajitteluasetuksia</value>
+  </data>
+  <data name="support.perks.sort_options.description" xml:space="preserve">
+    <value>Näet beatmapin maa-, kaveri- ja modikohtaiset sijoitukset pelissä.</value>
+  </data>
+  <data name="support.perks.more_favourites.title" xml:space="preserve">
+    <value>Lisää suosikkeja</value>
+  </data>
+  <data name="support.perks.more_favourites.description" xml:space="preserve">
+    <value>Voit lisätä suosikkilistaan {0} beatmappeja, verrattuna {1} beatmappeihin normaalitapauksessa</value>
+  </data>
+  <data name="support.perks.more_friends.title" xml:space="preserve">
+    <value>Lisää kavereita</value>
+  </data>
+  <data name="support.perks.more_friends.description" xml:space="preserve">
+    <value>Voit lisätä kaverilistaan {0} kavereita, verrattuna {1} kavereihin normaalitapauksessa</value>
+  </data>
+  <data name="support.perks.friend_filtering.description" xml:space="preserve">
+    <value>Kilpaile kavereitasi kanssa ja katso, miten sijoittaudut heitä vastaan!</value>
+  </data>
+  <data name="support.supporter_status.contribution" xml:space="preserve">
+    <value>Kiitos tuestasi tähän saakka! Olet tukenut kokonaisuudessaan {0} {1} tukijaostoksella!</value>
+  </data>
+  <data name="support.supporter_status.gifted" xml:space="preserve">
+    <value>Tagiostoksistasi {0} on lahjoitettu (yhteensä {1}), kuinka anteliasta!</value>
+  </data>
+  <data name="support.supporter_status.not_yet" xml:space="preserve">
+    <value>Et ole vielä tukija :(</value>
+  </data>
+  <data name="support.supporter_status.valid_until" xml:space="preserve">
+    <value>Nykyinen tukijatagi on voimassa {0} asti!</value>
+  </data>
+  <data name="support.supporter_status.was_valid_until" xml:space="preserve">
+    <value>Tukijatagisi oli voimassa {0} asti.</value>
+  </data>
+</root>

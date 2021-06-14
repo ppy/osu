@@ -1,0 +1,355 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="confirmation" xml:space="preserve">
+    <value>Êtes-vous sûr ?</value>
+  </data>
+  <data name="confirmation_unsaved" xml:space="preserve">
+    <value>Les modifications non enregistrées seront perdues. Êtes-vous sûr ?</value>
+  </data>
+  <data name="saved" xml:space="preserve">
+    <value>Sauvegardé</value>
+  </data>
+  <data name="array_and.words_connector" xml:space="preserve">
+    <value>, </value>
+  </data>
+  <data name="array_and.two_words_connector" xml:space="preserve">
+    <value> et </value>
+  </data>
+  <data name="array_and.last_word_connector" xml:space="preserve">
+    <value>, et </value>
+  </data>
+  <data name="badges.new" xml:space="preserve">
+    <value>NOUVEAU</value>
+  </data>
+  <data name="buttons.admin" xml:space="preserve">
+    <value>Administrateur</value>
+  </data>
+  <data name="buttons.authorise" xml:space="preserve">
+    <value>Autoriser</value>
+  </data>
+  <data name="buttons.authorising" xml:space="preserve">
+    <value>Autorisation...</value>
+  </data>
+  <data name="buttons.back_to_previous" xml:space="preserve">
+    <value>Retour à la position précédente</value>
+  </data>
+  <data name="buttons.back_to_top" xml:space="preserve">
+    <value>Haut de page</value>
+  </data>
+  <data name="buttons.cancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="buttons.change" xml:space="preserve">
+    <value>changer</value>
+  </data>
+  <data name="buttons.clear" xml:space="preserve">
+    <value>Effacer</value>
+  </data>
+  <data name="buttons.click_to_copy" xml:space="preserve">
+    <value>cliquez pour copier dans le presse-papier</value>
+  </data>
+  <data name="buttons.click_to_copy_copied" xml:space="preserve">
+    <value>copié dans le presse-papier !</value>
+  </data>
+  <data name="buttons.close" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="buttons.collapse" xml:space="preserve">
+    <value>réduire</value>
+  </data>
+  <data name="buttons.delete" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="buttons.edit" xml:space="preserve">
+    <value>Éditer</value>
+  </data>
+  <data name="buttons.expand" xml:space="preserve">
+    <value>agrandir</value>
+  </data>
+  <data name="buttons.hide" xml:space="preserve">
+    <value>masquer</value>
+  </data>
+  <data name="buttons.permalink" xml:space="preserve">
+    <value>permalink</value>
+  </data>
+  <data name="buttons.pin" xml:space="preserve">
+    <value>épingler</value>
+  </data>
+  <data name="buttons.post" xml:space="preserve">
+    <value>Post</value>
+  </data>
+  <data name="buttons.read_more" xml:space="preserve">
+    <value>lire plus</value>
+  </data>
+  <data name="buttons.reply" xml:space="preserve">
+    <value>Répondre</value>
+  </data>
+  <data name="buttons.reply_reopen" xml:space="preserve">
+    <value>Répondre et rouvrir</value>
+  </data>
+  <data name="buttons.reply_resolve" xml:space="preserve">
+    <value>Répondre et Résoudre</value>
+  </data>
+  <data name="buttons.reset" xml:space="preserve">
+    <value>Réinitialiser</value>
+  </data>
+  <data name="buttons.restore" xml:space="preserve">
+    <value>Restaurer</value>
+  </data>
+  <data name="buttons.save" xml:space="preserve">
+    <value>Sauvegarder</value>
+  </data>
+  <data name="buttons.saving" xml:space="preserve">
+    <value>Sauvegarde...</value>
+  </data>
+  <data name="buttons.search" xml:space="preserve">
+    <value>Rechercher</value>
+  </data>
+  <data name="buttons.see_more" xml:space="preserve">
+    <value>voir plus</value>
+  </data>
+  <data name="buttons.show" xml:space="preserve">
+    <value>afficher</value>
+  </data>
+  <data name="buttons.show_deleted" xml:space="preserve">
+    <value>Afficher supprimé</value>
+  </data>
+  <data name="buttons.show_less" xml:space="preserve">
+    <value>afficher moins</value>
+  </data>
+  <data name="buttons.show_more" xml:space="preserve">
+    <value>voir plus</value>
+  </data>
+  <data name="buttons.show_more_options" xml:space="preserve">
+    <value>afficher plus d’options</value>
+  </data>
+  <data name="buttons.unpin" xml:space="preserve">
+    <value>désépingler</value>
+  </data>
+  <data name="buttons.update" xml:space="preserve">
+    <value>Modifier</value>
+  </data>
+  <data name="buttons.upload_image" xml:space="preserve">
+    <value>mettre en ligne une image</value>
+  </data>
+  <data name="buttons.watch.to_0" xml:space="preserve">
+    <value>Ne plus suivre</value>
+  </data>
+  <data name="buttons.watch.to_1" xml:space="preserve">
+    <value>Suivre</value>
+  </data>
+  <data name="count.badges" xml:space="preserve">
+    <value>{0} badge|{0} badges</value>
+  </data>
+  <data name="count.days" xml:space="preserve">
+    <value>{0} jour|{0} jours</value>
+  </data>
+  <data name="count.hour_short_unit" xml:space="preserve">
+    <value>hr|hrs</value>
+  </data>
+  <data name="count.hours" xml:space="preserve">
+    <value>{0} heure|{0} heures</value>
+  </data>
+  <data name="count.item" xml:space="preserve">
+    <value>{0} objet|{0} objets</value>
+  </data>
+  <data name="count.minute_short_unit" xml:space="preserve">
+    <value>min|mins</value>
+  </data>
+  <data name="count.minutes" xml:space="preserve">
+    <value>{0} minute|{0} minutes</value>
+  </data>
+  <data name="count.months" xml:space="preserve">
+    <value>{0} mois|{0} mois</value>
+  </data>
+  <data name="count.notifications" xml:space="preserve">
+    <value>{0} notification|{0} notifications</value>
+  </data>
+  <data name="count.plus_others" xml:space="preserve">
+    <value>+ {0} autre !|+ {0} autres !</value>
+  </data>
+  <data name="count.post" xml:space="preserve">
+    <value>{0} discussion|{0} discussions</value>
+  </data>
+  <data name="count.second_short_unit" xml:space="preserve">
+    <value>sec|secs</value>
+  </data>
+  <data name="count.star_priority" xml:space="preserve">
+    <value>{0} priorité d'étoile|{0} priorité d'étoiles</value>
+  </data>
+  <data name="count.update" xml:space="preserve">
+    <value>{0} mise à jour|{0} mises à jour</value>
+  </data>
+  <data name="count.view" xml:space="preserve">
+    <value>{0} vue|{0} vues</value>
+  </data>
+  <data name="count.years" xml:space="preserve">
+    <value>{0} an|{0} ans</value>
+  </data>
+  <data name="countdown.days" xml:space="preserve">
+    <value>jours</value>
+  </data>
+  <data name="countdown.hours" xml:space="preserve">
+    <value>heures</value>
+  </data>
+  <data name="countdown.minutes" xml:space="preserve">
+    <value>minutes</value>
+  </data>
+  <data name="countdown.seconds" xml:space="preserve">
+    <value>secondes</value>
+  </data>
+  <data name="datetime.year_month.moment" xml:space="preserve">
+    <value>MMMM YYYY</value>
+  </data>
+  <data name="datetime.year_month.php" xml:space="preserve">
+    <value>MMMM y</value>
+  </data>
+  <data name="datetime.year_month_short.moment" xml:space="preserve">
+    <value>MMM YYYY</value>
+  </data>
+  <data name="device.keyboard" xml:space="preserve">
+    <value>Clavier</value>
+  </data>
+  <data name="device.mouse" xml:space="preserve">
+    <value>Souris</value>
+  </data>
+  <data name="device.tablet" xml:space="preserve">
+    <value>Tablette</value>
+  </data>
+  <data name="device.touch" xml:space="preserve">
+    <value>Écran tactile</value>
+  </data>
+  <data name="dropzone.target" xml:space="preserve">
+    <value>déplacez ici pour uploader</value>
+  </data>
+  <data name="input.search" xml:space="preserve">
+    <value>rechercher...</value>
+  </data>
+  <data name="pagination.previous" xml:space="preserve">
+    <value>précédent</value>
+  </data>
+  <data name="pagination.next" xml:space="preserve">
+    <value>suivant</value>
+  </data>
+  <data name="score_count.count_100" xml:space="preserve">
+    <value>100</value>
+  </data>
+  <data name="score_count.count_300" xml:space="preserve">
+    <value>300</value>
+  </data>
+  <data name="score_count.count_50" xml:space="preserve">
+    <value>50</value>
+  </data>
+  <data name="score_count.count_katu" xml:space="preserve">
+    <value>200</value>
+  </data>
+  <data name="score_count.count_miss" xml:space="preserve">
+    <value>Raté</value>
+  </data>
+  <data name="scoreboard_time.d" xml:space="preserve">
+    <value>%d j</value>
+  </data>
+  <data name="scoreboard_time.dd" xml:space="preserve">
+    <value>%d j</value>
+  </data>
+  <data name="scoreboard_time.h" xml:space="preserve">
+    <value>%dh</value>
+  </data>
+  <data name="scoreboard_time.hh" xml:space="preserve">
+    <value>%dh</value>
+  </data>
+  <data name="scoreboard_time.m" xml:space="preserve">
+    <value>%dmois</value>
+  </data>
+  <data name="scoreboard_time.mm" xml:space="preserve">
+    <value>%dmois</value>
+  </data>
+  <data name="scoreboard_time.s" xml:space="preserve">
+    <value>maintenant</value>
+  </data>
+  <data name="scoreboard_time.y" xml:space="preserve">
+    <value>%dan</value>
+  </data>
+  <data name="scoreboard_time.yy" xml:space="preserve">
+    <value>%dans</value>
+  </data>
+  <data name="time.days_ago" xml:space="preserve">
+    <value>Il y à {0} jour|Il y à{0} jours</value>
+  </data>
+  <data name="time.hours_ago" xml:space="preserve">
+    <value>Il y à{0} heure|Il y à {0} heures</value>
+  </data>
+  <data name="time.now" xml:space="preserve">
+    <value>maintenant</value>
+  </data>
+  <data name="time.remaining" xml:space="preserve">
+    <value>Temps restant</value>
+  </data>
+  <data name="title.notice" xml:space="preserve">
+    <value>Remarque</value>
+  </data>
+  <data name="wrong_user._" xml:space="preserve">
+    <value>Vous êtes connecté en tant que {0}. {1}.</value>
+  </data>
+  <data name="wrong_user.logout_link" xml:space="preserve">
+    <value>Cliquez ici pour vous connecter en tant qu'utilisateur différent</value>
+  </data>
+</root>

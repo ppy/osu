@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="landing.download" xml:space="preserve">
+    <value>Lataa nyt</value>
+  </data>
+  <data name="landing.online" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; online-tilassa &lt;strong&gt;{1}&lt;/strong&gt; pelaamassa</value>
+  </data>
+  <data name="landing.peak" xml:space="preserve">
+    <value>Huipussaan {0} käyttäjää paikalla</value>
+  </data>
+  <data name="landing.players" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; rekisteröitynyttä pelaajaa</value>
+  </data>
+  <data name="landing.title" xml:space="preserve">
+    <value>tervetuloa</value>
+  </data>
+  <data name="landing.see_more_news" xml:space="preserve">
+    <value>näytä lisää uutisia</value>
+  </data>
+  <data name="landing.slogan.main" xml:space="preserve">
+    <value>parastakin parempi ilmainen rytmipeli</value>
+  </data>
+  <data name="landing.slogan.sub" xml:space="preserve">
+    <value>rytmi on vain klikkauksen päässä</value>
+  </data>
+  <data name="search.advanced_link" xml:space="preserve">
+    <value>Tarkempi haku</value>
+  </data>
+  <data name="search.button" xml:space="preserve">
+    <value>Hae</value>
+  </data>
+  <data name="search.empty_result" xml:space="preserve">
+    <value>Mitään ei löytynyt!</value>
+  </data>
+  <data name="search.keyword_required" xml:space="preserve">
+    <value>Syötä hakusana</value>
+  </data>
+  <data name="search.placeholder" xml:space="preserve">
+    <value>kirjoita hakeaksesi</value>
+  </data>
+  <data name="search.title" xml:space="preserve">
+    <value>Hae</value>
+  </data>
+  <data name="search.beatmapset.login_required" xml:space="preserve">
+    <value>Kirjaudu sisään käyttääksesi beatmap-hakua</value>
+  </data>
+  <data name="search.beatmapset.more" xml:space="preserve">
+    <value>{0} lisää hakutulosta</value>
+  </data>
+  <data name="search.beatmapset.more_simple" xml:space="preserve">
+    <value>Katso lisää hakutuloksia</value>
+  </data>
+  <data name="search.beatmapset.title" xml:space="preserve">
+    <value>Beatmapit</value>
+  </data>
+  <data name="search.forum_post.all" xml:space="preserve">
+    <value>Kaikki foorumit</value>
+  </data>
+  <data name="search.forum_post.link" xml:space="preserve">
+    <value>Etsi foorumilta</value>
+  </data>
+  <data name="search.forum_post.login_required" xml:space="preserve">
+    <value>Kirjaudu sisään käyttääksesi foorumihakua</value>
+  </data>
+  <data name="search.forum_post.more_simple" xml:space="preserve">
+    <value>Katso lisää foorumien hakutuloksia</value>
+  </data>
+  <data name="search.forum_post.title" xml:space="preserve">
+    <value>Foorumi</value>
+  </data>
+  <data name="search.forum_post.label.forum" xml:space="preserve">
+    <value>etsi foorumeista</value>
+  </data>
+  <data name="search.forum_post.label.forum_children" xml:space="preserve">
+    <value>etsi myös alafoorumeilta</value>
+  </data>
+  <data name="search.forum_post.label.topic_id" xml:space="preserve">
+    <value>aihe #</value>
+  </data>
+  <data name="search.forum_post.label.username" xml:space="preserve">
+    <value>tekijä</value>
+  </data>
+  <data name="search.mode.all" xml:space="preserve">
+    <value>kaikki</value>
+  </data>
+  <data name="search.mode.beatmapset" xml:space="preserve">
+    <value>beatmap</value>
+  </data>
+  <data name="search.mode.forum_post" xml:space="preserve">
+    <value>foorumi</value>
+  </data>
+  <data name="search.mode.user" xml:space="preserve">
+    <value>pelaaja</value>
+  </data>
+  <data name="search.mode.wiki_page" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="search.user.login_required" xml:space="preserve">
+    <value>Kirjaudu sisään käyttääksesi käyttäjähakua</value>
+  </data>
+  <data name="search.user.more" xml:space="preserve">
+    <value>{0} hakutulosta lisää</value>
+  </data>
+  <data name="search.user.more_simple" xml:space="preserve">
+    <value>Näytä enemmän pelaajia hakutuloksista</value>
+  </data>
+  <data name="search.user.more_hidden" xml:space="preserve">
+    <value>Pelaajien etsintä on rajoitettu {0} pelaajalle. Kokeile tarkentaa hakua.</value>
+  </data>
+  <data name="search.user.title" xml:space="preserve">
+    <value>Pelaajat</value>
+  </data>
+  <data name="search.wiki_page.link" xml:space="preserve">
+    <value>Etsi wikistä</value>
+  </data>
+  <data name="search.wiki_page.more_simple" xml:space="preserve">
+    <value>Katso lisää wiki-hakutuloksia</value>
+  </data>
+  <data name="search.wiki_page.title" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="download.tagline" xml:space="preserve">
+    <value>laitetaan sinut&lt;br&gt;liikkeelle!</value>
+  </data>
+  <data name="download.action" xml:space="preserve">
+    <value>Lataa osu!</value>
+  </data>
+  <data name="download.help._" xml:space="preserve">
+    <value>jos sinulla on ongelmia pelin käynnistämisessä tai tilin rekisteröinnissä, {0} tai {1}.</value>
+  </data>
+  <data name="download.help.help_forum_link" xml:space="preserve">
+    <value>katso apufoorumia</value>
+  </data>
+  <data name="download.help.support_button" xml:space="preserve">
+    <value>ota yhteyttä tukeen</value>
+  </data>
+  <data name="download.os.windows" xml:space="preserve">
+    <value>Windowsille</value>
+  </data>
+  <data name="download.os.macos" xml:space="preserve">
+    <value>macOS{0}</value>
+  </data>
+  <data name="download.os.linux" xml:space="preserve">
+    <value>Linuxille</value>
+  </data>
+  <data name="download.mirror" xml:space="preserve">
+    <value>vaihtoehtoinen lataus</value>
+  </data>
+  <data name="download.macos-fallback" xml:space="preserve">
+    <value>macOS-käyttäjät</value>
+  </data>
+  <data name="download.steps.register.title" xml:space="preserve">
+    <value>luo tili</value>
+  </data>
+  <data name="download.steps.register.description" xml:space="preserve">
+    <value>käynnistäessäsi pelin, seuraa ohjeita kirjautuaksesi sisään tai luo uusi tili</value>
+  </data>
+  <data name="download.steps.download.title" xml:space="preserve">
+    <value>lataa peli</value>
+  </data>
+  <data name="download.steps.download.description" xml:space="preserve">
+    <value>klikkaa ylläolevaa painiketta ladataksesi asennusohjelman ja suorita se!</value>
+  </data>
+  <data name="download.steps.beatmaps.title" xml:space="preserve">
+    <value>hanki beatmappeja</value>
+  </data>
+  <data name="download.steps.beatmaps.description._" xml:space="preserve">
+    <value>{0} käyttäjien luomaa laajaa beatmapkokoelmaa ja ryhdy pelaamaan!</value>
+  </data>
+  <data name="download.steps.beatmaps.description.browse" xml:space="preserve">
+    <value>selaa</value>
+  </data>
+  <data name="download.video-guide" xml:space="preserve">
+    <value>video-opas</value>
+  </data>
+  <data name="user.title" xml:space="preserve">
+    <value>yleiskatsaus</value>
+  </data>
+  <data name="user.news.title" xml:space="preserve">
+    <value>Uutiset</value>
+  </data>
+  <data name="user.news.error" xml:space="preserve">
+    <value>Virhe ladattaessa uutisia. Kokeile sivun päivittämistä.</value>
+  </data>
+  <data name="user.header.stats.friends" xml:space="preserve">
+    <value>Kavereita paikalla</value>
+  </data>
+  <data name="user.header.stats.games" xml:space="preserve">
+    <value>Pelejä</value>
+  </data>
+  <data name="user.header.stats.online" xml:space="preserve">
+    <value>Käyttäjiä paikalla</value>
+  </data>
+  <data name="user.beatmaps.new" xml:space="preserve">
+    <value>Uudet Hyväksytyt Beatmapit</value>
+  </data>
+  <data name="user.beatmaps.popular" xml:space="preserve">
+    <value>Suositut Beatmapit</value>
+  </data>
+  <data name="user.beatmaps.by_user" xml:space="preserve">
+    <value>tehnyt {0}</value>
+  </data>
+  <data name="user.buttons.download" xml:space="preserve">
+    <value>Lataa osu!</value>
+  </data>
+  <data name="user.buttons.support" xml:space="preserve">
+    <value>Tue osua!</value>
+  </data>
+  <data name="user.buttons.store" xml:space="preserve">
+    <value>osu!kauppa</value>
+  </data>
+  <data name="support-osu.title" xml:space="preserve">
+    <value>Vau!</value>
+  </data>
+  <data name="support-osu.subtitle" xml:space="preserve">
+    <value>Sinulla taitaa olla hauskaa! {0}</value>
+  </data>
+  <data name="support-osu.body.part-1" xml:space="preserve">
+    <value>Tiesitkö että osu!a pidetään yllä ilman mainoksia ja turvautuu pelaajien tukeen sen kehitys- ja käyttökustannuksissa?</value>
+  </data>
+  <data name="support-osu.body.part-2" xml:space="preserve">
+    <value>Tiesitkö myös että osua! tukemalla saat kasan hyödyllisiä ominaisuuksia, kuten &lt;strong&gt;pelinsisäisen beatmappien lataamisen&lt;/strong&gt; joka aktivoituu automaattisesti moninpelissä ja katsojatilassa?</value>
+  </data>
+  <data name="support-osu.find-out-more" xml:space="preserve">
+    <value>Klikkaa tästä lisätietoja!</value>
+  </data>
+  <data name="support-osu.download-starting" xml:space="preserve">
+    <value>Niin, ja älä huoli - latauksesi on jo aloitettu ;)</value>
+  </data>
+</root>

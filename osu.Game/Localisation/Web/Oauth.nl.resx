@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="cancel" xml:space="preserve">
+    <value>Annuleren</value>
+  </data>
+  <data name="authorise.request" xml:space="preserve">
+    <value>vraagt om toestemming om toegang tot uw account.</value>
+  </data>
+  <data name="authorise.scopes_title" xml:space="preserve">
+    <value>Deze applicatie krijgt toegang tot:</value>
+  </data>
+  <data name="authorise.title" xml:space="preserve">
+    <value>Inloggen verplicht</value>
+  </data>
+  <data name="authorized_clients.confirm_revoke" xml:space="preserve">
+    <value>Weet u zeker dat u de rechten van deze client wilt intrekken?</value>
+  </data>
+  <data name="authorized_clients.scopes_title" xml:space="preserve">
+    <value>Deze applicatie kan:</value>
+  </data>
+  <data name="authorized_clients.owned_by" xml:space="preserve">
+    <value>Eigendom van {0}</value>
+  </data>
+  <data name="authorized_clients.none" xml:space="preserve">
+    <value>Geen clients</value>
+  </data>
+  <data name="authorized_clients.revoked.false" xml:space="preserve">
+    <value>Toegang intrekken</value>
+  </data>
+  <data name="authorized_clients.revoked.true" xml:space="preserve">
+    <value>Toegang Ingetrokken</value>
+  </data>
+  <data name="client.id" xml:space="preserve">
+    <value>Client-ID</value>
+  </data>
+  <data name="client.name" xml:space="preserve">
+    <value>Applicatienaam</value>
+  </data>
+  <data name="client.redirect" xml:space="preserve">
+    <value>Applicatie Terugbel URL</value>
+  </data>
+  <data name="client.reset" xml:space="preserve">
+    <value>Reset client geheim</value>
+  </data>
+  <data name="client.reset_failed" xml:space="preserve">
+    <value>Resetten van client geheim mislukt</value>
+  </data>
+  <data name="client.secret" xml:space="preserve">
+    <value>Client Secret</value>
+  </data>
+  <data name="client.secret_visible.false" xml:space="preserve">
+    <value>Laat client geheim zien</value>
+  </data>
+  <data name="client.secret_visible.true" xml:space="preserve">
+    <value>Verberg client geheim</value>
+  </data>
+  <data name="new_client.header" xml:space="preserve">
+    <value>Registreer een nieuwe OAuth applicatie</value>
+  </data>
+  <data name="new_client.register" xml:space="preserve">
+    <value>Registreer applicatie</value>
+  </data>
+  <data name="new_client.terms_of_use._" xml:space="preserve">
+    <value>Door gebruik te maken van de API gaat u akkoord met de {0}.</value>
+  </data>
+  <data name="new_client.terms_of_use.link" xml:space="preserve">
+    <value>Gebruiksvoorwaarden</value>
+  </data>
+  <data name="own_clients.confirm_delete" xml:space="preserve">
+    <value>Weet je zeker dat je deze reactie wilt verwijderen?</value>
+  </data>
+  <data name="own_clients.confirm_reset" xml:space="preserve">
+    <value>Weet je zeker dat je jouw client geheim wilt resetten? Dit verwijdert alle huidige kentekens.</value>
+  </data>
+  <data name="own_clients.new" xml:space="preserve">
+    <value>Nieuwe OAuth applicatie</value>
+  </data>
+  <data name="own_clients.none" xml:space="preserve">
+    <value>Geen clients</value>
+  </data>
+  <data name="own_clients.revoked.false" xml:space="preserve">
+    <value>Verwijderen</value>
+  </data>
+  <data name="own_clients.revoked.true" xml:space="preserve">
+    <value>Verwijderd</value>
+  </data>
+</root>

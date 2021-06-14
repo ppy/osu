@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="comment.empty" xml:space="preserve">
+    <value>Коментарів не переглянуто.</value>
+  </data>
+  <data name="comment.page_title" xml:space="preserve">
+    <value>список спостереження за коментарями</value>
+  </data>
+  <data name="comment.title" xml:space="preserve">
+    <value>коментар
+</value>
+  </data>
+  <data name="comment.table.latest_comment_empty" xml:space="preserve">
+    <value>без коментарів</value>
+  </data>
+  <data name="comment.table.latest_comment_value" xml:space="preserve">
+    <value>{0} від {1}</value>
+  </data>
+  <data name="forum_topic.title" xml:space="preserve">
+    <value>тема форуму</value>
+  </data>
+  <data name="index.title_compact" xml:space="preserve">
+    <value>список перегляду</value>
+  </data>
+  <data name="mapping.empty" xml:space="preserve">
+    <value>Жоден маппер не дивився</value>
+  </data>
+  <data name="mapping.followers" xml:space="preserve">
+    <value>глядачі маппінгу</value>
+  </data>
+  <data name="mapping.page_title" xml:space="preserve">
+    <value>список перегляду маппера</value>
+  </data>
+  <data name="mapping.title" xml:space="preserve">
+    <value>маппер
+</value>
+  </data>
+  <data name="mapping.to_0" xml:space="preserve">
+    <value>не сповіщувати мене, коли цей користувач завантажує нову карту</value>
+  </data>
+  <data name="mapping.to_1" xml:space="preserve">
+    <value>сповіщувати мене, коли цей користувач завантажує нову карту</value>
+  </data>
+  <data name="modding.title" xml:space="preserve">
+    <value>бітмап дискусія</value>
+  </data>
+</root>

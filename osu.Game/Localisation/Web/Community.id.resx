@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="support.convinced.title" xml:space="preserve">
+    <value>Saya yakin! {0}</value>
+  </data>
+  <data name="support.convinced.support" xml:space="preserve">
+    <value>dukung osu!</value>
+  </data>
+  <data name="support.convinced.gift" xml:space="preserve">
+    <value>atau hadiahkan supporter tag kepada pemain lain</value>
+  </data>
+  <data name="support.convinced.instructions" xml:space="preserve">
+    <value>klik tombol hati di atas untuk melanjutkan ke osu!store</value>
+  </data>
+  <data name="support.why-support.title" xml:space="preserve">
+    <value>Kenapa saya harus mendukung osu!? Ke mana saja uangnya akan disalurkan?</value>
+  </data>
+  <data name="support.why-support.team.title" xml:space="preserve">
+    <value>Dukung Tim Kami</value>
+  </data>
+  <data name="support.why-support.team.description" xml:space="preserve">
+    <value>osu! senantiasa dikembangkan dan dikelola oleh sebuah tim yang berukuran relatif kecil. Dukunganmu akan sangat membantu... keberlangsungan hidup mereka.</value>
+  </data>
+  <data name="support.why-support.infra.title" xml:space="preserve">
+    <value>Prasarana Server</value>
+  </data>
+  <data name="support.why-support.infra.description" xml:space="preserve">
+    <value>Kontribusimu akan turut digunakan untuk memenuhi biaya operasional server-server kami dan menjalankan berbagai fasilitas yang kami miliki seperti situs web, multiplayer, papan peringkat, dan lain sebagainya.</value>
+  </data>
+  <data name="support.why-support.featured-artists.title" xml:space="preserve">
+    <value>Featured Artist</value>
+  </data>
+  <data name="support.why-support.featured-artists.description" xml:space="preserve">
+    <value>Berkat dukunganmu, kami dapat melisensi berbagai lagu pilihan dari musisi-musisi berbakat di seluruh dunia untuk dapat secara bebas dipergunakan di dalam lingkungan osu!.</value>
+  </data>
+  <data name="support.why-support.featured-artists.link_text" xml:space="preserve">
+    <value>Lihat daftar Featured Artist saat ini &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.ads.title" xml:space="preserve">
+    <value>Bantu osu! Untuk Tetap Mandiri</value>
+  </data>
+  <data name="support.why-support.ads.description" xml:space="preserve">
+    <value>Kontribusimu memungkinkan osu! untuk dapat sepenuhnya berfungsi secara independen tanpa bergantung pada iklan-iklan maupun sponsor-sponsor dari luar.</value>
+  </data>
+  <data name="support.why-support.tournaments.title" xml:space="preserve">
+    <value>Turnamen Resmi</value>
+  </data>
+  <data name="support.why-support.tournaments.description" xml:space="preserve">
+    <value>Dukungan yang kamu berikan akan sebagian digunakan untuk memenuhi biaya operasional (dan menambah pundi-pundi hadiah) turnamen osu! World Cup.</value>
+  </data>
+  <data name="support.why-support.tournaments.link_text" xml:space="preserve">
+    <value>Jelajahi turnamen &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.bounty-program.title" xml:space="preserve">
+    <value>Program Open Source Bounty</value>
+  </data>
+  <data name="support.why-support.bounty-program.description" xml:space="preserve">
+    <value>Sebagian dari dana yang kamu salurkan juga akan disumbangkan kepada para kontributor yang telah menyisihkan waktu dan upaya mereka untuk membuat osu! menjadi lebih baik.</value>
+  </data>
+  <data name="support.why-support.bounty-program.link_text" xml:space="preserve">
+    <value>Cari tahu lebih lanjut seputar program Open Source Bounty &amp;raquo;</value>
+  </data>
+  <data name="support.perks.title" xml:space="preserve">
+    <value>Oh? Apa saja yang akan saya dapatkan?!</value>
+  </data>
+  <data name="support.perks.osu_direct.title" xml:space="preserve">
+    <value>osu!direct</value>
+  </data>
+  <data name="support.perks.osu_direct.description" xml:space="preserve">
+    <value>Telusuri beatmap-beatmap yang Anda kehendaki dengan cepat dan mudah tanpa harus meninggalkan permainan.</value>
+  </data>
+  <data name="support.perks.friend_ranking.title" xml:space="preserve">
+    <value>Peringkat Teman</value>
+  </data>
+  <data name="support.perks.friend_ranking.description" xml:space="preserve">
+    <value>Lihat bagaimana kemampuanmu dibandingkan dengan teman-temanmu di papan peringkat beatmap, baik dalam game maupun di situs web.</value>
+  </data>
+  <data name="support.perks.country_ranking.title" xml:space="preserve">
+    <value>Peringkat Negara</value>
+  </data>
+  <data name="support.perks.country_ranking.description" xml:space="preserve">
+    <value>Taklukkan negaramu sebelum kamu menaklukkan dunia.</value>
+  </data>
+  <data name="support.perks.mod_filtering.title" xml:space="preserve">
+    <value>Filter Berdasarkan Mod</value>
+  </data>
+  <data name="support.perks.mod_filtering.description" xml:space="preserve">
+    <value>Ingin mencari tahu siapa-siapa saja yang memainkan suatu map dengan HDHR? Tidak masalah!</value>
+  </data>
+  <data name="support.perks.auto_downloads.title" xml:space="preserve">
+    <value>Unduh Otomatis</value>
+  </data>
+  <data name="support.perks.auto_downloads.description" xml:space="preserve">
+    <value>Unduhan otomatis saat bermain multiplayer, menonton orang lain, atau mengklik tautan dalam obrolan!</value>
+  </data>
+  <data name="support.perks.upload_more.title" xml:space="preserve">
+    <value>Unggah Lebih Banyak</value>
+  </data>
+  <data name="support.perks.upload_more.description" xml:space="preserve">
+    <value>Slot tambahan untuk mengunggah beatmap yang berstatus Pending (satu slot tambahan per beatmap Ranked yang Anda miliki, hingga maksimum 10 beatmap Pending)</value>
+  </data>
+  <data name="support.perks.early_access.title" xml:space="preserve">
+    <value>Akses Pra-Rilis</value>
+  </data>
+  <data name="support.perks.early_access.description" xml:space="preserve">
+    <value>Akses ke rilisan terbaru lebih awal, di mana Anda dapat mencoba fitur yang bahkan belum dirilis secara publik!</value>
+  </data>
+  <data name="support.perks.customisation.title" xml:space="preserve">
+    <value>Kustomisasi</value>
+  </data>
+  <data name="support.perks.customisation.description" xml:space="preserve">
+    <value>Buat laman profil Anda lebih menarik dengan tambahan gambar latar dan kolom "saya!" yang dapat diisi dengan hal apapun yang Anda kehendaki.</value>
+  </data>
+  <data name="support.perks.beatmap_filters.title" xml:space="preserve">
+    <value>Filter Beatmap</value>
+  </data>
+  <data name="support.perks.beatmap_filters.description" xml:space="preserve">
+    <value>Filter pencarian beatmap berdasarkan map yang belum dan sudah dimainkan juga peringkat yang dicapai (jika ada).</value>
+  </data>
+  <data name="support.perks.yellow_fellow.title" xml:space="preserve">
+    <value>Pesona Kuning Cemerlang</value>
+  </data>
+  <data name="support.perks.yellow_fellow.description" xml:space="preserve">
+    <value>Buat dirimu lebih tersorot dengan nama pengguna yang berwarna kuning terang di dalam kanal obrolan.</value>
+  </data>
+  <data name="support.perks.speedy_downloads.title" xml:space="preserve">
+    <value>Unduh Lebih Cepat</value>
+  </data>
+  <data name="support.perks.speedy_downloads.description" xml:space="preserve">
+    <value>Pembatasan jumlah unduhan yang lebih lengang, terutama saat menggunakan osu!direct.</value>
+  </data>
+  <data name="support.perks.change_username.title" xml:space="preserve">
+    <value>Perubahan Nama Pengguna</value>
+  </data>
+  <data name="support.perks.change_username.description" xml:space="preserve">
+    <value>Kemampuan untuk mengubah nama pengguna Anda tanpa biaya tambahan (maksimum sekali).</value>
+  </data>
+  <data name="support.perks.skinnables.title" xml:space="preserve">
+    <value>Elemen Skinning Tambahan</value>
+  </data>
+  <data name="support.perks.skinnables.description" xml:space="preserve">
+    <value>Tambahan elemen skin yang bisa Anda kustomisasi, seperti latar belakang menu utama.</value>
+  </data>
+  <data name="support.perks.feature_votes.title" xml:space="preserve">
+    <value>Hak Suara Ekstra</value>
+  </data>
+  <data name="support.perks.feature_votes.description" xml:space="preserve">
+    <value>Hak suara tambahan yang dapat Anda dipergunakan pada sub-forum Feature Requests. (2 suara per bulan)</value>
+  </data>
+  <data name="support.perks.sort_options.title" xml:space="preserve">
+    <value>Opsi Untuk Menyortir</value>
+  </data>
+  <data name="support.perks.sort_options.description" xml:space="preserve">
+    <value>Akses untuk melihat peringkat beatmap berdasarkan negara/teman/mod secara spesifik dalam game.</value>
+  </data>
+  <data name="support.perks.more_favourites.title" xml:space="preserve">
+    <value>Lebih Banyak Favorit</value>
+  </data>
+  <data name="support.perks.more_favourites.description" xml:space="preserve">
+    <value>Jumlah maksimum beatmap yang dapat kamu favoritkan bertambah dari {0} &amp;rarr; {1}</value>
+  </data>
+  <data name="support.perks.more_friends.title" xml:space="preserve">
+    <value>Lebih Banyak Teman</value>
+  </data>
+  <data name="support.perks.more_friends.description" xml:space="preserve">
+    <value>Jumlah maksimum teman yang dapat kamu tambahkan bertambah dari {0} &amp;rarr; {1}</value>
+  </data>
+  <data name="support.perks.more_beatmaps.title" xml:space="preserve">
+    <value>Unggah Lebih Banyak Beatmap</value>
+  </data>
+  <data name="support.perks.more_beatmaps.description" xml:space="preserve">
+    <value>Jumlah beatmap Pending yang dapat kamu unggah pada satu waktu pada umumnya terbatas hanya pada bilangan {0} beatmap ditambah {1} beatmap per beatmap Ranked yang kamu miliki (hingga {2} beatmap).&lt;br/&gt;&lt;br/&gt; Dengan osu!supporter, kamu akan dapat mengunggah lebih banyak beatmap hingga bilangan {3} beatmap ditambah {4} beatmap per beatmap Ranked yang kamu miliki (hingga {5} beatmap).</value>
+  </data>
+  <data name="support.perks.friend_filtering.title" xml:space="preserve">
+    <value>Papan Peringkat Teman</value>
+  </data>
+  <data name="support.perks.friend_filtering.description" xml:space="preserve">
+    <value>Bersainglah dengan teman-temanmu dan lihat siapa yang paling unggul di antara kamu dan teman-temanmu!</value>
+  </data>
+  <data name="support.supporter_status.contribution" xml:space="preserve">
+    <value>Terima kasih atas dukungan Anda! Anda telah membeli supporter tag sebanyak {0} kali dengan total kontribusi finansial senilai {1}!</value>
+  </data>
+  <data name="support.supporter_status.gifted" xml:space="preserve">
+    <value>{0} dari pembelian tag Anda telah dihadiahkan (dengan total sebesar {1} telah dihadiahkan). Terima kasih atas kemurahan hati Anda!</value>
+  </data>
+  <data name="support.supporter_status.not_yet" xml:space="preserve">
+    <value>Anda belum pernah memiliki supporter tag :(</value>
+  </data>
+  <data name="support.supporter_status.valid_until" xml:space="preserve">
+    <value>Supporter Tag Anda saat ini berlaku hingga {0}!</value>
+  </data>
+  <data name="support.supporter_status.was_valid_until" xml:space="preserve">
+    <value>Supporter Tag Anda berlaku hingga {0}.</value>
+  </data>
+</root>

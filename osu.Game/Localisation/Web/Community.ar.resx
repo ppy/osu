@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="support.convinced.title" xml:space="preserve">
+    <value>أنا مقتنع! D:</value>
+  </data>
+  <data name="support.convinced.support" xml:space="preserve">
+    <value>اِدعم osu!</value>
+  </data>
+  <data name="support.convinced.gift" xml:space="preserve">
+    <value>او قدم الشارة للاعب اخر</value>
+  </data>
+  <data name="support.convinced.instructions" xml:space="preserve">
+    <value>انقر زر القلب للمضي قدما الى osu!store</value>
+  </data>
+  <data name="support.why-support.title" xml:space="preserve">
+    <value>لماذا يجب ان أدعم !osu؟ إلى أين يذهب مالي؟</value>
+  </data>
+  <data name="support.why-support.team.title" xml:space="preserve">
+    <value>إدعم الفريق</value>
+  </data>
+  <data name="support.why-support.team.description" xml:space="preserve">
+    <value>يقوم فريق صغير ببرمجة و تشغيل osu!. دعمك يساعدهم على, تَعرِف... العيش.</value>
+  </data>
+  <data name="support.why-support.infra.title" xml:space="preserve">
+    <value>بنية الخادم</value>
+  </data>
+  <data name="support.why-support.infra.description" xml:space="preserve">
+    <value>المساهمات تقوم بالمساعدة على استمرار عمل الموقع, خدمات اللعب الجماعي, لوحات المتصدرين, إلخ.</value>
+  </data>
+  <data name="support.why-support.featured-artists.title" xml:space="preserve">
+    <value>الفنانين المميزين</value>
+  </data>
+  <data name="support.why-support.featured-artists.description" xml:space="preserve">
+    <value>مع شارة الدعم خاصتك, يمكننا الوصول الى فنانين رائعين وترخيص موسيقى ممتعة اكثر لأستعمالها في osu!</value>
+  </data>
+  <data name="support.why-support.featured-artists.link_text" xml:space="preserve">
+    <value>عرض الجدول الحالي &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.ads.title" xml:space="preserve">
+    <value>ابقي osu! مستقرة ذاتيا</value>
+  </data>
+  <data name="support.why-support.ads.description" xml:space="preserve">
+    <value>يمكنك المشاركة في ابقاء اللعبة مستقلة ومجانية تماما من الأعلانات والرعاة الخارجيين.</value>
+  </data>
+  <data name="support.why-support.tournaments.title" xml:space="preserve">
+    <value>المباريات الرسمية</value>
+  </data>
+  <data name="support.why-support.tournaments.description" xml:space="preserve">
+    <value>ساعد بدفع تكاليف (وجائزة) مباراة كأس osu! العالمي الرسمي.</value>
+  </data>
+  <data name="support.why-support.tournaments.link_text" xml:space="preserve">
+    <value>تصفح المباريات &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.bounty-program.title" xml:space="preserve">
+    <value>برنامج مكافأة مفتوح المصدر</value>
+  </data>
+  <data name="support.why-support.bounty-program.description" xml:space="preserve">
+    <value>ادعم مشاركي المجتمع الذين اعطو وقتهم وجهدهم لمساعدة osu! لتصبح افضل.</value>
+  </data>
+  <data name="support.why-support.bounty-program.link_text" xml:space="preserve">
+    <value>اكتشف المزيد &amp;raquo;</value>
+  </data>
+  <data name="support.perks.title" xml:space="preserve">
+    <value>أوه؟ على ماذا احصُل؟!</value>
+  </data>
+  <data name="support.perks.osu_direct.title" xml:space="preserve">
+    <value>osu!direct</value>
+  </data>
+  <data name="support.perks.osu_direct.description" xml:space="preserve">
+    <value>الوصول السريع والسهل للبحث عن الأغاني دون ترك اللعبة.</value>
+  </data>
+  <data name="support.perks.friend_ranking.title" xml:space="preserve">
+    <value>ترتيب الأصدقاء</value>
+  </data>
+  <data name="support.perks.friend_ranking.description" xml:space="preserve">
+    <value>تأكد كيف تبلي امام اصدقائك على جدول خريطة, على الموقع وفي اللعبة.</value>
+  </data>
+  <data name="support.perks.country_ranking.title" xml:space="preserve">
+    <value>ترتيب الدولة</value>
+  </data>
+  <data name="support.perks.country_ranking.description" xml:space="preserve">
+    <value>قم بأحتلال دولتك قبل احتلال العالم.</value>
+  </data>
+  <data name="support.perks.mod_filtering.title" xml:space="preserve">
+    <value>فرز بأِضافات الصعوبة</value>
+  </data>
+  <data name="support.perks.mod_filtering.description" xml:space="preserve">
+    <value>تتعامل مع الناس الذين يلعبون HDHR فقط؟ لا مشكلة!</value>
+  </data>
+  <data name="support.perks.auto_downloads.title" xml:space="preserve">
+    <value>تنزيل تلقائي</value>
+  </data>
+  <data name="support.perks.auto_downloads.description" xml:space="preserve">
+    <value>التحميل التلقائي عند اللعب المتعدد، مشاهدة الآخرين، أو النقر فوق الروابط في دردشة!</value>
+  </data>
+  <data name="support.perks.upload_more.title" xml:space="preserve">
+    <value>اِرفع المزيد</value>
+  </data>
+  <data name="support.perks.upload_more.description" xml:space="preserve">
+    <value>اماكن خرائط معلقة اضافية (للخرائط المصفوفة) تصل حتى ١٠.</value>
+  </data>
+  <data name="support.perks.early_access.title" xml:space="preserve">
+    <value>الوصول المبكر</value>
+  </data>
+  <data name="support.perks.early_access.description" xml:space="preserve">
+    <value>الوصول إلى الإصدارات المبكرة، حيث يمكنك تجربة الميزات الجديدة قبل ان تكون عامة!</value>
+  </data>
+  <data name="support.perks.customisation.title" xml:space="preserve">
+    <value>التخصيص</value>
+  </data>
+  <data name="support.perks.customisation.description" xml:space="preserve">
+    <value>خصص ملفك الشخصي باِضافة خصائص متكاملة الى صفحتك الشخصية.</value>
+  </data>
+  <data name="support.perks.beatmap_filters.title" xml:space="preserve">
+    <value>مرشحات الخرائط</value>
+  </data>
+  <data name="support.perks.beatmap_filters.description" xml:space="preserve">
+    <value>قم بتصفية بحث الخرائط كـ ملعوبة و غير ملعوبة وكذلك الترتيب المعطى (اذا وجدت).</value>
+  </data>
+  <data name="support.perks.yellow_fellow.title" xml:space="preserve">
+    <value>الصديق الأصفر</value>
+  </data>
+  <data name="support.perks.yellow_fellow.description" xml:space="preserve">
+    <value>كُن معروفاََ باِسمك المشع الاَصفر في دردشة اللعبة.</value>
+  </data>
+  <data name="support.perks.speedy_downloads.title" xml:space="preserve">
+    <value>تنزيل سريع</value>
+  </data>
+  <data name="support.perks.speedy_downloads.description" xml:space="preserve">
+    <value>قيود تحميل أكثر تساهلاََ، خاصة عند استخدام osu!direct.</value>
+  </data>
+  <data name="support.perks.change_username.title" xml:space="preserve">
+    <value>تغيير اسم المستخدم</value>
+  </data>
+  <data name="support.perks.change_username.description" xml:space="preserve">
+    <value>القدرة على تغيير اسمك دون تكاليف إضافية. (مرة واحدة بحد اقصى)</value>
+  </data>
+  <data name="support.perks.skinnables.title" xml:space="preserve">
+    <value>التجليد</value>
+  </data>
+  <data name="support.perks.skinnables.description" xml:space="preserve">
+    <value>يمكنك تجليد المزيد من الأغراض, مثل الخلفية في الصفحة الرئيسية للعبة.</value>
+  </data>
+  <data name="support.perks.feature_votes.title" xml:space="preserve">
+    <value>اصوات الميزات</value>
+  </data>
+  <data name="support.perks.feature_votes.description" xml:space="preserve">
+    <value>صوت لميزات المستقبل (٢ بالشهر)</value>
+  </data>
+  <data name="support.perks.sort_options.title" xml:space="preserve">
+    <value>خيارات الترتيب</value>
+  </data>
+  <data name="support.perks.sort_options.description" xml:space="preserve">
+    <value>القدرة على عرض ترتيب الدولة / الصديق / تعديل معين داخل اللعبة.</value>
+  </data>
+  <data name="support.perks.more_favourites.title" xml:space="preserve">
+    <value>تفضيلات اكثر</value>
+  </data>
+  <data name="support.perks.more_favourites.description" xml:space="preserve">
+    <value>عدد الخرائط التي تفضلها سيرتفع من {0}&amp;rarr;{1}</value>
+  </data>
+  <data name="support.perks.more_friends.title" xml:space="preserve">
+    <value>أصدقاء اكثر</value>
+  </data>
+  <data name="support.perks.more_friends.description" xml:space="preserve">
+    <value>عدد الأصدقاء الذين تمتلكهم سيرتفع من {0}&amp;rarr;{1}</value>
+  </data>
+  <data name="support.perks.more_beatmaps.title" xml:space="preserve">
+    <value>ارفع المزيد من الخرائط</value>
+  </data>
+  <data name="support.perks.more_beatmaps.description" xml:space="preserve">
+    <value>عدد الخرائط الغير-مصفوفة التي يمكن ان تملكها مرة واحدة محسوبة من القيمة الأساسية ونسبة اضافية لكل خريطة مصفوفة لديك حاليا (فوك الحد).&lt;br/&gt;&lt;br/&gt;عادتاََ هذه 4 زائد 1 لكل خريطة مصفوفة (لحد 2). مع شارة الدعم, يرتفع الحد الى 8 زائد 1 لكل خريطة مصفوفة (لحد 12).</value>
+  </data>
+  <data name="support.perks.friend_filtering.title" xml:space="preserve">
+    <value>الأصدقاء المتصدرين</value>
+  </data>
+  <data name="support.perks.friend_filtering.description" xml:space="preserve">
+    <value>تنافس مع اصدقائك وتنبه كيف ستبلي ضدهم!&lt;br/&gt;&lt;br/&gt;&lt;small&gt;*ليس موجودا على الموقع الجديد, سيتوفر قريا(tm)&lt;/small&gt;</value>
+  </data>
+  <data name="support.supporter_status.contribution" xml:space="preserve">
+    <value>شكراََ لك للدعم الذي قدمتهُ حتى الان! لقد ساهمت بجموع {0} لـ {1} اِشارات اشتريتها!</value>
+  </data>
+  <data name="support.supporter_status.gifted" xml:space="preserve">
+    <value>{0} من اِشاراتك التي اشتريتها قد قدمت كهدية (كمجموع {1} من الهداية التي قدمتها), كم انت كريم!</value>
+  </data>
+  <data name="support.supporter_status.not_yet" xml:space="preserve">
+    <value>ليس لديك شارة osu!supporter حتى الان :(</value>
+  </data>
+  <data name="support.supporter_status.valid_until" xml:space="preserve">
+    <value>شارة osu!supporter خاصتك نافذة لغاية {0}!</value>
+  </data>
+  <data name="support.supporter_status.was_valid_until" xml:space="preserve">
+    <value>شارة osu!supporter خاصتك كانت نافذة لغاية {0}.</value>
+  </data>
+</root>

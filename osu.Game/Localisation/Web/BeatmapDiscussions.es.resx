@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authorizations.update.null_user" xml:space="preserve">
+    <value>Debes iniciar sesión para editar.</value>
+  </data>
+  <data name="authorizations.update.system_generated" xml:space="preserve">
+    <value>Una publicación generada por el sistema no se puede editar.</value>
+  </data>
+  <data name="authorizations.update.wrong_user" xml:space="preserve">
+    <value>Debes ser el dueño de la publicación para editarla.</value>
+  </data>
+  <data name="events.empty" xml:space="preserve">
+    <value>Nada ha sucedido... aún.</value>
+  </data>
+  <data name="index.deleted_beatmap" xml:space="preserve">
+    <value>eliminado</value>
+  </data>
+  <data name="index.none_found" xml:space="preserve">
+    <value>No se encontraron discusiones que coincidieran con ese criterio de búsqueda.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Discusiones del mapa</value>
+  </data>
+  <data name="index.form._" xml:space="preserve">
+    <value>Buscar</value>
+  </data>
+  <data name="index.form.deleted" xml:space="preserve">
+    <value>Incluir discusiones eliminadas</value>
+  </data>
+  <data name="index.form.mode" xml:space="preserve">
+    <value>Modo del mapa</value>
+  </data>
+  <data name="index.form.only_unresolved" xml:space="preserve">
+    <value>Mostrar sólo discusiones no resueltas</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Tipos de mensaje</value>
+  </data>
+  <data name="index.form.username" xml:space="preserve">
+    <value>Nombre de usuario</value>
+  </data>
+  <data name="index.form.beatmapset_status._" xml:space="preserve">
+    <value>Estado del mapa</value>
+  </data>
+  <data name="index.form.beatmapset_status.all" xml:space="preserve">
+    <value>Todo</value>
+  </data>
+  <data name="index.form.beatmapset_status.disqualified" xml:space="preserve">
+    <value>Descalificado</value>
+  </data>
+  <data name="index.form.beatmapset_status.never_qualified" xml:space="preserve">
+    <value>No calificado</value>
+  </data>
+  <data name="index.form.beatmapset_status.qualified" xml:space="preserve">
+    <value>Calificado</value>
+  </data>
+  <data name="index.form.beatmapset_status.ranked" xml:space="preserve">
+    <value>Clasificado</value>
+  </data>
+  <data name="index.form.user.label" xml:space="preserve">
+    <value>Usuario</value>
+  </data>
+  <data name="index.form.user.overview" xml:space="preserve">
+    <value>Resumen de actividades</value>
+  </data>
+  <data name="item.created_at" xml:space="preserve">
+    <value>Fecha de publicación</value>
+  </data>
+  <data name="item.deleted_at" xml:space="preserve">
+    <value>Fecha de eliminación</value>
+  </data>
+  <data name="item.message_type" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="item.permalink" xml:space="preserve">
+    <value>Enlace permanente</value>
+  </data>
+  <data name="nearby_posts.confirm" xml:space="preserve">
+    <value>Ninguna de las publicaciones aborda mi asunto</value>
+  </data>
+  <data name="nearby_posts.notice" xml:space="preserve">
+    <value>Ya hay publicaciones cerca de {0} ({1}). Por favor revíselas antes de publicar.</value>
+  </data>
+  <data name="nearby_posts.unsaved" xml:space="preserve">
+    <value>{0} en esta revisión</value>
+  </data>
+  <data name="owner_editor.button" xml:space="preserve">
+    <value>Dueño de la dificultad</value>
+  </data>
+  <data name="owner_editor.reset_confirm" xml:space="preserve">
+    <value>¿Restablecer dueño para esta dificultad?</value>
+  </data>
+  <data name="owner_editor.user" xml:space="preserve">
+    <value>Dueño</value>
+  </data>
+  <data name="owner_editor.version" xml:space="preserve">
+    <value>Dificultad</value>
+  </data>
+  <data name="reply.open.guest" xml:space="preserve">
+    <value>Inicia sesión para responder</value>
+  </data>
+  <data name="reply.open.user" xml:space="preserve">
+    <value>Responder</value>
+  </data>
+  <data name="review.block_count" xml:space="preserve">
+    <value>{0} / {1} bloques usados</value>
+  </data>
+  <data name="review.go_to_parent" xml:space="preserve">
+    <value>Ver publicación de revisión</value>
+  </data>
+  <data name="review.go_to_child" xml:space="preserve">
+    <value>Ver discusión</value>
+  </data>
+  <data name="review.validation.block_too_large" xml:space="preserve">
+    <value>cada bloque sólo puede contener hasta {0} caracteres</value>
+  </data>
+  <data name="review.validation.external_references" xml:space="preserve">
+    <value>la revisión contiene referencias a problemas que no pertenecen a esta revisión</value>
+  </data>
+  <data name="review.validation.invalid_block_type" xml:space="preserve">
+    <value>tipo de bloque no válido</value>
+  </data>
+  <data name="review.validation.invalid_document" xml:space="preserve">
+    <value>revisión no válida</value>
+  </data>
+  <data name="review.validation.minimum_issues" xml:space="preserve">
+    <value>la revisión debe contener un mínimo de {0} problema|la revisión debe contener un mínimo de {0} problemas</value>
+  </data>
+  <data name="review.validation.missing_text" xml:space="preserve">
+    <value>le falta texto al bloque</value>
+  </data>
+  <data name="review.validation.too_many_blocks" xml:space="preserve">
+    <value>las revisiones sólo pueden contener {0} párrafo/problema|las revisiones sólo pueden contener hasta {0} párrafos/problemas</value>
+  </data>
+  <data name="system.resolved.true" xml:space="preserve">
+    <value>Marcado como resuelto por {0}</value>
+  </data>
+  <data name="system.resolved.false" xml:space="preserve">
+    <value>Reabierto por {0}</value>
+  </data>
+  <data name="timestamp_display.general" xml:space="preserve">
+    <value>general</value>
+  </data>
+  <data name="timestamp_display.general_all" xml:space="preserve">
+    <value>general (todo)</value>
+  </data>
+  <data name="user_filter.everyone" xml:space="preserve">
+    <value>Todos</value>
+  </data>
+  <data name="user_filter.label" xml:space="preserve">
+    <value>Filtrar por usuario</value>
+  </data>
+</root>

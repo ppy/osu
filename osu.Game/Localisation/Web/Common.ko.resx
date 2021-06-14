@@ -1,0 +1,355 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="confirmation" xml:space="preserve">
+    <value>확실합니까?</value>
+  </data>
+  <data name="confirmation_unsaved" xml:space="preserve">
+    <value>저장되지 않은 정보는 사라집니다. 계속하시겠어요?</value>
+  </data>
+  <data name="saved" xml:space="preserve">
+    <value>저장됨</value>
+  </data>
+  <data name="array_and.words_connector" xml:space="preserve">
+    <value>, </value>
+  </data>
+  <data name="array_and.two_words_connector" xml:space="preserve">
+    <value> 와(과) </value>
+  </data>
+  <data name="array_and.last_word_connector" xml:space="preserve">
+    <value>, 그리고 </value>
+  </data>
+  <data name="badges.new" xml:space="preserve">
+    <value>NEW</value>
+  </data>
+  <data name="buttons.admin" xml:space="preserve">
+    <value>관리</value>
+  </data>
+  <data name="buttons.authorise" xml:space="preserve">
+    <value>권한 부여</value>
+  </data>
+  <data name="buttons.authorising" xml:space="preserve">
+    <value>인증하기...</value>
+  </data>
+  <data name="buttons.back_to_previous" xml:space="preserve">
+    <value>이전 위치로 돌아가기</value>
+  </data>
+  <data name="buttons.back_to_top" xml:space="preserve">
+    <value>맨 위로</value>
+  </data>
+  <data name="buttons.cancel" xml:space="preserve">
+    <value>취소</value>
+  </data>
+  <data name="buttons.change" xml:space="preserve">
+    <value>변경</value>
+  </data>
+  <data name="buttons.clear" xml:space="preserve">
+    <value>비우기</value>
+  </data>
+  <data name="buttons.click_to_copy" xml:space="preserve">
+    <value>클립보드에 복사</value>
+  </data>
+  <data name="buttons.click_to_copy_copied" xml:space="preserve">
+    <value>클립보드에 복사되었습니다!</value>
+  </data>
+  <data name="buttons.close" xml:space="preserve">
+    <value>닫기</value>
+  </data>
+  <data name="buttons.collapse" xml:space="preserve">
+    <value>축소</value>
+  </data>
+  <data name="buttons.delete" xml:space="preserve">
+    <value>삭제</value>
+  </data>
+  <data name="buttons.edit" xml:space="preserve">
+    <value>수정</value>
+  </data>
+  <data name="buttons.expand" xml:space="preserve">
+    <value>확장</value>
+  </data>
+  <data name="buttons.hide" xml:space="preserve">
+    <value>숨기기</value>
+  </data>
+  <data name="buttons.permalink" xml:space="preserve">
+    <value>고유 주소</value>
+  </data>
+  <data name="buttons.pin" xml:space="preserve">
+    <value>고정</value>
+  </data>
+  <data name="buttons.post" xml:space="preserve">
+    <value>게시하기</value>
+  </data>
+  <data name="buttons.read_more" xml:space="preserve">
+    <value>자세히 보기</value>
+  </data>
+  <data name="buttons.reply" xml:space="preserve">
+    <value>답변하기</value>
+  </data>
+  <data name="buttons.reply_reopen" xml:space="preserve">
+    <value>답변하고 토론 재개하기</value>
+  </data>
+  <data name="buttons.reply_resolve" xml:space="preserve">
+    <value>답변하고 토론 마무리하기</value>
+  </data>
+  <data name="buttons.reset" xml:space="preserve">
+    <value>초기화</value>
+  </data>
+  <data name="buttons.restore" xml:space="preserve">
+    <value>되돌리기</value>
+  </data>
+  <data name="buttons.save" xml:space="preserve">
+    <value>저장</value>
+  </data>
+  <data name="buttons.saving" xml:space="preserve">
+    <value>저장 중...</value>
+  </data>
+  <data name="buttons.search" xml:space="preserve">
+    <value>검색</value>
+  </data>
+  <data name="buttons.see_more" xml:space="preserve">
+    <value>더 보기</value>
+  </data>
+  <data name="buttons.show" xml:space="preserve">
+    <value>표시</value>
+  </data>
+  <data name="buttons.show_deleted" xml:space="preserve">
+    <value>삭제된 내용 표시</value>
+  </data>
+  <data name="buttons.show_less" xml:space="preserve">
+    <value>간략히 보기</value>
+  </data>
+  <data name="buttons.show_more" xml:space="preserve">
+    <value>더 보기</value>
+  </data>
+  <data name="buttons.show_more_options" xml:space="preserve">
+    <value>더 많은 옵션 보기</value>
+  </data>
+  <data name="buttons.unpin" xml:space="preserve">
+    <value>고정 해제</value>
+  </data>
+  <data name="buttons.update" xml:space="preserve">
+    <value>업데이트</value>
+  </data>
+  <data name="buttons.upload_image" xml:space="preserve">
+    <value>이미지 올리기</value>
+  </data>
+  <data name="buttons.watch.to_0" xml:space="preserve">
+    <value>구독 해제하기</value>
+  </data>
+  <data name="buttons.watch.to_1" xml:space="preserve">
+    <value>구독하기</value>
+  </data>
+  <data name="count.badges" xml:space="preserve">
+    <value>{0}개의 배지|{0}개의 배지</value>
+  </data>
+  <data name="count.days" xml:space="preserve">
+    <value>{0}일</value>
+  </data>
+  <data name="count.hour_short_unit" xml:space="preserve">
+    <value>시간</value>
+  </data>
+  <data name="count.hours" xml:space="preserve">
+    <value>{0}시간</value>
+  </data>
+  <data name="count.item" xml:space="preserve">
+    <value>{0} unit|{0} units</value>
+  </data>
+  <data name="count.minute_short_unit" xml:space="preserve">
+    <value>분</value>
+  </data>
+  <data name="count.minutes" xml:space="preserve">
+    <value>{0}분</value>
+  </data>
+  <data name="count.months" xml:space="preserve">
+    <value>{0}달</value>
+  </data>
+  <data name="count.notifications" xml:space="preserve">
+    <value>알림 {0}개</value>
+  </data>
+  <data name="count.plus_others" xml:space="preserve">
+    <value>+ {0} 기타!</value>
+  </data>
+  <data name="count.post" xml:space="preserve">
+    <value>{0} 게시글</value>
+  </data>
+  <data name="count.second_short_unit" xml:space="preserve">
+    <value>초</value>
+  </data>
+  <data name="count.star_priority" xml:space="preserve">
+    <value>{0} 별 우선 순위</value>
+  </data>
+  <data name="count.update" xml:space="preserve">
+    <value>{0} 업데이트</value>
+  </data>
+  <data name="count.view" xml:space="preserve">
+    <value>{0} 조회</value>
+  </data>
+  <data name="count.years" xml:space="preserve">
+    <value>{0}년</value>
+  </data>
+  <data name="countdown.days" xml:space="preserve">
+    <value>일</value>
+  </data>
+  <data name="countdown.hours" xml:space="preserve">
+    <value>시간</value>
+  </data>
+  <data name="countdown.minutes" xml:space="preserve">
+    <value>분</value>
+  </data>
+  <data name="countdown.seconds" xml:space="preserve">
+    <value>초</value>
+  </data>
+  <data name="datetime.year_month.moment" xml:space="preserve">
+    <value>YYYY년 MMMM</value>
+  </data>
+  <data name="datetime.year_month.php" xml:space="preserve">
+    <value>y년 MMMM</value>
+  </data>
+  <data name="datetime.year_month_short.moment" xml:space="preserve">
+    <value>YYYY년 MMM</value>
+  </data>
+  <data name="device.keyboard" xml:space="preserve">
+    <value>키보드</value>
+  </data>
+  <data name="device.mouse" xml:space="preserve">
+    <value>마우스</value>
+  </data>
+  <data name="device.tablet" xml:space="preserve">
+    <value>태블릿</value>
+  </data>
+  <data name="device.touch" xml:space="preserve">
+    <value>터치스크린</value>
+  </data>
+  <data name="dropzone.target" xml:space="preserve">
+    <value>업로드할 파일을 이곳에 끌어놓으세요</value>
+  </data>
+  <data name="input.search" xml:space="preserve">
+    <value>검색...</value>
+  </data>
+  <data name="pagination.previous" xml:space="preserve">
+    <value>이전</value>
+  </data>
+  <data name="pagination.next" xml:space="preserve">
+    <value>다음</value>
+  </data>
+  <data name="score_count.count_100" xml:space="preserve">
+    <value>100</value>
+  </data>
+  <data name="score_count.count_300" xml:space="preserve">
+    <value>300</value>
+  </data>
+  <data name="score_count.count_50" xml:space="preserve">
+    <value>50</value>
+  </data>
+  <data name="score_count.count_katu" xml:space="preserve">
+    <value>200</value>
+  </data>
+  <data name="score_count.count_miss" xml:space="preserve">
+    <value>Miss</value>
+  </data>
+  <data name="scoreboard_time.d" xml:space="preserve">
+    <value>%d일</value>
+  </data>
+  <data name="scoreboard_time.dd" xml:space="preserve">
+    <value>%d일</value>
+  </data>
+  <data name="scoreboard_time.h" xml:space="preserve">
+    <value>%d시간</value>
+  </data>
+  <data name="scoreboard_time.hh" xml:space="preserve">
+    <value>%d시간</value>
+  </data>
+  <data name="scoreboard_time.m" xml:space="preserve">
+    <value>%d달</value>
+  </data>
+  <data name="scoreboard_time.mm" xml:space="preserve">
+    <value>%d달</value>
+  </data>
+  <data name="scoreboard_time.s" xml:space="preserve">
+    <value>%d초</value>
+  </data>
+  <data name="scoreboard_time.y" xml:space="preserve">
+    <value>%d년</value>
+  </data>
+  <data name="scoreboard_time.yy" xml:space="preserve">
+    <value>%d년</value>
+  </data>
+  <data name="time.days_ago" xml:space="preserve">
+    <value>{0}일 전</value>
+  </data>
+  <data name="time.hours_ago" xml:space="preserve">
+    <value>{0}시간 전|{0}시간 전</value>
+  </data>
+  <data name="time.now" xml:space="preserve">
+    <value>지금</value>
+  </data>
+  <data name="time.remaining" xml:space="preserve">
+    <value>남은 시간</value>
+  </data>
+  <data name="title.notice" xml:space="preserve">
+    <value>알림</value>
+  </data>
+  <data name="wrong_user._" xml:space="preserve">
+    <value>{0}로 로그인되어있습니다. {1}.</value>
+  </data>
+  <data name="wrong_user.logout_link" xml:space="preserve">
+    <value>다른 사용자로 로그인하려면 이곳을 클릭하세요</value>
+  </data>
+</root>

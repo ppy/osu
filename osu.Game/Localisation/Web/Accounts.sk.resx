@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="edit.title_compact" xml:space="preserve">
+    <value>nastavenia</value>
+  </data>
+  <data name="edit.username" xml:space="preserve">
+    <value>používateľské meno</value>
+  </data>
+  <data name="edit.avatar.title" xml:space="preserve">
+    <value>Avatar</value>
+  </data>
+  <data name="edit.avatar.rules" xml:space="preserve">
+    <value>Prosím uistite sa že váš avatar sedí s {0}.&lt;br/&gt;Toto znamená že musí byť &lt;strong&gt;primeraný pre každý vek&lt;/strong&gt;. to znamená žiadna nudita, vulgarizmy alebo sugestívny obsah.</value>
+  </data>
+  <data name="edit.avatar.rules_link" xml:space="preserve">
+    <value>pravidlá komunity</value>
+  </data>
+  <data name="edit.email.current" xml:space="preserve">
+    <value>aktuálny email</value>
+  </data>
+  <data name="edit.email.new" xml:space="preserve">
+    <value>nový email</value>
+  </data>
+  <data name="edit.email.new_confirmation" xml:space="preserve">
+    <value>potvrdenie emailu</value>
+  </data>
+  <data name="edit.email.title" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="edit.password.current" xml:space="preserve">
+    <value>aktuálne heslo</value>
+  </data>
+  <data name="edit.password.new" xml:space="preserve">
+    <value>nové heslo</value>
+  </data>
+  <data name="edit.password.new_confirmation" xml:space="preserve">
+    <value>potvrdenie hesla</value>
+  </data>
+  <data name="edit.password.title" xml:space="preserve">
+    <value>Heslo</value>
+  </data>
+  <data name="edit.profile.title" xml:space="preserve">
+    <value>Profil</value>
+  </data>
+  <data name="edit.profile.user.user_from" xml:space="preserve">
+    <value>súčasná poloha</value>
+  </data>
+  <data name="edit.profile.user.user_interests" xml:space="preserve">
+    <value>záujmy</value>
+  </data>
+  <data name="edit.profile.user.user_occ" xml:space="preserve">
+    <value>povolanie</value>
+  </data>
+  <data name="edit.profile.user.user_website" xml:space="preserve">
+    <value>webstránka</value>
+  </data>
+  <data name="edit.signature.title" xml:space="preserve">
+    <value>Podpis</value>
+  </data>
+  <data name="edit.signature.update" xml:space="preserve">
+    <value>aktualizovať</value>
+  </data>
+  <data name="notifications.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>dostávať notifikácie pre nové problémy na kvalifikovaných beatmapách pre následujúce módy</value>
+  </data>
+  <data name="notifications.beatmapset_disqualify" xml:space="preserve">
+    <value>prijímať upozornenia, keď sú beatmapy diskvalifikované s týchto módov</value>
+  </data>
+  <data name="notifications.comment_reply" xml:space="preserve">
+    <value>prijímať upozornenia pre odpovede na moje komentáre</value>
+  </data>
+  <data name="notifications.title" xml:space="preserve">
+    <value>Oznámenia</value>
+  </data>
+  <data name="notifications.topic_auto_subscribe" xml:space="preserve">
+    <value>automaticky zapnúť notifikácie pre nové fórove témy ktoré vytvoríte</value>
+  </data>
+  <data name="notifications.options._" xml:space="preserve">
+    <value>spôsoby doručenia</value>
+  </data>
+  <data name="notifications.options.beatmapset:modding" xml:space="preserve">
+    <value>módovanie beatmáp</value>
+  </data>
+  <data name="notifications.options.channel_message" xml:space="preserve">
+    <value>súkromné správy</value>
+  </data>
+  <data name="notifications.options.comment_new" xml:space="preserve">
+    <value>nové komentáre
+</value>
+  </data>
+  <data name="notifications.options.forum_topic_reply" xml:space="preserve">
+    <value>odpoveď na tému</value>
+  </data>
+  <data name="notifications.options.mail" xml:space="preserve">
+    <value>pošta</value>
+  </data>
+  <data name="notifications.options.push" xml:space="preserve">
+    <value>upozornenia na stránke</value>
+  </data>
+  <data name="notifications.options.user_achievement_unlock" xml:space="preserve">
+    <value>hráčska medaila odomknutá</value>
+  </data>
+  <data name="oauth.authorized_clients" xml:space="preserve">
+    <value>autorizované klienty</value>
+  </data>
+  <data name="oauth.own_clients" xml:space="preserve">
+    <value>vlastné klienty</value>
+  </data>
+  <data name="oauth.title" xml:space="preserve">
+    <value>OAuth</value>
+  </data>
+  <data name="options.beatmapset_title_show_original" xml:space="preserve">
+    <value>zobraziť metadáta beatmapy v originálnom jazyku</value>
+  </data>
+  <data name="options.title" xml:space="preserve">
+    <value>Možnosti</value>
+  </data>
+  <data name="options.beatmapset_download._" xml:space="preserve">
+    <value>predvolený druh sťahovania beatmáp</value>
+  </data>
+  <data name="options.beatmapset_download.all" xml:space="preserve">
+    <value>s videom, ak je dostupné</value>
+  </data>
+  <data name="options.beatmapset_download.direct" xml:space="preserve">
+    <value>otvoriť v osu!direct</value>
+  </data>
+  <data name="options.beatmapset_download.no_video" xml:space="preserve">
+    <value>bez videa</value>
+  </data>
+  <data name="playstyles.keyboard" xml:space="preserve">
+    <value>klávesnica</value>
+  </data>
+  <data name="playstyles.mouse" xml:space="preserve">
+    <value>myš</value>
+  </data>
+  <data name="playstyles.tablet" xml:space="preserve">
+    <value>tablet</value>
+  </data>
+  <data name="playstyles.title" xml:space="preserve">
+    <value>Štýly hrania</value>
+  </data>
+  <data name="playstyles.touch" xml:space="preserve">
+    <value>dotyk</value>
+  </data>
+  <data name="privacy.friends_only" xml:space="preserve">
+    <value>blokovať súkromné správy od osôb mimo vášho zoznamu priateľov</value>
+  </data>
+  <data name="privacy.hide_online" xml:space="preserve">
+    <value>skryť online status</value>
+  </data>
+  <data name="privacy.title" xml:space="preserve">
+    <value>Súkromie</value>
+  </data>
+  <data name="security.current_session" xml:space="preserve">
+    <value>aktuálne</value>
+  </data>
+  <data name="security.end_session" xml:space="preserve">
+    <value>Koniec relácie</value>
+  </data>
+  <data name="security.end_session_confirmation" xml:space="preserve">
+    <value>Toto okamžite vypne reláciu na vybranom zariadení. Ste si istí?</value>
+  </data>
+  <data name="security.last_active" xml:space="preserve">
+    <value>Naposledy aktívny:</value>
+  </data>
+  <data name="security.title" xml:space="preserve">
+    <value>Zabezpečenie</value>
+  </data>
+  <data name="security.web_sessions" xml:space="preserve">
+    <value>webové relácie</value>
+  </data>
+  <data name="update_email.update" xml:space="preserve">
+    <value>aktualizovať</value>
+  </data>
+  <data name="update_password.update" xml:space="preserve">
+    <value>aktualizovať</value>
+  </data>
+  <data name="verification_completed.text" xml:space="preserve">
+    <value>Už môžete túto kartu/okno zatvoriť</value>
+  </data>
+  <data name="verification_completed.title" xml:space="preserve">
+    <value>Overenie bolo dokončené</value>
+  </data>
+  <data name="verification_invalid.title" xml:space="preserve">
+    <value>Link už vypršal alebo je neplatný</value>
+  </data>
+</root>

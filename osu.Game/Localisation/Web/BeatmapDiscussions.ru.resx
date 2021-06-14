@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authorizations.update.null_user" xml:space="preserve">
+    <value>Вы должны войти для редактирования.</value>
+  </data>
+  <data name="authorizations.update.system_generated" xml:space="preserve">
+    <value>Системное сообщение не может быть отредактировано.</value>
+  </data>
+  <data name="authorizations.update.wrong_user" xml:space="preserve">
+    <value>Вы должны быть автором данной публикации для редактирования.</value>
+  </data>
+  <data name="events.empty" xml:space="preserve">
+    <value>Ничего не происходит... пока что.</value>
+  </data>
+  <data name="index.deleted_beatmap" xml:space="preserve">
+    <value>удалено</value>
+  </data>
+  <data name="index.none_found" xml:space="preserve">
+    <value>Не найдено обсуждений, совпадающих с данными критериями поиска.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Обсуждение карты</value>
+  </data>
+  <data name="index.form._" xml:space="preserve">
+    <value>Поиск</value>
+  </data>
+  <data name="index.form.deleted" xml:space="preserve">
+    <value>Включая удаленные обсуждения</value>
+  </data>
+  <data name="index.form.mode" xml:space="preserve">
+    <value>Режим карты</value>
+  </data>
+  <data name="index.form.only_unresolved" xml:space="preserve">
+    <value>Показать только нерешённые обсуждения</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Типы сообщений</value>
+  </data>
+  <data name="index.form.username" xml:space="preserve">
+    <value>Имя пользователя</value>
+  </data>
+  <data name="index.form.beatmapset_status._" xml:space="preserve">
+    <value>Статус карты</value>
+  </data>
+  <data name="index.form.beatmapset_status.all" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="index.form.beatmapset_status.disqualified" xml:space="preserve">
+    <value>Дисквалифицирована</value>
+  </data>
+  <data name="index.form.beatmapset_status.never_qualified" xml:space="preserve">
+    <value>Никогда не квалифицирована</value>
+  </data>
+  <data name="index.form.beatmapset_status.qualified" xml:space="preserve">
+    <value>Квалифицирована</value>
+  </data>
+  <data name="index.form.beatmapset_status.ranked" xml:space="preserve">
+    <value>Рейтинговая</value>
+  </data>
+  <data name="index.form.user.label" xml:space="preserve">
+    <value>Пользователь</value>
+  </data>
+  <data name="index.form.user.overview" xml:space="preserve">
+    <value>Просмотр активности</value>
+  </data>
+  <data name="item.created_at" xml:space="preserve">
+    <value>Дата создания</value>
+  </data>
+  <data name="item.deleted_at" xml:space="preserve">
+    <value>Дата удаления</value>
+  </data>
+  <data name="item.message_type" xml:space="preserve">
+    <value>Тип</value>
+  </data>
+  <data name="item.permalink" xml:space="preserve">
+    <value>Прямая ссылка</value>
+  </data>
+  <data name="nearby_posts.confirm" xml:space="preserve">
+    <value>Ни один из постов не решает мою проблему</value>
+  </data>
+  <data name="nearby_posts.notice" xml:space="preserve">
+    <value>Есть ответы между {0} ({1}). Проверьте их перед тем как отвечать.</value>
+  </data>
+  <data name="nearby_posts.unsaved" xml:space="preserve">
+    <value>{0} в этом отзыве</value>
+  </data>
+  <data name="owner_editor.button" xml:space="preserve">
+    <value>Владелец сложности</value>
+  </data>
+  <data name="owner_editor.reset_confirm" xml:space="preserve">
+    <value>Сбросить владельца сложности?</value>
+  </data>
+  <data name="owner_editor.user" xml:space="preserve">
+    <value>Владелец</value>
+  </data>
+  <data name="owner_editor.version" xml:space="preserve">
+    <value>Сложность</value>
+  </data>
+  <data name="reply.open.guest" xml:space="preserve">
+    <value>Войдите, чтобы ответить</value>
+  </data>
+  <data name="reply.open.user" xml:space="preserve">
+    <value>Ответить</value>
+  </data>
+  <data name="review.block_count" xml:space="preserve">
+    <value>{0} / {1} блоков использовано</value>
+  </data>
+  <data name="review.go_to_parent" xml:space="preserve">
+    <value>Посмотреть отзыв</value>
+  </data>
+  <data name="review.go_to_child" xml:space="preserve">
+    <value>Посмотреть обсуждение</value>
+  </data>
+  <data name="review.validation.block_too_large" xml:space="preserve">
+    <value>каждый блок может содержать до {0} символов</value>
+  </data>
+  <data name="review.validation.external_references" xml:space="preserve">
+    <value>отзыв содержит ссылки на проблемы, не отсоящиеся к этому отзыву</value>
+  </data>
+  <data name="review.validation.invalid_block_type" xml:space="preserve">
+    <value>недопустимый тип блока</value>
+  </data>
+  <data name="review.validation.invalid_document" xml:space="preserve">
+    <value>недопустимый отзыв</value>
+  </data>
+  <data name="review.validation.minimum_issues" xml:space="preserve">
+    <value>отзыв должен содержать как минимум {0} проблему|отзыв должен содержать как минимум {0} проблемы|отзыв должен содержать как минимум {0} проблем</value>
+  </data>
+  <data name="review.validation.missing_text" xml:space="preserve">
+    <value>в блоке отсутствует текст</value>
+  </data>
+  <data name="review.validation.too_many_blocks" xml:space="preserve">
+    <value>отзывы могут содержать только {0} параграф/проблему|отзывы могут содержать только до {0} параграфов/проблем</value>
+  </data>
+  <data name="system.resolved.true" xml:space="preserve">
+    <value>Помечено решённым пользователем {0}</value>
+  </data>
+  <data name="system.resolved.false" xml:space="preserve">
+    <value>Открыто заново пользователем {0}</value>
+  </data>
+  <data name="timestamp_display.general" xml:space="preserve">
+    <value>общее</value>
+  </data>
+  <data name="timestamp_display.general_all" xml:space="preserve">
+    <value>общее (все)</value>
+  </data>
+  <data name="user_filter.everyone" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="user_filter.label" xml:space="preserve">
+    <value>Сортировать по пользователям</value>
+  </data>
+</root>

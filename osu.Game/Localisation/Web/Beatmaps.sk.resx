@@ -1,0 +1,580 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="discussion-votes.update.error" xml:space="preserve">
+    <value>Nastala chyba počas hlasovania</value>
+  </data>
+  <data name="discussions.allow_kudosu" xml:space="preserve">
+    <value>povoliť kudosu</value>
+  </data>
+  <data name="discussions.beatmap_information" xml:space="preserve">
+    <value>Stránka Beatmapy</value>
+  </data>
+  <data name="discussions.delete" xml:space="preserve">
+    <value>odstrániť</value>
+  </data>
+  <data name="discussions.deleted" xml:space="preserve">
+    <value>Odstránene uživateľom {0} {1}.</value>
+  </data>
+  <data name="discussions.deny_kudosu" xml:space="preserve">
+    <value>odmietnuť kudosu</value>
+  </data>
+  <data name="discussions.edit" xml:space="preserve">
+    <value>upraviť</value>
+  </data>
+  <data name="discussions.edited" xml:space="preserve">
+    <value>Naposledy upravené uživateľom {0} {1}.</value>
+  </data>
+  <data name="discussions.kudosu_denied" xml:space="preserve">
+    <value>Odopretý od získania kudosu.</value>
+  </data>
+  <data name="discussions.message_placeholder_deleted_beatmap" xml:space="preserve">
+    <value>Táto obtiažnosť bola vymazaná, takže už nemôže byť diskutovaná.</value>
+  </data>
+  <data name="discussions.message_placeholder_locked" xml:space="preserve">
+    <value>Diskusia o tejto mape boli vypnuté.</value>
+  </data>
+  <data name="discussions.message_type_select" xml:space="preserve">
+    <value>Vybrať typ komentára</value>
+  </data>
+  <data name="discussions.reply_notice" xml:space="preserve">
+    <value>Stlačením Enter odpovedaj.</value>
+  </data>
+  <data name="discussions.reply_placeholder" xml:space="preserve">
+    <value>Sem napíš tvoju odpoveď</value>
+  </data>
+  <data name="discussions.require-login" xml:space="preserve">
+    <value>Na písanie príspevkov alebo odpovedanie sa prosím prihlas</value>
+  </data>
+  <data name="discussions.resolved" xml:space="preserve">
+    <value>Vyriešený</value>
+  </data>
+  <data name="discussions.restore" xml:space="preserve">
+    <value>obnoviť</value>
+  </data>
+  <data name="discussions.show_deleted" xml:space="preserve">
+    <value>Zobraziť zmazané</value>
+  </data>
+  <data name="discussions.title" xml:space="preserve">
+    <value>Diskusie</value>
+  </data>
+  <data name="discussions.collapse.all-collapse" xml:space="preserve">
+    <value>Zbaliť všetko</value>
+  </data>
+  <data name="discussions.collapse.all-expand" xml:space="preserve">
+    <value>Rozbaliť všetko</value>
+  </data>
+  <data name="discussions.empty.empty" xml:space="preserve">
+    <value>Zatiaľ žiadne diskusie!</value>
+  </data>
+  <data name="discussions.empty.hidden" xml:space="preserve">
+    <value>Žiadna diskusia nezodpovedá zvolenému filtru.</value>
+  </data>
+  <data name="discussions.lock.button.lock" xml:space="preserve">
+    <value>Zamknúť diskusie</value>
+  </data>
+  <data name="discussions.lock.button.unlock" xml:space="preserve">
+    <value>Odomknúť diskusie</value>
+  </data>
+  <data name="discussions.lock.prompt.lock" xml:space="preserve">
+    <value>Dôvod k uzamknutiu</value>
+  </data>
+  <data name="discussions.lock.prompt.unlock" xml:space="preserve">
+    <value>Ste si istý o uzamknutie?</value>
+  </data>
+  <data name="discussions.message_hint.in_general" xml:space="preserve">
+    <value>Tento príspevok bude zverejnený na generálnej diskusii beatmapy. Pokial chcete beatmapu módovať, začnite správu časovou sekvenciou (napr. 00:12:345).</value>
+  </data>
+  <data name="discussions.message_hint.in_timeline" xml:space="preserve">
+    <value>Pre módovanie viacero časových sekvencii, pridajte viac príspevkov (1 príspevok na každú sekvenciu).</value>
+  </data>
+  <data name="discussions.message_placeholder.general" xml:space="preserve">
+    <value>Píšte sem pre odoslanie príspevku do General ({0})</value>
+  </data>
+  <data name="discussions.message_placeholder.generalall" xml:space="preserve">
+    <value>Píšte sem pre odoslanie príspevku do General (Všetky obtiažnosti)</value>
+  </data>
+  <data name="discussions.message_placeholder.timeline" xml:space="preserve">
+    <value>Píšte sem pre zaradenie príspevku do časovej osy ({0})</value>
+  </data>
+  <data name="discussions.message_type.disqualify" xml:space="preserve">
+    <value>Diskvalifikácia</value>
+  </data>
+  <data name="discussions.message_type.hype" xml:space="preserve">
+    <value>Hype!</value>
+  </data>
+  <data name="discussions.message_type.mapper_note" xml:space="preserve">
+    <value>Poznámka</value>
+  </data>
+  <data name="discussions.message_type.nomination_reset" xml:space="preserve">
+    <value>Obnoviť Nomináciu</value>
+  </data>
+  <data name="discussions.message_type.praise" xml:space="preserve">
+    <value>Pochvala</value>
+  </data>
+  <data name="discussions.message_type.problem" xml:space="preserve">
+    <value>Problém</value>
+  </data>
+  <data name="discussions.message_type.review" xml:space="preserve">
+    <value>Recenzia</value>
+  </data>
+  <data name="discussions.message_type.suggestion" xml:space="preserve">
+    <value>Návrh</value>
+  </data>
+  <data name="discussions.mode.events" xml:space="preserve">
+    <value>História</value>
+  </data>
+  <data name="discussions.mode.general" xml:space="preserve">
+    <value>Všeobecný {0}</value>
+  </data>
+  <data name="discussions.mode.reviews" xml:space="preserve">
+    <value>Recenzie</value>
+  </data>
+  <data name="discussions.mode.timeline" xml:space="preserve">
+    <value>Časová os</value>
+  </data>
+  <data name="discussions.mode.scopes.general" xml:space="preserve">
+    <value>Táto obtiažnosť</value>
+  </data>
+  <data name="discussions.mode.scopes.generalall" xml:space="preserve">
+    <value>Všetky obtiažnosti</value>
+  </data>
+  <data name="discussions.new.pin" xml:space="preserve">
+    <value>Pin</value>
+  </data>
+  <data name="discussions.new.timestamp" xml:space="preserve">
+    <value>Časová značka</value>
+  </data>
+  <data name="discussions.new.timestamp_missing" xml:space="preserve">
+    <value>ctrl-c v režime editovania a vložte správu pre pridanie časovej sekvencie!</value>
+  </data>
+  <data name="discussions.new.title" xml:space="preserve">
+    <value>Nová diskusia</value>
+  </data>
+  <data name="discussions.new.unpin" xml:space="preserve">
+    <value>Odopnúť</value>
+  </data>
+  <data name="discussions.show.title" xml:space="preserve">
+    <value>{0} zmapovaná hráčom {1}</value>
+  </data>
+  <data name="discussions.sort.created_at" xml:space="preserve">
+    <value>Čas vytvorenia</value>
+  </data>
+  <data name="discussions.sort.timeline" xml:space="preserve">
+    <value>Časová os</value>
+  </data>
+  <data name="discussions.sort.updated_at" xml:space="preserve">
+    <value>Posledná aktualizácia</value>
+  </data>
+  <data name="discussions.stats.deleted" xml:space="preserve">
+    <value>Vymazané</value>
+  </data>
+  <data name="discussions.stats.mapper_notes" xml:space="preserve">
+    <value>Poznámky</value>
+  </data>
+  <data name="discussions.stats.mine" xml:space="preserve">
+    <value>Moje</value>
+  </data>
+  <data name="discussions.stats.pending" xml:space="preserve">
+    <value>Čakajúce</value>
+  </data>
+  <data name="discussions.stats.praises" xml:space="preserve">
+    <value>Pochvaly</value>
+  </data>
+  <data name="discussions.stats.resolved" xml:space="preserve">
+    <value>Vyriešené</value>
+  </data>
+  <data name="discussions.stats.total" xml:space="preserve">
+    <value>Všetko</value>
+  </data>
+  <data name="discussions.status-messages.approved" xml:space="preserve">
+    <value>Táto beatmapa bola schválená dňa {0}!</value>
+  </data>
+  <data name="discussions.status-messages.graveyard" xml:space="preserve">
+    <value>Táto beatmapa nebola aktualizovaná od {0} a pravdepodobne bola opustená tvorcom...</value>
+  </data>
+  <data name="discussions.status-messages.loved" xml:space="preserve">
+    <value>Táto beatmapa bola pridaná do kategórie obľúbených dňa {0}!</value>
+  </data>
+  <data name="discussions.status-messages.ranked" xml:space="preserve">
+    <value>Táto beatmapa sa stala hodnotenou dňa {0}!</value>
+  </data>
+  <data name="discussions.status-messages.wip" xml:space="preserve">
+    <value>Táto beatmapa bola označená ako rozpracovaná jeho autorom.</value>
+  </data>
+  <data name="discussions.votes.none.down" xml:space="preserve">
+    <value>Zatiaľ žiadne negatívne hodnotenia</value>
+  </data>
+  <data name="discussions.votes.none.up" xml:space="preserve">
+    <value>Zatiaľ žiadne kladné hodnotenie</value>
+  </data>
+  <data name="discussions.votes.latest.down" xml:space="preserve">
+    <value>Nedávne neschválenie</value>
+  </data>
+  <data name="discussions.votes.latest.up" xml:space="preserve">
+    <value>Najnovšie hlasovania</value>
+  </data>
+  <data name="hype.button" xml:space="preserve">
+    <value>Hype Beatmap!</value>
+  </data>
+  <data name="hype.button_done" xml:space="preserve">
+    <value>Už hypenutá!</value>
+  </data>
+  <data name="hype.confirm" xml:space="preserve">
+    <value>Si si istý? Toto ti odoberie jednu z tvojich zvyšných {0} nadšení a nedá sa to vrátiť.</value>
+  </data>
+  <data name="hype.explanation" xml:space="preserve">
+    <value>Nadchni tuto beatmapu a sprav ju viac viditelnú pre nominátorov a hodnotenie!</value>
+  </data>
+  <data name="hype.explanation_guest" xml:space="preserve">
+    <value>Prihlás sa a nadchni túto beatmapu a urob ju viac viditelnú pre nominátorov a hodnotenie!</value>
+  </data>
+  <data name="hype.new_time" xml:space="preserve">
+    <value>Ďalšie nadšenie získaš za {0}.</value>
+  </data>
+  <data name="hype.remaining" xml:space="preserve">
+    <value>Zostáva ti zvyšných {0} nadšeni.</value>
+  </data>
+  <data name="hype.required_text" xml:space="preserve">
+    <value>Nadšenie: {0}/{1}</value>
+  </data>
+  <data name="hype.section_title" xml:space="preserve">
+    <value>Natešenie</value>
+  </data>
+  <data name="hype.title" xml:space="preserve">
+    <value>Nadšenie</value>
+  </data>
+  <data name="feedback.button" xml:space="preserve">
+    <value>Zanechaj Spätnú Väzbu</value>
+  </data>
+  <data name="nominations.delete" xml:space="preserve">
+    <value>Odstrániť</value>
+  </data>
+  <data name="nominations.delete_own_confirm" xml:space="preserve">
+    <value>Ste si istý? Beatmapa bude odstránená a budete presmerovaný späť na svoj profil.</value>
+  </data>
+  <data name="nominations.delete_other_confirm" xml:space="preserve">
+    <value>Ste si istý? Beatmapa bude odstránená a budete presmerovaný späť na profil používateľa.</value>
+  </data>
+  <data name="nominations.disqualification_prompt" xml:space="preserve">
+    <value>Dôvod pre diskvalifikáciu?</value>
+  </data>
+  <data name="nominations.disqualified_at" xml:space="preserve">
+    <value>Diskvalifikovaný pred {0} ({1}).</value>
+  </data>
+  <data name="nominations.disqualified_no_reason" xml:space="preserve">
+    <value>nebol uvedený dôvod</value>
+  </data>
+  <data name="nominations.disqualify" xml:space="preserve">
+    <value>Diskvalifikovať</value>
+  </data>
+  <data name="nominations.incorrect_state" xml:space="preserve">
+    <value>Chyba pri vykonávaní akcie, skúste obnoviť stránku.</value>
+  </data>
+  <data name="nominations.love" xml:space="preserve">
+    <value>Obľuba</value>
+  </data>
+  <data name="nominations.love_confirm" xml:space="preserve">
+    <value>Obľúbil si si túto beatmapu?</value>
+  </data>
+  <data name="nominations.nominate" xml:space="preserve">
+    <value>Nominovať</value>
+  </data>
+  <data name="nominations.nominate_confirm" xml:space="preserve">
+    <value>Nominovať túto beatmapu?</value>
+  </data>
+  <data name="nominations.nominated_by" xml:space="preserve">
+    <value>nominované od {0}</value>
+  </data>
+  <data name="nominations.required_text" xml:space="preserve">
+    <value>Nominácie {0}/{1}</value>
+  </data>
+  <data name="nominations.reset_message_deleted" xml:space="preserve">
+    <value>vymazané</value>
+  </data>
+  <data name="nominations.title" xml:space="preserve">
+    <value>Stav Nominácie</value>
+  </data>
+  <data name="nominations.unresolved_issues" xml:space="preserve">
+    <value>Sú tu stále nevyriešené problémy, ktoré musia byť riešené ako prvé.</value>
+  </data>
+  <data name="nominations.reset_at.nomination_reset" xml:space="preserve">
+    <value>Proces nominácie bol resetnutý pred {0} nominátorom {1} kvôli novému problému {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_at.disqualify" xml:space="preserve">
+    <value>Diskvalifikované pred {0} uživatelom {1} kvôli novému problému {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_confirm.nomination_reset" xml:space="preserve">
+    <value>Si si istý? Vytvorením novej pripomienky sa proces nominácie resetne.</value>
+  </data>
+  <data name="nominations.reset_confirm.disqualify" xml:space="preserve">
+    <value>Ste si istý? Toto odstráni beatmapu z kvalifikácie a resetuje nominačný proces.</value>
+  </data>
+  <data name="listing.search.prompt" xml:space="preserve">
+    <value>zadaj kľúčové slova...</value>
+  </data>
+  <data name="listing.search.login_required" xml:space="preserve">
+    <value>Prihláste sa, ak chcete hľadať.</value>
+  </data>
+  <data name="listing.search.options" xml:space="preserve">
+    <value>Viac možností hladania</value>
+  </data>
+  <data name="listing.search.supporter_filter" xml:space="preserve">
+    <value>Filtrovanie podľa {0} vyžaduje aktívny osu!supporter tag</value>
+  </data>
+  <data name="listing.search.not-found" xml:space="preserve">
+    <value>bez výsledkov</value>
+  </data>
+  <data name="listing.search.not-found-quote" xml:space="preserve">
+    <value>... nič sa nenašlo.</value>
+  </data>
+  <data name="listing.search.filters.extra" xml:space="preserve">
+    <value>extra</value>
+  </data>
+  <data name="listing.search.filters.general" xml:space="preserve">
+    <value>Všeobecné</value>
+  </data>
+  <data name="listing.search.filters.genre" xml:space="preserve">
+    <value>Žáner</value>
+  </data>
+  <data name="listing.search.filters.language" xml:space="preserve">
+    <value>Jazyk</value>
+  </data>
+  <data name="listing.search.filters.mode" xml:space="preserve">
+    <value>Mód</value>
+  </data>
+  <data name="listing.search.filters.played" xml:space="preserve">
+    <value>Hrané</value>
+  </data>
+  <data name="listing.search.filters.rank" xml:space="preserve">
+    <value>Dosiahnuté Hodnotenie</value>
+  </data>
+  <data name="listing.search.filters.status" xml:space="preserve">
+    <value>Kategórie</value>
+  </data>
+  <data name="listing.search.sorting.title" xml:space="preserve">
+    <value>Názov</value>
+  </data>
+  <data name="listing.search.sorting.artist" xml:space="preserve">
+    <value>Skladateľ</value>
+  </data>
+  <data name="listing.search.sorting.difficulty" xml:space="preserve">
+    <value>Obtiažnosť</value>
+  </data>
+  <data name="listing.search.sorting.favourites" xml:space="preserve">
+    <value>Obľúbené</value>
+  </data>
+  <data name="listing.search.sorting.updated" xml:space="preserve">
+    <value>Aktualizované</value>
+  </data>
+  <data name="listing.search.sorting.ranked" xml:space="preserve">
+    <value>Ohodnotené</value>
+  </data>
+  <data name="listing.search.sorting.rating" xml:space="preserve">
+    <value>Hodnotenie</value>
+  </data>
+  <data name="listing.search.sorting.plays" xml:space="preserve">
+    <value>Počet zahraní</value>
+  </data>
+  <data name="listing.search.sorting.relevance" xml:space="preserve">
+    <value>Relevantnosť</value>
+  </data>
+  <data name="listing.search.sorting.nominations" xml:space="preserve">
+    <value>Nominácie</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote._" xml:space="preserve">
+    <value>Filtrovanie podľa {0} vyžaduje aktívny {1}</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote.link_text" xml:space="preserve">
+    <value>osu!supporter tag</value>
+  </data>
+  <data name="general.converts" xml:space="preserve">
+    <value>Zahrnúť konvertované beatmapy</value>
+  </data>
+  <data name="general.recommended" xml:space="preserve">
+    <value>Odporúčaná obtiažnosť</value>
+  </data>
+  <data name="mode.any" xml:space="preserve">
+    <value>Akékoľvek</value>
+  </data>
+  <data name="status.any" xml:space="preserve">
+    <value>Akékoľvek</value>
+  </data>
+  <data name="status.approved" xml:space="preserve">
+    <value>Schválené</value>
+  </data>
+  <data name="status.favourites" xml:space="preserve">
+    <value>Obľúbené</value>
+  </data>
+  <data name="status.graveyard" xml:space="preserve">
+    <value>Cintorín</value>
+  </data>
+  <data name="status.leaderboard" xml:space="preserve">
+    <value>Má rebríček</value>
+  </data>
+  <data name="status.loved" xml:space="preserve">
+    <value>Obľúbené</value>
+  </data>
+  <data name="status.mine" xml:space="preserve">
+    <value>Moje mapy</value>
+  </data>
+  <data name="status.pending" xml:space="preserve">
+    <value>Nerozhodnutý &amp; prebiehajúci</value>
+  </data>
+  <data name="status.qualified" xml:space="preserve">
+    <value>Kvalifikované</value>
+  </data>
+  <data name="status.ranked" xml:space="preserve">
+    <value>Hodnotené</value>
+  </data>
+  <data name="genre.any" xml:space="preserve">
+    <value>Akékoľvek</value>
+  </data>
+  <data name="genre.unspecified" xml:space="preserve">
+    <value>Nešpecifikované</value>
+  </data>
+  <data name="genre.video-game" xml:space="preserve">
+    <value>Videohry</value>
+  </data>
+  <data name="genre.anime" xml:space="preserve">
+    <value>Anime</value>
+  </data>
+  <data name="genre.rock" xml:space="preserve">
+    <value>Rock</value>
+  </data>
+  <data name="genre.pop" xml:space="preserve">
+    <value>Pop</value>
+  </data>
+  <data name="genre.other" xml:space="preserve">
+    <value>Ostatné</value>
+  </data>
+  <data name="genre.novelty" xml:space="preserve">
+    <value>Novinky</value>
+  </data>
+  <data name="genre.hip-hop" xml:space="preserve">
+    <value>Hip Hop</value>
+  </data>
+  <data name="genre.electronic" xml:space="preserve">
+    <value>Elektronické</value>
+  </data>
+  <data name="language.english" xml:space="preserve">
+    <value>Anglické</value>
+  </data>
+  <data name="language.chinese" xml:space="preserve">
+    <value>Čínske</value>
+  </data>
+  <data name="language.french" xml:space="preserve">
+    <value>Francúzske</value>
+  </data>
+  <data name="language.german" xml:space="preserve">
+    <value>Nemecké</value>
+  </data>
+  <data name="language.italian" xml:space="preserve">
+    <value>Talianské</value>
+  </data>
+  <data name="language.japanese" xml:space="preserve">
+    <value>Japonské</value>
+  </data>
+  <data name="language.korean" xml:space="preserve">
+    <value>Kórejské</value>
+  </data>
+  <data name="language.spanish" xml:space="preserve">
+    <value>Španielske</value>
+  </data>
+  <data name="language.swedish" xml:space="preserve">
+    <value>Švédske</value>
+  </data>
+  <data name="language.instrumental" xml:space="preserve">
+    <value>Inštrumentálne</value>
+  </data>
+  <data name="language.other" xml:space="preserve">
+    <value>Ostatné</value>
+  </data>
+  <data name="played.any" xml:space="preserve">
+    <value>Akékoľvek</value>
+  </data>
+  <data name="played.played" xml:space="preserve">
+    <value>Hrané</value>
+  </data>
+  <data name="played.unplayed" xml:space="preserve">
+    <value>Nehrané</value>
+  </data>
+  <data name="extra.video" xml:space="preserve">
+    <value>S Videom</value>
+  </data>
+  <data name="extra.storyboard" xml:space="preserve">
+    <value>So Storyboardmi</value>
+  </data>
+  <data name="rank.any" xml:space="preserve">
+    <value>Akékoľvek</value>
+  </data>
+  <data name="rank.xh" xml:space="preserve">
+    <value>Strieborné SS</value>
+  </data>
+  <data name="rank.sh" xml:space="preserve">
+    <value>Strieborné S</value>
+  </data>
+  <data name="panel.playcount" xml:space="preserve">
+    <value>Počet zahraní {0}</value>
+  </data>
+  <data name="panel.favourites" xml:space="preserve">
+    <value>V obľúbených: {0}</value>
+  </data>
+</root>

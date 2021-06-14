@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="invalid" xml:space="preserve">
+    <value>指定的 {0} 无效。</value>
+  </data>
+  <data name="not_negative" xml:space="preserve">
+    <value>{0} 不能为负数。</value>
+  </data>
+  <data name="required" xml:space="preserve">
+    <value>需要 {0} 。</value>
+  </data>
+  <data name="too_long" xml:space="preserve">
+    <value>{0} 超出最大长度——最多允许 {1} 个字符。</value>
+  </data>
+  <data name="wrong_confirmation" xml:space="preserve">
+    <value>确认信息不匹配。</value>
+  </data>
+  <data name="beatmapset_discussion.beatmap_missing" xml:space="preserve">
+    <value>指定了时间戳但是谱面不存在。</value>
+  </data>
+  <data name="beatmapset_discussion.beatmapset_no_hype" xml:space="preserve">
+    <value>无法推荐谱面。</value>
+  </data>
+  <data name="beatmapset_discussion.hype_requires_null_beatmap" xml:space="preserve">
+    <value>只能在 常规（全难度） 中推荐。</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmap_id" xml:space="preserve">
+    <value>指定的难度无效。</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmapset_id" xml:space="preserve">
+    <value>指定的谱面无效。</value>
+  </data>
+  <data name="beatmapset_discussion.locked" xml:space="preserve">
+    <value>讨论被锁定。</value>
+  </data>
+  <data name="beatmapset_discussion.attributes.message_type" xml:space="preserve">
+    <value>消息类型</value>
+  </data>
+  <data name="beatmapset_discussion.attributes.timestamp" xml:space="preserve">
+    <value>时间戳</value>
+  </data>
+  <data name="beatmapset_discussion.hype.discussion_locked" xml:space="preserve">
+    <value>这张谱面正处于锁定状态以便进行讨论，目前不能被推荐</value>
+  </data>
+  <data name="beatmapset_discussion.hype.guest" xml:space="preserve">
+    <value>登录后才能推荐</value>
+  </data>
+  <data name="beatmapset_discussion.hype.hyped" xml:space="preserve">
+    <value>你已经推荐了这张谱面</value>
+  </data>
+  <data name="beatmapset_discussion.hype.limit_exceeded" xml:space="preserve">
+    <value>你已经用光了推荐次数</value>
+  </data>
+  <data name="beatmapset_discussion.hype.not_hypeable" xml:space="preserve">
+    <value>这张谱面无法推荐</value>
+  </data>
+  <data name="beatmapset_discussion.hype.owner" xml:space="preserve">
+    <value>不能推荐你自己的谱面</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.exceeds_beatmapset_length" xml:space="preserve">
+    <value>指定的时间戳不在谱面范围内。</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.negative" xml:space="preserve">
+    <value>无法定位时间戳。</value>
+  </data>
+  <data name="beatmapset_discussion_post.discussion_locked" xml:space="preserve">
+    <value>讨论被锁定。</value>
+  </data>
+  <data name="beatmapset_discussion_post.first_post" xml:space="preserve">
+    <value>无法删除第一个帖子。</value>
+  </data>
+  <data name="beatmapset_discussion_post.attributes.message" xml:space="preserve">
+    <value>消息</value>
+  </data>
+  <data name="comment.deleted_parent" xml:space="preserve">
+    <value>不能回复已删除的评论。</value>
+  </data>
+  <data name="comment.top_only" xml:space="preserve">
+    <value>暂不允许将回复置顶</value>
+  </data>
+  <data name="comment.attributes.message" xml:space="preserve">
+    <value>消息</value>
+  </data>
+  <data name="follow.invalid" xml:space="preserve">
+    <value>指定的 {0} 无效。</value>
+  </data>
+  <data name="forum.feature_vote.not_feature_topic" xml:space="preserve">
+    <value>只能给新特性请求投票。</value>
+  </data>
+  <data name="forum.feature_vote.not_enough_feature_votes" xml:space="preserve">
+    <value>票数不足。</value>
+  </data>
+  <data name="forum.poll_vote.invalid" xml:space="preserve">
+    <value>指定的选项无效。</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_delete" xml:space="preserve">
+    <value>不允许删除谱面信息帖。</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_edit" xml:space="preserve">
+    <value>不允许编辑谱面信息帖。</value>
+  </data>
+  <data name="forum.post.first_post_no_delete" xml:space="preserve">
+    <value>无法删除第一个帖子</value>
+  </data>
+  <data name="forum.post.missing_topic" xml:space="preserve">
+    <value>该帖子缺少主题</value>
+  </data>
+  <data name="forum.post.only_quote" xml:space="preserve">
+    <value>你的回复仅包含引用</value>
+  </data>
+  <data name="forum.post.attributes.post_text" xml:space="preserve">
+    <value>帖子主体</value>
+  </data>
+  <data name="forum.topic.attributes.topic_title" xml:space="preserve">
+    <value>主题标题</value>
+  </data>
+  <data name="forum.topic_poll.duplicate_options" xml:space="preserve">
+    <value>不允许重复的选项。</value>
+  </data>
+  <data name="forum.topic_poll.grace_period_expired" xml:space="preserve">
+    <value>不能编辑发起已经超过 {0} 小时的投票</value>
+  </data>
+  <data name="forum.topic_poll.hiding_results_forever" xml:space="preserve">
+    <value>不能隐藏尚未结束投票的结果。</value>
+  </data>
+  <data name="forum.topic_poll.invalid_max_options" xml:space="preserve">
+    <value>每人可选的选项不能超出总选项数。</value>
+  </data>
+  <data name="forum.topic_poll.minimum_one_selection" xml:space="preserve">
+    <value>每人至少可选一项。</value>
+  </data>
+  <data name="forum.topic_poll.minimum_two_options" xml:space="preserve">
+    <value>需要至少两个选项。</value>
+  </data>
+  <data name="forum.topic_poll.too_many_options" xml:space="preserve">
+    <value>选项数量超出限制。</value>
+  </data>
+  <data name="forum.topic_poll.attributes.title" xml:space="preserve">
+    <value>投票标题</value>
+  </data>
+  <data name="forum.topic_vote.required" xml:space="preserve">
+    <value>至少选择一项以投票</value>
+  </data>
+  <data name="forum.topic_vote.too_many" xml:space="preserve">
+    <value>选项数量超出限制。</value>
+  </data>
+  <data name="oauth.client.too_many" xml:space="preserve">
+    <value>OAuth 应用数量超出限制。</value>
+  </data>
+  <data name="oauth.client.url" xml:space="preserve">
+    <value>请输入一个有效的 URL。</value>
+  </data>
+  <data name="oauth.client.attributes.name" xml:space="preserve">
+    <value>应用名称</value>
+  </data>
+  <data name="oauth.client.attributes.redirect" xml:space="preserve">
+    <value>应用回调 URL</value>
+  </data>
+  <data name="user.contains_username" xml:space="preserve">
+    <value>密码不能包含用户名。</value>
+  </data>
+  <data name="user.email_already_used" xml:space="preserve">
+    <value>邮箱已被使用。</value>
+  </data>
+  <data name="user.email_not_allowed" xml:space="preserve">
+    <value>不允许的邮箱地址。</value>
+  </data>
+  <data name="user.invalid_country" xml:space="preserve">
+    <value>国家未被数据库收录。</value>
+  </data>
+  <data name="user.invalid_discord" xml:space="preserve">
+    <value>Discord 用户名无效。</value>
+  </data>
+  <data name="user.invalid_email" xml:space="preserve">
+    <value>无效的邮箱地址。</value>
+  </data>
+  <data name="user.invalid_twitter" xml:space="preserve">
+    <value>Twitter 用户名无效</value>
+  </data>
+  <data name="user.too_short" xml:space="preserve">
+    <value>新密码太短。</value>
+  </data>
+  <data name="user.unknown_duplicate" xml:space="preserve">
+    <value>用户名或邮箱已被使用。</value>
+  </data>
+  <data name="user.username_available_in" xml:space="preserve">
+    <value>该用户名将在 {0} 后可用。</value>
+  </data>
+  <data name="user.username_available_soon" xml:space="preserve">
+    <value>该用户名即将可用！</value>
+  </data>
+  <data name="user.username_invalid_characters" xml:space="preserve">
+    <value>用户名中包含非法字符。</value>
+  </data>
+  <data name="user.username_in_use" xml:space="preserve">
+    <value>用户名已经被使用！</value>
+  </data>
+  <data name="user.username_locked" xml:space="preserve">
+    <value>用户名已被使用！</value>
+  </data>
+  <data name="user.username_no_space_userscore_mix" xml:space="preserve">
+    <value>请在下划线和空格间选一个，不要混用！</value>
+  </data>
+  <data name="user.username_no_spaces" xml:space="preserve">
+    <value>用户名不能以空格开头或结束。</value>
+  </data>
+  <data name="user.username_not_allowed" xml:space="preserve">
+    <value>不允许使用该用户名。</value>
+  </data>
+  <data name="user.username_too_short" xml:space="preserve">
+    <value>用户名太短。</value>
+  </data>
+  <data name="user.username_too_long" xml:space="preserve">
+    <value>用户名太长。</value>
+  </data>
+  <data name="user.weak" xml:space="preserve">
+    <value>弱密码。</value>
+  </data>
+  <data name="user.wrong_current_password" xml:space="preserve">
+    <value>当前密码错误。</value>
+  </data>
+  <data name="user.wrong_email_confirmation" xml:space="preserve">
+    <value>重复新邮箱与新邮箱不一致。</value>
+  </data>
+  <data name="user.wrong_password_confirmation" xml:space="preserve">
+    <value>重复新密码与新密码不一致。</value>
+  </data>
+  <data name="user.too_long" xml:space="preserve">
+    <value>超出长度限制——最多为 {0} 个字符。</value>
+  </data>
+  <data name="user.attributes.username" xml:space="preserve">
+    <value>用户名</value>
+  </data>
+  <data name="user.attributes.user_email" xml:space="preserve">
+    <value>电子邮件地址</value>
+  </data>
+  <data name="user.attributes.password" xml:space="preserve">
+    <value>密码</value>
+  </data>
+  <data name="user.change_username.restricted" xml:space="preserve">
+    <value>账户受限时不能变更用户名。</value>
+  </data>
+  <data name="user.change_username.supporter_required._" xml:space="preserve">
+    <value>你必须 {0} 才能更改用户名！</value>
+  </data>
+  <data name="user.change_username.supporter_required.link_text" xml:space="preserve">
+    <value>支持 osu!</value>
+  </data>
+  <data name="user.change_username.username_is_same" xml:space="preserve">
+    <value>这就是你的用户名，Baka！</value>
+  </data>
+  <data name="user_report.reason_not_valid" xml:space="preserve">
+    <value>{0} 不符合此报告类型。</value>
+  </data>
+  <data name="user_report.self" xml:space="preserve">
+    <value>无法举报自己</value>
+  </data>
+  <data name="store.order_item.attributes.quantity" xml:space="preserve">
+    <value>数量</value>
+  </data>
+  <data name="store.order_item.attributes.cost" xml:space="preserve">
+    <value>价格</value>
+  </data>
+</root>

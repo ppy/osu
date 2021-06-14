@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="index.description" xml:space="preserve">
+    <value>Voorverpakte collecties van beatmaps gebaseerd rond een gedeeld thema.</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>lijst</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmap Packs</value>
+  </data>
+  <data name="index.blurb.important" xml:space="preserve">
+    <value>LEES DIT VOOR TE JE DOWNLOAD</value>
+  </data>
+  <data name="index.blurb.instruction._" xml:space="preserve">
+    <value>Installatie: Eens een pack gedownload is, pak dan de .rar uit in je osu! Songs map.
+                    Alle individuele beatmaps zijn nog in .zip of .osz formaat, dus osu! zal ze zelf uitpakken de volgende keer dat je in de Play mode gaat.
+                    {0} de zip's/osz's zelf uitpakken,
+                    of de beatmaps zullen incorrect in osu! worden weergegeven/niet werken.</value>
+  </data>
+  <data name="index.blurb.instruction.scary" xml:space="preserve">
+    <value>Ga NIET</value>
+  </data>
+  <data name="index.blurb.note._" xml:space="preserve">
+    <value>Merk ook op dat het is ten zeerste is aangeraden om {0}, omdat de oudste maps van mindere kwaliteit zijn dan de recentere maps.</value>
+  </data>
+  <data name="index.blurb.note.scary" xml:space="preserve">
+    <value>eerst de nieuwste packs te downloaden</value>
+  </data>
+  <data name="show.download" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="show.item.cleared" xml:space="preserve">
+    <value>uitgespeeld</value>
+  </data>
+  <data name="show.item.not_cleared" xml:space="preserve">
+    <value>nog niet uitgespeeld</value>
+  </data>
+  <data name="show.no_diff_reduction._" xml:space="preserve">
+    <value>{0} kan niet worden gebruikt om dit pakket te wissen.</value>
+  </data>
+  <data name="show.no_diff_reduction.link" xml:space="preserve">
+    <value>Mods voor moeilijkheidsvermindering</value>
+  </data>
+  <data name="mode.artist" xml:space="preserve">
+    <value>Artiest/Album</value>
+  </data>
+  <data name="mode.chart" xml:space="preserve">
+    <value>In de schijnwerpers</value>
+  </data>
+  <data name="mode.standard" xml:space="preserve">
+    <value>Standaard</value>
+  </data>
+  <data name="mode.theme" xml:space="preserve">
+    <value>Thema</value>
+  </data>
+  <data name="require_login._" xml:space="preserve">
+    <value>Je moet {0} zijn om de downloaden</value>
+  </data>
+  <data name="require_login.link_text" xml:space="preserve">
+    <value>ingelogd</value>
+  </data>
+</root>

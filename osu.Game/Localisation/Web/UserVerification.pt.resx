@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="box.sent" xml:space="preserve">
+    <value>Um email foi enviado para {0} com um código de verificação. Introduz o código.</value>
+  </data>
+  <data name="box.title" xml:space="preserve">
+    <value>Verificação da conta</value>
+  </data>
+  <data name="box.verifying" xml:space="preserve">
+    <value>A verificar...</value>
+  </data>
+  <data name="box.issuing" xml:space="preserve">
+    <value>A emitir o novo código...</value>
+  </data>
+  <data name="box.info.check_spam" xml:space="preserve">
+    <value>Assegura-te de que confirmas a pasta de spam se não conseguires encontrar o email.</value>
+  </data>
+  <data name="box.info.recover" xml:space="preserve">
+    <value>Se não conseguires aceder ao teu email ou esqueceste-te do que usaste, por favor segue o {0}.</value>
+  </data>
+  <data name="box.info.recover_link" xml:space="preserve">
+    <value>processo de recuperação de email aqui</value>
+  </data>
+  <data name="box.info.reissue" xml:space="preserve">
+    <value>Também podes {0} ou {1}.</value>
+  </data>
+  <data name="box.info.reissue_link" xml:space="preserve">
+    <value>pedir outro código</value>
+  </data>
+  <data name="box.info.logout_link" xml:space="preserve">
+    <value>terminar sessão</value>
+  </data>
+  <data name="errors.expired" xml:space="preserve">
+    <value>O código de verificação está expirado, um novo email de verificação foi enviado.</value>
+  </data>
+  <data name="errors.incorrect_key" xml:space="preserve">
+    <value>Código de verificação incorreto.</value>
+  </data>
+  <data name="errors.retries_exceeded" xml:space="preserve">
+    <value>Código de verificação incorreto. O limite de tentativas foi excedido, um novo email de verificação foi enviado.</value>
+  </data>
+  <data name="errors.reissued" xml:space="preserve">
+    <value>Código de verificação reenviado, um novo email de verificação foi enviado.</value>
+  </data>
+  <data name="errors.unknown" xml:space="preserve">
+    <value>Ocorreu um problema desconhecido, um novo email de verificação foi enviado.</value>
+  </data>
+</root>

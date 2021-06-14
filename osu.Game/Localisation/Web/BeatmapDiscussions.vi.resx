@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authorizations.update.null_user" xml:space="preserve">
+    <value>Cần phải đăng nhập để chỉnh sửa.</value>
+  </data>
+  <data name="authorizations.update.system_generated" xml:space="preserve">
+    <value>Không thể chỉnh sửa bài đăng được tạo bởi hệ thống.</value>
+  </data>
+  <data name="authorizations.update.wrong_user" xml:space="preserve">
+    <value>Chỉ chủ bài đăng mới được chỉnh sửa.</value>
+  </data>
+  <data name="events.empty" xml:space="preserve">
+    <value>Chưa có gì xảy ra cả.</value>
+  </data>
+  <data name="index.deleted_beatmap" xml:space="preserve">
+    <value>đã xóa</value>
+  </data>
+  <data name="index.none_found" xml:space="preserve">
+    <value>Không có cuộc thảo luận nào khớp với bộ lọc tìm kiếm.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Góc Thảo Luận Beatmap</value>
+  </data>
+  <data name="index.form._" xml:space="preserve">
+    <value>Tìm kiếm</value>
+  </data>
+  <data name="index.form.deleted" xml:space="preserve">
+    <value>Bao gồm cuộc thảo luận đã xóa</value>
+  </data>
+  <data name="index.form.only_unresolved" xml:space="preserve">
+    <value>Chỉ hiện các cuộc thảo luận chưa được giải quyết</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Kiểu tin nhắn</value>
+  </data>
+  <data name="index.form.username" xml:space="preserve">
+    <value>Tên người dùng</value>
+  </data>
+  <data name="index.form.beatmapset_status._" xml:space="preserve">
+    <value>Tình trạng Beatmap</value>
+  </data>
+  <data name="index.form.beatmapset_status.all" xml:space="preserve">
+    <value>Tất cả</value>
+  </data>
+  <data name="index.form.beatmapset_status.disqualified" xml:space="preserve">
+    <value>Disqualified </value>
+  </data>
+  <data name="index.form.beatmapset_status.never_qualified" xml:space="preserve">
+    <value>Chưa bao giờ Qualified</value>
+  </data>
+  <data name="index.form.beatmapset_status.qualified" xml:space="preserve">
+    <value>Qualified</value>
+  </data>
+  <data name="index.form.beatmapset_status.ranked" xml:space="preserve">
+    <value>Ranked</value>
+  </data>
+  <data name="index.form.user.label" xml:space="preserve">
+    <value>Người dùng</value>
+  </data>
+  <data name="index.form.user.overview" xml:space="preserve">
+    <value>Tổng quan hoạt động</value>
+  </data>
+  <data name="item.created_at" xml:space="preserve">
+    <value>Ngày đăng</value>
+  </data>
+  <data name="item.deleted_at" xml:space="preserve">
+    <value>Ngày xóa</value>
+  </data>
+  <data name="item.message_type" xml:space="preserve">
+    <value>Loại</value>
+  </data>
+  <data name="item.permalink" xml:space="preserve">
+    <value>Permalink</value>
+  </data>
+  <data name="nearby_posts.confirm" xml:space="preserve">
+    <value>Không bài đăng nào đề cập đến vấn đề của tôi</value>
+  </data>
+  <data name="nearby_posts.notice" xml:space="preserve">
+    <value>Có một vài bài đăng vào khoảng {0} ({1}). Hãy xem chúng trước khi đăng.</value>
+  </data>
+  <data name="nearby_posts.unsaved" xml:space="preserve">
+    <value>{0} trong bài đánh giá này</value>
+  </data>
+  <data name="reply.open.guest" xml:space="preserve">
+    <value>Hãy đăng nhập để trả lời</value>
+  </data>
+  <data name="reply.open.user" xml:space="preserve">
+    <value>Trả lời</value>
+  </data>
+  <data name="review.go_to_parent" xml:space="preserve">
+    <value>Xem Bài viết Đánh giá</value>
+  </data>
+  <data name="review.go_to_child" xml:space="preserve">
+    <value>Xem cuộc thảo luận</value>
+  </data>
+  <data name="review.validation.invalid_document" xml:space="preserve">
+    <value>đánh giá không phù hợp</value>
+  </data>
+  <data name="system.resolved.true" xml:space="preserve">
+    <value>Đã đánh dấu là được giải quyết bởi {0}</value>
+  </data>
+  <data name="system.resolved.false" xml:space="preserve">
+    <value>Đã mở lại bởi {0}</value>
+  </data>
+  <data name="user_filter.everyone" xml:space="preserve">
+    <value>Mọi người</value>
+  </data>
+  <data name="user_filter.label" xml:space="preserve">
+    <value>Lọc theo người dùng</value>
+  </data>
+</root>

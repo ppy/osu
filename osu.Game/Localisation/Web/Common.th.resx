@@ -1,0 +1,355 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="confirmation" xml:space="preserve">
+    <value>แน่ใจหรือ?</value>
+  </data>
+  <data name="confirmation_unsaved" xml:space="preserve">
+    <value>การเปลี่ยนแปลงทั้งหมดจะหายไป คุณแน่หรือไม่</value>
+  </data>
+  <data name="saved" xml:space="preserve">
+    <value>บันทึกแล้ว</value>
+  </data>
+  <data name="array_and.words_connector" xml:space="preserve">
+    <value> </value>
+  </data>
+  <data name="array_and.two_words_connector" xml:space="preserve">
+    <value> และ</value>
+  </data>
+  <data name="array_and.last_word_connector" xml:space="preserve">
+    <value> และ</value>
+  </data>
+  <data name="badges.new" xml:space="preserve">
+    <value>ใหม่!</value>
+  </data>
+  <data name="buttons.admin" xml:space="preserve">
+    <value>ผู้ดูแล</value>
+  </data>
+  <data name="buttons.authorise" xml:space="preserve">
+    <value>อนุญาต</value>
+  </data>
+  <data name="buttons.authorising" xml:space="preserve">
+    <value>กำลังอนุญาต...</value>
+  </data>
+  <data name="buttons.back_to_previous" xml:space="preserve">
+    <value>กลับไปยังตำแหน่งก่อนหน้านี้</value>
+  </data>
+  <data name="buttons.back_to_top" xml:space="preserve">
+    <value>กลับไปด้านบน</value>
+  </data>
+  <data name="buttons.cancel" xml:space="preserve">
+    <value>ยกเลิก</value>
+  </data>
+  <data name="buttons.change" xml:space="preserve">
+    <value>เปลี่ยน</value>
+  </data>
+  <data name="buttons.clear" xml:space="preserve">
+    <value>ล้าง</value>
+  </data>
+  <data name="buttons.click_to_copy" xml:space="preserve">
+    <value>คลิกเพื่อคัดลอกไปยังคลิปบอร์ด</value>
+  </data>
+  <data name="buttons.click_to_copy_copied" xml:space="preserve">
+    <value>คัดลอกไปยังคลิปบอร์ดแล้ว</value>
+  </data>
+  <data name="buttons.close" xml:space="preserve">
+    <value>ปิด</value>
+  </data>
+  <data name="buttons.collapse" xml:space="preserve">
+    <value>ยุบ</value>
+  </data>
+  <data name="buttons.delete" xml:space="preserve">
+    <value>ลบ</value>
+  </data>
+  <data name="buttons.edit" xml:space="preserve">
+    <value>แก้ไข</value>
+  </data>
+  <data name="buttons.expand" xml:space="preserve">
+    <value>ขยาย</value>
+  </data>
+  <data name="buttons.hide" xml:space="preserve">
+    <value>ซ่อน</value>
+  </data>
+  <data name="buttons.permalink" xml:space="preserve">
+    <value>ลิงก์ถาวร</value>
+  </data>
+  <data name="buttons.pin" xml:space="preserve">
+    <value>ปักหมุด</value>
+  </data>
+  <data name="buttons.post" xml:space="preserve">
+    <value>โพสต์</value>
+  </data>
+  <data name="buttons.read_more" xml:space="preserve">
+    <value>อ่านเพิ่มเติม</value>
+  </data>
+  <data name="buttons.reply" xml:space="preserve">
+    <value>ตอบกลับ</value>
+  </data>
+  <data name="buttons.reply_reopen" xml:space="preserve">
+    <value>ตอบกลับ และเปิดใหม่</value>
+  </data>
+  <data name="buttons.reply_resolve" xml:space="preserve">
+    <value>ตอบกลับ และแก้ไข</value>
+  </data>
+  <data name="buttons.reset" xml:space="preserve">
+    <value>รีเซ็ต</value>
+  </data>
+  <data name="buttons.restore" xml:space="preserve">
+    <value>กู้คืน</value>
+  </data>
+  <data name="buttons.save" xml:space="preserve">
+    <value>บันทึก</value>
+  </data>
+  <data name="buttons.saving" xml:space="preserve">
+    <value>กำลังบันทึก...</value>
+  </data>
+  <data name="buttons.search" xml:space="preserve">
+    <value>ค้นหา</value>
+  </data>
+  <data name="buttons.see_more" xml:space="preserve">
+    <value>ดูเพิ่มเติม</value>
+  </data>
+  <data name="buttons.show" xml:space="preserve">
+    <value>แสดง</value>
+  </data>
+  <data name="buttons.show_deleted" xml:space="preserve">
+    <value>แสดงรายการที่ลบ</value>
+  </data>
+  <data name="buttons.show_less" xml:space="preserve">
+    <value>แสดงน้อยลง</value>
+  </data>
+  <data name="buttons.show_more" xml:space="preserve">
+    <value>แสดงเพิ่มเติม</value>
+  </data>
+  <data name="buttons.show_more_options" xml:space="preserve">
+    <value>แสดงตัวเลือกเพิ่มเติม</value>
+  </data>
+  <data name="buttons.unpin" xml:space="preserve">
+    <value>ยกเลิกการปักหมุด</value>
+  </data>
+  <data name="buttons.update" xml:space="preserve">
+    <value>อัปเดต</value>
+  </data>
+  <data name="buttons.upload_image" xml:space="preserve">
+    <value>อัปโหลดรูปภาพ</value>
+  </data>
+  <data name="buttons.watch.to_0" xml:space="preserve">
+    <value>เลิกติดตาม</value>
+  </data>
+  <data name="buttons.watch.to_1" xml:space="preserve">
+    <value>ติดตาม</value>
+  </data>
+  <data name="count.badges" xml:space="preserve">
+    <value>{0} เหรียญ|{0} เหรียญ</value>
+  </data>
+  <data name="count.days" xml:space="preserve">
+    <value>{0} วัน|{0} วัน</value>
+  </data>
+  <data name="count.hour_short_unit" xml:space="preserve">
+    <value>ชั่วโมง|ชั่วโมง</value>
+  </data>
+  <data name="count.hours" xml:space="preserve">
+    <value>{0} ชั่วโมง|{0} ชั่วโมง</value>
+  </data>
+  <data name="count.item" xml:space="preserve">
+    <value>{0} อัน|{0} อัน</value>
+  </data>
+  <data name="count.minute_short_unit" xml:space="preserve">
+    <value>นาที|นาที</value>
+  </data>
+  <data name="count.minutes" xml:space="preserve">
+    <value>{0} นาที|{0} นาที</value>
+  </data>
+  <data name="count.months" xml:space="preserve">
+    <value>{0} เดือน|{0} เดือน</value>
+  </data>
+  <data name="count.notifications" xml:space="preserve">
+    <value>{0} การแจ้งเตือน|{0} การแจ้งเตือนทั้งหมด</value>
+  </data>
+  <data name="count.plus_others" xml:space="preserve">
+    <value>อีก + {0} อัน!|อีก + {0} อัน!</value>
+  </data>
+  <data name="count.post" xml:space="preserve">
+    <value>{0} โพสต์|{0} โพสต์</value>
+  </data>
+  <data name="count.second_short_unit" xml:space="preserve">
+    <value>วินาที|วินาที</value>
+  </data>
+  <data name="count.star_priority" xml:space="preserve">
+    <value>{0} ดาวความสำคัญ|{0} ดาวความสำคัญ</value>
+  </data>
+  <data name="count.update" xml:space="preserve">
+    <value>{0} อัพเดต|{0} อัปเดต</value>
+  </data>
+  <data name="count.view" xml:space="preserve">
+    <value>{0} วิว|{0} วิว</value>
+  </data>
+  <data name="count.years" xml:space="preserve">
+    <value>{0} ปี|{0} ปี</value>
+  </data>
+  <data name="countdown.days" xml:space="preserve">
+    <value>วัน</value>
+  </data>
+  <data name="countdown.hours" xml:space="preserve">
+    <value>ชั่วโมง</value>
+  </data>
+  <data name="countdown.minutes" xml:space="preserve">
+    <value>นาที</value>
+  </data>
+  <data name="countdown.seconds" xml:space="preserve">
+    <value>วินาที</value>
+  </data>
+  <data name="datetime.year_month.moment" xml:space="preserve">
+    <value>MMMM YYYY</value>
+  </data>
+  <data name="datetime.year_month.php" xml:space="preserve">
+    <value>MMMM y</value>
+  </data>
+  <data name="datetime.year_month_short.moment" xml:space="preserve">
+    <value>MMM YYYY</value>
+  </data>
+  <data name="device.keyboard" xml:space="preserve">
+    <value>แป้นพิมพ์</value>
+  </data>
+  <data name="device.mouse" xml:space="preserve">
+    <value>เมาส์</value>
+  </data>
+  <data name="device.tablet" xml:space="preserve">
+    <value>แทบเล็ต</value>
+  </data>
+  <data name="device.touch" xml:space="preserve">
+    <value>จอสัมผัส</value>
+  </data>
+  <data name="dropzone.target" xml:space="preserve">
+    <value>วางที่นี่เพื่ออัปโหลด</value>
+  </data>
+  <data name="input.search" xml:space="preserve">
+    <value>ค้นหา...</value>
+  </data>
+  <data name="pagination.previous" xml:space="preserve">
+    <value>ก่อนหน้า</value>
+  </data>
+  <data name="pagination.next" xml:space="preserve">
+    <value>ถัดไป</value>
+  </data>
+  <data name="score_count.count_100" xml:space="preserve">
+    <value>100</value>
+  </data>
+  <data name="score_count.count_300" xml:space="preserve">
+    <value>300</value>
+  </data>
+  <data name="score_count.count_50" xml:space="preserve">
+    <value>50</value>
+  </data>
+  <data name="score_count.count_katu" xml:space="preserve">
+    <value>200</value>
+  </data>
+  <data name="score_count.count_miss" xml:space="preserve">
+    <value>Miss</value>
+  </data>
+  <data name="scoreboard_time.d" xml:space="preserve">
+    <value>%d วัน</value>
+  </data>
+  <data name="scoreboard_time.dd" xml:space="preserve">
+    <value>%d วัน</value>
+  </data>
+  <data name="scoreboard_time.h" xml:space="preserve">
+    <value>%d ชั่วโมง</value>
+  </data>
+  <data name="scoreboard_time.hh" xml:space="preserve">
+    <value>%d ชั่วโมง</value>
+  </data>
+  <data name="scoreboard_time.m" xml:space="preserve">
+    <value>%d เดือน</value>
+  </data>
+  <data name="scoreboard_time.mm" xml:space="preserve">
+    <value>%d เดือน</value>
+  </data>
+  <data name="scoreboard_time.s" xml:space="preserve">
+    <value>%d วินาที</value>
+  </data>
+  <data name="scoreboard_time.y" xml:space="preserve">
+    <value>%d ปี</value>
+  </data>
+  <data name="scoreboard_time.yy" xml:space="preserve">
+    <value>%d ปี</value>
+  </data>
+  <data name="time.days_ago" xml:space="preserve">
+    <value>{0} วันที่แล้ว|{0} วันที่แล้ว</value>
+  </data>
+  <data name="time.hours_ago" xml:space="preserve">
+    <value>{0} ชั่วโมงที่แล้ว|{0} ชั่วโมงที่แล้ว</value>
+  </data>
+  <data name="time.now" xml:space="preserve">
+    <value>ขณะนี้</value>
+  </data>
+  <data name="time.remaining" xml:space="preserve">
+    <value>เวลาที่เหลือ</value>
+  </data>
+  <data name="title.notice" xml:space="preserve">
+    <value>แจ้งเตือน</value>
+  </data>
+  <data name="wrong_user._" xml:space="preserve">
+    <value>คุณกำลังเข้าสู่ระบบด้วยชื่อ {0} {1}</value>
+  </data>
+  <data name="wrong_user.logout_link" xml:space="preserve">
+    <value>คลิกที่นี่เพื่อเข้าสู่ระบบในฐานะบัญชีผู้ใช้อื่น</value>
+  </data>
+</root>

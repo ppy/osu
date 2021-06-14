@@ -1,0 +1,556 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="pinned_topics" xml:space="preserve">
+    <value>หัวข้อที่ปักหมุดไว้</value>
+  </data>
+  <data name="slogan" xml:space="preserve">
+    <value>มันอันตรายที่จะเล่นคนเดียว</value>
+  </data>
+  <data name="subforums" xml:space="preserve">
+    <value>ฟอรั่มย่อย</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>ฟอรั่ม osu!</value>
+  </data>
+  <data name="covers.edit" xml:space="preserve">
+    <value>แก้ไขหน้าปก</value>
+  </data>
+  <data name="covers.create._" xml:space="preserve">
+    <value>ตั้งภาพหน้าปก</value>
+  </data>
+  <data name="covers.create.button" xml:space="preserve">
+    <value>อัพโหลดรูปภาพ</value>
+  </data>
+  <data name="covers.create.info" xml:space="preserve">
+    <value>ภาพหน้าปกควรมีขนาด {0}. คุณยังสามารถลากวางรูปที่นี่ได้เพื่ออัพโหลด</value>
+  </data>
+  <data name="covers.destroy._" xml:space="preserve">
+    <value>นำภาพหน้าปกออก</value>
+  </data>
+  <data name="covers.destroy.confirm" xml:space="preserve">
+    <value>คุณแน่ใจหรือไม่ว่าจะนำภาพหน้าปกออก</value>
+  </data>
+  <data name="forums.latest_post" xml:space="preserve">
+    <value>โพสต์ล่าสุด</value>
+  </data>
+  <data name="forums.index.title" xml:space="preserve">
+    <value>หน้าแรกของบอร์ด</value>
+  </data>
+  <data name="forums.topics.empty" xml:space="preserve">
+    <value>ไม่มีหัวข้อ</value>
+  </data>
+  <data name="mark_as_read.forum" xml:space="preserve">
+    <value>ทำเครื่องหมายว่าอ่านทั้งหมดแล้ว</value>
+  </data>
+  <data name="mark_as_read.forums" xml:space="preserve">
+    <value>ทำเครื่องหมายว่าอ่านทั้งหมดแล้ว</value>
+  </data>
+  <data name="mark_as_read.busy" xml:space="preserve">
+    <value>กําลังทำเครื่องหมายว่าอ่านแล้ว...</value>
+  </data>
+  <data name="post.confirm_destroy" xml:space="preserve">
+    <value>ต้องการลบโพสต์จริงหรอ?</value>
+  </data>
+  <data name="post.confirm_restore" xml:space="preserve">
+    <value>ต้องการกู้คืนโพสต์จริงหรอ?</value>
+  </data>
+  <data name="post.edited" xml:space="preserve">
+    <value>แก้ไขล่าสุดโดย {0} {1} ถูกแก้ไขทั้งหมด {2} ครั้ง</value>
+  </data>
+  <data name="post.posted_at" xml:space="preserve">
+    <value>โพสต์เมื่อ {0}</value>
+  </data>
+  <data name="post.posted_by" xml:space="preserve">
+    <value>โพสต์โดย {0}</value>
+  </data>
+  <data name="post.actions.destroy" xml:space="preserve">
+    <value>ลบโพสต์</value>
+  </data>
+  <data name="post.actions.edit" xml:space="preserve">
+    <value>แก้ไขโพสต์</value>
+  </data>
+  <data name="post.actions.report" xml:space="preserve">
+    <value>รายงานโพสต์</value>
+  </data>
+  <data name="post.actions.restore" xml:space="preserve">
+    <value>กู้คืนโพสต์</value>
+  </data>
+  <data name="post.create.title.reply" xml:space="preserve">
+    <value>ตอบกลับ</value>
+  </data>
+  <data name="post.info.post_count" xml:space="preserve">
+    <value>{0} โพสต์|{0} โพสต์</value>
+  </data>
+  <data name="post.info.topic_starter" xml:space="preserve">
+    <value>ผู้เริ่มกระทู้</value>
+  </data>
+  <data name="search.go_to_post" xml:space="preserve">
+    <value>ไปยังโพสต์</value>
+  </data>
+  <data name="search.post_number_input" xml:space="preserve">
+    <value>ป้อนหมายเลขของโพสต์</value>
+  </data>
+  <data name="search.total_posts" xml:space="preserve">
+    <value>{0} จำนวนโพสต์ทั้งหมด</value>
+  </data>
+  <data name="topic.confirm_destroy" xml:space="preserve">
+    <value>ต้องการลบโพสต์จริงหรอ?</value>
+  </data>
+  <data name="topic.confirm_restore" xml:space="preserve">
+    <value>ต้องการกู้คืนโพสต์จริงหรอ?</value>
+  </data>
+  <data name="topic.deleted" xml:space="preserve">
+    <value>ลบกระทู้</value>
+  </data>
+  <data name="topic.go_to_latest" xml:space="preserve">
+    <value>ดูโพสต์ล่าสุด</value>
+  </data>
+  <data name="topic.has_replied" xml:space="preserve">
+    <value>คุณได้ตอบกลับการสนทนานี้</value>
+  </data>
+  <data name="topic.in_forum" xml:space="preserve">
+    <value>ใน {0}</value>
+  </data>
+  <data name="topic.latest_post" xml:space="preserve">
+    <value>{0} โดย {1}</value>
+  </data>
+  <data name="topic.latest_reply_by" xml:space="preserve">
+    <value>ตอบกลับล่าสุดโดย {0}</value>
+  </data>
+  <data name="topic.new_topic" xml:space="preserve">
+    <value>สร้างกระทู้ใหม่</value>
+  </data>
+  <data name="topic.new_topic_login" xml:space="preserve">
+    <value>เข้าสู่ระบบเพื่อตั้งกระทู้ใหม่</value>
+  </data>
+  <data name="topic.post_reply" xml:space="preserve">
+    <value>โพสต์</value>
+  </data>
+  <data name="topic.reply_box_placeholder" xml:space="preserve">
+    <value>พิมพ์ที่นี่เพื่อตอบกลับ</value>
+  </data>
+  <data name="topic.reply_title_prefix" xml:space="preserve">
+    <value>รี</value>
+  </data>
+  <data name="topic.started_by" xml:space="preserve">
+    <value>โดย {0}</value>
+  </data>
+  <data name="topic.started_by_verbose" xml:space="preserve">
+    <value>เริ่มโดย {0}</value>
+  </data>
+  <data name="topic.actions.destroy" xml:space="preserve">
+    <value>ลบหัวข้อ</value>
+  </data>
+  <data name="topic.actions.restore" xml:space="preserve">
+    <value>กู้คือหัวข้อ</value>
+  </data>
+  <data name="topic.create.close" xml:space="preserve">
+    <value>ปิด</value>
+  </data>
+  <data name="topic.create.preview" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="topic.create.preview_hide" xml:space="preserve">
+    <value>เขียน</value>
+  </data>
+  <data name="topic.create.submit" xml:space="preserve">
+    <value>โพสต์</value>
+  </data>
+  <data name="topic.create.necropost.default" xml:space="preserve">
+    <value>กระทู้นี้ไม่ได้ถูกใช้งานมาระยะหนึ่ง ให้โพสต์ลงที่นี่หากคุณมีเหตุจำเป็นจริงๆ</value>
+  </data>
+  <data name="topic.create.necropost.new_topic._" xml:space="preserve">
+    <value>กระทู้นี้ไม่ได้ถูกใช้งานมาระยะหนึ่ง ให้โพสต์ลงที่นี่หากคุณมีเหตุจำเป็นจริงๆ กรุณา {0} แทน</value>
+  </data>
+  <data name="topic.create.necropost.new_topic.create" xml:space="preserve">
+    <value>สร้างกระทู้ใหม่</value>
+  </data>
+  <data name="topic.create.placeholder.body" xml:space="preserve">
+    <value>พิมพ์เนื้อหาโพสต์ที่นี่</value>
+  </data>
+  <data name="topic.create.placeholder.title" xml:space="preserve">
+    <value>คลิกที่นี่เพื่อตั้งหัวข้อ</value>
+  </data>
+  <data name="topic.jump.enter" xml:space="preserve">
+    <value>click to enter specific post number</value>
+  </data>
+  <data name="topic.jump.first" xml:space="preserve">
+    <value>ไปที่โพสต์แรก</value>
+  </data>
+  <data name="topic.jump.last" xml:space="preserve">
+    <value>ไปที่โพสต์ล่าสุด</value>
+  </data>
+  <data name="topic.jump.next" xml:space="preserve">
+    <value>skip next 10 posts</value>
+  </data>
+  <data name="topic.jump.previous" xml:space="preserve">
+    <value>go back 10 posts</value>
+  </data>
+  <data name="topic.post_edit.cancel" xml:space="preserve">
+    <value>ยกเลิก</value>
+  </data>
+  <data name="topic.post_edit.post" xml:space="preserve">
+    <value>บันทึก</value>
+  </data>
+  <data name="topic_watches.index.title_compact" xml:space="preserve">
+    <value>กระทู้ที่ติดตาม</value>
+  </data>
+  <data name="topic_watches.index.box.total" xml:space="preserve">
+    <value>ติดตามกระทู้แล้ว</value>
+  </data>
+  <data name="topic_watches.index.box.unread" xml:space="preserve">
+    <value>กระทู้ที่มีการตอบกลับใหม่</value>
+  </data>
+  <data name="topic_watches.index.info.total" xml:space="preserve">
+    <value>การติดตามของคุณ {0} topics.</value>
+  </data>
+  <data name="topic_watches.index.info.unread" xml:space="preserve">
+    <value>คุณมี {0} การตอบกลับที่ยังไม่ได้อ่านในกระทู้ที่ติดตาม</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.confirmation" xml:space="preserve">
+    <value>ยกเลิกการติดตามกระทู้นี้</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.title" xml:space="preserve">
+    <value>ยกเลิกการติดตาม</value>
+  </data>
+  <data name="topics._" xml:space="preserve">
+    <value>หัวข้อ</value>
+  </data>
+  <data name="topics.actions.login_reply" xml:space="preserve">
+    <value>เข้าสู่ระบบเพื่อตอบกลับ</value>
+  </data>
+  <data name="topics.actions.reply" xml:space="preserve">
+    <value>แสดงหน้าต่างตอบกลับ</value>
+  </data>
+  <data name="topics.actions.reply_with_quote" xml:space="preserve">
+    <value>Quote post for reply</value>
+  </data>
+  <data name="topics.actions.search" xml:space="preserve">
+    <value>ค้นหา</value>
+  </data>
+  <data name="topics.create.create_poll" xml:space="preserve">
+    <value>Poll Creation</value>
+  </data>
+  <data name="topics.create.preview" xml:space="preserve">
+    <value>ตัวอย่างโพสต์</value>
+  </data>
+  <data name="topics.create.create_poll_button.add" xml:space="preserve">
+    <value>Create a poll</value>
+  </data>
+  <data name="topics.create.create_poll_button.remove" xml:space="preserve">
+    <value>Cancel creating a poll</value>
+  </data>
+  <data name="topics.create.poll.hide_results" xml:space="preserve">
+    <value>ซ่อนผลลัพท์ของโพลล์</value>
+  </data>
+  <data name="topics.create.poll.hide_results_info" xml:space="preserve">
+    <value>จะแสดงหลังจากโพลล์สิ้นสุดเท่านั้น</value>
+  </data>
+  <data name="topics.create.poll.length" xml:space="preserve">
+    <value>Run poll for</value>
+  </data>
+  <data name="topics.create.poll.length_days_suffix" xml:space="preserve">
+    <value>days</value>
+  </data>
+  <data name="topics.create.poll.length_info" xml:space="preserve">
+    <value>Leave blank for a never ending poll</value>
+  </data>
+  <data name="topics.create.poll.max_options" xml:space="preserve">
+    <value>Options per user</value>
+  </data>
+  <data name="topics.create.poll.max_options_info" xml:space="preserve">
+    <value>This is the number of options each user may select when voting.</value>
+  </data>
+  <data name="topics.create.poll.options" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="topics.create.poll.options_info" xml:space="preserve">
+    <value>Place each options on a new line. You may enter up to 10 options.</value>
+  </data>
+  <data name="topics.create.poll.title" xml:space="preserve">
+    <value>Question</value>
+  </data>
+  <data name="topics.create.poll.vote_change" xml:space="preserve">
+    <value>Allow re-voting.</value>
+  </data>
+  <data name="topics.create.poll.vote_change_info" xml:space="preserve">
+    <value>If enabled, users are able to change their vote.</value>
+  </data>
+  <data name="topics.edit_title.start" xml:space="preserve">
+    <value>Edit title</value>
+  </data>
+  <data name="topics.index.feature_votes" xml:space="preserve">
+    <value>ลำดับความสำคัญ</value>
+  </data>
+  <data name="topics.index.replies" xml:space="preserve">
+    <value>replies</value>
+  </data>
+  <data name="topics.index.views" xml:space="preserve">
+    <value>views</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0" xml:space="preserve">
+    <value>ลบ"แท็ก"ที่เพิ่ม</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0_done" xml:space="preserve">
+    <value>ลบแท็ก "เพิ่มแล้ว" แล้ว</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1" xml:space="preserve">
+    <value>เพิ่มแท็ก</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1_done" xml:space="preserve">
+    <value>เพิ่มแท็ก "เพิ่มแล้ว" แล้ว</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0" xml:space="preserve">
+    <value>ลบแท็ก "กำหนดแล้ว"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0_done" xml:space="preserve">
+    <value>ลบแท็ก "กำหนดแล้ว" แล้ว</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1" xml:space="preserve">
+    <value>เพิ่มแท็ก "กำหนดแล้ว"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1_done" xml:space="preserve">
+    <value>เพิ่มแท็ก "กำหนดแล้ว" แล้ว</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0" xml:space="preserve">
+    <value>ลบแท็ก "ยืนยันแล้ว"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0_done" xml:space="preserve">
+    <value>ลบแท็ก "ยืนยันแล้ว" แล้ว</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1" xml:space="preserve">
+    <value>เพิ่มแท็ก "ยืนยันแล้ว"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1_done" xml:space="preserve">
+    <value>เพิ่มแท็ก "ยืนยันแล้ว" แล้ว</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0" xml:space="preserve">
+    <value>ลบแท็ก "ซ้ำ"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0_done" xml:space="preserve">
+    <value>ลบแท็ก "ซ้ำ" แล้ว</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1" xml:space="preserve">
+    <value>เพิ่มแท็ก "ซ้ำ"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1_done" xml:space="preserve">
+    <value>เพิ่มแท็ก "ซ้ำ" แล้ว</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0" xml:space="preserve">
+    <value>ลบแท็ก "โมฆะ"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0_done" xml:space="preserve">
+    <value>ลบแท็ก "โมฆะ" แล้ว</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1" xml:space="preserve">
+    <value>เพิ่มแท็ก "โมฆะ"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1_done" xml:space="preserve">
+    <value>เพิ่มแท็ก "โมฆะ" แล้ว</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0" xml:space="preserve">
+    <value>ลบแท็ก "แก้แล้ว"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0_done" xml:space="preserve">
+    <value>ลบแท็ก "แก้แล้ว" แล้ว</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1" xml:space="preserve">
+    <value>เพิ่มแท็ก "แก้แล้ว"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1_done" xml:space="preserve">
+    <value>เพิ่มแท็ก "แก้แล้ว" แล้ว</value>
+  </data>
+  <data name="topics.lock.is_locked" xml:space="preserve">
+    <value>This topic is locked and can not be replied to</value>
+  </data>
+  <data name="topics.lock.to_0" xml:space="preserve">
+    <value>ปลดล็อกหัวข้อ</value>
+  </data>
+  <data name="topics.lock.to_0_confirm" xml:space="preserve">
+    <value>จะปลดล็อกกระทู้หรือไม่</value>
+  </data>
+  <data name="topics.lock.to_0_done" xml:space="preserve">
+    <value>หัวข้อถูกปลดล็อกแล้ว</value>
+  </data>
+  <data name="topics.lock.to_1" xml:space="preserve">
+    <value>ล็อกหัวข้อ</value>
+  </data>
+  <data name="topics.lock.to_1_confirm" xml:space="preserve">
+    <value>จะล็อกกระทู้หรือไม่</value>
+  </data>
+  <data name="topics.lock.to_1_done" xml:space="preserve">
+    <value>หัวข้อถูกล็อกแล้ว</value>
+  </data>
+  <data name="topics.moderate_move.title" xml:space="preserve">
+    <value>Move to another forum</value>
+  </data>
+  <data name="topics.moderate_pin.to_0" xml:space="preserve">
+    <value>เลิกปักหมุดหัวข้อ</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_confirm" xml:space="preserve">
+    <value>จะเลิกปักหมุดหัวข้อหรือไม่</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_done" xml:space="preserve">
+    <value>หัวข้อถูกเลิกปักหมุดแล้ว</value>
+  </data>
+  <data name="topics.moderate_pin.to_1" xml:space="preserve">
+    <value>ปักหมุดหัวข้อ</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_confirm" xml:space="preserve">
+    <value>จะปักหมุดหัวข้อหรือไม่</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_done" xml:space="preserve">
+    <value>หัวข้อถูกปักหมุดแล้ว</value>
+  </data>
+  <data name="topics.moderate_pin.to_2" xml:space="preserve">
+    <value>ปักหมุดหัวข้อและตั้งให้เป็นประกาศ</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_confirm" xml:space="preserve">
+    <value>จะปักหมุดและให้กระทู้นี้เป็นการประกาศหรือไม่</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_done" xml:space="preserve">
+    <value>หัวข้อถูกปักหมุดและตั้งให้เป็นประกาศแล้ว</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.show" xml:space="preserve">
+    <value>แสดงโพสต์ที่ถูกลบ</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.hide" xml:space="preserve">
+    <value>ซ่อนโพสต์ที่ถูกลบ</value>
+  </data>
+  <data name="topics.show.deleted-posts" xml:space="preserve">
+    <value>Deleted Posts</value>
+  </data>
+  <data name="topics.show.total_posts" xml:space="preserve">
+    <value>Total Posts</value>
+  </data>
+  <data name="topics.show.feature_vote.current" xml:space="preserve">
+    <value>Current Priority: +{0}</value>
+  </data>
+  <data name="topics.show.feature_vote.do" xml:space="preserve">
+    <value>Promote this request</value>
+  </data>
+  <data name="topics.show.feature_vote.info._" xml:space="preserve">
+    <value>นี่คือ {0} คำขอคุณสมบัติสามารถลงคะแนนได้โดย {1}</value>
+  </data>
+  <data name="topics.show.feature_vote.info.feature_request" xml:space="preserve">
+    <value>ร้องข้อคุณสมบัติ</value>
+  </data>
+  <data name="topics.show.feature_vote.info.supporters" xml:space="preserve">
+    <value>ผู้สนับสนุน</value>
+  </data>
+  <data name="topics.show.feature_vote.user.count" xml:space="preserve">
+    <value>{0} no vote|{1} {0} vote|[2,*] {0} votes</value>
+  </data>
+  <data name="topics.show.feature_vote.user.current" xml:space="preserve">
+    <value>You have {0} remaining.</value>
+  </data>
+  <data name="topics.show.feature_vote.user.not_enough" xml:space="preserve">
+    <value>You don't have any more votes remaining</value>
+  </data>
+  <data name="topics.show.poll.edit" xml:space="preserve">
+    <value>แก้ไขโพลล์</value>
+  </data>
+  <data name="topics.show.poll.edit_warning" xml:space="preserve">
+    <value>ถ้าแก้ไขโพลล์แล้วผลโหวตจะหายนะ</value>
+  </data>
+  <data name="topics.show.poll.vote" xml:space="preserve">
+    <value>Vote</value>
+  </data>
+  <data name="topics.show.poll.button.change_vote" xml:space="preserve">
+    <value>เปลี่ยนตัวเลือกโหวต</value>
+  </data>
+  <data name="topics.show.poll.button.edit" xml:space="preserve">
+    <value>แก้ไขโพลล์</value>
+  </data>
+  <data name="topics.show.poll.button.view_results" xml:space="preserve">
+    <value>ไปดูผลโหวต</value>
+  </data>
+  <data name="topics.show.poll.button.vote" xml:space="preserve">
+    <value>โหวต</value>
+  </data>
+  <data name="topics.show.poll.detail.end_time" xml:space="preserve">
+    <value>Polling will end at {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.ended" xml:space="preserve">
+    <value>Polling ended {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.results_hidden" xml:space="preserve">
+    <value>ผลลัพท์จะถูกแสดงหลังจากโพลล์สิ้นสุดลง</value>
+  </data>
+  <data name="topics.show.poll.detail.total" xml:space="preserve">
+    <value>Total votes: {0}</value>
+  </data>
+  <data name="topics.watch.to_not_watching" xml:space="preserve">
+    <value>ไม่ได้บุ๊กมาร์คไว้</value>
+  </data>
+  <data name="topics.watch.to_watching" xml:space="preserve">
+    <value>บุ๊กมาร์ค</value>
+  </data>
+  <data name="topics.watch.to_watching_mail" xml:space="preserve">
+    <value>บุ๊กมาร์คและรับการแจ้งเตือน</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_disable" xml:space="preserve">
+    <value>การแจ้งเตือนถูกเปิดใช้งาน คลิกเพื่อปิดการใช้งาน</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_enable" xml:space="preserve">
+    <value>การแจ้งเตือนถูกปิดใช้งาน คลิกเพื่อเปิดการใช้งาน</value>
+  </data>
+</root>

@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="support.convinced.title" xml:space="preserve">
+    <value>Έχω πειστεί! {0}</value>
+  </data>
+  <data name="support.convinced.support" xml:space="preserve">
+    <value>υποστηρίξτε το osu!</value>
+  </data>
+  <data name="support.convinced.gift" xml:space="preserve">
+    <value>ή δωρίστε σε άλλους παίκτες</value>
+  </data>
+  <data name="support.convinced.instructions" xml:space="preserve">
+    <value>κάντε κλικ στην καρδιά για να προχωρήσετε στο osu!κατάστημα</value>
+  </data>
+  <data name="support.perks.title" xml:space="preserve">
+    <value>Χμ; Τι κερδίζω;!</value>
+  </data>
+  <data name="support.perks.osu_direct.title" xml:space="preserve">
+    <value>osu!direct</value>
+  </data>
+  <data name="support.perks.osu_direct.description" xml:space="preserve">
+    <value>γρήγορη και εύκολη πρόσβαση για να αναζητήσετε beatmaps χωρίς να βγείτε από το παιχνίδι.</value>
+  </data>
+  <data name="support.perks.auto_downloads.title" xml:space="preserve">
+    <value>Αυτόματα download</value>
+  </data>
+  <data name="support.perks.auto_downloads.description" xml:space="preserve">
+    <value>Αυτόματα download όσο παίζετε σε multiplayer, όταν κάνετε spectate άλλους, ή ανοίγετε links στο chat!</value>
+  </data>
+  <data name="support.perks.upload_more.title" xml:space="preserve">
+    <value>Ανεβάστε Περισσότερα</value>
+  </data>
+  <data name="support.perks.upload_more.description" xml:space="preserve">
+    <value>Επιπλέον θέσεις για pending beatmaps (ανά ranked beatmap) μέχρι το μέγιστο των 10.</value>
+  </data>
+  <data name="support.perks.early_access.title" xml:space="preserve">
+    <value>Πρόωρη Πρόσβαση</value>
+  </data>
+  <data name="support.perks.early_access.description" xml:space="preserve">
+    <value>Πρόσβαση σε πρόωρες κυκλοφορίες, όπου μπορείτε να δοκιμάσετε τα νέα χαρακτηριστικά πριν γίνουν δημόσια!</value>
+  </data>
+  <data name="support.perks.customisation.title" xml:space="preserve">
+    <value>Προσαρμογή</value>
+  </data>
+  <data name="support.perks.customisation.description" xml:space="preserve">
+    <value>Προσαρμόστε το προφίλ σας προσθέτοντας μία πλήρως προσαρμόσιμη σελίδα χρήστη.</value>
+  </data>
+  <data name="support.perks.beatmap_filters.title" xml:space="preserve">
+    <value>Φίλτρα για beatmaps</value>
+  </data>
+  <data name="support.perks.beatmap_filters.description" xml:space="preserve">
+    <value>Φιλτράρετε τις αναζητήσεις για beatmaps σε αυτά που έχετε παίξει και σε αυτά που δεν έχετε παίξει και στο βαθμό που έχετε πάρει (αν υπάρχει).</value>
+  </data>
+  <data name="support.perks.yellow_fellow.title" xml:space="preserve">
+    <value>Κίτρινος Σύντροφος</value>
+  </data>
+  <data name="support.perks.yellow_fellow.description" xml:space="preserve">
+    <value>Είστε αναγνωρίσιμοι μέσα στο παιχνίδι από το φωτεινό κίτρινο χρώμα στο όνομα χρήστη σας.</value>
+  </data>
+  <data name="support.perks.speedy_downloads.title" xml:space="preserve">
+    <value>Γρήγορα Download</value>
+  </data>
+  <data name="support.perks.speedy_downloads.description" xml:space="preserve">
+    <value>Πιο επιεικείς περιορισμοί στα download, ειδικά όταν χρησιμοποιείτε το osu!direct.</value>
+  </data>
+  <data name="support.perks.change_username.title" xml:space="preserve">
+    <value>Αλλάξτε το όνομα χρήστη σας</value>
+  </data>
+  <data name="support.perks.change_username.description" xml:space="preserve">
+    <value>Η δυνατότητα να αλλάξετε το όνομα χρήστη σας χωρίς επιπλέον κόστη. (μία φορά το πολύ)</value>
+  </data>
+  <data name="support.perks.skinnables.title" xml:space="preserve">
+    <value>Προσαρμόσιμα χαρακτηριστικά</value>
+  </data>
+  <data name="support.perks.skinnables.description" xml:space="preserve">
+    <value>Επιπλέον προσαρμόσιμα χαρακτηριστικά μέσα στο παιχνίδι, όπως το εξώφυλλο του κύριου μενού.</value>
+  </data>
+  <data name="support.perks.feature_votes.title" xml:space="preserve">
+    <value>Ψήφοι για Λειτουργίες</value>
+  </data>
+  <data name="support.perks.feature_votes.description" xml:space="preserve">
+    <value>Ψήφοι για αιτήματα νέων λειτουργιών. (2 κάθε μήνα)</value>
+  </data>
+  <data name="support.perks.sort_options.title" xml:space="preserve">
+    <value>Κατάταξε</value>
+  </data>
+  <data name="support.perks.sort_options.description" xml:space="preserve">
+    <value>Η ικανότητα να βλέπετε την σειρά κατάταξης της χώρας / των φίλων σας / συγκεκριμένων mod στα beatmaps μέσα στο παιχνίδι.</value>
+  </data>
+  <data name="support.supporter_status.contribution" xml:space="preserve">
+    <value>Ευχαριστούμε για την υποστήριξή σας μέχρι τώρα! Έχετε συνεισφέρει το χρηματικό ποσό των {0} σε {1} συναλλαγές!</value>
+  </data>
+  <data name="support.supporter_status.gifted" xml:space="preserve">
+    <value>{0} από τις αγορές των tag που έχετε κάνει έχουν δωριστεί (συνολικά {1}), πόσο γενναιόδωρο!</value>
+  </data>
+  <data name="support.supporter_status.not_yet" xml:space="preserve">
+    <value>Δεν έχετε supporter tag. :(</value>
+  </data>
+  <data name="support.supporter_status.valid_until" xml:space="preserve">
+    <value>Το τρέχον supporter tag σας είναι έγκυρο μέχρι τις {0}!</value>
+  </data>
+  <data name="support.supporter_status.was_valid_until" xml:space="preserve">
+    <value>Το supporter tag σας ήταν έγκυρο μέχρι {0}.</value>
+  </data>
+</root>

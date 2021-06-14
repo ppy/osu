@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="invalid" xml:space="preserve">
+    <value>تم تحديد {0} خاطئ.</value>
+  </data>
+  <data name="not_negative" xml:space="preserve">
+    <value>{0} لا يمكن ان يكون سلبياََ.</value>
+  </data>
+  <data name="required" xml:space="preserve">
+    <value>{0} مطلوب.</value>
+  </data>
+  <data name="too_long" xml:space="preserve">
+    <value>{0} تجاوز الحد المطلوب - يمكن ان يصل حد {1} حروف فقط.</value>
+  </data>
+  <data name="wrong_confirmation" xml:space="preserve">
+    <value>التأكيد لا يتطابق.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmap_missing" xml:space="preserve">
+    <value>الطابع الزمني المحدد ولكن الخريطة مفقودة.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmapset_no_hype" xml:space="preserve">
+    <value>الخريطة لان يمكن ان تُشاد.</value>
+  </data>
+  <data name="beatmapset_discussion.hype_requires_null_beatmap" xml:space="preserve">
+    <value>الاِشادة يحب ان تتم في قسم العام (كل الصعوبات).</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmap_id" xml:space="preserve">
+    <value>تم تحديد صعوبة غير صالحة.</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmapset_id" xml:space="preserve">
+    <value>تم تحديد خريطة غير صالحة.</value>
+  </data>
+  <data name="beatmapset_discussion.locked" xml:space="preserve">
+    <value>المناقشة مقفلة.</value>
+  </data>
+  <data name="beatmapset_discussion.attributes.message_type" xml:space="preserve">
+    <value>نوع الرسالة</value>
+  </data>
+  <data name="beatmapset_discussion.attributes.timestamp" xml:space="preserve">
+    <value>الطابع الزمني</value>
+  </data>
+  <data name="beatmapset_discussion.hype.discussion_locked" xml:space="preserve">
+    <value>هذه الخريطة مقفلة حاليا للنقاش ولا يمكن أِضافة نقاط تشجيع لها</value>
+  </data>
+  <data name="beatmapset_discussion.hype.guest" xml:space="preserve">
+    <value>يجب أن تسجل دخولك للاِشادة.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.hyped" xml:space="preserve">
+    <value>لقد اشدت هذه الخريطة بالفعل.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.limit_exceeded" xml:space="preserve">
+    <value>لقد استنفذت كافة اِشاداتك.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.not_hypeable" xml:space="preserve">
+    <value>لا يمكن اِشادة هذه الخريطة</value>
+  </data>
+  <data name="beatmapset_discussion.hype.owner" xml:space="preserve">
+    <value>لا يمكن اِشادة خرائطك.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.exceeds_beatmapset_length" xml:space="preserve">
+    <value>الطابع الزمني المحدد أبعد من طول الخريطة.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.negative" xml:space="preserve">
+    <value>الطابع الزمني لا يمكن أن يكون سلبيا.</value>
+  </data>
+  <data name="beatmapset_discussion_post.discussion_locked" xml:space="preserve">
+    <value>المناقشة مقفلة.</value>
+  </data>
+  <data name="beatmapset_discussion_post.first_post" xml:space="preserve">
+    <value>لا يمكن حذف منشور البداية.</value>
+  </data>
+  <data name="beatmapset_discussion_post.attributes.message" xml:space="preserve">
+    <value>الرسالة</value>
+  </data>
+  <data name="comment.deleted_parent" xml:space="preserve">
+    <value>الرد على تعليق محذوف غير مسموح.</value>
+  </data>
+  <data name="comment.top_only" xml:space="preserve">
+    <value>تثبيت تعليق الرد غير مسموح به.</value>
+  </data>
+  <data name="comment.attributes.message" xml:space="preserve">
+    <value>الرسالة</value>
+  </data>
+  <data name="follow.invalid" xml:space="preserve">
+    <value>تم تحديد {0} خاطئ.</value>
+  </data>
+  <data name="forum.feature_vote.not_feature_topic" xml:space="preserve">
+    <value>يمكن فقط التصويت لطلب المميزات.</value>
+  </data>
+  <data name="forum.feature_vote.not_enough_feature_votes" xml:space="preserve">
+    <value>اصوات غير كافية.</value>
+  </data>
+  <data name="forum.poll_vote.invalid" xml:space="preserve">
+    <value>خيار غير صالح.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_delete" xml:space="preserve">
+    <value>غير مسموح بحذف منشور موارد الخريطة.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_edit" xml:space="preserve">
+    <value>غير مسموح بتعديل منشور موارد الخريطة.</value>
+  </data>
+  <data name="forum.post.first_post_no_delete" xml:space="preserve">
+    <value>لا يمكن حذف المنشور الأول</value>
+  </data>
+  <data name="forum.post.missing_topic" xml:space="preserve">
+    <value>المنشور يفتقد لـ موضوع</value>
+  </data>
+  <data name="forum.post.only_quote" xml:space="preserve">
+    <value>الرد الخاص بك يحتوي على اقتباس فقط.</value>
+  </data>
+  <data name="forum.post.attributes.post_text" xml:space="preserve">
+    <value>مساحة المنشور</value>
+  </data>
+  <data name="forum.topic.attributes.topic_title" xml:space="preserve">
+    <value>اسم الموضوع</value>
+  </data>
+  <data name="forum.topic_poll.duplicate_options" xml:space="preserve">
+    <value>الخيار المكرر غير مسموح به.</value>
+  </data>
+  <data name="forum.topic_poll.grace_period_expired" xml:space="preserve">
+    <value>لا يمكن تحرير استطلاع للرأي بعد أكثر من {0} ساعة</value>
+  </data>
+  <data name="forum.topic_poll.hiding_results_forever" xml:space="preserve">
+    <value>لا يمكن اخفاء نتائج التصويت الذي لا ينتهي.</value>
+  </data>
+  <data name="forum.topic_poll.invalid_max_options" xml:space="preserve">
+    <value>لا يجوز أن تتجاوز خيارات المستخدم الواحد عدد الخيارات المسموحة.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_one_selection" xml:space="preserve">
+    <value>خاصية واحد لكل مستخدم مطلوبة.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_two_options" xml:space="preserve">
+    <value>تحتاج خاصيتين على الأقل.</value>
+  </data>
+  <data name="forum.topic_poll.too_many_options" xml:space="preserve">
+    <value>تجاوزت الحد الأقصى لعدد الخيارات المسموح بها.</value>
+  </data>
+  <data name="forum.topic_poll.attributes.title" xml:space="preserve">
+    <value>عنوان الأستبيان</value>
+  </data>
+  <data name="forum.topic_vote.required" xml:space="preserve">
+    <value>حدد أحد الخيارات اثناء التصويت.</value>
+  </data>
+  <data name="forum.topic_vote.too_many" xml:space="preserve">
+    <value>اخترت خيارات اكثر من المطلوب.</value>
+  </data>
+  <data name="oauth.client.too_many" xml:space="preserve">
+    <value>تجاوزت الحد الأقصى لعدد الـ0Auth المسموح به.</value>
+  </data>
+  <data name="oauth.client.url" xml:space="preserve">
+    <value>المرجو إدخال عنوان صحيح.</value>
+  </data>
+  <data name="oauth.client.attributes.name" xml:space="preserve">
+    <value>اسم التّطبيق</value>
+  </data>
+  <data name="oauth.client.attributes.redirect" xml:space="preserve">
+    <value>رابط نقطة معاودة التطبيق</value>
+  </data>
+  <data name="user.contains_username" xml:space="preserve">
+    <value>كلمة المرور يجب أن لا تحتوي على اسم المستخدم.</value>
+  </data>
+  <data name="user.email_already_used" xml:space="preserve">
+    <value>البريد الإلكتروني مستخدم مسبقاََ.</value>
+  </data>
+  <data name="user.email_not_allowed" xml:space="preserve">
+    <value>عنوان البريد الإلكتروني غير مسموح به.</value>
+  </data>
+  <data name="user.invalid_country" xml:space="preserve">
+    <value>الدولة ليست في قاعدة البيانات.</value>
+  </data>
+  <data name="user.invalid_discord" xml:space="preserve">
+    <value>اِسم خلاف غير صالح.</value>
+  </data>
+  <data name="user.invalid_email" xml:space="preserve">
+    <value>لا يبدو وكأنه بريد الكتروني صالح.</value>
+  </data>
+  <data name="user.invalid_twitter" xml:space="preserve">
+    <value>اسم تويتر غير صالح.</value>
+  </data>
+  <data name="user.too_short" xml:space="preserve">
+    <value>كلمة المرور الجديدة قصيرة جداً.</value>
+  </data>
+  <data name="user.unknown_duplicate" xml:space="preserve">
+    <value>اسم المستخدم أو عنوان البريد الإلكتروني مستخدمة مسبقاََ.</value>
+  </data>
+  <data name="user.username_available_in" xml:space="preserve">
+    <value>اسم المستخدم سيكون متوفرا للاِستعمال في {0}.</value>
+  </data>
+  <data name="user.username_available_soon" xml:space="preserve">
+    <value>اسم المستخدم سيكون متوفرا للاِستعمال في اي دقيقة الان!</value>
+  </data>
+  <data name="user.username_invalid_characters" xml:space="preserve">
+    <value>يحتوي اسم المستخدم على أحرف غير صالحة.</value>
+  </data>
+  <data name="user.username_in_use" xml:space="preserve">
+    <value>الاسم مستخدم حاليا!</value>
+  </data>
+  <data name="user.username_locked" xml:space="preserve">
+    <value>الاسم مستخدم حاليا!</value>
+  </data>
+  <data name="user.username_no_space_userscore_mix" xml:space="preserve">
+    <value>رجائاََ استخدم الخط السفلي او المسافة, ليس كلاهما!</value>
+  </data>
+  <data name="user.username_no_spaces" xml:space="preserve">
+    <value>اسم المسخدم لا يمكن ان يبدأ او ينتهي مع مسافات!</value>
+  </data>
+  <data name="user.username_not_allowed" xml:space="preserve">
+    <value>اختيار اسم المستخدم غير مقبول.</value>
+  </data>
+  <data name="user.username_too_short" xml:space="preserve">
+    <value>اسم المستخدم المطلوب قصير جداََ.</value>
+  </data>
+  <data name="user.username_too_long" xml:space="preserve">
+    <value>اسم المسيتخدم المطلوب طويل للغاية.</value>
+  </data>
+  <data name="user.weak" xml:space="preserve">
+    <value>كلمة سر ممنوعة.</value>
+  </data>
+  <data name="user.wrong_current_password" xml:space="preserve">
+    <value>كلمة السر الحالية غير صحيحة.</value>
+  </data>
+  <data name="user.wrong_email_confirmation" xml:space="preserve">
+    <value>تأكيد البريد الألكتروني لا يتطابق.</value>
+  </data>
+  <data name="user.wrong_password_confirmation" xml:space="preserve">
+    <value>تأكيد كلمة المرور لا يتطابق.</value>
+  </data>
+  <data name="user.too_long" xml:space="preserve">
+    <value>تجاوزت الحد المطلوب - يمكن ان يصل الى {0} حروف فقط.</value>
+  </data>
+  <data name="user.attributes.username" xml:space="preserve">
+    <value>اسم المُستخدم</value>
+  </data>
+  <data name="user.attributes.user_email" xml:space="preserve">
+    <value>عنوان البريد الإلكتروني</value>
+  </data>
+  <data name="user.attributes.password" xml:space="preserve">
+    <value>كلمة المرور</value>
+  </data>
+  <data name="user.change_username.restricted" xml:space="preserve">
+    <value>لا يمكنك تغيير اسم المستخدم اذا كان حسابك مقيد.</value>
+  </data>
+  <data name="user.change_username.supporter_required._" xml:space="preserve">
+    <value>تحتاج إلى أن تملك {0} لتغيير اسمك!</value>
+  </data>
+  <data name="user.change_username.supporter_required.link_text" xml:space="preserve">
+    <value>اِدعم osu!</value>
+  </data>
+  <data name="user.change_username.username_is_same" xml:space="preserve">
+    <value>هذا هو اسم المستخدم الخاص بك حالياََ ايها السخيف!</value>
+  </data>
+  <data name="user_report.reason_not_valid" xml:space="preserve">
+    <value>{0} ليس مقبولا لنوع الأبلاغ هذا.</value>
+  </data>
+  <data name="user_report.self" xml:space="preserve">
+    <value>لا يمكنك الإبلاغ عن نفسك!</value>
+  </data>
+  <data name="store.order_item.attributes.quantity" xml:space="preserve">
+    <value>الكمية</value>
+  </data>
+  <data name="store.order_item.attributes.cost" xml:space="preserve">
+    <value>التكلفة</value>
+  </data>
+</root>

@@ -1,0 +1,385 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="all_read" xml:space="preserve">
+    <value>已经阅读所有通知！</value>
+  </data>
+  <data name="delete" xml:space="preserve">
+    <value>删除 {0}</value>
+  </data>
+  <data name="loading" xml:space="preserve">
+    <value>加载未读通知…</value>
+  </data>
+  <data name="mark_read" xml:space="preserve">
+    <value>清除 {0} 类型的通知</value>
+  </data>
+  <data name="none" xml:space="preserve">
+    <value>没有新通知</value>
+  </data>
+  <data name="see_all" xml:space="preserve">
+    <value>显示所有通知</value>
+  </data>
+  <data name="see_channel" xml:space="preserve">
+    <value>前往聊天</value>
+  </data>
+  <data name="verifying" xml:space="preserve">
+    <value>请验证会话以查看通知</value>
+  </data>
+  <data name="filters._" xml:space="preserve">
+    <value>所有</value>
+  </data>
+  <data name="filters.user" xml:space="preserve">
+    <value>个人资料</value>
+  </data>
+  <data name="filters.beatmapset" xml:space="preserve">
+    <value>谱面</value>
+  </data>
+  <data name="filters.forum_topic" xml:space="preserve">
+    <value>论坛</value>
+  </data>
+  <data name="filters.news_post" xml:space="preserve">
+    <value>新闻</value>
+  </data>
+  <data name="filters.build" xml:space="preserve">
+    <value>版本</value>
+  </data>
+  <data name="filters.channel" xml:space="preserve">
+    <value>聊天</value>
+  </data>
+  <data name="item.beatmapset._" xml:space="preserve">
+    <value>谱面</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change._" xml:space="preserve">
+    <value>客串难度</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change.beatmap_owner_change" xml:space="preserve">
+    <value>您现在是{0}内{1}难度的作者
+</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change.beatmap_owner_change_compact" xml:space="preserve">
+    <value>您现在是{0}难度的作者
+</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion._" xml:space="preserve">
+    <value>谱面讨论</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>谱面 {0} 已被锁定以供讨论。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock_compact" xml:space="preserve">
+    <value>评论被锁定</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>用户 {0} 在 {1} 的谱面讨论中发布了新消息。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_empty" xml:space="preserve">
+    <value>{0} 发布了主题为“{1}”新的帖子</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact" xml:space="preserve">
+    <value>{0} 的新主题</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact_empty" xml:space="preserve">
+    <value>{0} 发布了新的帖子</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_review_new" xml:space="preserve">
+    <value>{0} 在《{1}》上发表了新的审阅，问题：{2}，建议：{3}，赞：{4}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_review_new_compact" xml:space="preserve">
+    <value>{0} 发表了新的审阅，问题：{1}，建议：{2}，赞：{3}</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>谱面 {0} 已被解锁以供讨论。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock_compact" xml:space="preserve">
+    <value>评论已解锁</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem._" xml:space="preserve">
+    <value>Qualified 谱面问题</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>{0} 在 “{1}” 下反馈：“{2}”</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_empty" xml:space="preserve">
+    <value>{0} 在 “{1}” 下反馈了问题</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_compact" xml:space="preserve">
+    <value>{0} 反馈如下：“{1}”</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_compact_empty" xml:space="preserve">
+    <value>{0} 反馈了问题</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state._" xml:space="preserve">
+    <value>谱面状态已改变</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify" xml:space="preserve">
+    <value>谱面 {0} 被 {1} 取消提名。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify_compact" xml:space="preserve">
+    <value>谱面被取消资格</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love" xml:space="preserve">
+    <value>谱面 {0} 已经被 {1} 推荐为 loved 。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love_compact" xml:space="preserve">
+    <value>谱面已被 Loved</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate" xml:space="preserve">
+    <value>谱面 {0} 被 {1} 提名。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate_compact" xml:space="preserve">
+    <value>谱面被提名</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify" xml:space="preserve">
+    <value>谱面 {0} 已经得到足够数量的提名并进入到 ranking 队列。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify_compact" xml:space="preserve">
+    <value>谱面进入 Ranked 序列</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>"{0}" 已 Rank</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank_compact" xml:space="preserve">
+    <value>谱面已 Ranked</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_remove_from_loved" xml:space="preserve">
+    <value>谱面 {0} 已被从 Loved 移除</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_remove_from_loved_compact" xml:space="preserve">
+    <value>谱面从 Loved 中移除</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_reset_nominations" xml:space="preserve">
+    <value>{0} 提出的问题重置了谱面 {1} 的提名过程 </value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_reset_nominations_compact" xml:space="preserve">
+    <value>提名被重置</value>
+  </data>
+  <data name="item.beatmapset.comment._" xml:space="preserve">
+    <value>新评论</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_new" xml:space="preserve">
+    <value>{0} 在 "{1}" 中评论道 "{2}</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} 评论道 "{1}</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_reply" xml:space="preserve">
+    <value>{0} 回复了“{1}”：“{2}”</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0} 回复了：“{1}”</value>
+  </data>
+  <data name="item.channel._" xml:space="preserve">
+    <value>聊天</value>
+  </data>
+  <data name="item.channel.channel._" xml:space="preserve">
+    <value>新消息</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message" xml:space="preserve">
+    <value>{0} 说 "{1}"</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_compact" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_group" xml:space="preserve">
+    <value>由 {0}</value>
+  </data>
+  <data name="item.build._" xml:space="preserve">
+    <value>更新日志</value>
+  </data>
+  <data name="item.build.comment._" xml:space="preserve">
+    <value>新评论</value>
+  </data>
+  <data name="item.build.comment.comment_new" xml:space="preserve">
+    <value>{0} 在 "{1}" 中评论道 "{2}"</value>
+  </data>
+  <data name="item.build.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} 评论道 "{1}"</value>
+  </data>
+  <data name="item.build.comment.comment_reply" xml:space="preserve">
+    <value>{0} 回复了“{1}”：“{2}”</value>
+  </data>
+  <data name="item.build.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0} 回复了：“{1}”</value>
+  </data>
+  <data name="item.news_post._" xml:space="preserve">
+    <value>新闻</value>
+  </data>
+  <data name="item.news_post.comment._" xml:space="preserve">
+    <value>新评论</value>
+  </data>
+  <data name="item.news_post.comment.comment_new" xml:space="preserve">
+    <value>{0} 在 "{1}" 中评论道 "{2}</value>
+  </data>
+  <data name="item.news_post.comment.comment_new_compact" xml:space="preserve">
+    <value>{0} 评论道 "{1}"</value>
+  </data>
+  <data name="item.news_post.comment.comment_reply" xml:space="preserve">
+    <value>{0} 回复了“{1}”：“{2}”</value>
+  </data>
+  <data name="item.news_post.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0} 回复了：“{1}”</value>
+  </data>
+  <data name="item.forum_topic._" xml:space="preserve">
+    <value>论坛主题</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply._" xml:space="preserve">
+    <value>论坛回复</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>{0} 回复了主题“{1}”</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply_compact" xml:space="preserve">
+    <value>{0} 回复了</value>
+  </data>
+  <data name="item.legacy_pm._" xml:space="preserve">
+    <value>旧论坛私信</value>
+  </data>
+  <data name="item.legacy_pm.legacy_pm.legacy_pm" xml:space="preserve">
+    <value>{0} 条未读消息</value>
+  </data>
+  <data name="item.user.user_beatmapset_new._" xml:space="preserve">
+    <value>新谱面</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new" xml:space="preserve">
+    <value>{0} 上传了标题为“{1}”的新谱面</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new_compact" xml:space="preserve">
+    <value>新谱面《{0}》</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new_group" xml:space="preserve">
+    <value>{0} 的新谱面</value>
+  </data>
+  <data name="item.user_achievement._" xml:space="preserve">
+    <value>奖章</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock._" xml:space="preserve">
+    <value>新奖章</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>解锁 "{0}"！</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_compact" xml:space="preserve">
+    <value>您已解锁 "{0}" 成就！</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_group" xml:space="preserve">
+    <value>奖章已解锁！</value>
+  </data>
+  <data name="mail.beatmapset.beatmap_owner_change.beatmap_owner_change" xml:space="preserve">
+    <value>您现在是{0}的客串作者
+</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>谱面“{0}”的讨论已被锁定</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>谱面“{0}”的讨论有新动态</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>谱面“{0}”的讨论已被解锁</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>谱面“{0}”被反馈了一个新问题</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_disqualify" xml:space="preserve">
+    <value>谱面 {0} 已被 DQ</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_love" xml:space="preserve">
+    <value>谱面 {0} 已被 Loved</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_nominate" xml:space="preserve">
+    <value>“{0}”已被提名</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_qualify" xml:space="preserve">
+    <value>谱面 {0} 已获得足够的提名，已进入 Ranked 流程</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>“{0}”已被 ranked</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_remove_from_loved" xml:space="preserve">
+    <value>谱面 {0} 已被从 Loved 移除</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_reset_nominations" xml:space="preserve">
+    <value>“{0}”的提名被重置</value>
+  </data>
+  <data name="mail.beatmapset.comment.comment_new" xml:space="preserve">
+    <value>谱面“{0}”有新的评论</value>
+  </data>
+  <data name="mail.channel.channel.pm" xml:space="preserve">
+    <value>您收到了来自 {0} 的新消息</value>
+  </data>
+  <data name="mail.build.comment.comment_new" xml:space="preserve">
+    <value>更新日志“{0}”有新的评论</value>
+  </data>
+  <data name="mail.news_post.comment.comment_new" xml:space="preserve">
+    <value>新闻“{0}”有新的评论</value>
+  </data>
+  <data name="mail.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>主题“{0}”有新的回复</value>
+  </data>
+  <data name="mail.user.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>{0} 解锁了新成就“{1}”！</value>
+  </data>
+  <data name="mail.user.user_achievement_unlock.user_achievement_unlock_self" xml:space="preserve">
+    <value>您已解锁了新成就“{0}”！</value>
+  </data>
+  <data name="mail.user.user_beatmapset_new.user_beatmapset_new" xml:space="preserve">
+    <value>{0} 创建了一张新谱面</value>
+  </data>
+</root>

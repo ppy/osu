@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="achievement" xml:space="preserve">
+    <value>&lt;strong&gt;&lt;em&gt;{0}&lt;/em&gt;&lt;/strong&gt; 解鎖了 "&lt;strong&gt;{1}&lt;/strong&gt;" 成就！</value>
+  </data>
+  <data name="beatmap_playcount" xml:space="preserve">
+    <value>{0} 已經被玩了 {1} 次！</value>
+  </data>
+  <data name="beatmapset_approve" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; 製作的 {1} 已經被 {2} ！</value>
+  </data>
+  <data name="beatmapset_delete" xml:space="preserve">
+    <value>{0} 已經被刪除。</value>
+  </data>
+  <data name="beatmapset_revive" xml:space="preserve">
+    <value>{0} 已經被 &lt;strong&gt;{1}&lt;/strong&gt; 恢復。</value>
+  </data>
+  <data name="beatmapset_update" xml:space="preserve">
+    <value>&lt;strong&gt;&lt;em&gt;{0}&lt;/em&gt;&lt;/strong&gt; 更新了圖譜 "&lt;em&gt;{1}&lt;/em&gt;"</value>
+  </data>
+  <data name="beatmapset_upload" xml:space="preserve">
+    <value>&lt;strong&gt;&lt;em&gt;{0}&lt;/em&gt;&lt;/strong&gt; 提交了一個新圖譜 "{1}"</value>
+  </data>
+  <data name="empty" xml:space="preserve">
+    <value>該用戶最近沒有活動！</value>
+  </data>
+  <data name="rank" xml:space="preserve">
+    <value>&lt;strong&gt;&lt;em&gt;{0}&lt;/em&gt;&lt;/strong&gt; 在 &lt;em&gt;{1}&lt;/em&gt; （{2}）中取得第 {3} 名</value>
+  </data>
+  <data name="rank_lost" xml:space="preserve">
+    <value>&lt;strong&gt;&lt;em&gt;{0}&lt;/em&gt;&lt;/strong&gt; 失去了 &lt;em&gt;{1}&lt;/em&gt; （{2}）的第一名</value>
+  </data>
+  <data name="user_support_again" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; 又一次支持了 osu! - 感謝您的慷慨捐贈！</value>
+  </data>
+  <data name="user_support_first" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; 成為了 osu!支持者 - 感謝您的慷慨捐贈！</value>
+  </data>
+  <data name="user_support_gift" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; 成為了 osu!支持者 - 來自匿名玩家的贈予！</value>
+  </data>
+  <data name="username_change" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; 將名字改為 &lt;strong&gt;&lt;em&gt;{1}&lt;/strong&gt;&lt;/em&gt;！</value>
+  </data>
+  <data name="beatmapset_status.approved" xml:space="preserve">
+    <value>已批准</value>
+  </data>
+  <data name="beatmapset_status.loved" xml:space="preserve">
+    <value>loved</value>
+  </data>
+  <data name="beatmapset_status.qualified" xml:space="preserve">
+    <value>已核可</value>
+  </data>
+</root>

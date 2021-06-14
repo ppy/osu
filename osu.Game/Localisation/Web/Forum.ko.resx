@@ -1,0 +1,556 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="pinned_topics" xml:space="preserve">
+    <value>고정된 주제</value>
+  </data>
+  <data name="slogan" xml:space="preserve">
+    <value>혼자서 놀기엔 너무 위험하지요.</value>
+  </data>
+  <data name="subforums" xml:space="preserve">
+    <value>서브포럼</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>osu! 포럼</value>
+  </data>
+  <data name="covers.edit" xml:space="preserve">
+    <value>커버 수정</value>
+  </data>
+  <data name="covers.create._" xml:space="preserve">
+    <value>표지 이미지 설정</value>
+  </data>
+  <data name="covers.create.button" xml:space="preserve">
+    <value>이미지 업로드</value>
+  </data>
+  <data name="covers.create.info" xml:space="preserve">
+    <value>표지 이미지의 해상도는 최대 {0}입니다. 이미지를 이 곳에 끌어넣어 업로드할 수도 있습니다.</value>
+  </data>
+  <data name="covers.destroy._" xml:space="preserve">
+    <value>표지 이미지 삭제</value>
+  </data>
+  <data name="covers.destroy.confirm" xml:space="preserve">
+    <value>정말 표지 이미지를 삭제하실 건가요?</value>
+  </data>
+  <data name="forums.latest_post" xml:space="preserve">
+    <value>최근 게시글</value>
+  </data>
+  <data name="forums.index.title" xml:space="preserve">
+    <value>포럼 목차</value>
+  </data>
+  <data name="forums.topics.empty" xml:space="preserve">
+    <value>주제글이 아무것도 없습니다!</value>
+  </data>
+  <data name="mark_as_read.forum" xml:space="preserve">
+    <value>포럼을 읽음으로 표시</value>
+  </data>
+  <data name="mark_as_read.forums" xml:space="preserve">
+    <value>포럼을 읽음으로 표시</value>
+  </data>
+  <data name="mark_as_read.busy" xml:space="preserve">
+    <value>읽음으로 표시하는 중...</value>
+  </data>
+  <data name="post.confirm_destroy" xml:space="preserve">
+    <value>정말 이 글을 삭제할까요?</value>
+  </data>
+  <data name="post.confirm_restore" xml:space="preserve">
+    <value>정말 이 글을 복원할까요?</value>
+  </data>
+  <data name="post.edited" xml:space="preserve">
+    <value>{0} 님이 마지막으로 {1}에 수정하여 총 {2}회 수정되었습니다.</value>
+  </data>
+  <data name="post.posted_at" xml:space="preserve">
+    <value>{0}에 게시됨</value>
+  </data>
+  <data name="post.posted_by" xml:space="preserve">
+    <value>{0} 님이 게시함</value>
+  </data>
+  <data name="post.actions.destroy" xml:space="preserve">
+    <value>삭제</value>
+  </data>
+  <data name="post.actions.edit" xml:space="preserve">
+    <value>수정</value>
+  </data>
+  <data name="post.actions.report" xml:space="preserve">
+    <value>게시글 신고</value>
+  </data>
+  <data name="post.actions.restore" xml:space="preserve">
+    <value>복원</value>
+  </data>
+  <data name="post.create.title.reply" xml:space="preserve">
+    <value>새 답글 작성</value>
+  </data>
+  <data name="post.info.post_count" xml:space="preserve">
+    <value>게시글 {0}개</value>
+  </data>
+  <data name="post.info.topic_starter" xml:space="preserve">
+    <value>주제 시작인</value>
+  </data>
+  <data name="search.go_to_post" xml:space="preserve">
+    <value>게시글로 이동</value>
+  </data>
+  <data name="search.post_number_input" xml:space="preserve">
+    <value>글 번호를 입력하세요</value>
+  </data>
+  <data name="search.total_posts" xml:space="preserve">
+    <value>총 {0}개의 글</value>
+  </data>
+  <data name="topic.confirm_destroy" xml:space="preserve">
+    <value>정말 주제를 삭제할까요?</value>
+  </data>
+  <data name="topic.confirm_restore" xml:space="preserve">
+    <value>정말 주제를 복원할까요?</value>
+  </data>
+  <data name="topic.deleted" xml:space="preserve">
+    <value>삭제된 주제</value>
+  </data>
+  <data name="topic.go_to_latest" xml:space="preserve">
+    <value>최근에 올라온 글 보기</value>
+  </data>
+  <data name="topic.has_replied" xml:space="preserve">
+    <value>이 주제에 답글을 달았습니다.</value>
+  </data>
+  <data name="topic.in_forum" xml:space="preserve">
+    <value>{0} 에서</value>
+  </data>
+  <data name="topic.latest_post" xml:space="preserve">
+    <value>{0} by {1}</value>
+  </data>
+  <data name="topic.latest_reply_by" xml:space="preserve">
+    <value>{0}님이 마지막 답변 작성</value>
+  </data>
+  <data name="topic.new_topic" xml:space="preserve">
+    <value>새 주제글 작성</value>
+  </data>
+  <data name="topic.new_topic_login" xml:space="preserve">
+    <value>새로운 글을 게시하려면 로그인해주세요.</value>
+  </data>
+  <data name="topic.post_reply" xml:space="preserve">
+    <value>게시하기</value>
+  </data>
+  <data name="topic.reply_box_placeholder" xml:space="preserve">
+    <value>답글 내용을 입력하세요.</value>
+  </data>
+  <data name="topic.reply_title_prefix" xml:space="preserve">
+    <value>답글</value>
+  </data>
+  <data name="topic.started_by" xml:space="preserve">
+    <value>by {0}</value>
+  </data>
+  <data name="topic.started_by_verbose" xml:space="preserve">
+    <value>{0} 님이 시작함</value>
+  </data>
+  <data name="topic.actions.destroy" xml:space="preserve">
+    <value>주제 삭제</value>
+  </data>
+  <data name="topic.actions.restore" xml:space="preserve">
+    <value>주제 복원</value>
+  </data>
+  <data name="topic.create.close" xml:space="preserve">
+    <value>닫기</value>
+  </data>
+  <data name="topic.create.preview" xml:space="preserve">
+    <value>미리보기</value>
+  </data>
+  <data name="topic.create.preview_hide" xml:space="preserve">
+    <value>작성</value>
+  </data>
+  <data name="topic.create.submit" xml:space="preserve">
+    <value>게시하기</value>
+  </data>
+  <data name="topic.create.necropost.default" xml:space="preserve">
+    <value>이 주제는 오래된 글입니다. 마땅한 사유가 있는 경우에만 작성해 주세요.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic._" xml:space="preserve">
+    <value>이 주제는 오래된 글입니다. 마땅한 사유가 있는 경우에만 {0}해 주세요.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic.create" xml:space="preserve">
+    <value>새로운 주제글을 작성</value>
+  </data>
+  <data name="topic.create.placeholder.body" xml:space="preserve">
+    <value>글 내용을 입력하세요.</value>
+  </data>
+  <data name="topic.create.placeholder.title" xml:space="preserve">
+    <value>이곳을 눌러 제목을 정하세요</value>
+  </data>
+  <data name="topic.jump.enter" xml:space="preserve">
+    <value>특정 글로 이동하려면 클릭하세요</value>
+  </data>
+  <data name="topic.jump.first" xml:space="preserve">
+    <value>처음 글로 이동하기</value>
+  </data>
+  <data name="topic.jump.last" xml:space="preserve">
+    <value>마지막 글로 이동하기</value>
+  </data>
+  <data name="topic.jump.next" xml:space="preserve">
+    <value>10개 글 건너뛰기</value>
+  </data>
+  <data name="topic.jump.previous" xml:space="preserve">
+    <value>10개 글 이전으로</value>
+  </data>
+  <data name="topic.post_edit.cancel" xml:space="preserve">
+    <value>취소</value>
+  </data>
+  <data name="topic.post_edit.post" xml:space="preserve">
+    <value>저장</value>
+  </data>
+  <data name="topic_watches.index.title_compact" xml:space="preserve">
+    <value>구독</value>
+  </data>
+  <data name="topic_watches.index.box.total" xml:space="preserve">
+    <value>구독한 주제글</value>
+  </data>
+  <data name="topic_watches.index.box.unread" xml:space="preserve">
+    <value>새로운 답변이 있는 주제글</value>
+  </data>
+  <data name="topic_watches.index.info.total" xml:space="preserve">
+    <value>총 {0}개의 주제글을 구독했습니다.</value>
+  </data>
+  <data name="topic_watches.index.info.unread" xml:space="preserve">
+    <value>구독한 주제글에 {0}개의 읽지 않은 답변이 있습니다.</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.confirmation" xml:space="preserve">
+    <value>이 주제를 구독 해제하시겠어요?</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.title" xml:space="preserve">
+    <value>구독 해제</value>
+  </data>
+  <data name="topics._" xml:space="preserve">
+    <value>주제</value>
+  </data>
+  <data name="topics.actions.login_reply" xml:space="preserve">
+    <value>답변하려면 로그인하세요</value>
+  </data>
+  <data name="topics.actions.reply" xml:space="preserve">
+    <value>답변</value>
+  </data>
+  <data name="topics.actions.reply_with_quote" xml:space="preserve">
+    <value>이 글을 답글에 인용하기</value>
+  </data>
+  <data name="topics.actions.search" xml:space="preserve">
+    <value>검색</value>
+  </data>
+  <data name="topics.create.create_poll" xml:space="preserve">
+    <value>투표 만들기</value>
+  </data>
+  <data name="topics.create.preview" xml:space="preserve">
+    <value>글 미리보기</value>
+  </data>
+  <data name="topics.create.create_poll_button.add" xml:space="preserve">
+    <value>투표 만들기</value>
+  </data>
+  <data name="topics.create.create_poll_button.remove" xml:space="preserve">
+    <value>투표 생성 취소</value>
+  </data>
+  <data name="topics.create.poll.hide_results" xml:space="preserve">
+    <value>투표의 결과를 숨깁니다.</value>
+  </data>
+  <data name="topics.create.poll.hide_results_info" xml:space="preserve">
+    <value>투표가 끝났을 때만 보입니다.</value>
+  </data>
+  <data name="topics.create.poll.length" xml:space="preserve">
+    <value>투표 진행 기간</value>
+  </data>
+  <data name="topics.create.poll.length_days_suffix" xml:space="preserve">
+    <value>일</value>
+  </data>
+  <data name="topics.create.poll.length_info" xml:space="preserve">
+    <value>투표를 영구적으로 진행하려면 공백으로 두세요.</value>
+  </data>
+  <data name="topics.create.poll.max_options" xml:space="preserve">
+    <value>투표가능 항목 수</value>
+  </data>
+  <data name="topics.create.poll.max_options_info" xml:space="preserve">
+    <value>중복으로 선택 가능한 항목 수를 나타냅니다.</value>
+  </data>
+  <data name="topics.create.poll.options" xml:space="preserve">
+    <value>투표 항목</value>
+  </data>
+  <data name="topics.create.poll.options_info" xml:space="preserve">
+    <value>항목으로 쓰일 내용을 적어주세요. 각 행마다 항목을 구분하며, 10개 까지 입력 가능합니다.</value>
+  </data>
+  <data name="topics.create.poll.title" xml:space="preserve">
+    <value>투표 제목</value>
+  </data>
+  <data name="topics.create.poll.vote_change" xml:space="preserve">
+    <value>재투표 허용.</value>
+  </data>
+  <data name="topics.create.poll.vote_change_info" xml:space="preserve">
+    <value>허용하면, 본인이 투표한 내용을 바꿀 수 있습니다.</value>
+  </data>
+  <data name="topics.edit_title.start" xml:space="preserve">
+    <value>제목 수정</value>
+  </data>
+  <data name="topics.index.feature_votes" xml:space="preserve">
+    <value>별 평점 순위</value>
+  </data>
+  <data name="topics.index.replies" xml:space="preserve">
+    <value>답글</value>
+  </data>
+  <data name="topics.index.views" xml:space="preserve">
+    <value>조회수</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0" xml:space="preserve">
+    <value>"added" 태그 삭제</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0_done" xml:space="preserve">
+    <value>"added" 태그 삭제됨</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1" xml:space="preserve">
+    <value>"added" 태그 추가</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1_done" xml:space="preserve">
+    <value>"added" 태그 추가됨</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0" xml:space="preserve">
+    <value>"assigned" 태그 삭제</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0_done" xml:space="preserve">
+    <value>"assigned" 태그 삭제됨</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1" xml:space="preserve">
+    <value>"assigned" 태그 추가</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1_done" xml:space="preserve">
+    <value>"assigned" 태그 추가됨</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0" xml:space="preserve">
+    <value>"confirmed" 태그 삭제</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0_done" xml:space="preserve">
+    <value>"confirmed" 태그 삭제됨</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1" xml:space="preserve">
+    <value>"confirmed" 태그 추가</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1_done" xml:space="preserve">
+    <value>"confirmed" 태그 추가됨</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0" xml:space="preserve">
+    <value>"duplicate" 태그 삭제</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0_done" xml:space="preserve">
+    <value>"duplicate" 태그 삭제됨</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1" xml:space="preserve">
+    <value>"duplicate" 태그 추가</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1_done" xml:space="preserve">
+    <value>"duplicate" 태그 추가됨</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0" xml:space="preserve">
+    <value>"invalid" 태그 삭제</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0_done" xml:space="preserve">
+    <value>"invalid" 태그 삭제됨</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1" xml:space="preserve">
+    <value>"invalid" 태그 추가</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1_done" xml:space="preserve">
+    <value>"invalid" 태그 추가됨</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0" xml:space="preserve">
+    <value>"resolved" 태그 삭제</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0_done" xml:space="preserve">
+    <value>"resolved" 태그 삭제됨</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1" xml:space="preserve">
+    <value>"resolved" 태그 추가</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1_done" xml:space="preserve">
+    <value>"resolved" 태그 추가됨</value>
+  </data>
+  <data name="topics.lock.is_locked" xml:space="preserve">
+    <value>주제글이 잠겨있어 답글을 달 수 없습니다.</value>
+  </data>
+  <data name="topics.lock.to_0" xml:space="preserve">
+    <value>주제글 잠금 풀기</value>
+  </data>
+  <data name="topics.lock.to_0_confirm" xml:space="preserve">
+    <value>주제를 잠금 해제할까요?</value>
+  </data>
+  <data name="topics.lock.to_0_done" xml:space="preserve">
+    <value>해당 주제의 잠금이 해제되었습니다,</value>
+  </data>
+  <data name="topics.lock.to_1" xml:space="preserve">
+    <value>주제글 잠그기</value>
+  </data>
+  <data name="topics.lock.to_1_confirm" xml:space="preserve">
+    <value>주제를 잠글까요?</value>
+  </data>
+  <data name="topics.lock.to_1_done" xml:space="preserve">
+    <value>해당 주제가 잠겼습니다.</value>
+  </data>
+  <data name="topics.moderate_move.title" xml:space="preserve">
+    <value>다른 포럼으로 이동</value>
+  </data>
+  <data name="topics.moderate_pin.to_0" xml:space="preserve">
+    <value>주제글 고정 해제</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_confirm" xml:space="preserve">
+    <value>주제를 고정 해제할까요?</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_done" xml:space="preserve">
+    <value>해당 주제의 고정이 해제되었습니다.</value>
+  </data>
+  <data name="topics.moderate_pin.to_1" xml:space="preserve">
+    <value>주제글 고정</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_confirm" xml:space="preserve">
+    <value>주제를 고정할까요?</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_done" xml:space="preserve">
+    <value>해당 주제가 고정되었습니다.</value>
+  </data>
+  <data name="topics.moderate_pin.to_2" xml:space="preserve">
+    <value>주제글을 고정하고 알림글로 나타내기</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_confirm" xml:space="preserve">
+    <value>주제를 고정하고 공지 사항로 표시할까요?</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_done" xml:space="preserve">
+    <value>해당 주제가 고정되고 알림글로 표시됩니다.</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.show" xml:space="preserve">
+    <value>삭제된 글 표시</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.hide" xml:space="preserve">
+    <value>삭제된 글 숨기기</value>
+  </data>
+  <data name="topics.show.deleted-posts" xml:space="preserve">
+    <value>삭제된 게시글</value>
+  </data>
+  <data name="topics.show.total_posts" xml:space="preserve">
+    <value>총 게시글</value>
+  </data>
+  <data name="topics.show.feature_vote.current" xml:space="preserve">
+    <value>현재 우선도: +{0}</value>
+  </data>
+  <data name="topics.show.feature_vote.do" xml:space="preserve">
+    <value>이 요청 옹호</value>
+  </data>
+  <data name="topics.show.feature_vote.info._" xml:space="preserve">
+    <value>이곳은 {0}입니다. 기능 요청들의 투표는 {1}가 할 수 있습니다.</value>
+  </data>
+  <data name="topics.show.feature_vote.info.feature_request" xml:space="preserve">
+    <value>기능 요청</value>
+  </data>
+  <data name="topics.show.feature_vote.info.supporters" xml:space="preserve">
+    <value>서포터</value>
+  </data>
+  <data name="topics.show.feature_vote.user.count" xml:space="preserve">
+    <value>{0} 표 없음|{1,*} {0} 표</value>
+  </data>
+  <data name="topics.show.feature_vote.user.current" xml:space="preserve">
+    <value>투표 횟수가 {0}회 남았습니다.</value>
+  </data>
+  <data name="topics.show.feature_vote.user.not_enough" xml:space="preserve">
+    <value>투표 횟수를 모두 사용하여 더이상 투표할 수 없습니다.</value>
+  </data>
+  <data name="topics.show.poll.edit" xml:space="preserve">
+    <value>투표 수정</value>
+  </data>
+  <data name="topics.show.poll.edit_warning" xml:space="preserve">
+    <value>투표를 수정하면 현재 결과가 제거됩니다!</value>
+  </data>
+  <data name="topics.show.poll.vote" xml:space="preserve">
+    <value>투표</value>
+  </data>
+  <data name="topics.show.poll.button.change_vote" xml:space="preserve">
+    <value>추천 변경</value>
+  </data>
+  <data name="topics.show.poll.button.edit" xml:space="preserve">
+    <value>투표 수정</value>
+  </data>
+  <data name="topics.show.poll.button.view_results" xml:space="preserve">
+    <value>결과로 건너뛰기</value>
+  </data>
+  <data name="topics.show.poll.button.vote" xml:space="preserve">
+    <value>투표</value>
+  </data>
+  <data name="topics.show.poll.detail.end_time" xml:space="preserve">
+    <value>투표가 {0}에 종료됩니다.</value>
+  </data>
+  <data name="topics.show.poll.detail.ended" xml:space="preserve">
+    <value>투표가 {0}에 종료되었습니다.</value>
+  </data>
+  <data name="topics.show.poll.detail.results_hidden" xml:space="preserve">
+    <value>투표가 끝난 후에 결과가 표시됩니다.</value>
+  </data>
+  <data name="topics.show.poll.detail.total" xml:space="preserve">
+    <value>총 투표 수: {0}회</value>
+  </data>
+  <data name="topics.watch.to_not_watching" xml:space="preserve">
+    <value>즐겨찾기 등록 안됨</value>
+  </data>
+  <data name="topics.watch.to_watching" xml:space="preserve">
+    <value>즐겨찾기</value>
+  </data>
+  <data name="topics.watch.to_watching_mail" xml:space="preserve">
+    <value>알림과 함께 즐겨찾기</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_disable" xml:space="preserve">
+    <value>알림이 활성화되었습니다. 눌러서 비활성화하세요.</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_enable" xml:space="preserve">
+    <value>알림이 비활성화되었습니다. 눌러서 활성화하세요.</value>
+  </data>
+</root>

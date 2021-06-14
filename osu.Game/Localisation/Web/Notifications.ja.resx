@@ -1,0 +1,382 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="all_read" xml:space="preserve">
+    <value>通知を全て既読にする！</value>
+  </data>
+  <data name="delete" xml:space="preserve">
+    <value>{0} を削除</value>
+  </data>
+  <data name="loading" xml:space="preserve">
+    <value>未読通知を読み込み中...</value>
+  </data>
+  <data name="mark_read" xml:space="preserve">
+    <value>消去 {0}</value>
+  </data>
+  <data name="none" xml:space="preserve">
+    <value>通知なし</value>
+  </data>
+  <data name="see_all" xml:space="preserve">
+    <value>すべての通知を見る</value>
+  </data>
+  <data name="see_channel" xml:space="preserve">
+    <value>チャットに行く</value>
+  </data>
+  <data name="verifying" xml:space="preserve">
+    <value>通知を表示するには、セッションを確認してください。</value>
+  </data>
+  <data name="filters._" xml:space="preserve">
+    <value>全て</value>
+  </data>
+  <data name="filters.user" xml:space="preserve">
+    <value>プロフィール</value>
+  </data>
+  <data name="filters.beatmapset" xml:space="preserve">
+    <value>ビートマップ</value>
+  </data>
+  <data name="filters.forum_topic" xml:space="preserve">
+    <value>フォーラム</value>
+  </data>
+  <data name="filters.news_post" xml:space="preserve">
+    <value>お知らせ</value>
+  </data>
+  <data name="filters.build" xml:space="preserve">
+    <value>ビルド</value>
+  </data>
+  <data name="filters.channel" xml:space="preserve">
+    <value>チャット</value>
+  </data>
+  <data name="item.beatmapset._" xml:space="preserve">
+    <value>ビートマップ</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change._" xml:space="preserve">
+    <value>ゲスト難易度</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change.beatmap_owner_change" xml:space="preserve">
+    <value>ビートマップ"{0}"の難易度"{1}"の所有者になりました</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change.beatmap_owner_change_compact" xml:space="preserve">
+    <value>難易度"{0}”の所有者になりました</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion._" xml:space="preserve">
+    <value>ビートマップディスカッション</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>ビートマップ「{0}」ディスカッションのためにロックされています。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock_compact" xml:space="preserve">
+    <value>ディスカッションはロックされています。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>{0}がビートマップディスカッション「{1}」に新しいメッセージを投稿しました。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_empty" xml:space="preserve">
+    <value>{0} による「{1}」への新しい投稿</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact" xml:space="preserve">
+    <value>{0} による新しい投稿: 「{1}」</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new_compact_empty" xml:space="preserve">
+    <value>{0} による新しい投稿</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_review_new" xml:space="preserve">
+    <value>{0}が「{1}」に問題：{2}、提案：{3}、称賛：{4}を含む、新しいレビューを投稿しました。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_review_new_compact" xml:space="preserve">
+    <value>{0}が問題：{1}、提案：{2}、称賛：{3}を含む、新しいレビューを投稿しました。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>ビートマップ「{0}」ディスカッションのためにロック解除されました。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock_compact" xml:space="preserve">
+    <value>ディスカッションはアンロックされました。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem._" xml:space="preserve">
+    <value>Qualifiedビートマップの問題</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>{0} による「{1}」への報告：「{2}」</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_empty" xml:space="preserve">
+    <value>{0}による「{1}」への報告</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_compact" xml:space="preserve">
+    <value>{0} による報告：「{1}」</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem_compact_empty" xml:space="preserve">
+    <value>{0} による報告</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state._" xml:space="preserve">
+    <value>ビートマップのステータスが変更されました</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify" xml:space="preserve">
+    <value>ビートマップ「{0}」は{1}によってdisqualifyされました。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_disqualify_compact" xml:space="preserve">
+    <value>ビートマップはdisqualifiedになりました。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love" xml:space="preserve">
+    <value>「{0}」は{1}によってLovedされているとして宣伝されました。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_love_compact" xml:space="preserve">
+    <value>ビートマップはLovedされているとして宣伝されました。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate" xml:space="preserve">
+    <value>「{0}」は{1}によってノミネートされました。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_nominate_compact" xml:space="preserve">
+    <value>ビートマップがノミネートされました。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify" xml:space="preserve">
+    <value>「{0}」は十分なノミネートを受けたのでランキングに入れられました。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_qualify_compact" xml:space="preserve">
+    <value>ビートマップがランキングのキューに入りました</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>「{0}」はrankedされました。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_rank_compact" xml:space="preserve">
+    <value>ビートマップがrankedされました。</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_remove_from_loved" xml:space="preserve">
+    <value>「{0}」はlovedから削除されました</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_remove_from_loved_compact" xml:space="preserve">
+    <value>ビートマップはlovedから削除されました</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_reset_nominations" xml:space="preserve">
+    <value>{0}の問題点投稿によりビートマップ「{1}」のノミネーションがリセットされました。 </value>
+  </data>
+  <data name="item.beatmapset.beatmapset_state.beatmapset_reset_nominations_compact" xml:space="preserve">
+    <value>ノミネーションがリセットされました。</value>
+  </data>
+  <data name="item.beatmapset.comment._" xml:space="preserve">
+    <value>新しいコメント</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_new" xml:space="preserve">
+    <value>{0}が「{1}」でコメント「{2}」</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_new_compact" xml:space="preserve">
+    <value>{0}がコメント「{1}」</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_reply" xml:space="preserve">
+    <value>{0}が「{1}」に「{2}」を返信しました</value>
+  </data>
+  <data name="item.beatmapset.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0}が「{1}」に返信しました</value>
+  </data>
+  <data name="item.channel._" xml:space="preserve">
+    <value>チャット</value>
+  </data>
+  <data name="item.channel.channel._" xml:space="preserve">
+    <value>新しいメッセージ</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message" xml:space="preserve">
+    <value>{0}が「{1}」で発言</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_compact" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_group" xml:space="preserve">
+    <value>{0} より</value>
+  </data>
+  <data name="item.build._" xml:space="preserve">
+    <value>更新履歴</value>
+  </data>
+  <data name="item.build.comment._" xml:space="preserve">
+    <value>新しいコメント</value>
+  </data>
+  <data name="item.build.comment.comment_new" xml:space="preserve">
+    <value>{0}が「{1}」でコメント「{2}」</value>
+  </data>
+  <data name="item.build.comment.comment_new_compact" xml:space="preserve">
+    <value>{0}がコメント「{1}」</value>
+  </data>
+  <data name="item.build.comment.comment_reply" xml:space="preserve">
+    <value>{0}が「{1}」に「{2}」を返信しました</value>
+  </data>
+  <data name="item.build.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0}が「{1}」に返信しました</value>
+  </data>
+  <data name="item.news_post._" xml:space="preserve">
+    <value>ニュース</value>
+  </data>
+  <data name="item.news_post.comment._" xml:space="preserve">
+    <value>新しいコメント</value>
+  </data>
+  <data name="item.news_post.comment.comment_new" xml:space="preserve">
+    <value>{0}が「{1}」でコメント「{2}」</value>
+  </data>
+  <data name="item.news_post.comment.comment_new_compact" xml:space="preserve">
+    <value>{0}がコメント「{1}」</value>
+  </data>
+  <data name="item.news_post.comment.comment_reply" xml:space="preserve">
+    <value>{0}が「{1}」に「{2}」を返信しました</value>
+  </data>
+  <data name="item.news_post.comment.comment_reply_compact" xml:space="preserve">
+    <value>{0}が「{1}」に返信しました</value>
+  </data>
+  <data name="item.forum_topic._" xml:space="preserve">
+    <value>フォーラムトピック</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply._" xml:space="preserve">
+    <value>新しいフォーラムの返信</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>{0}がフォーラムトピック「{1}」に返信しました。</value>
+  </data>
+  <data name="item.forum_topic.forum_topic_reply.forum_topic_reply_compact" xml:space="preserve">
+    <value>{0} の返信</value>
+  </data>
+  <data name="item.legacy_pm._" xml:space="preserve">
+    <value>レガシーフォーラムPM</value>
+  </data>
+  <data name="item.legacy_pm.legacy_pm.legacy_pm" xml:space="preserve">
+    <value>{0}個の未読メッセージ</value>
+  </data>
+  <data name="item.user.user_beatmapset_new._" xml:space="preserve">
+    <value>新しいビートマップ</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new" xml:space="preserve">
+    <value>{0} による新しいビートマップ「{1}」</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new_compact" xml:space="preserve">
+    <value>新しいビートマップ「{0}」</value>
+  </data>
+  <data name="item.user.user_beatmapset_new.user_beatmapset_new_group" xml:space="preserve">
+    <value>{0} の新しいビートマップ</value>
+  </data>
+  <data name="item.user_achievement._" xml:space="preserve">
+    <value>メダル</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock._" xml:space="preserve">
+    <value>新しいメダル</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>{0} をアンロック！</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_compact" xml:space="preserve">
+    <value>{0} をアンロック！</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock.user_achievement_unlock_group" xml:space="preserve">
+    <value>メダルのロックが解除されました！</value>
+  </data>
+  <data name="mail.beatmapset.beatmap_owner_change.beatmap_owner_change" xml:space="preserve">
+    <value>ビートマップ"{0}"のゲストになりました</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>ディスカッション「{0}」はロックされています</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>ディスカッション「{0}」に新しい更新があります</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>ディスカッション「{0}」のロックが解除されました</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>新しい問題が「{0}」で報告されました</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_disqualify" xml:space="preserve">
+    <value>「{0}」はdisqualifyされました</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_love" xml:space="preserve">
+    <value>「{0}」はlovedになりました</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_nominate" xml:space="preserve">
+    <value>「{0}」はノミネートされました</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_qualify" xml:space="preserve">
+    <value>「{0}」は十分なノミネートを獲得し、ランキングキューに入りました</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>「{0}」はrankedされました</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_remove_from_loved" xml:space="preserve">
+    <value>「{0}」はlovedから削除されました</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_reset_nominations" xml:space="preserve">
+    <value>「{0}」のノミネーションがリセットされました</value>
+  </data>
+  <data name="mail.beatmapset.comment.comment_new" xml:space="preserve">
+    <value>ビートマップ「{0}」に新しいコメントがあります</value>
+  </data>
+  <data name="mail.channel.channel.pm" xml:space="preserve">
+    <value>{0}から新しいメッセージを受信しました</value>
+  </data>
+  <data name="mail.build.comment.comment_new" xml:space="preserve">
+    <value>更新履歴「{0}」に新しいコメントがあります</value>
+  </data>
+  <data name="mail.news_post.comment.comment_new" xml:space="preserve">
+    <value>ニュース「{0}」に新しいコメントがあります</value>
+  </data>
+  <data name="mail.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>「{0}」に新しい返信があります</value>
+  </data>
+  <data name="mail.user.user_achievement_unlock.user_achievement_unlock" xml:space="preserve">
+    <value>{0}が新しいメダル「{1}」をアンロックしました！</value>
+  </data>
+  <data name="mail.user.user_achievement_unlock.user_achievement_unlock_self" xml:space="preserve">
+    <value>新しいメダル「{0}」をアンロックしました！</value>
+  </data>
+  <data name="mail.user.user_beatmapset_new.user_beatmapset_new" xml:space="preserve">
+    <value>{0}がビートマップを作成しました</value>
+  </data>
+</root>

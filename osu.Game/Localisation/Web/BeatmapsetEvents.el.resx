@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="event.approve" xml:space="preserve">
+    <value>Approved.</value>
+  </data>
+  <data name="event.discussion_delete" xml:space="preserve">
+    <value>Ένας συντονιστής διέγραψε τη συζήτηση {0}.</value>
+  </data>
+  <data name="event.discussion_lock" xml:space="preserve">
+    <value>Η συζήτηση για αυτό το beatmap έχει απενεργοποιηθεί. ({0})</value>
+  </data>
+  <data name="event.discussion_post_delete" xml:space="preserve">
+    <value>Ένας συντονιστής διέγραψε μια δημοσίευση από τη συζήτηση {0}.</value>
+  </data>
+  <data name="event.discussion_post_restore" xml:space="preserve">
+    <value>Ένας συντονιστής επανέφερε μία δημοσίευση στη συζήτηση {0}.</value>
+  </data>
+  <data name="event.discussion_restore" xml:space="preserve">
+    <value>Ένας συντονιστής επανέφερε τη συζήτηση {0}.</value>
+  </data>
+  <data name="event.discussion_unlock" xml:space="preserve">
+    <value>Η συζήτηση για αυτό το beatmap έχει ενεργοποιηθεί.</value>
+  </data>
+  <data name="event.disqualify" xml:space="preserve">
+    <value>Disqualified από {0}. Αιτία: {1} ({2}).</value>
+  </data>
+  <data name="event.disqualify_legacy" xml:space="preserve">
+    <value>Disqualified από {0}. Αιτία: {1}.</value>
+  </data>
+  <data name="event.issue_reopen" xml:space="preserve">
+    <value>Το ζήτημα επιλύθηκε, η συζήτηση {0} ξανάνοιξε.</value>
+  </data>
+  <data name="event.issue_resolve" xml:space="preserve">
+    <value>Ζήτημα {0} σημάνθηκε ως επιλυμένο.</value>
+  </data>
+  <data name="event.kudosu_allow" xml:space="preserve">
+    <value>Άρνηση kudosu για τη συζήτηση {0} που αφαιρέθηκε.</value>
+  </data>
+  <data name="event.kudosu_deny" xml:space="preserve">
+    <value>Άρνηση kudosu για τη συζήτηση {0}.</value>
+  </data>
+  <data name="event.kudosu_gain" xml:space="preserve">
+    <value>Η συζήτηση {0} από τον {1} έλαβε αρκετές ψήφους για kudosu.</value>
+  </data>
+  <data name="event.kudosu_lost" xml:space="preserve">
+    <value>Η συζήτηση {0} από τον {1} έχασε ψήφους και τα kudosu που είχαν δοθεί αφαιρέθηκαν.</value>
+  </data>
+  <data name="event.kudosu_recalculate" xml:space="preserve">
+    <value>Τα κέρδη kudosu για τη συζήτηση {0} επαναϋπολογίστηκαν.</value>
+  </data>
+  <data name="event.love" xml:space="preserve">
+    <value>Loved από {0}</value>
+  </data>
+  <data name="event.nominate" xml:space="preserve">
+    <value>Nominated από {0}.</value>
+  </data>
+  <data name="event.nomination_reset" xml:space="preserve">
+    <value>Ένα νέο πρόβλημα {0} ({1}) ξεκίνησε μια επαναφορά της διαδικασίας υποψηφιότητας.</value>
+  </data>
+  <data name="event.qualify" xml:space="preserve">
+    <value>Αυτό το beatmap έχει φτάσει των απαραίτητο αριθμό nominations και είναι πλέον qualified.</value>
+  </data>
+  <data name="event.rank" xml:space="preserve">
+    <value>Ranked.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Γεγονότα Beatmapset</value>
+  </data>
+  <data name="index.form.period" xml:space="preserve">
+    <value>Περίοδος</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Τύποι</value>
+  </data>
+  <data name="item.content" xml:space="preserve">
+    <value>Περιεχόμενο</value>
+  </data>
+  <data name="item.discussion_deleted" xml:space="preserve">
+    <value>[διαγράφηκε]</value>
+  </data>
+  <data name="item.type" xml:space="preserve">
+    <value>Τύπος</value>
+  </data>
+  <data name="type.approve" xml:space="preserve">
+    <value>Έγκριση</value>
+  </data>
+  <data name="type.discussion_delete" xml:space="preserve">
+    <value>Διαγραφή συζήτησης</value>
+  </data>
+  <data name="type.discussion_post_delete" xml:space="preserve">
+    <value>Διαγραφή απάντησης συζήτησης</value>
+  </data>
+  <data name="type.discussion_post_restore" xml:space="preserve">
+    <value>Αποκατάσταση απάντησης συζήτησης</value>
+  </data>
+  <data name="type.discussion_restore" xml:space="preserve">
+    <value>Αποκατάσταση συζήτησης</value>
+  </data>
+  <data name="type.disqualify" xml:space="preserve">
+    <value>Αποκλεισμός</value>
+  </data>
+  <data name="type.issue_reopen" xml:space="preserve">
+    <value>Επανάνοιγμα συζήτησης</value>
+  </data>
+  <data name="type.issue_resolve" xml:space="preserve">
+    <value>Επίλυση συζήτησης</value>
+  </data>
+  <data name="type.kudosu_allow" xml:space="preserve">
+    <value>Επίδομα Kudosu</value>
+  </data>
+  <data name="type.kudosu_deny" xml:space="preserve">
+    <value>Άρνηση Kudosu</value>
+  </data>
+  <data name="type.kudosu_gain" xml:space="preserve">
+    <value>Κέρδος Kudosu</value>
+  </data>
+  <data name="type.kudosu_lost" xml:space="preserve">
+    <value>Απώλεια Kudosu</value>
+  </data>
+  <data name="type.kudosu_recalculate" xml:space="preserve">
+    <value>Επαναϋπολογισμός Kudosu</value>
+  </data>
+  <data name="type.love" xml:space="preserve">
+    <value>Αγαπημένο</value>
+  </data>
+  <data name="type.nominate" xml:space="preserve">
+    <value>Διορισμός</value>
+  </data>
+  <data name="type.nomination_reset" xml:space="preserve">
+    <value>Επαναφορά διορισμού</value>
+  </data>
+  <data name="type.qualify" xml:space="preserve">
+    <value>Προσόντα</value>
+  </data>
+  <data name="type.rank" xml:space="preserve">
+    <value>Κατάταξη</value>
+  </data>
+</root>

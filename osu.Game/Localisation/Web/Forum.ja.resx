@@ -1,0 +1,556 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="pinned_topics" xml:space="preserve">
+    <value>ピン留めされたトピック</value>
+  </data>
+  <data name="slogan" xml:space="preserve">
+    <value>ひとりで遊ぶにはキケンじゃ</value>
+  </data>
+  <data name="subforums" xml:space="preserve">
+    <value>サブフォーラム</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>osu! フォーラム</value>
+  </data>
+  <data name="covers.edit" xml:space="preserve">
+    <value>カバーを編集</value>
+  </data>
+  <data name="covers.create._" xml:space="preserve">
+    <value>カバー画像の設定</value>
+  </data>
+  <data name="covers.create.button" xml:space="preserve">
+    <value>画像をアップロード</value>
+  </data>
+  <data name="covers.create.info" xml:space="preserve">
+    <value>カバー画像の大きさは{0}にしてください。画像をここにドロップすることでアップロードもできます。</value>
+  </data>
+  <data name="covers.destroy._" xml:space="preserve">
+    <value>カバー画像を削除</value>
+  </data>
+  <data name="covers.destroy.confirm" xml:space="preserve">
+    <value>カバー画像を本当に削除しますか？</value>
+  </data>
+  <data name="forums.latest_post" xml:space="preserve">
+    <value>最新の投稿</value>
+  </data>
+  <data name="forums.index.title" xml:space="preserve">
+    <value>フォーラム 目次</value>
+  </data>
+  <data name="forums.topics.empty" xml:space="preserve">
+    <value>トピックがありません！</value>
+  </data>
+  <data name="mark_as_read.forum" xml:space="preserve">
+    <value>フォーラムを既読にする</value>
+  </data>
+  <data name="mark_as_read.forums" xml:space="preserve">
+    <value>フォーラムを既読にする</value>
+  </data>
+  <data name="mark_as_read.busy" xml:space="preserve">
+    <value>既読にする・・・</value>
+  </data>
+  <data name="post.confirm_destroy" xml:space="preserve">
+    <value>投稿を本当に削除しますか？</value>
+  </data>
+  <data name="post.confirm_restore" xml:space="preserve">
+    <value>投稿を本当に復元しますか？</value>
+  </data>
+  <data name="post.edited" xml:space="preserve">
+    <value>{0}が{1}に最終編集、合計{2}回の編集</value>
+  </data>
+  <data name="post.posted_at" xml:space="preserve">
+    <value>投稿日時 {0}</value>
+  </data>
+  <data name="post.posted_by" xml:space="preserve">
+    <value>{0} による投稿</value>
+  </data>
+  <data name="post.actions.destroy" xml:space="preserve">
+    <value>投稿を削除</value>
+  </data>
+  <data name="post.actions.edit" xml:space="preserve">
+    <value>投稿を編集</value>
+  </data>
+  <data name="post.actions.report" xml:space="preserve">
+    <value>投稿を報告</value>
+  </data>
+  <data name="post.actions.restore" xml:space="preserve">
+    <value>投稿を復元</value>
+  </data>
+  <data name="post.create.title.reply" xml:space="preserve">
+    <value>新規返信</value>
+  </data>
+  <data name="post.info.post_count" xml:space="preserve">
+    <value>{0} 投稿|{0} 投稿</value>
+  </data>
+  <data name="post.info.topic_starter" xml:space="preserve">
+    <value>トピック開始者</value>
+  </data>
+  <data name="search.go_to_post" xml:space="preserve">
+    <value>投稿に飛ぶ</value>
+  </data>
+  <data name="search.post_number_input" xml:space="preserve">
+    <value>投稿番号を入力</value>
+  </data>
+  <data name="search.total_posts" xml:space="preserve">
+    <value>合計{0}個の投稿</value>
+  </data>
+  <data name="topic.confirm_destroy" xml:space="preserve">
+    <value>トピックを本当に削除しますか？</value>
+  </data>
+  <data name="topic.confirm_restore" xml:space="preserve">
+    <value>トピックを本当に復元しますか？</value>
+  </data>
+  <data name="topic.deleted" xml:space="preserve">
+    <value>削除されたトピック</value>
+  </data>
+  <data name="topic.go_to_latest" xml:space="preserve">
+    <value>最新の投稿を見る</value>
+  </data>
+  <data name="topic.has_replied" xml:space="preserve">
+    <value>このトピックに返信しました</value>
+  </data>
+  <data name="topic.in_forum" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="topic.latest_post" xml:space="preserve">
+    <value>{0} by {1}</value>
+  </data>
+  <data name="topic.latest_reply_by" xml:space="preserve">
+    <value>最新の投稿 by {0}</value>
+  </data>
+  <data name="topic.new_topic" xml:space="preserve">
+    <value>トピックの新規作成</value>
+  </data>
+  <data name="topic.new_topic_login" xml:space="preserve">
+    <value>ログインして新規トピックを投稿</value>
+  </data>
+  <data name="topic.post_reply" xml:space="preserve">
+    <value>投稿</value>
+  </data>
+  <data name="topic.reply_box_placeholder" xml:space="preserve">
+    <value>返信をここに入力</value>
+  </data>
+  <data name="topic.reply_title_prefix" xml:space="preserve">
+    <value>Re</value>
+  </data>
+  <data name="topic.started_by" xml:space="preserve">
+    <value>by {0}</value>
+  </data>
+  <data name="topic.started_by_verbose" xml:space="preserve">
+    <value>開始したユーザー: {0}</value>
+  </data>
+  <data name="topic.actions.destroy" xml:space="preserve">
+    <value>トピックを削除</value>
+  </data>
+  <data name="topic.actions.restore" xml:space="preserve">
+    <value>トピックを復元</value>
+  </data>
+  <data name="topic.create.close" xml:space="preserve">
+    <value>閉じる</value>
+  </data>
+  <data name="topic.create.preview" xml:space="preserve">
+    <value>プレビュー</value>
+  </data>
+  <data name="topic.create.preview_hide" xml:space="preserve">
+    <value>編集</value>
+  </data>
+  <data name="topic.create.submit" xml:space="preserve">
+    <value>投稿</value>
+  </data>
+  <data name="topic.create.necropost.default" xml:space="preserve">
+    <value>このトピックはしばらくの間アクティブではありません。特別な理由がある場合のみ、ここに投稿してください。</value>
+  </data>
+  <data name="topic.create.necropost.new_topic._" xml:space="preserve">
+    <value>このトピックはしばらくアクティブになっていません。ここに投稿しなければならない特別な理由がない場合は、代わりに{0}してください。</value>
+  </data>
+  <data name="topic.create.necropost.new_topic.create" xml:space="preserve">
+    <value>新規トピックを作成</value>
+  </data>
+  <data name="topic.create.placeholder.body" xml:space="preserve">
+    <value>内容をここに入力</value>
+  </data>
+  <data name="topic.create.placeholder.title" xml:space="preserve">
+    <value>ここにタイトルを記入</value>
+  </data>
+  <data name="topic.jump.enter" xml:space="preserve">
+    <value>投稿番号をクリックして入力</value>
+  </data>
+  <data name="topic.jump.first" xml:space="preserve">
+    <value>最初の投稿に飛ぶ</value>
+  </data>
+  <data name="topic.jump.last" xml:space="preserve">
+    <value>最後の投稿に飛ぶ</value>
+  </data>
+  <data name="topic.jump.next" xml:space="preserve">
+    <value>10件の投稿を飛ばす</value>
+  </data>
+  <data name="topic.jump.previous" xml:space="preserve">
+    <value>投稿を10件戻る</value>
+  </data>
+  <data name="topic.post_edit.cancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="topic.post_edit.post" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="topic_watches.index.title_compact" xml:space="preserve">
+    <value>フォーラムトピック ウォッチリスト</value>
+  </data>
+  <data name="topic_watches.index.box.total" xml:space="preserve">
+    <value>サブスクライブ中のトピック</value>
+  </data>
+  <data name="topic_watches.index.box.unread" xml:space="preserve">
+    <value>新しい投稿があるトピック</value>
+  </data>
+  <data name="topic_watches.index.info.total" xml:space="preserve">
+    <value>{0}個のトピックをサブスクライブしています。</value>
+  </data>
+  <data name="topic_watches.index.info.unread" xml:space="preserve">
+    <value>{0}個の未読の返信があります。</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.confirmation" xml:space="preserve">
+    <value>トピックのサブスクライブを外しますか？</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.title" xml:space="preserve">
+    <value>サブスクライブを外す</value>
+  </data>
+  <data name="topics._" xml:space="preserve">
+    <value>トピック</value>
+  </data>
+  <data name="topics.actions.login_reply" xml:space="preserve">
+    <value>ログインして返信する</value>
+  </data>
+  <data name="topics.actions.reply" xml:space="preserve">
+    <value>返信</value>
+  </data>
+  <data name="topics.actions.reply_with_quote" xml:space="preserve">
+    <value>引用して返信</value>
+  </data>
+  <data name="topics.actions.search" xml:space="preserve">
+    <value>検索</value>
+  </data>
+  <data name="topics.create.create_poll" xml:space="preserve">
+    <value>投票の作成</value>
+  </data>
+  <data name="topics.create.preview" xml:space="preserve">
+    <value>投稿のプレビュー</value>
+  </data>
+  <data name="topics.create.create_poll_button.add" xml:space="preserve">
+    <value>投票を作成</value>
+  </data>
+  <data name="topics.create.create_poll_button.remove" xml:space="preserve">
+    <value>投票の作成をキャンセル</value>
+  </data>
+  <data name="topics.create.poll.hide_results" xml:space="preserve">
+    <value>投票結果を非表示にする。</value>
+  </data>
+  <data name="topics.create.poll.hide_results_info" xml:space="preserve">
+    <value>投票が終わった後にだけ表示されます。</value>
+  </data>
+  <data name="topics.create.poll.length" xml:space="preserve">
+    <value>投票期限</value>
+  </data>
+  <data name="topics.create.poll.length_days_suffix" xml:space="preserve">
+    <value>日間</value>
+  </data>
+  <data name="topics.create.poll.length_info" xml:space="preserve">
+    <value>投票期限を設定しない場合は空白のままにしてください</value>
+  </data>
+  <data name="topics.create.poll.max_options" xml:space="preserve">
+    <value>選択数</value>
+  </data>
+  <data name="topics.create.poll.max_options_info" xml:space="preserve">
+    <value>一人のユーザーが選べる選択肢の上限です</value>
+  </data>
+  <data name="topics.create.poll.options" xml:space="preserve">
+    <value>選択肢</value>
+  </data>
+  <data name="topics.create.poll.options_info" xml:space="preserve">
+    <value>選択肢ごとに改行してください。上限は10個までです。</value>
+  </data>
+  <data name="topics.create.poll.title" xml:space="preserve">
+    <value>質問</value>
+  </data>
+  <data name="topics.create.poll.vote_change" xml:space="preserve">
+    <value>投票の変更を可能にする</value>
+  </data>
+  <data name="topics.create.poll.vote_change_info" xml:space="preserve">
+    <value>有効にすると投票後であっても別の選択肢に変えることができます。</value>
+  </data>
+  <data name="topics.edit_title.start" xml:space="preserve">
+    <value>タイトルの編集</value>
+  </data>
+  <data name="topics.index.feature_votes" xml:space="preserve">
+    <value>スタープライオリティ</value>
+  </data>
+  <data name="topics.index.replies" xml:space="preserve">
+    <value>返信数</value>
+  </data>
+  <data name="topics.index.views" xml:space="preserve">
+    <value>観覧数</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0" xml:space="preserve">
+    <value>"added" タグを外す</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0_done" xml:space="preserve">
+    <value>"added" タグを外しました</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1" xml:space="preserve">
+    <value>"added" タグを追加する</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1_done" xml:space="preserve">
+    <value>"added" タグを追加しました</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0" xml:space="preserve">
+    <value>"assigned" タグを外す</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0_done" xml:space="preserve">
+    <value>"assigned" タグを外しました</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1" xml:space="preserve">
+    <value>"assigned" タグを追加する</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1_done" xml:space="preserve">
+    <value>"assigned" タグを追加しました</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0" xml:space="preserve">
+    <value>"confirmed" タグを外す</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0_done" xml:space="preserve">
+    <value>"confirmed" タグを外しました</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1" xml:space="preserve">
+    <value>"confirmed" タグを追加する</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1_done" xml:space="preserve">
+    <value>"confirmed" タグを追加しました</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0" xml:space="preserve">
+    <value>"duplicate" タグを外す</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0_done" xml:space="preserve">
+    <value>"duplicate" タグを外しました</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1" xml:space="preserve">
+    <value>"duplicate" タグを追加する</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1_done" xml:space="preserve">
+    <value>"duplicate" タグを追加しました</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0" xml:space="preserve">
+    <value>"invalid" タグを外す</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0_done" xml:space="preserve">
+    <value>"invalid" タグを外しました</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1" xml:space="preserve">
+    <value>"invalid" タグを追加する</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1_done" xml:space="preserve">
+    <value>"invalid" タグを追加しました</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0" xml:space="preserve">
+    <value>"resolved" タグを外す</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0_done" xml:space="preserve">
+    <value>"resolved" タグを外しました</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1" xml:space="preserve">
+    <value>"resolved" タグを追加する</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1_done" xml:space="preserve">
+    <value>"resolved" タグを追加しました</value>
+  </data>
+  <data name="topics.lock.is_locked" xml:space="preserve">
+    <value>このトピックはロックされていて投稿が制限されています。</value>
+  </data>
+  <data name="topics.lock.to_0" xml:space="preserve">
+    <value>トピックのロックを解除する</value>
+  </data>
+  <data name="topics.lock.to_0_confirm" xml:space="preserve">
+    <value>トピックロックを解除しますか？</value>
+  </data>
+  <data name="topics.lock.to_0_done" xml:space="preserve">
+    <value>ロックが解除されました</value>
+  </data>
+  <data name="topics.lock.to_1" xml:space="preserve">
+    <value>トピックをロックする</value>
+  </data>
+  <data name="topics.lock.to_1_confirm" xml:space="preserve">
+    <value>トピックをロックしますか？</value>
+  </data>
+  <data name="topics.lock.to_1_done" xml:space="preserve">
+    <value>ロックされました</value>
+  </data>
+  <data name="topics.moderate_move.title" xml:space="preserve">
+    <value>別のフォーラムに移動する</value>
+  </data>
+  <data name="topics.moderate_pin.to_0" xml:space="preserve">
+    <value>トピックのピンを外す</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_confirm" xml:space="preserve">
+    <value>トピックのピンを外しますか？</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_done" xml:space="preserve">
+    <value>ピンが外されました</value>
+  </data>
+  <data name="topics.moderate_pin.to_1" xml:space="preserve">
+    <value>トピックをピン留めする</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_confirm" xml:space="preserve">
+    <value>トピックをピン留めしますか？</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_done" xml:space="preserve">
+    <value>ピン留めされました</value>
+  </data>
+  <data name="topics.moderate_pin.to_2" xml:space="preserve">
+    <value>トピックをピン留めしてアナウンスメントとしてマークする</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_confirm" xml:space="preserve">
+    <value>トピックをピン留めしてお知らせとしてマークしますか？</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_done" xml:space="preserve">
+    <value>ピン留めされてアナウンスメントになりました</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.show" xml:space="preserve">
+    <value>削除された投稿を表示</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.hide" xml:space="preserve">
+    <value>削除された投稿を非表示</value>
+  </data>
+  <data name="topics.show.deleted-posts" xml:space="preserve">
+    <value>削除された投稿</value>
+  </data>
+  <data name="topics.show.total_posts" xml:space="preserve">
+    <value>全ての投稿</value>
+  </data>
+  <data name="topics.show.feature_vote.current" xml:space="preserve">
+    <value>現在の優先度： +{0}</value>
+  </data>
+  <data name="topics.show.feature_vote.do" xml:space="preserve">
+    <value>このリクエストを推進する</value>
+  </data>
+  <data name="topics.show.feature_vote.info._" xml:space="preserve">
+    <value>これは{0}です。機能の提案は{1}が投票することができます。</value>
+  </data>
+  <data name="topics.show.feature_vote.info.feature_request" xml:space="preserve">
+    <value>機能の提案</value>
+  </data>
+  <data name="topics.show.feature_vote.info.supporters" xml:space="preserve">
+    <value>サポーター</value>
+  </data>
+  <data name="topics.show.feature_vote.user.count" xml:space="preserve">
+    <value>{0} 投票なし|{1,*} {0} 票</value>
+  </data>
+  <data name="topics.show.feature_vote.user.current" xml:space="preserve">
+    <value>{0}回可能です。</value>
+  </data>
+  <data name="topics.show.feature_vote.user.not_enough" xml:space="preserve">
+    <value>票が足りません。</value>
+  </data>
+  <data name="topics.show.poll.edit" xml:space="preserve">
+    <value>投票編集</value>
+  </data>
+  <data name="topics.show.poll.edit_warning" xml:space="preserve">
+    <value>投票フォームを編集すると現在の投票結果が削除されます！</value>
+  </data>
+  <data name="topics.show.poll.vote" xml:space="preserve">
+    <value>投票</value>
+  </data>
+  <data name="topics.show.poll.button.change_vote" xml:space="preserve">
+    <value>投票を変更する</value>
+  </data>
+  <data name="topics.show.poll.button.edit" xml:space="preserve">
+    <value>投票を編集</value>
+  </data>
+  <data name="topics.show.poll.button.view_results" xml:space="preserve">
+    <value>結果にスキップ</value>
+  </data>
+  <data name="topics.show.poll.button.vote" xml:space="preserve">
+    <value>投票</value>
+  </data>
+  <data name="topics.show.poll.detail.end_time" xml:space="preserve">
+    <value>投票期限は {0} までです</value>
+  </data>
+  <data name="topics.show.poll.detail.ended" xml:space="preserve">
+    <value>投票は {0} に受付終了しました</value>
+  </data>
+  <data name="topics.show.poll.detail.results_hidden" xml:space="preserve">
+    <value>投票後に結果が表示されます。</value>
+  </data>
+  <data name="topics.show.poll.detail.total" xml:space="preserve">
+    <value>総票数: {0}</value>
+  </data>
+  <data name="topics.watch.to_not_watching" xml:space="preserve">
+    <value>ブックマーク無し</value>
+  </data>
+  <data name="topics.watch.to_watching" xml:space="preserve">
+    <value>ブックマーク</value>
+  </data>
+  <data name="topics.watch.to_watching_mail" xml:space="preserve">
+    <value>ブックマーク（通知あり）</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_disable" xml:space="preserve">
+    <value>通知は有効です。クリックして無効化</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_enable" xml:space="preserve">
+    <value>通知は無効です。クリックして有効化</value>
+  </data>
+</root>

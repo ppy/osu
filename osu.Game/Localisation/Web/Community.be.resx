@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="support.convinced.title" xml:space="preserve">
+    <value>Цудоўна! {0}</value>
+  </data>
+  <data name="support.convinced.support" xml:space="preserve">
+    <value>падтрымаць osu!</value>
+  </data>
+  <data name="support.convinced.gift" xml:space="preserve">
+    <value>або падараваць падтрымку іншаму гульцу</value>
+  </data>
+  <data name="support.convinced.instructions" xml:space="preserve">
+    <value>націсніце па кнопкі з сэрцам, каб перайсці да osu!store</value>
+  </data>
+  <data name="support.why-support.title" xml:space="preserve">
+    <value>Чаму мне падтрымліваць osu!? Куда ідуць грошы?</value>
+  </data>
+  <data name="support.why-support.team.title" xml:space="preserve">
+    <value>Падтрымаць каманду распрацоўкі</value>
+  </data>
+  <data name="support.why-support.team.description" xml:space="preserve">
+    <value>osu! распрацоўваецца невялікай камандай людзей. Вашая падтрымка дапаможа ім, ну, вы ведаеце... жыць.</value>
+  </data>
+  <data name="support.perks.title" xml:space="preserve">
+    <value>Оў, і што ж я атрымаю?!</value>
+  </data>
+  <data name="support.perks.osu_direct.title" xml:space="preserve">
+    <value>osu!direct</value>
+  </data>
+  <data name="support.perks.osu_direct.description" xml:space="preserve">
+    <value>хуткі і просты доступ да пошуку і спампоўкі бітмап, непакідая гульні.</value>
+  </data>
+  <data name="support.perks.auto_downloads.title" xml:space="preserve">
+    <value>Аўтаспампоўка</value>
+  </data>
+  <data name="support.perks.auto_downloads.description" xml:space="preserve">
+    <value>Аўтаматычная спампоўка бітмап падчас шматкарыстальніцкай гульні, назірання за іншымі гульцамі або націскання спасылак у чаце!</value>
+  </data>
+  <data name="support.perks.upload_more.title" xml:space="preserve">
+    <value>Загрузіць больш</value>
+  </data>
+  <data name="support.perks.upload_more.description" xml:space="preserve">
+    <value>Дадатковыя слоты для бітмап, якія чакаюць ранкінга (да 10).</value>
+  </data>
+  <data name="support.perks.early_access.title" xml:space="preserve">
+    <value>Ранні доступ</value>
+  </data>
+  <data name="support.perks.early_access.description" xml:space="preserve">
+    <value>Доступ да ранніх выпускаў гульні, дзе вы можаце пратэсціраваць новыя функцыі перш, чым яны з'явяцца публічна!</value>
+  </data>
+  <data name="support.perks.customisation.title" xml:space="preserve">
+    <value>Індывідуальнасць</value>
+  </data>
+  <data name="support.perks.customisation.description" xml:space="preserve">
+    <value>Дапасуйце свой профіль, дадаўшы цалкам дапасавальную старонку карыстальніка.</value>
+  </data>
+  <data name="support.perks.beatmap_filters.title" xml:space="preserve">
+    <value>Фільтр бітмап</value>
+  </data>
+  <data name="support.perks.beatmap_filters.description" xml:space="preserve">
+    <value>Фільтр бітмап шукае па мапах, на якіх гулялі або не гулялі. А таксама па атрыманых у іх рэйтынгах.</value>
+  </data>
+  <data name="support.perks.yellow_fellow.title" xml:space="preserve">
+    <value>Залатая мянушка</value>
+  </data>
+  <data name="support.perks.yellow_fellow.description" xml:space="preserve">
+    <value>Будзьце пазнавальнымі ў гульні з новай ярка жоўтай мянушкай у чаце.</value>
+  </data>
+  <data name="support.perks.speedy_downloads.title" xml:space="preserve">
+    <value>Хуткія спампоўкі</value>
+  </data>
+  <data name="support.perks.speedy_downloads.description" xml:space="preserve">
+    <value>Менш абмежаванняў для спампоўкі бітмап, асабліва праз osu!direct.</value>
+  </data>
+  <data name="support.perks.change_username.title" xml:space="preserve">
+    <value>Змяніць імя карыстальніка</value>
+  </data>
+  <data name="support.perks.change_username.description" xml:space="preserve">
+    <value>Магчымасць змяніць імя карыстальніка без дадатковай аплаты. (толькі адзін раз)</value>
+  </data>
+  <data name="support.perks.skinnables.title" xml:space="preserve">
+    <value>Дапасаванне</value>
+  </data>
+  <data name="support.perks.skinnables.description" xml:space="preserve">
+    <value>Дадатковае дастасаванне ў гульні, кшталту зменнага фону меню.</value>
+  </data>
+  <data name="support.perks.feature_votes.title" xml:space="preserve">
+    <value>Галасаванне за новыя функцыі</value>
+  </data>
+  <data name="support.perks.feature_votes.description" xml:space="preserve">
+    <value>Галасаванне за новыя функцыі. (2 голаса ў месяц)</value>
+  </data>
+  <data name="support.perks.sort_options.title" xml:space="preserve">
+    <value>Параметры сартавання</value>
+  </data>
+  <data name="support.perks.sort_options.description" xml:space="preserve">
+    <value>Магчымасць прагляду рэйтынгу бітмапы паміж краінамі / сябрамі / модамі ў гульні.</value>
+  </data>
+  <data name="support.supporter_status.contribution" xml:space="preserve">
+    <value>Дзякуем за вашу падтрымку спасибо! Усяго вы ахвяравалі {0} за {1} пакупак!</value>
+  </data>
+  <data name="support.supporter_status.gifted" xml:space="preserve">
+    <value>З іх, вы падаравалі {0} тэгаў (агулам падорана {1}), як шчодра!</value>
+  </data>
+  <data name="support.supporter_status.not_yet" xml:space="preserve">
+    <value>Вы яшчэ не маеце тэг osu!supporter :(</value>
+  </data>
+  <data name="support.supporter_status.valid_until" xml:space="preserve">
+    <value>Ваш бягучы тэг osu!supporter дзейнічае да {0}!</value>
+  </data>
+  <data name="support.supporter_status.was_valid_until" xml:space="preserve">
+    <value>Ваш тэг osu!supporter дзейнічаў да {0}.</value>
+  </data>
+</root>

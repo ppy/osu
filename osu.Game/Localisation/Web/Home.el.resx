@@ -1,0 +1,262 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="landing.download" xml:space="preserve">
+    <value>Κάντε λήψη τώρα</value>
+  </data>
+  <data name="landing.online" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; συνδεδεμένοι αυτή τη στιγμή σε &lt;strong&gt;{1}&lt;/strong&gt; παιχνίδια</value>
+  </data>
+  <data name="landing.peak" xml:space="preserve">
+    <value>Κορύφωση, {0} συνδεδεμένοι χρήστες</value>
+  </data>
+  <data name="landing.players" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; εγγεγραμμένοι παίκτες</value>
+  </data>
+  <data name="landing.title" xml:space="preserve">
+    <value>καλώς ήρθατε</value>
+  </data>
+  <data name="landing.slogan.main" xml:space="preserve">
+    <value>το καλυτερότερο free-to-win ρυθμικό παιχνίδι</value>
+  </data>
+  <data name="landing.slogan.sub" xml:space="preserve">
+    <value>ο ρυθμός είναι ένα κλικ μακριά</value>
+  </data>
+  <data name="search.advanced_link" xml:space="preserve">
+    <value>Σύνθετη αναζήτηση</value>
+  </data>
+  <data name="search.button" xml:space="preserve">
+    <value>Αναζήτηση</value>
+  </data>
+  <data name="search.empty_result" xml:space="preserve">
+    <value>Δεν βρέθηκε τίποτα!</value>
+  </data>
+  <data name="search.placeholder" xml:space="preserve">
+    <value>πληκτρολογήστε για αναζήτηση</value>
+  </data>
+  <data name="search.title" xml:space="preserve">
+    <value>Αναζήτηση</value>
+  </data>
+  <data name="search.beatmapset.more" xml:space="preserve">
+    <value>{0} περισσότερα αποτελέσματα αναζήτησης beatmap</value>
+  </data>
+  <data name="search.beatmapset.more_simple" xml:space="preserve">
+    <value>Δείτε περισσότερα αποτελέσματα αναζήτησης beatmap</value>
+  </data>
+  <data name="search.beatmapset.title" xml:space="preserve">
+    <value>Beatmaps</value>
+  </data>
+  <data name="search.forum_post.all" xml:space="preserve">
+    <value>Όλα τα Φόρουμ</value>
+  </data>
+  <data name="search.forum_post.link" xml:space="preserve">
+    <value>Αναζήτηση στο φόρουμ</value>
+  </data>
+  <data name="search.forum_post.more_simple" xml:space="preserve">
+    <value>Δείτε περισσότερα αποτελέσματα αναζήτησης φόρουμ</value>
+  </data>
+  <data name="search.forum_post.title" xml:space="preserve">
+    <value>Φόρουμ</value>
+  </data>
+  <data name="search.forum_post.label.forum" xml:space="preserve">
+    <value>αναζήτηση στο φόρουμ</value>
+  </data>
+  <data name="search.forum_post.label.forum_children" xml:space="preserve">
+    <value>συμπεριλάμβανε υπο-φόρουμ</value>
+  </data>
+  <data name="search.forum_post.label.topic_id" xml:space="preserve">
+    <value>θέμα #</value>
+  </data>
+  <data name="search.forum_post.label.username" xml:space="preserve">
+    <value>συντάκτης</value>
+  </data>
+  <data name="search.mode.all" xml:space="preserve">
+    <value>όλα</value>
+  </data>
+  <data name="search.mode.beatmapset" xml:space="preserve">
+    <value>beatmap</value>
+  </data>
+  <data name="search.mode.forum_post" xml:space="preserve">
+    <value>φόρουμ</value>
+  </data>
+  <data name="search.mode.user" xml:space="preserve">
+    <value>παίκτης</value>
+  </data>
+  <data name="search.mode.wiki_page" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="search.user.more" xml:space="preserve">
+    <value>{0} περισσότερα αποτελέσματα αναζήτησης παίκτη</value>
+  </data>
+  <data name="search.user.more_simple" xml:space="preserve">
+    <value>Δείτε περισσότερα αποτελέσματα αναζήτησης παίκτη</value>
+  </data>
+  <data name="search.user.more_hidden" xml:space="preserve">
+    <value>Αναζήτηση παικτών περιορίζεται σε {0} παίκτες. Δοκιμάστε να βελτιώσετε το ερώτημα αναζήτησης.</value>
+  </data>
+  <data name="search.user.title" xml:space="preserve">
+    <value>Παίκτες</value>
+  </data>
+  <data name="search.wiki_page.link" xml:space="preserve">
+    <value>Αναζήτηση στο wiki</value>
+  </data>
+  <data name="search.wiki_page.more_simple" xml:space="preserve">
+    <value>Δείτε περισσότερα αποτελέσματα αναζήτησης στο wiki</value>
+  </data>
+  <data name="search.wiki_page.title" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="download.tagline" xml:space="preserve">
+    <value>ας&lt;br&gt;αρχίσουμε!</value>
+  </data>
+  <data name="download.action" xml:space="preserve">
+    <value>Λήψη osu!</value>
+  </data>
+  <data name="download.os.windows" xml:space="preserve">
+    <value>για Windows</value>
+  </data>
+  <data name="download.os.macos" xml:space="preserve">
+    <value>για macOS</value>
+  </data>
+  <data name="download.os.linux" xml:space="preserve">
+    <value>για Linux</value>
+  </data>
+  <data name="download.mirror" xml:space="preserve">
+    <value>mirror</value>
+  </data>
+  <data name="download.macos-fallback" xml:space="preserve">
+    <value>χρήστες macOS</value>
+  </data>
+  <data name="download.steps.register.title" xml:space="preserve">
+    <value>αποκτήστε ένα λογαριασμό</value>
+  </data>
+  <data name="download.steps.register.description" xml:space="preserve">
+    <value>ακολουθήστε τις οδηγίες που εμφανίζονται κατά την εκκίνηση του παιχνιδιού για να εγγραφείτε ή να δημιουργήσετε ένα νέο λογαριασμό</value>
+  </data>
+  <data name="download.steps.download.title" xml:space="preserve">
+    <value>κατεβάστε το παιχνίδι</value>
+  </data>
+  <data name="download.steps.download.description" xml:space="preserve">
+    <value>κάντε κλικ στο κουμπί πάνω για να κατεβάσετε το πρόγραμμα εγκατάστασης και στη συνέχεια, εκτελέστε το!</value>
+  </data>
+  <data name="download.steps.beatmaps.title" xml:space="preserve">
+    <value>κατεβάστε beatmaps</value>
+  </data>
+  <data name="download.steps.beatmaps.description._" xml:space="preserve">
+    <value>{0} στην τεράστια βιβλιοθήκη των beatmaps που δημιουργούνται από τους χρήστες και αρχίστε να παίζετε!</value>
+  </data>
+  <data name="download.steps.beatmaps.description.browse" xml:space="preserve">
+    <value>περιηγηθείτε</value>
+  </data>
+  <data name="download.video-guide" xml:space="preserve">
+    <value>οδηγός βίντεο</value>
+  </data>
+  <data name="user.title" xml:space="preserve">
+    <value>επισκόπηση</value>
+  </data>
+  <data name="user.news.title" xml:space="preserve">
+    <value>Ειδήσεις</value>
+  </data>
+  <data name="user.news.error" xml:space="preserve">
+    <value>Σφάλμα φόρτωσης ειδήσεων, δοκιμάστε να ανανεώσετε τη σελίδα;...</value>
+  </data>
+  <data name="user.header.stats.friends" xml:space="preserve">
+    <value>Συνδεδεμένοι Φίλοι</value>
+  </data>
+  <data name="user.header.stats.games" xml:space="preserve">
+    <value>Παιχνίδια</value>
+  </data>
+  <data name="user.header.stats.online" xml:space="preserve">
+    <value>Συνδεδεμένοι Χρήστες</value>
+  </data>
+  <data name="user.beatmaps.new" xml:space="preserve">
+    <value>Νέα Ranked Beatmaps</value>
+  </data>
+  <data name="user.beatmaps.popular" xml:space="preserve">
+    <value>Δημοφιλή Beatmaps</value>
+  </data>
+  <data name="user.buttons.download" xml:space="preserve">
+    <value>Λήψη osu!</value>
+  </data>
+  <data name="user.buttons.support" xml:space="preserve">
+    <value>Υποστηρίξτε το osu!</value>
+  </data>
+  <data name="user.buttons.store" xml:space="preserve">
+    <value>osu!κατάστημα</value>
+  </data>
+  <data name="support-osu.title" xml:space="preserve">
+    <value>Ουάου!</value>
+  </data>
+  <data name="support-osu.subtitle" xml:space="preserve">
+    <value>Φαίνεται να περνάτε καλά! {0}</value>
+  </data>
+  <data name="support-osu.body.part-1" xml:space="preserve">
+    <value>Ξέρατε ότι το osu! τρέχει χωρίς διαφημίσεις και βασίζεται στους παίκτες για την υποστήριξη της ανάπτυξης και το κόστος λειτουργίας;</value>
+  </data>
+  <data name="support-osu.body.part-2" xml:space="preserve">
+    <value>Ξέρατε επίσης ότι υποστηρίζοντας το osu! παίρνετε ένα σωρό χρήσιμες λειτουργίες, όπως η &lt;strong&gt;λήψη εντός παιχνιδιού&lt;/strong&gt; η οποία ενεργοποιείται αυτόματα στο spectator και στα multiplayer λόμπυ;</value>
+  </data>
+  <data name="support-osu.find-out-more" xml:space="preserve">
+    <value>Κάντε κλικ εδώ για να μάθετε περισσότερα!</value>
+  </data>
+  <data name="support-osu.download-starting" xml:space="preserve">
+    <value>Ω, και μην ανησυχείτε - η λήψη σας έχει ήδη ξεκινήσει ;)</value>
+  </data>
+</root>

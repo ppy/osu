@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="beatmapset_update_notice.subject" xml:space="preserve">
+    <value>Uusi päivitys beatmappiin "{0}"</value>
+  </data>
+  <data name="common.closing" xml:space="preserve">
+    <value>Terveisin</value>
+  </data>
+  <data name="common.hello" xml:space="preserve">
+    <value>Hei {0},</value>
+  </data>
+  <data name="donation_thanks.subject" xml:space="preserve">
+    <value>Kiitos, osu! &lt;3 sinua</value>
+  </data>
+  <data name="donation_thanks.support._" xml:space="preserve">
+    <value>Kiitos paljon {0} osu!'lle.</value>
+  </data>
+  <data name="donation_thanks.support.first" xml:space="preserve">
+    <value>tuestasi</value>
+  </data>
+  <data name="donation_thanks.support.repeat" xml:space="preserve">
+    <value>jatkuvasta tuestasi</value>
+  </data>
+  <data name="forum_new_reply.new" xml:space="preserve">
+    <value>Tiedoksesi vain, että "{0}" on saanut uuden vastauksen poissaolosi aikana.</value>
+  </data>
+  <data name="forum_new_reply.subject" xml:space="preserve">
+    <value>[osu!] Uusi vastaus aiheessa "{0}"</value>
+  </data>
+  <data name="password_reset.code" xml:space="preserve">
+    <value>Vahvistuskoodisi on:</value>
+  </data>
+  <data name="password_reset.subject" xml:space="preserve">
+    <value>osu! tilin palauttaminen</value>
+  </data>
+  <data name="store_payment_completed.questions" xml:space="preserve">
+    <value>Jos sinulla on kysyttävää, älä epäröi vastata tähän sähköpostiin.</value>
+  </data>
+  <data name="store_payment_completed.shipping" xml:space="preserve">
+    <value>Toimitus</value>
+  </data>
+  <data name="store_payment_completed.subject" xml:space="preserve">
+    <value>Vastaanotimme osu!kauppa-tilauksesi!</value>
+  </data>
+  <data name="store_payment_completed.thank_you" xml:space="preserve">
+    <value>Kiitos osu!kauppa-tilauksestasi!</value>
+  </data>
+  <data name="store_payment_completed.total" xml:space="preserve">
+    <value>Yhteensä</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift_maybe_not" xml:space="preserve">
+    <value>Mutta taidat jo tietää kuka se mahtaa olla ;).</value>
+  </data>
+  <data name="supporter_gift.subject" xml:space="preserve">
+    <value>Sinulle on lahjoitettu osu!tukijatagi!</value>
+  </data>
+  <data name="user_email_updated.subject" xml:space="preserve">
+    <value>osu!-sähköpostin muutoksen vahvistaminen</value>
+  </data>
+  <data name="user_force_reactivation.reason" xml:space="preserve">
+    <value>Syy:</value>
+  </data>
+  <data name="user_notification_digest.subject" xml:space="preserve">
+    <value>Uusia osu!-ilmoituksia</value>
+  </data>
+  <data name="user_password_updated.subject" xml:space="preserve">
+    <value>osu!-salasanan muutoksen vahvistaminen</value>
+  </data>
+  <data name="user_verification.code" xml:space="preserve">
+    <value>Vahvistuskoodisi on:</value>
+  </data>
+  <data name="user_verification.report" xml:space="preserve">
+    <value>Jos et ole pyytänyt tätä, ole hyvä ja VASTAA HETI, koska tilisi voi olla vaarassa.</value>
+  </data>
+  <data name="user_verification.subject" xml:space="preserve">
+    <value>osu! tilin vahvistaminen</value>
+  </data>
+  <data name="user_verification.action_from.unknown_country" xml:space="preserve">
+    <value>tuntemattomasta maasta</value>
+  </data>
+</root>

@@ -1,0 +1,265 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="admin.warehouse" xml:space="preserve">
+    <value>Gudang</value>
+  </data>
+  <data name="cart.checkout" xml:space="preserve">
+    <value>Checkout</value>
+  </data>
+  <data name="cart.info" xml:space="preserve">
+    <value>{0} barang dalam keranjang (${1})|{0} barang dalam keranjang (${1})</value>
+  </data>
+  <data name="cart.more_goodies" xml:space="preserve">
+    <value>Saya ingin melihat produk-produk lainnya yang tersedia sebelum merampungkan pesanan</value>
+  </data>
+  <data name="cart.shipping_fees" xml:space="preserve">
+    <value>biaya pengiriman</value>
+  </data>
+  <data name="cart.title" xml:space="preserve">
+    <value>Keranjang Belanja</value>
+  </data>
+  <data name="cart.total" xml:space="preserve">
+    <value>total</value>
+  </data>
+  <data name="cart.errors_no_checkout.line_1" xml:space="preserve">
+    <value>Uh-oh, terdapat masalah dengan keranjang Anda yang menghalangi kami untuk dapat memproses pemesanan lebih lanjut!</value>
+  </data>
+  <data name="cart.errors_no_checkout.line_2" xml:space="preserve">
+    <value>Hapus atau perbarui item-item di atas untuk melanjutkan.</value>
+  </data>
+  <data name="cart.empty.text" xml:space="preserve">
+    <value>Keranjang anda masih kosong.</value>
+  </data>
+  <data name="cart.empty.return_link._" xml:space="preserve">
+    <value>Kembali ke tautan {0} untuk mencari merchandise!</value>
+  </data>
+  <data name="cart.empty.return_link.link_text" xml:space="preserve">
+    <value>etalase toko</value>
+  </data>
+  <data name="checkout.cart_problems" xml:space="preserve">
+    <value>Aduh, ada masalah dengan pemesanan anda!</value>
+  </data>
+  <data name="checkout.cart_problems_edit" xml:space="preserve">
+    <value>Klik di sini untuk menyuntingnya.</value>
+  </data>
+  <data name="checkout.declined" xml:space="preserve">
+    <value>Pembayaran dibatalkan.</value>
+  </data>
+  <data name="checkout.delayed_shipping" xml:space="preserve">
+    <value>Kami saat ini sedang kebanjiran pesanan! Apabila Anda memesan sekarang, harap beri kami tenggat waktu tambahan **selama 1-2 minggu** untuk dapat mulai memproses pesanan Anda mengingat kami masih harus mengurus pesanan-pesanan yang sudah terlebih dahulu masuk sebelumnya.</value>
+  </data>
+  <data name="checkout.old_cart" xml:space="preserve">
+    <value>Keranjang Anda nampaknya sudah kedaluwarsa dan telah dimuat ulang, silakan coba lagi.</value>
+  </data>
+  <data name="checkout.pay" xml:space="preserve">
+    <value>Checkout melalui Paypal</value>
+  </data>
+  <data name="checkout.title_compact" xml:space="preserve">
+    <value>checkout</value>
+  </data>
+  <data name="checkout.has_pending._" xml:space="preserve">
+    <value>Anda memiliki transaksi yang belum tuntas, klik {0} untuk melihatnya.</value>
+  </data>
+  <data name="checkout.has_pending.link_text" xml:space="preserve">
+    <value>di sini</value>
+  </data>
+  <data name="checkout.pending_checkout.line_1" xml:space="preserve">
+    <value>Anda belum menuntaskan pembayaran sebelumnya.</value>
+  </data>
+  <data name="checkout.pending_checkout.line_2" xml:space="preserve">
+    <value>Lanjutkan pembayaran Anda dengan memilih metode pembayaran.</value>
+  </data>
+  <data name="discount" xml:space="preserve">
+    <value>hemat {0}%</value>
+  </data>
+  <data name="invoice.echeck_delay" xml:space="preserve">
+    <value>Karena Anda melakukan pembayaran via eCheck, mohon izinkan setidaknya 10 hari tambahan untuk masuk melalui PayPal!</value>
+  </data>
+  <data name="invoice.title_compact" xml:space="preserve">
+    <value>invoice</value>
+  </data>
+  <data name="invoice.status.processing.title" xml:space="preserve">
+    <value>Pembayaran Anda belum terkonfirmasi!</value>
+  </data>
+  <data name="invoice.status.processing.line_1" xml:space="preserve">
+    <value>Apabila Anda sebelumnya benar-benar telah membayar sesuai dengan jumlah yang tertagih, ada kemungkinan sistem kami masih memproses dan mengonfirmasi pembayaran Anda tersebut. Mohon tunggu beberapa menit dan muat ulang halaman ini!</value>
+  </data>
+  <data name="invoice.status.processing.line_2._" xml:space="preserve">
+    <value>Jika Anda mengalami masalah saat melakukan pembayaran, {0}</value>
+  </data>
+  <data name="invoice.status.processing.line_2.link_text" xml:space="preserve">
+    <value>klik di sini untuk melanjutkan transaksi Anda</value>
+  </data>
+  <data name="order.cancel" xml:space="preserve">
+    <value>Batalkan Pesanan</value>
+  </data>
+  <data name="order.cancel_confirm" xml:space="preserve">
+    <value>Pesanan ini akan secara otomatis dibatalkan dan segala biaya yang telah Anda keluarkan tidak akan kami terima. Apakah Anda yakin?</value>
+  </data>
+  <data name="order.cancel_not_allowed" xml:space="preserve">
+    <value>Pesanan ini tidak dapat dibatalkan pada saat ini.</value>
+  </data>
+  <data name="order.invoice" xml:space="preserve">
+    <value>Lihat Invoice</value>
+  </data>
+  <data name="order.no_orders" xml:space="preserve">
+    <value>Tidak ada pesanan yang tercatat.</value>
+  </data>
+  <data name="order.paid_on" xml:space="preserve">
+    <value>Pemesanan dilangsungkan pada {0}</value>
+  </data>
+  <data name="order.resume" xml:space="preserve">
+    <value>Lanjutkan Proses Checkout</value>
+  </data>
+  <data name="order.shopify_expired" xml:space="preserve">
+    <value>Tautan checkout untuk pesanan ini telah kadaluarsa.</value>
+  </data>
+  <data name="order.item.display_name.supporter_tag" xml:space="preserve">
+    <value>{0} untuk {1} ({2})</value>
+  </data>
+  <data name="order.item.quantity" xml:space="preserve">
+    <value>Jumlah</value>
+  </data>
+  <data name="order.not_modifiable_exception.cancelled" xml:space="preserve">
+    <value>Anda tidak dapat menyunting pesanan yang telah dibatalkan.</value>
+  </data>
+  <data name="order.not_modifiable_exception.checkout" xml:space="preserve">
+    <value>Anda tidak dapat menyunting pesanan yang sedang diproses.</value>
+  </data>
+  <data name="order.not_modifiable_exception.default" xml:space="preserve">
+    <value>Pesanan tidak dapat diubah</value>
+  </data>
+  <data name="order.not_modifiable_exception.delivered" xml:space="preserve">
+    <value>Anda tidak dapat menyunting pesanan yang telah dikirim.</value>
+  </data>
+  <data name="order.not_modifiable_exception.paid" xml:space="preserve">
+    <value>Anda tidak dapat menyunting pesanan yang telah dibayar.</value>
+  </data>
+  <data name="order.not_modifiable_exception.processing" xml:space="preserve">
+    <value>Anda tidak dapat menyunting pesanan yang sedang diproses.</value>
+  </data>
+  <data name="order.not_modifiable_exception.shipped" xml:space="preserve">
+    <value>Anda tidak dapat menyunting pesanan yang telah dikirim.</value>
+  </data>
+  <data name="order.status.cancelled" xml:space="preserve">
+    <value>Dibatalkan</value>
+  </data>
+  <data name="order.status.checkout" xml:space="preserve">
+    <value>Pesanan Diproses</value>
+  </data>
+  <data name="order.status.delivered" xml:space="preserve">
+    <value>Terkirim</value>
+  </data>
+  <data name="order.status.paid" xml:space="preserve">
+    <value>Lunas</value>
+  </data>
+  <data name="order.status.processing" xml:space="preserve">
+    <value>Menunggu konfirmasi</value>
+  </data>
+  <data name="order.status.shipped" xml:space="preserve">
+    <value>Terkirim</value>
+  </data>
+  <data name="product.name" xml:space="preserve">
+    <value>Nama</value>
+  </data>
+  <data name="product.stock.out" xml:space="preserve">
+    <value>Stok barang ini saat ini sedang tidak tersedia. Silahkan periksa kembali nanti!</value>
+  </data>
+  <data name="product.stock.out_with_alternative" xml:space="preserve">
+    <value>Sayangnya stok untuk barang ini habis. Gunakan menu dropdown untuk memilih jenis yang lain atau silahkan periksa kembali nanti!</value>
+  </data>
+  <data name="product.add_to_cart" xml:space="preserve">
+    <value>Tambahkan ke Keranjang</value>
+  </data>
+  <data name="product.notify" xml:space="preserve">
+    <value>Beri tahu saya bila telah tersedia!</value>
+  </data>
+  <data name="product.notification_success" xml:space="preserve">
+    <value>Anda akan diberitahu saat kami punya stok baru. klik {0} untuk membatalkan</value>
+  </data>
+  <data name="product.notification_remove_text" xml:space="preserve">
+    <value>di sini</value>
+  </data>
+  <data name="product.notification_in_stock" xml:space="preserve">
+    <value>Produk ini telah tersedia!</value>
+  </data>
+  <data name="supporter_tag.gift" xml:space="preserve">
+    <value>hadiahkan ke pengguna lain</value>
+  </data>
+  <data name="supporter_tag.require_login._" xml:space="preserve">
+    <value>Anda harus {0} untuk menerima osu!supporter tag!</value>
+  </data>
+  <data name="supporter_tag.require_login.link_text" xml:space="preserve">
+    <value>masuk</value>
+  </data>
+  <data name="username_change.check" xml:space="preserve">
+    <value>Masukkan nama pengguna untuk memeriksa ketersediaan!</value>
+  </data>
+  <data name="username_change.checking" xml:space="preserve">
+    <value>Memeriksa ketersediaan {0}...</value>
+  </data>
+  <data name="username_change.require_login._" xml:space="preserve">
+    <value>Anda harus {0} untuk mengubah nama Anda!</value>
+  </data>
+  <data name="username_change.require_login.link_text" xml:space="preserve">
+    <value>masuk</value>
+  </data>
+</root>

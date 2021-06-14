@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="invalid" xml:space="preserve">
+    <value>{0} đã chọn không hợp lệ.</value>
+  </data>
+  <data name="not_negative" xml:space="preserve">
+    <value>{0} không thể âm.</value>
+  </data>
+  <data name="required" xml:space="preserve">
+    <value>Yêu cầu {0}.</value>
+  </data>
+  <data name="too_long" xml:space="preserve">
+    <value>{0} vượt quá độ dài cho phép - chỉ có thể lên đến {1} kí tự.</value>
+  </data>
+  <data name="wrong_confirmation" xml:space="preserve">
+    <value>Xác nhận không phù hợp.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmap_missing" xml:space="preserve">
+    <value>Mốc thời gian đã chỉ định nhưng không có beatmap.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmapset_no_hype" xml:space="preserve">
+    <value>Không thể hype beatmap này được.</value>
+  </data>
+  <data name="beatmapset_discussion.hype_requires_null_beatmap" xml:space="preserve">
+    <value>Hype phải được thực hiện tại phần Chung (tất cả difficulties).</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmap_id" xml:space="preserve">
+    <value>Difficulty đã chọn không hợp lệ.</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmapset_id" xml:space="preserve">
+    <value>Beatmap đã chọn không hợp lệ.</value>
+  </data>
+  <data name="beatmapset_discussion.locked" xml:space="preserve">
+    <value>Cuộc thảo luận đã bị khóa.</value>
+  </data>
+  <data name="beatmapset_discussion.attributes.message_type" xml:space="preserve">
+    <value>Kiểu tin nhắn</value>
+  </data>
+  <data name="beatmapset_discussion.attributes.timestamp" xml:space="preserve">
+    <value>Mốc thời gian</value>
+  </data>
+  <data name="beatmapset_discussion.hype.guest" xml:space="preserve">
+    <value>Cần phải đăng nhập để hype.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.hyped" xml:space="preserve">
+    <value>Bạn đã hype beatmap này rồi.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.limit_exceeded" xml:space="preserve">
+    <value>Bạn đã sử dụng hết số hype bạn có.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.not_hypeable" xml:space="preserve">
+    <value>Beatmap này không thể được hype.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.owner" xml:space="preserve">
+    <value>Không thể hype map của bạn.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.exceeds_beatmapset_length" xml:space="preserve">
+    <value>Mốc thời gian đã chọn vượt quá độ dài beatmap.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.negative" xml:space="preserve">
+    <value>Mốc thời gian không thể âm.</value>
+  </data>
+  <data name="beatmapset_discussion_post.discussion_locked" xml:space="preserve">
+    <value>Cuộc thảo luận đã bị khóa.</value>
+  </data>
+  <data name="beatmapset_discussion_post.first_post" xml:space="preserve">
+    <value>Không thể xóa bài đăng mở đầu.</value>
+  </data>
+  <data name="beatmapset_discussion_post.attributes.message" xml:space="preserve">
+    <value>Tin nhắn</value>
+  </data>
+  <data name="comment.deleted_parent" xml:space="preserve">
+    <value>Không cho phép trả lời bình luận đã xóa.</value>
+  </data>
+  <data name="comment.top_only" xml:space="preserve">
+    <value>Không thể trả lời các bình luận được ghim.</value>
+  </data>
+  <data name="comment.attributes.message" xml:space="preserve">
+    <value>Tin nhắn</value>
+  </data>
+  <data name="forum.feature_vote.not_feature_topic" xml:space="preserve">
+    <value>Chỉ có thể bầu chọn một feature request.</value>
+  </data>
+  <data name="forum.feature_vote.not_enough_feature_votes" xml:space="preserve">
+    <value>Không đủ phiếu bầu.</value>
+  </data>
+  <data name="forum.poll_vote.invalid" xml:space="preserve">
+    <value>Lựa chọn không hợp lệ.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_delete" xml:space="preserve">
+    <value>Không cho phép xóa beatmap metadata.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_edit" xml:space="preserve">
+    <value>Không cho phép chỉnh sửa beatmap metadata.</value>
+  </data>
+  <data name="forum.post.only_quote" xml:space="preserve">
+    <value>Câu trả lời của bạn chỉ có một trích dẫn.</value>
+  </data>
+  <data name="forum.post.attributes.post_text" xml:space="preserve">
+    <value>Thân bài viết</value>
+  </data>
+  <data name="forum.topic.attributes.topic_title" xml:space="preserve">
+    <value>Tiêu đề chủ đề</value>
+  </data>
+  <data name="forum.topic_poll.duplicate_options" xml:space="preserve">
+    <value>Không cho phép thêm lựa chọn trùng lặp.</value>
+  </data>
+  <data name="forum.topic_poll.grace_period_expired" xml:space="preserve">
+    <value>Không thể chỉnh sửa cuộc thăm dò sau {0} giờ</value>
+  </data>
+  <data name="forum.topic_poll.hiding_results_forever" xml:space="preserve">
+    <value>Không thể ẩn kết quả của một cuộc thăm dò không bao giờ kết thúc.</value>
+  </data>
+  <data name="forum.topic_poll.invalid_max_options" xml:space="preserve">
+    <value>Số lựa chọn cho một người không được vượt quá số lựa chọn sẵn có.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_one_selection" xml:space="preserve">
+    <value>Yêu cầu tối thiểu một lựa chọn cho mỗi người dùng.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_two_options" xml:space="preserve">
+    <value>Cần ít nhất hai lựa chọn.</value>
+  </data>
+  <data name="forum.topic_poll.too_many_options" xml:space="preserve">
+    <value>Vượt quá số lượng lựa chọn tối đa.</value>
+  </data>
+  <data name="forum.topic_poll.attributes.title" xml:space="preserve">
+    <value>Tiêu đề bài thăm dò</value>
+  </data>
+  <data name="forum.topic_vote.required" xml:space="preserve">
+    <value>Chọn một lựa chọn khi đang bỏ phiếu.</value>
+  </data>
+  <data name="forum.topic_vote.too_many" xml:space="preserve">
+    <value>Vượt quá mức cho phép chọn các lựa chọn.</value>
+  </data>
+  <data name="user.contains_username" xml:space="preserve">
+    <value>Mật khẩu không thể chứa tên tài khoản.</value>
+  </data>
+  <data name="user.email_already_used" xml:space="preserve">
+    <value>Địa chỉ email đã được sử dụng.</value>
+  </data>
+  <data name="user.invalid_country" xml:space="preserve">
+    <value>Quốc gia không có trong cơ sở dữ liệu.</value>
+  </data>
+  <data name="user.invalid_discord" xml:space="preserve">
+    <value>Tên người dùng Discord không hợp lệ.</value>
+  </data>
+  <data name="user.invalid_email" xml:space="preserve">
+    <value>Dường như đây không phải là địa chỉ email hợp lệ.</value>
+  </data>
+  <data name="user.too_short" xml:space="preserve">
+    <value>Mật khẩu mới quá ngắn.</value>
+  </data>
+  <data name="user.unknown_duplicate" xml:space="preserve">
+    <value>Tên người dùng hoặc email đã được sử dụng.</value>
+  </data>
+  <data name="user.username_available_in" xml:space="preserve">
+    <value>Tên người dùng này sẽ có sẵn để sử dụng trong {0}.</value>
+  </data>
+  <data name="user.username_available_soon" xml:space="preserve">
+    <value>Tên người dùng này sẽ có sẵn để sử dụng bất cứ lúc nào!</value>
+  </data>
+  <data name="user.username_invalid_characters" xml:space="preserve">
+    <value>Tên người dùng đã yêu cầu chứa các ký tự không hợp lệ.</value>
+  </data>
+  <data name="user.username_in_use" xml:space="preserve">
+    <value>Tên người dùng đã được sử dụng!</value>
+  </data>
+  <data name="user.username_locked" xml:space="preserve">
+    <value>Tên người dùng đã được sử dụng!</value>
+  </data>
+  <data name="user.username_no_space_userscore_mix" xml:space="preserve">
+    <value>Vui lòng sử dụng dấu gạch dưới hoặc dấu cách, không phải cả hai!</value>
+  </data>
+  <data name="user.username_no_spaces" xml:space="preserve">
+    <value>Tên người dùng không thể bắt đầu hoặc kết thúc bằng dấu cách!</value>
+  </data>
+  <data name="user.username_not_allowed" xml:space="preserve">
+    <value>Không cho phép sử dụng tên người dùng đã chọn.</value>
+  </data>
+  <data name="user.username_too_short" xml:space="preserve">
+    <value>Tên người dùng đã yêu cầu quá ngắn.</value>
+  </data>
+  <data name="user.username_too_long" xml:space="preserve">
+    <value>Tên người dùng đã yêu cầu quá dài.</value>
+  </data>
+  <data name="user.weak" xml:space="preserve">
+    <value>Mật khẩu quá yếu.</value>
+  </data>
+  <data name="user.wrong_current_password" xml:space="preserve">
+    <value>Mật khẩu hiện tại không đúng.</value>
+  </data>
+  <data name="user.wrong_email_confirmation" xml:space="preserve">
+    <value>Email xác nhận không phù hợp.</value>
+  </data>
+  <data name="user.wrong_password_confirmation" xml:space="preserve">
+    <value>Mật khẩu xác nhận không phù hợp.</value>
+  </data>
+  <data name="user.too_long" xml:space="preserve">
+    <value>Đã vượt quá độ dài tối đa - tối đa {0} kí tự.</value>
+  </data>
+  <data name="user.attributes.username" xml:space="preserve">
+    <value>Tên người chơi</value>
+  </data>
+  <data name="user.attributes.user_email" xml:space="preserve">
+    <value>Địa chỉ email</value>
+  </data>
+  <data name="user.attributes.password" xml:space="preserve">
+    <value>Mật khẩu</value>
+  </data>
+  <data name="user.change_username.restricted" xml:space="preserve">
+    <value>Bạn không thể đổi tên người dùng khi đang bị hạn chế.</value>
+  </data>
+  <data name="user.change_username.supporter_required._" xml:space="preserve">
+    <value>Bạn phải {0} để đổi tên người dùng!</value>
+  </data>
+  <data name="user.change_username.supporter_required.link_text" xml:space="preserve">
+    <value>hỗ trợ osu!</value>
+  </data>
+  <data name="user.change_username.username_is_same" xml:space="preserve">
+    <value>Đây là tên người dùng của bạn mà, đồ ngốc!</value>
+  </data>
+  <data name="user_report.self" xml:space="preserve">
+    <value>Bạn không thể báo cáo chính mình!</value>
+  </data>
+  <data name="store.order_item.attributes.quantity" xml:space="preserve">
+    <value>Số lượng</value>
+  </data>
+  <data name="store.order_item.attributes.cost" xml:space="preserve">
+    <value>Chi phí</value>
+  </data>
+</root>

@@ -1,0 +1,556 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="pinned_topics" xml:space="preserve">
+    <value>Tópicos Fixados</value>
+  </data>
+  <data name="slogan" xml:space="preserve">
+    <value>é perigoso jogar sozinho.</value>
+  </data>
+  <data name="subforums" xml:space="preserve">
+    <value>Subfóruns</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>osu! fóruns</value>
+  </data>
+  <data name="covers.edit" xml:space="preserve">
+    <value>Editar capa</value>
+  </data>
+  <data name="covers.create._" xml:space="preserve">
+    <value>Definir imagem de capa</value>
+  </data>
+  <data name="covers.create.button" xml:space="preserve">
+    <value>Enviar imagem</value>
+  </data>
+  <data name="covers.create.info" xml:space="preserve">
+    <value>O tamanho da capa deve ser {0}. Você também pode arrastar sua imagem aqui para enviar.</value>
+  </data>
+  <data name="covers.destroy._" xml:space="preserve">
+    <value>Remover imagem de capa</value>
+  </data>
+  <data name="covers.destroy.confirm" xml:space="preserve">
+    <value>Tem certeza de que deseja remover a imagem de capa?</value>
+  </data>
+  <data name="forums.latest_post" xml:space="preserve">
+    <value>Última Publicação</value>
+  </data>
+  <data name="forums.index.title" xml:space="preserve">
+    <value>Índice do Fórum</value>
+  </data>
+  <data name="forums.topics.empty" xml:space="preserve">
+    <value>Sem tópicos!</value>
+  </data>
+  <data name="mark_as_read.forum" xml:space="preserve">
+    <value>Marcar fórum como lido</value>
+  </data>
+  <data name="mark_as_read.forums" xml:space="preserve">
+    <value>Marcar fóruns como lido</value>
+  </data>
+  <data name="mark_as_read.busy" xml:space="preserve">
+    <value>Marcando como lido...</value>
+  </data>
+  <data name="post.confirm_destroy" xml:space="preserve">
+    <value>Deseja mesmo a excluir publicação?</value>
+  </data>
+  <data name="post.confirm_restore" xml:space="preserve">
+    <value>Deseja mesmo restaurar a publicação?</value>
+  </data>
+  <data name="post.edited" xml:space="preserve">
+    <value>Última edição por {0} {1}, editado {2} vezes no total.</value>
+  </data>
+  <data name="post.posted_at" xml:space="preserve">
+    <value>publicado {0}</value>
+  </data>
+  <data name="post.posted_by" xml:space="preserve">
+    <value>publicado por {0}</value>
+  </data>
+  <data name="post.actions.destroy" xml:space="preserve">
+    <value>Excluir publicação</value>
+  </data>
+  <data name="post.actions.edit" xml:space="preserve">
+    <value>Editar publicação</value>
+  </data>
+  <data name="post.actions.report" xml:space="preserve">
+    <value>Denunciar publicação</value>
+  </data>
+  <data name="post.actions.restore" xml:space="preserve">
+    <value>Restaurar publicação</value>
+  </data>
+  <data name="post.create.title.reply" xml:space="preserve">
+    <value>Nova resposta</value>
+  </data>
+  <data name="post.info.post_count" xml:space="preserve">
+    <value>{0} publicação|{0} publicações</value>
+  </data>
+  <data name="post.info.topic_starter" xml:space="preserve">
+    <value>Autor do tópico</value>
+  </data>
+  <data name="search.go_to_post" xml:space="preserve">
+    <value>Ir para a publicação</value>
+  </data>
+  <data name="search.post_number_input" xml:space="preserve">
+    <value>insira o número da publicação</value>
+  </data>
+  <data name="search.total_posts" xml:space="preserve">
+    <value>{0} publicações no total</value>
+  </data>
+  <data name="topic.confirm_destroy" xml:space="preserve">
+    <value>Realmente excluir tópico?</value>
+  </data>
+  <data name="topic.confirm_restore" xml:space="preserve">
+    <value>Realmente restaurar tópico?</value>
+  </data>
+  <data name="topic.deleted" xml:space="preserve">
+    <value>tópico excluído</value>
+  </data>
+  <data name="topic.go_to_latest" xml:space="preserve">
+    <value>ver a ultima publicação</value>
+  </data>
+  <data name="topic.has_replied" xml:space="preserve">
+    <value>Você respondeu a este tópico</value>
+  </data>
+  <data name="topic.in_forum" xml:space="preserve">
+    <value>em {0}</value>
+  </data>
+  <data name="topic.latest_post" xml:space="preserve">
+    <value>{0} por {1}</value>
+  </data>
+  <data name="topic.latest_reply_by" xml:space="preserve">
+    <value>última resposta por {0}</value>
+  </data>
+  <data name="topic.new_topic" xml:space="preserve">
+    <value>Criar novo tópico</value>
+  </data>
+  <data name="topic.new_topic_login" xml:space="preserve">
+    <value>Conecte-se para criar um novo tópico</value>
+  </data>
+  <data name="topic.post_reply" xml:space="preserve">
+    <value>Publicar</value>
+  </data>
+  <data name="topic.reply_box_placeholder" xml:space="preserve">
+    <value>Escreva aqui para responder</value>
+  </data>
+  <data name="topic.reply_title_prefix" xml:space="preserve">
+    <value>Re</value>
+  </data>
+  <data name="topic.started_by" xml:space="preserve">
+    <value>por {0}</value>
+  </data>
+  <data name="topic.started_by_verbose" xml:space="preserve">
+    <value>publicado por {0}</value>
+  </data>
+  <data name="topic.actions.destroy" xml:space="preserve">
+    <value>Excluir tópico</value>
+  </data>
+  <data name="topic.actions.restore" xml:space="preserve">
+    <value>Restaurar tópico</value>
+  </data>
+  <data name="topic.create.close" xml:space="preserve">
+    <value>Fechar</value>
+  </data>
+  <data name="topic.create.preview" xml:space="preserve">
+    <value>Pré-visualizar</value>
+  </data>
+  <data name="topic.create.preview_hide" xml:space="preserve">
+    <value>Escrever</value>
+  </data>
+  <data name="topic.create.submit" xml:space="preserve">
+    <value>Publicar</value>
+  </data>
+  <data name="topic.create.necropost.default" xml:space="preserve">
+    <value>Este tópico está inativo por um tempo. Apenas publique aqui se você tiver um motivo específico para isso.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic._" xml:space="preserve">
+    <value>Este tópico está inativo por um tempo. Se não tiver uma razão especifica para publicar aqui, por favor {0} como alternativa.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic.create" xml:space="preserve">
+    <value>criar um novo tópico</value>
+  </data>
+  <data name="topic.create.placeholder.body" xml:space="preserve">
+    <value>Escreva o conteúdo da publicação aqui</value>
+  </data>
+  <data name="topic.create.placeholder.title" xml:space="preserve">
+    <value>Clique aqui para definir o título</value>
+  </data>
+  <data name="topic.jump.enter" xml:space="preserve">
+    <value>clique para inserir o número específico da publicação</value>
+  </data>
+  <data name="topic.jump.first" xml:space="preserve">
+    <value>ir para a primeira publicação</value>
+  </data>
+  <data name="topic.jump.last" xml:space="preserve">
+    <value>ir para a última publicação</value>
+  </data>
+  <data name="topic.jump.next" xml:space="preserve">
+    <value>pular as próximas 10 publicações</value>
+  </data>
+  <data name="topic.jump.previous" xml:space="preserve">
+    <value>voltar 10 publicações</value>
+  </data>
+  <data name="topic.post_edit.cancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="topic.post_edit.post" xml:space="preserve">
+    <value>Salvar</value>
+  </data>
+  <data name="topic_watches.index.title_compact" xml:space="preserve">
+    <value>inscrições de fórum</value>
+  </data>
+  <data name="topic_watches.index.box.total" xml:space="preserve">
+    <value>Tópicos inscritos</value>
+  </data>
+  <data name="topic_watches.index.box.unread" xml:space="preserve">
+    <value>Tópicos com novas respostas</value>
+  </data>
+  <data name="topic_watches.index.info.total" xml:space="preserve">
+    <value>Você se inscreveu em {0} tópicos.</value>
+  </data>
+  <data name="topic_watches.index.info.unread" xml:space="preserve">
+    <value>Você tem {0} respostas não lidas de tópicos inscritos.</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.confirmation" xml:space="preserve">
+    <value>Cancelar inscrição no tópico?</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.title" xml:space="preserve">
+    <value>Cancelar Inscrição</value>
+  </data>
+  <data name="topics._" xml:space="preserve">
+    <value>Tópicos</value>
+  </data>
+  <data name="topics.actions.login_reply" xml:space="preserve">
+    <value>Conecte-se para Responder</value>
+  </data>
+  <data name="topics.actions.reply" xml:space="preserve">
+    <value>Responder</value>
+  </data>
+  <data name="topics.actions.reply_with_quote" xml:space="preserve">
+    <value>Citar publicação na resposta</value>
+  </data>
+  <data name="topics.actions.search" xml:space="preserve">
+    <value>Pesquisar</value>
+  </data>
+  <data name="topics.create.create_poll" xml:space="preserve">
+    <value>Criação de Enquete</value>
+  </data>
+  <data name="topics.create.preview" xml:space="preserve">
+    <value>Pré-visualizar a publicação</value>
+  </data>
+  <data name="topics.create.create_poll_button.add" xml:space="preserve">
+    <value>Criar enquete</value>
+  </data>
+  <data name="topics.create.create_poll_button.remove" xml:space="preserve">
+    <value>Cancelar criação de enquete</value>
+  </data>
+  <data name="topics.create.poll.hide_results" xml:space="preserve">
+    <value>Esconder os resultados da enquete.</value>
+  </data>
+  <data name="topics.create.poll.hide_results_info" xml:space="preserve">
+    <value>Eles apenas serão exibidos após a conclusão da enquete.</value>
+  </data>
+  <data name="topics.create.poll.length" xml:space="preserve">
+    <value>Manter enquete aberta por</value>
+  </data>
+  <data name="topics.create.poll.length_days_suffix" xml:space="preserve">
+    <value>dias</value>
+  </data>
+  <data name="topics.create.poll.length_info" xml:space="preserve">
+    <value>Deixe em branco para uma votação sem fim</value>
+  </data>
+  <data name="topics.create.poll.max_options" xml:space="preserve">
+    <value>Opções por usuário</value>
+  </data>
+  <data name="topics.create.poll.max_options_info" xml:space="preserve">
+    <value>Este é o número de opções que cada usuário pode selecionar ao votar.</value>
+  </data>
+  <data name="topics.create.poll.options" xml:space="preserve">
+    <value>Opções</value>
+  </data>
+  <data name="topics.create.poll.options_info" xml:space="preserve">
+    <value>Coloque cada uma das opções em uma nova linha. Você pode inserir até 10 opções.</value>
+  </data>
+  <data name="topics.create.poll.title" xml:space="preserve">
+    <value>Pergunta</value>
+  </data>
+  <data name="topics.create.poll.vote_change" xml:space="preserve">
+    <value>Permitir alteração de voto.</value>
+  </data>
+  <data name="topics.create.poll.vote_change_info" xml:space="preserve">
+    <value>Caso ativado, usuários poderão alterar o voto.</value>
+  </data>
+  <data name="topics.edit_title.start" xml:space="preserve">
+    <value>Editar título</value>
+  </data>
+  <data name="topics.index.feature_votes" xml:space="preserve">
+    <value>prioridade de estrela</value>
+  </data>
+  <data name="topics.index.replies" xml:space="preserve">
+    <value>respostas</value>
+  </data>
+  <data name="topics.index.views" xml:space="preserve">
+    <value>visualizações</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0" xml:space="preserve">
+    <value>Remover marcador "adicionado"</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0_done" xml:space="preserve">
+    <value>Marcador "adicionado" removido</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1" xml:space="preserve">
+    <value>Adicionar marcador "adicionado"</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1_done" xml:space="preserve">
+    <value>Marcador "adicionado" adicionado</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0" xml:space="preserve">
+    <value>Remover marcador "nomeado"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0_done" xml:space="preserve">
+    <value>Marcador "nomeado" removido</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1" xml:space="preserve">
+    <value>Adicionar marcador "nomeado"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1_done" xml:space="preserve">
+    <value>Marcador "nomeado" adicionado</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0" xml:space="preserve">
+    <value>Remover marcador "confirmado"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0_done" xml:space="preserve">
+    <value>Marcador "confirmado" removido</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1" xml:space="preserve">
+    <value>Adicionar marcador "confirmado"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1_done" xml:space="preserve">
+    <value>Marcador "confirmado" adicionado</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0" xml:space="preserve">
+    <value>Remover marcador "duplicado"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0_done" xml:space="preserve">
+    <value>Marcador "duplicado" removido</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1" xml:space="preserve">
+    <value>Adicionar marcador "duplicado"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1_done" xml:space="preserve">
+    <value>Marcador "duplicado" adicionado</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0" xml:space="preserve">
+    <value>Remover marcador "inválido"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0_done" xml:space="preserve">
+    <value>Marcador "inválido" removido</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1" xml:space="preserve">
+    <value>Adicionar marcador "inválido"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1_done" xml:space="preserve">
+    <value>Marcador "inválido" adicionado</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0" xml:space="preserve">
+    <value>Remover marcador "resolvido"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0_done" xml:space="preserve">
+    <value>Marcador "resolvido" removido</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1" xml:space="preserve">
+    <value>Adicionar marcador "resolvido"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1_done" xml:space="preserve">
+    <value>Marcador "resolvido" adicionado</value>
+  </data>
+  <data name="topics.lock.is_locked" xml:space="preserve">
+    <value>Este tópico está trancado e não pode mais ser respondido</value>
+  </data>
+  <data name="topics.lock.to_0" xml:space="preserve">
+    <value>Destrancar tópico</value>
+  </data>
+  <data name="topics.lock.to_0_confirm" xml:space="preserve">
+    <value>Destrancar tópico?</value>
+  </data>
+  <data name="topics.lock.to_0_done" xml:space="preserve">
+    <value>Tópico destrancado</value>
+  </data>
+  <data name="topics.lock.to_1" xml:space="preserve">
+    <value>Trancar tópico</value>
+  </data>
+  <data name="topics.lock.to_1_confirm" xml:space="preserve">
+    <value>Trancar tópico?</value>
+  </data>
+  <data name="topics.lock.to_1_done" xml:space="preserve">
+    <value>Tópico trancado</value>
+  </data>
+  <data name="topics.moderate_move.title" xml:space="preserve">
+    <value>Mover para outro fórum</value>
+  </data>
+  <data name="topics.moderate_pin.to_0" xml:space="preserve">
+    <value>Desafixar tópico</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_confirm" xml:space="preserve">
+    <value>Desafixar tópico?</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_done" xml:space="preserve">
+    <value>Tópico desafixado</value>
+  </data>
+  <data name="topics.moderate_pin.to_1" xml:space="preserve">
+    <value>Fixar tópico</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_confirm" xml:space="preserve">
+    <value>Fixar tópico?</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_done" xml:space="preserve">
+    <value>Tópico fixado</value>
+  </data>
+  <data name="topics.moderate_pin.to_2" xml:space="preserve">
+    <value>Fixar tópico e marcar como anúncio</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_confirm" xml:space="preserve">
+    <value>Fixar tópico e marcar como anúncio?</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_done" xml:space="preserve">
+    <value>Tópico fixado e marcado como anúncio</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.show" xml:space="preserve">
+    <value>Exibir publicações excluídas</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.hide" xml:space="preserve">
+    <value>Ocultar publicações excluídas</value>
+  </data>
+  <data name="topics.show.deleted-posts" xml:space="preserve">
+    <value>Publicações Excluídas</value>
+  </data>
+  <data name="topics.show.total_posts" xml:space="preserve">
+    <value>Total de publicações</value>
+  </data>
+  <data name="topics.show.feature_vote.current" xml:space="preserve">
+    <value>Prioridade Atual: +{0}</value>
+  </data>
+  <data name="topics.show.feature_vote.do" xml:space="preserve">
+    <value>Promover este pedido</value>
+  </data>
+  <data name="topics.show.feature_vote.info._" xml:space="preserve">
+    <value>Esse é um {0}. Pedidos de recursos podem ser votados por {1}.</value>
+  </data>
+  <data name="topics.show.feature_vote.info.feature_request" xml:space="preserve">
+    <value>pedido de recurso</value>
+  </data>
+  <data name="topics.show.feature_vote.info.supporters" xml:space="preserve">
+    <value>supporters</value>
+  </data>
+  <data name="topics.show.feature_vote.user.count" xml:space="preserve">
+    <value>{0} sem votos|{1} {0} voto|[2,*] {0} votos</value>
+  </data>
+  <data name="topics.show.feature_vote.user.current" xml:space="preserve">
+    <value>Você tem {0} restantes.</value>
+  </data>
+  <data name="topics.show.feature_vote.user.not_enough" xml:space="preserve">
+    <value>Você não tem mais votos restantes</value>
+  </data>
+  <data name="topics.show.poll.edit" xml:space="preserve">
+    <value>Edição de enquete</value>
+  </data>
+  <data name="topics.show.poll.edit_warning" xml:space="preserve">
+    <value>Editar uma enquete irá remover os resultados atuais!</value>
+  </data>
+  <data name="topics.show.poll.vote" xml:space="preserve">
+    <value>Votar</value>
+  </data>
+  <data name="topics.show.poll.button.change_vote" xml:space="preserve">
+    <value>Alterar voto</value>
+  </data>
+  <data name="topics.show.poll.button.edit" xml:space="preserve">
+    <value>Editar enquete</value>
+  </data>
+  <data name="topics.show.poll.button.view_results" xml:space="preserve">
+    <value>Ir para resultados</value>
+  </data>
+  <data name="topics.show.poll.button.vote" xml:space="preserve">
+    <value>Votar</value>
+  </data>
+  <data name="topics.show.poll.detail.end_time" xml:space="preserve">
+    <value>A votação encerrará às {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.ended" xml:space="preserve">
+    <value>Votação encerrada {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.results_hidden" xml:space="preserve">
+    <value>Os resultados serão exibidos após a conclusão da enquete.</value>
+  </data>
+  <data name="topics.show.poll.detail.total" xml:space="preserve">
+    <value>Total de votos: {0}</value>
+  </data>
+  <data name="topics.watch.to_not_watching" xml:space="preserve">
+    <value>Não marcada</value>
+  </data>
+  <data name="topics.watch.to_watching" xml:space="preserve">
+    <value>Marcar</value>
+  </data>
+  <data name="topics.watch.to_watching_mail" xml:space="preserve">
+    <value>Marcar com notificação</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_disable" xml:space="preserve">
+    <value>Notificação está habilitada. Clique para desativar</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_enable" xml:space="preserve">
+    <value>Notificação está desativada. Clique para habilitar</value>
+  </data>
+</root>

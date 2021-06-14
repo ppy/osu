@@ -1,0 +1,721 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="deleted" xml:space="preserve">
+    <value>[삭제된 사용자]</value>
+  </data>
+  <data name="beatmapset_activities.title" xml:space="preserve">
+    <value>{0}님의 모딩 기록</value>
+  </data>
+  <data name="beatmapset_activities.title_compact" xml:space="preserve">
+    <value>모딩</value>
+  </data>
+  <data name="beatmapset_activities.discussions.title_recent" xml:space="preserve">
+    <value>최근 시작된 토론</value>
+  </data>
+  <data name="beatmapset_activities.events.title_recent" xml:space="preserve">
+    <value>최근 이벤트</value>
+  </data>
+  <data name="beatmapset_activities.posts.title_recent" xml:space="preserve">
+    <value>최근 답변</value>
+  </data>
+  <data name="beatmapset_activities.votes_received.title_most" xml:space="preserve">
+    <value>투표받은 횟수 (최근 3개월)</value>
+  </data>
+  <data name="beatmapset_activities.votes_made.title_most" xml:space="preserve">
+    <value>투표한 횟수 (최근 3개월)</value>
+  </data>
+  <data name="blocks.banner_text" xml:space="preserve">
+    <value>해당 유저를 차단했습니다.</value>
+  </data>
+  <data name="blocks.blocked_count" xml:space="preserve">
+    <value>차단된 유저 ({0})</value>
+  </data>
+  <data name="blocks.hide_profile" xml:space="preserve">
+    <value>프로필 숨기기</value>
+  </data>
+  <data name="blocks.not_blocked" xml:space="preserve">
+    <value>해당 유저는 차단되어있지 않습니다.</value>
+  </data>
+  <data name="blocks.show_profile" xml:space="preserve">
+    <value>프로필 표시</value>
+  </data>
+  <data name="blocks.too_many" xml:space="preserve">
+    <value>차단 한계치에 도달했습니다.</value>
+  </data>
+  <data name="blocks.button.block" xml:space="preserve">
+    <value>차단</value>
+  </data>
+  <data name="blocks.button.unblock" xml:space="preserve">
+    <value>차단 해제</value>
+  </data>
+  <data name="card.loading" xml:space="preserve">
+    <value>로딩 중...</value>
+  </data>
+  <data name="card.send_message" xml:space="preserve">
+    <value>메시지 보내기</value>
+  </data>
+  <data name="disabled.title" xml:space="preserve">
+    <value>이런! 계정이 비활성화 된 것 같네요.</value>
+  </data>
+  <data name="disabled.warning" xml:space="preserve">
+    <value>규칙을 어긴 경우, 일반적으로 한 달 동안 어떠한 사면 요청도 받고 있지 않습니다. 해당 기간이 끝난 후, 사면이 필요하다고 판단될 경우 언제든지 저희에게 연락하실 수 있습니다. 하나의 계정이 비활성화된 이후 새로운 계정을 만들면 &lt;strong&gt;한 달의 기간이 연장될 수 있음&lt;/strong&gt;을 명심해주세요. 또한, &lt;strong&gt;계정을 새로 만들 때마다 더욱 규칙 위반으로 간주&lt;/strong&gt;한다는 것을 잊지 마세요. 이 길은 절대로 건너지 말아 주시기 바랍니다!</value>
+  </data>
+  <data name="disabled.if_mistake._" xml:space="preserve">
+    <value>만약 실수라고 생각된다면, 저희에게 연락할 수 있습니다 ({0} 이나 이 페이지의 오른쪽 하단 버튼 "?"을 클릭).</value>
+  </data>
+  <data name="disabled.if_mistake.email" xml:space="preserve">
+    <value>이메일</value>
+  </data>
+  <data name="disabled.reasons.compromised" xml:space="preserve">
+    <value>계정 도용이 의심됩니다. 신원이 확인될 때까지 계정이 비활성화될 수 있습니다.</value>
+  </data>
+  <data name="disabled.reasons.opening" xml:space="preserve">
+    <value>계정 비활성화가 될 수 있는 이유는 다음과 같습니다:</value>
+  </data>
+  <data name="disabled.reasons.tos._" xml:space="preserve">
+    <value>해당 계정은 {0} 또는 {1} 를 위반했습니다.</value>
+  </data>
+  <data name="disabled.reasons.tos.community_rules" xml:space="preserve">
+    <value>커뮤니티 규칙</value>
+  </data>
+  <data name="disabled.reasons.tos.tos" xml:space="preserve">
+    <value>이용 약관</value>
+  </data>
+  <data name="filtering.by_game_mode" xml:space="preserve">
+    <value>게임 모드 별 멤버</value>
+  </data>
+  <data name="force_reactivation.reason.inactive_different_country" xml:space="preserve">
+    <value>당신의 계정은 오랫동안 사용되지 않았네요.</value>
+  </data>
+  <data name="login._" xml:space="preserve">
+    <value>로그인</value>
+  </data>
+  <data name="login.button" xml:space="preserve">
+    <value>로그인</value>
+  </data>
+  <data name="login.button_posting" xml:space="preserve">
+    <value>로그인 중...</value>
+  </data>
+  <data name="login.email_login_disabled" xml:space="preserve">
+    <value>현재 이메일로 로그인할 수 없습니다. 대신 유저 이름을 사용해 주세요.</value>
+  </data>
+  <data name="login.failed" xml:space="preserve">
+    <value>계정 정보가 올바르지 않습니다</value>
+  </data>
+  <data name="login.forgot" xml:space="preserve">
+    <value>비밀번호를 잊어버리셨나요?</value>
+  </data>
+  <data name="login.info" xml:space="preserve">
+    <value>계속 하시려면 로그인 해주세요</value>
+  </data>
+  <data name="login.invalid_captcha" xml:space="preserve">
+    <value>Captcha가 올바르지 않습니다. 페이지를 새로 고친 후 다시 시도해주세요.</value>
+  </data>
+  <data name="login.locked_ip" xml:space="preserve">
+    <value>당신의 IP 주소가 잠겨있습니다. 잠시만 기다려주세요.</value>
+  </data>
+  <data name="login.password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="login.register" xml:space="preserve">
+    <value>osu!계정이 없으신가요? 새로 하나 만들어보세요</value>
+  </data>
+  <data name="login.remember" xml:space="preserve">
+    <value>이 컴퓨터에서 계정 정보 기억하기</value>
+  </data>
+  <data name="login.title" xml:space="preserve">
+    <value>계속하려면 로그인해 주세요</value>
+  </data>
+  <data name="login.username" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="login.beta.main" xml:space="preserve">
+    <value>베타 권한은 현재 일부 특수 사용자만 가지고 있습니다.</value>
+  </data>
+  <data name="login.beta.small" xml:space="preserve">
+    <value>(osu! 서포터들도 곧 받게 될 거에요)</value>
+  </data>
+  <data name="posts.title" xml:space="preserve">
+    <value>{0}님의 글</value>
+  </data>
+  <data name="anonymous.login_link" xml:space="preserve">
+    <value>클릭하여 로그인</value>
+  </data>
+  <data name="anonymous.login_text" xml:space="preserve">
+    <value>로그인</value>
+  </data>
+  <data name="anonymous.username" xml:space="preserve">
+    <value>손님</value>
+  </data>
+  <data name="anonymous.error" xml:space="preserve">
+    <value>계속하려면 로그인하셔야 합니다.</value>
+  </data>
+  <data name="logout_confirm" xml:space="preserve">
+    <value>정말 로그아웃하실건가요? :(</value>
+  </data>
+  <data name="report.button_text" xml:space="preserve">
+    <value>신고</value>
+  </data>
+  <data name="report.comments" xml:space="preserve">
+    <value>추가 의견</value>
+  </data>
+  <data name="report.placeholder" xml:space="preserve">
+    <value>아시는 정보를 입력해 주세요. 유용하게 쓰일 수 있습니다.</value>
+  </data>
+  <data name="report.reason" xml:space="preserve">
+    <value>이유</value>
+  </data>
+  <data name="report.thanks" xml:space="preserve">
+    <value>신고해 주셔서 감사합니다!</value>
+  </data>
+  <data name="report.title" xml:space="preserve">
+    <value>{0} 님을 신고할까요?</value>
+  </data>
+  <data name="report.actions.send" xml:space="preserve">
+    <value>신고 보내기</value>
+  </data>
+  <data name="report.actions.cancel" xml:space="preserve">
+    <value>취소</value>
+  </data>
+  <data name="report.options.cheating" xml:space="preserve">
+    <value>부정 행위 / 치트 사용</value>
+  </data>
+  <data name="report.options.insults" xml:space="preserve">
+    <value>자신 / 다른 사람을 모욕 함</value>
+  </data>
+  <data name="report.options.spam" xml:space="preserve">
+    <value>도배</value>
+  </data>
+  <data name="report.options.unwanted_content" xml:space="preserve">
+    <value>부적절한 콘텐츠에 링크 걸기</value>
+  </data>
+  <data name="report.options.nonsense" xml:space="preserve">
+    <value>허튼소리</value>
+  </data>
+  <data name="report.options.other" xml:space="preserve">
+    <value>기타 (아래에 입력해 주세요)</value>
+  </data>
+  <data name="restricted_banner.title" xml:space="preserve">
+    <value>계정이 제한되어 있습니다!</value>
+  </data>
+  <data name="restricted_banner.message" xml:space="preserve">
+    <value>계정이 제한되어있으면 다른 플레이어와 소통할 수 없으며 점수가 본인에게만 표시됩니다. 계정 제한은 보통 자동적으로 처리되며, 24시간 이내에 철회될 수 있습니다. 제한에 대한 항소를 원하시면 &lt;a href="mailto{0}@ppy.sh"&gt;지원팀에 연락&lt;/a&gt;해주시기 바랍니다.</value>
+  </data>
+  <data name="show.age" xml:space="preserve">
+    <value>만 {0}세</value>
+  </data>
+  <data name="show.change_avatar" xml:space="preserve">
+    <value>아바타를 바꾸세요!</value>
+  </data>
+  <data name="show.first_members" xml:space="preserve">
+    <value>osu!의 초창기부터 함께한 유저</value>
+  </data>
+  <data name="show.is_developer" xml:space="preserve">
+    <value>osu!developer</value>
+  </data>
+  <data name="show.is_supporter" xml:space="preserve">
+    <value>osu!supporter</value>
+  </data>
+  <data name="show.joined_at" xml:space="preserve">
+    <value>{0}에 가입</value>
+  </data>
+  <data name="show.lastvisit" xml:space="preserve">
+    <value>{0}에 마지막으로 접속</value>
+  </data>
+  <data name="show.lastvisit_online" xml:space="preserve">
+    <value>현재 온라인</value>
+  </data>
+  <data name="show.missingtext" xml:space="preserve">
+    <value>오타가 있는 것 같은데요! (또는 차단된 사용자일 수 있습니다)</value>
+  </data>
+  <data name="show.origin_country" xml:space="preserve">
+    <value>{0}에 거주</value>
+  </data>
+  <data name="show.previous_usernames" xml:space="preserve">
+    <value>이전 사용자명</value>
+  </data>
+  <data name="show.plays_with" xml:space="preserve">
+    <value>플레이 장비: {0}</value>
+  </data>
+  <data name="show.title" xml:space="preserve">
+    <value>{0}님의 프로필</value>
+  </data>
+  <data name="show.comments_count._" xml:space="preserve">
+    <value>{0} 작성됨</value>
+  </data>
+  <data name="show.comments_count.count" xml:space="preserve">
+    <value>댓글 {0}개</value>
+  </data>
+  <data name="show.edit.cover.button" xml:space="preserve">
+    <value>프로필 표지 변경</value>
+  </data>
+  <data name="show.edit.cover.defaults_info" xml:space="preserve">
+    <value>이후에 더 많은 표지 설정이 추가됩니다</value>
+  </data>
+  <data name="show.edit.cover.upload.broken_file" xml:space="preserve">
+    <value>이미지 처리 실패. 업로드하려는 이미지를 확인하시고 다시 시도해주세요.</value>
+  </data>
+  <data name="show.edit.cover.upload.button" xml:space="preserve">
+    <value>이미지 업로드</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone" xml:space="preserve">
+    <value>업로드하려면 여기에 끌어놓으세요</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone_info" xml:space="preserve">
+    <value>여기에 이미지를 끌어놓아 업로드할 수도 있습니다.</value>
+  </data>
+  <data name="show.edit.cover.upload.size_info" xml:space="preserve">
+    <value>표지 크기는 2400x640 이여야 합니다.</value>
+  </data>
+  <data name="show.edit.cover.upload.too_large" xml:space="preserve">
+    <value>업로드된 파일이 너무 큽니다.</value>
+  </data>
+  <data name="show.edit.cover.upload.unsupported_format" xml:space="preserve">
+    <value>지원되지 않는 확장자입니다.</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info._" xml:space="preserve">
+    <value>업로드는 {0}만 가능합니다.</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info.link" xml:space="preserve">
+    <value>osu! 서포터</value>
+  </data>
+  <data name="show.edit.default_playmode.is_default_tooltip" xml:space="preserve">
+    <value>메인 게임 모드</value>
+  </data>
+  <data name="show.edit.default_playmode.set" xml:space="preserve">
+    <value>{0}를 메인 게임 모드로 설정</value>
+  </data>
+  <data name="show.extra.none" xml:space="preserve">
+    <value>없음</value>
+  </data>
+  <data name="show.extra.unranked" xml:space="preserve">
+    <value>최근 플레이가 없습니다</value>
+  </data>
+  <data name="show.extra.achievements.achieved-on" xml:space="preserve">
+    <value>{0}에 달성함</value>
+  </data>
+  <data name="show.extra.achievements.locked" xml:space="preserve">
+    <value>잠김</value>
+  </data>
+  <data name="show.extra.achievements.title" xml:space="preserve">
+    <value>업적</value>
+  </data>
+  <data name="show.extra.beatmaps.by_artist" xml:space="preserve">
+    <value>by {0}</value>
+  </data>
+  <data name="show.extra.beatmaps.title" xml:space="preserve">
+    <value>비트맵</value>
+  </data>
+  <data name="show.extra.beatmaps.favourite.title" xml:space="preserve">
+    <value>즐겨찾기한 비트맵</value>
+  </data>
+  <data name="show.extra.beatmaps.graveyard.title" xml:space="preserve">
+    <value>무덤에 간 비트맵</value>
+  </data>
+  <data name="show.extra.beatmaps.loved.title" xml:space="preserve">
+    <value>Loved 비트맵</value>
+  </data>
+  <data name="show.extra.beatmaps.ranked_and_approved.title" xml:space="preserve">
+    <value>Ranked 및 Approved 상태의 비트맵</value>
+  </data>
+  <data name="show.extra.beatmaps.unranked.title" xml:space="preserve">
+    <value>Pending 비트맵</value>
+  </data>
+  <data name="show.extra.discussions.title" xml:space="preserve">
+    <value>토론</value>
+  </data>
+  <data name="show.extra.discussions.title_longer" xml:space="preserve">
+    <value>최근 토론</value>
+  </data>
+  <data name="show.extra.discussions.show_more" xml:space="preserve">
+    <value>토론 더 보기</value>
+  </data>
+  <data name="show.extra.events.title" xml:space="preserve">
+    <value>이벤트</value>
+  </data>
+  <data name="show.extra.events.title_longer" xml:space="preserve">
+    <value>최근 이벤트</value>
+  </data>
+  <data name="show.extra.events.show_more" xml:space="preserve">
+    <value>이벤트 더 보기</value>
+  </data>
+  <data name="show.extra.historical.title" xml:space="preserve">
+    <value>통계</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.title" xml:space="preserve">
+    <value>플레이 기록</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.count_label" xml:space="preserve">
+    <value>플레이 횟수</value>
+  </data>
+  <data name="show.extra.historical.most_played.count" xml:space="preserve">
+    <value>플레이 횟수</value>
+  </data>
+  <data name="show.extra.historical.most_played.title" xml:space="preserve">
+    <value>가장 많이 플레이한 비트맵</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.accuracy" xml:space="preserve">
+    <value>정확도: {0}</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.title" xml:space="preserve">
+    <value>최근 플레이 (24시간)</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.title" xml:space="preserve">
+    <value>리플레이가 재생된 횟수</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.count_label" xml:space="preserve">
+    <value>리플레이 재생 횟수</value>
+  </data>
+  <data name="show.extra.kudosu.recent_entries" xml:space="preserve">
+    <value>최근 Kudosu 기록</value>
+  </data>
+  <data name="show.extra.kudosu.title" xml:space="preserve">
+    <value>Kudosu!</value>
+  </data>
+  <data name="show.extra.kudosu.total" xml:space="preserve">
+    <value>총 획득한 Kudosu 수</value>
+  </data>
+  <data name="show.extra.kudosu.entry.amount" xml:space="preserve">
+    <value>{0} kudosu</value>
+  </data>
+  <data name="show.extra.kudosu.entry.empty" xml:space="preserve">
+    <value>획득한 kudosu가 없습니다!</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.allow_kudosu.give" xml:space="preserve">
+    <value>토론 {0}에서의 kudosu 획득 자격이 복구되어 {1}를 받았습니다.</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.deny_kudosu.reset" xml:space="preserve">
+    <value>토론 {0}에서 {1}를 거절당했습니다.</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.delete.reset" xml:space="preserve">
+    <value>토론 {0}이 삭제되어 {1}를 잃었습니다.</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.restore.give" xml:space="preserve">
+    <value>삭제된 토론 {0}이 복원되어 {1}를 받았습니다.</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.give" xml:space="preserve">
+    <value>모딩 토론 {0}에서 득표하여 {1}를 받았습니다.</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.reset" xml:space="preserve">
+    <value>모딩 글({0})의 투표에서 충분한 표를 얻지 못해 {1}를 잃었습니다.</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.give" xml:space="preserve">
+    <value>모딩 토론 {0}에서 투표가 재계산되어 {1}를 얻었습니다.</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.reset" xml:space="preserve">
+    <value>모딩 토론 {0}에서 투표가 재계산되어 {1}를 잃었습니다.</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.give" xml:space="preserve">
+    <value>{0}에서 {1}님으로부터 {2}를 받았습니다.</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.reset" xml:space="preserve">
+    <value>{0}에서 {1}님으로부터 kudosu가 초기화되었습니다.</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.revoke" xml:space="preserve">
+    <value>{0}에서 {1}님으로부터 kudosu 획득 자격을 박탈당했습니다.</value>
+  </data>
+  <data name="show.extra.kudosu.total_info._" xml:space="preserve">
+    <value>유저가 비트맵 제작 과정에 얼마나 기여했는지에 기반합니다. 더 많은 정보를 얻고싶으시다면 {0}를 참고해주세요.</value>
+  </data>
+  <data name="show.extra.kudosu.total_info.link" xml:space="preserve">
+    <value>이 페이지</value>
+  </data>
+  <data name="show.extra.me.title" xml:space="preserve">
+    <value>me!</value>
+  </data>
+  <data name="show.extra.medals.empty" xml:space="preserve">
+    <value>아직 아무런 메달도 받지 못했네요. ;_;</value>
+  </data>
+  <data name="show.extra.medals.recent" xml:space="preserve">
+    <value>최근 획득</value>
+  </data>
+  <data name="show.extra.medals.title" xml:space="preserve">
+    <value>메달</value>
+  </data>
+  <data name="show.extra.posts.title" xml:space="preserve">
+    <value>게시글</value>
+  </data>
+  <data name="show.extra.posts.title_longer" xml:space="preserve">
+    <value>최근 게시글</value>
+  </data>
+  <data name="show.extra.posts.show_more" xml:space="preserve">
+    <value>글 더 보기</value>
+  </data>
+  <data name="show.extra.recent_activity.title" xml:space="preserve">
+    <value>최근 활동</value>
+  </data>
+  <data name="show.extra.top_ranks.download_replay" xml:space="preserve">
+    <value>리플레이 다운로드</value>
+  </data>
+  <data name="show.extra.top_ranks.not_ranked" xml:space="preserve">
+    <value>랭크된 비트맵만 pp를 줍니다.</value>
+  </data>
+  <data name="show.extra.top_ranks.pp_weight" xml:space="preserve">
+    <value>가중치 {0}</value>
+  </data>
+  <data name="show.extra.top_ranks.view_details" xml:space="preserve">
+    <value>자세히 보기</value>
+  </data>
+  <data name="show.extra.top_ranks.title" xml:space="preserve">
+    <value>랭크</value>
+  </data>
+  <data name="show.extra.top_ranks.best.title" xml:space="preserve">
+    <value>최고 성과</value>
+  </data>
+  <data name="show.extra.top_ranks.first.title" xml:space="preserve">
+    <value>1위 달성 맵</value>
+  </data>
+  <data name="show.extra.votes.given" xml:space="preserve">
+    <value>투표 참여 수 (지난 3개월 간)</value>
+  </data>
+  <data name="show.extra.votes.received" xml:space="preserve">
+    <value>받은 투표수 (지난 3개월 간)</value>
+  </data>
+  <data name="show.extra.votes.title" xml:space="preserve">
+    <value>투표</value>
+  </data>
+  <data name="show.extra.votes.title_longer" xml:space="preserve">
+    <value>최근 투표</value>
+  </data>
+  <data name="show.extra.votes.vote_count" xml:space="preserve">
+    <value>{0} 투표</value>
+  </data>
+  <data name="show.extra.account_standing.title" xml:space="preserve">
+    <value>계정 상태</value>
+  </data>
+  <data name="show.extra.account_standing.bad_standing" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; 님이 규칙을 위반하셨습니다. :(</value>
+  </data>
+  <data name="show.extra.account_standing.remaining_silence" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; 님은 {1} 후에 말할 수 있습니다.</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.title" xml:space="preserve">
+    <value>최근 사건</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.date" xml:space="preserve">
+    <value>날짜</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.action" xml:space="preserve">
+    <value>처벌</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length" xml:space="preserve">
+    <value>기간</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length_permanent" xml:space="preserve">
+    <value>영구</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.description" xml:space="preserve">
+    <value>사유</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actor" xml:space="preserve">
+    <value>{0}으로</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.restriction" xml:space="preserve">
+    <value>Ban</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.silence" xml:space="preserve">
+    <value>침묵</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.note" xml:space="preserve">
+    <value>알림</value>
+  </data>
+  <data name="show.info.interests" xml:space="preserve">
+    <value>관심 분야</value>
+  </data>
+  <data name="show.info.location" xml:space="preserve">
+    <value>거주지</value>
+  </data>
+  <data name="show.info.occupation" xml:space="preserve">
+    <value>직업</value>
+  </data>
+  <data name="show.info.website" xml:space="preserve">
+    <value>웹사이트</value>
+  </data>
+  <data name="show.not_found.reason_1" xml:space="preserve">
+    <value>사용자명이 변경되었을 가능성이 있습니다.</value>
+  </data>
+  <data name="show.not_found.reason_2" xml:space="preserve">
+    <value>보안 혹은 남용 문제 때문에 일시적으로 이 계정을 사용할 수 없습니다.</value>
+  </data>
+  <data name="show.not_found.reason_3" xml:space="preserve">
+    <value>오타가 있나봐요!</value>
+  </data>
+  <data name="show.not_found.reason_header" xml:space="preserve">
+    <value>이에 대한 몇 가지 이유가 있습니다:</value>
+  </data>
+  <data name="show.not_found.title" xml:space="preserve">
+    <value>사용자를 찾을 수 없습니다! ;_;</value>
+  </data>
+  <data name="show.page.button" xml:space="preserve">
+    <value>프로필 페이지 수정</value>
+  </data>
+  <data name="show.page.description" xml:space="preserve">
+    <value>&lt;strong&gt;me!&lt;/strong&gt;는 유저 프로필 페이지에서 개인이 꾸밀 수 있는 공간입니다.</value>
+  </data>
+  <data name="show.page.edit_big" xml:space="preserve">
+    <value>me! 수정하기</value>
+  </data>
+  <data name="show.page.placeholder" xml:space="preserve">
+    <value>페이지에 들어갈 내용을 입력하세요.</value>
+  </data>
+  <data name="show.page.restriction_info._" xml:space="preserve">
+    <value>이 기능을 사용하기 위해서는 {0}가 되어야합니다.</value>
+  </data>
+  <data name="show.page.restriction_info.link" xml:space="preserve">
+    <value>osu! 서포터</value>
+  </data>
+  <data name="show.post_count._" xml:space="preserve">
+    <value>게시글 수 {0}</value>
+  </data>
+  <data name="show.post_count.count" xml:space="preserve">
+    <value>{0}개|{0}개</value>
+  </data>
+  <data name="show.rank.country" xml:space="preserve">
+    <value>{0} 국가 순위</value>
+  </data>
+  <data name="show.rank.country_simple" xml:space="preserve">
+    <value>국가 순위</value>
+  </data>
+  <data name="show.rank.global" xml:space="preserve">
+    <value>{0} 세계 순위</value>
+  </data>
+  <data name="show.rank.global_simple" xml:space="preserve">
+    <value>세계 순위</value>
+  </data>
+  <data name="show.stats.hit_accuracy" xml:space="preserve">
+    <value>정확도</value>
+  </data>
+  <data name="show.stats.level" xml:space="preserve">
+    <value>레벨 {0}</value>
+  </data>
+  <data name="show.stats.level_progress" xml:space="preserve">
+    <value>다음 레벨까지의 진척도</value>
+  </data>
+  <data name="show.stats.maximum_combo" xml:space="preserve">
+    <value>최대 콤보</value>
+  </data>
+  <data name="show.stats.medals" xml:space="preserve">
+    <value>메달</value>
+  </data>
+  <data name="show.stats.play_count" xml:space="preserve">
+    <value>플레이 횟수</value>
+  </data>
+  <data name="show.stats.play_time" xml:space="preserve">
+    <value>총 플레이 시간</value>
+  </data>
+  <data name="show.stats.ranked_score" xml:space="preserve">
+    <value>기록된 점수</value>
+  </data>
+  <data name="show.stats.replays_watched_by_others" xml:space="preserve">
+    <value>리플레이가 재생된 횟수</value>
+  </data>
+  <data name="show.stats.score_ranks" xml:space="preserve">
+    <value>점수 순위</value>
+  </data>
+  <data name="show.stats.total_hits" xml:space="preserve">
+    <value>총 타격 횟수</value>
+  </data>
+  <data name="show.stats.total_score" xml:space="preserve">
+    <value>총 점수</value>
+  </data>
+  <data name="show.stats.ranked_and_approved_beatmapset_count" xml:space="preserve">
+    <value>Ranked 및 Approved 상태의 비트맵</value>
+  </data>
+  <data name="show.stats.loved_beatmapset_count" xml:space="preserve">
+    <value>Loved 비트맵</value>
+  </data>
+  <data name="show.stats.unranked_beatmapset_count" xml:space="preserve">
+    <value>대기 중인 비트맵</value>
+  </data>
+  <data name="show.stats.graveyard_beatmapset_count" xml:space="preserve">
+    <value>묻힌 비트맵</value>
+  </data>
+  <data name="silenced_banner.title" xml:space="preserve">
+    <value>당신은 현재 침묵 상태입니다.</value>
+  </data>
+  <data name="silenced_banner.message" xml:space="preserve">
+    <value>몇몇 동작이 수행 불가능할 수 있습니다.</value>
+  </data>
+  <data name="status.all" xml:space="preserve">
+    <value>모두</value>
+  </data>
+  <data name="status.online" xml:space="preserve">
+    <value>온라인</value>
+  </data>
+  <data name="status.offline" xml:space="preserve">
+    <value>오프라인</value>
+  </data>
+  <data name="store.saved" xml:space="preserve">
+    <value>사용자 계정 생성됨</value>
+  </data>
+  <data name="verify.title" xml:space="preserve">
+    <value>계정 인증</value>
+  </data>
+  <data name="view_mode.brick" xml:space="preserve">
+    <value>벽돌 형식 보기</value>
+  </data>
+  <data name="view_mode.card" xml:space="preserve">
+    <value>카드 형식 보기</value>
+  </data>
+  <data name="view_mode.list" xml:space="preserve">
+    <value>목록으로 보기</value>
+  </data>
+</root>

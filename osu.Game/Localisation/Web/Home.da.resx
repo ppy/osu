@@ -1,0 +1,291 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="landing.download" xml:space="preserve">
+    <value>Hent nu</value>
+  </data>
+  <data name="landing.online" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; online i øjeblikket i &lt;strong&gt;{1}&lt;/strong&gt; spil</value>
+  </data>
+  <data name="landing.peak" xml:space="preserve">
+    <value>Højeste antal, {0} online brugere</value>
+  </data>
+  <data name="landing.players" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; registrerede brugere</value>
+  </data>
+  <data name="landing.title" xml:space="preserve">
+    <value>velkommen</value>
+  </data>
+  <data name="landing.see_more_news" xml:space="preserve">
+    <value>se flere nyheder</value>
+  </data>
+  <data name="landing.slogan.main" xml:space="preserve">
+    <value>det aller-allerbedste, gratis rytmespil</value>
+  </data>
+  <data name="landing.slogan.sub" xml:space="preserve">
+    <value>rytme er bare et klik væk</value>
+  </data>
+  <data name="search.advanced_link" xml:space="preserve">
+    <value>Avanceret søgning</value>
+  </data>
+  <data name="search.button" xml:space="preserve">
+    <value>Søg</value>
+  </data>
+  <data name="search.empty_result" xml:space="preserve">
+    <value>Intet fundet!</value>
+  </data>
+  <data name="search.keyword_required" xml:space="preserve">
+    <value>Et søge-nøgleord behøves</value>
+  </data>
+  <data name="search.placeholder" xml:space="preserve">
+    <value>klik for at søge</value>
+  </data>
+  <data name="search.title" xml:space="preserve">
+    <value>Søg</value>
+  </data>
+  <data name="search.beatmapset.login_required" xml:space="preserve">
+    <value>Log ind for at søge efter brugere
+</value>
+  </data>
+  <data name="search.beatmapset.more" xml:space="preserve">
+    <value>{0} flere beatmap søgeresultater</value>
+  </data>
+  <data name="search.beatmapset.more_simple" xml:space="preserve">
+    <value>Se flere beatmap søgeresultater</value>
+  </data>
+  <data name="search.beatmapset.title" xml:space="preserve">
+    <value>Beatmaps</value>
+  </data>
+  <data name="search.forum_post.all" xml:space="preserve">
+    <value>Alle forumer</value>
+  </data>
+  <data name="search.forum_post.link" xml:space="preserve">
+    <value>Søg i forumet</value>
+  </data>
+  <data name="search.forum_post.login_required" xml:space="preserve">
+    <value>Log ind for at søge efter brugere</value>
+  </data>
+  <data name="search.forum_post.more_simple" xml:space="preserve">
+    <value>Se flere forum-søgeresultater</value>
+  </data>
+  <data name="search.forum_post.title" xml:space="preserve">
+    <value>Forum</value>
+  </data>
+  <data name="search.forum_post.label.forum" xml:space="preserve">
+    <value>søg i forummerne</value>
+  </data>
+  <data name="search.forum_post.label.forum_children" xml:space="preserve">
+    <value>inkluder subforummer</value>
+  </data>
+  <data name="search.forum_post.label.topic_id" xml:space="preserve">
+    <value>emne #</value>
+  </data>
+  <data name="search.forum_post.label.username" xml:space="preserve">
+    <value>forfatter</value>
+  </data>
+  <data name="search.mode.all" xml:space="preserve">
+    <value>alt</value>
+  </data>
+  <data name="search.mode.beatmapset" xml:space="preserve">
+    <value>beatmap</value>
+  </data>
+  <data name="search.mode.forum_post" xml:space="preserve">
+    <value>forum</value>
+  </data>
+  <data name="search.mode.user" xml:space="preserve">
+    <value>bruger</value>
+  </data>
+  <data name="search.mode.wiki_page" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="search.user.login_required" xml:space="preserve">
+    <value>Log ind for at søge efter brugere
+</value>
+  </data>
+  <data name="search.user.more" xml:space="preserve">
+    <value>{0} flere spiller-søgeresultater</value>
+  </data>
+  <data name="search.user.more_simple" xml:space="preserve">
+    <value>Se flere spiller-søgeresultater</value>
+  </data>
+  <data name="search.user.more_hidden" xml:space="preserve">
+    <value>Spillersøgningen er begrænset til højest {0} spillere. Prøv at søge igen.</value>
+  </data>
+  <data name="search.user.title" xml:space="preserve">
+    <value>Spillere</value>
+  </data>
+  <data name="search.wiki_page.link" xml:space="preserve">
+    <value>Søg på wiki´et</value>
+  </data>
+  <data name="search.wiki_page.more_simple" xml:space="preserve">
+    <value>Se flere wiki-søgeresultater</value>
+  </data>
+  <data name="search.wiki_page.title" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="download.tagline" xml:space="preserve">
+    <value>lad os få&lt;br&gt;dig i gang!</value>
+  </data>
+  <data name="download.action" xml:space="preserve">
+    <value>Download osu!</value>
+  </data>
+  <data name="download.help._" xml:space="preserve">
+    <value>hvis du har problemer med at starte spillet eller registrere dig for konto, {0} eller {1}.</value>
+  </data>
+  <data name="download.help.help_forum_link" xml:space="preserve">
+    <value>tjek hjælpeforum</value>
+  </data>
+  <data name="download.help.support_button" xml:space="preserve">
+    <value>kontakt support</value>
+  </data>
+  <data name="download.os.windows" xml:space="preserve">
+    <value>til Windows</value>
+  </data>
+  <data name="download.os.macos" xml:space="preserve">
+    <value>til macOS</value>
+  </data>
+  <data name="download.os.linux" xml:space="preserve">
+    <value>til Linux</value>
+  </data>
+  <data name="download.mirror" xml:space="preserve">
+    <value>mirror</value>
+  </data>
+  <data name="download.macos-fallback" xml:space="preserve">
+    <value>macOS brugere</value>
+  </data>
+  <data name="download.steps.register.title" xml:space="preserve">
+    <value>opret en bruger</value>
+  </data>
+  <data name="download.steps.register.description" xml:space="preserve">
+    <value>følg instrukserne når spillet startes for at logge ind eller lave en ny konto</value>
+  </data>
+  <data name="download.steps.download.title" xml:space="preserve">
+    <value>hent spillet</value>
+  </data>
+  <data name="download.steps.download.description" xml:space="preserve">
+    <value>klik på knappen ovenfor for at hente installeren, og kør den!</value>
+  </data>
+  <data name="download.steps.beatmaps.title" xml:space="preserve">
+    <value>få beatmaps</value>
+  </data>
+  <data name="download.steps.beatmaps.description._" xml:space="preserve">
+    <value>{0} det gigantiske bibliotek af bruger-skabte beatmaps, og begynd at spille!</value>
+  </data>
+  <data name="download.steps.beatmaps.description.browse" xml:space="preserve">
+    <value>udforsk</value>
+  </data>
+  <data name="download.video-guide" xml:space="preserve">
+    <value>video-guide</value>
+  </data>
+  <data name="user.title" xml:space="preserve">
+    <value>instrumentbræt</value>
+  </data>
+  <data name="user.news.title" xml:space="preserve">
+    <value>Nyheder</value>
+  </data>
+  <data name="user.news.error" xml:space="preserve">
+    <value>Fejl ved indlæsning af nyheder, prøv at genindlæse siden?...</value>
+  </data>
+  <data name="user.header.stats.friends" xml:space="preserve">
+    <value>Venner Online</value>
+  </data>
+  <data name="user.header.stats.games" xml:space="preserve">
+    <value>Spil</value>
+  </data>
+  <data name="user.header.stats.online" xml:space="preserve">
+    <value>Online Brugere</value>
+  </data>
+  <data name="user.beatmaps.new" xml:space="preserve">
+    <value>Nye Rangerede Beatmaps</value>
+  </data>
+  <data name="user.beatmaps.popular" xml:space="preserve">
+    <value>Populære Beatmaps</value>
+  </data>
+  <data name="user.beatmaps.by_user" xml:space="preserve">
+    <value>af {0}</value>
+  </data>
+  <data name="user.buttons.download" xml:space="preserve">
+    <value>Hent osu!</value>
+  </data>
+  <data name="user.buttons.support" xml:space="preserve">
+    <value>Støt osu!</value>
+  </data>
+  <data name="user.buttons.store" xml:space="preserve">
+    <value>osu!store</value>
+  </data>
+  <data name="support-osu.title" xml:space="preserve">
+    <value>Wow!</value>
+  </data>
+  <data name="support-osu.subtitle" xml:space="preserve">
+    <value>Du ser ud til at have det sjovt! {0}</value>
+  </data>
+  <data name="support-osu.body.part-1" xml:space="preserve">
+    <value>Vidste du, at osu! kører helt uden reklamer og er stærkt afhængigt af, at spillerne støtter spillets udvikling og omkostninger?</value>
+  </data>
+  <data name="support-osu.body.part-2" xml:space="preserve">
+    <value>Vidste du også, at du ved at støtte osu! får en stor håndfuld ekstra funktioner, såsom &lt;strong&gt;in-game downloading&lt;/strong&gt; som kan udnyttes i multiplayer- og spectator-tilstand?</value>
+  </data>
+  <data name="support-osu.find-out-more" xml:space="preserve">
+    <value>Klik her for at læse mere!</value>
+  </data>
+  <data name="support-osu.download-starting" xml:space="preserve">
+    <value>Oh, og bare rolig - din download er allerede blevet startet for dig ;)</value>
+  </data>
+</root>

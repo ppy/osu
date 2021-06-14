@@ -1,0 +1,661 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="discussion-votes.update.error" xml:space="preserve">
+    <value>Äänen päivitys ei onnistunut</value>
+  </data>
+  <data name="discussions.allow_kudosu" xml:space="preserve">
+    <value>salli kudosu</value>
+  </data>
+  <data name="discussions.beatmap_information" xml:space="preserve">
+    <value>Beatmap-sivu</value>
+  </data>
+  <data name="discussions.delete" xml:space="preserve">
+    <value>poista</value>
+  </data>
+  <data name="discussions.deleted" xml:space="preserve">
+    <value>Poistanut {0} {1}.</value>
+  </data>
+  <data name="discussions.deny_kudosu" xml:space="preserve">
+    <value>hylkää kudosu</value>
+  </data>
+  <data name="discussions.edit" xml:space="preserve">
+    <value>muokkaa</value>
+  </data>
+  <data name="discussions.edited" xml:space="preserve">
+    <value>Viimeksi muokannut {0} {1}.</value>
+  </data>
+  <data name="discussions.kudosu_denied" xml:space="preserve">
+    <value>Evätty saamasta kudosua.</value>
+  </data>
+  <data name="discussions.message_placeholder_deleted_beatmap" xml:space="preserve">
+    <value>Tämä vaikeustaso on poistettu, joten siitä ei voi enää keskustella.</value>
+  </data>
+  <data name="discussions.message_placeholder_locked" xml:space="preserve">
+    <value>Keskustelu tällä beatmapille on poistettu käytöstä.</value>
+  </data>
+  <data name="discussions.message_placeholder_silenced" xml:space="preserve">
+    <value>Keskusteluun ei voi osallistua mykistettynä.</value>
+  </data>
+  <data name="discussions.message_type_select" xml:space="preserve">
+    <value>Valitse kommentin tyyppi</value>
+  </data>
+  <data name="discussions.reply_notice" xml:space="preserve">
+    <value>Vastaa painamalla enter-näppäintä.</value>
+  </data>
+  <data name="discussions.reply_placeholder" xml:space="preserve">
+    <value>Kirjoita vastauksesi tähän</value>
+  </data>
+  <data name="discussions.require-login" xml:space="preserve">
+    <value>Kirjaudu sisään lähettääksesi viestejä tai vastauksia</value>
+  </data>
+  <data name="discussions.resolved" xml:space="preserve">
+    <value>Ratkaistu</value>
+  </data>
+  <data name="discussions.restore" xml:space="preserve">
+    <value>palauta</value>
+  </data>
+  <data name="discussions.show_deleted" xml:space="preserve">
+    <value>Näytä poistetut</value>
+  </data>
+  <data name="discussions.title" xml:space="preserve">
+    <value>Keskustelut</value>
+  </data>
+  <data name="discussions.collapse.all-collapse" xml:space="preserve">
+    <value>Sulje kaikki</value>
+  </data>
+  <data name="discussions.collapse.all-expand" xml:space="preserve">
+    <value>Avaa kaikki</value>
+  </data>
+  <data name="discussions.empty.empty" xml:space="preserve">
+    <value>Keskustelut puuttuu!</value>
+  </data>
+  <data name="discussions.empty.hidden" xml:space="preserve">
+    <value>Yksikään keskusteluista ei täsmää hakuehtoihisi.</value>
+  </data>
+  <data name="discussions.lock.button.lock" xml:space="preserve">
+    <value>Lukitse keskustelu</value>
+  </data>
+  <data name="discussions.lock.button.unlock" xml:space="preserve">
+    <value>Avaa keskustelu</value>
+  </data>
+  <data name="discussions.lock.prompt.lock" xml:space="preserve">
+    <value>Syy lukitsemiseen</value>
+  </data>
+  <data name="discussions.lock.prompt.unlock" xml:space="preserve">
+    <value>Avataanko varmasti?</value>
+  </data>
+  <data name="discussions.message_hint.in_general" xml:space="preserve">
+    <value>Tämä viesti menee beatmapin yleiseen keskusteluun. Modataksesi tätä beatmappia, aloita viestisi aikaleimalla (esim. 00:12:345).</value>
+  </data>
+  <data name="discussions.message_hint.in_timeline" xml:space="preserve">
+    <value>Modataksesi useampia aikaleimoja, lähetä useampi viesti (yksi viesti per aikaleima).</value>
+  </data>
+  <data name="discussions.message_placeholder.general" xml:space="preserve">
+    <value>Kirjoita tähän lähettääksesi viestin Yleiseen ({0})</value>
+  </data>
+  <data name="discussions.message_placeholder.generalall" xml:space="preserve">
+    <value>Kirjoita tähän lähettääksesi viestin Yleiseen (Kaikki vaikeustasot)</value>
+  </data>
+  <data name="discussions.message_placeholder.review" xml:space="preserve">
+    <value>Kirjoitä tähän lähettääksesi arvostelun</value>
+  </data>
+  <data name="discussions.message_placeholder.timeline" xml:space="preserve">
+    <value>Kirjoita tähän lähettääksesi viestin Aikajanalle ({0})</value>
+  </data>
+  <data name="discussions.message_type.disqualify" xml:space="preserve">
+    <value>Hylkää</value>
+  </data>
+  <data name="discussions.message_type.hype" xml:space="preserve">
+    <value>Hurraus!</value>
+  </data>
+  <data name="discussions.message_type.mapper_note" xml:space="preserve">
+    <value>Huomautus</value>
+  </data>
+  <data name="discussions.message_type.nomination_reset" xml:space="preserve">
+    <value>Nollaa Suositus</value>
+  </data>
+  <data name="discussions.message_type.praise" xml:space="preserve">
+    <value>Kehu</value>
+  </data>
+  <data name="discussions.message_type.problem" xml:space="preserve">
+    <value>Ongelma</value>
+  </data>
+  <data name="discussions.message_type.review" xml:space="preserve">
+    <value>Arvostelu</value>
+  </data>
+  <data name="discussions.message_type.suggestion" xml:space="preserve">
+    <value>Ehdotus</value>
+  </data>
+  <data name="discussions.mode.events" xml:space="preserve">
+    <value>Historia</value>
+  </data>
+  <data name="discussions.mode.general" xml:space="preserve">
+    <value>Yleinen {0}</value>
+  </data>
+  <data name="discussions.mode.reviews" xml:space="preserve">
+    <value>Arvostelut</value>
+  </data>
+  <data name="discussions.mode.timeline" xml:space="preserve">
+    <value>Aikajana</value>
+  </data>
+  <data name="discussions.mode.scopes.general" xml:space="preserve">
+    <value>Tämä vaikeustaso</value>
+  </data>
+  <data name="discussions.mode.scopes.generalall" xml:space="preserve">
+    <value>Kaikki vaikeustasot</value>
+  </data>
+  <data name="discussions.new.pin" xml:space="preserve">
+    <value>Kiinnitä</value>
+  </data>
+  <data name="discussions.new.timestamp" xml:space="preserve">
+    <value>Aikaleima</value>
+  </data>
+  <data name="discussions.new.timestamp_missing" xml:space="preserve">
+    <value>Paina ctrl-c editointitilassa ja liitä viestiisi lisätäksesi aikaleiman!</value>
+  </data>
+  <data name="discussions.new.title" xml:space="preserve">
+    <value>Uusi keskustelu</value>
+  </data>
+  <data name="discussions.new.unpin" xml:space="preserve">
+    <value>Poista kiinnitys</value>
+  </data>
+  <data name="discussions.review.new" xml:space="preserve">
+    <value>Uusi arvostelu</value>
+  </data>
+  <data name="discussions.review.embed.delete" xml:space="preserve">
+    <value>Poista</value>
+  </data>
+  <data name="discussions.review.embed.missing" xml:space="preserve">
+    <value>[KESKUSTELU POISTETTU]</value>
+  </data>
+  <data name="discussions.review.insert-block.paragraph" xml:space="preserve">
+    <value>lisää kappale</value>
+  </data>
+  <data name="discussions.review.insert-block.praise" xml:space="preserve">
+    <value>lisää ylistystä</value>
+  </data>
+  <data name="discussions.review.insert-block.problem" xml:space="preserve">
+    <value>lisää ongelma</value>
+  </data>
+  <data name="discussions.review.insert-block.suggestion" xml:space="preserve">
+    <value>lisää ehdotus</value>
+  </data>
+  <data name="discussions.show.title" xml:space="preserve">
+    <value>{0}, luonut {1}</value>
+  </data>
+  <data name="discussions.sort.created_at" xml:space="preserve">
+    <value>Luomisaika</value>
+  </data>
+  <data name="discussions.sort.timeline" xml:space="preserve">
+    <value>Aikajana</value>
+  </data>
+  <data name="discussions.sort.updated_at" xml:space="preserve">
+    <value>Viimeisin päivitys</value>
+  </data>
+  <data name="discussions.stats.deleted" xml:space="preserve">
+    <value>Poistettu</value>
+  </data>
+  <data name="discussions.stats.mapper_notes" xml:space="preserve">
+    <value>Huomautukset</value>
+  </data>
+  <data name="discussions.stats.mine" xml:space="preserve">
+    <value>Omat</value>
+  </data>
+  <data name="discussions.stats.pending" xml:space="preserve">
+    <value>Vireillä</value>
+  </data>
+  <data name="discussions.stats.praises" xml:space="preserve">
+    <value>Kehut</value>
+  </data>
+  <data name="discussions.stats.resolved" xml:space="preserve">
+    <value>Ratkaistu</value>
+  </data>
+  <data name="discussions.stats.total" xml:space="preserve">
+    <value>Kaikki</value>
+  </data>
+  <data name="discussions.status-messages.approved" xml:space="preserve">
+    <value>Tämä beatmappi hyväksyttiiin {0}!</value>
+  </data>
+  <data name="discussions.status-messages.graveyard" xml:space="preserve">
+    <value>Tätä beatmappia ei ole päivitetty sitten {0} ja sen tekijä on todennäköisesti hylännyt sen...</value>
+  </data>
+  <data name="discussions.status-messages.loved" xml:space="preserve">
+    <value>Tämä beatmap lisättiin Rakastettuihin {0}!</value>
+  </data>
+  <data name="discussions.status-messages.ranked" xml:space="preserve">
+    <value>Tämä beatmap hyväksyttiin {0}!</value>
+  </data>
+  <data name="discussions.status-messages.wip" xml:space="preserve">
+    <value>Huomaa: Tämän beatmapin tekijä on merkannut sen keskeneräiseksi.</value>
+  </data>
+  <data name="hype.button" xml:space="preserve">
+    <value>Hurraa Beatmappia!</value>
+  </data>
+  <data name="hype.button_done" xml:space="preserve">
+    <value>Hurrasit Jo!</value>
+  </data>
+  <data name="hype.confirm" xml:space="preserve">
+    <value>Oletko varma? Tämä toiminto käyttää yhden jäljelläolevista hurrauspisteistä eikä se ole peruutettavissa. Hurrauksia jäljellä {0}.</value>
+  </data>
+  <data name="hype.explanation" xml:space="preserve">
+    <value>Hurraa tätä beatmappia tuodaksesi sille näkyvyyttä suositusta- ja hyväksymistä varten!</value>
+  </data>
+  <data name="hype.explanation_guest" xml:space="preserve">
+    <value>Kirjaudu sisään ja hurraa tätä beatmappia tuodaksesi sille näkyvyyttä suositusta- ja hyväksymistä varten!</value>
+  </data>
+  <data name="hype.new_time" xml:space="preserve">
+    <value>Saat uuden hurrauksen {0}.</value>
+  </data>
+  <data name="hype.remaining" xml:space="preserve">
+    <value>Sinulla on {0} hurrausta jäljellä.</value>
+  </data>
+  <data name="hype.required_text" xml:space="preserve">
+    <value>Hurraukset: {0}/{1}</value>
+  </data>
+  <data name="hype.section_title" xml:space="preserve">
+    <value>Hurrausjuna</value>
+  </data>
+  <data name="hype.title" xml:space="preserve">
+    <value>Hurraukset</value>
+  </data>
+  <data name="feedback.button" xml:space="preserve">
+    <value>Jätä Palautetta</value>
+  </data>
+  <data name="nominations.delete" xml:space="preserve">
+    <value>Poista</value>
+  </data>
+  <data name="nominations.delete_own_confirm" xml:space="preserve">
+    <value>Oletko varma? Tämä beatmap poistetaan ja sinut uudelleenohjataan takaisin profiiliisi.</value>
+  </data>
+  <data name="nominations.delete_other_confirm" xml:space="preserve">
+    <value>Oletko varma? Tämä beatmap poistetaan ja sinut uudelleenohjataan käyttäjän profiiliin.</value>
+  </data>
+  <data name="nominations.disqualification_prompt" xml:space="preserve">
+    <value>Hylkäyksen syy?</value>
+  </data>
+  <data name="nominations.disqualified_at" xml:space="preserve">
+    <value>Hylättiin {0} sitten ({1}).</value>
+  </data>
+  <data name="nominations.disqualified_no_reason" xml:space="preserve">
+    <value>ei määriteltyä syytä</value>
+  </data>
+  <data name="nominations.disqualify" xml:space="preserve">
+    <value>Hylkää</value>
+  </data>
+  <data name="nominations.incorrect_state" xml:space="preserve">
+    <value>Virhe toiminnon suorittamisessa, kokeile päivittää sivu.</value>
+  </data>
+  <data name="nominations.love" xml:space="preserve">
+    <value>Rakasta</value>
+  </data>
+  <data name="nominations.love_confirm" xml:space="preserve">
+    <value>Rakasta tätä beatmappia?</value>
+  </data>
+  <data name="nominations.nominate" xml:space="preserve">
+    <value>Suosittele</value>
+  </data>
+  <data name="nominations.nominate_confirm" xml:space="preserve">
+    <value>Suosittele tätä beatmappia?</value>
+  </data>
+  <data name="nominations.nominated_by" xml:space="preserve">
+    <value>suositellut {0}</value>
+  </data>
+  <data name="nominations.not_enough_hype" xml:space="preserve">
+    <value>Ei ole riittävästi hypetystä.</value>
+  </data>
+  <data name="nominations.remove_from_loved" xml:space="preserve">
+    <value>Poista rakastetuista beatmapeista</value>
+  </data>
+  <data name="nominations.remove_from_loved_prompt" xml:space="preserve">
+    <value>Rakastetuista beatmapeista poistamisen syy:</value>
+  </data>
+  <data name="nominations.required_text" xml:space="preserve">
+    <value>Suositukset: {0}/{1}</value>
+  </data>
+  <data name="nominations.reset_message_deleted" xml:space="preserve">
+    <value>poistettu</value>
+  </data>
+  <data name="nominations.title" xml:space="preserve">
+    <value>Suositusten Tila</value>
+  </data>
+  <data name="nominations.unresolved_issues" xml:space="preserve">
+    <value>Vanhat ongelmat on ratkaistava ensin.</value>
+  </data>
+  <data name="nominations.rank_estimate._" xml:space="preserve">
+    <value>Tämän beatmapin arvioidaan tulla hyväksytyksi {0}, jos mitään ongelmia ei löydy. Se on #{1} {2}.</value>
+  </data>
+  <data name="nominations.rank_estimate.queue" xml:space="preserve">
+    <value>hyväksytysjonossa</value>
+  </data>
+  <data name="nominations.rank_estimate.soon" xml:space="preserve">
+    <value>pian</value>
+  </data>
+  <data name="nominations.reset_at.nomination_reset" xml:space="preserve">
+    <value>Suositteluprosessi nollaantui {0} sitten käyttäjän {1} uuden ongelman vuoksi {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_at.disqualify" xml:space="preserve">
+    <value>Hyväksyminen peruuntui {0} sitten käyttäjän {1} uuden ongelman vuoksi {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_confirm.nomination_reset" xml:space="preserve">
+    <value>Oletko varma? Uuden ongelman lähettäminen kumoaa suositusprosessin.</value>
+  </data>
+  <data name="nominations.reset_confirm.disqualify" xml:space="preserve">
+    <value>Oletko varma? Tämä poistaa beatmapin esihyväksytyistä ja kumoaa suositusprosessin.</value>
+  </data>
+  <data name="listing.search.prompt" xml:space="preserve">
+    <value>anna hakusana...</value>
+  </data>
+  <data name="listing.search.login_required" xml:space="preserve">
+    <value>Kirjaudu sisään hakeaksesi.</value>
+  </data>
+  <data name="listing.search.options" xml:space="preserve">
+    <value>Enemmän Hakuasetuksia</value>
+  </data>
+  <data name="listing.search.supporter_filter" xml:space="preserve">
+    <value>Tunnisteella {0} rajaaminen vaatii aktiivisen osu!supporter-tagin</value>
+  </data>
+  <data name="listing.search.not-found" xml:space="preserve">
+    <value>ei tuloksia</value>
+  </data>
+  <data name="listing.search.not-found-quote" xml:space="preserve">
+    <value>... mitään ei löytynyt.</value>
+  </data>
+  <data name="listing.search.filters.extra" xml:space="preserve">
+    <value>extra</value>
+  </data>
+  <data name="listing.search.filters.general" xml:space="preserve">
+    <value>Yleinen</value>
+  </data>
+  <data name="listing.search.filters.genre" xml:space="preserve">
+    <value>Tyylilaji</value>
+  </data>
+  <data name="listing.search.filters.language" xml:space="preserve">
+    <value>Kieli</value>
+  </data>
+  <data name="listing.search.filters.mode" xml:space="preserve">
+    <value>Pelitila</value>
+  </data>
+  <data name="listing.search.filters.played" xml:space="preserve">
+    <value>Pelatut</value>
+  </data>
+  <data name="listing.search.filters.rank" xml:space="preserve">
+    <value>Luokitus</value>
+  </data>
+  <data name="listing.search.filters.status" xml:space="preserve">
+    <value>Luokat</value>
+  </data>
+  <data name="listing.search.sorting.title" xml:space="preserve">
+    <value>Nimi</value>
+  </data>
+  <data name="listing.search.sorting.artist" xml:space="preserve">
+    <value>Esittäjä</value>
+  </data>
+  <data name="listing.search.sorting.difficulty" xml:space="preserve">
+    <value>Vaikeustaso</value>
+  </data>
+  <data name="listing.search.sorting.favourites" xml:space="preserve">
+    <value>Suosikit</value>
+  </data>
+  <data name="listing.search.sorting.updated" xml:space="preserve">
+    <value>Päivitetty</value>
+  </data>
+  <data name="listing.search.sorting.ranked" xml:space="preserve">
+    <value>Hyväksytty</value>
+  </data>
+  <data name="listing.search.sorting.rating" xml:space="preserve">
+    <value>Luokitus</value>
+  </data>
+  <data name="listing.search.sorting.plays" xml:space="preserve">
+    <value>Pelikerrat</value>
+  </data>
+  <data name="listing.search.sorting.relevance" xml:space="preserve">
+    <value>Osuvuus</value>
+  </data>
+  <data name="listing.search.sorting.nominations" xml:space="preserve">
+    <value>Äänestykset</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote._" xml:space="preserve">
+    <value>Rajataksesi tunnisteella {0} sinulla on oltava aktiivinen {1}</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote.link_text" xml:space="preserve">
+    <value>osu!supporter-tagi</value>
+  </data>
+  <data name="general.converts" xml:space="preserve">
+    <value>Sisällytä muunnetut beatmapit</value>
+  </data>
+  <data name="general.follows" xml:space="preserve">
+    <value>Tilatut kartoittajat</value>
+  </data>
+  <data name="general.recommended" xml:space="preserve">
+    <value>Suositeltu vaikeustaso</value>
+  </data>
+  <data name="mode.all" xml:space="preserve">
+    <value>Kaikki</value>
+  </data>
+  <data name="mode.any" xml:space="preserve">
+    <value>Kaikki</value>
+  </data>
+  <data name="status.any" xml:space="preserve">
+    <value>Kaikki</value>
+  </data>
+  <data name="status.approved" xml:space="preserve">
+    <value>Vahvistettu</value>
+  </data>
+  <data name="status.favourites" xml:space="preserve">
+    <value>Suosikit</value>
+  </data>
+  <data name="status.graveyard" xml:space="preserve">
+    <value>Hautausmaa</value>
+  </data>
+  <data name="status.leaderboard" xml:space="preserve">
+    <value>Tulostaulukollinen</value>
+  </data>
+  <data name="status.loved" xml:space="preserve">
+    <value>Rakastettu</value>
+  </data>
+  <data name="status.mine" xml:space="preserve">
+    <value>Mappini</value>
+  </data>
+  <data name="status.pending" xml:space="preserve">
+    <value>Vireillä &amp; WIP</value>
+  </data>
+  <data name="status.qualified" xml:space="preserve">
+    <value>Esihyväksytty</value>
+  </data>
+  <data name="status.ranked" xml:space="preserve">
+    <value>Hyväksytty</value>
+  </data>
+  <data name="genre.any" xml:space="preserve">
+    <value>Kaikki</value>
+  </data>
+  <data name="genre.unspecified" xml:space="preserve">
+    <value>Määrittelemätön</value>
+  </data>
+  <data name="genre.video-game" xml:space="preserve">
+    <value>Videopeli</value>
+  </data>
+  <data name="genre.anime" xml:space="preserve">
+    <value>Anime</value>
+  </data>
+  <data name="genre.rock" xml:space="preserve">
+    <value>Rock</value>
+  </data>
+  <data name="genre.pop" xml:space="preserve">
+    <value>Pop</value>
+  </data>
+  <data name="genre.other" xml:space="preserve">
+    <value>Muu</value>
+  </data>
+  <data name="genre.novelty" xml:space="preserve">
+    <value>Epätavallinen</value>
+  </data>
+  <data name="genre.hip-hop" xml:space="preserve">
+    <value>Hip Hop</value>
+  </data>
+  <data name="genre.electronic" xml:space="preserve">
+    <value>Elektroninen</value>
+  </data>
+  <data name="genre.metal" xml:space="preserve">
+    <value>Metalli</value>
+  </data>
+  <data name="genre.classical" xml:space="preserve">
+    <value>Klassinen</value>
+  </data>
+  <data name="genre.folk" xml:space="preserve">
+    <value>Kansanmusiikki</value>
+  </data>
+  <data name="genre.jazz" xml:space="preserve">
+    <value>Jatsi</value>
+  </data>
+  <data name="mods.v2" xml:space="preserve">
+    <value>Pisteytys V2</value>
+  </data>
+  <data name="language.any" xml:space="preserve">
+    <value>Kaikki</value>
+  </data>
+  <data name="language.english" xml:space="preserve">
+    <value>englanti</value>
+  </data>
+  <data name="language.chinese" xml:space="preserve">
+    <value>kiina</value>
+  </data>
+  <data name="language.french" xml:space="preserve">
+    <value>ranska</value>
+  </data>
+  <data name="language.german" xml:space="preserve">
+    <value>saksa</value>
+  </data>
+  <data name="language.italian" xml:space="preserve">
+    <value>italia</value>
+  </data>
+  <data name="language.japanese" xml:space="preserve">
+    <value>japani</value>
+  </data>
+  <data name="language.korean" xml:space="preserve">
+    <value>korea</value>
+  </data>
+  <data name="language.spanish" xml:space="preserve">
+    <value>espanja</value>
+  </data>
+  <data name="language.swedish" xml:space="preserve">
+    <value>ruotsi</value>
+  </data>
+  <data name="language.russian" xml:space="preserve">
+    <value>Venäläinen</value>
+  </data>
+  <data name="language.polish" xml:space="preserve">
+    <value>Puolalainen</value>
+  </data>
+  <data name="language.instrumental" xml:space="preserve">
+    <value>Instrumentaalinen</value>
+  </data>
+  <data name="language.other" xml:space="preserve">
+    <value>Muu</value>
+  </data>
+  <data name="language.unspecified" xml:space="preserve">
+    <value>Täsmentämätön</value>
+  </data>
+  <data name="nsfw.exclude" xml:space="preserve">
+    <value>Piilota</value>
+  </data>
+  <data name="nsfw.include" xml:space="preserve">
+    <value>Näytä</value>
+  </data>
+  <data name="played.any" xml:space="preserve">
+    <value>Kaikki</value>
+  </data>
+  <data name="played.played" xml:space="preserve">
+    <value>Pelatut</value>
+  </data>
+  <data name="played.unplayed" xml:space="preserve">
+    <value>Pelaamaton</value>
+  </data>
+  <data name="extra.video" xml:space="preserve">
+    <value>Videollinen</value>
+  </data>
+  <data name="extra.storyboard" xml:space="preserve">
+    <value>Sisältää visuaalisen taustaesityksen</value>
+  </data>
+  <data name="rank.any" xml:space="preserve">
+    <value>Kaikki</value>
+  </data>
+  <data name="rank.xh" xml:space="preserve">
+    <value>Hopea SS</value>
+  </data>
+  <data name="rank.sh" xml:space="preserve">
+    <value>Hopea S</value>
+  </data>
+  <data name="panel.playcount" xml:space="preserve">
+    <value>Pelikerrat {0}</value>
+  </data>
+  <data name="panel.favourites" xml:space="preserve">
+    <value>Suosikit {0}</value>
+  </data>
+  <data name="variant.mania.4k" xml:space="preserve">
+    <value>4K</value>
+  </data>
+  <data name="variant.mania.7k" xml:space="preserve">
+    <value>7K</value>
+  </data>
+  <data name="variant.mania.all" xml:space="preserve">
+    <value>Kaikki</value>
+  </data>
+</root>

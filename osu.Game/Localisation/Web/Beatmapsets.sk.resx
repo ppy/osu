@@ -1,0 +1,298 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>Táto beatmapa momentálne nie je k dispozícii na stiahnutie.</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>Časti tejto mapy boli vymazané na žiadosť tvorca alebo vlastníka tretej strany.</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>Klikni sem pre viac informácií.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Zoznam Beatmap</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>Beatmapy</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>stiahnúť</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>stiahnuť s videom</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>stiahnuť bez videa</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>Diskusia</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>Pridať do mojich obľúbených</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>Pre sťahovanie beatmap sa najskôr musíš prihlásiť!</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>beatmapu vytvoril {0}</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>Odobrať z mojich obľúbených</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>naposledy aktualizované {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>Stiahnúť</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>bez Videa</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>s Videom</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>pre prístup k ďalším funkciám</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>Prihláste sa</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>naposledy aktualizovaný {0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>Máte príliš veľa obľúbených beatmáp! Prosím odstráňte jednu pre pokračovanie.</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>Dajte Hype tejto mape, ak ste si užili jej hranie, aby ste jej pomohli dostať &lt;strong&gt;Hodnotený&lt;/strong&gt; status.</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>Táto mapa je práve {0}.</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>čakajúci</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>kvalifikované</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>rozpracované</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>Nahlásiť problém</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>tu</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>Popis</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>Žáner</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>Jazyk</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>Vypočítavajú sa dáta...</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>Body Neúspechu</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>Zdroj</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>Úspešnosť</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>Tagy</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>dosiahol {0}</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>Rebríček Krajiny</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>Rebríček Priateľov</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>Celosvetový Rebríčok</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>Kliknite &lt;a href="{0}"&gt;tu&lt;/a&gt; pre zobrazenie všetkych výhod, ktoré dostanete!</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>Pre zobrazenie štátnych a rebriček priateľov potrebujete funkciu supportera!</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>Tabuľka výsledkov</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>Presnosť</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>Maximálne Kombo</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>Minutie</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>Módy</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>Hráč</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>Hodnotenie</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>Celkové skóre</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>Skóre</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>Zatiaľ nikto z tvojej krajiny nedosiahol žiadne skóre na tejto mape!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>Zatiaľ nikto z tvojich priateľov nedosiahol žiadne skóre na tejto mape!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>Zatiaľ žiadne skóre. Možno by si sa o to mal pokúsiť?</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>Načítava sa skóre...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>Nehodnotená beatmapa.</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>Vo Vedení</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>Tvoje Najlepšie</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>Veľkosť Koliečok</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>Počet Kláves</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>Vysávanie bodov života</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>Presnosť</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>Rýchlosť Zobrazovania Koliečok</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>Počet Hviezd</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>Dĺžka</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>Počet kruhov</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>Počet sliderov</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>Používateľské hodnotenie</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>Graf hodnotenia</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>Nominácie</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>Počet zahraní</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>Hodnotené</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>Schválené</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>Obľúbené</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>Kvalifikované</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>Nedorobené</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>Nevybavené</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>Cintorín</value>
+  </data>
+</root>

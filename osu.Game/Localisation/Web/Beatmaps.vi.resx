@@ -1,0 +1,682 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="discussion-votes.update.error" xml:space="preserve">
+    <value>Cập nhật vote thất bại</value>
+  </data>
+  <data name="discussions.allow_kudosu" xml:space="preserve">
+    <value>cho phép kudosu</value>
+  </data>
+  <data name="discussions.beatmap_information" xml:space="preserve">
+    <value>Trang Beatmap</value>
+  </data>
+  <data name="discussions.delete" xml:space="preserve">
+    <value>xóa</value>
+  </data>
+  <data name="discussions.deleted" xml:space="preserve">
+    <value>Đã xóa bởi {0} {1}.</value>
+  </data>
+  <data name="discussions.deny_kudosu" xml:space="preserve">
+    <value>từ chối kudosu</value>
+  </data>
+  <data name="discussions.edit" xml:space="preserve">
+    <value>chỉnh sửa</value>
+  </data>
+  <data name="discussions.edited" xml:space="preserve">
+    <value>Sửa đổi lần cuối bởi {0} {1}.</value>
+  </data>
+  <data name="discussions.kudosu_denied" xml:space="preserve">
+    <value>Đã từ chối nhận kudosu.</value>
+  </data>
+  <data name="discussions.message_placeholder_deleted_beatmap" xml:space="preserve">
+    <value>Difficulty này đã bị xóa nên nó có thể sẽ không còn được thảo luận nữa.</value>
+  </data>
+  <data name="discussions.message_placeholder_locked" xml:space="preserve">
+    <value>Chức năng bàn luận của beatmap này đã bị vô hiệu hóa.</value>
+  </data>
+  <data name="discussions.message_placeholder_silenced" xml:space="preserve">
+    <value>Không thể đăng thảo luận khi bị khoá mõm.</value>
+  </data>
+  <data name="discussions.message_type_select" xml:space="preserve">
+    <value>Chọn Loại Nhận Xét</value>
+  </data>
+  <data name="discussions.reply_notice" xml:space="preserve">
+    <value>Nhấn enter để trả lời.</value>
+  </data>
+  <data name="discussions.reply_placeholder" xml:space="preserve">
+    <value>Nhập câu trả lời của bạn tại đây</value>
+  </data>
+  <data name="discussions.require-login" xml:space="preserve">
+    <value>Hãy đăng nhập để đăng hoặc trả lời</value>
+  </data>
+  <data name="discussions.resolved" xml:space="preserve">
+    <value>Đã giải quyết</value>
+  </data>
+  <data name="discussions.restore" xml:space="preserve">
+    <value>hoàn lại</value>
+  </data>
+  <data name="discussions.show_deleted" xml:space="preserve">
+    <value>Hiển thị đã bị xóa</value>
+  </data>
+  <data name="discussions.title" xml:space="preserve">
+    <value>Góc Thảo Luận</value>
+  </data>
+  <data name="discussions.collapse.all-collapse" xml:space="preserve">
+    <value>Thu gọn tất cả</value>
+  </data>
+  <data name="discussions.collapse.all-expand" xml:space="preserve">
+    <value>Mở rộng tất cả</value>
+  </data>
+  <data name="discussions.empty.empty" xml:space="preserve">
+    <value>Chưa có cuộc thảo luận nào hết!</value>
+  </data>
+  <data name="discussions.empty.hidden" xml:space="preserve">
+    <value>Không có cuộc thảo luận nào tương ứng với bộ lọc đã chọn.</value>
+  </data>
+  <data name="discussions.lock.button.lock" xml:space="preserve">
+    <value>Khóa thảo luận</value>
+  </data>
+  <data name="discussions.lock.button.unlock" xml:space="preserve">
+    <value>Mở khóa thảo luận</value>
+  </data>
+  <data name="discussions.lock.prompt.lock" xml:space="preserve">
+    <value>Lí do khóa</value>
+  </data>
+  <data name="discussions.lock.prompt.unlock" xml:space="preserve">
+    <value>Bạn có chắc chắn muốn mở khóa không ?</value>
+  </data>
+  <data name="discussions.message_hint.in_general" xml:space="preserve">
+    <value>Bài đăng này sẽ vào phần thảo luận chung của beatmap, dùng mốc thởi gian để bắt đầu bài đăng (ví dụ 00:12:345) để mod beatmap này.</value>
+  </data>
+  <data name="discussions.message_hint.in_timeline" xml:space="preserve">
+    <value>Để mod nhiều mốc thời gian , hãy đăng nhiều lần (một bài đăng trên một mốc thời gian).</value>
+  </data>
+  <data name="discussions.message_placeholder.general" xml:space="preserve">
+    <value>Nhập vào đây để đăng vào Chung ({0})</value>
+  </data>
+  <data name="discussions.message_placeholder.generalall" xml:space="preserve">
+    <value>Nhập vào đây để đăng vào Chung (Tất cả difficulties)</value>
+  </data>
+  <data name="discussions.message_placeholder.review" xml:space="preserve">
+    <value>Gõ ở đây để đăng một bài đánh giá</value>
+  </data>
+  <data name="discussions.message_placeholder.timeline" xml:space="preserve">
+    <value>Nhập vào đây để đăng vào Timeline ({0})</value>
+  </data>
+  <data name="discussions.message_type.disqualify" xml:space="preserve">
+    <value>Disqualify</value>
+  </data>
+  <data name="discussions.message_type.hype" xml:space="preserve">
+    <value>Hype!</value>
+  </data>
+  <data name="discussions.message_type.mapper_note" xml:space="preserve">
+    <value>Ghi Chú</value>
+  </data>
+  <data name="discussions.message_type.nomination_reset" xml:space="preserve">
+    <value>Thiết Lập Lại Đề Cử</value>
+  </data>
+  <data name="discussions.message_type.praise" xml:space="preserve">
+    <value>Khen Ngợi</value>
+  </data>
+  <data name="discussions.message_type.problem" xml:space="preserve">
+    <value>Vấn Đề</value>
+  </data>
+  <data name="discussions.message_type.review" xml:space="preserve">
+    <value>Đánh giá</value>
+  </data>
+  <data name="discussions.message_type.suggestion" xml:space="preserve">
+    <value>Đề Nghị</value>
+  </data>
+  <data name="discussions.mode.events" xml:space="preserve">
+    <value>Lịch sử</value>
+  </data>
+  <data name="discussions.mode.general" xml:space="preserve">
+    <value>Chung {0}</value>
+  </data>
+  <data name="discussions.mode.reviews" xml:space="preserve">
+    <value>Các đánh giá</value>
+  </data>
+  <data name="discussions.mode.timeline" xml:space="preserve">
+    <value>Timeline</value>
+  </data>
+  <data name="discussions.mode.scopes.general" xml:space="preserve">
+    <value>Difficulty này</value>
+  </data>
+  <data name="discussions.mode.scopes.generalall" xml:space="preserve">
+    <value>Tất cả difficulties</value>
+  </data>
+  <data name="discussions.new.pin" xml:space="preserve">
+    <value>Ghim</value>
+  </data>
+  <data name="discussions.new.timestamp" xml:space="preserve">
+    <value>Mốc thời gian</value>
+  </data>
+  <data name="discussions.new.timestamp_missing" xml:space="preserve">
+    <value>ctrl-c trong chế độ chỉnh sửa (edit mode) và dán trong bài đăng của bạn để thêm một mốc thời gian!</value>
+  </data>
+  <data name="discussions.new.title" xml:space="preserve">
+    <value>Cuộc Thảo Luận Mới</value>
+  </data>
+  <data name="discussions.new.unpin" xml:space="preserve">
+    <value>Bỏ ghim</value>
+  </data>
+  <data name="discussions.review.new" xml:space="preserve">
+    <value>Nhận xét mới</value>
+  </data>
+  <data name="discussions.review.embed.delete" xml:space="preserve">
+    <value>Xoá</value>
+  </data>
+  <data name="discussions.review.embed.missing" xml:space="preserve">
+    <value>[ĐÃ XOÁ THẢO LUẬN]</value>
+  </data>
+  <data name="discussions.review.embed.unlink" xml:space="preserve">
+    <value>Gỡ liên kết</value>
+  </data>
+  <data name="discussions.review.embed.unsaved" xml:space="preserve">
+    <value>Huỷ lưu</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.all-diff" xml:space="preserve">
+    <value>Các bài đăng trên "Mọi độ khó" không thể gắn mốc thời gian.</value>
+  </data>
+  <data name="discussions.review.insert-block.paragraph" xml:space="preserve">
+    <value>chèn đoạn văn</value>
+  </data>
+  <data name="discussions.review.insert-block.praise" xml:space="preserve">
+    <value>chèn lời ca ngợi</value>
+  </data>
+  <data name="discussions.review.insert-block.problem" xml:space="preserve">
+    <value>chèn vấn đề</value>
+  </data>
+  <data name="discussions.review.insert-block.suggestion" xml:space="preserve">
+    <value>chèn gợi ý</value>
+  </data>
+  <data name="discussions.show.title" xml:space="preserve">
+    <value>{0} được map bởi {1}</value>
+  </data>
+  <data name="discussions.sort.created_at" xml:space="preserve">
+    <value>Thời gian tạo</value>
+  </data>
+  <data name="discussions.sort.timeline" xml:space="preserve">
+    <value>Timeline</value>
+  </data>
+  <data name="discussions.sort.updated_at" xml:space="preserve">
+    <value>Cập nhật lần cuối</value>
+  </data>
+  <data name="discussions.stats.deleted" xml:space="preserve">
+    <value>Đã xóa</value>
+  </data>
+  <data name="discussions.stats.mapper_notes" xml:space="preserve">
+    <value>Ghi chú</value>
+  </data>
+  <data name="discussions.stats.mine" xml:space="preserve">
+    <value>Của tôi</value>
+  </data>
+  <data name="discussions.stats.pending" xml:space="preserve">
+    <value>Chưa giải quyết</value>
+  </data>
+  <data name="discussions.stats.praises" xml:space="preserve">
+    <value>Khen ngợi</value>
+  </data>
+  <data name="discussions.stats.resolved" xml:space="preserve">
+    <value>Đã giải quyết</value>
+  </data>
+  <data name="discussions.stats.total" xml:space="preserve">
+    <value>Tất cả</value>
+  </data>
+  <data name="discussions.status-messages.approved" xml:space="preserve">
+    <value>Beatmap này đã được chấp nhận (approved) vào {0}!</value>
+  </data>
+  <data name="discussions.status-messages.graveyard" xml:space="preserve">
+    <value>Beatmap này chưa được cập nhật từ {0} và có thể đã bị bỏ rơi bởi mapper...</value>
+  </data>
+  <data name="discussions.status-messages.loved" xml:space="preserve">
+    <value>Beatmap này đã được love vào {0}!</value>
+  </data>
+  <data name="discussions.status-messages.ranked" xml:space="preserve">
+    <value>Beatmap này đã được xếp hạng (ranked) vào {0}!</value>
+  </data>
+  <data name="discussions.status-messages.wip" xml:space="preserve">
+    <value>Ghi chú: Beatmap này được đánh dấu là đang thực hiện bởi mapper.</value>
+  </data>
+  <data name="discussions.votes.none.down" xml:space="preserve">
+    <value>Chưa có downvote</value>
+  </data>
+  <data name="discussions.votes.none.up" xml:space="preserve">
+    <value>Chưa có upvote</value>
+  </data>
+  <data name="discussions.votes.latest.down" xml:space="preserve">
+    <value>Downvote mới nhất</value>
+  </data>
+  <data name="discussions.votes.latest.up" xml:space="preserve">
+    <value>Upvote mới nhất</value>
+  </data>
+  <data name="hype.button" xml:space="preserve">
+    <value>Hype Beatmap!</value>
+  </data>
+  <data name="hype.button_done" xml:space="preserve">
+    <value>Đã Được Hype!</value>
+  </data>
+  <data name="hype.confirm" xml:space="preserve">
+    <value>Bạn chắc không? Việc này sẽ dùng một trong {0} hype còn lại của bạn và không thể hủy bỏ.</value>
+  </data>
+  <data name="hype.explanation" xml:space="preserve">
+    <value>Hype beatmap này để làm nó có khả năng được đề cử (nominate) và xếp hạng (rank)!</value>
+  </data>
+  <data name="hype.explanation_guest" xml:space="preserve">
+    <value>Đăng nhập và hype beatmap này để nó có khả năng được đề cử (nominate) và xếp hạng (rank)!</value>
+  </data>
+  <data name="hype.new_time" xml:space="preserve">
+    <value>Bạn sẽ nhận được đợt hype khác vào {0}.</value>
+  </data>
+  <data name="hype.remaining" xml:space="preserve">
+    <value>Bạn còn {0} hype.</value>
+  </data>
+  <data name="hype.required_text" xml:space="preserve">
+    <value>Hype: {0}/{1}</value>
+  </data>
+  <data name="hype.section_title" xml:space="preserve">
+    <value>Hype Train</value>
+  </data>
+  <data name="hype.title" xml:space="preserve">
+    <value>Hype</value>
+  </data>
+  <data name="feedback.button" xml:space="preserve">
+    <value>Để Lại Phản Hồi</value>
+  </data>
+  <data name="nominations.delete" xml:space="preserve">
+    <value>Xóa</value>
+  </data>
+  <data name="nominations.delete_own_confirm" xml:space="preserve">
+    <value>Bạn có chắc không? Beatmap sẽ bị xóa và bạn sẽ được chuyển hướng quay lại trang cá nhân của bạn.</value>
+  </data>
+  <data name="nominations.delete_other_confirm" xml:space="preserve">
+    <value>Bạn có chắc không? Beatmap sẽ bị xóa và bạn sẽ được chuyển hướng quay trở lại trang cá nhân của người dùng.</value>
+  </data>
+  <data name="nominations.disqualification_prompt" xml:space="preserve">
+    <value>Lí do để qualify?</value>
+  </data>
+  <data name="nominations.disqualified_at" xml:space="preserve">
+    <value>Disqualified {0} ({1}).</value>
+  </data>
+  <data name="nominations.disqualified_no_reason" xml:space="preserve">
+    <value>không đưa ra lí do</value>
+  </data>
+  <data name="nominations.disqualify" xml:space="preserve">
+    <value>Disqualify</value>
+  </data>
+  <data name="nominations.incorrect_state" xml:space="preserve">
+    <value>Có lỗi khi thực hiện việc này, hãy thử tải lại trang.</value>
+  </data>
+  <data name="nominations.love" xml:space="preserve">
+    <value>Yêu thích</value>
+  </data>
+  <data name="nominations.love_confirm" xml:space="preserve">
+    <value>Yêu thích beatmap này?</value>
+  </data>
+  <data name="nominations.nominate" xml:space="preserve">
+    <value>Đề Cử</value>
+  </data>
+  <data name="nominations.nominate_confirm" xml:space="preserve">
+    <value>Đề cử (nominate) beatmap này?</value>
+  </data>
+  <data name="nominations.nominated_by" xml:space="preserve">
+    <value>Được {0} đề cử</value>
+  </data>
+  <data name="nominations.not_enough_hype" xml:space="preserve">
+    <value>Không đủ hype.</value>
+  </data>
+  <data name="nominations.remove_from_loved" xml:space="preserve">
+    <value>Gỡ khỏi Được Yêu thích</value>
+  </data>
+  <data name="nominations.remove_from_loved_prompt" xml:space="preserve">
+    <value>Lý do gỡ khỏi Được Yêu thích:</value>
+  </data>
+  <data name="nominations.required_text" xml:space="preserve">
+    <value>Trạng thái đề cử: {0}/{1}</value>
+  </data>
+  <data name="nominations.reset_message_deleted" xml:space="preserve">
+    <value>đã xóa</value>
+  </data>
+  <data name="nominations.title" xml:space="preserve">
+    <value>Trạng Thái Đề Cử</value>
+  </data>
+  <data name="nominations.unresolved_issues" xml:space="preserve">
+    <value>Vẫn còn một số vấn đề chưa giải quyết cần được xem lại trước.</value>
+  </data>
+  <data name="nominations.rank_estimate._" xml:space="preserve">
+    <value>Map này ước tính sẽ được Xếp Hạng {0} nếu không tìm ra lỗi nào. Nó đang ở #{1} trong {2}.</value>
+  </data>
+  <data name="nominations.rank_estimate.queue" xml:space="preserve">
+    <value>hàng chờ xếp hạng</value>
+  </data>
+  <data name="nominations.rank_estimate.soon" xml:space="preserve">
+    <value>sớm</value>
+  </data>
+  <data name="nominations.reset_at.nomination_reset" xml:space="preserve">
+    <value>Quá trình đề cử (nomination) thiết lập lại vào {0} bởi {1} với vấn đề mới {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_at.disqualify" xml:space="preserve">
+    <value>Disqualified {0} bởi {1} với vấn đề mới {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_confirm.nomination_reset" xml:space="preserve">
+    <value>Bạn chắc không? Đăng một vấn đề mới sẽ thiết lập lại quá trình đề cử (nomination).</value>
+  </data>
+  <data name="nominations.reset_confirm.disqualify" xml:space="preserve">
+    <value>Bạn chắc không? Việc này sẽ loại bỏ beatmap khỏi qualify và thiết lập lại quá trình đề cử.</value>
+  </data>
+  <data name="listing.search.prompt" xml:space="preserve">
+    <value>nhập từ khóa...</value>
+  </data>
+  <data name="listing.search.login_required" xml:space="preserve">
+    <value>Đăng nhập để tìm kiếm.</value>
+  </data>
+  <data name="listing.search.options" xml:space="preserve">
+    <value>Tùy Chọn Tìm Kiếm Khác</value>
+  </data>
+  <data name="listing.search.supporter_filter" xml:space="preserve">
+    <value>Lọc theo {0} cần một supporter tag đang hoạt động</value>
+  </data>
+  <data name="listing.search.not-found" xml:space="preserve">
+    <value>không có kết quả</value>
+  </data>
+  <data name="listing.search.not-found-quote" xml:space="preserve">
+    <value>... không, chả có gì cả.</value>
+  </data>
+  <data name="listing.search.filters.extra" xml:space="preserve">
+    <value>thêm</value>
+  </data>
+  <data name="listing.search.filters.general" xml:space="preserve">
+    <value>Chung</value>
+  </data>
+  <data name="listing.search.filters.genre" xml:space="preserve">
+    <value>Thể Loại</value>
+  </data>
+  <data name="listing.search.filters.language" xml:space="preserve">
+    <value>Ngôn Ngữ</value>
+  </data>
+  <data name="listing.search.filters.mode" xml:space="preserve">
+    <value>Chế Độ</value>
+  </data>
+  <data name="listing.search.filters.nsfw" xml:space="preserve">
+    <value>Nội dung không lành mạnh</value>
+  </data>
+  <data name="listing.search.filters.played" xml:space="preserve">
+    <value>Đã chơi</value>
+  </data>
+  <data name="listing.search.filters.rank" xml:space="preserve">
+    <value>Thứ Hạng Đạt Được</value>
+  </data>
+  <data name="listing.search.filters.status" xml:space="preserve">
+    <value>Danh mục</value>
+  </data>
+  <data name="listing.search.sorting.title" xml:space="preserve">
+    <value>Tiêu đề</value>
+  </data>
+  <data name="listing.search.sorting.artist" xml:space="preserve">
+    <value>Nghệ sĩ</value>
+  </data>
+  <data name="listing.search.sorting.difficulty" xml:space="preserve">
+    <value>Độ khó</value>
+  </data>
+  <data name="listing.search.sorting.favourites" xml:space="preserve">
+    <value>Số yêu thích</value>
+  </data>
+  <data name="listing.search.sorting.updated" xml:space="preserve">
+    <value>Ngày cập nhật</value>
+  </data>
+  <data name="listing.search.sorting.ranked" xml:space="preserve">
+    <value>Ngày xếp hạng</value>
+  </data>
+  <data name="listing.search.sorting.rating" xml:space="preserve">
+    <value>Đánh giá</value>
+  </data>
+  <data name="listing.search.sorting.plays" xml:space="preserve">
+    <value>Lượt chơi</value>
+  </data>
+  <data name="listing.search.sorting.relevance" xml:space="preserve">
+    <value>Mức độ liên quan</value>
+  </data>
+  <data name="listing.search.sorting.nominations" xml:space="preserve">
+    <value>Số đề cử</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote._" xml:space="preserve">
+    <value>Lọc theo {0} cần một {1} đang hoạt động</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote.link_text" xml:space="preserve">
+    <value>osu!supporter tag</value>
+  </data>
+  <data name="general.converts" xml:space="preserve">
+    <value>Bao gồm beatmap được chuyển đổi</value>
+  </data>
+  <data name="general.recommended" xml:space="preserve">
+    <value>Độ khó đề nghị</value>
+  </data>
+  <data name="mode.all" xml:space="preserve">
+    <value>Tất cả</value>
+  </data>
+  <data name="mode.any" xml:space="preserve">
+    <value>Bất Kì</value>
+  </data>
+  <data name="status.any" xml:space="preserve">
+    <value>Bất Kì</value>
+  </data>
+  <data name="status.approved" xml:space="preserve">
+    <value>Được Chấp Nhận</value>
+  </data>
+  <data name="status.favourites" xml:space="preserve">
+    <value>Yêu thích</value>
+  </data>
+  <data name="status.graveyard" xml:space="preserve">
+    <value>Graveyard</value>
+  </data>
+  <data name="status.leaderboard" xml:space="preserve">
+    <value>Có danh sách xếp hạng</value>
+  </data>
+  <data name="status.loved" xml:space="preserve">
+    <value>Loved</value>
+  </data>
+  <data name="status.mine" xml:space="preserve">
+    <value>Map của tôi</value>
+  </data>
+  <data name="status.pending" xml:space="preserve">
+    <value>Đang chờ &amp; WIP</value>
+  </data>
+  <data name="status.qualified" xml:space="preserve">
+    <value>Qualified</value>
+  </data>
+  <data name="status.ranked" xml:space="preserve">
+    <value>Đã được xếp hạng</value>
+  </data>
+  <data name="genre.any" xml:space="preserve">
+    <value>Bất Kì</value>
+  </data>
+  <data name="genre.unspecified" xml:space="preserve">
+    <value>Chưa Xác Định</value>
+  </data>
+  <data name="genre.video-game" xml:space="preserve">
+    <value>Video Game</value>
+  </data>
+  <data name="genre.anime" xml:space="preserve">
+    <value>Anime</value>
+  </data>
+  <data name="genre.rock" xml:space="preserve">
+    <value>Rock</value>
+  </data>
+  <data name="genre.pop" xml:space="preserve">
+    <value>Pop</value>
+  </data>
+  <data name="genre.other" xml:space="preserve">
+    <value>Khác</value>
+  </data>
+  <data name="genre.novelty" xml:space="preserve">
+    <value>Mới Lạ</value>
+  </data>
+  <data name="genre.hip-hop" xml:space="preserve">
+    <value>Hip Hop</value>
+  </data>
+  <data name="genre.electronic" xml:space="preserve">
+    <value>Điện Tử</value>
+  </data>
+  <data name="genre.metal" xml:space="preserve">
+    <value>Metal</value>
+  </data>
+  <data name="genre.classical" xml:space="preserve">
+    <value>Cổ điển</value>
+  </data>
+  <data name="genre.folk" xml:space="preserve">
+    <value>Dân ca</value>
+  </data>
+  <data name="genre.jazz" xml:space="preserve">
+    <value>Jazz</value>
+  </data>
+  <data name="mods.v2" xml:space="preserve">
+    <value>Score V2</value>
+  </data>
+  <data name="language.any" xml:space="preserve">
+    <value>Bất Kì</value>
+  </data>
+  <data name="language.english" xml:space="preserve">
+    <value>Tiếng Anh</value>
+  </data>
+  <data name="language.chinese" xml:space="preserve">
+    <value>Tiếng Trung</value>
+  </data>
+  <data name="language.french" xml:space="preserve">
+    <value>Tiếng Pháp</value>
+  </data>
+  <data name="language.german" xml:space="preserve">
+    <value>Tiếng Đức</value>
+  </data>
+  <data name="language.italian" xml:space="preserve">
+    <value>Tiếng Ý</value>
+  </data>
+  <data name="language.japanese" xml:space="preserve">
+    <value>Tiếng Nhật</value>
+  </data>
+  <data name="language.korean" xml:space="preserve">
+    <value>Tiếng Hàn</value>
+  </data>
+  <data name="language.spanish" xml:space="preserve">
+    <value>Tiếng Tây Ban Nha</value>
+  </data>
+  <data name="language.swedish" xml:space="preserve">
+    <value>Tiếng Thụy Điển</value>
+  </data>
+  <data name="language.russian" xml:space="preserve">
+    <value>Tiếng Nga</value>
+  </data>
+  <data name="language.polish" xml:space="preserve">
+    <value>Tiếng Ba Lan</value>
+  </data>
+  <data name="language.instrumental" xml:space="preserve">
+    <value>Nhạc Cụ</value>
+  </data>
+  <data name="language.other" xml:space="preserve">
+    <value>Khác</value>
+  </data>
+  <data name="language.unspecified" xml:space="preserve">
+    <value>Không xác định</value>
+  </data>
+  <data name="nsfw.exclude" xml:space="preserve">
+    <value>Ẩn</value>
+  </data>
+  <data name="nsfw.include" xml:space="preserve">
+    <value>Hiển thị</value>
+  </data>
+  <data name="played.any" xml:space="preserve">
+    <value>Bất Kì</value>
+  </data>
+  <data name="played.played" xml:space="preserve">
+    <value>Đã Chơi</value>
+  </data>
+  <data name="played.unplayed" xml:space="preserve">
+    <value>Chưa Chơi</value>
+  </data>
+  <data name="extra.video" xml:space="preserve">
+    <value>Có Video</value>
+  </data>
+  <data name="extra.storyboard" xml:space="preserve">
+    <value>Có Storyboard</value>
+  </data>
+  <data name="rank.any" xml:space="preserve">
+    <value>Bất Kì</value>
+  </data>
+  <data name="rank.xh" xml:space="preserve">
+    <value>Silver SS</value>
+  </data>
+  <data name="rank.sh" xml:space="preserve">
+    <value>Silver S</value>
+  </data>
+  <data name="panel.playcount" xml:space="preserve">
+    <value>Số lượt chơi: {0}</value>
+  </data>
+  <data name="panel.favourites" xml:space="preserve">
+    <value>Yêu thích: {0}</value>
+  </data>
+  <data name="variant.mania.4k" xml:space="preserve">
+    <value>4K</value>
+  </data>
+  <data name="variant.mania.7k" xml:space="preserve">
+    <value>7K</value>
+  </data>
+  <data name="variant.mania.all" xml:space="preserve">
+    <value>Tất cả</value>
+  </data>
+</root>

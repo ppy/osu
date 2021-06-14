@@ -1,0 +1,556 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="pinned_topics" xml:space="preserve">
+    <value>Topik yang Disematkan</value>
+  </data>
+  <data name="slogan" xml:space="preserve">
+    <value>Bermain sendiri itu berbahaya.</value>
+  </data>
+  <data name="subforums" xml:space="preserve">
+    <value>Subforum</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>Forum</value>
+  </data>
+  <data name="covers.edit" xml:space="preserve">
+    <value>Sunting gambar sampul</value>
+  </data>
+  <data name="covers.create._" xml:space="preserve">
+    <value>Pasang gambar sampul</value>
+  </data>
+  <data name="covers.create.button" xml:space="preserve">
+    <value>Unggah gambar sampul</value>
+  </data>
+  <data name="covers.create.info" xml:space="preserve">
+    <value>Ukuran gambar yang optimal adalah {0}. Anda juga dapat meletakkan gambar di sini untuk mengunggah.</value>
+  </data>
+  <data name="covers.destroy._" xml:space="preserve">
+    <value>Hapus gambar sampul</value>
+  </data>
+  <data name="covers.destroy.confirm" xml:space="preserve">
+    <value>Apakah Anda yakin ingin menghapus gambar sampul ini?</value>
+  </data>
+  <data name="forums.latest_post" xml:space="preserve">
+    <value>Kiriman Terbaru</value>
+  </data>
+  <data name="forums.index.title" xml:space="preserve">
+    <value>Indeks Forum</value>
+  </data>
+  <data name="forums.topics.empty" xml:space="preserve">
+    <value>Topik tidak ditemukan!</value>
+  </data>
+  <data name="mark_as_read.forum" xml:space="preserve">
+    <value>Tandai forum ini sebagai telah terbaca</value>
+  </data>
+  <data name="mark_as_read.forums" xml:space="preserve">
+    <value>Tandai forum-forum ini sebagai telah terbaca</value>
+  </data>
+  <data name="mark_as_read.busy" xml:space="preserve">
+    <value>Menandai sebagai telah terbaca...</value>
+  </data>
+  <data name="post.confirm_destroy" xml:space="preserve">
+    <value>Apakah Anda yakin untuk menghapus post ini?</value>
+  </data>
+  <data name="post.confirm_restore" xml:space="preserve">
+    <value>Apakah Anda yakin untuk mengembalikan post ini?</value>
+  </data>
+  <data name="post.edited" xml:space="preserve">
+    <value>Terakhir disunting oleh {0} {1}, dengan total penyuntingan sebanyak {2} kali.|Terakhir disunting oleh {0} {1}, dengan total penyuntingan sebanyak {2} kali.</value>
+  </data>
+  <data name="post.posted_at" xml:space="preserve">
+    <value>diposting {0}</value>
+  </data>
+  <data name="post.posted_by" xml:space="preserve">
+    <value>di-post oleh {0}</value>
+  </data>
+  <data name="post.actions.destroy" xml:space="preserve">
+    <value>Hapus Kiriman</value>
+  </data>
+  <data name="post.actions.edit" xml:space="preserve">
+    <value>Sunting post</value>
+  </data>
+  <data name="post.actions.report" xml:space="preserve">
+    <value>Laporkan post</value>
+  </data>
+  <data name="post.actions.restore" xml:space="preserve">
+    <value>Kembalikan post</value>
+  </data>
+  <data name="post.create.title.reply" xml:space="preserve">
+    <value>Balasan baru</value>
+  </data>
+  <data name="post.info.post_count" xml:space="preserve">
+    <value>{0} postingan</value>
+  </data>
+  <data name="post.info.topic_starter" xml:space="preserve">
+    <value>Pembuka Topik</value>
+  </data>
+  <data name="search.go_to_post" xml:space="preserve">
+    <value>Pergi ke post</value>
+  </data>
+  <data name="search.post_number_input" xml:space="preserve">
+    <value>masukkan nomor post</value>
+  </data>
+  <data name="search.total_posts" xml:space="preserve">
+    <value>{0} post total</value>
+  </data>
+  <data name="topic.confirm_destroy" xml:space="preserve">
+    <value>Apakah Anda yakin untuk menghapus topik ini?</value>
+  </data>
+  <data name="topic.confirm_restore" xml:space="preserve">
+    <value>Apakah Anda yakin untuk mengembalikan topik ini?</value>
+  </data>
+  <data name="topic.deleted" xml:space="preserve">
+    <value>topik yang dihapus</value>
+  </data>
+  <data name="topic.go_to_latest" xml:space="preserve">
+    <value>lihat posting terbaru</value>
+  </data>
+  <data name="topic.has_replied" xml:space="preserve">
+    <value>Anda telah mengirimkan balasan pada topik ini</value>
+  </data>
+  <data name="topic.in_forum" xml:space="preserve">
+    <value>pada forum {0}</value>
+  </data>
+  <data name="topic.latest_post" xml:space="preserve">
+    <value>{0} oleh {1}</value>
+  </data>
+  <data name="topic.latest_reply_by" xml:space="preserve">
+    <value>balasan terbaru oleh {0}</value>
+  </data>
+  <data name="topic.new_topic" xml:space="preserve">
+    <value>Post topik baru</value>
+  </data>
+  <data name="topic.new_topic_login" xml:space="preserve">
+    <value>Silakan masuk untuk membuat topik baru</value>
+  </data>
+  <data name="topic.post_reply" xml:space="preserve">
+    <value>Post</value>
+  </data>
+  <data name="topic.reply_box_placeholder" xml:space="preserve">
+    <value>Ketik di sini untuk membalas</value>
+  </data>
+  <data name="topic.reply_title_prefix" xml:space="preserve">
+    <value>Re</value>
+  </data>
+  <data name="topic.started_by" xml:space="preserve">
+    <value>oleh {0}</value>
+  </data>
+  <data name="topic.started_by_verbose" xml:space="preserve">
+    <value>topik dimulai oleh {0}</value>
+  </data>
+  <data name="topic.actions.destroy" xml:space="preserve">
+    <value>Hapus topik</value>
+  </data>
+  <data name="topic.actions.restore" xml:space="preserve">
+    <value>Kembalikan topik</value>
+  </data>
+  <data name="topic.create.close" xml:space="preserve">
+    <value>Tutup</value>
+  </data>
+  <data name="topic.create.preview" xml:space="preserve">
+    <value>Pratinjau</value>
+  </data>
+  <data name="topic.create.preview_hide" xml:space="preserve">
+    <value>Ketik</value>
+  </data>
+  <data name="topic.create.submit" xml:space="preserve">
+    <value>Post</value>
+  </data>
+  <data name="topic.create.necropost.default" xml:space="preserve">
+    <value>Topik ini sudah tidak aktif untuk sementara waktu. Posting di sini jika Anda memiliki alasan khusus untuk melakukannya.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic._" xml:space="preserve">
+    <value>Topik ini sudah tidak aktif untuk beberapa waktu. Jika Anda tidak memiliki alasan khusus untuk memposting di sini, silakan {0} saja.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic.create" xml:space="preserve">
+    <value>post topik baru</value>
+  </data>
+  <data name="topic.create.placeholder.body" xml:space="preserve">
+    <value>Ketik konten post di sini</value>
+  </data>
+  <data name="topic.create.placeholder.title" xml:space="preserve">
+    <value>Klik di sini untuk mengatur judul</value>
+  </data>
+  <data name="topic.jump.enter" xml:space="preserve">
+    <value>klik untuk memasukkan nomor tertentu</value>
+  </data>
+  <data name="topic.jump.first" xml:space="preserve">
+    <value>pergi ke post pertama</value>
+  </data>
+  <data name="topic.jump.last" xml:space="preserve">
+    <value>pergi ke post terakhir</value>
+  </data>
+  <data name="topic.jump.next" xml:space="preserve">
+    <value>lewati 10 post berikutnya</value>
+  </data>
+  <data name="topic.jump.previous" xml:space="preserve">
+    <value>tuju 10 post terdahulu</value>
+  </data>
+  <data name="topic.post_edit.cancel" xml:space="preserve">
+    <value>Batal</value>
+  </data>
+  <data name="topic.post_edit.post" xml:space="preserve">
+    <value>Simpan</value>
+  </data>
+  <data name="topic_watches.index.title_compact" xml:space="preserve">
+    <value>daftar pantauan topik forum</value>
+  </data>
+  <data name="topic_watches.index.box.total" xml:space="preserve">
+    <value>Topik yang dilanggan</value>
+  </data>
+  <data name="topic_watches.index.box.unread" xml:space="preserve">
+    <value>Topik dengan balasan baru</value>
+  </data>
+  <data name="topic_watches.index.info.total" xml:space="preserve">
+    <value>Anda berlangganan {0} topik.</value>
+  </data>
+  <data name="topic_watches.index.info.unread" xml:space="preserve">
+    <value>Anda mempunyai {0} balasan yang belum dibalas di topik yang Anda langgan.</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.confirmation" xml:space="preserve">
+    <value>Berhenti berlangganan dari topik?</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.title" xml:space="preserve">
+    <value>Berhenti Berlangganan</value>
+  </data>
+  <data name="topics._" xml:space="preserve">
+    <value>Topik</value>
+  </data>
+  <data name="topics.actions.login_reply" xml:space="preserve">
+    <value>Masuk untuk Membalas</value>
+  </data>
+  <data name="topics.actions.reply" xml:space="preserve">
+    <value>Balas</value>
+  </data>
+  <data name="topics.actions.reply_with_quote" xml:space="preserve">
+    <value>Kutip posting untuk balasan</value>
+  </data>
+  <data name="topics.actions.search" xml:space="preserve">
+    <value>Cari</value>
+  </data>
+  <data name="topics.create.create_poll" xml:space="preserve">
+    <value>Pembuatan Jajak Pendapat</value>
+  </data>
+  <data name="topics.create.preview" xml:space="preserve">
+    <value>Pratinjau Postingan</value>
+  </data>
+  <data name="topics.create.create_poll_button.add" xml:space="preserve">
+    <value>Buat jajak pendapat</value>
+  </data>
+  <data name="topics.create.create_poll_button.remove" xml:space="preserve">
+    <value>Batal membuat jajak pendapat</value>
+  </data>
+  <data name="topics.create.poll.hide_results" xml:space="preserve">
+    <value>Rahasiakan suara yang masuk ketika polling sedang berjalan.</value>
+  </data>
+  <data name="topics.create.poll.hide_results_info" xml:space="preserve">
+    <value>Hasil polling baru akan dapat terlihat ketika waktu pemungutan suara telah berakhir.</value>
+  </data>
+  <data name="topics.create.poll.length" xml:space="preserve">
+    <value>Jalankan jajak pendapat selama</value>
+  </data>
+  <data name="topics.create.poll.length_days_suffix" xml:space="preserve">
+    <value>hari</value>
+  </data>
+  <data name="topics.create.poll.length_info" xml:space="preserve">
+    <value>Biarkan kosong apabila Anda tidak ingin menerapkan tenggat waktu pada jajak pendapat ini</value>
+  </data>
+  <data name="topics.create.poll.max_options" xml:space="preserve">
+    <value>Pilihan per pengguna</value>
+  </data>
+  <data name="topics.create.poll.max_options_info" xml:space="preserve">
+    <value>Jumlah opsi yang dapat dipilih setiap pengguna saat memilih.</value>
+  </data>
+  <data name="topics.create.poll.options" xml:space="preserve">
+    <value>Pilihan</value>
+  </data>
+  <data name="topics.create.poll.options_info" xml:space="preserve">
+    <value>Tempatkan setiap opsi pada baris baru. Anda dapat memasukkan hingga 10 opsi.</value>
+  </data>
+  <data name="topics.create.poll.title" xml:space="preserve">
+    <value>Pertanyaan</value>
+  </data>
+  <data name="topics.create.poll.vote_change" xml:space="preserve">
+    <value>Izinkan pemilihan ulang.</value>
+  </data>
+  <data name="topics.create.poll.vote_change_info" xml:space="preserve">
+    <value>Jika diaktifkan, pengguna dapat mengubah pilihan mereka.</value>
+  </data>
+  <data name="topics.edit_title.start" xml:space="preserve">
+    <value>Sunting judul</value>
+  </data>
+  <data name="topics.index.feature_votes" xml:space="preserve">
+    <value>prioritas</value>
+  </data>
+  <data name="topics.index.replies" xml:space="preserve">
+    <value>balasan</value>
+  </data>
+  <data name="topics.index.views" xml:space="preserve">
+    <value>kali dilihat</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0" xml:space="preserve">
+    <value>Hapus tanda "tertambahkan"</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0_done" xml:space="preserve">
+    <value>Tanda "tertambahkan" telah dihapus</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1" xml:space="preserve">
+    <value>Tambahkan tanda "tertambahkan"</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1_done" xml:space="preserve">
+    <value>Tanda "tertambahkan" telah ditambahkan</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0" xml:space="preserve">
+    <value>Hapus tanda "tertentukan"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0_done" xml:space="preserve">
+    <value>Tanda "tertentukan" telah dihapus</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1" xml:space="preserve">
+    <value>Tambahkan tanda "tertentukan"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1_done" xml:space="preserve">
+    <value>Tanda "tertentukan" telah ditambahkan</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0" xml:space="preserve">
+    <value>Hapus tanda "terkonfirmasi"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0_done" xml:space="preserve">
+    <value>Tanda "terkonfirmasi" telah dihapus</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1" xml:space="preserve">
+    <value>Tambahkan tanda "terkonfirmasi"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1_done" xml:space="preserve">
+    <value>Tanda "terkonfirmasi" telah ditambahkan</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0" xml:space="preserve">
+    <value>Hapus tanda "terselesaikan"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0_done" xml:space="preserve">
+    <value>Tanda "terselesaikan" telah dihapus</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1" xml:space="preserve">
+    <value>Tambahkan tanda "terselesaikan"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1_done" xml:space="preserve">
+    <value>Tanda "terselesaikan" telah ditambahkan</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0" xml:space="preserve">
+    <value>Hapus tanda "tidak valid"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0_done" xml:space="preserve">
+    <value>Tanda "tidak valid" telah dihapus</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1" xml:space="preserve">
+    <value>Tambahkan tanda "tidak valid"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1_done" xml:space="preserve">
+    <value>Tanda "tidak valid" telah ditambahkan</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0" xml:space="preserve">
+    <value>Hapus tanda "terselesaikan"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0_done" xml:space="preserve">
+    <value>Tanda "terselesaikan" telah dihapus</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1" xml:space="preserve">
+    <value>Tambahkan tanda "terselesaikan"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1_done" xml:space="preserve">
+    <value>Tanda "terselesaikan" telah ditambahkan</value>
+  </data>
+  <data name="topics.lock.is_locked" xml:space="preserve">
+    <value>Topik ini telah dikunci dan tidak dapat dibalas</value>
+  </data>
+  <data name="topics.lock.to_0" xml:space="preserve">
+    <value>Buka topik</value>
+  </data>
+  <data name="topics.lock.to_0_confirm" xml:space="preserve">
+    <value>Buka kunci topik?</value>
+  </data>
+  <data name="topics.lock.to_0_done" xml:space="preserve">
+    <value>Topik telah dibuka</value>
+  </data>
+  <data name="topics.lock.to_1" xml:space="preserve">
+    <value>Kunci topik</value>
+  </data>
+  <data name="topics.lock.to_1_confirm" xml:space="preserve">
+    <value>Kunci topik?</value>
+  </data>
+  <data name="topics.lock.to_1_done" xml:space="preserve">
+    <value>Topik telah dikunci</value>
+  </data>
+  <data name="topics.moderate_move.title" xml:space="preserve">
+    <value>Pindahkan ke forum lain</value>
+  </data>
+  <data name="topics.moderate_pin.to_0" xml:space="preserve">
+    <value>Lepas sematan topik</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_confirm" xml:space="preserve">
+    <value>Lepas sematan topik?</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_done" xml:space="preserve">
+    <value>Sematan topik telah dilepaskan</value>
+  </data>
+  <data name="topics.moderate_pin.to_1" xml:space="preserve">
+    <value>Sematkan topik</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_confirm" xml:space="preserve">
+    <value>Sematkan topik?</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_done" xml:space="preserve">
+    <value>Topik telah disematkan</value>
+  </data>
+  <data name="topics.moderate_pin.to_2" xml:space="preserve">
+    <value>Sematkan topik dan tandai sebagai pengumuman</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_confirm" xml:space="preserve">
+    <value>Sematkan topik dan tandai sebagai pengumuman?</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_done" xml:space="preserve">
+    <value>Topik telah disematkan dan ditandai sebagai pengumuman</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.show" xml:space="preserve">
+    <value>Tampilkan postingan yang telah dihapus</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.hide" xml:space="preserve">
+    <value>Sembunyikan postingan yang telah dihapus</value>
+  </data>
+  <data name="topics.show.deleted-posts" xml:space="preserve">
+    <value>Post yang Dihapus</value>
+  </data>
+  <data name="topics.show.total_posts" xml:space="preserve">
+    <value>Jumlah Post</value>
+  </data>
+  <data name="topics.show.feature_vote.current" xml:space="preserve">
+    <value>Prioritas saat ini: +{0}</value>
+  </data>
+  <data name="topics.show.feature_vote.do" xml:space="preserve">
+    <value>Promosikan permintaan ini</value>
+  </data>
+  <data name="topics.show.feature_vote.info._" xml:space="preserve">
+    <value>Ini adalah sebuah {0}. Fitur-fitur yang diajukan dapat di-vote lebih lanjut oleh {1}.</value>
+  </data>
+  <data name="topics.show.feature_vote.info.feature_request" xml:space="preserve">
+    <value>permintaan fitur</value>
+  </data>
+  <data name="topics.show.feature_vote.info.supporters" xml:space="preserve">
+    <value>para supporter</value>
+  </data>
+  <data name="topics.show.feature_vote.user.count" xml:space="preserve">
+    <value>{0} tidak ada suara|{1} {0} suara|[2,*] {0} suara</value>
+  </data>
+  <data name="topics.show.feature_vote.user.current" xml:space="preserve">
+    <value>Anda memiliki {0} tersisa.</value>
+  </data>
+  <data name="topics.show.feature_vote.user.not_enough" xml:space="preserve">
+    <value>Anda tidak memiliki cukup hak suara untuk dapat mempromosikan gagasan ini lebih jauh.</value>
+  </data>
+  <data name="topics.show.poll.edit" xml:space="preserve">
+    <value>Sunting jajak pendapat</value>
+  </data>
+  <data name="topics.show.poll.edit_warning" xml:space="preserve">
+    <value>Menyunting isi jajak pendapat akan menghilangkan semua hasil yang sudah tercatat sampai saat ini!</value>
+  </data>
+  <data name="topics.show.poll.vote" xml:space="preserve">
+    <value>Pilih</value>
+  </data>
+  <data name="topics.show.poll.button.change_vote" xml:space="preserve">
+    <value>Ubah suara</value>
+  </data>
+  <data name="topics.show.poll.button.edit" xml:space="preserve">
+    <value>Sunting jajak pendapat</value>
+  </data>
+  <data name="topics.show.poll.button.view_results" xml:space="preserve">
+    <value>Lewati ke hasil jajak pendapat</value>
+  </data>
+  <data name="topics.show.poll.button.vote" xml:space="preserve">
+    <value>Pilih</value>
+  </data>
+  <data name="topics.show.poll.detail.end_time" xml:space="preserve">
+    <value>Pemilihan akan berakhir {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.ended" xml:space="preserve">
+    <value>Pemilihan telah berakhir {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.results_hidden" xml:space="preserve">
+    <value>Hasil polling baru akan dapat terlihat ketika waktu pemungutan suara telah berakhir.</value>
+  </data>
+  <data name="topics.show.poll.detail.total" xml:space="preserve">
+    <value>Jumlah suara: {0}</value>
+  </data>
+  <data name="topics.watch.to_not_watching" xml:space="preserve">
+    <value>Tidak dimarkahi</value>
+  </data>
+  <data name="topics.watch.to_watching" xml:space="preserve">
+    <value>Markah</value>
+  </data>
+  <data name="topics.watch.to_watching_mail" xml:space="preserve">
+    <value>Markah dengan notifikasi</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_disable" xml:space="preserve">
+    <value>Anda sedang mengaktifkan notifikasi otomatis untuk topik ini. Klik di sini untuk menonaktifkan notifikasi otomatis</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_enable" xml:space="preserve">
+    <value>Anda sedang tidak mengaktifkan notifikasi otomatis untuk topik ini. Klik di sini untuk mengaktifkan notifikasi otomatis</value>
+  </data>
+</root>

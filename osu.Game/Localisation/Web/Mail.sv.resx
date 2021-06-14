@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="beatmapset_update_notice.new" xml:space="preserve">
+    <value>Bara så att du vet har det skett en ny uppdatering i beatmap "{0}" sedan ditt senaste besök.</value>
+  </data>
+  <data name="beatmapset_update_notice.subject" xml:space="preserve">
+    <value>Ny uppdatering för beatmap "{0}"</value>
+  </data>
+  <data name="beatmapset_update_notice.unwatch" xml:space="preserve">
+    <value>Om du inte längre vill titta på denna beatmap, så kan du antingen klicka på länken "Sluta följa" som finns på sidan ovan, eller från sidan för modding bevakningslista:</value>
+  </data>
+  <data name="beatmapset_update_notice.visit" xml:space="preserve">
+    <value>Besök diskussionssidan här:</value>
+  </data>
+  <data name="common.closing" xml:space="preserve">
+    <value>Hälsningar</value>
+  </data>
+  <data name="common.hello" xml:space="preserve">
+    <value>Hej {0},</value>
+  </data>
+  <data name="common.report" xml:space="preserve">
+    <value>Vänligen svara på detta e-postmeddelande OMEDELBART om du inte begär denna ändring.</value>
+  </data>
+  <data name="donation_thanks.benefit_more" xml:space="preserve">
+    <value>Fler nya supporterförmåner kommer också att dyka upp över tid!</value>
+  </data>
+  <data name="donation_thanks.feedback" xml:space="preserve">
+    <value>Om du har några frågor eller synpunkter, tveka inte att svara på detta mejlet, jag återkommer till dig så snart som möjligt!</value>
+  </data>
+  <data name="donation_thanks.keep_free" xml:space="preserve">
+    <value>Det är tack vare människor som du som osu! kan hålla spelet och gemenskapen välfungerande utan reklam eller påtvingade betalningar.</value>
+  </data>
+  <data name="donation_thanks.keep_running" xml:space="preserve">
+    <value>Ditt stöd håller osu! igång i runt {0}! Det kanske inte verkar som mycket, men allt lägger till :).</value>
+  </data>
+  <data name="donation_thanks.subject" xml:space="preserve">
+    <value>Tack, osu! &lt;3 dig</value>
+  </data>
+  <data name="donation_thanks.translation" xml:space="preserve">
+    <value>En översättning som tillhandahålls av gemenskapen för informationsändamål följande:</value>
+  </data>
+  <data name="donation_thanks.benefit.gift" xml:space="preserve">
+    <value>Dina gåvmottagare kommer nu att ha tillgång till osu!direkt och många andra supporter fördelar.</value>
+  </data>
+  <data name="donation_thanks.benefit.self" xml:space="preserve">
+    <value>Du kommer nu att ha tillgång till osu!direct och många andra supporter fördelar i {0}.</value>
+  </data>
+  <data name="donation_thanks.support._" xml:space="preserve">
+    <value>Tack så mycket för din {0} till osu!.</value>
+  </data>
+  <data name="donation_thanks.support.first" xml:space="preserve">
+    <value>support</value>
+  </data>
+  <data name="donation_thanks.support.repeat" xml:space="preserve">
+    <value>fortsatt stöd</value>
+  </data>
+  <data name="forum_new_reply.new" xml:space="preserve">
+    <value>Bara så att du vet finns det ett nytt svar i "{0}" sedan ditt senaste besök.</value>
+  </data>
+  <data name="forum_new_reply.subject" xml:space="preserve">
+    <value>[osu!] Nytt svar på ämne "{0}"</value>
+  </data>
+  <data name="forum_new_reply.unwatch" xml:space="preserve">
+    <value>Om du inte längre vill följa detta ämnet, kan du antingen klicka på länken "Avsluta prenumeration" längst ned i ämnet ovan, eller från ämnes-prenumerationshanteringssidan:</value>
+  </data>
+  <data name="forum_new_reply.visit" xml:space="preserve">
+    <value>Hoppa direkt till det senaste svaret med hjälp av följande länk:</value>
+  </data>
+  <data name="password_reset.code" xml:space="preserve">
+    <value>Din verifieringskod är:</value>
+  </data>
+  <data name="password_reset.requested" xml:space="preserve">
+    <value>Antingen du eller någon som låtsas vara du har begärt en lösenordsåterställning på ditt osu! konto.</value>
+  </data>
+  <data name="password_reset.subject" xml:space="preserve">
+    <value>osu! konto återhämtning</value>
+  </data>
+  <data name="store_payment_completed.prepare_shipping" xml:space="preserve">
+    <value>Vi har fått din betalning och förbereder din beställning för frakt. Det kan ta några dagar för oss att skicka ut det, beroende på antalet beställningar. Du kan följa utvecklingen av din beställning här, inklusive spårningsdetaljer där det finns:</value>
+  </data>
+  <data name="store_payment_completed.processing" xml:space="preserve">
+    <value>Vi har mottagit din betalning och behandlar för närvarande din beställning. Du kan följa utvecklingen av din beställning här:</value>
+  </data>
+  <data name="store_payment_completed.questions" xml:space="preserve">
+    <value>Om du har några frågor, tveka inte att svara på detta meljet.</value>
+  </data>
+  <data name="store_payment_completed.shipping" xml:space="preserve">
+    <value>Frakt</value>
+  </data>
+  <data name="store_payment_completed.subject" xml:space="preserve">
+    <value>Vi har tagit emot din osu!store-beställning!</value>
+  </data>
+  <data name="store_payment_completed.thank_you" xml:space="preserve">
+    <value>Tack för din osu!store beställning!</value>
+  </data>
+  <data name="store_payment_completed.total" xml:space="preserve">
+    <value>Totalt</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift" xml:space="preserve">
+    <value>Personen som gav dig denna tagg kan välja att förbli anonym, så de har inte nämnts i denna avisering.</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift_maybe_not" xml:space="preserve">
+    <value>Men du vet förmodligen redan vem det är ;).</value>
+  </data>
+  <data name="supporter_gift.duration" xml:space="preserve">
+    <value>Tack vare dem har du tillgång till osu!direkt och andra osu!supporter fördelar för de kommande {0}.</value>
+  </data>
+  <data name="supporter_gift.features" xml:space="preserve">
+    <value>Du kan läsa mer om dessa funktioner här:</value>
+  </data>
+  <data name="supporter_gift.gifted" xml:space="preserve">
+    <value>Någon har precis gett dig en osu!supporter tag!</value>
+  </data>
+  <data name="supporter_gift.subject" xml:space="preserve">
+    <value>Du har fått en osu!supporter tagg!</value>
+  </data>
+  <data name="user_email_updated.changed_to" xml:space="preserve">
+    <value>Detta är ett bekräftelsemail för att informera dig om att din osu! e-postadress har ändrats till: "{0}".</value>
+  </data>
+  <data name="user_email_updated.check" xml:space="preserve">
+    <value>Vänligen se till att du fick detta e-postmeddelande på din nya adress för att förhindra att förlora tillgång till ditt osu-konto i framtiden.</value>
+  </data>
+  <data name="user_email_updated.sent" xml:space="preserve">
+    <value>Av säkerhetsskäl har detta e-postmeddelande skickats till både din nya och gamla e-postadress.</value>
+  </data>
+  <data name="user_email_updated.subject" xml:space="preserve">
+    <value>bekräfta ändrad osu! e-postadress</value>
+  </data>
+  <data name="user_force_reactivation.main" xml:space="preserve">
+    <value>Ditt konto misstänks ha blivit komprometterat, har nyligen misstänkt aktivitet eller ett MYCKET svagt lösenord. Därför kräver vi att du anger ett nytt lösenord. Se till att du väljer ett SÄKER lösenord.</value>
+  </data>
+  <data name="user_force_reactivation.perform_reset" xml:space="preserve">
+    <value>Du kan utföra återställningen från {0}</value>
+  </data>
+  <data name="user_force_reactivation.reason" xml:space="preserve">
+    <value>Orsak:</value>
+  </data>
+  <data name="user_force_reactivation.subject" xml:space="preserve">
+    <value>osu! Konto återaktivering krävs</value>
+  </data>
+  <data name="user_notification_digest.new" xml:space="preserve">
+    <value>Låter dig bara veta att det har skett nya uppdateringar på objekt du tittar på.</value>
+  </data>
+  <data name="user_notification_digest.settings" xml:space="preserve">
+    <value>Ändra preferenser för e-postnotifikationer:</value>
+  </data>
+  <data name="user_notification_digest.subject" xml:space="preserve">
+    <value>Nya osu! aviseringar</value>
+  </data>
+  <data name="user_password_updated.confirmation" xml:space="preserve">
+    <value>Detta är bara en bekräftelse på att ditt osu! lösenord har ändrats.</value>
+  </data>
+  <data name="user_password_updated.subject" xml:space="preserve">
+    <value>bekräfta ändrat osu! lösenord</value>
+  </data>
+  <data name="user_verification.code" xml:space="preserve">
+    <value>Din verifieringskod är:</value>
+  </data>
+  <data name="user_verification.code_hint" xml:space="preserve">
+    <value>Du kan ange koden med eller utan mellanslag.</value>
+  </data>
+  <data name="user_verification.link" xml:space="preserve">
+    <value>Alternativt, kan du också besöka denna länk nedan för att slutföra verifieringen:</value>
+  </data>
+  <data name="user_verification.report" xml:space="preserve">
+    <value>Om du inte efterfrågade detta, vänligen SVARA OMEDELBART då ditt konto kan vara i fara.</value>
+  </data>
+  <data name="user_verification.subject" xml:space="preserve">
+    <value>osu! kontobekräftelse</value>
+  </data>
+  <data name="user_verification.action_from._" xml:space="preserve">
+    <value>En åtgärd som utförs på ditt konto från {0} kräver verifiering.</value>
+  </data>
+  <data name="user_verification.action_from.unknown_country" xml:space="preserve">
+    <value>okänt land</value>
+  </data>
+</root>

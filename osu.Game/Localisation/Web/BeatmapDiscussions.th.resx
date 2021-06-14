@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authorizations.update.null_user" xml:space="preserve">
+    <value>ต้องเข้าสู่ระบบก่อนจะแก้ไข</value>
+  </data>
+  <data name="authorizations.update.system_generated" xml:space="preserve">
+    <value>ไม่สามารถแก้ไขโพสต์ที่ระบบสร้างขึ้นเองได้</value>
+  </data>
+  <data name="authorizations.update.wrong_user" xml:space="preserve">
+    <value>ต้องเป็นเจ้าของโพสต์นี้ถึงจะสามารถแก้ไขได้</value>
+  </data>
+  <data name="events.empty" xml:space="preserve">
+    <value>อืม... ยังไม่มีอะไรเกิดขึ้น</value>
+  </data>
+  <data name="index.deleted_beatmap" xml:space="preserve">
+    <value>ถูกลบไปแล้ว</value>
+  </data>
+  <data name="index.none_found" xml:space="preserve">
+    <value>ไม่พบการสนทนาตามเกณฑ์การค้นหาที่เลือก</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>การสนทนาเกี่ยวกับบีทแมพ</value>
+  </data>
+  <data name="index.form._" xml:space="preserve">
+    <value>ค้นหา</value>
+  </data>
+  <data name="index.form.deleted" xml:space="preserve">
+    <value>รวมการสนทนาที่ถูกลบ</value>
+  </data>
+  <data name="index.form.mode" xml:space="preserve">
+    <value>โหมดของบีทแมพ</value>
+  </data>
+  <data name="index.form.only_unresolved" xml:space="preserve">
+    <value>มองเห็นเฉพาะการสนทนา/ปัญหาที่ยังไม่ได้แก้</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>ชนิดของข้อความ</value>
+  </data>
+  <data name="index.form.username" xml:space="preserve">
+    <value>ชื่อผู้ใช้</value>
+  </data>
+  <data name="index.form.beatmapset_status._" xml:space="preserve">
+    <value>สถานะบีทแมพ</value>
+  </data>
+  <data name="index.form.beatmapset_status.all" xml:space="preserve">
+    <value>ทั้งหมด</value>
+  </data>
+  <data name="index.form.beatmapset_status.disqualified" xml:space="preserve">
+    <value>ถูกตัดสิทธิ์</value>
+  </data>
+  <data name="index.form.beatmapset_status.never_qualified" xml:space="preserve">
+    <value>ไม่เคยถูก Qualified</value>
+  </data>
+  <data name="index.form.beatmapset_status.qualified" xml:space="preserve">
+    <value>Qualified</value>
+  </data>
+  <data name="index.form.beatmapset_status.ranked" xml:space="preserve">
+    <value>จัดอันดับแล้ว</value>
+  </data>
+  <data name="index.form.user.label" xml:space="preserve">
+    <value>ผู้ใช้</value>
+  </data>
+  <data name="index.form.user.overview" xml:space="preserve">
+    <value>ภาพรวมกิจกรรม</value>
+  </data>
+  <data name="item.created_at" xml:space="preserve">
+    <value>โพสเมื่อวันที่</value>
+  </data>
+  <data name="item.deleted_at" xml:space="preserve">
+    <value>ถูกลบเมื่อวันที่</value>
+  </data>
+  <data name="item.message_type" xml:space="preserve">
+    <value>ประเภท</value>
+  </data>
+  <data name="item.permalink" xml:space="preserve">
+    <value>ลิงค์</value>
+  </data>
+  <data name="nearby_posts.confirm" xml:space="preserve">
+    <value>ไม่มีโพสต์ใดกล่าวถึงปัญหาของฉัน</value>
+  </data>
+  <data name="nearby_posts.notice" xml:space="preserve">
+    <value>มีโพสต์เมื่อเวลาประมาณ {0} ({1}). โปรตตรวจสอบก่อนโพสต์</value>
+  </data>
+  <data name="nearby_posts.unsaved" xml:space="preserve">
+    <value>{0} ในบทวิจารณ์นี้</value>
+  </data>
+  <data name="owner_editor.button" xml:space="preserve">
+    <value>เจ้าของระดับความยาก</value>
+  </data>
+  <data name="owner_editor.reset_confirm" xml:space="preserve">
+    <value>รีเซ็ตเจ้าของสําหรับระดับความยากนี้ไหม</value>
+  </data>
+  <data name="owner_editor.user" xml:space="preserve">
+    <value>เจ้าของ</value>
+  </data>
+  <data name="owner_editor.version" xml:space="preserve">
+    <value>ระดับความยาก</value>
+  </data>
+  <data name="reply.open.guest" xml:space="preserve">
+    <value>เข้าสู่ระบบเพื่อตอบกลับ</value>
+  </data>
+  <data name="reply.open.user" xml:space="preserve">
+    <value>ตอบกลับ</value>
+  </data>
+  <data name="review.block_count" xml:space="preserve">
+    <value>ใช้ไป {0} / {1} blocks</value>
+  </data>
+  <data name="review.go_to_parent" xml:space="preserve">
+    <value>ดูโพสต์วิจารณ์</value>
+  </data>
+  <data name="review.go_to_child" xml:space="preserve">
+    <value>ดูการสนทนา</value>
+  </data>
+  <data name="review.validation.block_too_large" xml:space="preserve">
+    <value>แต่ละบล็อกเก็บอักขระได้แค่ {0} อักขระ</value>
+  </data>
+  <data name="review.validation.external_references" xml:space="preserve">
+    <value>บทวิจารณ์นี้มีการพูดถึงปัญหาที่ไม่เกี่ยวข้องกับบทวิจารณ์นี้</value>
+  </data>
+  <data name="review.validation.invalid_block_type" xml:space="preserve">
+    <value>ชนิดของบล็อกไม่ถูกต้อง</value>
+  </data>
+  <data name="review.validation.invalid_document" xml:space="preserve">
+    <value>บทวิจารณ์ไม่ถูกต้อง</value>
+  </data>
+  <data name="review.validation.minimum_issues" xml:space="preserve">
+    <value>บทวิจารณ์ต้องมีปัญหาอย่างน้อย {0} ปัญหา|บทวิจารณ์ต้องมีปัญหาอย่างน้อย {0} ปัญหา</value>
+  </data>
+  <data name="review.validation.missing_text" xml:space="preserve">
+    <value>บล็อกไม่มีข้อความ</value>
+  </data>
+  <data name="review.validation.too_many_blocks" xml:space="preserve">
+    <value>บทวิจารณ์จำกัดให้มีแค่ {0} ย่อหน้าต่อปัญหา|บทวิจารณ์จำกัดให้มีแค่ {0} ย่อหน้าต่อหลายปัญหา</value>
+  </data>
+  <data name="system.resolved.true" xml:space="preserve">
+    <value>ทำเครื่องหมายเป็นแก้ไขแล้วโดย {0}</value>
+  </data>
+  <data name="system.resolved.false" xml:space="preserve">
+    <value>ถูกเปิดใหม่โดย {0}</value>
+  </data>
+  <data name="timestamp_display.general" xml:space="preserve">
+    <value>ทั่วไป</value>
+  </data>
+  <data name="timestamp_display.general_all" xml:space="preserve">
+    <value>หมวดทั่วไป (รวม)</value>
+  </data>
+  <data name="user_filter.everyone" xml:space="preserve">
+    <value>ทุกคน</value>
+  </data>
+  <data name="user_filter.label" xml:space="preserve">
+    <value>กรองโดยผู้ใช้</value>
+  </data>
+</root>

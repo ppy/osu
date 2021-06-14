@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="edit.title_compact" xml:space="preserve">
+    <value>การตั้งค่า</value>
+  </data>
+  <data name="edit.username" xml:space="preserve">
+    <value>ชื่อผู้ใช้</value>
+  </data>
+  <data name="edit.avatar.title" xml:space="preserve">
+    <value>รูปโปรไฟล์</value>
+  </data>
+  <data name="edit.avatar.rules" xml:space="preserve">
+    <value>โปรดตรวจสอบให้แน่ใจว่า avatar ของคุณเป็นไปตาม {0}.&lt;br/&gt; ซึ่งหมายความว่ามันจะต้องเป็น &lt;strong&gt; เหมาะสำหรับทุกวัย &lt;/strong&gt; เช่น ไม่มีภาพลามกหยาบคายหรือเนื้อหาที่มีการชักจูง</value>
+  </data>
+  <data name="edit.avatar.rules_link" xml:space="preserve">
+    <value>กฎของชุมชน</value>
+  </data>
+  <data name="edit.email.current" xml:space="preserve">
+    <value>อีเมลปัจจุบัน</value>
+  </data>
+  <data name="edit.email.new" xml:space="preserve">
+    <value>อีเมลใหม่</value>
+  </data>
+  <data name="edit.email.new_confirmation" xml:space="preserve">
+    <value>ยืนยันอีเมล</value>
+  </data>
+  <data name="edit.email.title" xml:space="preserve">
+    <value>อีเมล</value>
+  </data>
+  <data name="edit.password.current" xml:space="preserve">
+    <value>รหัสผ่านปัจจุบัน</value>
+  </data>
+  <data name="edit.password.new" xml:space="preserve">
+    <value>รหัสผ่านใหม่</value>
+  </data>
+  <data name="edit.password.new_confirmation" xml:space="preserve">
+    <value>ยืนยันรหัสผ่าน</value>
+  </data>
+  <data name="edit.password.title" xml:space="preserve">
+    <value>รหัสผ่าน</value>
+  </data>
+  <data name="edit.profile.title" xml:space="preserve">
+    <value>โปรไฟล์</value>
+  </data>
+  <data name="edit.profile.user.user_from" xml:space="preserve">
+    <value>ที่อยู่ปัจจุบัน</value>
+  </data>
+  <data name="edit.profile.user.user_interests" xml:space="preserve">
+    <value>สิ่งที่สนใจ</value>
+  </data>
+  <data name="edit.profile.user.user_occ" xml:space="preserve">
+    <value>อาชีพ</value>
+  </data>
+  <data name="edit.profile.user.user_website" xml:space="preserve">
+    <value>เว็บไซต์</value>
+  </data>
+  <data name="edit.signature.title" xml:space="preserve">
+    <value>ลายเซ็น</value>
+  </data>
+  <data name="edit.signature.update" xml:space="preserve">
+    <value>อัพเดต</value>
+  </data>
+  <data name="notifications.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>ได้รับการแจ้งเตือนเกียวกับปัญหาของ Qualified beatmaps กับโหมดต่อไปนี้</value>
+  </data>
+  <data name="notifications.beatmapset_disqualify" xml:space="preserve">
+    <value>ได้รับการแจ้งเตือนเมื่อบีทแมพในโหมดที่ท่านเลือกถูกตัดสิทธิ์</value>
+  </data>
+  <data name="notifications.comment_reply" xml:space="preserve">
+    <value>รับการแจ้งเตือนสำหรับการตอบกลับความคิดเห็นของคุณ</value>
+  </data>
+  <data name="notifications.title" xml:space="preserve">
+    <value>การแจ้งเตือน</value>
+  </data>
+  <data name="notifications.topic_auto_subscribe" xml:space="preserve">
+    <value>เปิดการแจ้งเตือนอัตโนมัติในกระทู้ที่คุณสร้างขึ้น</value>
+  </data>
+  <data name="notifications.options._" xml:space="preserve">
+    <value>วิธีการรับการแจ้งเตือน</value>
+  </data>
+  <data name="notifications.options.beatmap_owner_change" xml:space="preserve">
+    <value>ระดับความยากของแขก</value>
+  </data>
+  <data name="notifications.options.beatmapset:modding" xml:space="preserve">
+    <value>การวิจารณ์บีทแมพ</value>
+  </data>
+  <data name="notifications.options.channel_message" xml:space="preserve">
+    <value>ข้อความส่วนตัว</value>
+  </data>
+  <data name="notifications.options.comment_new" xml:space="preserve">
+    <value>ความคิดเห็นใหม่</value>
+  </data>
+  <data name="notifications.options.forum_topic_reply" xml:space="preserve">
+    <value>ข้อความตอบกลับในกระทู้</value>
+  </data>
+  <data name="notifications.options.mail" xml:space="preserve">
+    <value>อีเมล</value>
+  </data>
+  <data name="notifications.options.mapping" xml:space="preserve">
+    <value>ผู้ทำบีทแมพ</value>
+  </data>
+  <data name="notifications.options.push" xml:space="preserve">
+    <value>ส่งการแจ้งเตือน</value>
+  </data>
+  <data name="notifications.options.user_achievement_unlock" xml:space="preserve">
+    <value>ผู้เล่นได้ปลดล็อกเหรียญตรา</value>
+  </data>
+  <data name="oauth.authorized_clients" xml:space="preserve">
+    <value>client ที่ได้รับการยืนยัน</value>
+  </data>
+  <data name="oauth.own_clients" xml:space="preserve">
+    <value>client ของตนเอง</value>
+  </data>
+  <data name="oauth.title" xml:space="preserve">
+    <value>OAuth</value>
+  </data>
+  <data name="options.beatmapset_show_nsfw" xml:space="preserve">
+    <value>ซ่อนคำเตือนเกี่ยวกับเนื้อหาที่ล่อแหลมในบีทแมพ</value>
+  </data>
+  <data name="options.beatmapset_title_show_original" xml:space="preserve">
+    <value>แสดงข้อมูลของ บีทแมพ ในภาษาดั้งเดิม</value>
+  </data>
+  <data name="options.title" xml:space="preserve">
+    <value>ตัวเลือก</value>
+  </data>
+  <data name="options.beatmapset_download._" xml:space="preserve">
+    <value>ประเภทการดาวน์โหลดบีทแมพเริ่มต้น</value>
+  </data>
+  <data name="options.beatmapset_download.all" xml:space="preserve">
+    <value>พร้อมวิดีโอ ถ้าใช้ได้</value>
+  </data>
+  <data name="options.beatmapset_download.direct" xml:space="preserve">
+    <value>เปิดใน osu!direct</value>
+  </data>
+  <data name="options.beatmapset_download.no_video" xml:space="preserve">
+    <value>โดยที่ไม่มีวิดีโอ</value>
+  </data>
+  <data name="playstyles.keyboard" xml:space="preserve">
+    <value>คีย์บอร์ด</value>
+  </data>
+  <data name="playstyles.mouse" xml:space="preserve">
+    <value>เมาส์</value>
+  </data>
+  <data name="playstyles.tablet" xml:space="preserve">
+    <value>แท็บเล็ต</value>
+  </data>
+  <data name="playstyles.title" xml:space="preserve">
+    <value>รูปแบบการเล่น</value>
+  </data>
+  <data name="playstyles.touch" xml:space="preserve">
+    <value>จอสัมผัส</value>
+  </data>
+  <data name="privacy.friends_only" xml:space="preserve">
+    <value>บล็อกข้อความส่วนตัวจากคนที่ไม่ได้อยู่ในรายชื่อเพื่อน</value>
+  </data>
+  <data name="privacy.hide_online" xml:space="preserve">
+    <value>ซ่อนสถานะออนไลน์ของคุณ</value>
+  </data>
+  <data name="privacy.title" xml:space="preserve">
+    <value>ความเป็นส่วนตัว</value>
+  </data>
+  <data name="security.current_session" xml:space="preserve">
+    <value>ปัจจุบัน</value>
+  </data>
+  <data name="security.end_session" xml:space="preserve">
+    <value>สิ้นสุดเซสชัน</value>
+  </data>
+  <data name="security.end_session_confirmation" xml:space="preserve">
+    <value>ขั้นตอนนี้จะสิ้นสุดเซสชันของคุณในอุปกรณ์นั้นทันที คุณแน่ใจไหม?</value>
+  </data>
+  <data name="security.last_active" xml:space="preserve">
+    <value>ใช้งานล่าสุด:</value>
+  </data>
+  <data name="security.title" xml:space="preserve">
+    <value>ความปลอดภัย</value>
+  </data>
+  <data name="security.web_sessions" xml:space="preserve">
+    <value>เซสชั่นของเว็บ</value>
+  </data>
+  <data name="update_email.update" xml:space="preserve">
+    <value>อัปเดต</value>
+  </data>
+  <data name="update_password.update" xml:space="preserve">
+    <value>อัปเดต</value>
+  </data>
+  <data name="verification_completed.text" xml:space="preserve">
+    <value>ตอนนี้คุณสามารถปิดแท็บ/หน้าต่างนี้ได้</value>
+  </data>
+  <data name="verification_completed.title" xml:space="preserve">
+    <value>การยืนยันตัวตนสำเร็จ</value>
+  </data>
+  <data name="verification_invalid.title" xml:space="preserve">
+    <value>ลิงก์ยืนยันตนไม่ถูกต้องหรือหมดอายุแล้ว</value>
+  </data>
+</root>

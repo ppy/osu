@@ -1,0 +1,226 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="event.approve" xml:space="preserve">
+    <value>Jóváhagyva.</value>
+  </data>
+  <data name="event.discussion_delete" xml:space="preserve">
+    <value>A moderátor kitörölte a {0} megbeszélést.</value>
+  </data>
+  <data name="event.discussion_lock" xml:space="preserve">
+    <value>A beatmap megbeszélése meg lett tiltva. ({0})</value>
+  </data>
+  <data name="event.discussion_post_delete" xml:space="preserve">
+    <value>A moderátor posztot törölt a {0} megbeszélésből.</value>
+  </data>
+  <data name="event.discussion_post_restore" xml:space="preserve">
+    <value>A moderátor posztot állított vissza a {0} megbeszélésben.</value>
+  </data>
+  <data name="event.discussion_restore" xml:space="preserve">
+    <value>A moderátor visszaállította a következő megbeszélést {0}.</value>
+  </data>
+  <data name="event.discussion_unlock" xml:space="preserve">
+    <value>A beatmap megbeszélése engedélyezve lett.</value>
+  </data>
+  <data name="event.disqualify" xml:space="preserve">
+    <value>Diszkvalifikálva {0} által. Indok: {1} ({2}).</value>
+  </data>
+  <data name="event.disqualify_legacy" xml:space="preserve">
+    <value>Diszkvalifikálva {0} által. Indok: {1}.</value>
+  </data>
+  <data name="event.genre_edit" xml:space="preserve">
+    <value>Műfaj megváltoztatva erről {0} erre {1}.</value>
+  </data>
+  <data name="event.issue_reopen" xml:space="preserve">
+    <value>Megoldott probléma {0} újranyitva.</value>
+  </data>
+  <data name="event.issue_resolve" xml:space="preserve">
+    <value>A {0} problémát megoldottnak jelölték.</value>
+  </data>
+  <data name="event.kudosu_allow" xml:space="preserve">
+    <value>Kudosu megtagadás a {0} megbeszélésre el lett távolítva.</value>
+  </data>
+  <data name="event.kudosu_deny" xml:space="preserve">
+    <value>A {0} megbeszélés kudosu-tól megtagadva.</value>
+  </data>
+  <data name="event.kudosu_gain" xml:space="preserve">
+    <value>A {0} megbeszélés {1} által elég szavazatot szerzett kudosu-ra.</value>
+  </data>
+  <data name="event.kudosu_lost" xml:space="preserve">
+    <value>A {0} megbeszélés {1} által szavazatokat vesztett, így a megszerzett kudosu vissza lett vonva.</value>
+  </data>
+  <data name="event.kudosu_recalculate" xml:space="preserve">
+    <value>A {0} megbeszélés kudosu értékei újra lettek kalkulálva.</value>
+  </data>
+  <data name="event.language_edit" xml:space="preserve">
+    <value>Nyelv megváltoztatva erről {0} erre {1}.</value>
+  </data>
+  <data name="event.love" xml:space="preserve">
+    <value>Kedvelte {0}</value>
+  </data>
+  <data name="event.nominate" xml:space="preserve">
+    <value>Nominálva {0} által.</value>
+  </data>
+  <data name="event.nominate_modes" xml:space="preserve">
+    <value>Nominálva {0} ({1}) által.</value>
+  </data>
+  <data name="event.nomination_reset" xml:space="preserve">
+    <value>Új probléma {0} ({1}) miatt a nominálás alaphelyzetbe állt.</value>
+  </data>
+  <data name="event.qualify" xml:space="preserve">
+    <value>Ez a beatmap elérte az elegendő számú nominálást és kvalifikálva lett.</value>
+  </data>
+  <data name="event.rank" xml:space="preserve">
+    <value>Rangsorolt.</value>
+  </data>
+  <data name="event.remove_from_loved" xml:space="preserve">
+    <value>Eltávolítva szeretettek közül {0} felhasználó által. ({1})</value>
+  </data>
+  <data name="event.nsfw_toggle.to_0" xml:space="preserve">
+    <value>Felnőtt tartalom törlése</value>
+  </data>
+  <data name="event.nsfw_toggle.to_1" xml:space="preserve">
+    <value>Felnőtt tartalomként jelölés</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmap szett Események</value>
+  </data>
+  <data name="index.form.period" xml:space="preserve">
+    <value>Időszak</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Típusok</value>
+  </data>
+  <data name="item.content" xml:space="preserve">
+    <value>Tartalom</value>
+  </data>
+  <data name="item.discussion_deleted" xml:space="preserve">
+    <value>[törölt]</value>
+  </data>
+  <data name="item.type" xml:space="preserve">
+    <value>Típus</value>
+  </data>
+  <data name="type.approve" xml:space="preserve">
+    <value>Jóváhagyás</value>
+  </data>
+  <data name="type.discussion_delete" xml:space="preserve">
+    <value>Megbeszélés törlése</value>
+  </data>
+  <data name="type.discussion_post_delete" xml:space="preserve">
+    <value>Megbeszélés válaszának törlése</value>
+  </data>
+  <data name="type.discussion_post_restore" xml:space="preserve">
+    <value>Megbeszélés válaszának visszaállítása</value>
+  </data>
+  <data name="type.discussion_restore" xml:space="preserve">
+    <value>Megbeszélés visszaállítása</value>
+  </data>
+  <data name="type.disqualify" xml:space="preserve">
+    <value>Diszkvalifikáció</value>
+  </data>
+  <data name="type.genre_edit" xml:space="preserve">
+    <value>Műfaj szerkesztése</value>
+  </data>
+  <data name="type.issue_reopen" xml:space="preserve">
+    <value>Megbeszélés újranyitás</value>
+  </data>
+  <data name="type.issue_resolve" xml:space="preserve">
+    <value>Megbeszélés megoldás</value>
+  </data>
+  <data name="type.kudosu_allow" xml:space="preserve">
+    <value>Kudosu engedélyezés</value>
+  </data>
+  <data name="type.kudosu_deny" xml:space="preserve">
+    <value>Kudosu megtagadás</value>
+  </data>
+  <data name="type.kudosu_gain" xml:space="preserve">
+    <value>Kudosu nyereség</value>
+  </data>
+  <data name="type.kudosu_lost" xml:space="preserve">
+    <value>Kudosu veszteség</value>
+  </data>
+  <data name="type.kudosu_recalculate" xml:space="preserve">
+    <value>Kudosu újraszámítás</value>
+  </data>
+  <data name="type.language_edit" xml:space="preserve">
+    <value>Nyelv szerkesztése</value>
+  </data>
+  <data name="type.love" xml:space="preserve">
+    <value>Love</value>
+  </data>
+  <data name="type.nominate" xml:space="preserve">
+    <value>Nominálás</value>
+  </data>
+  <data name="type.nomination_reset" xml:space="preserve">
+    <value>Nominálás visszaállítás</value>
+  </data>
+  <data name="type.nsfw_toggle" xml:space="preserve">
+    <value>Felnőtt tartalom jel</value>
+  </data>
+  <data name="type.qualify" xml:space="preserve">
+    <value>Kvalifikáció</value>
+  </data>
+  <data name="type.rank" xml:space="preserve">
+    <value>Rangsorolás</value>
+  </data>
+  <data name="type.remove_from_loved" xml:space="preserve">
+    <value>Szeretett eltávolítás</value>
+  </data>
+</root>

@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="talking_in" xml:space="preserve">
+    <value>rozmowa na kanale {0}</value>
+  </data>
+  <data name="talking_with" xml:space="preserve">
+    <value>rozmowa z użytkownikiem {0}</value>
+  </data>
+  <data name="title_compact" xml:space="preserve">
+    <value>czat</value>
+  </data>
+  <data name="cannot_send.channel" xml:space="preserve">
+    <value>Nie możesz wysłać wiadomości na ten kanał z jednego z następujących powodów:</value>
+  </data>
+  <data name="cannot_send.user" xml:space="preserve">
+    <value>Nie możesz wysłać wiadomości do tego użytkownika z jednego z następujących powodów:</value>
+  </data>
+  <data name="cannot_send.reasons.blocked" xml:space="preserve">
+    <value>Ten użytkownik zablokował cię</value>
+  </data>
+  <data name="cannot_send.reasons.channel_moderated" xml:space="preserve">
+    <value>Ten kanał jest w trybie tylko dla moderatorów</value>
+  </data>
+  <data name="cannot_send.reasons.friends_only" xml:space="preserve">
+    <value>Ten użytkownik nie przyjmuje wiadomości od osób spoza listy znajomych</value>
+  </data>
+  <data name="cannot_send.reasons.not_enough_plays" xml:space="preserve">
+    <value>Nie zarejestrowano wystarczającego czasu spędzonego w grze.</value>
+  </data>
+  <data name="cannot_send.reasons.not_verified" xml:space="preserve">
+    <value>Twoja sesja nie została zweryfikowana</value>
+  </data>
+  <data name="cannot_send.reasons.restricted" xml:space="preserve">
+    <value>Twoje konto zostało zablokowane</value>
+  </data>
+  <data name="cannot_send.reasons.silenced" xml:space="preserve">
+    <value>Twoje konto jest obecnie uciszone</value>
+  </data>
+  <data name="cannot_send.reasons.target_restricted" xml:space="preserve">
+    <value>Konto tego użytkownika jest obecnie zablokowane</value>
+  </data>
+  <data name="input.disabled" xml:space="preserve">
+    <value>nie udało się wysłać wiadomości...</value>
+  </data>
+  <data name="input.placeholder" xml:space="preserve">
+    <value>napisz wiadomość...</value>
+  </data>
+  <data name="input.send" xml:space="preserve">
+    <value>Wyślij</value>
+  </data>
+  <data name="no-conversations.howto" xml:space="preserve">
+    <value>Rozpocznij konwersację poprzez profil lub kartę użytkownika.</value>
+  </data>
+  <data name="no-conversations.lazer" xml:space="preserve">
+    <value>Publiczne kanały, do których dołączysz poprzez &lt;a href="{0}"&gt;osu!lazer&lt;/a&gt;, także będą tutaj widoczne.</value>
+  </data>
+  <data name="no-conversations.title" xml:space="preserve">
+    <value>brak konwersacji</value>
+  </data>
+</root>

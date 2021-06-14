@@ -1,0 +1,298 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="defaults.page_description" xml:space="preserve">
+    <value>osu! - Rytmus je len o klikaní! Spolu s Quendan/EBA, Taikem a originálnými hernými módmi a plne funkčným level editorom.</value>
+  </data>
+  <data name="header.users.show" xml:space="preserve">
+    <value>informácie</value>
+  </data>
+  <data name="menu.beatmaps._" xml:space="preserve">
+    <value>beatmapy</value>
+  </data>
+  <data name="menu.beatmaps.artists" xml:space="preserve">
+    <value>významní umelci</value>
+  </data>
+  <data name="menu.beatmaps.index" xml:space="preserve">
+    <value>výpis</value>
+  </data>
+  <data name="menu.beatmaps.packs" xml:space="preserve">
+    <value>balíčky</value>
+  </data>
+  <data name="menu.community._" xml:space="preserve">
+    <value>komunita</value>
+  </data>
+  <data name="menu.community.chat" xml:space="preserve">
+    <value>konverzácia</value>
+  </data>
+  <data name="menu.community.contests" xml:space="preserve">
+    <value>súťaže</value>
+  </data>
+  <data name="menu.community.dev" xml:space="preserve">
+    <value>vývoj</value>
+  </data>
+  <data name="menu.community.forum-forums-index" xml:space="preserve">
+    <value>fórum</value>
+  </data>
+  <data name="menu.community.getlive" xml:space="preserve">
+    <value>naživo</value>
+  </data>
+  <data name="menu.community.tournaments" xml:space="preserve">
+    <value>turnaje</value>
+  </data>
+  <data name="menu.help._" xml:space="preserve">
+    <value>pomoc</value>
+  </data>
+  <data name="menu.help.getfaq" xml:space="preserve">
+    <value>faq</value>
+  </data>
+  <data name="menu.help.getrules" xml:space="preserve">
+    <value>pravidlá</value>
+  </data>
+  <data name="menu.help.getsupport" xml:space="preserve">
+    <value>nie, vážne, potrebujem pomoc!</value>
+  </data>
+  <data name="menu.help.getwiki" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="menu.home._" xml:space="preserve">
+    <value>domov</value>
+  </data>
+  <data name="menu.home.changelog-index" xml:space="preserve">
+    <value>záznam zmien</value>
+  </data>
+  <data name="menu.home.getdownload" xml:space="preserve">
+    <value>stiahnúť</value>
+  </data>
+  <data name="menu.home.news-index" xml:space="preserve">
+    <value>novinky</value>
+  </data>
+  <data name="menu.home.search" xml:space="preserve">
+    <value>hľadať</value>
+  </data>
+  <data name="menu.home.team" xml:space="preserve">
+    <value>tím</value>
+  </data>
+  <data name="menu.rankings._" xml:space="preserve">
+    <value>rebríčky</value>
+  </data>
+  <data name="menu.rankings.charts" xml:space="preserve">
+    <value>výber</value>
+  </data>
+  <data name="menu.rankings.country" xml:space="preserve">
+    <value>krajina</value>
+  </data>
+  <data name="menu.rankings.index" xml:space="preserve">
+    <value>výkon</value>
+  </data>
+  <data name="menu.rankings.kudosu" xml:space="preserve">
+    <value>kudosu</value>
+  </data>
+  <data name="menu.rankings.score" xml:space="preserve">
+    <value>skóre</value>
+  </data>
+  <data name="menu.store._" xml:space="preserve">
+    <value>obchod</value>
+  </data>
+  <data name="menu.store.cart-show" xml:space="preserve">
+    <value>košík</value>
+  </data>
+  <data name="menu.store.getlisting" xml:space="preserve">
+    <value>výpis</value>
+  </data>
+  <data name="menu.store.orders-index" xml:space="preserve">
+    <value>história objednávok</value>
+  </data>
+  <data name="footer.general._" xml:space="preserve">
+    <value>Všeobecné</value>
+  </data>
+  <data name="footer.general.home" xml:space="preserve">
+    <value>Domov</value>
+  </data>
+  <data name="footer.general.changelog-index" xml:space="preserve">
+    <value>Zoznam zmien</value>
+  </data>
+  <data name="footer.general.beatmaps" xml:space="preserve">
+    <value>Zoznam beatmap</value>
+  </data>
+  <data name="footer.general.download" xml:space="preserve">
+    <value>Stiahnuť osu!</value>
+  </data>
+  <data name="footer.help._" xml:space="preserve">
+    <value>Pomoc &amp; Komunita</value>
+  </data>
+  <data name="footer.help.faq" xml:space="preserve">
+    <value>Často Kladené Otázky</value>
+  </data>
+  <data name="footer.help.forum" xml:space="preserve">
+    <value>Komunitné Fóra</value>
+  </data>
+  <data name="footer.help.livestreams" xml:space="preserve">
+    <value>Živé Vysielania</value>
+  </data>
+  <data name="footer.help.report" xml:space="preserve">
+    <value>Nahlásiť Chybu</value>
+  </data>
+  <data name="footer.help.wiki" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="footer.legal._" xml:space="preserve">
+    <value>Právne záležitosti &amp; Stav serveru</value>
+  </data>
+  <data name="footer.legal.copyright" xml:space="preserve">
+    <value>Autorské práva (DMCA)</value>
+  </data>
+  <data name="footer.legal.privacy" xml:space="preserve">
+    <value>Súkromie</value>
+  </data>
+  <data name="footer.legal.server_status" xml:space="preserve">
+    <value>Stav Serveru</value>
+  </data>
+  <data name="footer.legal.source_code" xml:space="preserve">
+    <value>Zdrojový Kód</value>
+  </data>
+  <data name="footer.legal.terms" xml:space="preserve">
+    <value>Podmienky</value>
+  </data>
+  <data name="errors.404.error" xml:space="preserve">
+    <value>Stránka Chýba</value>
+  </data>
+  <data name="errors.404.description" xml:space="preserve">
+    <value>Prepáčte, ale požadovaná stránka tu nie je!</value>
+  </data>
+  <data name="errors.403.error" xml:space="preserve">
+    <value>Tu by si nemal byť.</value>
+  </data>
+  <data name="errors.403.description" xml:space="preserve">
+    <value>Môžete sa pokúsiť vrátiť späť.</value>
+  </data>
+  <data name="errors.401.error" xml:space="preserve">
+    <value>Tu by si nemal byť.</value>
+  </data>
+  <data name="errors.401.description" xml:space="preserve">
+    <value>Môžete sa pokúsiť vrátiť späť. Alebo sa možno prihlásiť.</value>
+  </data>
+  <data name="errors.405.error" xml:space="preserve">
+    <value>Stránka Chýba</value>
+  </data>
+  <data name="errors.405.description" xml:space="preserve">
+    <value>Prepáčte, ale požadovaná stránka tu nie je!</value>
+  </data>
+  <data name="errors.500.error" xml:space="preserve">
+    <value>Ale nie! Niečo sa pokazilo! ;_;</value>
+  </data>
+  <data name="errors.500.description" xml:space="preserve">
+    <value>Sme automaticky oznámení o každej chybe.</value>
+  </data>
+  <data name="errors.fatal.error" xml:space="preserve">
+    <value>Ale nie! Niečo sa pokazilo (vážne)! ;_;</value>
+  </data>
+  <data name="errors.fatal.description" xml:space="preserve">
+    <value>Sme automaticky oznámení o každej chybe.</value>
+  </data>
+  <data name="errors.503.error" xml:space="preserve">
+    <value>Vypnuté kvôli údržbe!</value>
+  </data>
+  <data name="errors.503.description" xml:space="preserve">
+    <value>Údržby zvyčajne trvajú 5 sekúnd až 10 minút. Pokiaľ servery nefungujú dlhšie, choďte {0} pre viacej informácií.</value>
+  </data>
+  <data name="errors.reference" xml:space="preserve">
+    <value>Tu je kód, ktorý môžeš napísať na podporu!</value>
+  </data>
+  <data name="popup_login.login.forgot" xml:space="preserve">
+    <value>Zabudol som svoje údaje</value>
+  </data>
+  <data name="popup_login.login.password" xml:space="preserve">
+    <value>heslo</value>
+  </data>
+  <data name="popup_login.login.title" xml:space="preserve">
+    <value>Pre pokračovanie sa prihláste</value>
+  </data>
+  <data name="popup_login.login.error.email" xml:space="preserve">
+    <value>Užívateľské meno alebo e-mailová adresa neexistuje</value>
+  </data>
+  <data name="popup_login.login.error.password" xml:space="preserve">
+    <value>Nesprávne heslo</value>
+  </data>
+  <data name="popup_login.register.info" xml:space="preserve">
+    <value>Potrebujete účet, pane. Prečo teda jeden nemáte?</value>
+  </data>
+  <data name="popup_login.register.title" xml:space="preserve">
+    <value>Nemáte účet?</value>
+  </data>
+  <data name="popup_user.links.account-edit" xml:space="preserve">
+    <value>Nastavenia</value>
+  </data>
+  <data name="popup_user.links.friends" xml:space="preserve">
+    <value>Priatelia</value>
+  </data>
+  <data name="popup_user.links.logout" xml:space="preserve">
+    <value>Odhlásiť Sa</value>
+  </data>
+  <data name="popup_user.links.profile" xml:space="preserve">
+    <value>Môj Profil</value>
+  </data>
+  <data name="popup_search.initial" xml:space="preserve">
+    <value>Zadaj hladaný výraz!</value>
+  </data>
+  <data name="popup_search.retry" xml:space="preserve">
+    <value>Hľadanie sa nepodarilo. Kliknite na Opakovať.</value>
+  </data>
+</root>

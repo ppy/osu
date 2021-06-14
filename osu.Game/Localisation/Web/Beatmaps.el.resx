@@ -1,0 +1,616 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="discussion-votes.update.error" xml:space="preserve">
+    <value>Αποτυχία ενημέρωσης ψήφων</value>
+  </data>
+  <data name="discussions.allow_kudosu" xml:space="preserve">
+    <value>επίτρεψε kudosu</value>
+  </data>
+  <data name="discussions.delete" xml:space="preserve">
+    <value>διαγραφή</value>
+  </data>
+  <data name="discussions.deleted" xml:space="preserve">
+    <value>Διαγράφηκε από {0} {1}.</value>
+  </data>
+  <data name="discussions.deny_kudosu" xml:space="preserve">
+    <value>αρνήσου kudosu</value>
+  </data>
+  <data name="discussions.edit" xml:space="preserve">
+    <value>επεξεργασία</value>
+  </data>
+  <data name="discussions.edited" xml:space="preserve">
+    <value>Τελευταία επεξεργασία από: {0} {1}.</value>
+  </data>
+  <data name="discussions.kudosu_denied" xml:space="preserve">
+    <value>Αδύνατη η απόκτηση kudosu.</value>
+  </data>
+  <data name="discussions.message_placeholder_deleted_beatmap" xml:space="preserve">
+    <value>Η δυσκολία αυτή έχει διαγραφεί για αυτό δεν συζητιέται πλέον.</value>
+  </data>
+  <data name="discussions.message_placeholder_locked" xml:space="preserve">
+    <value>Η συζήτηση για αυτό το beatmap έχει απενεργοποιηθεί.</value>
+  </data>
+  <data name="discussions.message_placeholder_silenced" xml:space="preserve">
+    <value>Δεν είναι δυνατή η δημοσίευση συζήτησης ενώ σιγασμένη.</value>
+  </data>
+  <data name="discussions.message_type_select" xml:space="preserve">
+    <value>Επιλέξτε Τύπο Σχολίου</value>
+  </data>
+  <data name="discussions.reply_notice" xml:space="preserve">
+    <value>Πατήστε enter για να απαντήσετε.</value>
+  </data>
+  <data name="discussions.reply_placeholder" xml:space="preserve">
+    <value>Πληκτρολογήστε την απάντησή σας εδώ</value>
+  </data>
+  <data name="discussions.require-login" xml:space="preserve">
+    <value>Παρακαλώ συνδεθείτε για να δημοσιεύσετε ή να απαντήσετε</value>
+  </data>
+  <data name="discussions.resolved" xml:space="preserve">
+    <value>Επιλύθηκε</value>
+  </data>
+  <data name="discussions.restore" xml:space="preserve">
+    <value>επαναφορά</value>
+  </data>
+  <data name="discussions.show_deleted" xml:space="preserve">
+    <value>Εμφάνιση διαγραμμένου</value>
+  </data>
+  <data name="discussions.title" xml:space="preserve">
+    <value>Συζητήσεις</value>
+  </data>
+  <data name="discussions.collapse.all-collapse" xml:space="preserve">
+    <value>Σύμπτηξη όλων</value>
+  </data>
+  <data name="discussions.collapse.all-expand" xml:space="preserve">
+    <value>Ανάπτυξη όλων</value>
+  </data>
+  <data name="discussions.empty.empty" xml:space="preserve">
+    <value>Καμία συζήτηση ακόμα!</value>
+  </data>
+  <data name="discussions.empty.hidden" xml:space="preserve">
+    <value>Καμία συζήτηση δεν ταιριάζει με το φίλτρο.</value>
+  </data>
+  <data name="discussions.lock.button.lock" xml:space="preserve">
+    <value>Κλείδωμα συζήτησης</value>
+  </data>
+  <data name="discussions.lock.button.unlock" xml:space="preserve">
+    <value>Ξεκλείδωμα συζήτησης</value>
+  </data>
+  <data name="discussions.lock.prompt.lock" xml:space="preserve">
+    <value>Λόγος κλειδώματος</value>
+  </data>
+  <data name="discussions.lock.prompt.unlock" xml:space="preserve">
+    <value>Είστε σίγουρος ότι θέλετε να το ξεκλειδώσετε;</value>
+  </data>
+  <data name="discussions.message_hint.in_general" xml:space="preserve">
+    <value>Αυτή η δημοσίευση θα πάει στη γενική συζήτηση beatmap. Για να κάνετε μία πρόταση για αυτό το beatmap, ξεκινήστε το μήνυμά σας με μία χρονική σήμανση (π.χ. 00:12:345).</value>
+  </data>
+  <data name="discussions.message_hint.in_timeline" xml:space="preserve">
+    <value>Για να κάνετε πολλαπλές προτάσεις ταυτόχρονα, δημοσιεύστε πολλές φορές (μία δημοσίευση ανά χρονική σήμανση).</value>
+  </data>
+  <data name="discussions.message_placeholder.general" xml:space="preserve">
+    <value>Πληκτρολογήστε εδώ για να δημοσιεύσετε στο General ({0})</value>
+  </data>
+  <data name="discussions.message_placeholder.generalall" xml:space="preserve">
+    <value>Πληκτρολογήστε εδώ για να δημοσιεύσετε στο General (όλες τις δυσκολίες)</value>
+  </data>
+  <data name="discussions.message_placeholder.timeline" xml:space="preserve">
+    <value>Πληκτρολογήστε εδώ για να δημοσιεύσετε στο Χρονολόγιο ({0})</value>
+  </data>
+  <data name="discussions.message_type.disqualify" xml:space="preserve">
+    <value>Ορισμός ως ακατάλληλου</value>
+  </data>
+  <data name="discussions.message_type.hype" xml:space="preserve">
+    <value>Πάμε ρε!</value>
+  </data>
+  <data name="discussions.message_type.mapper_note" xml:space="preserve">
+    <value>Σημείωση</value>
+  </data>
+  <data name="discussions.message_type.nomination_reset" xml:space="preserve">
+    <value>Αλλαγή Υποψηφιότητας</value>
+  </data>
+  <data name="discussions.message_type.praise" xml:space="preserve">
+    <value>Έπαινος</value>
+  </data>
+  <data name="discussions.message_type.problem" xml:space="preserve">
+    <value>Πρόβλημα</value>
+  </data>
+  <data name="discussions.message_type.suggestion" xml:space="preserve">
+    <value>Πρόταση</value>
+  </data>
+  <data name="discussions.mode.events" xml:space="preserve">
+    <value>Ιστορικό</value>
+  </data>
+  <data name="discussions.mode.general" xml:space="preserve">
+    <value>Γενικά {0}</value>
+  </data>
+  <data name="discussions.mode.timeline" xml:space="preserve">
+    <value>Χρονολόγιο</value>
+  </data>
+  <data name="discussions.mode.scopes.general" xml:space="preserve">
+    <value>Αυτή η δυσκολία</value>
+  </data>
+  <data name="discussions.mode.scopes.generalall" xml:space="preserve">
+    <value>Όλες οι δυσκολίες</value>
+  </data>
+  <data name="discussions.new.pin" xml:space="preserve">
+    <value>Καρφίτσωμα</value>
+  </data>
+  <data name="discussions.new.timestamp" xml:space="preserve">
+    <value>Χρονική σήμανση</value>
+  </data>
+  <data name="discussions.new.timestamp_missing" xml:space="preserve">
+    <value>Ctrl + C στη λειτουργία τροποποίησης και επικολλήστε στο μήνυμα σας για να προσθέσετε μία χρονική σήμανση!</value>
+  </data>
+  <data name="discussions.new.title" xml:space="preserve">
+    <value>Νέα Συζήτηση</value>
+  </data>
+  <data name="discussions.new.unpin" xml:space="preserve">
+    <value>Ξεκαρφίτσωμα</value>
+  </data>
+  <data name="discussions.review.embed.delete" xml:space="preserve">
+    <value>Διαγραφή</value>
+  </data>
+  <data name="discussions.show.title" xml:space="preserve">
+    <value>{0} δημιουργήθηκε από {1}</value>
+  </data>
+  <data name="discussions.sort.created_at" xml:space="preserve">
+    <value>Ημερομηνία δημιουργίας</value>
+  </data>
+  <data name="discussions.sort.timeline" xml:space="preserve">
+    <value>Χρονολόγιο</value>
+  </data>
+  <data name="discussions.sort.updated_at" xml:space="preserve">
+    <value>Τελευταία ενημέρωση</value>
+  </data>
+  <data name="discussions.stats.deleted" xml:space="preserve">
+    <value>Διαγράφηκε</value>
+  </data>
+  <data name="discussions.stats.mapper_notes" xml:space="preserve">
+    <value>Σημειώσεις</value>
+  </data>
+  <data name="discussions.stats.mine" xml:space="preserve">
+    <value>Δικό μου</value>
+  </data>
+  <data name="discussions.stats.pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="discussions.stats.praises" xml:space="preserve">
+    <value>Έπαινοι</value>
+  </data>
+  <data name="discussions.stats.resolved" xml:space="preserve">
+    <value>Επιλύθηκε</value>
+  </data>
+  <data name="discussions.stats.total" xml:space="preserve">
+    <value>Όλα</value>
+  </data>
+  <data name="discussions.status-messages.approved" xml:space="preserve">
+    <value>Αυτό το beatmap έγινε approved στις {0}!</value>
+  </data>
+  <data name="discussions.status-messages.graveyard" xml:space="preserve">
+    <value>Αυτό το beatmap δεν έχει ενημερωθεί από τις {0} και έχει πιθανότατα εγκαταλειφθεί από το δημιουργό του...</value>
+  </data>
+  <data name="discussions.status-messages.loved" xml:space="preserve">
+    <value>Αυτό το beatmap προστέθηκε στα loved στις {0}!</value>
+  </data>
+  <data name="discussions.status-messages.ranked" xml:space="preserve">
+    <value>Αυτό το beatmap έγινε ranked στις {0}!</value>
+  </data>
+  <data name="discussions.status-messages.wip" xml:space="preserve">
+    <value>Σημείωση: Αυτό το beatmap χαρακτηρίζεται ως έργο-σε-εξέλιξη από τον δημιουργό.</value>
+  </data>
+  <data name="discussions.votes.none.down" xml:space="preserve">
+    <value>Δεν υπάρχουν ακόμα downvotes</value>
+  </data>
+  <data name="discussions.votes.none.up" xml:space="preserve">
+    <value>Δεν υπάρχουν ακόμα upvotes</value>
+  </data>
+  <data name="discussions.votes.latest.down" xml:space="preserve">
+    <value>Πιο πρόσφατα downvotes</value>
+  </data>
+  <data name="discussions.votes.latest.up" xml:space="preserve">
+    <value>Πιο πρόσφατα upvotes</value>
+  </data>
+  <data name="hype.button" xml:space="preserve">
+    <value>Hype Beatmap!</value>
+  </data>
+  <data name="hype.button_done" xml:space="preserve">
+    <value>Ήδη Hyped!</value>
+  </data>
+  <data name="hype.confirm" xml:space="preserve">
+    <value>Είστε σίγουροι; Αυτό θα χρησιμοποιήσει ένα από τα υπολειπόμενα {0} hype σας και δεν μπορεί να αναιρεθεί.</value>
+  </data>
+  <data name="hype.explanation" xml:space="preserve">
+    <value>Δώστε hype σε αυτό το beatmap για να το κάνετε περισσότερο ορατό για την υποψηφιότητα και την κατάταξη!</value>
+  </data>
+  <data name="hype.explanation_guest" xml:space="preserve">
+    <value>Συνδεθείτε και δώστε hype σε αυτό το beatmap για να το κάνετε περισσότερο ορατό για την υποψηφιότητα και την κατάταξη!</value>
+  </data>
+  <data name="hype.new_time" xml:space="preserve">
+    <value>Θα πάρετε άλλο hype {0}.</value>
+  </data>
+  <data name="hype.remaining" xml:space="preserve">
+    <value>Έχετε {0} ακόμα hype.</value>
+  </data>
+  <data name="hype.required_text" xml:space="preserve">
+    <value>Hype: {0}/{1}</value>
+  </data>
+  <data name="hype.section_title" xml:space="preserve">
+    <value>Hype Τρένο</value>
+  </data>
+  <data name="hype.title" xml:space="preserve">
+    <value>Hype</value>
+  </data>
+  <data name="feedback.button" xml:space="preserve">
+    <value>Αφήστε Σχόλια</value>
+  </data>
+  <data name="nominations.delete" xml:space="preserve">
+    <value>Διαγραφή</value>
+  </data>
+  <data name="nominations.delete_own_confirm" xml:space="preserve">
+    <value>Είστε σίγουρος; Το beatmap θα διαγραφεί και θα ανακατευθυνθείτε πίσω στο προφίλ σας.</value>
+  </data>
+  <data name="nominations.delete_other_confirm" xml:space="preserve">
+    <value>Είστε σίγουρος; Το beatmap θα διαγραφεί και θα ανακατευθυνθείτε πίσω στο προφίλ του χρήστη.</value>
+  </data>
+  <data name="nominations.disqualification_prompt" xml:space="preserve">
+    <value>Λόγος αποκλεισμού;</value>
+  </data>
+  <data name="nominations.disqualified_at" xml:space="preserve">
+    <value>Disqualified {0} ({1}).</value>
+  </data>
+  <data name="nominations.disqualified_no_reason" xml:space="preserve">
+    <value>δεν έχει καθοριστεί κάποιος λόγος</value>
+  </data>
+  <data name="nominations.disqualify" xml:space="preserve">
+    <value>Απόκλεισε</value>
+  </data>
+  <data name="nominations.incorrect_state" xml:space="preserve">
+    <value>Σφάλμα κατά την εκτέλεση αυτής της ενέργειας, δοκιμάστε να ανανεώσετε τη σελίδα.</value>
+  </data>
+  <data name="nominations.love" xml:space="preserve">
+    <value>Love</value>
+  </data>
+  <data name="nominations.love_confirm" xml:space="preserve">
+    <value>Αγαπάτε αυτό το beatmap;</value>
+  </data>
+  <data name="nominations.nominate" xml:space="preserve">
+    <value>Nominate</value>
+  </data>
+  <data name="nominations.nominate_confirm" xml:space="preserve">
+    <value>Κάντε nominate αυτό το beatmap;</value>
+  </data>
+  <data name="nominations.nominated_by" xml:space="preserve">
+    <value>nominated από {0}</value>
+  </data>
+  <data name="nominations.not_enough_hype" xml:space="preserve">
+    <value>Δεν υπάρχει αρκετό hype.</value>
+  </data>
+  <data name="nominations.remove_from_loved" xml:space="preserve">
+    <value>Αφαίρεση από το Loved</value>
+  </data>
+  <data name="nominations.remove_from_loved_prompt" xml:space="preserve">
+    <value>Λόγος αφαίρεσης από το Loved:</value>
+  </data>
+  <data name="nominations.required_text" xml:space="preserve">
+    <value>Υποψηφιότητες {0}/{1}</value>
+  </data>
+  <data name="nominations.reset_message_deleted" xml:space="preserve">
+    <value>διαγράφηκε</value>
+  </data>
+  <data name="nominations.title" xml:space="preserve">
+    <value>Κατάσταση Υποψηφιότητας</value>
+  </data>
+  <data name="nominations.unresolved_issues" xml:space="preserve">
+    <value>Εξακολουθούν να υπάρχουν άλυτα ζητήματα που πρέπει να αντιμετωπιστούν πρώτα.</value>
+  </data>
+  <data name="nominations.rank_estimate.soon" xml:space="preserve">
+    <value>σύντομα</value>
+  </data>
+  <data name="nominations.reset_at.nomination_reset" xml:space="preserve">
+    <value>Επαναφορά διεργασίας υποψηφιότητας {0} από {1} με νέο πρόβλημα {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_at.disqualify" xml:space="preserve">
+    <value>Disqualified {0} από {1} με νέο πρόβλημα {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_confirm.nomination_reset" xml:space="preserve">
+    <value>Είστε σίγουροι; Η δημοσίευση ενός νέου προβλήματος θα επανεκκινήσει την διαδικασία υποψηφιότητας.</value>
+  </data>
+  <data name="nominations.reset_confirm.disqualify" xml:space="preserve">
+    <value>Είστε σίγουρος; Αυτό θα αφαιρέσει το beatmap απο τα προκριματικά και θα επαναφέρει την διαδικασία πιστοποίησης.</value>
+  </data>
+  <data name="listing.search.prompt" xml:space="preserve">
+    <value>πληκτρολογήστε λέξεις-κλειδιά...</value>
+  </data>
+  <data name="listing.search.login_required" xml:space="preserve">
+    <value>Συνδεθείτε για να αναζητήσετε.</value>
+  </data>
+  <data name="listing.search.options" xml:space="preserve">
+    <value>Περισσότερες Επιλογές Αναζήτησης</value>
+  </data>
+  <data name="listing.search.supporter_filter" xml:space="preserve">
+    <value>Το φιλτράρισμα βάσει {0} απαιτεί ένα ενεργό osu!supporter tag</value>
+  </data>
+  <data name="listing.search.not-found" xml:space="preserve">
+    <value>κανένα αποτέλεσμα</value>
+  </data>
+  <data name="listing.search.not-found-quote" xml:space="preserve">
+    <value>... όχι, τίποτα δεν βρέθηκε.</value>
+  </data>
+  <data name="listing.search.filters.extra" xml:space="preserve">
+    <value>επιπλέον</value>
+  </data>
+  <data name="listing.search.filters.general" xml:space="preserve">
+    <value>Γενικά</value>
+  </data>
+  <data name="listing.search.filters.genre" xml:space="preserve">
+    <value>Είδος</value>
+  </data>
+  <data name="listing.search.filters.language" xml:space="preserve">
+    <value>Γλώσσα</value>
+  </data>
+  <data name="listing.search.filters.mode" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="listing.search.filters.played" xml:space="preserve">
+    <value>Που έχετε παίξει</value>
+  </data>
+  <data name="listing.search.filters.rank" xml:space="preserve">
+    <value>Κατάκτηση Κατάταξης</value>
+  </data>
+  <data name="listing.search.filters.status" xml:space="preserve">
+    <value>Κατηγορίες</value>
+  </data>
+  <data name="listing.search.sorting.title" xml:space="preserve">
+    <value>Τίτλος</value>
+  </data>
+  <data name="listing.search.sorting.artist" xml:space="preserve">
+    <value>Καλλιτέχνης</value>
+  </data>
+  <data name="listing.search.sorting.difficulty" xml:space="preserve">
+    <value>Δυσκολία</value>
+  </data>
+  <data name="listing.search.sorting.favourites" xml:space="preserve">
+    <value>Αγαπημένα</value>
+  </data>
+  <data name="listing.search.sorting.updated" xml:space="preserve">
+    <value>Ενημερώθηκε</value>
+  </data>
+  <data name="listing.search.sorting.ranked" xml:space="preserve">
+    <value>Ranked</value>
+  </data>
+  <data name="listing.search.sorting.rating" xml:space="preserve">
+    <value>Βαθμολογία</value>
+  </data>
+  <data name="listing.search.sorting.plays" xml:space="preserve">
+    <value>Προσπάθειες</value>
+  </data>
+  <data name="listing.search.sorting.relevance" xml:space="preserve">
+    <value>Συνάφεια</value>
+  </data>
+  <data name="listing.search.sorting.nominations" xml:space="preserve">
+    <value>Nominations</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote._" xml:space="preserve">
+    <value>Το φιλτράρισμα κατά {0} απαιτεί ένα ενεργό {1}</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote.link_text" xml:space="preserve">
+    <value>osu!supporter tag</value>
+  </data>
+  <data name="general.converts" xml:space="preserve">
+    <value>Συμπεριλάμβανε beatmaps που έχουν μετατραπεί</value>
+  </data>
+  <data name="general.recommended" xml:space="preserve">
+    <value>Προτεινόμενη δυσκολία</value>
+  </data>
+  <data name="mode.all" xml:space="preserve">
+    <value>Όλα</value>
+  </data>
+  <data name="mode.any" xml:space="preserve">
+    <value>Οποιοδήποτε</value>
+  </data>
+  <data name="status.any" xml:space="preserve">
+    <value>Οποιοδήποτε</value>
+  </data>
+  <data name="status.approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="status.favourites" xml:space="preserve">
+    <value>Αγαπημένα</value>
+  </data>
+  <data name="status.graveyard" xml:space="preserve">
+    <value>Νεκροταφείο</value>
+  </data>
+  <data name="status.leaderboard" xml:space="preserve">
+    <value>Έχει Πίνακα Βαθμολογίας</value>
+  </data>
+  <data name="status.loved" xml:space="preserve">
+    <value>Loved</value>
+  </data>
+  <data name="status.mine" xml:space="preserve">
+    <value>Τα Maps Μου</value>
+  </data>
+  <data name="status.pending" xml:space="preserve">
+    <value>Pending &amp; WIP</value>
+  </data>
+  <data name="status.qualified" xml:space="preserve">
+    <value>Qualified</value>
+  </data>
+  <data name="status.ranked" xml:space="preserve">
+    <value>Ranked</value>
+  </data>
+  <data name="genre.any" xml:space="preserve">
+    <value>Οποιοδήποτε</value>
+  </data>
+  <data name="genre.unspecified" xml:space="preserve">
+    <value>Δεν έχει καθοριστεί</value>
+  </data>
+  <data name="genre.video-game" xml:space="preserve">
+    <value>Βιντεοπαιχνίδι</value>
+  </data>
+  <data name="genre.anime" xml:space="preserve">
+    <value>Anime</value>
+  </data>
+  <data name="genre.rock" xml:space="preserve">
+    <value>Rock</value>
+  </data>
+  <data name="genre.pop" xml:space="preserve">
+    <value>Pop</value>
+  </data>
+  <data name="genre.other" xml:space="preserve">
+    <value>Άλλο</value>
+  </data>
+  <data name="genre.novelty" xml:space="preserve">
+    <value>Σύγχρονο</value>
+  </data>
+  <data name="genre.hip-hop" xml:space="preserve">
+    <value>Hip Hop</value>
+  </data>
+  <data name="genre.electronic" xml:space="preserve">
+    <value>Ηλεκτρονική Μουσική</value>
+  </data>
+  <data name="genre.jazz" xml:space="preserve">
+    <value>Τζάζ</value>
+  </data>
+  <data name="mods.v2" xml:space="preserve">
+    <value>Σκορ V2</value>
+  </data>
+  <data name="language.any" xml:space="preserve">
+    <value>Όλα</value>
+  </data>
+  <data name="language.english" xml:space="preserve">
+    <value>Αγγλικά</value>
+  </data>
+  <data name="language.chinese" xml:space="preserve">
+    <value>Κινέζικα</value>
+  </data>
+  <data name="language.french" xml:space="preserve">
+    <value>Γαλλικά</value>
+  </data>
+  <data name="language.german" xml:space="preserve">
+    <value>Γερμανικά</value>
+  </data>
+  <data name="language.italian" xml:space="preserve">
+    <value>Ιταλικά</value>
+  </data>
+  <data name="language.japanese" xml:space="preserve">
+    <value>Ιαπωνικά</value>
+  </data>
+  <data name="language.korean" xml:space="preserve">
+    <value>Κορεάτικα</value>
+  </data>
+  <data name="language.spanish" xml:space="preserve">
+    <value>Ισπανικά</value>
+  </data>
+  <data name="language.swedish" xml:space="preserve">
+    <value>Σουηδικά</value>
+  </data>
+  <data name="language.russian" xml:space="preserve">
+    <value>Ρωσικά</value>
+  </data>
+  <data name="language.polish" xml:space="preserve">
+    <value>Πολωνικά</value>
+  </data>
+  <data name="language.instrumental" xml:space="preserve">
+    <value>Ορχηστρικό</value>
+  </data>
+  <data name="language.other" xml:space="preserve">
+    <value>Άλλο</value>
+  </data>
+  <data name="played.any" xml:space="preserve">
+    <value>Οποιοδήποτε</value>
+  </data>
+  <data name="played.played" xml:space="preserve">
+    <value>Που έχετε παίξει</value>
+  </data>
+  <data name="played.unplayed" xml:space="preserve">
+    <value>Που δεν έχετε παίξει</value>
+  </data>
+  <data name="extra.video" xml:space="preserve">
+    <value>Έχει βίντεο</value>
+  </data>
+  <data name="extra.storyboard" xml:space="preserve">
+    <value>Έχει Storyboard</value>
+  </data>
+  <data name="rank.any" xml:space="preserve">
+    <value>Οποιοδήποτε</value>
+  </data>
+  <data name="rank.xh" xml:space="preserve">
+    <value>Ασημένιο SS</value>
+  </data>
+  <data name="rank.sh" xml:space="preserve">
+    <value>Ασημένιο S</value>
+  </data>
+  <data name="panel.playcount" xml:space="preserve">
+    <value>Φορές που παίχτηκε: {0}</value>
+  </data>
+  <data name="panel.favourites" xml:space="preserve">
+    <value>Αγαπημένα: {0}</value>
+  </data>
+  <data name="variant.mania.4k" xml:space="preserve">
+    <value>4K</value>
+  </data>
+  <data name="variant.mania.7k" xml:space="preserve">
+    <value>7K</value>
+  </data>
+  <data name="variant.mania.all" xml:space="preserve">
+    <value>Όλα</value>
+  </data>
+</root>

@@ -1,0 +1,265 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="landing.download" xml:space="preserve">
+    <value>Спампаваць</value>
+  </data>
+  <data name="landing.online" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; бягучая колькасць гульцоў у&lt;strong&gt;{1}&lt;/strong&gt; гульнях</value>
+  </data>
+  <data name="landing.peak" xml:space="preserve">
+    <value>Пік, {0} актыўных карыстальнікаў</value>
+  </data>
+  <data name="landing.players" xml:space="preserve">
+    <value>Зарэгістравана гульцоў &lt;strong&gt;{0}&lt;/strong&gt;</value>
+  </data>
+  <data name="landing.title" xml:space="preserve">
+    <value>вітаем</value>
+  </data>
+  <data name="landing.slogan.main" xml:space="preserve">
+    <value>лепшая бясплатная рытм-гульня</value>
+  </data>
+  <data name="landing.slogan.sub" xml:space="preserve">
+    <value>рытм усяго ў націску ад вас</value>
+  </data>
+  <data name="search.advanced_link" xml:space="preserve">
+    <value>Пашыраны пошук</value>
+  </data>
+  <data name="search.button" xml:space="preserve">
+    <value>Пошук</value>
+  </data>
+  <data name="search.empty_result" xml:space="preserve">
+    <value>Нічога не знойдзена!</value>
+  </data>
+  <data name="search.keyword_required" xml:space="preserve">
+    <value>Пошукавае слова абавязковае</value>
+  </data>
+  <data name="search.placeholder" xml:space="preserve">
+    <value>пішыце тут</value>
+  </data>
+  <data name="search.title" xml:space="preserve">
+    <value>Пошук</value>
+  </data>
+  <data name="search.beatmapset.more" xml:space="preserve">
+    <value>больш {0} вынікаў пошуку бітмап</value>
+  </data>
+  <data name="search.beatmapset.more_simple" xml:space="preserve">
+    <value>Праглядзець іншыя вынікаў пошуку бітмап</value>
+  </data>
+  <data name="search.beatmapset.title" xml:space="preserve">
+    <value>Бітмапы</value>
+  </data>
+  <data name="search.forum_post.all" xml:space="preserve">
+    <value>Усе форумы</value>
+  </data>
+  <data name="search.forum_post.link" xml:space="preserve">
+    <value>Пошук па форуму</value>
+  </data>
+  <data name="search.forum_post.more_simple" xml:space="preserve">
+    <value>Праглядзець іншыя вынікі пошуку па форуму</value>
+  </data>
+  <data name="search.forum_post.title" xml:space="preserve">
+    <value>Форум</value>
+  </data>
+  <data name="search.forum_post.label.forum" xml:space="preserve">
+    <value>пошук па форумах</value>
+  </data>
+  <data name="search.forum_post.label.forum_children" xml:space="preserve">
+    <value>уключаючы падфорумы</value>
+  </data>
+  <data name="search.forum_post.label.topic_id" xml:space="preserve">
+    <value>тэма #</value>
+  </data>
+  <data name="search.forum_post.label.username" xml:space="preserve">
+    <value>аўтар</value>
+  </data>
+  <data name="search.mode.all" xml:space="preserve">
+    <value>усе</value>
+  </data>
+  <data name="search.mode.beatmapset" xml:space="preserve">
+    <value>бітмапы</value>
+  </data>
+  <data name="search.mode.forum_post" xml:space="preserve">
+    <value>форум</value>
+  </data>
+  <data name="search.mode.user" xml:space="preserve">
+    <value>гульцы</value>
+  </data>
+  <data name="search.mode.wiki_page" xml:space="preserve">
+    <value>вікі</value>
+  </data>
+  <data name="search.user.more" xml:space="preserve">
+    <value>больш {0} вынікаў пошуку гульцоў</value>
+  </data>
+  <data name="search.user.more_simple" xml:space="preserve">
+    <value>Прагляд іншых вынікаў пошуку гульцоў</value>
+  </data>
+  <data name="search.user.more_hidden" xml:space="preserve">
+    <value>Вынік пошуку гульцоў скарочаны да {0}. Паспрабуйце удакладніць запыт.</value>
+  </data>
+  <data name="search.user.title" xml:space="preserve">
+    <value>Гульцы</value>
+  </data>
+  <data name="search.wiki_page.link" xml:space="preserve">
+    <value>Пошук па вікі</value>
+  </data>
+  <data name="search.wiki_page.more_simple" xml:space="preserve">
+    <value>Прагляд іншых вынікаў пошуку па вікі</value>
+  </data>
+  <data name="search.wiki_page.title" xml:space="preserve">
+    <value>Вікі</value>
+  </data>
+  <data name="download.tagline" xml:space="preserve">
+    <value>давай&lt;br&gt;распачнем!</value>
+  </data>
+  <data name="download.action" xml:space="preserve">
+    <value>Спампаваць osu!</value>
+  </data>
+  <data name="download.os.windows" xml:space="preserve">
+    <value>для Windows</value>
+  </data>
+  <data name="download.os.macos" xml:space="preserve">
+    <value>для macOS</value>
+  </data>
+  <data name="download.os.linux" xml:space="preserve">
+    <value>для Linux</value>
+  </data>
+  <data name="download.mirror" xml:space="preserve">
+    <value>люстэрка</value>
+  </data>
+  <data name="download.macos-fallback" xml:space="preserve">
+    <value>для macOS</value>
+  </data>
+  <data name="download.steps.register.title" xml:space="preserve">
+    <value>стварыце ўлік. запіс</value>
+  </data>
+  <data name="download.steps.register.description" xml:space="preserve">
+    <value>прытрымлівайцеся падказак гульні, каб увайсці або стварыць уліковы запіс</value>
+  </data>
+  <data name="download.steps.download.title" xml:space="preserve">
+    <value>спампаваць гульню</value>
+  </data>
+  <data name="download.steps.download.description" xml:space="preserve">
+    <value>націсніце на кнопку ніжэй, каб спампаваць усталёўшчык, а потым запусціце яго!</value>
+  </data>
+  <data name="download.steps.beatmaps.title" xml:space="preserve">
+    <value>спампуйце бітмапы</value>
+  </data>
+  <data name="download.steps.beatmaps.description._" xml:space="preserve">
+    <value>{0} вялікую бібліятэку створаных гульцамі бітмап і пачніце гульню!</value>
+  </data>
+  <data name="download.steps.beatmaps.description.browse" xml:space="preserve">
+    <value>адкрыйце</value>
+  </data>
+  <data name="download.video-guide" xml:space="preserve">
+    <value>відэа дапаможнік</value>
+  </data>
+  <data name="user.title" xml:space="preserve">
+    <value>панэль</value>
+  </data>
+  <data name="user.news.title" xml:space="preserve">
+    <value>Навіны</value>
+  </data>
+  <data name="user.news.error" xml:space="preserve">
+    <value>Памылка загрузкі навін, паспрабуйце перазагрузіць старонку?...</value>
+  </data>
+  <data name="user.header.stats.friends" xml:space="preserve">
+    <value>Сяброў у сетцы</value>
+  </data>
+  <data name="user.header.stats.games" xml:space="preserve">
+    <value>Гульні</value>
+  </data>
+  <data name="user.header.stats.online" xml:space="preserve">
+    <value>Карыстальнікаў у сетцы</value>
+  </data>
+  <data name="user.beatmaps.new" xml:space="preserve">
+    <value>Новыя ранкаваныя бітмапы</value>
+  </data>
+  <data name="user.beatmaps.popular" xml:space="preserve">
+    <value>Папулярныя бітмапы</value>
+  </data>
+  <data name="user.buttons.download" xml:space="preserve">
+    <value>Спампаваць osu!</value>
+  </data>
+  <data name="user.buttons.support" xml:space="preserve">
+    <value>Падтрымаць osu!</value>
+  </data>
+  <data name="user.buttons.store" xml:space="preserve">
+    <value>Крама osu!</value>
+  </data>
+  <data name="support-osu.title" xml:space="preserve">
+    <value>Уаў!</value>
+  </data>
+  <data name="support-osu.subtitle" xml:space="preserve">
+    <value>Здаецца, вы добра праводзіце час! {0}</value>
+  </data>
+  <data name="support-osu.body.part-1" xml:space="preserve">
+    <value>Ці ведалі вы, што osu! не мае рэкламы, і спадзяецца на падтрымку гульцоў для распрацоўкі і пакрывання расходаў?</value>
+  </data>
+  <data name="support-osu.body.part-2" xml:space="preserve">
+    <value>Ці ведалі вы, што падтрымка osu! дае вам мноства карысных магчымасцяў, напрыклад &lt;strong&gt;in-game спампоўванне&lt;/strong&gt; падчас назірання або ў шматкарыстальніцкіх гульнях?</value>
+  </data>
+  <data name="support-osu.find-out-more" xml:space="preserve">
+    <value>Націсніце тут, каб даведацца больш!</value>
+  </data>
+  <data name="support-osu.download-starting" xml:space="preserve">
+    <value>Ах, не турбуйцеся, ваша спампоўванне бітмапы ўжо пачалося ;)</value>
+  </data>
+</root>

@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="generic" xml:space="preserve">
+    <value>Remedierea bug-urilor și îmbunătățiri minore.</value>
+  </data>
+  <data name="build.title" xml:space="preserve">
+    <value>schimbări în {0}</value>
+  </data>
+  <data name="builds.users_online" xml:space="preserve">
+    <value>{0} utilizator online|{0} utilizatori online</value>
+  </data>
+  <data name="entry.by" xml:space="preserve">
+    <value>de {0}</value>
+  </data>
+  <data name="index.page_title._" xml:space="preserve">
+    <value>jurnalul modificărilor</value>
+  </data>
+  <data name="index.page_title._from" xml:space="preserve">
+    <value>modificări din {0}</value>
+  </data>
+  <data name="index.page_title._from_to" xml:space="preserve">
+    <value>modificări între {0} și {1}</value>
+  </data>
+  <data name="index.page_title._stream" xml:space="preserve">
+    <value>modificări în {0}</value>
+  </data>
+  <data name="index.page_title._stream_from" xml:space="preserve">
+    <value>modificări în {0} din {1}</value>
+  </data>
+  <data name="index.page_title._stream_from_to" xml:space="preserve">
+    <value>modificări în {0} între {1} și {2}</value>
+  </data>
+  <data name="index.page_title._stream_to" xml:space="preserve">
+    <value>modificări în {0} până în {1}</value>
+  </data>
+  <data name="index.page_title._to" xml:space="preserve">
+    <value>modificări până în {0}</value>
+  </data>
+  <data name="support.heading" xml:space="preserve">
+    <value>Îți place această actualizare?</value>
+  </data>
+  <data name="support.text_1" xml:space="preserve">
+    <value>Susține dezvoltarea osu! și {0} astăzi!</value>
+  </data>
+  <data name="support.text_1_link" xml:space="preserve">
+    <value>devino un suporter</value>
+  </data>
+  <data name="support.text_2" xml:space="preserve">
+    <value>Nu doar că vei ajuta la accelerarea dezvoltării, dar vei primi, de asemenea, niște avantaje suplimentare și personalizări!</value>
+  </data>
+</root>

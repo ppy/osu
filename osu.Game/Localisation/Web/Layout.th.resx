@@ -1,0 +1,389 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="audio.autoplay" xml:space="preserve">
+    <value>เล่นเพลงถัดไปโดยอัตโนมัติ</value>
+  </data>
+  <data name="defaults.page_description" xml:space="preserve">
+    <value>osu! - จังหวะนั้นอยู่ห่างแค่คลิกเดียว! ด้วย Ouendan/EBA, Taiko และเกมโหมดดั้งเดิมอีกมากมาย พร้อมทั้งหน้าต่างแก้ไขที่ใช้งานได้อย่างสมบูรณ์</value>
+  </data>
+  <data name="header.admin.beatmapset" xml:space="preserve">
+    <value>บีทแมพเซ็ท</value>
+  </data>
+  <data name="header.admin.beatmapset_covers" xml:space="preserve">
+    <value>ปกหลังบีทแมพเซ็ท</value>
+  </data>
+  <data name="header.admin.contest" xml:space="preserve">
+    <value>การแข่งขัน</value>
+  </data>
+  <data name="header.admin.contests" xml:space="preserve">
+    <value>การแข่งขัน</value>
+  </data>
+  <data name="header.admin.root" xml:space="preserve">
+    <value>แผงควบคุม</value>
+  </data>
+  <data name="header.admin.store_orders" xml:space="preserve">
+    <value>ผู้ดูแลระบบร้านค้า</value>
+  </data>
+  <data name="header.artists.index" xml:space="preserve">
+    <value>รายการ</value>
+  </data>
+  <data name="header.changelog.index" xml:space="preserve">
+    <value>รายการ</value>
+  </data>
+  <data name="header.help.index" xml:space="preserve">
+    <value>หน้าแรก</value>
+  </data>
+  <data name="header.help.sitemap" xml:space="preserve">
+    <value>แผนผังเว็บไซต์</value>
+  </data>
+  <data name="header.store.cart" xml:space="preserve">
+    <value>ตะกร้าสินค้า</value>
+  </data>
+  <data name="header.store.orders" xml:space="preserve">
+    <value>ประวัติการสั่งซื้อ</value>
+  </data>
+  <data name="header.store.products" xml:space="preserve">
+    <value>สินค้า</value>
+  </data>
+  <data name="header.tournaments.index" xml:space="preserve">
+    <value>รายการทัวร์นาเมนต์</value>
+  </data>
+  <data name="header.users.modding" xml:space="preserve">
+    <value>การวิจารณ์บีทแมพ</value>
+  </data>
+  <data name="header.users.show" xml:space="preserve">
+    <value>ข้อมูล</value>
+  </data>
+  <data name="gallery.close" xml:space="preserve">
+    <value>ปิด (กด Esc)</value>
+  </data>
+  <data name="gallery.fullscreen" xml:space="preserve">
+    <value>ปรับเป็นเต็มหน้าจอ</value>
+  </data>
+  <data name="gallery.zoom" xml:space="preserve">
+    <value>ซูมเข้า/ออก</value>
+  </data>
+  <data name="gallery.previous" xml:space="preserve">
+    <value>รูปที่แล้ว (กดลูกศรซ้าย)</value>
+  </data>
+  <data name="gallery.next" xml:space="preserve">
+    <value>รูปต่อไป (กดลูกศรขวา)</value>
+  </data>
+  <data name="menu.beatmaps._" xml:space="preserve">
+    <value>บีทแมพ</value>
+  </data>
+  <data name="menu.beatmaps.artists" xml:space="preserve">
+    <value>ศิลปินโดดเด่น</value>
+  </data>
+  <data name="menu.beatmaps.index" xml:space="preserve">
+    <value>รายการ</value>
+  </data>
+  <data name="menu.beatmaps.packs" xml:space="preserve">
+    <value>แพ็ค</value>
+  </data>
+  <data name="menu.community._" xml:space="preserve">
+    <value>ชุมชน</value>
+  </data>
+  <data name="menu.community.chat" xml:space="preserve">
+    <value>แชท</value>
+  </data>
+  <data name="menu.community.contests" xml:space="preserve">
+    <value>การแข่งขัน</value>
+  </data>
+  <data name="menu.community.dev" xml:space="preserve">
+    <value>การพัฒนา</value>
+  </data>
+  <data name="menu.community.forum-forums-index" xml:space="preserve">
+    <value>ฟอรั่ม</value>
+  </data>
+  <data name="menu.community.getlive" xml:space="preserve">
+    <value>การถ่ายทอดสด</value>
+  </data>
+  <data name="menu.community.tournaments" xml:space="preserve">
+    <value>
+ทัวร์นาเมนต์</value>
+  </data>
+  <data name="menu.help._" xml:space="preserve">
+    <value>ช่วยเหลือ</value>
+  </data>
+  <data name="menu.help.getabuse" xml:space="preserve">
+    <value>รายงานการละเมิด</value>
+  </data>
+  <data name="menu.help.getfaq" xml:space="preserve">
+    <value>คำถามที่ถามบ่อย</value>
+  </data>
+  <data name="menu.help.getrules" xml:space="preserve">
+    <value>กฏ</value>
+  </data>
+  <data name="menu.help.getsupport" xml:space="preserve">
+    <value>ไม่ ฉันต้องการความช่วยเหลือ จริงๆ!</value>
+  </data>
+  <data name="menu.help.getwiki" xml:space="preserve">
+    <value>วิกิ</value>
+  </data>
+  <data name="menu.home._" xml:space="preserve">
+    <value>หน้าแรก</value>
+  </data>
+  <data name="menu.home.changelog-index" xml:space="preserve">
+    <value>บันทึกการเปลี่ยนแปลง</value>
+  </data>
+  <data name="menu.home.getdownload" xml:space="preserve">
+    <value>ดาวน์โหลด</value>
+  </data>
+  <data name="menu.home.news-index" xml:space="preserve">
+    <value>ข่าวสาร</value>
+  </data>
+  <data name="menu.home.search" xml:space="preserve">
+    <value>ค้นหา</value>
+  </data>
+  <data name="menu.home.team" xml:space="preserve">
+    <value>ทีม</value>
+  </data>
+  <data name="menu.rankings._" xml:space="preserve">
+    <value>การจัดอันดับ</value>
+  </data>
+  <data name="menu.rankings.charts" xml:space="preserve">
+    <value>ชาร์ท</value>
+  </data>
+  <data name="menu.rankings.country" xml:space="preserve">
+    <value>ประเทศ</value>
+  </data>
+  <data name="menu.rankings.index" xml:space="preserve">
+    <value>ประสิทธิภาพ</value>
+  </data>
+  <data name="menu.rankings.kudosu" xml:space="preserve">
+    <value>kudosu</value>
+  </data>
+  <data name="menu.rankings.multiplayer" xml:space="preserve">
+    <value>โหมดผู้เล่นหลายคน</value>
+  </data>
+  <data name="menu.rankings.score" xml:space="preserve">
+    <value>คะแนน</value>
+  </data>
+  <data name="menu.store._" xml:space="preserve">
+    <value>ร้านค้า</value>
+  </data>
+  <data name="menu.store.cart-show" xml:space="preserve">
+    <value>ตะกร้าสินค้า</value>
+  </data>
+  <data name="menu.store.getlisting" xml:space="preserve">
+    <value>รายการ</value>
+  </data>
+  <data name="menu.store.orders-index" xml:space="preserve">
+    <value>ประวัติการสั่งซื้อ</value>
+  </data>
+  <data name="footer.general._" xml:space="preserve">
+    <value>ทั่วไป</value>
+  </data>
+  <data name="footer.general.home" xml:space="preserve">
+    <value>หน้าแรก</value>
+  </data>
+  <data name="footer.general.changelog-index" xml:space="preserve">
+    <value>บันทึกการเปลี่ยนแปลง</value>
+  </data>
+  <data name="footer.general.beatmaps" xml:space="preserve">
+    <value>รายการบีทแมพ</value>
+  </data>
+  <data name="footer.general.download" xml:space="preserve">
+    <value>ดาวน์โหลด osu!</value>
+  </data>
+  <data name="footer.help._" xml:space="preserve">
+    <value>ความช่วยเหลือและชุมชน</value>
+  </data>
+  <data name="footer.help.faq" xml:space="preserve">
+    <value>คำถามที่พบบ่อย</value>
+  </data>
+  <data name="footer.help.forum" xml:space="preserve">
+    <value>ฟอรั่มชุมชน</value>
+  </data>
+  <data name="footer.help.livestreams" xml:space="preserve">
+    <value>การถ่ายทอดสด</value>
+  </data>
+  <data name="footer.help.report" xml:space="preserve">
+    <value>รายงานปัญหา</value>
+  </data>
+  <data name="footer.help.wiki" xml:space="preserve">
+    <value>วิกิ</value>
+  </data>
+  <data name="footer.legal._" xml:space="preserve">
+    <value>สถานะและกฎหมาย</value>
+  </data>
+  <data name="footer.legal.copyright" xml:space="preserve">
+    <value>ลิขสิทธิ์ (DMCA)</value>
+  </data>
+  <data name="footer.legal.privacy" xml:space="preserve">
+    <value>ความเป็นส่วนตัว</value>
+  </data>
+  <data name="footer.legal.server_status" xml:space="preserve">
+    <value>สถานะของเซิร์ฟเวอร์</value>
+  </data>
+  <data name="footer.legal.source_code" xml:space="preserve">
+    <value>ซอร์ซโค้ด</value>
+  </data>
+  <data name="footer.legal.terms" xml:space="preserve">
+    <value>เงื่อนไขการใช้บริการ</value>
+  </data>
+  <data name="errors.400.error" xml:space="preserve">
+    <value>คำร้องขอมีลักษณะไม่ถูกต้อง</value>
+  </data>
+  <data name="errors.404.error" xml:space="preserve">
+    <value>ไม่พบเจอหน้านี้</value>
+  </data>
+  <data name="errors.404.description" xml:space="preserve">
+    <value>ขออภัย แต่หน้าที่คุณร้องขอไม่อยู่ที่นี่!</value>
+  </data>
+  <data name="errors.403.error" xml:space="preserve">
+    <value>คุณไม่ควรอยู่ที่นี่</value>
+  </data>
+  <data name="errors.403.description" xml:space="preserve">
+    <value>คุณอาจจะลองกลับไปนะ</value>
+  </data>
+  <data name="errors.401.error" xml:space="preserve">
+    <value>คุณไม่ควรอยู่ที่นี่</value>
+  </data>
+  <data name="errors.401.description" xml:space="preserve">
+    <value>คุณอาจจะลองกลับไปนะ หรืออาจลงชื่อเข้าใช้ดู</value>
+  </data>
+  <data name="errors.405.error" xml:space="preserve">
+    <value>หน้าหายไป</value>
+  </data>
+  <data name="errors.405.description" xml:space="preserve">
+    <value>ขออภัย แต่หน้าที่คุณร้องขอไม่อยู่ที่นี่!</value>
+  </data>
+  <data name="errors.422.error" xml:space="preserve">
+    <value>คำร้องขอมีลักษณะไม่ถูกต้อง</value>
+  </data>
+  <data name="errors.429.error" xml:space="preserve">
+    <value>เกินขีดจำกัดการเข้าถึง</value>
+  </data>
+  <data name="errors.500.error" xml:space="preserve">
+    <value>โอ ไม่! บางอย่างพัง! ;_;</value>
+  </data>
+  <data name="errors.500.description" xml:space="preserve">
+    <value>เราได้รับแจ้งโดยอัตโนมัติจากทุกข้อผิดพลาด</value>
+  </data>
+  <data name="errors.fatal.error" xml:space="preserve">
+    <value>โอ ไม่! บางอย่างพัง (อย่างหนัก)! ;_;</value>
+  </data>
+  <data name="errors.fatal.description" xml:space="preserve">
+    <value>เราได้รับแจ้งโดยอัตโนมัติจากทุกข้อผิดพลาด</value>
+  </data>
+  <data name="errors.503.error" xml:space="preserve">
+    <value>ปิดปรับปรุง!</value>
+  </data>
+  <data name="errors.503.description" xml:space="preserve">
+    <value>การปิดปรับปรุงส่วนมากใช้เวลาจาก 5 วินาทีถึง 10 นาที ถ้าเราปิดนานกว่า ดู {0} เพื่อรายละเอียด</value>
+  </data>
+  <data name="errors.reference" xml:space="preserve">
+    <value>เผื่อไว้ นี่คือโค้ตสำหรับไว้ให้ซัพพอร์ท!</value>
+  </data>
+  <data name="popup_login.button" xml:space="preserve">
+    <value>ลงชื่อเข้าใช้/ลงทะเบียน</value>
+  </data>
+  <data name="popup_login.login.forgot" xml:space="preserve">
+    <value>ฉันลืมรายละเอียดของฉัน</value>
+  </data>
+  <data name="popup_login.login.password" xml:space="preserve">
+    <value>รหัสผ่าน</value>
+  </data>
+  <data name="popup_login.login.title" xml:space="preserve">
+    <value>ลงชื่อเข้าใช้เพื่อดำเนินการต่อ</value>
+  </data>
+  <data name="popup_login.login.username" xml:space="preserve">
+    <value>ชื่อผู้ใช้</value>
+  </data>
+  <data name="popup_login.login.error.email" xml:space="preserve">
+    <value>ชื่อผู้ใช้หรืออีเมลไม่มีอยู่</value>
+  </data>
+  <data name="popup_login.login.error.password" xml:space="preserve">
+    <value>รหัสผ่านไม่ถูกต้อง</value>
+  </data>
+  <data name="popup_login.register.download" xml:space="preserve">
+    <value>ดาวน์โหลด</value>
+  </data>
+  <data name="popup_login.register.info" xml:space="preserve">
+    <value>ดาวน์โหลด osu! เพื่อสร้างบัญชีของคุณ!</value>
+  </data>
+  <data name="popup_login.register.title" xml:space="preserve">
+    <value>ยังไม่มีมีบัญชีเหรอ?</value>
+  </data>
+  <data name="popup_user.links.account-edit" xml:space="preserve">
+    <value>การตั้งค่า</value>
+  </data>
+  <data name="popup_user.links.follows" xml:space="preserve">
+    <value>รายการการเฝ้าดู</value>
+  </data>
+  <data name="popup_user.links.friends" xml:space="preserve">
+    <value>เพื่อน</value>
+  </data>
+  <data name="popup_user.links.logout" xml:space="preserve">
+    <value>ออกจากระบบ</value>
+  </data>
+  <data name="popup_user.links.profile" xml:space="preserve">
+    <value>โปรไฟล์ของฉัน</value>
+  </data>
+  <data name="popup_search.initial" xml:space="preserve">
+    <value>พิมพ์เพื่อค้นหา!</value>
+  </data>
+  <data name="popup_search.retry" xml:space="preserve">
+    <value>การค้นหาล้มเหลว คลิกเพื่อลองอีกครั้ง</value>
+  </data>
+</root>

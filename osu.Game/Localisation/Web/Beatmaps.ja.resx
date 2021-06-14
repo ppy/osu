@@ -1,0 +1,694 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="discussion-votes.update.error" xml:space="preserve">
+    <value>評価の更新に失敗しました</value>
+  </data>
+  <data name="discussions.allow_kudosu" xml:space="preserve">
+    <value>kudosuを許可</value>
+  </data>
+  <data name="discussions.beatmap_information" xml:space="preserve">
+    <value>ビートマップページ</value>
+  </data>
+  <data name="discussions.delete" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="discussions.deleted" xml:space="preserve">
+    <value>{0}が{1}に削除</value>
+  </data>
+  <data name="discussions.deny_kudosu" xml:space="preserve">
+    <value>kudosuを拒否</value>
+  </data>
+  <data name="discussions.edit" xml:space="preserve">
+    <value>編集</value>
+  </data>
+  <data name="discussions.edited" xml:space="preserve">
+    <value>{0}が{1}に編集</value>
+  </data>
+  <data name="discussions.guest" xml:space="preserve">
+    <value>ゲスト難易度 by {0}</value>
+  </data>
+  <data name="discussions.kudosu_denied" xml:space="preserve">
+    <value>kudosuの入手を拒否されました。</value>
+  </data>
+  <data name="discussions.message_placeholder_deleted_beatmap" xml:space="preserve">
+    <value>この難易度は削除された為これ以上ディスカッションに投稿できません。</value>
+  </data>
+  <data name="discussions.message_placeholder_locked" xml:space="preserve">
+    <value>このビートマップに関するディスカッションは無効になっています。</value>
+  </data>
+  <data name="discussions.message_placeholder_silenced" xml:space="preserve">
+    <value>サイレンス中はディスカッションへ投稿できません。</value>
+  </data>
+  <data name="discussions.message_type_select" xml:space="preserve">
+    <value>コメントタイプを選択</value>
+  </data>
+  <data name="discussions.reply_notice" xml:space="preserve">
+    <value>Enterキーを押して送信</value>
+  </data>
+  <data name="discussions.reply_placeholder" xml:space="preserve">
+    <value>ここに入力してください</value>
+  </data>
+  <data name="discussions.require-login" xml:space="preserve">
+    <value>返信するにはログインが必要です。</value>
+  </data>
+  <data name="discussions.resolved" xml:space="preserve">
+    <value>解決済み</value>
+  </data>
+  <data name="discussions.restore" xml:space="preserve">
+    <value>復元</value>
+  </data>
+  <data name="discussions.show_deleted" xml:space="preserve">
+    <value>削除済みを表示</value>
+  </data>
+  <data name="discussions.title" xml:space="preserve">
+    <value>ディスカッション</value>
+  </data>
+  <data name="discussions.collapse.all-collapse" xml:space="preserve">
+    <value>全てを折りたたむ</value>
+  </data>
+  <data name="discussions.collapse.all-expand" xml:space="preserve">
+    <value>全て展開</value>
+  </data>
+  <data name="discussions.empty.empty" xml:space="preserve">
+    <value>まだディスカッションはありません！</value>
+  </data>
+  <data name="discussions.empty.hidden" xml:space="preserve">
+    <value>該当するディスカッションは見つかりませんでした。</value>
+  </data>
+  <data name="discussions.lock.button.lock" xml:space="preserve">
+    <value>ディスカッションのロック</value>
+  </data>
+  <data name="discussions.lock.button.unlock" xml:space="preserve">
+    <value>ディスカッションのロック解除</value>
+  </data>
+  <data name="discussions.lock.prompt.lock" xml:space="preserve">
+    <value>ロックの理由</value>
+  </data>
+  <data name="discussions.lock.prompt.unlock" xml:space="preserve">
+    <value>本当にロックを解除しますか？</value>
+  </data>
+  <data name="discussions.message_hint.in_general" xml:space="preserve">
+    <value>この投稿はビートマップディスカッションの一般に投稿されます。この難易度の問題を修正するには、タイムスタンプ（例：00:12:345）でメッセージを開始してください。</value>
+  </data>
+  <data name="discussions.message_hint.in_timeline" xml:space="preserve">
+    <value>複数のタイムスタンプをmodするには、投稿を複数回に分けてください。</value>
+  </data>
+  <data name="discussions.message_placeholder.general" xml:space="preserve">
+    <value>一般（{0}）への投稿をここに入力</value>
+  </data>
+  <data name="discussions.message_placeholder.generalall" xml:space="preserve">
+    <value>一般 （全ての難易度）への投稿をここに入力</value>
+  </data>
+  <data name="discussions.message_placeholder.review" xml:space="preserve">
+    <value>レビューを投稿するにはここに入力してください</value>
+  </data>
+  <data name="discussions.message_placeholder.timeline" xml:space="preserve">
+    <value>タイムライン（{0}）へ投稿するにはここに入力</value>
+  </data>
+  <data name="discussions.message_type.disqualify" xml:space="preserve">
+    <value>Disqualify</value>
+  </data>
+  <data name="discussions.message_type.hype" xml:space="preserve">
+    <value>Hype!</value>
+  </data>
+  <data name="discussions.message_type.mapper_note" xml:space="preserve">
+    <value>注意</value>
+  </data>
+  <data name="discussions.message_type.nomination_reset" xml:space="preserve">
+    <value>ノミネーションをリセット</value>
+  </data>
+  <data name="discussions.message_type.praise" xml:space="preserve">
+    <value>称賛</value>
+  </data>
+  <data name="discussions.message_type.problem" xml:space="preserve">
+    <value>問題</value>
+  </data>
+  <data name="discussions.message_type.review" xml:space="preserve">
+    <value>レビュー</value>
+  </data>
+  <data name="discussions.message_type.suggestion" xml:space="preserve">
+    <value>提案</value>
+  </data>
+  <data name="discussions.mode.events" xml:space="preserve">
+    <value>履歴</value>
+  </data>
+  <data name="discussions.mode.general" xml:space="preserve">
+    <value>一般{0}</value>
+  </data>
+  <data name="discussions.mode.reviews" xml:space="preserve">
+    <value>レビュー</value>
+  </data>
+  <data name="discussions.mode.timeline" xml:space="preserve">
+    <value>タイムライン</value>
+  </data>
+  <data name="discussions.mode.scopes.general" xml:space="preserve">
+    <value>この難易度</value>
+  </data>
+  <data name="discussions.mode.scopes.generalall" xml:space="preserve">
+    <value>全ての難易度</value>
+  </data>
+  <data name="discussions.new.pin" xml:space="preserve">
+    <value>ピン</value>
+  </data>
+  <data name="discussions.new.timestamp" xml:space="preserve">
+    <value>タイムスタンプ</value>
+  </data>
+  <data name="discussions.new.timestamp_missing" xml:space="preserve">
+    <value>ゲーム内のEdit画面でCtrl+Cを押してメッセージに張り付けるとタイムスタンプになります！</value>
+  </data>
+  <data name="discussions.new.title" xml:space="preserve">
+    <value>新しいディスカッション</value>
+  </data>
+  <data name="discussions.new.unpin" xml:space="preserve">
+    <value>ピン解除</value>
+  </data>
+  <data name="discussions.review.new" xml:space="preserve">
+    <value>新しいレビュー</value>
+  </data>
+  <data name="discussions.review.embed.delete" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="discussions.review.embed.missing" xml:space="preserve">
+    <value>[削除されたディスカッション]</value>
+  </data>
+  <data name="discussions.review.embed.unlink" xml:space="preserve">
+    <value>リンク解除</value>
+  </data>
+  <data name="discussions.review.embed.unsaved" xml:space="preserve">
+    <value>未保存</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.all-diff" xml:space="preserve">
+    <value>「全ての難易度」に関する投稿はタイムスタンプできません。</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.diff" xml:space="preserve">
+    <value>この{0}がタイムスタンプで始まる場合、タイムラインの下に表示されます。</value>
+  </data>
+  <data name="discussions.review.insert-block.paragraph" xml:space="preserve">
+    <value>段落の挿入</value>
+  </data>
+  <data name="discussions.review.insert-block.praise" xml:space="preserve">
+    <value>称賛を挿入</value>
+  </data>
+  <data name="discussions.review.insert-block.problem" xml:space="preserve">
+    <value>問題の挿入</value>
+  </data>
+  <data name="discussions.review.insert-block.suggestion" xml:space="preserve">
+    <value>提案を挿入</value>
+  </data>
+  <data name="discussions.show.title" xml:space="preserve">
+    <value>{0} 作成 {1}</value>
+  </data>
+  <data name="discussions.sort.created_at" xml:space="preserve">
+    <value>作成日時</value>
+  </data>
+  <data name="discussions.sort.timeline" xml:space="preserve">
+    <value>タイムライン</value>
+  </data>
+  <data name="discussions.sort.updated_at" xml:space="preserve">
+    <value>最終更新</value>
+  </data>
+  <data name="discussions.stats.deleted" xml:space="preserve">
+    <value>削除済み</value>
+  </data>
+  <data name="discussions.stats.mapper_notes" xml:space="preserve">
+    <value>注意</value>
+  </data>
+  <data name="discussions.stats.mine" xml:space="preserve">
+    <value>自分</value>
+  </data>
+  <data name="discussions.stats.pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="discussions.stats.praises" xml:space="preserve">
+    <value>称賛</value>
+  </data>
+  <data name="discussions.stats.resolved" xml:space="preserve">
+    <value>解決済み</value>
+  </data>
+  <data name="discussions.stats.total" xml:space="preserve">
+    <value>全て</value>
+  </data>
+  <data name="discussions.status-messages.approved" xml:space="preserve">
+    <value>このビートマップは{0}にApprovedになりました！</value>
+  </data>
+  <data name="discussions.status-messages.graveyard" xml:space="preserve">
+    <value>このビートマップは{0}から更新が止まっているため放棄された可能性があります・・・</value>
+  </data>
+  <data name="discussions.status-messages.loved" xml:space="preserve">
+    <value>このビートマップは{0}にLovedに追加しました！</value>
+  </data>
+  <data name="discussions.status-messages.ranked" xml:space="preserve">
+    <value>このビートマップは{0}にRankedになりました！</value>
+  </data>
+  <data name="discussions.status-messages.wip" xml:space="preserve">
+    <value>注意：このビートマップは作者によって作成途中とされています。</value>
+  </data>
+  <data name="discussions.votes.none.down" xml:space="preserve">
+    <value>反対票はまだありません</value>
+  </data>
+  <data name="discussions.votes.none.up" xml:space="preserve">
+    <value>賛成票はまだありません</value>
+  </data>
+  <data name="discussions.votes.latest.down" xml:space="preserve">
+    <value>最近の反対票</value>
+  </data>
+  <data name="discussions.votes.latest.up" xml:space="preserve">
+    <value>最近の賛成票</value>
+  </data>
+  <data name="hype.button" xml:space="preserve">
+    <value>ビートマップにHypeする！</value>
+  </data>
+  <data name="hype.button_done" xml:space="preserve">
+    <value>Hype済みです！</value>
+  </data>
+  <data name="hype.confirm" xml:space="preserve">
+    <value>あなたの残りHype数は{0}回です。Hypeは取り消しできません。Hypeしますか？</value>
+  </data>
+  <data name="hype.explanation" xml:space="preserve">
+    <value>このビートマップにHypeすることで注目が集まり、ノミネーションやRankedがされやすくなります！</value>
+  </data>
+  <data name="hype.explanation_guest" xml:space="preserve">
+    <value>ログインしてHypeすることでこのビートマップに注目が集まり、ノミネーションやRankedがされやすくなります！</value>
+  </data>
+  <data name="hype.new_time" xml:space="preserve">
+    <value>{0}でhype数が回復します。</value>
+  </data>
+  <data name="hype.remaining" xml:space="preserve">
+    <value>あなたの残りHype数は{0}回です</value>
+  </data>
+  <data name="hype.required_text" xml:space="preserve">
+    <value>Hype: {0}/{1}</value>
+  </data>
+  <data name="hype.section_title" xml:space="preserve">
+    <value>Hype Train</value>
+  </data>
+  <data name="hype.title" xml:space="preserve">
+    <value>Hype</value>
+  </data>
+  <data name="feedback.button" xml:space="preserve">
+    <value>フィードバックを残す</value>
+  </data>
+  <data name="nominations.delete" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="nominations.delete_own_confirm" xml:space="preserve">
+    <value>本当によろしいですか？ビートマップは削除され、プロフィール画面にリダイレクトされます。</value>
+  </data>
+  <data name="nominations.delete_other_confirm" xml:space="preserve">
+    <value>本当によろしいですか？ビートマップは削除され、ユーザーのプロフィール画面にリダイレクトされます。</value>
+  </data>
+  <data name="nominations.disqualification_prompt" xml:space="preserve">
+    <value>Disqualification（Qualifyの取り消し）の理由</value>
+  </data>
+  <data name="nominations.disqualified_at" xml:space="preserve">
+    <value>{0}にDisqualifyされました({1}).</value>
+  </data>
+  <data name="nominations.disqualified_no_reason" xml:space="preserve">
+    <value>理由が設定されていません</value>
+  </data>
+  <data name="nominations.disqualify" xml:space="preserve">
+    <value>Disqualify</value>
+  </data>
+  <data name="nominations.incorrect_state" xml:space="preserve">
+    <value>エラーが発生しました。ページの再読み込みを試してください。</value>
+  </data>
+  <data name="nominations.love" xml:space="preserve">
+    <value>Lovedに追加</value>
+  </data>
+  <data name="nominations.love_confirm" xml:space="preserve">
+    <value>Lovedに追加しますか？</value>
+  </data>
+  <data name="nominations.nominate" xml:space="preserve">
+    <value>ノミネート</value>
+  </data>
+  <data name="nominations.nominate_confirm" xml:space="preserve">
+    <value>このビートマップをノミネートしますか？</value>
+  </data>
+  <data name="nominations.nominated_by" xml:space="preserve">
+    <value>{0}がノミネート</value>
+  </data>
+  <data name="nominations.not_enough_hype" xml:space="preserve">
+    <value>Hypeが足りません</value>
+  </data>
+  <data name="nominations.remove_from_loved" xml:space="preserve">
+    <value>Lovedから削除</value>
+  </data>
+  <data name="nominations.remove_from_loved_prompt" xml:space="preserve">
+    <value>Lovedから削除した理由：</value>
+  </data>
+  <data name="nominations.required_text" xml:space="preserve">
+    <value>ノミネート数: {0}/{1}</value>
+  </data>
+  <data name="nominations.reset_message_deleted" xml:space="preserve">
+    <value>削除済み</value>
+  </data>
+  <data name="nominations.title" xml:space="preserve">
+    <value>ノミネートのステータス</value>
+  </data>
+  <data name="nominations.unresolved_issues" xml:space="preserve">
+    <value>まだ未解決の問題があります。</value>
+  </data>
+  <data name="nominations.rank_estimate._" xml:space="preserve">
+    <value>このマップは、問題が見つからなければ {0} にrankedされると推定されます。{1} 内の #{2} </value>
+  </data>
+  <data name="nominations.rank_estimate.queue" xml:space="preserve">
+    <value>ランキングキュー</value>
+  </data>
+  <data name="nominations.rank_estimate.soon" xml:space="preserve">
+    <value>間もなく</value>
+  </data>
+  <data name="nominations.reset_at.nomination_reset" xml:space="preserve">
+    <value>ノミネーション審査が{0}による新しい問題{1} （{2}）により、{3}にリセットされました。</value>
+  </data>
+  <data name="nominations.reset_at.disqualify" xml:space="preserve">
+    <value>{0}の新しい問題{1}（{2}）により、{3}にDisqualifyしました。</value>
+  </data>
+  <data name="nominations.reset_confirm.nomination_reset" xml:space="preserve">
+    <value>本当によろしいですか？新しい問題を投稿するとノミネーション審査中ではなくなります。</value>
+  </data>
+  <data name="nominations.reset_confirm.disqualify" xml:space="preserve">
+    <value>本当によろしいですか？これによりビートマップがQualifiedから外され、ノミネーション審査がリセットされます。</value>
+  </data>
+  <data name="listing.search.prompt" xml:space="preserve">
+    <value>キーワードを入力・・・</value>
+  </data>
+  <data name="listing.search.login_required" xml:space="preserve">
+    <value>ログインして検索する。</value>
+  </data>
+  <data name="listing.search.options" xml:space="preserve">
+    <value>検索の詳細設定</value>
+  </data>
+  <data name="listing.search.supporter_filter" xml:space="preserve">
+    <value>{0} による絞り込みにはosu!サポータータグが必要です</value>
+  </data>
+  <data name="listing.search.not-found" xml:space="preserve">
+    <value>該当結果なし</value>
+  </data>
+  <data name="listing.search.not-found-quote" xml:space="preserve">
+    <value>・・・なにも見つからなかったようだ。</value>
+  </data>
+  <data name="listing.search.filters.extra" xml:space="preserve">
+    <value>追加情報</value>
+  </data>
+  <data name="listing.search.filters.general" xml:space="preserve">
+    <value>全般</value>
+  </data>
+  <data name="listing.search.filters.genre" xml:space="preserve">
+    <value>ジャンル</value>
+  </data>
+  <data name="listing.search.filters.language" xml:space="preserve">
+    <value>言語</value>
+  </data>
+  <data name="listing.search.filters.mode" xml:space="preserve">
+    <value>モード</value>
+  </data>
+  <data name="listing.search.filters.nsfw" xml:space="preserve">
+    <value>露骨なコンテンツ</value>
+  </data>
+  <data name="listing.search.filters.played" xml:space="preserve">
+    <value>プレイ済み</value>
+  </data>
+  <data name="listing.search.filters.rank" xml:space="preserve">
+    <value>Rank取得日</value>
+  </data>
+  <data name="listing.search.filters.status" xml:space="preserve">
+    <value>カテゴリー</value>
+  </data>
+  <data name="listing.search.sorting.title" xml:space="preserve">
+    <value>タイトル</value>
+  </data>
+  <data name="listing.search.sorting.artist" xml:space="preserve">
+    <value>アーティスト</value>
+  </data>
+  <data name="listing.search.sorting.difficulty" xml:space="preserve">
+    <value>難易度</value>
+  </data>
+  <data name="listing.search.sorting.favourites" xml:space="preserve">
+    <value>お気に入り</value>
+  </data>
+  <data name="listing.search.sorting.updated" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="listing.search.sorting.ranked" xml:space="preserve">
+    <value>Ranked</value>
+  </data>
+  <data name="listing.search.sorting.rating" xml:space="preserve">
+    <value>評価</value>
+  </data>
+  <data name="listing.search.sorting.plays" xml:space="preserve">
+    <value>プレイ数</value>
+  </data>
+  <data name="listing.search.sorting.relevance" xml:space="preserve">
+    <value>関連性</value>
+  </data>
+  <data name="listing.search.sorting.nominations" xml:space="preserve">
+    <value>ノミネーション</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote._" xml:space="preserve">
+    <value>{0} による絞り込みには有効な{1} が必要です</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote.link_text" xml:space="preserve">
+    <value>osu!サポータータグ</value>
+  </data>
+  <data name="general.converts" xml:space="preserve">
+    <value>コンバートビートマップを含める</value>
+  </data>
+  <data name="general.follows" xml:space="preserve">
+    <value>サブスクライブ中のマッパー</value>
+  </data>
+  <data name="general.recommended" xml:space="preserve">
+    <value>推奨難易度</value>
+  </data>
+  <data name="mode.all" xml:space="preserve">
+    <value>全て</value>
+  </data>
+  <data name="mode.any" xml:space="preserve">
+    <value>全て</value>
+  </data>
+  <data name="status.any" xml:space="preserve">
+    <value>全て</value>
+  </data>
+  <data name="status.approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="status.favourites" xml:space="preserve">
+    <value>お気に入り</value>
+  </data>
+  <data name="status.graveyard" xml:space="preserve">
+    <value>Graveyard</value>
+  </data>
+  <data name="status.leaderboard" xml:space="preserve">
+    <value>リーダーボード</value>
+  </data>
+  <data name="status.loved" xml:space="preserve">
+    <value>Loved</value>
+  </data>
+  <data name="status.mine" xml:space="preserve">
+    <value>マイマップ</value>
+  </data>
+  <data name="status.pending" xml:space="preserve">
+    <value>Pending &amp; WIP</value>
+  </data>
+  <data name="status.qualified" xml:space="preserve">
+    <value>Qualified</value>
+  </data>
+  <data name="status.ranked" xml:space="preserve">
+    <value>Ranked</value>
+  </data>
+  <data name="genre.any" xml:space="preserve">
+    <value>全て</value>
+  </data>
+  <data name="genre.unspecified" xml:space="preserve">
+    <value>未分類</value>
+  </data>
+  <data name="genre.video-game" xml:space="preserve">
+    <value>ゲーム</value>
+  </data>
+  <data name="genre.anime" xml:space="preserve">
+    <value>アニメ</value>
+  </data>
+  <data name="genre.rock" xml:space="preserve">
+    <value>ロック</value>
+  </data>
+  <data name="genre.pop" xml:space="preserve">
+    <value>ポップ</value>
+  </data>
+  <data name="genre.other" xml:space="preserve">
+    <value>その他</value>
+  </data>
+  <data name="genre.novelty" xml:space="preserve">
+    <value>ノベルティ</value>
+  </data>
+  <data name="genre.hip-hop" xml:space="preserve">
+    <value>ヒップホップ</value>
+  </data>
+  <data name="genre.electronic" xml:space="preserve">
+    <value>エレクトロニック</value>
+  </data>
+  <data name="genre.metal" xml:space="preserve">
+    <value>メタル</value>
+  </data>
+  <data name="genre.classical" xml:space="preserve">
+    <value>クラシカル</value>
+  </data>
+  <data name="genre.folk" xml:space="preserve">
+    <value>フォーク</value>
+  </data>
+  <data name="genre.jazz" xml:space="preserve">
+    <value>ジャズ</value>
+  </data>
+  <data name="mods.rx" xml:space="preserve">
+    <value>Relax</value>
+  </data>
+  <data name="mods.v2" xml:space="preserve">
+    <value>Score V2</value>
+  </data>
+  <data name="language.any" xml:space="preserve">
+    <value>全て</value>
+  </data>
+  <data name="language.english" xml:space="preserve">
+    <value>英語</value>
+  </data>
+  <data name="language.chinese" xml:space="preserve">
+    <value>中国語</value>
+  </data>
+  <data name="language.french" xml:space="preserve">
+    <value>フランス語</value>
+  </data>
+  <data name="language.german" xml:space="preserve">
+    <value>ドイツ語</value>
+  </data>
+  <data name="language.italian" xml:space="preserve">
+    <value>イタリア語</value>
+  </data>
+  <data name="language.japanese" xml:space="preserve">
+    <value>日本語</value>
+  </data>
+  <data name="language.korean" xml:space="preserve">
+    <value>韓国語</value>
+  </data>
+  <data name="language.spanish" xml:space="preserve">
+    <value>スペイン語</value>
+  </data>
+  <data name="language.swedish" xml:space="preserve">
+    <value>スウェーデン語</value>
+  </data>
+  <data name="language.russian" xml:space="preserve">
+    <value>ロシア語</value>
+  </data>
+  <data name="language.polish" xml:space="preserve">
+    <value>ポーランド語</value>
+  </data>
+  <data name="language.instrumental" xml:space="preserve">
+    <value>楽器</value>
+  </data>
+  <data name="language.other" xml:space="preserve">
+    <value>その他</value>
+  </data>
+  <data name="language.unspecified" xml:space="preserve">
+    <value>未分類</value>
+  </data>
+  <data name="nsfw.exclude" xml:space="preserve">
+    <value>非表示</value>
+  </data>
+  <data name="nsfw.include" xml:space="preserve">
+    <value>表示</value>
+  </data>
+  <data name="played.any" xml:space="preserve">
+    <value>全て</value>
+  </data>
+  <data name="played.played" xml:space="preserve">
+    <value>プレイ済み</value>
+  </data>
+  <data name="played.unplayed" xml:space="preserve">
+    <value>未プレイ</value>
+  </data>
+  <data name="extra.video" xml:space="preserve">
+    <value>動画あり</value>
+  </data>
+  <data name="extra.storyboard" xml:space="preserve">
+    <value>ストーリーボードあり</value>
+  </data>
+  <data name="rank.any" xml:space="preserve">
+    <value>全て</value>
+  </data>
+  <data name="rank.xh" xml:space="preserve">
+    <value>Silver SS</value>
+  </data>
+  <data name="rank.sh" xml:space="preserve">
+    <value>Silver S</value>
+  </data>
+  <data name="panel.playcount" xml:space="preserve">
+    <value>プレイ回数：{0}</value>
+  </data>
+  <data name="panel.favourites" xml:space="preserve">
+    <value>お気に入り：{0}</value>
+  </data>
+  <data name="variant.mania.4k" xml:space="preserve">
+    <value>4K</value>
+  </data>
+  <data name="variant.mania.7k" xml:space="preserve">
+    <value>7K</value>
+  </data>
+  <data name="variant.mania.all" xml:space="preserve">
+    <value>全て</value>
+  </data>
+</root>

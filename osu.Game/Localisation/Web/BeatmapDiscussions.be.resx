@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authorizations.update.null_user" xml:space="preserve">
+    <value>Вы мусіце ўвайсці для рэдагавання.</value>
+  </data>
+  <data name="authorizations.update.system_generated" xml:space="preserve">
+    <value>Сістэмныя допісы немагчыма адрэдагаваць.</value>
+  </data>
+  <data name="authorizations.update.wrong_user" xml:space="preserve">
+    <value>Вы павінны быць уладальнікам допісу для рэдагавання.</value>
+  </data>
+  <data name="events.empty" xml:space="preserve">
+    <value>Нічога не адбылося... яшчэ.</value>
+  </data>
+  <data name="index.deleted_beatmap" xml:space="preserve">
+    <value>выдалена</value>
+  </data>
+  <data name="index.none_found" xml:space="preserve">
+    <value>Не знойдзена абмеркаванняў, супадаючых з гэтымі крытэрыямі пошука.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Абмеркаванне бітмап</value>
+  </data>
+  <data name="index.form._" xml:space="preserve">
+    <value>Пошук</value>
+  </data>
+  <data name="index.form.deleted" xml:space="preserve">
+    <value>Уключаючы выдаленыя абмеркаванні</value>
+  </data>
+  <data name="index.form.only_unresolved" xml:space="preserve">
+    <value>Паказаць толькі нявырашаныя абмеркаванні</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Тыпы памедамленняў</value>
+  </data>
+  <data name="index.form.username" xml:space="preserve">
+    <value>Імя карыстальніка</value>
+  </data>
+  <data name="index.form.beatmapset_status._" xml:space="preserve">
+    <value>Статус бітмапы</value>
+  </data>
+  <data name="index.form.beatmapset_status.all" xml:space="preserve">
+    <value>Усе</value>
+  </data>
+  <data name="index.form.beatmapset_status.disqualified" xml:space="preserve">
+    <value>Дыскваліфікаваны</value>
+  </data>
+  <data name="index.form.beatmapset_status.never_qualified" xml:space="preserve">
+    <value>Ніколі ні кваліфікавана</value>
+  </data>
+  <data name="index.form.beatmapset_status.qualified" xml:space="preserve">
+    <value>Кваліфікавана</value>
+  </data>
+  <data name="index.form.beatmapset_status.ranked" xml:space="preserve">
+    <value>Ранкавана</value>
+  </data>
+  <data name="index.form.user.label" xml:space="preserve">
+    <value>Карыстальнік</value>
+  </data>
+  <data name="index.form.user.overview" xml:space="preserve">
+    <value>Агляд актыўнасці</value>
+  </data>
+  <data name="item.created_at" xml:space="preserve">
+    <value>Дата размяшчэння</value>
+  </data>
+  <data name="item.deleted_at" xml:space="preserve">
+    <value>Дата выдалення</value>
+  </data>
+  <data name="item.message_type" xml:space="preserve">
+    <value>Тып</value>
+  </data>
+  <data name="item.permalink" xml:space="preserve">
+    <value>Пастаянная спасылка</value>
+  </data>
+  <data name="nearby_posts.confirm" xml:space="preserve">
+    <value>Ні адзін з допісаў не вырашае маю праблему</value>
+  </data>
+  <data name="nearby_posts.notice" xml:space="preserve">
+    <value>Існуюць допісы між {0} ({1}). Праверце іх перш, чым размяшчаць.</value>
+  </data>
+  <data name="reply.open.guest" xml:space="preserve">
+    <value>Каб адказаць, увайдзіце</value>
+  </data>
+  <data name="reply.open.user" xml:space="preserve">
+    <value>Адправіць</value>
+  </data>
+  <data name="review.go_to_parent" xml:space="preserve">
+    <value>Пабачыць адказ</value>
+  </data>
+  <data name="review.go_to_child" xml:space="preserve">
+    <value>Пабачыць абмеркаванне</value>
+  </data>
+  <data name="review.validation.invalid_block_type" xml:space="preserve">
+    <value>недапушчальны тып блоку</value>
+  </data>
+  <data name="review.validation.invalid_document" xml:space="preserve">
+    <value>недапушчальны адказ</value>
+  </data>
+  <data name="review.validation.minimum_issues" xml:space="preserve">
+    <value>адказ павінен утрымліваць як мінімум {0} праблему|адказ павінен утрымліваць як мінімум {0} праблемы|адказ павінен утрымліваць як мінімум {0} праблем</value>
+  </data>
+  <data name="review.validation.missing_text" xml:space="preserve">
+    <value>у блоке адсутнічае тэкст</value>
+  </data>
+  <data name="review.validation.too_many_blocks" xml:space="preserve">
+    <value>адказы могуць утрымліваць толькі {0} параграф/праблему|параграфы могуць утрымліваць толькі да {0} параграфаў/праблем</value>
+  </data>
+  <data name="system.resolved.true" xml:space="preserve">
+    <value>Пазначана як рашэнне карыстальнікам {0}</value>
+  </data>
+  <data name="system.resolved.false" xml:space="preserve">
+    <value>Адкрыта нанова карыстальнікам {0}</value>
+  </data>
+  <data name="timestamp_display.general" xml:space="preserve">
+    <value>агульнае</value>
+  </data>
+  <data name="timestamp_display.general_all" xml:space="preserve">
+    <value>агульнае (усе)</value>
+  </data>
+  <data name="user_filter.everyone" xml:space="preserve">
+    <value>Усе</value>
+  </data>
+  <data name="user_filter.label" xml:space="preserve">
+    <value>Фільтр па карыстальнікам</value>
+  </data>
+</root>

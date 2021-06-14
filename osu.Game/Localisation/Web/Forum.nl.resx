@@ -1,0 +1,556 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="pinned_topics" xml:space="preserve">
+    <value>Gepinde Onderwerpen</value>
+  </data>
+  <data name="slogan" xml:space="preserve">
+    <value>het is gevaarlijk om alleen te spelen.</value>
+  </data>
+  <data name="subforums" xml:space="preserve">
+    <value>Subforums</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>osu! forums</value>
+  </data>
+  <data name="covers.edit" xml:space="preserve">
+    <value>Wijzig omslag</value>
+  </data>
+  <data name="covers.create._" xml:space="preserve">
+    <value>Stel omslagafbeelding in</value>
+  </data>
+  <data name="covers.create.button" xml:space="preserve">
+    <value>Afbeelding uploaden</value>
+  </data>
+  <data name="covers.create.info" xml:space="preserve">
+    <value>Omslag grootte moet {0} zijn. Je kunt ook een afbeelding hier loslaten om hem te uploaden.</value>
+  </data>
+  <data name="covers.destroy._" xml:space="preserve">
+    <value>Verwijder omslag afbeelding</value>
+  </data>
+  <data name="covers.destroy.confirm" xml:space="preserve">
+    <value>Weet je zeker dat je de omslag afbeelding wilt verwijderen?</value>
+  </data>
+  <data name="forums.latest_post" xml:space="preserve">
+    <value>Laatste bericht</value>
+  </data>
+  <data name="forums.index.title" xml:space="preserve">
+    <value>Forum Overzicht</value>
+  </data>
+  <data name="forums.topics.empty" xml:space="preserve">
+    <value>Geen topics!</value>
+  </data>
+  <data name="mark_as_read.forum" xml:space="preserve">
+    <value>Markeer forum als gelezen</value>
+  </data>
+  <data name="mark_as_read.forums" xml:space="preserve">
+    <value>Markeer forums als gelezen</value>
+  </data>
+  <data name="mark_as_read.busy" xml:space="preserve">
+    <value>Markeren als gelezen...</value>
+  </data>
+  <data name="post.confirm_destroy" xml:space="preserve">
+    <value>Will je deze post echt verwijderen?</value>
+  </data>
+  <data name="post.confirm_restore" xml:space="preserve">
+    <value>Will je deze post echt terugzetten?</value>
+  </data>
+  <data name="post.edited" xml:space="preserve">
+    <value>Laatst bewerkt door {0} op {1}. {2} keer bewerkt in totaal.</value>
+  </data>
+  <data name="post.posted_at" xml:space="preserve">
+    <value>gepost op {0}</value>
+  </data>
+  <data name="post.posted_by" xml:space="preserve">
+    <value>geplaatst door {0}</value>
+  </data>
+  <data name="post.actions.destroy" xml:space="preserve">
+    <value>Verwijder bericht</value>
+  </data>
+  <data name="post.actions.edit" xml:space="preserve">
+    <value>Bewerk bericht</value>
+  </data>
+  <data name="post.actions.report" xml:space="preserve">
+    <value>Rapporteer bericht</value>
+  </data>
+  <data name="post.actions.restore" xml:space="preserve">
+    <value>Herstel bericht</value>
+  </data>
+  <data name="post.create.title.reply" xml:space="preserve">
+    <value>Nieuw antwoord</value>
+  </data>
+  <data name="post.info.post_count" xml:space="preserve">
+    <value>{0} bericht|{0} berichten</value>
+  </data>
+  <data name="post.info.topic_starter" xml:space="preserve">
+    <value>Onderwerp Starter</value>
+  </data>
+  <data name="search.go_to_post" xml:space="preserve">
+    <value>Ga naar bericht</value>
+  </data>
+  <data name="search.post_number_input" xml:space="preserve">
+    <value>geef bericht nummer</value>
+  </data>
+  <data name="search.total_posts" xml:space="preserve">
+    <value>{0} berichten totaal</value>
+  </data>
+  <data name="topic.confirm_destroy" xml:space="preserve">
+    <value>Topic echt verwijderen?</value>
+  </data>
+  <data name="topic.confirm_restore" xml:space="preserve">
+    <value>Topic echt herstellen?</value>
+  </data>
+  <data name="topic.deleted" xml:space="preserve">
+    <value>verwijder topic</value>
+  </data>
+  <data name="topic.go_to_latest" xml:space="preserve">
+    <value>bekijk nieuwste post</value>
+  </data>
+  <data name="topic.has_replied" xml:space="preserve">
+    <value>Je hebt gereageerd op dit onderwerp</value>
+  </data>
+  <data name="topic.in_forum" xml:space="preserve">
+    <value>in {0} </value>
+  </data>
+  <data name="topic.latest_post" xml:space="preserve">
+    <value>{0} door {1}</value>
+  </data>
+  <data name="topic.latest_reply_by" xml:space="preserve">
+    <value>laatste bericht door {0}</value>
+  </data>
+  <data name="topic.new_topic" xml:space="preserve">
+    <value>Nieuw onderwerp</value>
+  </data>
+  <data name="topic.new_topic_login" xml:space="preserve">
+    <value>Log in om een nieuw onderwerp maken</value>
+  </data>
+  <data name="topic.post_reply" xml:space="preserve">
+    <value>Post</value>
+  </data>
+  <data name="topic.reply_box_placeholder" xml:space="preserve">
+    <value>Typ hier om te antwoorden</value>
+  </data>
+  <data name="topic.reply_title_prefix" xml:space="preserve">
+    <value>Re</value>
+  </data>
+  <data name="topic.started_by" xml:space="preserve">
+    <value>door {0}</value>
+  </data>
+  <data name="topic.started_by_verbose" xml:space="preserve">
+    <value>gestart door {0}</value>
+  </data>
+  <data name="topic.actions.destroy" xml:space="preserve">
+    <value>Topic verwijderen</value>
+  </data>
+  <data name="topic.actions.restore" xml:space="preserve">
+    <value>Herstel topic</value>
+  </data>
+  <data name="topic.create.close" xml:space="preserve">
+    <value>Sluiten</value>
+  </data>
+  <data name="topic.create.preview" xml:space="preserve">
+    <value>Voorbeeld</value>
+  </data>
+  <data name="topic.create.preview_hide" xml:space="preserve">
+    <value>Schrijf</value>
+  </data>
+  <data name="topic.create.submit" xml:space="preserve">
+    <value>Post</value>
+  </data>
+  <data name="topic.create.necropost.default" xml:space="preserve">
+    <value>Dit onderwerp is al een tijdje inactief. Maak alleen een post hier als je een specifieke reden daarvoor hebt.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic._" xml:space="preserve">
+    <value>Dit onderwerp is al een tijdje inactief. Als je geen specifieke reden om hier te posten hebt, {0} in plaats daarvan.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic.create" xml:space="preserve">
+    <value>maak een onderwerp aan</value>
+  </data>
+  <data name="topic.create.placeholder.body" xml:space="preserve">
+    <value>Typ post inhoud hier</value>
+  </data>
+  <data name="topic.create.placeholder.title" xml:space="preserve">
+    <value>Klik hier om een titel in te stellen</value>
+  </data>
+  <data name="topic.jump.enter" xml:space="preserve">
+    <value>klik hier om een specifiek postnummer op te geven</value>
+  </data>
+  <data name="topic.jump.first" xml:space="preserve">
+    <value>ga naar eerste post</value>
+  </data>
+  <data name="topic.jump.last" xml:space="preserve">
+    <value>ga naar laatste post</value>
+  </data>
+  <data name="topic.jump.next" xml:space="preserve">
+    <value>sla 10 posts over</value>
+  </data>
+  <data name="topic.jump.previous" xml:space="preserve">
+    <value>ga 10 posts terug</value>
+  </data>
+  <data name="topic.post_edit.cancel" xml:space="preserve">
+    <value>Annuleren</value>
+  </data>
+  <data name="topic.post_edit.post" xml:space="preserve">
+    <value>Opslaan</value>
+  </data>
+  <data name="topic_watches.index.title_compact" xml:space="preserve">
+    <value>forum abonnementen</value>
+  </data>
+  <data name="topic_watches.index.box.total" xml:space="preserve">
+    <value>Geabonneerde topics</value>
+  </data>
+  <data name="topic_watches.index.box.unread" xml:space="preserve">
+    <value>Topics met nieuwe berichten</value>
+  </data>
+  <data name="topic_watches.index.info.total" xml:space="preserve">
+    <value>Je bent geabonneerd op {0} topics.</value>
+  </data>
+  <data name="topic_watches.index.info.unread" xml:space="preserve">
+    <value>Je hebt {0} ongelezen berichten in geabonneerde berichten.</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.confirmation" xml:space="preserve">
+    <value>Uitschrijven van topic?</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.title" xml:space="preserve">
+    <value>Uitschrijven</value>
+  </data>
+  <data name="topics._" xml:space="preserve">
+    <value>Onderwerpen</value>
+  </data>
+  <data name="topics.actions.login_reply" xml:space="preserve">
+    <value>Log in om te antwoorden</value>
+  </data>
+  <data name="topics.actions.reply" xml:space="preserve">
+    <value>Beantwoorden</value>
+  </data>
+  <data name="topics.actions.reply_with_quote" xml:space="preserve">
+    <value>Citeer post voor antwoord</value>
+  </data>
+  <data name="topics.actions.search" xml:space="preserve">
+    <value>Zoek</value>
+  </data>
+  <data name="topics.create.create_poll" xml:space="preserve">
+    <value>Peiling Aanmaken</value>
+  </data>
+  <data name="topics.create.preview" xml:space="preserve">
+    <value>Plaats voorbeeld</value>
+  </data>
+  <data name="topics.create.create_poll_button.add" xml:space="preserve">
+    <value>Maak een Peiling aan</value>
+  </data>
+  <data name="topics.create.create_poll_button.remove" xml:space="preserve">
+    <value>Annuleer aanmaken van peiling</value>
+  </data>
+  <data name="topics.create.poll.hide_results" xml:space="preserve">
+    <value>Verberg de resultaten van de poll.</value>
+  </data>
+  <data name="topics.create.poll.hide_results_info" xml:space="preserve">
+    <value>Deze zullen pas worden getoond na de sluiting van de poll.</value>
+  </data>
+  <data name="topics.create.poll.length" xml:space="preserve">
+    <value>Maak peiling voor</value>
+  </data>
+  <data name="topics.create.poll.length_days_suffix" xml:space="preserve">
+    <value>dagen</value>
+  </data>
+  <data name="topics.create.poll.length_info" xml:space="preserve">
+    <value>Laat leeg voor een peiling die nooit eindigt</value>
+  </data>
+  <data name="topics.create.poll.max_options" xml:space="preserve">
+    <value>Opties per gebruiker</value>
+  </data>
+  <data name="topics.create.poll.max_options_info" xml:space="preserve">
+    <value>Dit is het aantal opties dat iedere gebruiker mag selecteren bij de stemming.</value>
+  </data>
+  <data name="topics.create.poll.options" xml:space="preserve">
+    <value>Opties</value>
+  </data>
+  <data name="topics.create.poll.options_info" xml:space="preserve">
+    <value>Plaats elke optie op een nieuwe lijn. Je mag maximaal 10 opties ingeven.</value>
+  </data>
+  <data name="topics.create.poll.title" xml:space="preserve">
+    <value>Vraag</value>
+  </data>
+  <data name="topics.create.poll.vote_change" xml:space="preserve">
+    <value>Sta opnieuw stemmen toe.</value>
+  </data>
+  <data name="topics.create.poll.vote_change_info" xml:space="preserve">
+    <value>Indien ingeschakeld, kunnen gebruikers hun stem wijzigen.</value>
+  </data>
+  <data name="topics.edit_title.start" xml:space="preserve">
+    <value>Bewerk titel</value>
+  </data>
+  <data name="topics.index.feature_votes" xml:space="preserve">
+    <value>ster prioriteit</value>
+  </data>
+  <data name="topics.index.replies" xml:space="preserve">
+    <value>keer beantwoordt</value>
+  </data>
+  <data name="topics.index.views" xml:space="preserve">
+    <value>keer bekeken</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0" xml:space="preserve">
+    <value>Verwijder "toegevoegd" tag</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0_done" xml:space="preserve">
+    <value>Verwijderde "toegevoegd" tag</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1" xml:space="preserve">
+    <value>Voeg "toegevoegd" tag toe</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1_done" xml:space="preserve">
+    <value>Voegde "toegevoegd" tag toe</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0" xml:space="preserve">
+    <value>Verwijder "toegewezen" tag</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0_done" xml:space="preserve">
+    <value>Verwijderde "toegewezen" tag</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1" xml:space="preserve">
+    <value>Voeg "toegewezen" tag toe</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1_done" xml:space="preserve">
+    <value>Voegde "toegewezen" tag toe</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0" xml:space="preserve">
+    <value>Verwijder "bevestigd" tag</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0_done" xml:space="preserve">
+    <value>Verwijderde "bevestigd" tag</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1" xml:space="preserve">
+    <value>Voeg "bevestigd" tag toe</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1_done" xml:space="preserve">
+    <value>Voegde "bevestigd" tag toe</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0" xml:space="preserve">
+    <value>Verwijder "duplicaat" tag</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0_done" xml:space="preserve">
+    <value>Verwijderde "duplicaat" tag</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1" xml:space="preserve">
+    <value>Voeg "duplicaat" tag toe</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1_done" xml:space="preserve">
+    <value>Voegde "duplicaat" tag toe</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0" xml:space="preserve">
+    <value>Verwijder "invalide" tag</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0_done" xml:space="preserve">
+    <value>Verwijderde "invalide" tag</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1" xml:space="preserve">
+    <value>Voeg "invalide" tag toe</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1_done" xml:space="preserve">
+    <value>Voegde "invalide" tag toe</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0" xml:space="preserve">
+    <value>Verwijder "opgelost" tag</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0_done" xml:space="preserve">
+    <value>Verwijderde "opgelost" tag</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1" xml:space="preserve">
+    <value>Voeg "opgelost" tag toe</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1_done" xml:space="preserve">
+    <value>Voegde "opgelost" tag toe</value>
+  </data>
+  <data name="topics.lock.is_locked" xml:space="preserve">
+    <value>Dit onderwerp is gesloten en kan niet meer op beantwoord worden</value>
+  </data>
+  <data name="topics.lock.to_0" xml:space="preserve">
+    <value>Ontgrendel topic</value>
+  </data>
+  <data name="topics.lock.to_0_confirm" xml:space="preserve">
+    <value>Topic ontgrendelen?</value>
+  </data>
+  <data name="topics.lock.to_0_done" xml:space="preserve">
+    <value>Topic is ontgrendeld</value>
+  </data>
+  <data name="topics.lock.to_1" xml:space="preserve">
+    <value>Vergrendel topic</value>
+  </data>
+  <data name="topics.lock.to_1_confirm" xml:space="preserve">
+    <value>Topic vergrendelen?</value>
+  </data>
+  <data name="topics.lock.to_1_done" xml:space="preserve">
+    <value>Topic is vergrendeld</value>
+  </data>
+  <data name="topics.moderate_move.title" xml:space="preserve">
+    <value>Verplaats naar een ander forum</value>
+  </data>
+  <data name="topics.moderate_pin.to_0" xml:space="preserve">
+    <value>Onpin topic</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_confirm" xml:space="preserve">
+    <value>Topic losmaken?</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_done" xml:space="preserve">
+    <value>Topic niet meer gepint</value>
+  </data>
+  <data name="topics.moderate_pin.to_1" xml:space="preserve">
+    <value>Pin topic</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_confirm" xml:space="preserve">
+    <value>Topic vastmaken?</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_done" xml:space="preserve">
+    <value>Topic is gepint</value>
+  </data>
+  <data name="topics.moderate_pin.to_2" xml:space="preserve">
+    <value>Pin topic en markeer als melding</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_confirm" xml:space="preserve">
+    <value>Topic vastmaken en markeer als aankondiging?</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_done" xml:space="preserve">
+    <value>Topic is gepint en gemarkeerd als melding</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.show" xml:space="preserve">
+    <value>Toon verwijderde berichten</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.hide" xml:space="preserve">
+    <value>Verberg verwijderde berichten</value>
+  </data>
+  <data name="topics.show.deleted-posts" xml:space="preserve">
+    <value>Verwijderde posts</value>
+  </data>
+  <data name="topics.show.total_posts" xml:space="preserve">
+    <value>Alle posts</value>
+  </data>
+  <data name="topics.show.feature_vote.current" xml:space="preserve">
+    <value>Prioriteit: +{0}</value>
+  </data>
+  <data name="topics.show.feature_vote.do" xml:space="preserve">
+    <value>Promoot dit verzoek</value>
+  </data>
+  <data name="topics.show.feature_vote.info._" xml:space="preserve">
+    <value>Dit is een {0}. Feature requests kunnen omhoog worden gestemd door {1}.</value>
+  </data>
+  <data name="topics.show.feature_vote.info.feature_request" xml:space="preserve">
+    <value>feature request</value>
+  </data>
+  <data name="topics.show.feature_vote.info.supporters" xml:space="preserve">
+    <value>supporters</value>
+  </data>
+  <data name="topics.show.feature_vote.user.count" xml:space="preserve">
+    <value>{0} geen stemmen|{1} {0} stem|[2,*] {0} stemmen</value>
+  </data>
+  <data name="topics.show.feature_vote.user.current" xml:space="preserve">
+    <value>Je hebt {0} stemmen over.</value>
+  </data>
+  <data name="topics.show.feature_vote.user.not_enough" xml:space="preserve">
+    <value>Je hebt geen stemmen meer over</value>
+  </data>
+  <data name="topics.show.poll.edit" xml:space="preserve">
+    <value>Poll bewerken</value>
+  </data>
+  <data name="topics.show.poll.edit_warning" xml:space="preserve">
+    <value>Een poll bewerken zal de huidige resultaten verwijderen!</value>
+  </data>
+  <data name="topics.show.poll.vote" xml:space="preserve">
+    <value>Stem</value>
+  </data>
+  <data name="topics.show.poll.button.change_vote" xml:space="preserve">
+    <value>Verander je stem</value>
+  </data>
+  <data name="topics.show.poll.button.edit" xml:space="preserve">
+    <value>Bewerk poll</value>
+  </data>
+  <data name="topics.show.poll.button.view_results" xml:space="preserve">
+    <value>Ga naar resultaten</value>
+  </data>
+  <data name="topics.show.poll.button.vote" xml:space="preserve">
+    <value>Stem</value>
+  </data>
+  <data name="topics.show.poll.detail.end_time" xml:space="preserve">
+    <value>Stemmen eindigt op {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.ended" xml:space="preserve">
+    <value>Stemming eindigde op {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.results_hidden" xml:space="preserve">
+    <value>Als de pollen zijn gesloten dan zullen resultaten worden getoond.</value>
+  </data>
+  <data name="topics.show.poll.detail.total" xml:space="preserve">
+    <value>Totale stemmen: count</value>
+  </data>
+  <data name="topics.watch.to_not_watching" xml:space="preserve">
+    <value>Heeft geen bladwijzer</value>
+  </data>
+  <data name="topics.watch.to_watching" xml:space="preserve">
+    <value>Voeg bladwijzer toe</value>
+  </data>
+  <data name="topics.watch.to_watching_mail" xml:space="preserve">
+    <value>Voeg bladwijzer met notificaties toe</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_disable" xml:space="preserve">
+    <value>Melding is ingeschakeld. Klik om uit te schakelen</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_enable" xml:space="preserve">
+    <value>Melding is uitgeschakeld. Klik om in te schakelen</value>
+  </data>
+</root>

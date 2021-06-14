@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="edit.title_compact" xml:space="preserve">
+    <value>pengaturan</value>
+  </data>
+  <data name="edit.username" xml:space="preserve">
+    <value>nama pengguna</value>
+  </data>
+  <data name="edit.avatar.title" xml:space="preserve">
+    <value>Avatar</value>
+  </data>
+  <data name="edit.avatar.rules" xml:space="preserve">
+    <value>Pastikan avatar Anda mematuhi {0} yang berlaku.&lt;br/&gt;  Dengan kata lain, avatar Anda harus &lt;strong&gt;cocok untuk segala usia&lt;/strong&gt; tanpa mengandung unsur-unsur yang tidak dibenarkan seperti cacian, hinaan, atau konten-konten yang bersifat sugestif.</value>
+  </data>
+  <data name="edit.avatar.rules_link" xml:space="preserve">
+    <value>peraturan komunitas</value>
+  </data>
+  <data name="edit.email.current" xml:space="preserve">
+    <value>email saat ini</value>
+  </data>
+  <data name="edit.email.new" xml:space="preserve">
+    <value>email baru</value>
+  </data>
+  <data name="edit.email.new_confirmation" xml:space="preserve">
+    <value>konfirmasi email</value>
+  </data>
+  <data name="edit.email.title" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="edit.password.current" xml:space="preserve">
+    <value>kata sandi saat ini</value>
+  </data>
+  <data name="edit.password.new" xml:space="preserve">
+    <value>kata sandi baru</value>
+  </data>
+  <data name="edit.password.new_confirmation" xml:space="preserve">
+    <value>konfirmasi kata sandi</value>
+  </data>
+  <data name="edit.password.title" xml:space="preserve">
+    <value>Kata Sandi</value>
+  </data>
+  <data name="edit.profile.title" xml:space="preserve">
+    <value>Profil</value>
+  </data>
+  <data name="edit.profile.user.user_from" xml:space="preserve">
+    <value>lokasi saat ini</value>
+  </data>
+  <data name="edit.profile.user.user_interests" xml:space="preserve">
+    <value>minat</value>
+  </data>
+  <data name="edit.profile.user.user_occ" xml:space="preserve">
+    <value>pekerjaan</value>
+  </data>
+  <data name="edit.profile.user.user_website" xml:space="preserve">
+    <value>situs web</value>
+  </data>
+  <data name="edit.signature.title" xml:space="preserve">
+    <value>Tanda Tangan</value>
+  </data>
+  <data name="edit.signature.update" xml:space="preserve">
+    <value>perbarui</value>
+  </data>
+  <data name="notifications.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>terima notifikasi pada saat terdapat masalah baru pada beatmap yang berstatus Qualified pada mode</value>
+  </data>
+  <data name="notifications.beatmapset_disqualify" xml:space="preserve">
+    <value>terima notifikasi pada saat terdapat beatmap yang terdiskualifikasi pada mode</value>
+  </data>
+  <data name="notifications.comment_reply" xml:space="preserve">
+    <value>terima notifikasi pada saat terdapat balasan baru pada komentar yang Anda kirim</value>
+  </data>
+  <data name="notifications.title" xml:space="preserve">
+    <value>Notifikasi</value>
+  </data>
+  <data name="notifications.topic_auto_subscribe" xml:space="preserve">
+    <value>hidupkan notifikasi secara otomatis di topik forum baru yang Anda buat</value>
+  </data>
+  <data name="notifications.options._" xml:space="preserve">
+    <value>kirimkan notifikasi melalui</value>
+  </data>
+  <data name="notifications.options.beatmap_owner_change" xml:space="preserve">
+    <value>guest difficulty</value>
+  </data>
+  <data name="notifications.options.beatmapset:modding" xml:space="preserve">
+    <value>modding beatmap</value>
+  </data>
+  <data name="notifications.options.channel_message" xml:space="preserve">
+    <value>pesan pribadi</value>
+  </data>
+  <data name="notifications.options.comment_new" xml:space="preserve">
+    <value>komentar baru</value>
+  </data>
+  <data name="notifications.options.forum_topic_reply" xml:space="preserve">
+    <value>balasan pada topik</value>
+  </data>
+  <data name="notifications.options.mail" xml:space="preserve">
+    <value>email</value>
+  </data>
+  <data name="notifications.options.mapping" xml:space="preserve">
+    <value>pembuat beatmap</value>
+  </data>
+  <data name="notifications.options.push" xml:space="preserve">
+    <value>web</value>
+  </data>
+  <data name="notifications.options.user_achievement_unlock" xml:space="preserve">
+    <value>terbukanya medali baru</value>
+  </data>
+  <data name="oauth.authorized_clients" xml:space="preserve">
+    <value>klien yang memiliki akses</value>
+  </data>
+  <data name="oauth.own_clients" xml:space="preserve">
+    <value>klien yang Anda miliki</value>
+  </data>
+  <data name="oauth.title" xml:space="preserve">
+    <value>OAuth</value>
+  </data>
+  <data name="options.beatmapset_show_nsfw" xml:space="preserve">
+    <value>nonaktifkan peringatan untuk beatmap-beatmap yang mengandung konten eksplisit</value>
+  </data>
+  <data name="options.beatmapset_title_show_original" xml:space="preserve">
+    <value>tampilkan metadata beatmap dalam bahasa aslinya</value>
+  </data>
+  <data name="options.title" xml:space="preserve">
+    <value>Pengaturan</value>
+  </data>
+  <data name="options.beatmapset_download._" xml:space="preserve">
+    <value>tipe pengunduhan beatmap default</value>
+  </data>
+  <data name="options.beatmapset_download.all" xml:space="preserve">
+    <value>dengan video (apabila tersedia)</value>
+  </data>
+  <data name="options.beatmapset_download.direct" xml:space="preserve">
+    <value>buka melalui osu!direct</value>
+  </data>
+  <data name="options.beatmapset_download.no_video" xml:space="preserve">
+    <value>tanpa video</value>
+  </data>
+  <data name="playstyles.keyboard" xml:space="preserve">
+    <value>keyboard</value>
+  </data>
+  <data name="playstyles.mouse" xml:space="preserve">
+    <value>mouse</value>
+  </data>
+  <data name="playstyles.tablet" xml:space="preserve">
+    <value>tablet</value>
+  </data>
+  <data name="playstyles.title" xml:space="preserve">
+    <value>Gaya Bermain</value>
+  </data>
+  <data name="playstyles.touch" xml:space="preserve">
+    <value>layar sentuh</value>
+  </data>
+  <data name="privacy.friends_only" xml:space="preserve">
+    <value>Blokir pesan pribadi dari orang yang tidak ada dalam daftar teman Anda</value>
+  </data>
+  <data name="privacy.hide_online" xml:space="preserve">
+    <value>sembunyikan keberadaan online Anda</value>
+  </data>
+  <data name="privacy.title" xml:space="preserve">
+    <value>Kebijakan Privasi</value>
+  </data>
+  <data name="security.current_session" xml:space="preserve">
+    <value>saat ini</value>
+  </data>
+  <data name="security.end_session" xml:space="preserve">
+    <value>Akhiri Sesi</value>
+  </data>
+  <data name="security.end_session_confirmation" xml:space="preserve">
+    <value>Aksi ini akan langsung mengakhiri sesi anda di perangkat tersebut. Apakah anda yakin?</value>
+  </data>
+  <data name="security.last_active" xml:space="preserve">
+    <value>Terakhir aktif:</value>
+  </data>
+  <data name="security.title" xml:space="preserve">
+    <value>Keamanan</value>
+  </data>
+  <data name="security.web_sessions" xml:space="preserve">
+    <value>web session</value>
+  </data>
+  <data name="update_email.update" xml:space="preserve">
+    <value>perbarui</value>
+  </data>
+  <data name="update_password.update" xml:space="preserve">
+    <value>perbarui</value>
+  </data>
+  <data name="verification_completed.text" xml:space="preserve">
+    <value>Anda dapat menutup laman ini sekarang</value>
+  </data>
+  <data name="verification_completed.title" xml:space="preserve">
+    <value>Verifikasi selesai</value>
+  </data>
+  <data name="verification_invalid.title" xml:space="preserve">
+    <value>Tautan verifikasi tidak valid atau kedaluwarsa</value>
+  </data>
+</root>

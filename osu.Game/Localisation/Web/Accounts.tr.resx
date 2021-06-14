@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="edit.title_compact" xml:space="preserve">
+    <value>ayarlar</value>
+  </data>
+  <data name="edit.username" xml:space="preserve">
+    <value>kullanıcı adı</value>
+  </data>
+  <data name="edit.avatar.title" xml:space="preserve">
+    <value>Avatar</value>
+  </data>
+  <data name="edit.avatar.rules" xml:space="preserve">
+    <value>Lütfen avatarınızın {0} uyduğundan emin olun.&lt;br/&gt;Bu, avatarın &lt;strong&gt;her yaş grubuna uygun olması&lt;/strong&gt; gerektiği anlamına gelir. Yani çıplaklık, küfür veya müstehcen içerik bulunmamalıdır.</value>
+  </data>
+  <data name="edit.avatar.rules_link" xml:space="preserve">
+    <value>topluluk kurallarına</value>
+  </data>
+  <data name="edit.email.current" xml:space="preserve">
+    <value>mevcut e-posta</value>
+  </data>
+  <data name="edit.email.new" xml:space="preserve">
+    <value>yeni e-posta</value>
+  </data>
+  <data name="edit.email.new_confirmation" xml:space="preserve">
+    <value>e-posta onayı</value>
+  </data>
+  <data name="edit.email.title" xml:space="preserve">
+    <value>E-posta</value>
+  </data>
+  <data name="edit.password.current" xml:space="preserve">
+    <value>mevcut şifre</value>
+  </data>
+  <data name="edit.password.new" xml:space="preserve">
+    <value>yeni şifre</value>
+  </data>
+  <data name="edit.password.new_confirmation" xml:space="preserve">
+    <value>şifre onayı</value>
+  </data>
+  <data name="edit.password.title" xml:space="preserve">
+    <value>Şifre</value>
+  </data>
+  <data name="edit.profile.title" xml:space="preserve">
+    <value>Profil</value>
+  </data>
+  <data name="edit.profile.user.user_from" xml:space="preserve">
+    <value>mevcut konum</value>
+  </data>
+  <data name="edit.profile.user.user_interests" xml:space="preserve">
+    <value>ilgi alanları</value>
+  </data>
+  <data name="edit.profile.user.user_occ" xml:space="preserve">
+    <value>meslek</value>
+  </data>
+  <data name="edit.profile.user.user_website" xml:space="preserve">
+    <value>web sitesi</value>
+  </data>
+  <data name="edit.signature.title" xml:space="preserve">
+    <value>İmza</value>
+  </data>
+  <data name="edit.signature.update" xml:space="preserve">
+    <value>güncelle</value>
+  </data>
+  <data name="notifications.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>belirtilen modlardaki nitelikli maplerin yeni sorunlarında bildirim al </value>
+  </data>
+  <data name="notifications.beatmapset_disqualify" xml:space="preserve">
+    <value>belirtilen modlardaki beatmapler diskalifiye edildiğinde bildirim al</value>
+  </data>
+  <data name="notifications.comment_reply" xml:space="preserve">
+    <value>yorumlara yapılan yanıtlar için bildirim al</value>
+  </data>
+  <data name="notifications.title" xml:space="preserve">
+    <value>Bildirimler</value>
+  </data>
+  <data name="notifications.topic_auto_subscribe" xml:space="preserve">
+    <value>oluşturduğunuz yeni forum başlıklarında bildirimleri otomatik olarak etkinleştir</value>
+  </data>
+  <data name="notifications.options._" xml:space="preserve">
+    <value>bildirim seçenekleri</value>
+  </data>
+  <data name="notifications.options.beatmap_owner_change" xml:space="preserve">
+    <value>konuk zorluk</value>
+  </data>
+  <data name="notifications.options.beatmapset:modding" xml:space="preserve">
+    <value>beatmap modlama</value>
+  </data>
+  <data name="notifications.options.channel_message" xml:space="preserve">
+    <value>özel sohbet mesajları</value>
+  </data>
+  <data name="notifications.options.comment_new" xml:space="preserve">
+    <value>yeni yorumlar</value>
+  </data>
+  <data name="notifications.options.forum_topic_reply" xml:space="preserve">
+    <value>konu yanıtı</value>
+  </data>
+  <data name="notifications.options.mail" xml:space="preserve">
+    <value>e-posta</value>
+  </data>
+  <data name="notifications.options.mapping" xml:space="preserve">
+    <value>beatmap mapper</value>
+  </data>
+  <data name="notifications.options.push" xml:space="preserve">
+    <value>anlık</value>
+  </data>
+  <data name="notifications.options.user_achievement_unlock" xml:space="preserve">
+    <value>madalya açıldı</value>
+  </data>
+  <data name="oauth.authorized_clients" xml:space="preserve">
+    <value>izin verilen istemciler</value>
+  </data>
+  <data name="oauth.own_clients" xml:space="preserve">
+    <value>size ait istemciler</value>
+  </data>
+  <data name="oauth.title" xml:space="preserve">
+    <value>OAuth</value>
+  </data>
+  <data name="options.beatmapset_show_nsfw" xml:space="preserve">
+    <value>beatmaplerdeki müstehcen içerikler için uyarıları gizle</value>
+  </data>
+  <data name="options.beatmapset_title_show_original" xml:space="preserve">
+    <value>beatmap metaverisini orijinal dilinde göster</value>
+  </data>
+  <data name="options.title" xml:space="preserve">
+    <value>Seçenekler</value>
+  </data>
+  <data name="options.beatmapset_download._" xml:space="preserve">
+    <value>varsayılan beatmap indirme tipi</value>
+  </data>
+  <data name="options.beatmapset_download.all" xml:space="preserve">
+    <value>eğer varsa video ile beraber</value>
+  </data>
+  <data name="options.beatmapset_download.direct" xml:space="preserve">
+    <value>osu!direct'de aç</value>
+  </data>
+  <data name="options.beatmapset_download.no_video" xml:space="preserve">
+    <value>video olmadan</value>
+  </data>
+  <data name="playstyles.keyboard" xml:space="preserve">
+    <value>klavye</value>
+  </data>
+  <data name="playstyles.mouse" xml:space="preserve">
+    <value>fare</value>
+  </data>
+  <data name="playstyles.tablet" xml:space="preserve">
+    <value>tablet</value>
+  </data>
+  <data name="playstyles.title" xml:space="preserve">
+    <value>Oynayış Tarzları</value>
+  </data>
+  <data name="playstyles.touch" xml:space="preserve">
+    <value>dokunmatik</value>
+  </data>
+  <data name="privacy.friends_only" xml:space="preserve">
+    <value>Arkadaş listende olmayan kişilerden gelen mesajları engelle</value>
+  </data>
+  <data name="privacy.hide_online" xml:space="preserve">
+    <value>çevrimiçi durumunu gizle</value>
+  </data>
+  <data name="privacy.title" xml:space="preserve">
+    <value>Gizlilik</value>
+  </data>
+  <data name="security.current_session" xml:space="preserve">
+    <value>şu anki</value>
+  </data>
+  <data name="security.end_session" xml:space="preserve">
+    <value>Oturumu Sonlandır</value>
+  </data>
+  <data name="security.end_session_confirmation" xml:space="preserve">
+    <value>Bu, oturumunuzu o cihazda hemen sonlandırır. Emin misiniz?</value>
+  </data>
+  <data name="security.last_active" xml:space="preserve">
+    <value>Son etkinlik:</value>
+  </data>
+  <data name="security.title" xml:space="preserve">
+    <value>Güvenlik</value>
+  </data>
+  <data name="security.web_sessions" xml:space="preserve">
+    <value>web oturumları</value>
+  </data>
+  <data name="update_email.update" xml:space="preserve">
+    <value>güncelle</value>
+  </data>
+  <data name="update_password.update" xml:space="preserve">
+    <value>güncelle</value>
+  </data>
+  <data name="verification_completed.text" xml:space="preserve">
+    <value>Şimdi bu sekmeyi/pencereyi kapatabilirsiniz</value>
+  </data>
+  <data name="verification_completed.title" xml:space="preserve">
+    <value>Doğrulama tamamlandı</value>
+  </data>
+  <data name="verification_invalid.title" xml:space="preserve">
+    <value>Geçersiz veya süresi dolmuş doğrulama bağlantısı</value>
+  </data>
+</root>

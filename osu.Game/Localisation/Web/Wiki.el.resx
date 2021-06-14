@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="show.fallback_translation" xml:space="preserve">
+    <value>Η σελίδα δεν είναι ακόμα μεταφρασμένη στην επιλεγμένη γλώσσα ({0}). Αλλαγή στην Αγγλική έκδοση.</value>
+  </data>
+  <data name="show.missing" xml:space="preserve">
+    <value>Η σελίδα "{0}" δεν βρέθηκε.</value>
+  </data>
+  <data name="show.missing_title" xml:space="preserve">
+    <value>Δεν Βρέθηκε</value>
+  </data>
+  <data name="show.missing_translation" xml:space="preserve">
+    <value>Η σελίδα που ζητήσατε δεν βρέθηκε για την επιλεγμένη γλώσσα.</value>
+  </data>
+  <data name="show.search" xml:space="preserve">
+    <value>Αναζήτηση υπάρχουσων σελίδων για {0}.</value>
+  </data>
+  <data name="show.toc" xml:space="preserve">
+    <value>Περιεχόμενα</value>
+  </data>
+  <data name="show.edit.link" xml:space="preserve">
+    <value>Εμφάνιση σε GitHub</value>
+  </data>
+  <data name="show.edit.refresh" xml:space="preserve">
+    <value>Ανανέωση</value>
+  </data>
+  <data name="show.translation.legal" xml:space="preserve">
+    <value>Αυτή η μετάφραση παρέχεται μόνο για λόγους ευκολίας. Το πρωτότυπο {0} πρέπει να είναι η μοναδική νομικά δεσμευμένη έκδοση του κειμένου.</value>
+  </data>
+  <data name="show.translation.outdated" xml:space="preserve">
+    <value>Αυτή η σελίδα περιέχει μια παλαιότερη μετάφραση του αρχικού περιεχομένου. Παρακαλώ ελέγξτε το {0} για πιο ακριβής πληροφόρηση (και μπορείτε να ενημερώσετε τη μετάφραση, εάν θέλετε να βοηθήσετε)!</value>
+  </data>
+  <data name="show.translation.default" xml:space="preserve">
+    <value>Αγγλική έκδοση</value>
+  </data>
+</root>

@@ -1,0 +1,556 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="pinned_topics" xml:space="preserve">
+    <value>Sabitlenmiş Konular</value>
+  </data>
+  <data name="slogan" xml:space="preserve">
+    <value>yalnız başına oynamak tehlikeli.</value>
+  </data>
+  <data name="subforums" xml:space="preserve">
+    <value>Alt forumlar</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>osu! forumları</value>
+  </data>
+  <data name="covers.edit" xml:space="preserve">
+    <value>Kapak resmini düzenle</value>
+  </data>
+  <data name="covers.create._" xml:space="preserve">
+    <value>Kapak resmi ekle</value>
+  </data>
+  <data name="covers.create.button" xml:space="preserve">
+    <value>Kapak resmi yükle</value>
+  </data>
+  <data name="covers.create.info" xml:space="preserve">
+    <value>Kapak boyutları {0} olmalıdır. Görselleri yüklemek için buraya da sürükleyebilirsin.</value>
+  </data>
+  <data name="covers.destroy._" xml:space="preserve">
+    <value>Kapak resmini kaldır</value>
+  </data>
+  <data name="covers.destroy.confirm" xml:space="preserve">
+    <value>Kapak resmini kaldırmak istediğinden emin misin?</value>
+  </data>
+  <data name="forums.latest_post" xml:space="preserve">
+    <value>Son Gönderi</value>
+  </data>
+  <data name="forums.index.title" xml:space="preserve">
+    <value>Forum Ana Sayfası</value>
+  </data>
+  <data name="forums.topics.empty" xml:space="preserve">
+    <value>Konu yok!</value>
+  </data>
+  <data name="mark_as_read.forum" xml:space="preserve">
+    <value>Forumu okundu olarak işaretle</value>
+  </data>
+  <data name="mark_as_read.forums" xml:space="preserve">
+    <value>Forumları okundu olarak işaretle</value>
+  </data>
+  <data name="mark_as_read.busy" xml:space="preserve">
+    <value>Okundu olarak işaretleniyor...</value>
+  </data>
+  <data name="post.confirm_destroy" xml:space="preserve">
+    <value>Gerçekten gönderiyi silmek istiyor musun?</value>
+  </data>
+  <data name="post.confirm_restore" xml:space="preserve">
+    <value>Gönderiyi geri yükle?</value>
+  </data>
+  <data name="post.edited" xml:space="preserve">
+    <value>En son {0} tarafından {1}, toplamda {2} defa düzenlendi.|En son {0} tarafından {1}, toplamda {2} defa düzenlendi.</value>
+  </data>
+  <data name="post.posted_at" xml:space="preserve">
+    <value>{0} gönderildi</value>
+  </data>
+  <data name="post.posted_by" xml:space="preserve">
+    <value>{0} tarafından gönderildi</value>
+  </data>
+  <data name="post.actions.destroy" xml:space="preserve">
+    <value>Gönderiyi sil</value>
+  </data>
+  <data name="post.actions.edit" xml:space="preserve">
+    <value>Gönderiyi düzenle</value>
+  </data>
+  <data name="post.actions.report" xml:space="preserve">
+    <value>Gönderiyi bildir</value>
+  </data>
+  <data name="post.actions.restore" xml:space="preserve">
+    <value>Gönderiyi geri getir</value>
+  </data>
+  <data name="post.create.title.reply" xml:space="preserve">
+    <value>Yeni yanıt</value>
+  </data>
+  <data name="post.info.post_count" xml:space="preserve">
+    <value>{0} gönderi|{0} gönderi</value>
+  </data>
+  <data name="post.info.topic_starter" xml:space="preserve">
+    <value>Konuyu Başlatan</value>
+  </data>
+  <data name="search.go_to_post" xml:space="preserve">
+    <value>Gönderiye git</value>
+  </data>
+  <data name="search.post_number_input" xml:space="preserve">
+    <value>gönderi numarasını girin</value>
+  </data>
+  <data name="search.total_posts" xml:space="preserve">
+    <value>toplamda {0} gönderi</value>
+  </data>
+  <data name="topic.confirm_destroy" xml:space="preserve">
+    <value>Konu gerçekten silinsin mi?</value>
+  </data>
+  <data name="topic.confirm_restore" xml:space="preserve">
+    <value>Konu gerçekten geri yüklensin mi?</value>
+  </data>
+  <data name="topic.deleted" xml:space="preserve">
+    <value>silinmiş konu</value>
+  </data>
+  <data name="topic.go_to_latest" xml:space="preserve">
+    <value>son gönderiyi görüntüle</value>
+  </data>
+  <data name="topic.has_replied" xml:space="preserve">
+    <value>Bu konuyu yanıtladınız</value>
+  </data>
+  <data name="topic.in_forum" xml:space="preserve">
+    <value>{0} forumunda</value>
+  </data>
+  <data name="topic.latest_post" xml:space="preserve">
+    <value>{0} tarafından {1}</value>
+  </data>
+  <data name="topic.latest_reply_by" xml:space="preserve">
+    <value>son yanıt {0} tarafından</value>
+  </data>
+  <data name="topic.new_topic" xml:space="preserve">
+    <value>Yeni konu aç</value>
+  </data>
+  <data name="topic.new_topic_login" xml:space="preserve">
+    <value>Yeni konu başlatmak için giriş yapın</value>
+  </data>
+  <data name="topic.post_reply" xml:space="preserve">
+    <value>Gönder</value>
+  </data>
+  <data name="topic.reply_box_placeholder" xml:space="preserve">
+    <value>Yanıtlamak için buraya yazın</value>
+  </data>
+  <data name="topic.reply_title_prefix" xml:space="preserve">
+    <value>Ynt</value>
+  </data>
+  <data name="topic.started_by" xml:space="preserve">
+    <value>{0} tarafından</value>
+  </data>
+  <data name="topic.started_by_verbose" xml:space="preserve">
+    <value>{0} tarafından başlatıldı</value>
+  </data>
+  <data name="topic.actions.destroy" xml:space="preserve">
+    <value>Konuyu sil</value>
+  </data>
+  <data name="topic.actions.restore" xml:space="preserve">
+    <value>Konuyu geri yükle</value>
+  </data>
+  <data name="topic.create.close" xml:space="preserve">
+    <value>Kapat</value>
+  </data>
+  <data name="topic.create.preview" xml:space="preserve">
+    <value>Önizleme </value>
+  </data>
+  <data name="topic.create.preview_hide" xml:space="preserve">
+    <value>Yaz</value>
+  </data>
+  <data name="topic.create.submit" xml:space="preserve">
+    <value>Gönder</value>
+  </data>
+  <data name="topic.create.necropost.default" xml:space="preserve">
+    <value>Bu konu uzun bir süredir inaktif. Yalnızca geçerli bir nedeniniz varsa bir gönderi oluşturun.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic._" xml:space="preserve">
+    <value>Bu konu uzun bir süredir inaktif. Eğer burada gönderi oluşturmak için mantıklı bir nedeniniz yoksa, bunun yerine lütfen {0}.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic.create" xml:space="preserve">
+    <value>yeni bir konu açın</value>
+  </data>
+  <data name="topic.create.placeholder.body" xml:space="preserve">
+    <value>Gönderi içeriğini buraya yaz</value>
+  </data>
+  <data name="topic.create.placeholder.title" xml:space="preserve">
+    <value>Başlık eklemek için buraya tıkla</value>
+  </data>
+  <data name="topic.jump.enter" xml:space="preserve">
+    <value>spesifik bir gönderi numarası girmek için tıklayınız</value>
+  </data>
+  <data name="topic.jump.first" xml:space="preserve">
+    <value>ilk gönderiye git</value>
+  </data>
+  <data name="topic.jump.last" xml:space="preserve">
+    <value>son gönderiye git</value>
+  </data>
+  <data name="topic.jump.next" xml:space="preserve">
+    <value>sonraki 10 gönderiyi es geç</value>
+  </data>
+  <data name="topic.jump.previous" xml:space="preserve">
+    <value>10 gönderi geriye git</value>
+  </data>
+  <data name="topic.post_edit.cancel" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+  <data name="topic.post_edit.post" xml:space="preserve">
+    <value>Kaydet</value>
+  </data>
+  <data name="topic_watches.index.title_compact" xml:space="preserve">
+    <value>forum abonelikleri</value>
+  </data>
+  <data name="topic_watches.index.box.total" xml:space="preserve">
+    <value>Abone olunan konular</value>
+  </data>
+  <data name="topic_watches.index.box.unread" xml:space="preserve">
+    <value>Yeni yorumlar içeren konular</value>
+  </data>
+  <data name="topic_watches.index.info.total" xml:space="preserve">
+    <value>{0} konularına abone oldunuz.</value>
+  </data>
+  <data name="topic_watches.index.info.unread" xml:space="preserve">
+    <value>Abone olduğunuz konulara {0} tane okunmamış yanıt bulunmaktadır.</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.confirmation" xml:space="preserve">
+    <value>Konuyu aboneliklerinden çıkar?</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.title" xml:space="preserve">
+    <value>Abonelikten çık</value>
+  </data>
+  <data name="topics._" xml:space="preserve">
+    <value>Konular</value>
+  </data>
+  <data name="topics.actions.login_reply" xml:space="preserve">
+    <value>Yanıtlamak için giriş yap</value>
+  </data>
+  <data name="topics.actions.reply" xml:space="preserve">
+    <value>Yanıtla</value>
+  </data>
+  <data name="topics.actions.reply_with_quote" xml:space="preserve">
+    <value>Yanıtlamak için alıntıla</value>
+  </data>
+  <data name="topics.actions.search" xml:space="preserve">
+    <value>Ara</value>
+  </data>
+  <data name="topics.create.create_poll" xml:space="preserve">
+    <value>Anket Oluşturma</value>
+  </data>
+  <data name="topics.create.preview" xml:space="preserve">
+    <value>Gönderi Önizleme</value>
+  </data>
+  <data name="topics.create.create_poll_button.add" xml:space="preserve">
+    <value>Anket oluştur</value>
+  </data>
+  <data name="topics.create.create_poll_button.remove" xml:space="preserve">
+    <value>Anket oluşturmayı iptal et</value>
+  </data>
+  <data name="topics.create.poll.hide_results" xml:space="preserve">
+    <value>Anket sonuçlarını gizle.</value>
+  </data>
+  <data name="topics.create.poll.hide_results_info" xml:space="preserve">
+    <value>Sadece anket sonuçlandıktan sonra gösterilecekler.</value>
+  </data>
+  <data name="topics.create.poll.length" xml:space="preserve">
+    <value>Şu süreyle anketi sürdür</value>
+  </data>
+  <data name="topics.create.poll.length_days_suffix" xml:space="preserve">
+    <value>gün</value>
+  </data>
+  <data name="topics.create.poll.length_info" xml:space="preserve">
+    <value>Hiç bitmeyen bir anket için boş bırakın</value>
+  </data>
+  <data name="topics.create.poll.max_options" xml:space="preserve">
+    <value>Kullanıcı başına seçim</value>
+  </data>
+  <data name="topics.create.poll.max_options_info" xml:space="preserve">
+    <value>Her kullanıcının oylama sırasında seçebileceği seçenek sayısıdır.</value>
+  </data>
+  <data name="topics.create.poll.options" xml:space="preserve">
+    <value>Seçenekler</value>
+  </data>
+  <data name="topics.create.poll.options_info" xml:space="preserve">
+    <value>Her bir seçeneği yeni bir satıra yazın. 10 taneye kadar seçenek yazabilirsiniz.</value>
+  </data>
+  <data name="topics.create.poll.title" xml:space="preserve">
+    <value>Soru</value>
+  </data>
+  <data name="topics.create.poll.vote_change" xml:space="preserve">
+    <value>Yeniden oylamaya izin ver.</value>
+  </data>
+  <data name="topics.create.poll.vote_change_info" xml:space="preserve">
+    <value>Etkinleştirilirse, kullanıcılar oylarını değiştirebilme yetisine sahip olurlar.</value>
+  </data>
+  <data name="topics.edit_title.start" xml:space="preserve">
+    <value>Başlığı düzenle</value>
+  </data>
+  <data name="topics.index.feature_votes" xml:space="preserve">
+    <value>yıldız öncelik</value>
+  </data>
+  <data name="topics.index.replies" xml:space="preserve">
+    <value>yanıt</value>
+  </data>
+  <data name="topics.index.views" xml:space="preserve">
+    <value>görülme</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0" xml:space="preserve">
+    <value>"eklendi" etiketini kaldır</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0_done" xml:space="preserve">
+    <value>"eklendi" etiketi kaldırıldı</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1" xml:space="preserve">
+    <value>"eklendi" etiketini ekle</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1_done" xml:space="preserve">
+    <value>"eklendi" etiketi eklendi</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0" xml:space="preserve">
+    <value>"atandı" etiketini kaldır</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0_done" xml:space="preserve">
+    <value>"atandı" etiketi kaldırıldı</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1" xml:space="preserve">
+    <value>"atandı" etiketini ekle</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1_done" xml:space="preserve">
+    <value>"atandı" etiketi eklendi</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0" xml:space="preserve">
+    <value>"Onaylandı" etiketini kaldır</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0_done" xml:space="preserve">
+    <value>"Onaylandı" etiketi kaldırıldı</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1" xml:space="preserve">
+    <value>"Onaylandı" etiketi koy</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1_done" xml:space="preserve">
+    <value>"Onaylandı" etiketi koyuldu</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0" xml:space="preserve">
+    <value>"kopya" etiketini kaldır</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0_done" xml:space="preserve">
+    <value>"kopya" etiketi kaldırıldı</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1" xml:space="preserve">
+    <value>"kopya" etiketi ekle</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1_done" xml:space="preserve">
+    <value>"kopya" etiketi eklendi</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0" xml:space="preserve">
+    <value>"geçersiz" etiketini kaldır</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0_done" xml:space="preserve">
+    <value>"geçersiz" etiketi kaldırıldı</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1" xml:space="preserve">
+    <value>"geçersiz" etiketi ekle</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1_done" xml:space="preserve">
+    <value>"geçersiz" etiketi eklendi</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0" xml:space="preserve">
+    <value>"çözüldü" etiketini kaldır</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0_done" xml:space="preserve">
+    <value>"çözüldü" etiketi kaldırıldı</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1" xml:space="preserve">
+    <value>"çözüldü" etiketi ekle</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1_done" xml:space="preserve">
+    <value>"çözüldü" etiketi eklendi</value>
+  </data>
+  <data name="topics.lock.is_locked" xml:space="preserve">
+    <value>Bu konu kilitli ve yanıtlanamaz</value>
+  </data>
+  <data name="topics.lock.to_0" xml:space="preserve">
+    <value>Konu kilidini aç</value>
+  </data>
+  <data name="topics.lock.to_0_confirm" xml:space="preserve">
+    <value>Konunun kilidini aç?</value>
+  </data>
+  <data name="topics.lock.to_0_done" xml:space="preserve">
+    <value>Konu kilidi açıldı</value>
+  </data>
+  <data name="topics.lock.to_1" xml:space="preserve">
+    <value>Konuyu kilitle</value>
+  </data>
+  <data name="topics.lock.to_1_confirm" xml:space="preserve">
+    <value>Konuyu kilitle?</value>
+  </data>
+  <data name="topics.lock.to_1_done" xml:space="preserve">
+    <value>Konu kilitlendi</value>
+  </data>
+  <data name="topics.moderate_move.title" xml:space="preserve">
+    <value>Başka bir foruma taşı</value>
+  </data>
+  <data name="topics.moderate_pin.to_0" xml:space="preserve">
+    <value>Başlığı sabitleme</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_confirm" xml:space="preserve">
+    <value>Konuyu sabitlemeden kaldır?</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_done" xml:space="preserve">
+    <value>Başlık artık sabitli değil</value>
+  </data>
+  <data name="topics.moderate_pin.to_1" xml:space="preserve">
+    <value>Başlığı sabitle</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_confirm" xml:space="preserve">
+    <value>Konuyu sabitle?</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_done" xml:space="preserve">
+    <value>Başlık sabitlendi</value>
+  </data>
+  <data name="topics.moderate_pin.to_2" xml:space="preserve">
+    <value>Başlığı sabitle ve duyuru olarak işaretle</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_confirm" xml:space="preserve">
+    <value>Konuyu sabitle ve duyuru olarak işaretle?</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_done" xml:space="preserve">
+    <value>Başlık sabitlendi ve duyuru olarak işaretlendi</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.show" xml:space="preserve">
+    <value>Silinmiş gönderileri göster</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.hide" xml:space="preserve">
+    <value>Silinmiş gönderileri gizle</value>
+  </data>
+  <data name="topics.show.deleted-posts" xml:space="preserve">
+    <value>Silinmiş mesajlar</value>
+  </data>
+  <data name="topics.show.total_posts" xml:space="preserve">
+    <value>Toplam Mesaj</value>
+  </data>
+  <data name="topics.show.feature_vote.current" xml:space="preserve">
+    <value>Mevcut Öncelik: +{0}</value>
+  </data>
+  <data name="topics.show.feature_vote.do" xml:space="preserve">
+    <value>Bu talebi destekle</value>
+  </data>
+  <data name="topics.show.feature_vote.info._" xml:space="preserve">
+    <value>Bu bir {0}. Özellik talepleri {1} tarafından oylanabilir.</value>
+  </data>
+  <data name="topics.show.feature_vote.info.feature_request" xml:space="preserve">
+    <value>özellik talebidir</value>
+  </data>
+  <data name="topics.show.feature_vote.info.supporters" xml:space="preserve">
+    <value>supporter'lar</value>
+  </data>
+  <data name="topics.show.feature_vote.user.count" xml:space="preserve">
+    <value>{0} oy yok|{1} {0} oy|[2,*] {0} oy</value>
+  </data>
+  <data name="topics.show.feature_vote.user.current" xml:space="preserve">
+    <value>{0} oyunuz var.</value>
+  </data>
+  <data name="topics.show.feature_vote.user.not_enough" xml:space="preserve">
+    <value>Başka oyunuz kalmadı</value>
+  </data>
+  <data name="topics.show.poll.edit" xml:space="preserve">
+    <value>Anket Düzenleme</value>
+  </data>
+  <data name="topics.show.poll.edit_warning" xml:space="preserve">
+    <value>Bir anketi düzenlemek mevcut sonuçlarını siler!</value>
+  </data>
+  <data name="topics.show.poll.vote" xml:space="preserve">
+    <value>Oyla</value>
+  </data>
+  <data name="topics.show.poll.button.change_vote" xml:space="preserve">
+    <value>Oyu değiştir</value>
+  </data>
+  <data name="topics.show.poll.button.edit" xml:space="preserve">
+    <value>Anketi düzenle</value>
+  </data>
+  <data name="topics.show.poll.button.view_results" xml:space="preserve">
+    <value>Sonuçlara geç</value>
+  </data>
+  <data name="topics.show.poll.button.vote" xml:space="preserve">
+    <value>Oy ver</value>
+  </data>
+  <data name="topics.show.poll.detail.end_time" xml:space="preserve">
+    <value>Anket {0} tarihinde bitecek</value>
+  </data>
+  <data name="topics.show.poll.detail.ended" xml:space="preserve">
+    <value>Anket {0} tarihinde bitti</value>
+  </data>
+  <data name="topics.show.poll.detail.results_hidden" xml:space="preserve">
+    <value>Sonuçlar anket bittikten sonra gösterilecek.</value>
+  </data>
+  <data name="topics.show.poll.detail.total" xml:space="preserve">
+    <value>Toplam oy: {0}</value>
+  </data>
+  <data name="topics.watch.to_not_watching" xml:space="preserve">
+    <value>Kayıtlı değil</value>
+  </data>
+  <data name="topics.watch.to_watching" xml:space="preserve">
+    <value>Kaydet</value>
+  </data>
+  <data name="topics.watch.to_watching_mail" xml:space="preserve">
+    <value>Bildirimlerle beraber kaydet</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_disable" xml:space="preserve">
+    <value>Bildirim etkin. Devre dışı bırakmak için tıklayın</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_enable" xml:space="preserve">
+    <value>Bildirim devre dışı. Etkinleştirmek için tıklayın</value>
+  </data>
+</root>

@@ -1,0 +1,388 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="audio.autoplay" xml:space="preserve">
+    <value>Jouer automatiquement le titre suivant</value>
+  </data>
+  <data name="defaults.page_description" xml:space="preserve">
+    <value>osu ! - Le rythme n'est plus qu'à un *clic* !  Avec les modes de jeu Ouendan/EBA, Taiko et original, ainsi qu'un éditeur de niveaux entièrement fonctionnel.</value>
+  </data>
+  <data name="header.admin.beatmapset" xml:space="preserve">
+    <value>beatmapset</value>
+  </data>
+  <data name="header.admin.beatmapset_covers" xml:space="preserve">
+    <value>couvertures du beatmapset</value>
+  </data>
+  <data name="header.admin.contest" xml:space="preserve">
+    <value>concours</value>
+  </data>
+  <data name="header.admin.contests" xml:space="preserve">
+    <value>concours</value>
+  </data>
+  <data name="header.admin.root" xml:space="preserve">
+    <value>console</value>
+  </data>
+  <data name="header.admin.store_orders" xml:space="preserve">
+    <value>administration de la boutique</value>
+  </data>
+  <data name="header.artists.index" xml:space="preserve">
+    <value>liste</value>
+  </data>
+  <data name="header.changelog.index" xml:space="preserve">
+    <value>liste</value>
+  </data>
+  <data name="header.help.index" xml:space="preserve">
+    <value>index</value>
+  </data>
+  <data name="header.help.sitemap" xml:space="preserve">
+    <value>Aide à la navigation</value>
+  </data>
+  <data name="header.store.cart" xml:space="preserve">
+    <value>panier</value>
+  </data>
+  <data name="header.store.orders" xml:space="preserve">
+    <value>historique des commandes</value>
+  </data>
+  <data name="header.store.products" xml:space="preserve">
+    <value>produits</value>
+  </data>
+  <data name="header.tournaments.index" xml:space="preserve">
+    <value>liste</value>
+  </data>
+  <data name="header.users.modding" xml:space="preserve">
+    <value>modding</value>
+  </data>
+  <data name="header.users.show" xml:space="preserve">
+    <value>infos</value>
+  </data>
+  <data name="gallery.close" xml:space="preserve">
+    <value>Fermer (Échap)</value>
+  </data>
+  <data name="gallery.fullscreen" xml:space="preserve">
+    <value>Basculer en plein écran</value>
+  </data>
+  <data name="gallery.zoom" xml:space="preserve">
+    <value>Zoom avant/arrière</value>
+  </data>
+  <data name="gallery.previous" xml:space="preserve">
+    <value>Précédent (flèche gauche)</value>
+  </data>
+  <data name="gallery.next" xml:space="preserve">
+    <value>Suivant (flèche droite)</value>
+  </data>
+  <data name="menu.beatmaps._" xml:space="preserve">
+    <value>beatmaps</value>
+  </data>
+  <data name="menu.beatmaps.artists" xml:space="preserve">
+    <value>artistes en vedette</value>
+  </data>
+  <data name="menu.beatmaps.index" xml:space="preserve">
+    <value>liste</value>
+  </data>
+  <data name="menu.beatmaps.packs" xml:space="preserve">
+    <value>collections</value>
+  </data>
+  <data name="menu.community._" xml:space="preserve">
+    <value>communauté</value>
+  </data>
+  <data name="menu.community.chat" xml:space="preserve">
+    <value>tchat</value>
+  </data>
+  <data name="menu.community.contests" xml:space="preserve">
+    <value>concours</value>
+  </data>
+  <data name="menu.community.dev" xml:space="preserve">
+    <value>développement</value>
+  </data>
+  <data name="menu.community.forum-forums-index" xml:space="preserve">
+    <value>forums</value>
+  </data>
+  <data name="menu.community.getlive" xml:space="preserve">
+    <value>direct</value>
+  </data>
+  <data name="menu.community.tournaments" xml:space="preserve">
+    <value>tournois</value>
+  </data>
+  <data name="menu.help._" xml:space="preserve">
+    <value>aide</value>
+  </data>
+  <data name="menu.help.getabuse" xml:space="preserve">
+    <value>signaler un abus</value>
+  </data>
+  <data name="menu.help.getfaq" xml:space="preserve">
+    <value>faq</value>
+  </data>
+  <data name="menu.help.getrules" xml:space="preserve">
+    <value>règles</value>
+  </data>
+  <data name="menu.help.getsupport" xml:space="preserve">
+    <value>non, vraiment, j'ai besoin d'aide !</value>
+  </data>
+  <data name="menu.help.getwiki" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="menu.home._" xml:space="preserve">
+    <value>accueil</value>
+  </data>
+  <data name="menu.home.changelog-index" xml:space="preserve">
+    <value>changelog</value>
+  </data>
+  <data name="menu.home.getdownload" xml:space="preserve">
+    <value>télécharger</value>
+  </data>
+  <data name="menu.home.news-index" xml:space="preserve">
+    <value>actualités</value>
+  </data>
+  <data name="menu.home.search" xml:space="preserve">
+    <value>rechercher</value>
+  </data>
+  <data name="menu.home.team" xml:space="preserve">
+    <value>équipe</value>
+  </data>
+  <data name="menu.rankings._" xml:space="preserve">
+    <value>classements</value>
+  </data>
+  <data name="menu.rankings.charts" xml:space="preserve">
+    <value>mise en avant</value>
+  </data>
+  <data name="menu.rankings.country" xml:space="preserve">
+    <value>pays</value>
+  </data>
+  <data name="menu.rankings.index" xml:space="preserve">
+    <value>performance</value>
+  </data>
+  <data name="menu.rankings.kudosu" xml:space="preserve">
+    <value>kudosu</value>
+  </data>
+  <data name="menu.rankings.multiplayer" xml:space="preserve">
+    <value>multijoueur</value>
+  </data>
+  <data name="menu.rankings.score" xml:space="preserve">
+    <value>score</value>
+  </data>
+  <data name="menu.store._" xml:space="preserve">
+    <value>magasin</value>
+  </data>
+  <data name="menu.store.cart-show" xml:space="preserve">
+    <value>panier</value>
+  </data>
+  <data name="menu.store.getlisting" xml:space="preserve">
+    <value>liste</value>
+  </data>
+  <data name="menu.store.orders-index" xml:space="preserve">
+    <value>historique des commandes</value>
+  </data>
+  <data name="footer.general._" xml:space="preserve">
+    <value>Général</value>
+  </data>
+  <data name="footer.general.home" xml:space="preserve">
+    <value>Accueil</value>
+  </data>
+  <data name="footer.general.changelog-index" xml:space="preserve">
+    <value>Changelog</value>
+  </data>
+  <data name="footer.general.beatmaps" xml:space="preserve">
+    <value>Liste des beatmaps</value>
+  </data>
+  <data name="footer.general.download" xml:space="preserve">
+    <value>Télécharger osu!</value>
+  </data>
+  <data name="footer.help._" xml:space="preserve">
+    <value>Aide &amp; Communauté</value>
+  </data>
+  <data name="footer.help.faq" xml:space="preserve">
+    <value>Questions fréquemment posées</value>
+  </data>
+  <data name="footer.help.forum" xml:space="preserve">
+    <value>Forums communautaire</value>
+  </data>
+  <data name="footer.help.livestreams" xml:space="preserve">
+    <value>Streams en direct</value>
+  </data>
+  <data name="footer.help.report" xml:space="preserve">
+    <value>Signaler une erreur</value>
+  </data>
+  <data name="footer.help.wiki" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="footer.legal._" xml:space="preserve">
+    <value>Statut &amp; Légal</value>
+  </data>
+  <data name="footer.legal.copyright" xml:space="preserve">
+    <value>Copyright (DMCA)</value>
+  </data>
+  <data name="footer.legal.privacy" xml:space="preserve">
+    <value>Confidentialité</value>
+  </data>
+  <data name="footer.legal.server_status" xml:space="preserve">
+    <value>Statut du serveur</value>
+  </data>
+  <data name="footer.legal.source_code" xml:space="preserve">
+    <value>Code source</value>
+  </data>
+  <data name="footer.legal.terms" xml:space="preserve">
+    <value>Conditions du service</value>
+  </data>
+  <data name="errors.400.error" xml:space="preserve">
+    <value>Paramètre de requête invalide</value>
+  </data>
+  <data name="errors.404.error" xml:space="preserve">
+    <value>Page manquante</value>
+  </data>
+  <data name="errors.404.description" xml:space="preserve">
+    <value>Désolé, mais la page demandée n'est pas ici !</value>
+  </data>
+  <data name="errors.403.error" xml:space="preserve">
+    <value>Vous ne devriez pas être ici.</value>
+  </data>
+  <data name="errors.403.description" xml:space="preserve">
+    <value>Vous pouvez essayer de revenir en arrière.</value>
+  </data>
+  <data name="errors.401.error" xml:space="preserve">
+    <value>Vous ne devriez pas être ici.</value>
+  </data>
+  <data name="errors.401.description" xml:space="preserve">
+    <value>Vous pouvez essayer de revenir en arrière. Ou peut-être vous connecter.</value>
+  </data>
+  <data name="errors.405.error" xml:space="preserve">
+    <value>Page manquante</value>
+  </data>
+  <data name="errors.405.description" xml:space="preserve">
+    <value>Désolé, mais la page demandée n'est pas ici !</value>
+  </data>
+  <data name="errors.422.error" xml:space="preserve">
+    <value>Paramètre de requête invalide</value>
+  </data>
+  <data name="errors.429.error" xml:space="preserve">
+    <value>Limite de tentatives atteinte</value>
+  </data>
+  <data name="errors.500.error" xml:space="preserve">
+    <value>Oh non ! Quelque chose s'est cassé ! ;_;</value>
+  </data>
+  <data name="errors.500.description" xml:space="preserve">
+    <value>Nous avons automatiquement été notifié de cette erreur.</value>
+  </data>
+  <data name="errors.fatal.error" xml:space="preserve">
+    <value>Oh non ! Quelque chose s'est cassé ! (gravement) ;_;</value>
+  </data>
+  <data name="errors.fatal.description" xml:space="preserve">
+    <value>Nous avons été automatiquement notifié de cette erreur.</value>
+  </data>
+  <data name="errors.503.error" xml:space="preserve">
+    <value>Maintenance en cours!</value>
+  </data>
+  <data name="errors.503.description" xml:space="preserve">
+    <value>Les maintenances prennent en général 5 à 10 minutes. Si c'est plus long, regardez {0} pour plus d'informations.</value>
+  </data>
+  <data name="errors.reference" xml:space="preserve">
+    <value>Juste au cas où, voici un code que vous pourrez retourner au support !</value>
+  </data>
+  <data name="popup_login.button" xml:space="preserve">
+    <value>connexion / inscription</value>
+  </data>
+  <data name="popup_login.login.forgot" xml:space="preserve">
+    <value>J'ai oublié mes identifiants</value>
+  </data>
+  <data name="popup_login.login.password" xml:space="preserve">
+    <value>mot de passe</value>
+  </data>
+  <data name="popup_login.login.title" xml:space="preserve">
+    <value>Se connecter pour continuer</value>
+  </data>
+  <data name="popup_login.login.username" xml:space="preserve">
+    <value>nom d'utilisateur</value>
+  </data>
+  <data name="popup_login.login.error.email" xml:space="preserve">
+    <value>Le nom d'utilisateur ou l'e-mail ne correspond pas</value>
+  </data>
+  <data name="popup_login.login.error.password" xml:space="preserve">
+    <value>Mot de passe incorrect</value>
+  </data>
+  <data name="popup_login.register.download" xml:space="preserve">
+    <value>Télécharger</value>
+  </data>
+  <data name="popup_login.register.info" xml:space="preserve">
+    <value>Téléchargez osu! pour créer votre propre compte !</value>
+  </data>
+  <data name="popup_login.register.title" xml:space="preserve">
+    <value>Vous n'avez pas de compte ?</value>
+  </data>
+  <data name="popup_user.links.account-edit" xml:space="preserve">
+    <value>Paramètres</value>
+  </data>
+  <data name="popup_user.links.follows" xml:space="preserve">
+    <value>Listes de suivi</value>
+  </data>
+  <data name="popup_user.links.friends" xml:space="preserve">
+    <value>Amis</value>
+  </data>
+  <data name="popup_user.links.logout" xml:space="preserve">
+    <value>Se déconnecter</value>
+  </data>
+  <data name="popup_user.links.profile" xml:space="preserve">
+    <value>Mon profil</value>
+  </data>
+  <data name="popup_search.initial" xml:space="preserve">
+    <value>Écrivez pour rechercher !</value>
+  </data>
+  <data name="popup_search.retry" xml:space="preserve">
+    <value>La recherche a échouée. Cliquez pour réessayer.</value>
+  </data>
+</root>

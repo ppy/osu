@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="cancel" xml:space="preserve">
+    <value>Anulează</value>
+  </data>
+  <data name="authorise.request" xml:space="preserve">
+    <value>solicită permisiunea de a-ţi accesa contul.</value>
+  </data>
+  <data name="authorise.scopes_title" xml:space="preserve">
+    <value>Această aplicaţie va putea să:</value>
+  </data>
+  <data name="authorise.title" xml:space="preserve">
+    <value>Cerere de autorizare</value>
+  </data>
+  <data name="authorized_clients.confirm_revoke" xml:space="preserve">
+    <value>Ești sigur(ă) că vrei să revocați permisiunile clientului?</value>
+  </data>
+  <data name="authorized_clients.scopes_title" xml:space="preserve">
+    <value>Această aplicație poate:</value>
+  </data>
+  <data name="authorized_clients.owned_by" xml:space="preserve">
+    <value>Deținut de {0}</value>
+  </data>
+  <data name="authorized_clients.none" xml:space="preserve">
+    <value>Niciun Client</value>
+  </data>
+  <data name="authorized_clients.revoked.false" xml:space="preserve">
+    <value>Revocă Accesul</value>
+  </data>
+  <data name="authorized_clients.revoked.true" xml:space="preserve">
+    <value>Acces revocat</value>
+  </data>
+  <data name="client.id" xml:space="preserve">
+    <value>ID-ul clientului</value>
+  </data>
+  <data name="client.name" xml:space="preserve">
+    <value>Numele Aplicației</value>
+  </data>
+  <data name="client.redirect" xml:space="preserve">
+    <value>URL-ul Callback al Aplicației</value>
+  </data>
+  <data name="client.reset" xml:space="preserve">
+    <value>Resetează client secret</value>
+  </data>
+  <data name="client.reset_failed" xml:space="preserve">
+    <value>Nu s-a putut reseta client secret</value>
+  </data>
+  <data name="client.secret" xml:space="preserve">
+    <value>Client Secret</value>
+  </data>
+  <data name="client.secret_visible.false" xml:space="preserve">
+    <value>Arată clientul secret</value>
+  </data>
+  <data name="client.secret_visible.true" xml:space="preserve">
+    <value>Ascunde clientul secret</value>
+  </data>
+  <data name="new_client.header" xml:space="preserve">
+    <value>Înregistrează o nouă aplicație OAuth</value>
+  </data>
+  <data name="new_client.register" xml:space="preserve">
+    <value>Înregistrează aplicația</value>
+  </data>
+  <data name="new_client.terms_of_use._" xml:space="preserve">
+    <value>Folosind API-ul sunteți de acord cu {0}.</value>
+  </data>
+  <data name="new_client.terms_of_use.link" xml:space="preserve">
+    <value>Termeni de Utilizare</value>
+  </data>
+  <data name="own_clients.confirm_delete" xml:space="preserve">
+    <value>Ești sigur(Ă) că vrei să ștergi acest client?</value>
+  </data>
+  <data name="own_clients.confirm_reset" xml:space="preserve">
+    <value>Ești sigur(Ă) că vrei să resetezi clientul secret? Acesta va revoca toate token-urile existente.</value>
+  </data>
+  <data name="own_clients.new" xml:space="preserve">
+    <value>Noi aplicații OAuth</value>
+  </data>
+  <data name="own_clients.none" xml:space="preserve">
+    <value>Niciun Client</value>
+  </data>
+  <data name="own_clients.revoked.false" xml:space="preserve">
+    <value>Șterge</value>
+  </data>
+  <data name="own_clients.revoked.true" xml:space="preserve">
+    <value>Șters</value>
+  </data>
+</root>

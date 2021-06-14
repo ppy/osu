@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="index.none_running" xml:space="preserve">
+    <value>ليس هناك بطولات قيد التشغيل في الوقت الحالي، الرجاء التحقق في وقت لاحق!</value>
+  </data>
+  <data name="index.registration_period" xml:space="preserve">
+    <value>التسجيل: {0} الى {1}</value>
+  </data>
+  <data name="index.header.title" xml:space="preserve">
+    <value>بطولات المجتمع</value>
+  </data>
+  <data name="index.item.registered" xml:space="preserve">
+    <value>الاعبون المُسجلون</value>
+  </data>
+  <data name="index.state.current" xml:space="preserve">
+    <value>البطولات الحالية</value>
+  </data>
+  <data name="index.state.previous" xml:space="preserve">
+    <value>البطولات السابقة</value>
+  </data>
+  <data name="show.banner" xml:space="preserve">
+    <value>ادعم فريقك</value>
+  </data>
+  <data name="show.entered" xml:space="preserve">
+    <value>انت مسجل لهذه البطولة.&lt;br&gt;&lt;br&gt;رجائاََ اعرف ان هذا &lt;b&gt;لا&lt;/b&gt; يعني انه تم تسجيلك لأحد الفرق.&lt;br&gt;&lt;br&gt;سوف نرسل تعليمات الأستكمال عبر البريد عند قرب وقت البطولة, لذا ارجوك تأكد ان بريد osu! الخاص بك موثق!</value>
+  </data>
+  <data name="show.info_page" xml:space="preserve">
+    <value>صفحة المعلومات</value>
+  </data>
+  <data name="show.login_to_register" xml:space="preserve">
+    <value>رجائاََ قم بـ {0} لعرض معلومات التسجيل!</value>
+  </data>
+  <data name="show.not_yet_entered" xml:space="preserve">
+    <value>انت غير مسجل لهذه البطولة.</value>
+  </data>
+  <data name="show.rank_too_low" xml:space="preserve">
+    <value>أنت لا تستوفي متطلبات التسجيل لهذه البطولة!</value>
+  </data>
+  <data name="show.registration_ends" xml:space="preserve">
+    <value>التسجيل يغلق في{0}</value>
+  </data>
+  <data name="show.button.cancel" xml:space="preserve">
+    <value>الغاء التسجيل</value>
+  </data>
+  <data name="show.button.register" xml:space="preserve">
+    <value>سجلني!</value>
+  </data>
+  <data name="show.period.end" xml:space="preserve">
+    <value>نهاية</value>
+  </data>
+  <data name="show.period.start" xml:space="preserve">
+    <value>البداية</value>
+  </data>
+  <data name="show.state.before_registration" xml:space="preserve">
+    <value>لم يتم فتح التسجيل لهذه البطولة حتى الآن.</value>
+  </data>
+  <data name="show.state.ended" xml:space="preserve">
+    <value>لقد اختُتِمَت البطولة. تحقق من صفحة المعلومات من اجل النتائج.</value>
+  </data>
+  <data name="show.state.registration_closed" xml:space="preserve">
+    <value>تم إغلاق التسجيل لهذه البطولة. تحقق من صفحة المعلومات للحصول على أحدث التحديثات.</value>
+  </data>
+  <data name="show.state.running" xml:space="preserve">
+    <value>هذه البطولة قيد التقدم حاليا. تحقق من صفحة المعلومات للحصول على مزيد من التفاصيل.</value>
+  </data>
+  <data name="tournament_period" xml:space="preserve">
+    <value>{0} الى {1}</value>
+  </data>
+</root>

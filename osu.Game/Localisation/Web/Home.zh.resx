@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="landing.download" xml:space="preserve">
+    <value>立即下载</value>
+  </data>
+  <data name="landing.online" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; 名在线玩家，&lt;strong&gt;{1}&lt;/strong&gt; 个游戏房间</value>
+  </data>
+  <data name="landing.peak" xml:space="preserve">
+    <value>最高在线人数 {0} 人</value>
+  </data>
+  <data name="landing.players" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; 名已注册玩家</value>
+  </data>
+  <data name="landing.title" xml:space="preserve">
+    <value>欢迎</value>
+  </data>
+  <data name="landing.see_more_news" xml:space="preserve">
+    <value>查看更多新闻</value>
+  </data>
+  <data name="landing.slogan.main" xml:space="preserve">
+    <value>棒到不行的免费音乐游戏</value>
+  </data>
+  <data name="landing.slogan.sub" xml:space="preserve">
+    <value>节奏跃然指上</value>
+  </data>
+  <data name="search.advanced_link" xml:space="preserve">
+    <value>高级搜索</value>
+  </data>
+  <data name="search.button" xml:space="preserve">
+    <value>搜索</value>
+  </data>
+  <data name="search.empty_result" xml:space="preserve">
+    <value>没有结果！</value>
+  </data>
+  <data name="search.keyword_required" xml:space="preserve">
+    <value>需要关键字</value>
+  </data>
+  <data name="search.placeholder" xml:space="preserve">
+    <value>输入以搜索</value>
+  </data>
+  <data name="search.title" xml:space="preserve">
+    <value>搜索</value>
+  </data>
+  <data name="search.beatmapset.login_required" xml:space="preserve">
+    <value>登录以搜索谱面</value>
+  </data>
+  <data name="search.beatmapset.more" xml:space="preserve">
+    <value>搜索到 {0} 张谱面</value>
+  </data>
+  <data name="search.beatmapset.more_simple" xml:space="preserve">
+    <value>查看更多搜索结果</value>
+  </data>
+  <data name="search.beatmapset.title" xml:space="preserve">
+    <value>谱面</value>
+  </data>
+  <data name="search.forum_post.all" xml:space="preserve">
+    <value>所有论坛</value>
+  </data>
+  <data name="search.forum_post.link" xml:space="preserve">
+    <value>在论坛中搜索</value>
+  </data>
+  <data name="search.forum_post.login_required" xml:space="preserve">
+    <value>登录以搜索论坛帖</value>
+  </data>
+  <data name="search.forum_post.more_simple" xml:space="preserve">
+    <value>查看更多搜索结果</value>
+  </data>
+  <data name="search.forum_post.title" xml:space="preserve">
+    <value>论坛</value>
+  </data>
+  <data name="search.forum_post.label.forum" xml:space="preserve">
+    <value>在论坛中搜索</value>
+  </data>
+  <data name="search.forum_post.label.forum_children" xml:space="preserve">
+    <value>包括子版块</value>
+  </data>
+  <data name="search.forum_post.label.topic_id" xml:space="preserve">
+    <value>主题 #</value>
+  </data>
+  <data name="search.forum_post.label.username" xml:space="preserve">
+    <value>作者</value>
+  </data>
+  <data name="search.mode.all" xml:space="preserve">
+    <value>所有</value>
+  </data>
+  <data name="search.mode.beatmapset" xml:space="preserve">
+    <value>谱面</value>
+  </data>
+  <data name="search.mode.forum_post" xml:space="preserve">
+    <value>论坛</value>
+  </data>
+  <data name="search.mode.user" xml:space="preserve">
+    <value>玩家</value>
+  </data>
+  <data name="search.mode.wiki_page" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="search.user.login_required" xml:space="preserve">
+    <value>登录以搜索玩家</value>
+  </data>
+  <data name="search.user.more" xml:space="preserve">
+    <value>搜索到 {0} 个玩家</value>
+  </data>
+  <data name="search.user.more_simple" xml:space="preserve">
+    <value>查看更多搜索结果</value>
+  </data>
+  <data name="search.user.more_hidden" xml:space="preserve">
+    <value>玩家搜索超出 {0} 个限制，请修改搜索内容。</value>
+  </data>
+  <data name="search.user.title" xml:space="preserve">
+    <value>玩家</value>
+  </data>
+  <data name="search.wiki_page.link" xml:space="preserve">
+    <value>在 Wiki 中搜索</value>
+  </data>
+  <data name="search.wiki_page.more_simple" xml:space="preserve">
+    <value>查看更多搜索结果</value>
+  </data>
+  <data name="search.wiki_page.title" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="download.tagline" xml:space="preserve">
+    <value>让我们&lt;br&gt;开始吧！</value>
+  </data>
+  <data name="download.action" xml:space="preserve">
+    <value>下载 osu!</value>
+  </data>
+  <data name="download.help._" xml:space="preserve">
+    <value>如果您在开始游戏或注册帐户时遇到问题，请 {0} 或 {1}。</value>
+  </data>
+  <data name="download.help.help_forum_link" xml:space="preserve">
+    <value>查看帮助论坛</value>
+  </data>
+  <data name="download.help.support_button" xml:space="preserve">
+    <value>联系支持团队</value>
+  </data>
+  <data name="download.os.windows" xml:space="preserve">
+    <value>Windows 版</value>
+  </data>
+  <data name="download.os.macos" xml:space="preserve">
+    <value>macOS 版</value>
+  </data>
+  <data name="download.os.linux" xml:space="preserve">
+    <value>Linux 版</value>
+  </data>
+  <data name="download.mirror" xml:space="preserve">
+    <value>从镜像服务器下载</value>
+  </data>
+  <data name="download.macos-fallback" xml:space="preserve">
+    <value>macOS 用户</value>
+  </data>
+  <data name="download.steps.register.title" xml:space="preserve">
+    <value>注册帐号</value>
+  </data>
+  <data name="download.steps.register.description" xml:space="preserve">
+    <value>根据游戏提示进行登录或注册</value>
+  </data>
+  <data name="download.steps.download.title" xml:space="preserve">
+    <value>下载游戏</value>
+  </data>
+  <data name="download.steps.download.description" xml:space="preserve">
+    <value>点击上面的按钮下载安装器，然后运行它！</value>
+  </data>
+  <data name="download.steps.beatmaps.title" xml:space="preserve">
+    <value>下载谱面</value>
+  </data>
+  <data name="download.steps.beatmaps.description._" xml:space="preserve">
+    <value>{0} 玩家们创造的谱面然后开始游戏吧！</value>
+  </data>
+  <data name="download.steps.beatmaps.description.browse" xml:space="preserve">
+    <value>浏览</value>
+  </data>
+  <data name="download.video-guide" xml:space="preserve">
+    <value>视频教程</value>
+  </data>
+  <data name="user.title" xml:space="preserve">
+    <value>总览</value>
+  </data>
+  <data name="user.news.title" xml:space="preserve">
+    <value>新闻</value>
+  </data>
+  <data name="user.news.error" xml:space="preserve">
+    <value>载入新闻失败，刷新页面试试看？...</value>
+  </data>
+  <data name="user.header.stats.friends" xml:space="preserve">
+    <value>在线好友</value>
+  </data>
+  <data name="user.header.stats.games" xml:space="preserve">
+    <value>房间</value>
+  </data>
+  <data name="user.header.stats.online" xml:space="preserve">
+    <value>在线用户</value>
+  </data>
+  <data name="user.beatmaps.new" xml:space="preserve">
+    <value>新 Ranked 谱面</value>
+  </data>
+  <data name="user.beatmaps.popular" xml:space="preserve">
+    <value>高人气谱面</value>
+  </data>
+  <data name="user.beatmaps.by_user" xml:space="preserve">
+    <value>作者：{0}</value>
+  </data>
+  <data name="user.buttons.download" xml:space="preserve">
+    <value>下载 osu!</value>
+  </data>
+  <data name="user.buttons.support" xml:space="preserve">
+    <value>支持 osu!</value>
+  </data>
+  <data name="user.buttons.store" xml:space="preserve">
+    <value>osu! 商店</value>
+  </data>
+  <data name="support-osu.title" xml:space="preserve">
+    <value>喔！</value>
+  </data>
+  <data name="support-osu.subtitle" xml:space="preserve">
+    <value>看起来你玩得很开心！</value>
+  </data>
+  <data name="support-osu.body.part-1" xml:space="preserve">
+    <value>你知道吗？ osu! 是一款没有广告，完全依赖玩家支持以维持开发及运营的游戏。</value>
+  </data>
+  <data name="support-osu.body.part-2" xml:space="preserve">
+    <value>如果你选择给 osu! 捐赠，就可以解锁额外的功能，例如&lt;strong&gt;游戏内自动下载&lt;/strong&gt;。</value>
+  </data>
+  <data name="support-osu.find-out-more" xml:space="preserve">
+    <value>点击这里以了解更多</value>
+  </data>
+  <data name="support-osu.download-starting" xml:space="preserve">
+    <value>对了，别担心 - 下载已经开始了 ;)</value>
+  </data>
+</root>

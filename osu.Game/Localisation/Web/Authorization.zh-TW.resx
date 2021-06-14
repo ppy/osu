@@ -1,0 +1,274 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="require_login" xml:space="preserve">
+    <value>登入以繼續。</value>
+  </data>
+  <data name="require_verification" xml:space="preserve">
+    <value>需要驗證帳戶!</value>
+  </data>
+  <data name="restricted" xml:space="preserve">
+    <value>帳戶處於限制模式，無法進行該操作。</value>
+  </data>
+  <data name="silenced" xml:space="preserve">
+    <value>帳戶被禁言，無法進行該操作。</value>
+  </data>
+  <data name="unauthorized" xml:space="preserve">
+    <value>沒有權限。</value>
+  </data>
+  <data name="beatmap_discussion.destroy.is_hype" xml:space="preserve">
+    <value>無法撤銷推薦。</value>
+  </data>
+  <data name="beatmap_discussion.destroy.has_reply" xml:space="preserve">
+    <value>無法刪除有回覆的討論</value>
+  </data>
+  <data name="beatmap_discussion.nominate.exhausted" xml:space="preserve">
+    <value>你今天的提名次數已達上限，請明天再試。</value>
+  </data>
+  <data name="beatmap_discussion.nominate.incorrect_state" xml:space="preserve">
+    <value>執行操作時發生錯誤，請重新載入頁面。</value>
+  </data>
+  <data name="beatmap_discussion.nominate.owner" xml:space="preserve">
+    <value>不能提名自己的圖譜。</value>
+  </data>
+  <data name="beatmap_discussion.resolve.not_owner" xml:space="preserve">
+    <value>只有樓主和圖譜所有者才能標記為已解決。</value>
+  </data>
+  <data name="beatmap_discussion.store.mapper_note_wrong_user" xml:space="preserve">
+    <value>只有圖譜作者或譜面管理團隊/質量保證團隊可以發布備註。</value>
+  </data>
+  <data name="beatmap_discussion.vote.bot" xml:space="preserve">
+    <value>不能為機器人建立的討論投票。</value>
+  </data>
+  <data name="beatmap_discussion.vote.limit_exceeded" xml:space="preserve">
+    <value>在投更多票之前請稍等一會</value>
+  </data>
+  <data name="beatmap_discussion.vote.owner" xml:space="preserve">
+    <value>不能為自己的討論投票。</value>
+  </data>
+  <data name="beatmap_discussion.vote.wrong_beatmapset_state" xml:space="preserve">
+    <value>只能對待處理的圖譜討論進行投票。</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.not_owner" xml:space="preserve">
+    <value>您只能刪除自己的發文。</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.resolved" xml:space="preserve">
+    <value>你不能刪除已解決的討論串。</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.system_generated" xml:space="preserve">
+    <value>自動生成的貼文無法刪除。</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.not_owner" xml:space="preserve">
+    <value>只有作者可以編輯。</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.resolved" xml:space="preserve">
+    <value>你不能編輯已解決討論裡的貼文。</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.system_generated" xml:space="preserve">
+    <value>無法編輯自動回覆。</value>
+  </data>
+  <data name="beatmap_discussion_post.store.beatmapset_locked" xml:space="preserve">
+    <value>這個圖譜被鎖定討論。</value>
+  </data>
+  <data name="beatmapset.metadata.nominated" xml:space="preserve">
+    <value>你不能修改已提名的圖譜資訊。如果你認為有誤，請聯繫 BN 或 NAT 成員。</value>
+  </data>
+  <data name="chat.blocked" xml:space="preserve">
+    <value>無法向封鎖你或被你封鎖的人發送訊息。</value>
+  </data>
+  <data name="chat.friends_only" xml:space="preserve">
+    <value>用戶阻止了來自非好友的訊息。</value>
+  </data>
+  <data name="chat.moderated" xml:space="preserve">
+    <value>該頻道目前正在被管制中。</value>
+  </data>
+  <data name="chat.no_access" xml:space="preserve">
+    <value>你沒有權限訪問該頻道。</value>
+  </data>
+  <data name="chat.restricted" xml:space="preserve">
+    <value>你不能在帳戶被禁言、限制或封鎖的時候發送訊息。</value>
+  </data>
+  <data name="chat.silenced" xml:space="preserve">
+    <value>你不能在帳戶被禁言、限制或封鎖的時候傳送訊息。</value>
+  </data>
+  <data name="comment.update.deleted" xml:space="preserve">
+    <value>無法編輯已刪除的回覆。</value>
+  </data>
+  <data name="contest.voting_over" xml:space="preserve">
+    <value>投票已結束，禁止重新投票。</value>
+  </data>
+  <data name="contest.entry.limit_reached" xml:space="preserve">
+    <value>您提交的參賽文件大小超出限制</value>
+  </data>
+  <data name="contest.entry.over" xml:space="preserve">
+    <value>感謝參與！提交已經關閉，投票即將開始。</value>
+  </data>
+  <data name="forum.moderate.no_permission" xml:space="preserve">
+    <value>沒有權限編輯該板塊。</value>
+  </data>
+  <data name="forum.post.delete.only_last_post" xml:space="preserve">
+    <value>只有最後的回覆可以被刪除。</value>
+  </data>
+  <data name="forum.post.delete.locked" xml:space="preserve">
+    <value>無法刪除被鎖定主題的回覆。</value>
+  </data>
+  <data name="forum.post.delete.no_forum_access" xml:space="preserve">
+    <value>沒有權限進入該板塊。</value>
+  </data>
+  <data name="forum.post.delete.not_owner" xml:space="preserve">
+    <value>只有作者能刪除此回覆。</value>
+  </data>
+  <data name="forum.post.edit.deleted" xml:space="preserve">
+    <value>無法編輯已刪除的回覆。</value>
+  </data>
+  <data name="forum.post.edit.locked" xml:space="preserve">
+    <value>此回覆已被鎖定。</value>
+  </data>
+  <data name="forum.post.edit.no_forum_access" xml:space="preserve">
+    <value>沒有權限進入該板塊。</value>
+  </data>
+  <data name="forum.post.edit.not_owner" xml:space="preserve">
+    <value>只有作者能編輯此回覆。</value>
+  </data>
+  <data name="forum.post.edit.topic_locked" xml:space="preserve">
+    <value>無法編輯被鎖定主題的回覆。</value>
+  </data>
+  <data name="forum.post.store.play_more" xml:space="preserve">
+    <value>在发帖之前先玩上两局吧！如果你在游戏时遇到问题，请在 Help and Support 版块发帖求助。</value>
+  </data>
+  <data name="forum.post.store.too_many_help_posts" xml:space="preserve">
+    <value>您需要再玩久一點才可以發布更多貼文，如果您仍然在遊戲中遇到問題，請聯繫support@ppy.sh</value>
+  </data>
+  <data name="forum.topic.reply.double_post" xml:space="preserve">
+    <value>請編輯您的最後一條評論，而不是再次發表。</value>
+  </data>
+  <data name="forum.topic.reply.locked" xml:space="preserve">
+    <value>無法回覆被鎖定的主題。</value>
+  </data>
+  <data name="forum.topic.reply.no_forum_access" xml:space="preserve">
+    <value>沒有權限，無法進入該板塊。</value>
+  </data>
+  <data name="forum.topic.reply.no_permission" xml:space="preserve">
+    <value>沒有權限，無法回覆。</value>
+  </data>
+  <data name="forum.topic.reply.user.require_login" xml:space="preserve">
+    <value>回覆前請先登入。</value>
+  </data>
+  <data name="forum.topic.reply.user.restricted" xml:space="preserve">
+    <value>帳戶處於限制模式，無法回覆。</value>
+  </data>
+  <data name="forum.topic.reply.user.silenced" xml:space="preserve">
+    <value>帳戶被禁言，無法回覆。</value>
+  </data>
+  <data name="forum.topic.store.no_forum_access" xml:space="preserve">
+    <value>沒有權限，無法進入該板塊。</value>
+  </data>
+  <data name="forum.topic.store.no_permission" xml:space="preserve">
+    <value>沒有權限，無法創建新主題。</value>
+  </data>
+  <data name="forum.topic.store.forum_closed" xml:space="preserve">
+    <value>該討論區已關閉，無法發表新主題。</value>
+  </data>
+  <data name="forum.topic.vote.no_forum_access" xml:space="preserve">
+    <value>沒有權限，無法進入該討論區。</value>
+  </data>
+  <data name="forum.topic.vote.over" xml:space="preserve">
+    <value>投票已結束！</value>
+  </data>
+  <data name="forum.topic.vote.play_more" xml:space="preserve">
+    <value>你需要在論壇上投票之前多玩一些。</value>
+  </data>
+  <data name="forum.topic.vote.voted" xml:space="preserve">
+    <value>不允許修改投票。</value>
+  </data>
+  <data name="forum.topic.vote.user.require_login" xml:space="preserve">
+    <value>投票前請先登入。</value>
+  </data>
+  <data name="forum.topic.vote.user.restricted" xml:space="preserve">
+    <value>帳戶處於限制模式，無法投票。</value>
+  </data>
+  <data name="forum.topic.vote.user.silenced" xml:space="preserve">
+    <value>帳戶被禁言，無法投票。</value>
+  </data>
+  <data name="forum.topic.watch.no_forum_access" xml:space="preserve">
+    <value>沒有權限，無法進入該板塊。</value>
+  </data>
+  <data name="forum.topic_cover.edit.uneditable" xml:space="preserve">
+    <value>指定的封面不可用。</value>
+  </data>
+  <data name="forum.topic_cover.edit.not_owner" xml:space="preserve">
+    <value>只有樓主可以編輯封面。</value>
+  </data>
+  <data name="forum.topic_cover.store.forum_not_allowed" xml:space="preserve">
+    <value>此論壇不接受主題覆蓋。</value>
+  </data>
+  <data name="forum.view.admin_only" xml:space="preserve">
+    <value>該討論區僅限管理員查看。</value>
+  </data>
+  <data name="user.page.edit.locked" xml:space="preserve">
+    <value>個人頁面被鎖定。</value>
+  </data>
+  <data name="user.page.edit.not_owner" xml:space="preserve">
+    <value>只能編輯自己的個人頁面。</value>
+  </data>
+  <data name="user.page.edit.require_supporter_tag" xml:space="preserve">
+    <value>需要成為osu!贊助者。</value>
+  </data>
+</root>

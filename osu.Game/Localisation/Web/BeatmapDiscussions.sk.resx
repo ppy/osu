@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authorizations.update.null_user" xml:space="preserve">
+    <value>Pre úpravu musíte byť prihlásený.</value>
+  </data>
+  <data name="authorizations.update.system_generated" xml:space="preserve">
+    <value>Príspevky generované systémom nemôžu byť upravené.</value>
+  </data>
+  <data name="authorizations.update.wrong_user" xml:space="preserve">
+    <value>Aby ste mohli upraviť príspevok, musíte byť jeho vlastníkom.</value>
+  </data>
+  <data name="events.empty" xml:space="preserve">
+    <value>Nič sa nestalo... zatiaľ.</value>
+  </data>
+  <data name="index.deleted_beatmap" xml:space="preserve">
+    <value>odstránené</value>
+  </data>
+  <data name="index.none_found" xml:space="preserve">
+    <value>Nenašli sa žiadne diskusie, zodpovedajúci zadaným požiadavkám.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Diskusie ohľadom Beatmapy</value>
+  </data>
+  <data name="index.form._" xml:space="preserve">
+    <value>Hľadať</value>
+  </data>
+  <data name="index.form.deleted" xml:space="preserve">
+    <value>Zahrnúť odstránené diskusie</value>
+  </data>
+  <data name="index.form.only_unresolved" xml:space="preserve">
+    <value>Ukázať iba nevyriešené diskusie</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Typy správ</value>
+  </data>
+  <data name="index.form.username" xml:space="preserve">
+    <value>Meno Uživateľa</value>
+  </data>
+  <data name="index.form.beatmapset_status._" xml:space="preserve">
+    <value>Status beatmapy</value>
+  </data>
+  <data name="index.form.beatmapset_status.all" xml:space="preserve">
+    <value>Všetko</value>
+  </data>
+  <data name="index.form.beatmapset_status.disqualified" xml:space="preserve">
+    <value>Diskvalifikovaný</value>
+  </data>
+  <data name="index.form.beatmapset_status.never_qualified" xml:space="preserve">
+    <value>Nikdy kvalifikovaný</value>
+  </data>
+  <data name="index.form.beatmapset_status.qualified" xml:space="preserve">
+    <value>Kvalifikovaný</value>
+  </data>
+  <data name="index.form.beatmapset_status.ranked" xml:space="preserve">
+    <value>Hodnotené</value>
+  </data>
+  <data name="index.form.user.label" xml:space="preserve">
+    <value>Používateľ</value>
+  </data>
+  <data name="index.form.user.overview" xml:space="preserve">
+    <value>Prehľad aktivity</value>
+  </data>
+  <data name="item.created_at" xml:space="preserve">
+    <value>Dátum príspevku</value>
+  </data>
+  <data name="item.deleted_at" xml:space="preserve">
+    <value>Dátum odstránenia</value>
+  </data>
+  <data name="item.message_type" xml:space="preserve">
+    <value>Typ</value>
+  </data>
+  <data name="item.permalink" xml:space="preserve">
+    <value>Trvalý odkaz</value>
+  </data>
+  <data name="nearby_posts.confirm" xml:space="preserve">
+    <value>Žiadny z príspevkov nerieši môj problém</value>
+  </data>
+  <data name="nearby_posts.notice" xml:space="preserve">
+    <value>Príspevky okolo času {0} ({1}) už existujú. Prosím, skontrolujte ich pred prispievaním.</value>
+  </data>
+  <data name="reply.open.guest" xml:space="preserve">
+    <value>Prosím, prihláste sa, aby ste mohli odpovedať</value>
+  </data>
+  <data name="reply.open.user" xml:space="preserve">
+    <value>Odpoveď</value>
+  </data>
+  <data name="review.go_to_parent" xml:space="preserve">
+    <value>Zobraziť recenziu</value>
+  </data>
+  <data name="review.go_to_child" xml:space="preserve">
+    <value>Nová diskusia</value>
+  </data>
+  <data name="review.validation.invalid_block_type" xml:space="preserve">
+    <value>neplatný typ bloku</value>
+  </data>
+  <data name="review.validation.invalid_document" xml:space="preserve">
+    <value>neplatná recenzia</value>
+  </data>
+  <data name="review.validation.minimum_issues" xml:space="preserve">
+    <value>kontrola musí obsahovať minimálne {0} problémov|kontrola musí obsahovať minimálne {0} problémov</value>
+  </data>
+  <data name="review.validation.missing_text" xml:space="preserve">
+    <value>v bloku nie je žiadny text</value>
+  </data>
+  <data name="review.validation.too_many_blocks" xml:space="preserve">
+    <value>recenzie môžu obsahovať iba {0} odsekov/vydaní|recenzie môžu obsahovať iba {0} odsekov/čísel</value>
+  </data>
+  <data name="system.resolved.true" xml:space="preserve">
+    <value>Označené ako vyriešené uživateľom {0}</value>
+  </data>
+  <data name="system.resolved.false" xml:space="preserve">
+    <value>Znovu otvorené uživateľom {0}</value>
+  </data>
+  <data name="timestamp_display.general" xml:space="preserve">
+    <value>všeobecné</value>
+  </data>
+  <data name="timestamp_display.general_all" xml:space="preserve">
+    <value>všeobecné (všetky)</value>
+  </data>
+  <data name="user_filter.everyone" xml:space="preserve">
+    <value>Ktokoľvek</value>
+  </data>
+  <data name="user_filter.label" xml:space="preserve">
+    <value>Filtrovať podľa užívateľa</value>
+  </data>
+</root>

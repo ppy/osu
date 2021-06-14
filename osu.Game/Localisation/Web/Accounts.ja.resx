@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="edit.title_compact" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="edit.username" xml:space="preserve">
+    <value>ユーザー名</value>
+  </data>
+  <data name="edit.avatar.title" xml:space="preserve">
+    <value>プロフィール画像</value>
+  </data>
+  <data name="edit.avatar.rules" xml:space="preserve">
+    <value>あなたのプロフィール画像が公序良俗に反したもので無いか確認してください。 {0}.&lt;br/&gt;易しく言えば&lt;strong&gt;全ての年齢に適した&lt;/strong&gt;、つまりヌードや冒涜的な表現などを想起させるものを含んでいない事を確認してください。</value>
+  </data>
+  <data name="edit.avatar.rules_link" xml:space="preserve">
+    <value>コミュニティールール</value>
+  </data>
+  <data name="edit.email.current" xml:space="preserve">
+    <value>現在のメールアドレス</value>
+  </data>
+  <data name="edit.email.new" xml:space="preserve">
+    <value>新しいメールアドレス</value>
+  </data>
+  <data name="edit.email.new_confirmation" xml:space="preserve">
+    <value>新しいメールアドレス（再入力）</value>
+  </data>
+  <data name="edit.email.title" xml:space="preserve">
+    <value>メールアドレス</value>
+  </data>
+  <data name="edit.password.current" xml:space="preserve">
+    <value>現在のパスワード</value>
+  </data>
+  <data name="edit.password.new" xml:space="preserve">
+    <value>新しいパスワード</value>
+  </data>
+  <data name="edit.password.new_confirmation" xml:space="preserve">
+    <value>新しいパスワード（再入力）</value>
+  </data>
+  <data name="edit.password.title" xml:space="preserve">
+    <value>パスワード</value>
+  </data>
+  <data name="edit.profile.title" xml:space="preserve">
+    <value>プロフィール</value>
+  </data>
+  <data name="edit.profile.user.user_from" xml:space="preserve">
+    <value>現在地</value>
+  </data>
+  <data name="edit.profile.user.user_interests" xml:space="preserve">
+    <value>趣味</value>
+  </data>
+  <data name="edit.profile.user.user_occ" xml:space="preserve">
+    <value>職業</value>
+  </data>
+  <data name="edit.profile.user.user_website" xml:space="preserve">
+    <value>ウェブサイト</value>
+  </data>
+  <data name="edit.signature.title" xml:space="preserve">
+    <value>署名</value>
+  </data>
+  <data name="edit.signature.update" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="notifications.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>次のモードのQualifiedビートマップで新しい問題の通知を受け取る</value>
+  </data>
+  <data name="notifications.beatmapset_disqualify" xml:space="preserve">
+    <value>次のモードのビートマップがDisqualifiedになった場合に通知を受け取る</value>
+  </data>
+  <data name="notifications.comment_reply" xml:space="preserve">
+    <value>コメントへの返信の通知を受け取る</value>
+  </data>
+  <data name="notifications.title" xml:space="preserve">
+    <value>通知</value>
+  </data>
+  <data name="notifications.topic_auto_subscribe" xml:space="preserve">
+    <value>作成した新しいフォーラムトピックに関する通知を自動的に有効にします</value>
+  </data>
+  <data name="notifications.options._" xml:space="preserve">
+    <value>配送設定</value>
+  </data>
+  <data name="notifications.options.beatmap_owner_change" xml:space="preserve">
+    <value>ゲスト難易度</value>
+  </data>
+  <data name="notifications.options.beatmapset:modding" xml:space="preserve">
+    <value>ビートマップmodding</value>
+  </data>
+  <data name="notifications.options.channel_message" xml:space="preserve">
+    <value>プライベートチャットメッセージ</value>
+  </data>
+  <data name="notifications.options.comment_new" xml:space="preserve">
+    <value>新しいコメント</value>
+  </data>
+  <data name="notifications.options.forum_topic_reply" xml:space="preserve">
+    <value>トピックへの返信</value>
+  </data>
+  <data name="notifications.options.mail" xml:space="preserve">
+    <value>メール</value>
+  </data>
+  <data name="notifications.options.mapping" xml:space="preserve">
+    <value>ビートマップマッパー</value>
+  </data>
+  <data name="notifications.options.push" xml:space="preserve">
+    <value>プッシュ通知</value>
+  </data>
+  <data name="notifications.options.user_achievement_unlock" xml:space="preserve">
+    <value>ユーザーメダルのアンロック</value>
+  </data>
+  <data name="oauth.authorized_clients" xml:space="preserve">
+    <value>認証済みのクライアント</value>
+  </data>
+  <data name="oauth.own_clients" xml:space="preserve">
+    <value>自分のクライアント</value>
+  </data>
+  <data name="oauth.title" xml:space="preserve">
+    <value>OAuth</value>
+  </data>
+  <data name="options.beatmapset_show_nsfw" xml:space="preserve">
+    <value>ビートマップ内の不適切なコンテンツの警告を非表示にする</value>
+  </data>
+  <data name="options.beatmapset_title_show_original" xml:space="preserve">
+    <value>ビートマップのメタデータを元の言語で表示</value>
+  </data>
+  <data name="options.title" xml:space="preserve">
+    <value>オプション</value>
+  </data>
+  <data name="options.beatmapset_download._" xml:space="preserve">
+    <value>デフォルトのビートマップダウンロートタイプ</value>
+  </data>
+  <data name="options.beatmapset_download.all" xml:space="preserve">
+    <value>可能であれば動画付き</value>
+  </data>
+  <data name="options.beatmapset_download.direct" xml:space="preserve">
+    <value>osu!directで開く</value>
+  </data>
+  <data name="options.beatmapset_download.no_video" xml:space="preserve">
+    <value>動画なし</value>
+  </data>
+  <data name="playstyles.keyboard" xml:space="preserve">
+    <value>キーボード</value>
+  </data>
+  <data name="playstyles.mouse" xml:space="preserve">
+    <value>マウス</value>
+  </data>
+  <data name="playstyles.tablet" xml:space="preserve">
+    <value>ペンタブ</value>
+  </data>
+  <data name="playstyles.title" xml:space="preserve">
+    <value>プレイスタイル</value>
+  </data>
+  <data name="playstyles.touch" xml:space="preserve">
+    <value>タッチスクリーン</value>
+  </data>
+  <data name="privacy.friends_only" xml:space="preserve">
+    <value>フレンドリストにいない人からのプライベートメッセージをブロックする</value>
+  </data>
+  <data name="privacy.hide_online" xml:space="preserve">
+    <value>オンライン状態を隠す</value>
+  </data>
+  <data name="privacy.title" xml:space="preserve">
+    <value>プライバシー</value>
+  </data>
+  <data name="security.current_session" xml:space="preserve">
+    <value>現在</value>
+  </data>
+  <data name="security.end_session" xml:space="preserve">
+    <value>セッション終了</value>
+  </data>
+  <data name="security.end_session_confirmation" xml:space="preserve">
+    <value>このデバイスでのセッションが終了します。本当によろしいですか？</value>
+  </data>
+  <data name="security.last_active" xml:space="preserve">
+    <value>最終ログイン：</value>
+  </data>
+  <data name="security.title" xml:space="preserve">
+    <value>セキュリティ</value>
+  </data>
+  <data name="security.web_sessions" xml:space="preserve">
+    <value>webセッション</value>
+  </data>
+  <data name="update_email.update" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="update_password.update" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="verification_completed.text" xml:space="preserve">
+    <value>今すぐにこのウィンドウを閉じる事が出来ます。</value>
+  </data>
+  <data name="verification_completed.title" xml:space="preserve">
+    <value>認証が完了しました。</value>
+  </data>
+  <data name="verification_invalid.title" xml:space="preserve">
+    <value>無効もしくは期限切れの認証リンク</value>
+  </data>
+</root>

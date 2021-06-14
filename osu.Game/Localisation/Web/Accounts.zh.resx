@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="edit.title_compact" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="edit.username" xml:space="preserve">
+    <value>用户名</value>
+  </data>
+  <data name="edit.avatar.title" xml:space="preserve">
+    <value>头像</value>
+  </data>
+  <data name="edit.avatar.rules" xml:space="preserve">
+    <value>请确保你的头像符合 {0}。&lt;br/&gt;这意味着头像内容必须是&lt;strong&gt;全年龄的&lt;/strong&gt;，即没有裸露、亵渎或暗示的内容。</value>
+  </data>
+  <data name="edit.avatar.rules_link" xml:space="preserve">
+    <value>社群规则</value>
+  </data>
+  <data name="edit.email.current" xml:space="preserve">
+    <value>当前邮箱地址</value>
+  </data>
+  <data name="edit.email.new" xml:space="preserve">
+    <value>新邮箱地址</value>
+  </data>
+  <data name="edit.email.new_confirmation" xml:space="preserve">
+    <value>确认新邮箱地址</value>
+  </data>
+  <data name="edit.email.title" xml:space="preserve">
+    <value>邮箱</value>
+  </data>
+  <data name="edit.password.current" xml:space="preserve">
+    <value>当前密码</value>
+  </data>
+  <data name="edit.password.new" xml:space="preserve">
+    <value>新密码</value>
+  </data>
+  <data name="edit.password.new_confirmation" xml:space="preserve">
+    <value>确认新密码</value>
+  </data>
+  <data name="edit.password.title" xml:space="preserve">
+    <value>密码</value>
+  </data>
+  <data name="edit.profile.title" xml:space="preserve">
+    <value>个人资料</value>
+  </data>
+  <data name="edit.profile.user.user_from" xml:space="preserve">
+    <value>当前位置</value>
+  </data>
+  <data name="edit.profile.user.user_interests" xml:space="preserve">
+    <value>兴趣爱好</value>
+  </data>
+  <data name="edit.profile.user.user_occ" xml:space="preserve">
+    <value>职业</value>
+  </data>
+  <data name="edit.profile.user.user_website" xml:space="preserve">
+    <value>个人主页</value>
+  </data>
+  <data name="edit.signature.title" xml:space="preserve">
+    <value>个性签名</value>
+  </data>
+  <data name="edit.signature.update" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="notifications.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>在以下模式的合格谱面上接收新问题通知：</value>
+  </data>
+  <data name="notifications.beatmapset_disqualify" xml:space="preserve">
+    <value>在以下模式的谱面被标记为不合格时接收通知：</value>
+  </data>
+  <data name="notifications.comment_reply" xml:space="preserve">
+    <value>在你的评论被回复时接收通知</value>
+  </data>
+  <data name="notifications.title" xml:space="preserve">
+    <value>通知</value>
+  </data>
+  <data name="notifications.topic_auto_subscribe" xml:space="preserve">
+    <value>自动启用自己创建的主题的通知</value>
+  </data>
+  <data name="notifications.options._" xml:space="preserve">
+    <value>推送设置</value>
+  </data>
+  <data name="notifications.options.beatmap_owner_change" xml:space="preserve">
+    <value>客串难度</value>
+  </data>
+  <data name="notifications.options.beatmapset:modding" xml:space="preserve">
+    <value>谱面摸图</value>
+  </data>
+  <data name="notifications.options.channel_message" xml:space="preserve">
+    <value>私信</value>
+  </data>
+  <data name="notifications.options.comment_new" xml:space="preserve">
+    <value>新评论</value>
+  </data>
+  <data name="notifications.options.forum_topic_reply" xml:space="preserve">
+    <value>主题回复</value>
+  </data>
+  <data name="notifications.options.mail" xml:space="preserve">
+    <value>邮件</value>
+  </data>
+  <data name="notifications.options.mapping" xml:space="preserve">
+    <value>谱师</value>
+  </data>
+  <data name="notifications.options.push" xml:space="preserve">
+    <value>推送</value>
+  </data>
+  <data name="notifications.options.user_achievement_unlock" xml:space="preserve">
+    <value>成就解锁</value>
+  </data>
+  <data name="oauth.authorized_clients" xml:space="preserve">
+    <value>已授权的第三应用</value>
+  </data>
+  <data name="oauth.own_clients" xml:space="preserve">
+    <value>拥有的客户端</value>
+  </data>
+  <data name="oauth.title" xml:space="preserve">
+    <value>开放授权</value>
+  </data>
+  <data name="options.beatmapset_show_nsfw" xml:space="preserve">
+    <value>隐藏谱面少儿不宜提示</value>
+  </data>
+  <data name="options.beatmapset_title_show_original" xml:space="preserve">
+    <value>以原语言显示谱面信息</value>
+  </data>
+  <data name="options.title" xml:space="preserve">
+    <value>选项</value>
+  </data>
+  <data name="options.beatmapset_download._" xml:space="preserve">
+    <value>默认谱面下载类型</value>
+  </data>
+  <data name="options.beatmapset_download.all" xml:space="preserve">
+    <value>包含视频</value>
+  </data>
+  <data name="options.beatmapset_download.direct" xml:space="preserve">
+    <value>在 osu!direct 中查看</value>
+  </data>
+  <data name="options.beatmapset_download.no_video" xml:space="preserve">
+    <value>不包含视频</value>
+  </data>
+  <data name="playstyles.keyboard" xml:space="preserve">
+    <value>键盘</value>
+  </data>
+  <data name="playstyles.mouse" xml:space="preserve">
+    <value>鼠标</value>
+  </data>
+  <data name="playstyles.tablet" xml:space="preserve">
+    <value>数位板</value>
+  </data>
+  <data name="playstyles.title" xml:space="preserve">
+    <value>游戏方式</value>
+  </data>
+  <data name="playstyles.touch" xml:space="preserve">
+    <value>触摸屏</value>
+  </data>
+  <data name="privacy.friends_only" xml:space="preserve">
+    <value>屏蔽来自陌生人的私信</value>
+  </data>
+  <data name="privacy.hide_online" xml:space="preserve">
+    <value>隐藏在线状态</value>
+  </data>
+  <data name="privacy.title" xml:space="preserve">
+    <value>隐私政策</value>
+  </data>
+  <data name="security.current_session" xml:space="preserve">
+    <value>当前</value>
+  </data>
+  <data name="security.end_session" xml:space="preserve">
+    <value>终止会话</value>
+  </data>
+  <data name="security.end_session_confirmation" xml:space="preserve">
+    <value>这将立刻结束该设备上的会话，你确定吗？</value>
+  </data>
+  <data name="security.last_active" xml:space="preserve">
+    <value>上次使用：</value>
+  </data>
+  <data name="security.title" xml:space="preserve">
+    <value>安全</value>
+  </data>
+  <data name="security.web_sessions" xml:space="preserve">
+    <value>浏览器会话</value>
+  </data>
+  <data name="update_email.update" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="update_password.update" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="verification_completed.text" xml:space="preserve">
+    <value>现在可以关闭本窗口了</value>
+  </data>
+  <data name="verification_completed.title" xml:space="preserve">
+    <value>验证已经完成</value>
+  </data>
+  <data name="verification_invalid.title" xml:space="preserve">
+    <value>无效或过期的验证链接</value>
+  </data>
+</root>

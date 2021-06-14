@@ -1,0 +1,388 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="audio.autoplay" xml:space="preserve">
+    <value>次のトラックを自動的に再生</value>
+  </data>
+  <data name="defaults.page_description" xml:space="preserve">
+    <value>osu! - リズムはもう、その指先に！応援団や太鼓をモチーフにしたゲームモード、オリジナルのゲームモード、そしてレベルエディタも備えています。</value>
+  </data>
+  <data name="header.admin.beatmapset" xml:space="preserve">
+    <value>ビートマップセット</value>
+  </data>
+  <data name="header.admin.beatmapset_covers" xml:space="preserve">
+    <value>ビートマップセットカバー</value>
+  </data>
+  <data name="header.admin.contest" xml:space="preserve">
+    <value>コンテスト</value>
+  </data>
+  <data name="header.admin.contests" xml:space="preserve">
+    <value>コンテスト</value>
+  </data>
+  <data name="header.admin.root" xml:space="preserve">
+    <value>コンソール</value>
+  </data>
+  <data name="header.admin.store_orders" xml:space="preserve">
+    <value>ストア管理者</value>
+  </data>
+  <data name="header.artists.index" xml:space="preserve">
+    <value>一覧</value>
+  </data>
+  <data name="header.changelog.index" xml:space="preserve">
+    <value>一覧</value>
+  </data>
+  <data name="header.help.index" xml:space="preserve">
+    <value>目次</value>
+  </data>
+  <data name="header.help.sitemap" xml:space="preserve">
+    <value>サイトマップ</value>
+  </data>
+  <data name="header.store.cart" xml:space="preserve">
+    <value>カート</value>
+  </data>
+  <data name="header.store.orders" xml:space="preserve">
+    <value>注文履歴</value>
+  </data>
+  <data name="header.store.products" xml:space="preserve">
+    <value>製品</value>
+  </data>
+  <data name="header.tournaments.index" xml:space="preserve">
+    <value>一覧</value>
+  </data>
+  <data name="header.users.modding" xml:space="preserve">
+    <value>modding</value>
+  </data>
+  <data name="header.users.show" xml:space="preserve">
+    <value>詳細</value>
+  </data>
+  <data name="gallery.close" xml:space="preserve">
+    <value>閉じる（Esc）</value>
+  </data>
+  <data name="gallery.fullscreen" xml:space="preserve">
+    <value>全画面表示に切り替え</value>
+  </data>
+  <data name="gallery.zoom" xml:space="preserve">
+    <value>ズームイン/ズームアウト</value>
+  </data>
+  <data name="gallery.previous" xml:space="preserve">
+    <value>前（左矢印）</value>
+  </data>
+  <data name="gallery.next" xml:space="preserve">
+    <value>次へ（右矢印）</value>
+  </data>
+  <data name="menu.beatmaps._" xml:space="preserve">
+    <value>ビートマップ</value>
+  </data>
+  <data name="menu.beatmaps.artists" xml:space="preserve">
+    <value>注目アーティスト</value>
+  </data>
+  <data name="menu.beatmaps.index" xml:space="preserve">
+    <value>一覧</value>
+  </data>
+  <data name="menu.beatmaps.packs" xml:space="preserve">
+    <value>パック</value>
+  </data>
+  <data name="menu.community._" xml:space="preserve">
+    <value>コミュニティ</value>
+  </data>
+  <data name="menu.community.chat" xml:space="preserve">
+    <value>チャット</value>
+  </data>
+  <data name="menu.community.contests" xml:space="preserve">
+    <value>コンテスト</value>
+  </data>
+  <data name="menu.community.dev" xml:space="preserve">
+    <value>開発</value>
+  </data>
+  <data name="menu.community.forum-forums-index" xml:space="preserve">
+    <value>フォーラム</value>
+  </data>
+  <data name="menu.community.getlive" xml:space="preserve">
+    <value>配信</value>
+  </data>
+  <data name="menu.community.tournaments" xml:space="preserve">
+    <value>トーナメント</value>
+  </data>
+  <data name="menu.help._" xml:space="preserve">
+    <value>ヘルプ</value>
+  </data>
+  <data name="menu.help.getabuse" xml:space="preserve">
+    <value>不正利用の報告</value>
+  </data>
+  <data name="menu.help.getfaq" xml:space="preserve">
+    <value>FAQ</value>
+  </data>
+  <data name="menu.help.getrules" xml:space="preserve">
+    <value>ルール</value>
+  </data>
+  <data name="menu.help.getsupport" xml:space="preserve">
+    <value>サポートが必要です！</value>
+  </data>
+  <data name="menu.help.getwiki" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="menu.home._" xml:space="preserve">
+    <value>ホーム</value>
+  </data>
+  <data name="menu.home.changelog-index" xml:space="preserve">
+    <value>更新履歴</value>
+  </data>
+  <data name="menu.home.getdownload" xml:space="preserve">
+    <value>ダウンロード</value>
+  </data>
+  <data name="menu.home.news-index" xml:space="preserve">
+    <value>お知らせ</value>
+  </data>
+  <data name="menu.home.search" xml:space="preserve">
+    <value>検索</value>
+  </data>
+  <data name="menu.home.team" xml:space="preserve">
+    <value>osu!team</value>
+  </data>
+  <data name="menu.rankings._" xml:space="preserve">
+    <value>ランキング</value>
+  </data>
+  <data name="menu.rankings.charts" xml:space="preserve">
+    <value>スポットライト</value>
+  </data>
+  <data name="menu.rankings.country" xml:space="preserve">
+    <value>国別</value>
+  </data>
+  <data name="menu.rankings.index" xml:space="preserve">
+    <value>パフォーマンス</value>
+  </data>
+  <data name="menu.rankings.kudosu" xml:space="preserve">
+    <value>kudosu</value>
+  </data>
+  <data name="menu.rankings.multiplayer" xml:space="preserve">
+    <value>マルチプレイヤー</value>
+  </data>
+  <data name="menu.rankings.score" xml:space="preserve">
+    <value>スコア</value>
+  </data>
+  <data name="menu.store._" xml:space="preserve">
+    <value>ストア</value>
+  </data>
+  <data name="menu.store.cart-show" xml:space="preserve">
+    <value>カート</value>
+  </data>
+  <data name="menu.store.getlisting" xml:space="preserve">
+    <value>商品一覧</value>
+  </data>
+  <data name="menu.store.orders-index" xml:space="preserve">
+    <value>注文履歴</value>
+  </data>
+  <data name="footer.general._" xml:space="preserve">
+    <value>全般</value>
+  </data>
+  <data name="footer.general.home" xml:space="preserve">
+    <value>ホーム</value>
+  </data>
+  <data name="footer.general.changelog-index" xml:space="preserve">
+    <value>更新履歴</value>
+  </data>
+  <data name="footer.general.beatmaps" xml:space="preserve">
+    <value>ビートマップリスト</value>
+  </data>
+  <data name="footer.general.download" xml:space="preserve">
+    <value>osu!をダウンロード</value>
+  </data>
+  <data name="footer.help._" xml:space="preserve">
+    <value>ヘルプ＆コミュニティ</value>
+  </data>
+  <data name="footer.help.faq" xml:space="preserve">
+    <value>よくある質問</value>
+  </data>
+  <data name="footer.help.forum" xml:space="preserve">
+    <value>コミュニティフォーラム</value>
+  </data>
+  <data name="footer.help.livestreams" xml:space="preserve">
+    <value>ライブ配信</value>
+  </data>
+  <data name="footer.help.report" xml:space="preserve">
+    <value>問題を報告する</value>
+  </data>
+  <data name="footer.help.wiki" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="footer.legal._" xml:space="preserve">
+    <value>Legal &amp; Status</value>
+  </data>
+  <data name="footer.legal.copyright" xml:space="preserve">
+    <value>著作権 (DMCA)</value>
+  </data>
+  <data name="footer.legal.privacy" xml:space="preserve">
+    <value>プライバシー</value>
+  </data>
+  <data name="footer.legal.server_status" xml:space="preserve">
+    <value>サーバー状態</value>
+  </data>
+  <data name="footer.legal.source_code" xml:space="preserve">
+    <value>ソースコード</value>
+  </data>
+  <data name="footer.legal.terms" xml:space="preserve">
+    <value>利用規約</value>
+  </data>
+  <data name="errors.400.error" xml:space="preserve">
+    <value>無効な要求パラメーター</value>
+  </data>
+  <data name="errors.404.error" xml:space="preserve">
+    <value>ページが見つかりません</value>
+  </data>
+  <data name="errors.404.description" xml:space="preserve">
+    <value>申し訳ありませんが、要求されたページはここにはないようです。</value>
+  </data>
+  <data name="errors.403.error" xml:space="preserve">
+    <value>何か手違いがあったみたいです。</value>
+  </data>
+  <data name="errors.403.description" xml:space="preserve">
+    <value>戻ってみることをおすすめします。</value>
+  </data>
+  <data name="errors.401.error" xml:space="preserve">
+    <value>何か手違いがあったみたいです。</value>
+  </data>
+  <data name="errors.401.description" xml:space="preserve">
+    <value>戻ってみるか、ログインしてみる事をおすすめします。</value>
+  </data>
+  <data name="errors.405.error" xml:space="preserve">
+    <value>ページが見つかりません</value>
+  </data>
+  <data name="errors.405.description" xml:space="preserve">
+    <value>申し訳ありませんが、要求されたページはここにはないようです。</value>
+  </data>
+  <data name="errors.422.error" xml:space="preserve">
+    <value>無効な要求パラメーターです。</value>
+  </data>
+  <data name="errors.429.error" xml:space="preserve">
+    <value>試行可能回数の上限に達しました。</value>
+  </data>
+  <data name="errors.500.error" xml:space="preserve">
+    <value>予期せぬエラーが発生しました ;_;</value>
+  </data>
+  <data name="errors.500.description" xml:space="preserve">
+    <value>自動的にエラーは報告されます。</value>
+  </data>
+  <data name="errors.fatal.error" xml:space="preserve">
+    <value>予期せぬエラーが発生しました（爆） ;_;</value>
+  </data>
+  <data name="errors.fatal.description" xml:space="preserve">
+    <value>自動的にエラーは報告されます。</value>
+  </data>
+  <data name="errors.503.error" xml:space="preserve">
+    <value>メンテナンス中です！</value>
+  </data>
+  <data name="errors.503.description" xml:space="preserve">
+    <value>メンテナンスには通常5秒から10分かかります。もし長時間ダウンしている場合は{0}を参照してください。</value>
+  </data>
+  <data name="errors.reference" xml:space="preserve">
+    <value>念の為に、サポートに提示できるコードを表示します。</value>
+  </data>
+  <data name="popup_login.button" xml:space="preserve">
+    <value>ログイン / 登録</value>
+  </data>
+  <data name="popup_login.login.forgot" xml:space="preserve">
+    <value>ログイン情報を忘れた</value>
+  </data>
+  <data name="popup_login.login.password" xml:space="preserve">
+    <value>パスワード</value>
+  </data>
+  <data name="popup_login.login.title" xml:space="preserve">
+    <value>続行するにはログインしてください</value>
+  </data>
+  <data name="popup_login.login.username" xml:space="preserve">
+    <value>ユーザー名</value>
+  </data>
+  <data name="popup_login.login.error.email" xml:space="preserve">
+    <value>ユーザー名かメールアドレスが存在しません</value>
+  </data>
+  <data name="popup_login.login.error.password" xml:space="preserve">
+    <value>パスワードが一致しませんでした。</value>
+  </data>
+  <data name="popup_login.register.download" xml:space="preserve">
+    <value>ダウンロード</value>
+  </data>
+  <data name="popup_login.register.info" xml:space="preserve">
+    <value>アカウントが必要です。作ってみませんか？</value>
+  </data>
+  <data name="popup_login.register.title" xml:space="preserve">
+    <value>アカウントが必要です</value>
+  </data>
+  <data name="popup_user.links.account-edit" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="popup_user.links.follows" xml:space="preserve">
+    <value>ウォッチリスト</value>
+  </data>
+  <data name="popup_user.links.friends" xml:space="preserve">
+    <value>フレンド</value>
+  </data>
+  <data name="popup_user.links.logout" xml:space="preserve">
+    <value>ログアウト</value>
+  </data>
+  <data name="popup_user.links.profile" xml:space="preserve">
+    <value>プロフィール</value>
+  </data>
+  <data name="popup_search.initial" xml:space="preserve">
+    <value>入力して検索！</value>
+  </data>
+  <data name="popup_search.retry" xml:space="preserve">
+    <value>検索に失敗しました。クリックでリトライします。</value>
+  </data>
+</root>

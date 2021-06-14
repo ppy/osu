@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="landing.download" xml:space="preserve">
+    <value>Scarica ora</value>
+  </data>
+  <data name="landing.online" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; giocatori online in &lt;strong&gt;{1}&lt;/strong&gt; partite</value>
+  </data>
+  <data name="landing.peak" xml:space="preserve">
+    <value>Picco, {0} utenti online</value>
+  </data>
+  <data name="landing.players" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; utenti registrati</value>
+  </data>
+  <data name="landing.title" xml:space="preserve">
+    <value>benvenuto</value>
+  </data>
+  <data name="landing.see_more_news" xml:space="preserve">
+    <value>guarda più notizie</value>
+  </data>
+  <data name="landing.slogan.main" xml:space="preserve">
+    <value>il miglior gioco di ritmo free-to-win</value>
+  </data>
+  <data name="landing.slogan.sub" xml:space="preserve">
+    <value>il ritmo è solo ad un click di distanza</value>
+  </data>
+  <data name="search.advanced_link" xml:space="preserve">
+    <value>Ricerca avanzata</value>
+  </data>
+  <data name="search.button" xml:space="preserve">
+    <value>Cerca</value>
+  </data>
+  <data name="search.empty_result" xml:space="preserve">
+    <value>Nessun risultato!</value>
+  </data>
+  <data name="search.keyword_required" xml:space="preserve">
+    <value>È necessaria una parola chiave di ricerca</value>
+  </data>
+  <data name="search.placeholder" xml:space="preserve">
+    <value>digita per cercare</value>
+  </data>
+  <data name="search.title" xml:space="preserve">
+    <value>Cerca</value>
+  </data>
+  <data name="search.beatmapset.login_required" xml:space="preserve">
+    <value>Accedi per cercare beatmap</value>
+  </data>
+  <data name="search.beatmapset.more" xml:space="preserve">
+    <value>altri {0} risultati di ricerca delle beatmap</value>
+  </data>
+  <data name="search.beatmapset.more_simple" xml:space="preserve">
+    <value>Vedi più risultati di ricerca delle beatmap</value>
+  </data>
+  <data name="search.beatmapset.title" xml:space="preserve">
+    <value>Beatmap</value>
+  </data>
+  <data name="search.forum_post.all" xml:space="preserve">
+    <value>Tutti i forum</value>
+  </data>
+  <data name="search.forum_post.link" xml:space="preserve">
+    <value>Cerca nel forum</value>
+  </data>
+  <data name="search.forum_post.login_required" xml:space="preserve">
+    <value>Accedi per cercare nel forum</value>
+  </data>
+  <data name="search.forum_post.more_simple" xml:space="preserve">
+    <value>Vedi più risultati di ricerca del forum</value>
+  </data>
+  <data name="search.forum_post.title" xml:space="preserve">
+    <value>Forum</value>
+  </data>
+  <data name="search.forum_post.label.forum" xml:space="preserve">
+    <value>cerca nel forum</value>
+  </data>
+  <data name="search.forum_post.label.forum_children" xml:space="preserve">
+    <value>includi subforum</value>
+  </data>
+  <data name="search.forum_post.label.topic_id" xml:space="preserve">
+    <value>discussione #</value>
+  </data>
+  <data name="search.forum_post.label.username" xml:space="preserve">
+    <value>autore</value>
+  </data>
+  <data name="search.mode.all" xml:space="preserve">
+    <value>tutto</value>
+  </data>
+  <data name="search.mode.beatmapset" xml:space="preserve">
+    <value>beatmap</value>
+  </data>
+  <data name="search.mode.forum_post" xml:space="preserve">
+    <value>forum</value>
+  </data>
+  <data name="search.mode.user" xml:space="preserve">
+    <value>giocatore</value>
+  </data>
+  <data name="search.mode.wiki_page" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="search.user.login_required" xml:space="preserve">
+    <value>Accedi per cercare utenti</value>
+  </data>
+  <data name="search.user.more" xml:space="preserve">
+    <value>altri {0} risultati di ricerca di giocatori</value>
+  </data>
+  <data name="search.user.more_simple" xml:space="preserve">
+    <value>Vedi più risultati di ricerca di giocatori</value>
+  </data>
+  <data name="search.user.more_hidden" xml:space="preserve">
+    <value>La ricerca di giocatori è limitata a {0} giocatori. Prova a ridefinire la ricerca.</value>
+  </data>
+  <data name="search.user.title" xml:space="preserve">
+    <value>Giocatori</value>
+  </data>
+  <data name="search.wiki_page.link" xml:space="preserve">
+    <value>Cerca nella wiki</value>
+  </data>
+  <data name="search.wiki_page.more_simple" xml:space="preserve">
+    <value>Vedi più risultati di ricerca della wiki</value>
+  </data>
+  <data name="search.wiki_page.title" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="download.tagline" xml:space="preserve">
+    <value>iniziamo&lt;br&gt;subito!</value>
+  </data>
+  <data name="download.action" xml:space="preserve">
+    <value>Scarica osu!</value>
+  </data>
+  <data name="download.help._" xml:space="preserve">
+    <value>se hai problemi ad avviare il gioco o a registrarti l'account, {0} oppure {1}.</value>
+  </data>
+  <data name="download.help.help_forum_link" xml:space="preserve">
+    <value>visita il forum di assistenza</value>
+  </data>
+  <data name="download.help.support_button" xml:space="preserve">
+    <value>contatta il supporto</value>
+  </data>
+  <data name="download.os.windows" xml:space="preserve">
+    <value>per Windows</value>
+  </data>
+  <data name="download.os.macos" xml:space="preserve">
+    <value>per macOS</value>
+  </data>
+  <data name="download.os.linux" xml:space="preserve">
+    <value>per Linux</value>
+  </data>
+  <data name="download.mirror" xml:space="preserve">
+    <value>mirror</value>
+  </data>
+  <data name="download.macos-fallback" xml:space="preserve">
+    <value>utenti macOS</value>
+  </data>
+  <data name="download.steps.register.title" xml:space="preserve">
+    <value>registrati</value>
+  </data>
+  <data name="download.steps.register.description" xml:space="preserve">
+    <value>segui le istruzioni quando avvii il gioco per accedere o creare un nuovo account</value>
+  </data>
+  <data name="download.steps.download.title" xml:space="preserve">
+    <value>scarica il gioco</value>
+  </data>
+  <data name="download.steps.download.description" xml:space="preserve">
+    <value>clicca il bottone sopra per scaricare l'installer, poi avvialo!</value>
+  </data>
+  <data name="download.steps.beatmaps.title" xml:space="preserve">
+    <value>ottieni beatmap</value>
+  </data>
+  <data name="download.steps.beatmaps.description._" xml:space="preserve">
+    <value>{0} la vasta libreria di beatmap create dagli utenti e inizia a giocare!</value>
+  </data>
+  <data name="download.steps.beatmaps.description.browse" xml:space="preserve">
+    <value>esplora</value>
+  </data>
+  <data name="download.video-guide" xml:space="preserve">
+    <value>video guida</value>
+  </data>
+  <data name="user.title" xml:space="preserve">
+    <value>dashboard</value>
+  </data>
+  <data name="user.news.title" xml:space="preserve">
+    <value>Notizie</value>
+  </data>
+  <data name="user.news.error" xml:space="preserve">
+    <value>Errore nel caricamento delle notizie, prova a riavviare la pagina?...</value>
+  </data>
+  <data name="user.header.stats.friends" xml:space="preserve">
+    <value>Amici Online</value>
+  </data>
+  <data name="user.header.stats.games" xml:space="preserve">
+    <value>Partite</value>
+  </data>
+  <data name="user.header.stats.online" xml:space="preserve">
+    <value>Utenti Online</value>
+  </data>
+  <data name="user.beatmaps.new" xml:space="preserve">
+    <value>Nuove Beatmap Rankate</value>
+  </data>
+  <data name="user.beatmaps.popular" xml:space="preserve">
+    <value>Beatmap Popolari</value>
+  </data>
+  <data name="user.beatmaps.by_user" xml:space="preserve">
+    <value>di {0}</value>
+  </data>
+  <data name="user.buttons.download" xml:space="preserve">
+    <value>Scarica osu!</value>
+  </data>
+  <data name="user.buttons.support" xml:space="preserve">
+    <value>Supporta osu!</value>
+  </data>
+  <data name="user.buttons.store" xml:space="preserve">
+    <value>osu!store</value>
+  </data>
+  <data name="support-osu.title" xml:space="preserve">
+    <value>Wow!</value>
+  </data>
+  <data name="support-osu.subtitle" xml:space="preserve">
+    <value>Sembra che te la stai passando bene! {0}</value>
+  </data>
+  <data name="support-osu.body.part-1" xml:space="preserve">
+    <value>Sapevi che osu! è privo di pubblicità, e si basa sui giocatori per supportare il suo sviluppo e mantenimento?</value>
+  </data>
+  <data name="support-osu.body.part-2" xml:space="preserve">
+    <value>Sapevi anche che supportando osu! ricevi nuove utili funzionalità, come ad esempio il &lt;strong&gt;download in gioco&lt;/strong&gt; che si avvia in modalità spettatore e nelle partite multigiocatore?</value>
+  </data>
+  <data name="support-osu.find-out-more" xml:space="preserve">
+    <value>Clicca qui per scoprire di più!</value>
+  </data>
+  <data name="support-osu.download-starting" xml:space="preserve">
+    <value>Oh, e non preoccuparti - il tuo download è stato già avviato per te ;)</value>
+  </data>
+</root>

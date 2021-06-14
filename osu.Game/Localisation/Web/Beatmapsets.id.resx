@@ -1,0 +1,391 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>Beatmap saat ini tidak tersedia untuk diunduh.</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>Beberapa bagian dari beatmap ini telah dihapus atas permintaan pembuat lagu atau pihak ketiga pemegang hak cipta.</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>Lihat di sini untuk informasi lebih lanjut.</value>
+  </data>
+  <data name="availability.rule_violation" xml:space="preserve">
+    <value>Sebagian aset yang terkandung dalam berkas beatmap ini telah dihapus setelah tim kami memutuskan bahwa aset-aset yang bersangkutan tidak layak untuk dipergunakan secara luas di dalam lingkungan osu!.</value>
+  </data>
+  <data name="download.limit_exceeded" xml:space="preserve">
+    <value>Jangan terlalu bernafsu dalam mengunduh. Harap mainkan beatmap-beatmap yang telah Anda miliki terlebih dahulu.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Daftar Beatmap</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>Beatmap</value>
+  </data>
+  <data name="panel.empty" xml:space="preserve">
+    <value>tidak ada beatmap</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>unduh</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>unduh dengan video</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>unduh tanpa video</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>buka melalui osu!direct</value>
+  </data>
+  <data name="nominate.hybrid_requires_modes" xml:space="preserve">
+    <value>Pada beatmapset hybrid, Anda harus memilih satu mode permainan yang akan Anda nominasikan.</value>
+  </data>
+  <data name="nominate.incorrect_mode" xml:space="preserve">
+    <value>Anda tidak memiliki hak untuk memberikan nominasi pada mode permainan: {0}</value>
+  </data>
+  <data name="nominate.full_bn_required" xml:space="preserve">
+    <value>Anda harus berstatus sebagai nominator penuh (full nominator) untuk dapat menominasikan beatmap ini.</value>
+  </data>
+  <data name="nominate.too_many" xml:space="preserve">
+    <value>Persyaratan nominasi telah terpenuhi.</value>
+  </data>
+  <data name="nominate.dialog.confirmation" xml:space="preserve">
+    <value>Apakah Anda yakin untuk menominasikan beatmap ini?</value>
+  </data>
+  <data name="nominate.dialog.header" xml:space="preserve">
+    <value>Nominasikan Beatmap</value>
+  </data>
+  <data name="nominate.dialog.hybrid_warning" xml:space="preserve">
+    <value>catatan: Anda hanya dapat memberikan satu nominasi, sehingga pastikan Anda memberikan nominasi pada mode permainan yang memang Anda kehendaki</value>
+  </data>
+  <data name="nominate.dialog.which_modes" xml:space="preserve">
+    <value>Mode permainan apa yang hendak Anda nominasikan?</value>
+  </data>
+  <data name="nsfw_badge.label" xml:space="preserve">
+    <value>Eksplisit</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>Diskusi</value>
+  </data>
+  <data name="show.details.by_artist" xml:space="preserve">
+    <value>oleh {0}</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>Tambahkan beatmap ini ke dalam daftar Beatmap Favorit</value>
+  </data>
+  <data name="show.details.favourite_login" xml:space="preserve">
+    <value>Silakan masuk untuk menambahkan beatmap ini ke Beatmap Favorit</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>Anda harus masuk sebelum mengunduh beatmap!</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>dibuat oleh {0}</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>Hapus beatmap ini dari daftar Beatmap Favorit</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>terakhir diperbarui {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>Unduh</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>tanpa Video</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>dengan Video</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>untuk mengakses lebih banyak fitur</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>Masuk</value>
+  </data>
+  <data name="show.details_date.approved" xml:space="preserve">
+    <value>berstatus Approved sejak {0}</value>
+  </data>
+  <data name="show.details_date.loved" xml:space="preserve">
+    <value>berstatus Loved sejak {0}</value>
+  </data>
+  <data name="show.details_date.qualified" xml:space="preserve">
+    <value>berstatus Qualified sejak {0}</value>
+  </data>
+  <data name="show.details_date.ranked" xml:space="preserve">
+    <value>berstatus Ranked sejak {0}</value>
+  </data>
+  <data name="show.details_date.submitted" xml:space="preserve">
+    <value>diunggah pada {0}</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>terakhir diperbarui {0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>Beatmap yang telah Anda favorit terlalu banyak! Mohon hapus beberapa sebelum melanjutkan.</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>Apabila Anda menyukai beatmap ini, berikanlah hype Anda untuk mendorong beatmap ini agar dapat selangkah lebih dekat menuju status &lt;strong&gt;Ranked&lt;/strong&gt;.</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>Beatmap ini sedang berstatus {0}.</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>pending</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>qualified</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>dalam pengerjaan (work-in-progress)</value>
+  </data>
+  <data name="show.hype.disqualify._" xml:space="preserve">
+    <value>Jika Anda menemukan masalah pada beatmap ini, mohon diskualifikasi beatmap yang bersangkutan melalui {0}.</value>
+  </data>
+  <data name="show.hype.report._" xml:space="preserve">
+    <value>Jika Anda menemukan masalah pada beatmap ini, mohon laporkan kepada tim kami melalui {0}.</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>Laporkan Masalah</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>tautan ini</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>Deskripsi</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>Aliran</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>Bahasa</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>Data sedang diproses...</value>
+  </data>
+  <data name="show.info.nsfw" xml:space="preserve">
+    <value>Konten eksplisit</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>Titik-Titik Kegagalan</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>Sumber</value>
+  </data>
+  <data name="show.info.storyboard" xml:space="preserve">
+    <value>Beatmap ini menyertakan storyboard</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>Tingkat Keberhasilan</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>Tag</value>
+  </data>
+  <data name="show.info.video" xml:space="preserve">
+    <value>Beatmap ini menyertakan video</value>
+  </data>
+  <data name="show.nsfw_warning.details" xml:space="preserve">
+    <value>Beatmap ini ditenggarai mengandung konten yang bersifat eksplisit dan/atau konten yang dapat dianggap menyinggung bagi kalangan tertentu. Apakah Anda tetap ingin melihat beatmap ini?</value>
+  </data>
+  <data name="show.nsfw_warning.title" xml:space="preserve">
+    <value>Konten Eksplisit</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.disable" xml:space="preserve">
+    <value>Nonaktifkan peringatan</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.listing" xml:space="preserve">
+    <value>Daftar beatmap</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.show" xml:space="preserve">
+    <value>Tampilkan</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>diraih pada {0}</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>Peringkat Negara</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>Peringkat Teman</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>Peringkat Global</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>Klik &lt;a href="{0}"&gt;di sini&lt;/a&gt; untuk melihat semua fitur eksklusif yang Anda dapatkan!</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>Anda harus menjadi supporter untuk mengakses fitur peringkat teman dan negara!</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>Papan Skor</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>Akurasi</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>Kombo Maks</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>Miss</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>Mod</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>Pemain</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>Peringkat</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>Jumlah Skor</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>Skor</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>Waktu</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>Tidak seorang pun dari negara Anda yang memiliki skor di map ini!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>Tidak seorang pun dari daftar teman Anda yang memiliki skor di map ini!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>Belum ada skor yang tercatat pada beatmap ini. Mungkin Anda tertarik untuk mencetak skor Anda sendiri?</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>Memuat skor...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>Beatmap ini tidak berstatus Ranked.</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>Di Posisi Pertama</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>Skor Terbaik Anda</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>Circle Size</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>Key Amount</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>HP Drain</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>Accuracy</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>Approach Rate</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>Star Difficulty</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>Durasi</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>Jumlah Circle</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>Jumlah Slider</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>Nilai Pengguna</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>Persebaran Nilai Pengguna</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>Nominasi</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>Jumlah Dimainkan</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>Ranked</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>Loved</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>Qualified</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>WIP</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>Graveyard</value>
+  </data>
+</root>

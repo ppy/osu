@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="admin._" xml:space="preserve">
+    <value>ylläpitäjä</value>
+  </data>
+  <data name="admin_forum._" xml:space="preserve">
+    <value>ylläpitäjä</value>
+  </data>
+  <data name="admin_store._" xml:space="preserve">
+    <value>ylläpitäjä</value>
+  </data>
+  <data name="error.error.400" xml:space="preserve">
+    <value>virheellinen pyyntö</value>
+  </data>
+  <data name="error.error.404" xml:space="preserve">
+    <value>puuttuu</value>
+  </data>
+  <data name="error.error.403" xml:space="preserve">
+    <value>kielletty</value>
+  </data>
+  <data name="error.error.422" xml:space="preserve">
+    <value>virheellinen pyyntö</value>
+  </data>
+  <data name="error.error.429" xml:space="preserve">
+    <value>liian monta pyyntöä</value>
+  </data>
+  <data name="error.error.500" xml:space="preserve">
+    <value>jotain hajosi</value>
+  </data>
+  <data name="error.error.503" xml:space="preserve">
+    <value>huoltokatko</value>
+  </data>
+  <data name="forum._" xml:space="preserve">
+    <value>foorumi</value>
+  </data>
+  <data name="forum.topic_watches_controller.index" xml:space="preserve">
+    <value>yleiskatsaus</value>
+  </data>
+  <data name="main.changelog_controller._" xml:space="preserve">
+    <value>muutosloki</value>
+  </data>
+  <data name="main.comments_controller._" xml:space="preserve">
+    <value>kommentit</value>
+  </data>
+  <data name="main.contests_controller._" xml:space="preserve">
+    <value>kilpailut</value>
+  </data>
+  <data name="main.groups_controller.show" xml:space="preserve">
+    <value>ryhmät</value>
+  </data>
+  <data name="main.home_controller.get_download" xml:space="preserve">
+    <value>lataa</value>
+  </data>
+  <data name="main.livestreams_controller._" xml:space="preserve">
+    <value>suoralähetykset</value>
+  </data>
+  <data name="main.matches_controller._" xml:space="preserve">
+    <value>ottelut</value>
+  </data>
+  <data name="main.news_controller._" xml:space="preserve">
+    <value>uutiset</value>
+  </data>
+  <data name="main.notifications_controller._" xml:space="preserve">
+    <value>ilmoitushistoria</value>
+  </data>
+  <data name="main.password_reset_controller._" xml:space="preserve">
+    <value>salasanan uusiminen</value>
+  </data>
+  <data name="main.ranking_controller._" xml:space="preserve">
+    <value>sijoitus</value>
+  </data>
+  <data name="main.scores_controller._" xml:space="preserve">
+    <value>suorituskyky</value>
+  </data>
+  <data name="main.store_controller._" xml:space="preserve">
+    <value>osu!kauppa</value>
+  </data>
+  <data name="store._" xml:space="preserve">
+    <value>osu!kauppa</value>
+  </data>
+</root>

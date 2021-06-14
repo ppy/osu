@@ -1,0 +1,292 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="defaults.page_description" xml:space="preserve">
+    <value>osu! - Ο ρυθμός είναι μόνο ένα *κλικ* μακριά! Με Ouendan/EBA, Taiko και αυθεντικά gameplay modes, καθώς και έναν πλήρως λειτουργικό level editor.</value>
+  </data>
+  <data name="menu.beatmaps._" xml:space="preserve">
+    <value>beatmaps</value>
+  </data>
+  <data name="menu.beatmaps.artists" xml:space="preserve">
+    <value>επιλεγμένοι καλλιτέχνες</value>
+  </data>
+  <data name="menu.beatmaps.index" xml:space="preserve">
+    <value>λίστα</value>
+  </data>
+  <data name="menu.beatmaps.packs" xml:space="preserve">
+    <value>πακέτα</value>
+  </data>
+  <data name="menu.community._" xml:space="preserve">
+    <value>κοινότητα</value>
+  </data>
+  <data name="menu.community.chat" xml:space="preserve">
+    <value>συνομιλία</value>
+  </data>
+  <data name="menu.community.contests" xml:space="preserve">
+    <value>διαγωνισμοί</value>
+  </data>
+  <data name="menu.community.dev" xml:space="preserve">
+    <value>προγραμματισμός</value>
+  </data>
+  <data name="menu.community.forum-forums-index" xml:space="preserve">
+    <value>φόρουμ</value>
+  </data>
+  <data name="menu.community.getlive" xml:space="preserve">
+    <value>ζωντανά</value>
+  </data>
+  <data name="menu.community.tournaments" xml:space="preserve">
+    <value>τουρνουά</value>
+  </data>
+  <data name="menu.help._" xml:space="preserve">
+    <value>βοήθεια</value>
+  </data>
+  <data name="menu.help.getfaq" xml:space="preserve">
+    <value>συχνές ερωτήσεις</value>
+  </data>
+  <data name="menu.help.getrules" xml:space="preserve">
+    <value>κανόνες</value>
+  </data>
+  <data name="menu.help.getsupport" xml:space="preserve">
+    <value>όχι, πραγματικά, χρειάζομαι βοήθεια!</value>
+  </data>
+  <data name="menu.help.getwiki" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="menu.home._" xml:space="preserve">
+    <value>αρχική σελίδα</value>
+  </data>
+  <data name="menu.home.changelog-index" xml:space="preserve">
+    <value>αρχείο καταγραφής αλλαγών</value>
+  </data>
+  <data name="menu.home.getdownload" xml:space="preserve">
+    <value>λήψη</value>
+  </data>
+  <data name="menu.home.news-index" xml:space="preserve">
+    <value>ειδήσεις</value>
+  </data>
+  <data name="menu.home.search" xml:space="preserve">
+    <value>αναζήτηση</value>
+  </data>
+  <data name="menu.home.team" xml:space="preserve">
+    <value>ομάδα</value>
+  </data>
+  <data name="menu.rankings._" xml:space="preserve">
+    <value>κατατάξεις</value>
+  </data>
+  <data name="menu.rankings.charts" xml:space="preserve">
+    <value>spotlights</value>
+  </data>
+  <data name="menu.rankings.country" xml:space="preserve">
+    <value>χώρα</value>
+  </data>
+  <data name="menu.rankings.index" xml:space="preserve">
+    <value>επίδοση</value>
+  </data>
+  <data name="menu.rankings.kudosu" xml:space="preserve">
+    <value>kudosu</value>
+  </data>
+  <data name="menu.rankings.score" xml:space="preserve">
+    <value>βαθμολογία</value>
+  </data>
+  <data name="menu.store._" xml:space="preserve">
+    <value>κατάστημα</value>
+  </data>
+  <data name="menu.store.cart-show" xml:space="preserve">
+    <value>καλάθι</value>
+  </data>
+  <data name="menu.store.getlisting" xml:space="preserve">
+    <value>λίστα</value>
+  </data>
+  <data name="menu.store.orders-index" xml:space="preserve">
+    <value>ιστορικό παραγγελιών</value>
+  </data>
+  <data name="footer.general._" xml:space="preserve">
+    <value>Γενικά</value>
+  </data>
+  <data name="footer.general.home" xml:space="preserve">
+    <value>Αρχική σελίδα</value>
+  </data>
+  <data name="footer.general.changelog-index" xml:space="preserve">
+    <value>Αρχείο καταγραφής αλλαγών</value>
+  </data>
+  <data name="footer.general.beatmaps" xml:space="preserve">
+    <value>Λίστα Beatmap</value>
+  </data>
+  <data name="footer.general.download" xml:space="preserve">
+    <value>Κατεβάστε το osu!</value>
+  </data>
+  <data name="footer.help._" xml:space="preserve">
+    <value>Βοήθεια &amp; Κοινότητα</value>
+  </data>
+  <data name="footer.help.faq" xml:space="preserve">
+    <value>Συχνές Ερωτήσεις</value>
+  </data>
+  <data name="footer.help.forum" xml:space="preserve">
+    <value>Φόρουμ Κοινότητας</value>
+  </data>
+  <data name="footer.help.livestreams" xml:space="preserve">
+    <value>Ζωντανές Μεταδόσεις</value>
+  </data>
+  <data name="footer.help.report" xml:space="preserve">
+    <value>Αναφέρετε Κάποιο Πρόβλημα</value>
+  </data>
+  <data name="footer.legal._" xml:space="preserve">
+    <value>Νομική Υπόσταση</value>
+  </data>
+  <data name="footer.legal.copyright" xml:space="preserve">
+    <value>Δικαιώματα Πνευματικής Ιδιοκτησίας (DMCA)</value>
+  </data>
+  <data name="footer.legal.privacy" xml:space="preserve">
+    <value>Απόρρητο</value>
+  </data>
+  <data name="footer.legal.server_status" xml:space="preserve">
+    <value>Κατάσταση Διακομιστή</value>
+  </data>
+  <data name="footer.legal.source_code" xml:space="preserve">
+    <value>Πηγαίος Κώδικας</value>
+  </data>
+  <data name="footer.legal.terms" xml:space="preserve">
+    <value>Όροι Παροχής Υπηρεσιών</value>
+  </data>
+  <data name="errors.404.error" xml:space="preserve">
+    <value>Η Σελίδα Λείπει</value>
+  </data>
+  <data name="errors.404.description" xml:space="preserve">
+    <value>Λυπούμαστε, αλλά η σελίδα που ζητήσατε δεν είναι εδώ!</value>
+  </data>
+  <data name="errors.403.error" xml:space="preserve">
+    <value>Δεν πρέπει να είστε εδώ.</value>
+  </data>
+  <data name="errors.403.description" xml:space="preserve">
+    <value>Θα μπορούσατε όμως να προσπαθήσετε να επιστρέψετε.</value>
+  </data>
+  <data name="errors.401.error" xml:space="preserve">
+    <value>Δεν πρέπει να είστε εδώ.</value>
+  </data>
+  <data name="errors.401.description" xml:space="preserve">
+    <value>Θα μπορούσατε όμως να προσπαθήσετε να επιστρέψετε. Ή ίσως να συνδεθείτε.</value>
+  </data>
+  <data name="errors.405.error" xml:space="preserve">
+    <value>Η Σελίδα Λείπει</value>
+  </data>
+  <data name="errors.405.description" xml:space="preserve">
+    <value>Λυπούμαστε, αλλά η σελίδα που ζητήσατε δεν είναι εδώ!</value>
+  </data>
+  <data name="errors.500.error" xml:space="preserve">
+    <value>Ωχ όχι! Κάτι χάλασε! ;_;</value>
+  </data>
+  <data name="errors.500.description" xml:space="preserve">
+    <value>Eιδοποιούμαστε αυτόματα για κάθε σφάλμα.</value>
+  </data>
+  <data name="errors.fatal.error" xml:space="preserve">
+    <value>Ωχ όχι! Κάτι χάλασε (άσχημα)! ;_;</value>
+  </data>
+  <data name="errors.fatal.description" xml:space="preserve">
+    <value>Eιδοποιούμαστε αυτόματα για κάθε σφάλμα.</value>
+  </data>
+  <data name="errors.503.error" xml:space="preserve">
+    <value>Εκτός λειτουργίας λόγω συντήρησης!</value>
+  </data>
+  <data name="errors.503.description" xml:space="preserve">
+    <value>Η συντήρηση συνήθως διαρκεί από 5 δευτερόλεπτα έως 10 λεπτά. Αν είμαστε εκτός λειτουργίας για μεγαλύτερο χρονικό διάστημα, δείτε {0} για περισσότερες πληροφορίες.</value>
+  </data>
+  <data name="errors.reference" xml:space="preserve">
+    <value>Για παν ενδεχόμενο, εδώ είναι ένας κωδικός που μπορείτε να δώσετε στην υποστήριξη!</value>
+  </data>
+  <data name="popup_login.login.forgot" xml:space="preserve">
+    <value>Έχω ξεχάσει τα στοιχεία μου</value>
+  </data>
+  <data name="popup_login.login.password" xml:space="preserve">
+    <value>κωδικός</value>
+  </data>
+  <data name="popup_login.login.title" xml:space="preserve">
+    <value>Συνδεθείτε Για Να Συνεχίσετε</value>
+  </data>
+  <data name="popup_login.login.error.email" xml:space="preserve">
+    <value>Το όνομα χρήστη ή η διεύθυνση ηλεκτρονικού ταχυδρομείου δεν υπάρχει</value>
+  </data>
+  <data name="popup_login.login.error.password" xml:space="preserve">
+    <value>Λάθος κωδικός</value>
+  </data>
+  <data name="popup_login.register.info" xml:space="preserve">
+    <value>Χρειάζεστε λογαριασμό, κύριε. Γιατί δεν έχετε ήδη έναν;</value>
+  </data>
+  <data name="popup_login.register.title" xml:space="preserve">
+    <value>Δεν έχετε λογαριασμό;</value>
+  </data>
+  <data name="popup_user.links.account-edit" xml:space="preserve">
+    <value>Ρυθμίσεις</value>
+  </data>
+  <data name="popup_user.links.friends" xml:space="preserve">
+    <value>Φίλοι</value>
+  </data>
+  <data name="popup_user.links.logout" xml:space="preserve">
+    <value>Αποσύνδεση</value>
+  </data>
+  <data name="popup_user.links.profile" xml:space="preserve">
+    <value>Το Προφίλ μου</value>
+  </data>
+  <data name="popup_search.initial" xml:space="preserve">
+    <value>Πληκτρολογήστε για αναζήτηση!</value>
+  </data>
+  <data name="popup_search.retry" xml:space="preserve">
+    <value>Η αναζήτηση απέτυχε. Κάντε κλικ για να προσπαθήσετε ξανά.</value>
+  </data>
+</root>

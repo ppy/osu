@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="show.fallback_translation" xml:space="preserve">
+    <value>요청하신 페이지는 아직 사용하시는 언어({0})로 번역되지 않았네요. 영어로 된 페이지를 보여드릴게요.</value>
+  </data>
+  <data name="show.incomplete_or_outdated" xml:space="preserve">
+    <value>이 페이지의 내용은 미완성 이거나 오래된 내용입니다. 도울 여건이 되신다면, 이 글을 업데이트하는 것을 고려해 주세요!</value>
+  </data>
+  <data name="show.missing" xml:space="preserve">
+    <value>요청하신 "{0}" 페이지를 찾을 수 없습니다.</value>
+  </data>
+  <data name="show.missing_title" xml:space="preserve">
+    <value>찾을 수 없음</value>
+  </data>
+  <data name="show.missing_translation" xml:space="preserve">
+    <value>현재 사용하시는 언어로 된 요청하신 페이지를 찾을 수 없습니다.</value>
+  </data>
+  <data name="show.needs_cleanup_or_rewrite" xml:space="preserve">
+    <value>이 페이지는 osu! 위키 표준을 따르지 않으며 정리해서 다시 쓸 필요가 있습니다. 도울 여건이 되신다면, 글 업데이트를 고려해 주세요!</value>
+  </data>
+  <data name="show.search" xml:space="preserve">
+    <value>{0}에 해당하는 페이지</value>
+  </data>
+  <data name="show.toc" xml:space="preserve">
+    <value>내용</value>
+  </data>
+  <data name="show.edit.link" xml:space="preserve">
+    <value>GitHub에서 보기</value>
+  </data>
+  <data name="show.edit.refresh" xml:space="preserve">
+    <value>새로 고침</value>
+  </data>
+  <data name="show.translation.legal" xml:space="preserve">
+    <value>이 번역은 편의를 위해서만 제공 됩니다. 이 {0}의 원문만이 법적 구속력을 가지고 있습니다.</value>
+  </data>
+  <data name="show.translation.outdated" xml:space="preserve">
+    <value>이 문서는 이전 버전 기준으로 번역된 내용을 포함하고 있습니다. {0}에서 가장 정확한 최신 정보를 확인하세요 (가능하다면 번역에 동참해 주세요)!</value>
+  </data>
+  <data name="show.translation.default" xml:space="preserve">
+    <value>영어 버전</value>
+  </data>
+</root>

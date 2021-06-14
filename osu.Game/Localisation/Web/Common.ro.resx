@@ -1,0 +1,355 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="confirmation" xml:space="preserve">
+    <value>Ești sigur?</value>
+  </data>
+  <data name="confirmation_unsaved" xml:space="preserve">
+    <value>Modificările nesalvate vor fi pierdute. Ești sigur?</value>
+  </data>
+  <data name="saved" xml:space="preserve">
+    <value>Salvat</value>
+  </data>
+  <data name="array_and.words_connector" xml:space="preserve">
+    <value>, </value>
+  </data>
+  <data name="array_and.two_words_connector" xml:space="preserve">
+    <value> și </value>
+  </data>
+  <data name="array_and.last_word_connector" xml:space="preserve">
+    <value>, și </value>
+  </data>
+  <data name="badges.new" xml:space="preserve">
+    <value>NOU</value>
+  </data>
+  <data name="buttons.admin" xml:space="preserve">
+    <value>Admin</value>
+  </data>
+  <data name="buttons.authorise" xml:space="preserve">
+    <value>Autorizează</value>
+  </data>
+  <data name="buttons.authorising" xml:space="preserve">
+    <value>Se autorizează...</value>
+  </data>
+  <data name="buttons.back_to_previous" xml:space="preserve">
+    <value>Revino la poziția anterioară</value>
+  </data>
+  <data name="buttons.back_to_top" xml:space="preserve">
+    <value>Înapoi sus</value>
+  </data>
+  <data name="buttons.cancel" xml:space="preserve">
+    <value>Anulează</value>
+  </data>
+  <data name="buttons.change" xml:space="preserve">
+    <value>modifică</value>
+  </data>
+  <data name="buttons.clear" xml:space="preserve">
+    <value>Curăță</value>
+  </data>
+  <data name="buttons.click_to_copy" xml:space="preserve">
+    <value>faceți clic pentru a copia în clipboard</value>
+  </data>
+  <data name="buttons.click_to_copy_copied" xml:space="preserve">
+    <value>copiat în clipboard!</value>
+  </data>
+  <data name="buttons.close" xml:space="preserve">
+    <value>Închide</value>
+  </data>
+  <data name="buttons.collapse" xml:space="preserve">
+    <value>restrânge</value>
+  </data>
+  <data name="buttons.delete" xml:space="preserve">
+    <value>Șterge</value>
+  </data>
+  <data name="buttons.edit" xml:space="preserve">
+    <value>Editează</value>
+  </data>
+  <data name="buttons.expand" xml:space="preserve">
+    <value>extinde</value>
+  </data>
+  <data name="buttons.hide" xml:space="preserve">
+    <value>ascunde</value>
+  </data>
+  <data name="buttons.permalink" xml:space="preserve">
+    <value>link permanent</value>
+  </data>
+  <data name="buttons.pin" xml:space="preserve">
+    <value>fixează</value>
+  </data>
+  <data name="buttons.post" xml:space="preserve">
+    <value>Postează</value>
+  </data>
+  <data name="buttons.read_more" xml:space="preserve">
+    <value>citește mai mult</value>
+  </data>
+  <data name="buttons.reply" xml:space="preserve">
+    <value>Răspunde</value>
+  </data>
+  <data name="buttons.reply_reopen" xml:space="preserve">
+    <value>Răspundeți și deschideți din nou</value>
+  </data>
+  <data name="buttons.reply_resolve" xml:space="preserve">
+    <value>Răspunde și rezolvă</value>
+  </data>
+  <data name="buttons.reset" xml:space="preserve">
+    <value>Resetează</value>
+  </data>
+  <data name="buttons.restore" xml:space="preserve">
+    <value>Restaurează</value>
+  </data>
+  <data name="buttons.save" xml:space="preserve">
+    <value>Salvează</value>
+  </data>
+  <data name="buttons.saving" xml:space="preserve">
+    <value>Se salvează...</value>
+  </data>
+  <data name="buttons.search" xml:space="preserve">
+    <value>Caută</value>
+  </data>
+  <data name="buttons.see_more" xml:space="preserve">
+    <value>vezi mai mult</value>
+  </data>
+  <data name="buttons.show" xml:space="preserve">
+    <value>arată</value>
+  </data>
+  <data name="buttons.show_deleted" xml:space="preserve">
+    <value>Arată șterse</value>
+  </data>
+  <data name="buttons.show_less" xml:space="preserve">
+    <value>arată mai puțin</value>
+  </data>
+  <data name="buttons.show_more" xml:space="preserve">
+    <value>arată mai mult</value>
+  </data>
+  <data name="buttons.show_more_options" xml:space="preserve">
+    <value>arată mai multe opţiuni</value>
+  </data>
+  <data name="buttons.unpin" xml:space="preserve">
+    <value>nu mai fixa</value>
+  </data>
+  <data name="buttons.update" xml:space="preserve">
+    <value>Actualizează</value>
+  </data>
+  <data name="buttons.upload_image" xml:space="preserve">
+    <value>încarcă imaginea</value>
+  </data>
+  <data name="buttons.watch.to_0" xml:space="preserve">
+    <value>Nu mai urmări</value>
+  </data>
+  <data name="buttons.watch.to_1" xml:space="preserve">
+    <value>Urmărește</value>
+  </data>
+  <data name="count.badges" xml:space="preserve">
+    <value>{0} insignă|{0} insigne</value>
+  </data>
+  <data name="count.days" xml:space="preserve">
+    <value>{0} zi|{0} zile</value>
+  </data>
+  <data name="count.hour_short_unit" xml:space="preserve">
+    <value>oră|ore</value>
+  </data>
+  <data name="count.hours" xml:space="preserve">
+    <value>{0} oră|{0} ore</value>
+  </data>
+  <data name="count.item" xml:space="preserve">
+    <value>{0} element|{0} elemente</value>
+  </data>
+  <data name="count.minute_short_unit" xml:space="preserve">
+    <value>minut|minute</value>
+  </data>
+  <data name="count.minutes" xml:space="preserve">
+    <value>{0} minut|{0} minute</value>
+  </data>
+  <data name="count.months" xml:space="preserve">
+    <value>{0} lună|{0} luni</value>
+  </data>
+  <data name="count.notifications" xml:space="preserve">
+    <value>{0} notificare|{0} notificări</value>
+  </data>
+  <data name="count.plus_others" xml:space="preserve">
+    <value>+ {0} altul!|+ {0} alții!</value>
+  </data>
+  <data name="count.post" xml:space="preserve">
+    <value>{0} postare|{0} postări</value>
+  </data>
+  <data name="count.second_short_unit" xml:space="preserve">
+    <value>secundă|secunde</value>
+  </data>
+  <data name="count.star_priority" xml:space="preserve">
+    <value>{0} prioritate stea|{0} Prioritați stea</value>
+  </data>
+  <data name="count.update" xml:space="preserve">
+    <value>{0} actualizare|{0} actualizări</value>
+  </data>
+  <data name="count.view" xml:space="preserve">
+    <value>{0} vizualizare|{0} vizualizări</value>
+  </data>
+  <data name="count.years" xml:space="preserve">
+    <value>{0} an|{0} ani</value>
+  </data>
+  <data name="countdown.days" xml:space="preserve">
+    <value>zile</value>
+  </data>
+  <data name="countdown.hours" xml:space="preserve">
+    <value>ore</value>
+  </data>
+  <data name="countdown.minutes" xml:space="preserve">
+    <value>minute</value>
+  </data>
+  <data name="countdown.seconds" xml:space="preserve">
+    <value>secunde</value>
+  </data>
+  <data name="datetime.year_month.moment" xml:space="preserve">
+    <value>MMMM YYYY</value>
+  </data>
+  <data name="datetime.year_month.php" xml:space="preserve">
+    <value>MMMM y</value>
+  </data>
+  <data name="datetime.year_month_short.moment" xml:space="preserve">
+    <value>MMM YYYY</value>
+  </data>
+  <data name="device.keyboard" xml:space="preserve">
+    <value>Tastatură</value>
+  </data>
+  <data name="device.mouse" xml:space="preserve">
+    <value>Mouse</value>
+  </data>
+  <data name="device.tablet" xml:space="preserve">
+    <value>Tabletă</value>
+  </data>
+  <data name="device.touch" xml:space="preserve">
+    <value>Ecran tactil</value>
+  </data>
+  <data name="dropzone.target" xml:space="preserve">
+    <value>dați drumul aici pentru a încărca</value>
+  </data>
+  <data name="input.search" xml:space="preserve">
+    <value>caută...</value>
+  </data>
+  <data name="pagination.previous" xml:space="preserve">
+    <value>anterior</value>
+  </data>
+  <data name="pagination.next" xml:space="preserve">
+    <value>următor</value>
+  </data>
+  <data name="score_count.count_100" xml:space="preserve">
+    <value>100</value>
+  </data>
+  <data name="score_count.count_300" xml:space="preserve">
+    <value>300</value>
+  </data>
+  <data name="score_count.count_50" xml:space="preserve">
+    <value>50</value>
+  </data>
+  <data name="score_count.count_katu" xml:space="preserve">
+    <value>200</value>
+  </data>
+  <data name="score_count.count_miss" xml:space="preserve">
+    <value>Miss</value>
+  </data>
+  <data name="scoreboard_time.d" xml:space="preserve">
+    <value>%d d</value>
+  </data>
+  <data name="scoreboard_time.dd" xml:space="preserve">
+    <value>%d d</value>
+  </data>
+  <data name="scoreboard_time.h" xml:space="preserve">
+    <value>%d ore</value>
+  </data>
+  <data name="scoreboard_time.hh" xml:space="preserve">
+    <value>%d ore</value>
+  </data>
+  <data name="scoreboard_time.m" xml:space="preserve">
+    <value>%d luni</value>
+  </data>
+  <data name="scoreboard_time.mm" xml:space="preserve">
+    <value>%d luni</value>
+  </data>
+  <data name="scoreboard_time.s" xml:space="preserve">
+    <value>%d sec</value>
+  </data>
+  <data name="scoreboard_time.y" xml:space="preserve">
+    <value>%d an</value>
+  </data>
+  <data name="scoreboard_time.yy" xml:space="preserve">
+    <value>%d an</value>
+  </data>
+  <data name="time.days_ago" xml:space="preserve">
+    <value>{0} zi în urmă|{0} zile în urmă</value>
+  </data>
+  <data name="time.hours_ago" xml:space="preserve">
+    <value>{0} oră în urmă|{0} ore în urmă</value>
+  </data>
+  <data name="time.now" xml:space="preserve">
+    <value>acum</value>
+  </data>
+  <data name="time.remaining" xml:space="preserve">
+    <value>Timp rămas</value>
+  </data>
+  <data name="title.notice" xml:space="preserve">
+    <value>Notificare</value>
+  </data>
+  <data name="wrong_user._" xml:space="preserve">
+    <value>Ești conectat ca {0}. {1}.</value>
+  </data>
+  <data name="wrong_user.logout_link" xml:space="preserve">
+    <value>Fă click aici pentru a te conecta ca alt utilizator</value>
+  </data>
+</root>

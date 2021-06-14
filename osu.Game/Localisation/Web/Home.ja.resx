@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="landing.download" xml:space="preserve">
+    <value>今すぐダウンロード</value>
+  </data>
+  <data name="landing.online" xml:space="preserve">
+    <value>現在&lt;strong&gt;{0}&lt;/strong&gt;人オンラインでマルチ部屋数&lt;strong&gt;{1}&lt;/strong&gt;</value>
+  </data>
+  <data name="landing.peak" xml:space="preserve">
+    <value>最高オンライン数{0}人</value>
+  </data>
+  <data name="landing.players" xml:space="preserve">
+    <value>累計登録者数&lt;strong&gt;{0}&lt;/strong&gt;人</value>
+  </data>
+  <data name="landing.title" xml:space="preserve">
+    <value>ようこそ！</value>
+  </data>
+  <data name="landing.see_more_news" xml:space="preserve">
+    <value>他のニュースを見る</value>
+  </data>
+  <data name="landing.slogan.main" xml:space="preserve">
+    <value>基本料無料で最高のリズムゲーム</value>
+  </data>
+  <data name="landing.slogan.sub" xml:space="preserve">
+    <value>リズムはもう、その指先に</value>
+  </data>
+  <data name="search.advanced_link" xml:space="preserve">
+    <value>高度な検索</value>
+  </data>
+  <data name="search.button" xml:space="preserve">
+    <value>検索</value>
+  </data>
+  <data name="search.empty_result" xml:space="preserve">
+    <value>何も見つかりませんでした！</value>
+  </data>
+  <data name="search.keyword_required" xml:space="preserve">
+    <value>検索キーワードが必要です</value>
+  </data>
+  <data name="search.placeholder" xml:space="preserve">
+    <value>検索キーワードを入力</value>
+  </data>
+  <data name="search.title" xml:space="preserve">
+    <value>検索</value>
+  </data>
+  <data name="search.beatmapset.login_required" xml:space="preserve">
+    <value>ログインしてビートマップを検索</value>
+  </data>
+  <data name="search.beatmapset.more" xml:space="preserve">
+    <value>他{0}件のビートマップ検索結果</value>
+  </data>
+  <data name="search.beatmapset.more_simple" xml:space="preserve">
+    <value>もっとビートマップの検索結果を見る</value>
+  </data>
+  <data name="search.beatmapset.title" xml:space="preserve">
+    <value>ビートマップ</value>
+  </data>
+  <data name="search.forum_post.all" xml:space="preserve">
+    <value>全てのフォーラム</value>
+  </data>
+  <data name="search.forum_post.link" xml:space="preserve">
+    <value>フォーラムを検索</value>
+  </data>
+  <data name="search.forum_post.login_required" xml:space="preserve">
+    <value>ログインしてフォーラムを検索</value>
+  </data>
+  <data name="search.forum_post.more_simple" xml:space="preserve">
+    <value>もっとフォーラム検索結果を見る</value>
+  </data>
+  <data name="search.forum_post.title" xml:space="preserve">
+    <value>フォーラム</value>
+  </data>
+  <data name="search.forum_post.label.forum" xml:space="preserve">
+    <value>フォーラム内を検索</value>
+  </data>
+  <data name="search.forum_post.label.forum_children" xml:space="preserve">
+    <value>サブフォーラムを含む</value>
+  </data>
+  <data name="search.forum_post.label.topic_id" xml:space="preserve">
+    <value>トピック #</value>
+  </data>
+  <data name="search.forum_post.label.username" xml:space="preserve">
+    <value>投稿者</value>
+  </data>
+  <data name="search.mode.all" xml:space="preserve">
+    <value>全て</value>
+  </data>
+  <data name="search.mode.beatmapset" xml:space="preserve">
+    <value>ビートマップ</value>
+  </data>
+  <data name="search.mode.forum_post" xml:space="preserve">
+    <value>フォーラム</value>
+  </data>
+  <data name="search.mode.user" xml:space="preserve">
+    <value>プレイヤー</value>
+  </data>
+  <data name="search.mode.wiki_page" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="search.user.login_required" xml:space="preserve">
+    <value>ログインしてユーザーを検索</value>
+  </data>
+  <data name="search.user.more" xml:space="preserve">
+    <value>他に{0}人のプレイヤーが見つかりました</value>
+  </data>
+  <data name="search.user.more_simple" xml:space="preserve">
+    <value>もっとプレイヤーの検索結果を見る</value>
+  </data>
+  <data name="search.user.more_hidden" xml:space="preserve">
+    <value>プレイヤー検索は最大{0}件までです。絞り込む事をおすすめします。</value>
+  </data>
+  <data name="search.user.title" xml:space="preserve">
+    <value>プレイヤー</value>
+  </data>
+  <data name="search.wiki_page.link" xml:space="preserve">
+    <value>wikiを検索</value>
+  </data>
+  <data name="search.wiki_page.more_simple" xml:space="preserve">
+    <value>もっとwikiの検索結果を見る</value>
+  </data>
+  <data name="search.wiki_page.title" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="download.tagline" xml:space="preserve">
+    <value>さぁ、&lt;br&gt;始めよう！</value>
+  </data>
+  <data name="download.action" xml:space="preserve">
+    <value>osu!をダウンロード</value>
+  </data>
+  <data name="download.help._" xml:space="preserve">
+    <value>ゲームの開始やアカウント登録に問題がある場合は、{0} または {1}。</value>
+  </data>
+  <data name="download.help.help_forum_link" xml:space="preserve">
+    <value>ヘルプフォーラムを確認する</value>
+  </data>
+  <data name="download.help.support_button" xml:space="preserve">
+    <value>お問い合わせ</value>
+  </data>
+  <data name="download.os.windows" xml:space="preserve">
+    <value>for Windows</value>
+  </data>
+  <data name="download.os.macos" xml:space="preserve">
+    <value>for macOS</value>
+  </data>
+  <data name="download.os.linux" xml:space="preserve">
+    <value>for Linux</value>
+  </data>
+  <data name="download.mirror" xml:space="preserve">
+    <value>ミラー</value>
+  </data>
+  <data name="download.macos-fallback" xml:space="preserve">
+    <value>macOSユーザー</value>
+  </data>
+  <data name="download.steps.register.title" xml:space="preserve">
+    <value>アカウントを作る</value>
+  </data>
+  <data name="download.steps.register.description" xml:space="preserve">
+    <value>ゲーム起動後に表示される手順に沿ってアカウントを作成、そしてログインしよう</value>
+  </data>
+  <data name="download.steps.download.title" xml:space="preserve">
+    <value>ゲームをインストール</value>
+  </data>
+  <data name="download.steps.download.description" xml:space="preserve">
+    <value>上のボタンからインストーラーをダウンロードして、実行しよう！</value>
+  </data>
+  <data name="download.steps.beatmaps.title" xml:space="preserve">
+    <value>ビートマップを取得</value>
+  </data>
+  <data name="download.steps.beatmaps.description._" xml:space="preserve">
+    <value>{0}からユーザーが作った膨大な数のビートマップから好きなビートマップを見つけて遊ぼう！</value>
+  </data>
+  <data name="download.steps.beatmaps.description.browse" xml:space="preserve">
+    <value>ここ</value>
+  </data>
+  <data name="download.video-guide" xml:space="preserve">
+    <value>説明動画</value>
+  </data>
+  <data name="user.title" xml:space="preserve">
+    <value>ダッシュボード</value>
+  </data>
+  <data name="user.news.title" xml:space="preserve">
+    <value>お知らせ</value>
+  </data>
+  <data name="user.news.error" xml:space="preserve">
+    <value>読み込みに失敗しました。ページの更新をしてみると直るかも・・・？</value>
+  </data>
+  <data name="user.header.stats.friends" xml:space="preserve">
+    <value>オンラインのフレンド</value>
+  </data>
+  <data name="user.header.stats.games" xml:space="preserve">
+    <value>部屋数</value>
+  </data>
+  <data name="user.header.stats.online" xml:space="preserve">
+    <value>オンラインのユーザー数</value>
+  </data>
+  <data name="user.beatmaps.new" xml:space="preserve">
+    <value>最新のRankedビートマップ</value>
+  </data>
+  <data name="user.beatmaps.popular" xml:space="preserve">
+    <value>人気のビートマップ</value>
+  </data>
+  <data name="user.beatmaps.by_user" xml:space="preserve">
+    <value>by {0}</value>
+  </data>
+  <data name="user.buttons.download" xml:space="preserve">
+    <value>osu!をダウンロード</value>
+  </data>
+  <data name="user.buttons.support" xml:space="preserve">
+    <value>osu!を支援する</value>
+  </data>
+  <data name="user.buttons.store" xml:space="preserve">
+    <value>osu!ストア</value>
+  </data>
+  <data name="support-osu.title" xml:space="preserve">
+    <value>ねえねえ、君！</value>
+  </data>
+  <data name="support-osu.subtitle" xml:space="preserve">
+    <value>osu!の事、気に入って貰えたかな？</value>
+  </data>
+  <data name="support-osu.body.part-1" xml:space="preserve">
+    <value>osu!のサービス維持は広告に頼らず、全てプレイヤーたちの支援によって実現されています。</value>
+  </data>
+  <data name="support-osu.body.part-2" xml:space="preserve">
+    <value>osu! を支援する事によってさまざまな機能が追加で利用できるようになります。&lt;strong&gt;ゲーム内ダウンロード&lt;/strong&gt;はそのうちのひとつで、観戦やマルチプレイ中に自動でビートマップをダウンロードできるようになります！</value>
+  </data>
+  <data name="support-osu.find-out-more" xml:space="preserve">
+    <value>もっと知りたい人はクリック！</value>
+  </data>
+  <data name="support-osu.download-starting" xml:space="preserve">
+    <value>あ、君のダウンロードはもう始まってるよ！</value>
+  </data>
+</root>

@@ -1,0 +1,556 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="pinned_topics" xml:space="preserve">
+    <value>置顶主题</value>
+  </data>
+  <data name="slogan" xml:space="preserve">
+    <value>独乐乐不如众乐乐~</value>
+  </data>
+  <data name="subforums" xml:space="preserve">
+    <value>子版块</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>osu! 论坛</value>
+  </data>
+  <data name="covers.edit" xml:space="preserve">
+    <value>编辑封面</value>
+  </data>
+  <data name="covers.create._" xml:space="preserve">
+    <value>设置封面</value>
+  </data>
+  <data name="covers.create.button" xml:space="preserve">
+    <value>上传图片</value>
+  </data>
+  <data name="covers.create.info" xml:space="preserve">
+    <value>图片尺寸应为 {0} 。 也可以将图片拖动到这里上传。</value>
+  </data>
+  <data name="covers.destroy._" xml:space="preserve">
+    <value>移除封面</value>
+  </data>
+  <data name="covers.destroy.confirm" xml:space="preserve">
+    <value>要移除这个封面吗？</value>
+  </data>
+  <data name="forums.latest_post" xml:space="preserve">
+    <value>最新帖子</value>
+  </data>
+  <data name="forums.index.title" xml:space="preserve">
+    <value>论坛主页</value>
+  </data>
+  <data name="forums.topics.empty" xml:space="preserve">
+    <value>没有主题！</value>
+  </data>
+  <data name="mark_as_read.forum" xml:space="preserve">
+    <value>标记版块为已读</value>
+  </data>
+  <data name="mark_as_read.forums" xml:space="preserve">
+    <value>标记版块为已读</value>
+  </data>
+  <data name="mark_as_read.busy" xml:space="preserve">
+    <value>标记为已读…</value>
+  </data>
+  <data name="post.confirm_destroy" xml:space="preserve">
+    <value>删除此回复？</value>
+  </data>
+  <data name="post.confirm_restore" xml:space="preserve">
+    <value>恢复此回复？</value>
+  </data>
+  <data name="post.edited" xml:space="preserve">
+    <value>最后由 {0} 于 {1} 编辑，总共编辑了 {2} 次。</value>
+  </data>
+  <data name="post.posted_at" xml:space="preserve">
+    <value>发表于 {0}</value>
+  </data>
+  <data name="post.posted_by" xml:space="preserve">
+    <value>发帖人：{0}</value>
+  </data>
+  <data name="post.actions.destroy" xml:space="preserve">
+    <value>删除回复</value>
+  </data>
+  <data name="post.actions.edit" xml:space="preserve">
+    <value>编辑回复</value>
+  </data>
+  <data name="post.actions.report" xml:space="preserve">
+    <value>举报帖子</value>
+  </data>
+  <data name="post.actions.restore" xml:space="preserve">
+    <value>恢复回复</value>
+  </data>
+  <data name="post.create.title.reply" xml:space="preserve">
+    <value>新回复</value>
+  </data>
+  <data name="post.info.post_count" xml:space="preserve">
+    <value>{0} 篇帖子</value>
+  </data>
+  <data name="post.info.topic_starter" xml:space="preserve">
+    <value>楼主</value>
+  </data>
+  <data name="search.go_to_post" xml:space="preserve">
+    <value>前往该楼层</value>
+  </data>
+  <data name="search.post_number_input" xml:space="preserve">
+    <value>输入楼层号</value>
+  </data>
+  <data name="search.total_posts" xml:space="preserve">
+    <value>一共有 {0} 楼</value>
+  </data>
+  <data name="topic.confirm_destroy" xml:space="preserve">
+    <value>删除此主题？</value>
+  </data>
+  <data name="topic.confirm_restore" xml:space="preserve">
+    <value>恢复此主题？</value>
+  </data>
+  <data name="topic.deleted" xml:space="preserve">
+    <value>已删除的主题</value>
+  </data>
+  <data name="topic.go_to_latest" xml:space="preserve">
+    <value>查看最后的帖子</value>
+  </data>
+  <data name="topic.has_replied" xml:space="preserve">
+    <value>你已回复过此主题</value>
+  </data>
+  <data name="topic.in_forum" xml:space="preserve">
+    <value>在 {0}</value>
+  </data>
+  <data name="topic.latest_post" xml:space="preserve">
+    <value>{0} {1}</value>
+  </data>
+  <data name="topic.latest_reply_by" xml:space="preserve">
+    <value>最后回复： {0}</value>
+  </data>
+  <data name="topic.new_topic" xml:space="preserve">
+    <value>发表新主题</value>
+  </data>
+  <data name="topic.new_topic_login" xml:space="preserve">
+    <value>登录以发表新主题</value>
+  </data>
+  <data name="topic.post_reply" xml:space="preserve">
+    <value>发表</value>
+  </data>
+  <data name="topic.reply_box_placeholder" xml:space="preserve">
+    <value>输入回复</value>
+  </data>
+  <data name="topic.reply_title_prefix" xml:space="preserve">
+    <value>回复</value>
+  </data>
+  <data name="topic.started_by" xml:space="preserve">
+    <value>发帖人： {0}</value>
+  </data>
+  <data name="topic.started_by_verbose" xml:space="preserve">
+    <value>由 {0} 发起</value>
+  </data>
+  <data name="topic.actions.destroy" xml:space="preserve">
+    <value>删除主题</value>
+  </data>
+  <data name="topic.actions.restore" xml:space="preserve">
+    <value>恢复主题</value>
+  </data>
+  <data name="topic.create.close" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="topic.create.preview" xml:space="preserve">
+    <value>预览</value>
+  </data>
+  <data name="topic.create.preview_hide" xml:space="preserve">
+    <value>编辑</value>
+  </data>
+  <data name="topic.create.submit" xml:space="preserve">
+    <value>发表</value>
+  </data>
+  <data name="topic.create.necropost.default" xml:space="preserve">
+    <value>这个主题已经有一段时间无活动了。除非你有特殊的理由，否则不要在这里回复。</value>
+  </data>
+  <data name="topic.create.necropost.new_topic._" xml:space="preserve">
+    <value>此主题已有一段时间不活跃了。如果你没有特别的理由一定要发表在这里，请另行 {0} 。</value>
+  </data>
+  <data name="topic.create.necropost.new_topic.create" xml:space="preserve">
+    <value>创建一个新主题</value>
+  </data>
+  <data name="topic.create.placeholder.body" xml:space="preserve">
+    <value>在这里输入正文</value>
+  </data>
+  <data name="topic.create.placeholder.title" xml:space="preserve">
+    <value>点击这里设置标题</value>
+  </data>
+  <data name="topic.jump.enter" xml:space="preserve">
+    <value>点击这里跳转到指定回复</value>
+  </data>
+  <data name="topic.jump.first" xml:space="preserve">
+    <value>跳转到第一条回复</value>
+  </data>
+  <data name="topic.jump.last" xml:space="preserve">
+    <value>跳转到最后一条回复</value>
+  </data>
+  <data name="topic.jump.next" xml:space="preserve">
+    <value>向后 10 条</value>
+  </data>
+  <data name="topic.jump.previous" xml:space="preserve">
+    <value>向前 10 条</value>
+  </data>
+  <data name="topic.post_edit.cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="topic.post_edit.post" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="topic_watches.index.title_compact" xml:space="preserve">
+    <value>订阅</value>
+  </data>
+  <data name="topic_watches.index.box.total" xml:space="preserve">
+    <value>订阅的主题</value>
+  </data>
+  <data name="topic_watches.index.box.unread" xml:space="preserve">
+    <value>主题有新回复</value>
+  </data>
+  <data name="topic_watches.index.info.total" xml:space="preserve">
+    <value>共订阅了 {0} 个主题</value>
+  </data>
+  <data name="topic_watches.index.info.unread" xml:space="preserve">
+    <value>有 {0} 个未读回复</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.confirmation" xml:space="preserve">
+    <value>取消订阅该主题？</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.title" xml:space="preserve">
+    <value>取消订阅</value>
+  </data>
+  <data name="topics._" xml:space="preserve">
+    <value>主题</value>
+  </data>
+  <data name="topics.actions.login_reply" xml:space="preserve">
+    <value>登录后回复</value>
+  </data>
+  <data name="topics.actions.reply" xml:space="preserve">
+    <value>回复</value>
+  </data>
+  <data name="topics.actions.reply_with_quote" xml:space="preserve">
+    <value>引用以回复</value>
+  </data>
+  <data name="topics.actions.search" xml:space="preserve">
+    <value>搜索</value>
+  </data>
+  <data name="topics.create.create_poll" xml:space="preserve">
+    <value>创建投票</value>
+  </data>
+  <data name="topics.create.preview" xml:space="preserve">
+    <value>发帖预览</value>
+  </data>
+  <data name="topics.create.create_poll_button.add" xml:space="preserve">
+    <value>创建投票</value>
+  </data>
+  <data name="topics.create.create_poll_button.remove" xml:space="preserve">
+    <value>取消创建投票</value>
+  </data>
+  <data name="topics.create.poll.hide_results" xml:space="preserve">
+    <value>隐藏投票结果。</value>
+  </data>
+  <data name="topics.create.poll.hide_results_info" xml:space="preserve">
+    <value>这些内容只在投票结束之后显示。</value>
+  </data>
+  <data name="topics.create.poll.length" xml:space="preserve">
+    <value>投票持续</value>
+  </data>
+  <data name="topics.create.poll.length_days_suffix" xml:space="preserve">
+    <value>天</value>
+  </data>
+  <data name="topics.create.poll.length_info" xml:space="preserve">
+    <value>如果无期限则留空</value>
+  </data>
+  <data name="topics.create.poll.max_options" xml:space="preserve">
+    <value>最大可选数</value>
+  </data>
+  <data name="topics.create.poll.max_options_info" xml:space="preserve">
+    <value>填写每个人最多可以选的选项数。</value>
+  </data>
+  <data name="topics.create.poll.options" xml:space="preserve">
+    <value>选项</value>
+  </data>
+  <data name="topics.create.poll.options_info" xml:space="preserve">
+    <value>一个选项占一行，最多10个选项。</value>
+  </data>
+  <data name="topics.create.poll.title" xml:space="preserve">
+    <value>问题</value>
+  </data>
+  <data name="topics.create.poll.vote_change" xml:space="preserve">
+    <value>允许修改</value>
+  </data>
+  <data name="topics.create.poll.vote_change_info" xml:space="preserve">
+    <value>如果选中，则用户可以更改他们的投票。</value>
+  </data>
+  <data name="topics.edit_title.start" xml:space="preserve">
+    <value>编辑标题</value>
+  </data>
+  <data name="topics.index.feature_votes" xml:space="preserve">
+    <value>星级优先级</value>
+  </data>
+  <data name="topics.index.replies" xml:space="preserve">
+    <value>回复数</value>
+  </data>
+  <data name="topics.index.views" xml:space="preserve">
+    <value>查看数</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0" xml:space="preserve">
+    <value>移除 "added" 标签</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0_done" xml:space="preserve">
+    <value>已移除 "added" 标签</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1" xml:space="preserve">
+    <value>添加 "added" 标签</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1_done" xml:space="preserve">
+    <value>已添加 "added" 标签</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0" xml:space="preserve">
+    <value>移除 "assigned" 标签</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0_done" xml:space="preserve">
+    <value>已移除 "assigned" 标签</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1" xml:space="preserve">
+    <value>添加 "assigned" 标签</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1_done" xml:space="preserve">
+    <value>已添加 "assigned" 标签</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0" xml:space="preserve">
+    <value>移除 "confirmed" 标签</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0_done" xml:space="preserve">
+    <value>已移除 "confirmed" 标签</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1" xml:space="preserve">
+    <value>添加 "confirmed" 标签</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1_done" xml:space="preserve">
+    <value>已添加 "confirmed" 标签</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0" xml:space="preserve">
+    <value>移除 "duplicate" 标签</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0_done" xml:space="preserve">
+    <value>已移除 "duplicate" 标签</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1" xml:space="preserve">
+    <value>添加 "duplicate" 标签</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1_done" xml:space="preserve">
+    <value>已添加 "duplicate" 标签</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0" xml:space="preserve">
+    <value>移除 "invalid" 标签</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0_done" xml:space="preserve">
+    <value>已移除 "invalid" 标签</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1" xml:space="preserve">
+    <value>添加 "invalid" 标签</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1_done" xml:space="preserve">
+    <value>已添加 "invalid" 标签</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0" xml:space="preserve">
+    <value>移除 "resolved" 标签</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0_done" xml:space="preserve">
+    <value>已移除 "resolved" 标签</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1" xml:space="preserve">
+    <value>添加 "resolved" 标签</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1_done" xml:space="preserve">
+    <value>已添加 "resolved" 标签</value>
+  </data>
+  <data name="topics.lock.is_locked" xml:space="preserve">
+    <value>主题已被锁定，不能回复</value>
+  </data>
+  <data name="topics.lock.to_0" xml:space="preserve">
+    <value>解锁主题</value>
+  </data>
+  <data name="topics.lock.to_0_confirm" xml:space="preserve">
+    <value>解锁主题?</value>
+  </data>
+  <data name="topics.lock.to_0_done" xml:space="preserve">
+    <value>主题已经解锁</value>
+  </data>
+  <data name="topics.lock.to_1" xml:space="preserve">
+    <value>锁定主题</value>
+  </data>
+  <data name="topics.lock.to_1_confirm" xml:space="preserve">
+    <value>锁定主题?</value>
+  </data>
+  <data name="topics.lock.to_1_done" xml:space="preserve">
+    <value>主题已被锁定</value>
+  </data>
+  <data name="topics.moderate_move.title" xml:space="preserve">
+    <value>将主题移动到其他板块</value>
+  </data>
+  <data name="topics.moderate_pin.to_0" xml:space="preserve">
+    <value>取消置顶</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_confirm" xml:space="preserve">
+    <value>取消置顶主题？</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_done" xml:space="preserve">
+    <value>该主题已取消置顶</value>
+  </data>
+  <data name="topics.moderate_pin.to_1" xml:space="preserve">
+    <value>置顶</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_confirm" xml:space="preserve">
+    <value>置顶主题？</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_done" xml:space="preserve">
+    <value>该主题已置顶</value>
+  </data>
+  <data name="topics.moderate_pin.to_2" xml:space="preserve">
+    <value>置顶并标记为公告</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_confirm" xml:space="preserve">
+    <value>置顶此主题并将其标记为公告?</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_done" xml:space="preserve">
+    <value>该主题已置顶并标记为公告</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.show" xml:space="preserve">
+    <value>显示已删除的帖子</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.hide" xml:space="preserve">
+    <value>隐藏已删除的帖子</value>
+  </data>
+  <data name="topics.show.deleted-posts" xml:space="preserve">
+    <value>删除主题</value>
+  </data>
+  <data name="topics.show.total_posts" xml:space="preserve">
+    <value>讨论总数</value>
+  </data>
+  <data name="topics.show.feature_vote.current" xml:space="preserve">
+    <value>当前优先级: +{0}</value>
+  </data>
+  <data name="topics.show.feature_vote.do" xml:space="preserve">
+    <value>提升这个请求</value>
+  </data>
+  <data name="topics.show.feature_vote.info._" xml:space="preserve">
+    <value>这是一个 {0}。{1} 可以为新功能请求投票。</value>
+  </data>
+  <data name="topics.show.feature_vote.info.feature_request" xml:space="preserve">
+    <value>新功能请求</value>
+  </data>
+  <data name="topics.show.feature_vote.info.supporters" xml:space="preserve">
+    <value>osu! 支持者</value>
+  </data>
+  <data name="topics.show.feature_vote.user.count" xml:space="preserve">
+    <value>{0} 票</value>
+  </data>
+  <data name="topics.show.feature_vote.user.current" xml:space="preserve">
+    <value>还有 {0} 。</value>
+  </data>
+  <data name="topics.show.feature_vote.user.not_enough" xml:space="preserve">
+    <value>没有票了</value>
+  </data>
+  <data name="topics.show.poll.edit" xml:space="preserve">
+    <value>编辑投票</value>
+  </data>
+  <data name="topics.show.poll.edit_warning" xml:space="preserve">
+    <value>编辑投票将清空当前投票结果！</value>
+  </data>
+  <data name="topics.show.poll.vote" xml:space="preserve">
+    <value>投票</value>
+  </data>
+  <data name="topics.show.poll.button.change_vote" xml:space="preserve">
+    <value>更改投票</value>
+  </data>
+  <data name="topics.show.poll.button.edit" xml:space="preserve">
+    <value>编辑投票</value>
+  </data>
+  <data name="topics.show.poll.button.view_results" xml:space="preserve">
+    <value>直接跳到结果</value>
+  </data>
+  <data name="topics.show.poll.button.vote" xml:space="preserve">
+    <value>投票</value>
+  </data>
+  <data name="topics.show.poll.detail.end_time" xml:space="preserve">
+    <value>将于 {0} 结束</value>
+  </data>
+  <data name="topics.show.poll.detail.ended" xml:space="preserve">
+    <value>结束于 {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.results_hidden" xml:space="preserve">
+    <value>投票结束后才显示结果。</value>
+  </data>
+  <data name="topics.show.poll.detail.total" xml:space="preserve">
+    <value>总票数: {0}</value>
+  </data>
+  <data name="topics.watch.to_not_watching" xml:space="preserve">
+    <value>未订阅</value>
+  </data>
+  <data name="topics.watch.to_watching" xml:space="preserve">
+    <value>订阅</value>
+  </data>
+  <data name="topics.watch.to_watching_mail" xml:space="preserve">
+    <value>订阅并启用邮件通知</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_disable" xml:space="preserve">
+    <value>通知已启用。点击禁用</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_enable" xml:space="preserve">
+    <value>通知已禁用。点击启用</value>
+  </data>
+</root>

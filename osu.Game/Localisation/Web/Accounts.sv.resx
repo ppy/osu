@@ -1,0 +1,250 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="edit.title_compact" xml:space="preserve">
+    <value>kontoinställningar</value>
+  </data>
+  <data name="edit.username" xml:space="preserve">
+    <value>användarnamn</value>
+  </data>
+  <data name="edit.avatar.title" xml:space="preserve">
+    <value>Avatar</value>
+  </data>
+  <data name="edit.avatar.rules" xml:space="preserve">
+    <value>Se till att din avatar följer {0}.&lt;br/&gt;Det betyder att den måste vara &lt;strong&gt;lämplig för alla åldrar&lt;/strong&gt;. dvs ingen nakenhet, svordomar eller suggestivt innehåll.</value>
+  </data>
+  <data name="edit.avatar.rules_link" xml:space="preserve">
+    <value>gemenskapsreglerna</value>
+  </data>
+  <data name="edit.email.current" xml:space="preserve">
+    <value>nuvarande e-postadress</value>
+  </data>
+  <data name="edit.email.new" xml:space="preserve">
+    <value>ny e-postadress</value>
+  </data>
+  <data name="edit.email.new_confirmation" xml:space="preserve">
+    <value>e-postbekräftelse</value>
+  </data>
+  <data name="edit.email.title" xml:space="preserve">
+    <value>E-postadress</value>
+  </data>
+  <data name="edit.password.current" xml:space="preserve">
+    <value>nuvarande lösenord</value>
+  </data>
+  <data name="edit.password.new" xml:space="preserve">
+    <value>nytt lösenord</value>
+  </data>
+  <data name="edit.password.new_confirmation" xml:space="preserve">
+    <value>lösenordsbekräftelse</value>
+  </data>
+  <data name="edit.password.title" xml:space="preserve">
+    <value>Lösenord</value>
+  </data>
+  <data name="edit.profile.title" xml:space="preserve">
+    <value>Profil</value>
+  </data>
+  <data name="edit.profile.user.user_from" xml:space="preserve">
+    <value>nuvarande position</value>
+  </data>
+  <data name="edit.profile.user.user_interests" xml:space="preserve">
+    <value>intressen</value>
+  </data>
+  <data name="edit.profile.user.user_occ" xml:space="preserve">
+    <value>sysselsättning</value>
+  </data>
+  <data name="edit.profile.user.user_website" xml:space="preserve">
+    <value>hemsida</value>
+  </data>
+  <data name="edit.signature.title" xml:space="preserve">
+    <value>Signatur</value>
+  </data>
+  <data name="edit.signature.update" xml:space="preserve">
+    <value>uppdatera</value>
+  </data>
+  <data name="notifications.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>ta emot meddelanden om nya problem på kvalificerade beatmaps över följande lägen</value>
+  </data>
+  <data name="notifications.beatmapset_disqualify" xml:space="preserve">
+    <value>ta emot aviseringar när beatmaps för följande lägen diskvalificeras</value>
+  </data>
+  <data name="notifications.comment_reply" xml:space="preserve">
+    <value>motta aviseringar för svar på dina kommentarer</value>
+  </data>
+  <data name="notifications.title" xml:space="preserve">
+    <value>Aviseringar</value>
+  </data>
+  <data name="notifications.topic_auto_subscribe" xml:space="preserve">
+    <value>aktivera aviseringar automatiskt på nya forumtrådar som du skapar </value>
+  </data>
+  <data name="notifications.options._" xml:space="preserve">
+    <value>leveransalternativ</value>
+  </data>
+  <data name="notifications.options.beatmapset:modding" xml:space="preserve">
+    <value>beatmap modding</value>
+  </data>
+  <data name="notifications.options.channel_message" xml:space="preserve">
+    <value>privata chattmeddelanden</value>
+  </data>
+  <data name="notifications.options.comment_new" xml:space="preserve">
+    <value>nya kommentarer</value>
+  </data>
+  <data name="notifications.options.forum_topic_reply" xml:space="preserve">
+    <value>ämnessvar</value>
+  </data>
+  <data name="notifications.options.mail" xml:space="preserve">
+    <value>mail</value>
+  </data>
+  <data name="notifications.options.mapping" xml:space="preserve">
+    <value>beatmap ägare</value>
+  </data>
+  <data name="notifications.options.push" xml:space="preserve">
+    <value>push</value>
+  </data>
+  <data name="notifications.options.user_achievement_unlock" xml:space="preserve">
+    <value>användarmedalj upplåst</value>
+  </data>
+  <data name="oauth.authorized_clients" xml:space="preserve">
+    <value>auktoriserade klienter</value>
+  </data>
+  <data name="oauth.own_clients" xml:space="preserve">
+    <value>egna klienter</value>
+  </data>
+  <data name="oauth.title" xml:space="preserve">
+    <value>OAuth</value>
+  </data>
+  <data name="options.beatmapset_show_nsfw" xml:space="preserve">
+    <value>dölj varningar för explicit innehåll i beatmaps</value>
+  </data>
+  <data name="options.beatmapset_title_show_original" xml:space="preserve">
+    <value>visa beatmapmetadata på originalspråk</value>
+  </data>
+  <data name="options.title" xml:space="preserve">
+    <value>Alternativ</value>
+  </data>
+  <data name="options.beatmapset_download._" xml:space="preserve">
+    <value>standard beatmap nedladdningstyp</value>
+  </data>
+  <data name="options.beatmapset_download.all" xml:space="preserve">
+    <value>med video om tillgängligt</value>
+  </data>
+  <data name="options.beatmapset_download.direct" xml:space="preserve">
+    <value>öppna i osu!direct</value>
+  </data>
+  <data name="options.beatmapset_download.no_video" xml:space="preserve">
+    <value>utan video</value>
+  </data>
+  <data name="playstyles.keyboard" xml:space="preserve">
+    <value>tangentbord</value>
+  </data>
+  <data name="playstyles.mouse" xml:space="preserve">
+    <value>mus</value>
+  </data>
+  <data name="playstyles.tablet" xml:space="preserve">
+    <value>platta</value>
+  </data>
+  <data name="playstyles.title" xml:space="preserve">
+    <value>Spelsätt</value>
+  </data>
+  <data name="playstyles.touch" xml:space="preserve">
+    <value>pekskärm</value>
+  </data>
+  <data name="privacy.friends_only" xml:space="preserve">
+    <value>Blockera privata meddelanden från icke-vänner</value>
+  </data>
+  <data name="privacy.hide_online" xml:space="preserve">
+    <value>dölj din online-närvaro</value>
+  </data>
+  <data name="privacy.title" xml:space="preserve">
+    <value>Sekretess</value>
+  </data>
+  <data name="security.current_session" xml:space="preserve">
+    <value>nuvarande</value>
+  </data>
+  <data name="security.end_session" xml:space="preserve">
+    <value>Avsluta sessionen</value>
+  </data>
+  <data name="security.end_session_confirmation" xml:space="preserve">
+    <value>Detta kommer avsluta din session på den valda enheten. Är du säker?</value>
+  </data>
+  <data name="security.last_active" xml:space="preserve">
+    <value>Senast aktiv:</value>
+  </data>
+  <data name="security.title" xml:space="preserve">
+    <value>Säkerhet</value>
+  </data>
+  <data name="security.web_sessions" xml:space="preserve">
+    <value>webbsessioner</value>
+  </data>
+  <data name="update_email.update" xml:space="preserve">
+    <value>uppdatera</value>
+  </data>
+  <data name="update_password.update" xml:space="preserve">
+    <value>uppdatera</value>
+  </data>
+  <data name="verification_completed.text" xml:space="preserve">
+    <value>Du kan stänga detta fönstret nu</value>
+  </data>
+  <data name="verification_completed.title" xml:space="preserve">
+    <value>Verifieringen har slutförts</value>
+  </data>
+  <data name="verification_invalid.title" xml:space="preserve">
+    <value>Ogiltig eller utgånget verifieringslänk</value>
+  </data>
+</root>

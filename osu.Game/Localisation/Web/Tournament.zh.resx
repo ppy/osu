@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="index.none_running" xml:space="preserve">
+    <value>目前没有正在进行的比赛，过段时间再来看看吧！</value>
+  </data>
+  <data name="index.registration_period" xml:space="preserve">
+    <value>报名时间： {0} 到 {1}</value>
+  </data>
+  <data name="index.header.title" xml:space="preserve">
+    <value>社区比赛</value>
+  </data>
+  <data name="index.item.registered" xml:space="preserve">
+    <value>已注册玩家</value>
+  </data>
+  <data name="index.state.current" xml:space="preserve">
+    <value>正在进行的比赛</value>
+  </data>
+  <data name="index.state.previous" xml:space="preserve">
+    <value>已经结束的比赛</value>
+  </data>
+  <data name="show.banner" xml:space="preserve">
+    <value>支持你的队伍</value>
+  </data>
+  <data name="show.entered" xml:space="preserve">
+    <value>你已报名此次比赛。&lt;br&gt;&lt;br&gt;这不意味着你已经被分组。&lt;br&gt;&lt;br&gt;比赛开始前你将收到邮件通知，所以请确保你的 osu! 邮箱可用！</value>
+  </data>
+  <data name="show.info_page" xml:space="preserve">
+    <value>信息页</value>
+  </data>
+  <data name="show.login_to_register" xml:space="preserve">
+    <value>请 {0} 以查看报名细节！</value>
+  </data>
+  <data name="show.not_yet_entered" xml:space="preserve">
+    <value>你还没有报名此次比赛。</value>
+  </data>
+  <data name="show.rank_too_low" xml:space="preserve">
+    <value>抱歉，你还没有达到本次比赛的排名要求！</value>
+  </data>
+  <data name="show.registration_ends" xml:space="preserve">
+    <value>报名将于 {0} 结束</value>
+  </data>
+  <data name="show.button.cancel" xml:space="preserve">
+    <value>取消报名</value>
+  </data>
+  <data name="show.button.register" xml:space="preserve">
+    <value>我要报名！</value>
+  </data>
+  <data name="show.period.end" xml:space="preserve">
+    <value>结束于</value>
+  </data>
+  <data name="show.period.start" xml:space="preserve">
+    <value>开始于</value>
+  </data>
+  <data name="show.state.before_registration" xml:space="preserve">
+    <value>本次比赛还未开始报名。</value>
+  </data>
+  <data name="show.state.ended" xml:space="preserve">
+    <value>本次比赛已经结束。移步信息页查看比赛结果。</value>
+  </data>
+  <data name="show.state.registration_closed" xml:space="preserve">
+    <value>本次比赛已停止报名。移步信息页查看最新信息。</value>
+  </data>
+  <data name="show.state.running" xml:space="preserve">
+    <value>本次比赛正在进行。移步信息页查看赛况。</value>
+  </data>
+  <data name="tournament_period" xml:space="preserve">
+    <value>{0} 到 {1}</value>
+  </data>
+</root>

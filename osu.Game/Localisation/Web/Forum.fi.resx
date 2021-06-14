@@ -1,0 +1,514 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="pinned_topics" xml:space="preserve">
+    <value>Kiinnitetyt Aiheet</value>
+  </data>
+  <data name="slogan" xml:space="preserve">
+    <value>on vaarallista pelata yksin.</value>
+  </data>
+  <data name="subforums" xml:space="preserve">
+    <value>Alafoorumit</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>osu!-foorumit</value>
+  </data>
+  <data name="covers.create._" xml:space="preserve">
+    <value>Aseta kansikuva</value>
+  </data>
+  <data name="covers.create.button" xml:space="preserve">
+    <value>Lataa kuva</value>
+  </data>
+  <data name="covers.create.info" xml:space="preserve">
+    <value>Kansikuvan koon kuuluisi olla {0}. Voit upottaa kuvan myös tähän.</value>
+  </data>
+  <data name="covers.destroy._" xml:space="preserve">
+    <value>Poista kansikuva</value>
+  </data>
+  <data name="covers.destroy.confirm" xml:space="preserve">
+    <value>Haluatko varmasti poistaa kansikuvan?</value>
+  </data>
+  <data name="forums.topics.empty" xml:space="preserve">
+    <value>Ei aiheita!</value>
+  </data>
+  <data name="mark_as_read.forum" xml:space="preserve">
+    <value>Merkitse luetuksi</value>
+  </data>
+  <data name="mark_as_read.forums" xml:space="preserve">
+    <value>Merkitse luetuksi</value>
+  </data>
+  <data name="mark_as_read.busy" xml:space="preserve">
+    <value>Merkitään luetuksi...</value>
+  </data>
+  <data name="post.confirm_destroy" xml:space="preserve">
+    <value>Haluatko varmasti poistaa viestin?</value>
+  </data>
+  <data name="post.confirm_restore" xml:space="preserve">
+    <value>Haluatko varmasti palauttaa viestin?</value>
+  </data>
+  <data name="post.edited" xml:space="preserve">
+    <value>Viimeksi muokannut {0} {1}, muokattu yhteensä {2} kertaa.</value>
+  </data>
+  <data name="post.posted_at" xml:space="preserve">
+    <value>lähetetty {0}</value>
+  </data>
+  <data name="post.actions.destroy" xml:space="preserve">
+    <value>Poista viesti</value>
+  </data>
+  <data name="post.actions.edit" xml:space="preserve">
+    <value>Muokkaa viestiä</value>
+  </data>
+  <data name="post.actions.restore" xml:space="preserve">
+    <value>Palauta viesti</value>
+  </data>
+  <data name="post.info.post_count" xml:space="preserve">
+    <value>{0} viesti|{0} viestiä</value>
+  </data>
+  <data name="post.info.topic_starter" xml:space="preserve">
+    <value>Aiheen Aloittaja</value>
+  </data>
+  <data name="search.go_to_post" xml:space="preserve">
+    <value>Siirry viestiin</value>
+  </data>
+  <data name="search.post_number_input" xml:space="preserve">
+    <value>anna viestin numero</value>
+  </data>
+  <data name="search.total_posts" xml:space="preserve">
+    <value>{0} viestiä</value>
+  </data>
+  <data name="topic.confirm_destroy" xml:space="preserve">
+    <value>Haluatko varmasti poistaa aiheen?</value>
+  </data>
+  <data name="topic.confirm_restore" xml:space="preserve">
+    <value>Haluatko varmasti palauttaa aiheen?</value>
+  </data>
+  <data name="topic.deleted" xml:space="preserve">
+    <value>poistettu aihe</value>
+  </data>
+  <data name="topic.go_to_latest" xml:space="preserve">
+    <value>näytä viimeisin viesti</value>
+  </data>
+  <data name="topic.has_replied" xml:space="preserve">
+    <value>Olet vastannut tähän aiheeseen</value>
+  </data>
+  <data name="topic.latest_post" xml:space="preserve">
+    <value>{0} käyttäjältä {1}</value>
+  </data>
+  <data name="topic.latest_reply_by" xml:space="preserve">
+    <value>viimeisimmän vastauksen jätti {0}</value>
+  </data>
+  <data name="topic.new_topic" xml:space="preserve">
+    <value>Lähetä uusi aihe</value>
+  </data>
+  <data name="topic.new_topic_login" xml:space="preserve">
+    <value>Kirjaudu sisään lähettääksesi uuden aiheen</value>
+  </data>
+  <data name="topic.post_reply" xml:space="preserve">
+    <value>Vastaa</value>
+  </data>
+  <data name="topic.reply_box_placeholder" xml:space="preserve">
+    <value>Kirjoita vastauksesi tähän</value>
+  </data>
+  <data name="topic.reply_title_prefix" xml:space="preserve">
+    <value>Re</value>
+  </data>
+  <data name="topic.started_by" xml:space="preserve">
+    <value>tehnyt {0}</value>
+  </data>
+  <data name="topic.started_by_verbose" xml:space="preserve">
+    <value>aloittanut {0}</value>
+  </data>
+  <data name="topic.actions.destroy" xml:space="preserve">
+    <value>Poista aihe</value>
+  </data>
+  <data name="topic.actions.restore" xml:space="preserve">
+    <value>Palauta aihe</value>
+  </data>
+  <data name="topic.create.close" xml:space="preserve">
+    <value>Sulje</value>
+  </data>
+  <data name="topic.create.preview" xml:space="preserve">
+    <value>Esikatselu</value>
+  </data>
+  <data name="topic.create.preview_hide" xml:space="preserve">
+    <value>Kirjoita</value>
+  </data>
+  <data name="topic.create.submit" xml:space="preserve">
+    <value>Lähetä</value>
+  </data>
+  <data name="topic.create.necropost.default" xml:space="preserve">
+    <value>Tämä aihealue on ollut epäaktiivinen lähiaikoina. Postaa tänne vain jos sinulla on hyvä syy siihen.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic._" xml:space="preserve">
+    <value>Tämä aihe on ollut epäaktiivisena jo pidemmän aikaa. {0} jos sinulla ei ole hyvää syytä lähettää viestiä.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic.create" xml:space="preserve">
+    <value>luo uusi aihe</value>
+  </data>
+  <data name="topic.create.placeholder.body" xml:space="preserve">
+    <value>Kirjoita aiheen sisältö tähän</value>
+  </data>
+  <data name="topic.create.placeholder.title" xml:space="preserve">
+    <value>Määritä otsikko napsauttamalla tätä</value>
+  </data>
+  <data name="topic.jump.enter" xml:space="preserve">
+    <value>paina siirtyäksesi haluamaasi viestin numeroon</value>
+  </data>
+  <data name="topic.jump.first" xml:space="preserve">
+    <value>siirry ensimmäiseen viestiin</value>
+  </data>
+  <data name="topic.jump.last" xml:space="preserve">
+    <value>siirry viimeisimpään viestiin</value>
+  </data>
+  <data name="topic.jump.next" xml:space="preserve">
+    <value>ohita seuraavat 10 viestiä</value>
+  </data>
+  <data name="topic.jump.previous" xml:space="preserve">
+    <value>mene 10 viestiä takaisin</value>
+  </data>
+  <data name="topic.post_edit.cancel" xml:space="preserve">
+    <value>Peruuta</value>
+  </data>
+  <data name="topic.post_edit.post" xml:space="preserve">
+    <value>Tallenna</value>
+  </data>
+  <data name="topic_watches.index.title_compact" xml:space="preserve">
+    <value>foorumilla seuratut</value>
+  </data>
+  <data name="topic_watches.index.box.total" xml:space="preserve">
+    <value>Seurattuja aiheita</value>
+  </data>
+  <data name="topic_watches.index.box.unread" xml:space="preserve">
+    <value>Aiheita joissa uusia vastauksia</value>
+  </data>
+  <data name="topic_watches.index.info.total" xml:space="preserve">
+    <value>{0} aihetta seurattavana.</value>
+  </data>
+  <data name="topic_watches.index.info.unread" xml:space="preserve">
+    <value>Sinulla on {0} lukematonta vastausta seuratuissa aiheissa.</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.confirmation" xml:space="preserve">
+    <value>Lopeta aiheen seuraaminen?</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.title" xml:space="preserve">
+    <value>Lopeta seuraaminen</value>
+  </data>
+  <data name="topics._" xml:space="preserve">
+    <value>Aiheet</value>
+  </data>
+  <data name="topics.actions.login_reply" xml:space="preserve">
+    <value>Kirjaudu sisään vastataksesi</value>
+  </data>
+  <data name="topics.actions.reply" xml:space="preserve">
+    <value>Vastaa</value>
+  </data>
+  <data name="topics.actions.reply_with_quote" xml:space="preserve">
+    <value>Lainaa viestiä vastaukseen</value>
+  </data>
+  <data name="topics.actions.search" xml:space="preserve">
+    <value>Hae</value>
+  </data>
+  <data name="topics.create.create_poll" xml:space="preserve">
+    <value>Äänestyksen Luonti</value>
+  </data>
+  <data name="topics.create.preview" xml:space="preserve">
+    <value>Viestin esikatselu</value>
+  </data>
+  <data name="topics.create.create_poll_button.add" xml:space="preserve">
+    <value>Luo äänestys</value>
+  </data>
+  <data name="topics.create.create_poll_button.remove" xml:space="preserve">
+    <value>Keskeytä äänestyksen luonti</value>
+  </data>
+  <data name="topics.create.poll.hide_results" xml:space="preserve">
+    <value>Piilota äänestyksen tulokset.</value>
+  </data>
+  <data name="topics.create.poll.length" xml:space="preserve">
+    <value>Pidä äänestystä auki</value>
+  </data>
+  <data name="topics.create.poll.length_days_suffix" xml:space="preserve">
+    <value>päivää</value>
+  </data>
+  <data name="topics.create.poll.length_info" xml:space="preserve">
+    <value>Jätä tyhjäksi jos haluat kyselyn kestävän ikuisesti</value>
+  </data>
+  <data name="topics.create.poll.max_options" xml:space="preserve">
+    <value>Vastauksia per käyttäjä</value>
+  </data>
+  <data name="topics.create.poll.max_options_info" xml:space="preserve">
+    <value>Määrä vaihtoehtoja, joita käyttäjä voi valita äänestyksen aikana.</value>
+  </data>
+  <data name="topics.create.poll.options" xml:space="preserve">
+    <value>Asetukset</value>
+  </data>
+  <data name="topics.create.poll.options_info" xml:space="preserve">
+    <value>Jokaiselle valinnalle tulee uusi rivi. Vaihtoehtoja on korkeintaan 10.</value>
+  </data>
+  <data name="topics.create.poll.title" xml:space="preserve">
+    <value>Kysymys</value>
+  </data>
+  <data name="topics.create.poll.vote_change" xml:space="preserve">
+    <value>Salli uudelleenäänestys.</value>
+  </data>
+  <data name="topics.create.poll.vote_change_info" xml:space="preserve">
+    <value>Vastaajat voivat vaihtaa ääniään, jos tämä on käytössä.</value>
+  </data>
+  <data name="topics.edit_title.start" xml:space="preserve">
+    <value>Muokkaa otsikkoa</value>
+  </data>
+  <data name="topics.index.feature_votes" xml:space="preserve">
+    <value>tähtitaso</value>
+  </data>
+  <data name="topics.index.replies" xml:space="preserve">
+    <value>vastausta</value>
+  </data>
+  <data name="topics.index.views" xml:space="preserve">
+    <value>katsomiskertaa</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0" xml:space="preserve">
+    <value>Poista tunniste "lisätty" </value>
+  </data>
+  <data name="topics.issue_tag_added.to_0_done" xml:space="preserve">
+    <value>Tunniste "lisätty" poistettu</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1" xml:space="preserve">
+    <value>Lisää tunniste "lisätty"</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1_done" xml:space="preserve">
+    <value>Tunniste "lisätty" lisätty</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0" xml:space="preserve">
+    <value>Poista tunniste "siirretty"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0_done" xml:space="preserve">
+    <value>Tunniste "siirretty" poistettu</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1" xml:space="preserve">
+    <value>Lisää tunniste "siirretty"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1_done" xml:space="preserve">
+    <value>Tunniste "siirretty" lisätty</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0" xml:space="preserve">
+    <value>Poista tunniste "vahvistettu"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0_done" xml:space="preserve">
+    <value>Tunniste "vahvistettu" poistettu</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1" xml:space="preserve">
+    <value>Lisää tunniste "vahvistettu"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1_done" xml:space="preserve">
+    <value>Tunniste "vahvistettu" lisätty</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0" xml:space="preserve">
+    <value>Poista tunniste "duplikaatti"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0_done" xml:space="preserve">
+    <value>Tunniste "duplikaatti" poistettu</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1" xml:space="preserve">
+    <value>Lisää tunniste "duplikaatti"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1_done" xml:space="preserve">
+    <value>Tunniste "duplikaatti" lisätty</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0" xml:space="preserve">
+    <value>Poista tunniste "virheellinen"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0_done" xml:space="preserve">
+    <value>Tunniste "virheellinen" poistettu</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1" xml:space="preserve">
+    <value>Lisää tunniste "virheellinen"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1_done" xml:space="preserve">
+    <value>Lisää tunniste "virheellinen"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0" xml:space="preserve">
+    <value>Poista tunniste "selvitetty"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0_done" xml:space="preserve">
+    <value>Tunniste "selvitetty" poistettu</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1" xml:space="preserve">
+    <value>Lisää tunniste "selvitetty"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1_done" xml:space="preserve">
+    <value>Lisää tunniste "selvitetty"</value>
+  </data>
+  <data name="topics.lock.is_locked" xml:space="preserve">
+    <value>Tämä aihe on lukittu, eikä siihen voida vastata</value>
+  </data>
+  <data name="topics.lock.to_0" xml:space="preserve">
+    <value>Avaa aihe</value>
+  </data>
+  <data name="topics.lock.to_0_done" xml:space="preserve">
+    <value>Aihe on avattu</value>
+  </data>
+  <data name="topics.lock.to_1" xml:space="preserve">
+    <value>Lukitse aihe</value>
+  </data>
+  <data name="topics.lock.to_1_confirm" xml:space="preserve">
+    <value>Lukitse aihe?</value>
+  </data>
+  <data name="topics.lock.to_1_done" xml:space="preserve">
+    <value>Aihe lukittu</value>
+  </data>
+  <data name="topics.moderate_move.title" xml:space="preserve">
+    <value>Siirrä toiselle foorumille</value>
+  </data>
+  <data name="topics.moderate_pin.to_0" xml:space="preserve">
+    <value>Irrota aihe</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_confirm" xml:space="preserve">
+    <value>Irrota aihe?</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_done" xml:space="preserve">
+    <value>Aihe irrotettu</value>
+  </data>
+  <data name="topics.moderate_pin.to_1" xml:space="preserve">
+    <value>Kiinnitä aihe</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_confirm" xml:space="preserve">
+    <value>Kiinnitä aihe?</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_done" xml:space="preserve">
+    <value>Aihe kiinnitetty</value>
+  </data>
+  <data name="topics.moderate_pin.to_2" xml:space="preserve">
+    <value>Kiinnitä aihe ja merkkaa ilmoitukseksi</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_confirm" xml:space="preserve">
+    <value>Kiinnitä aihe ja merkkaa ilmoitukseksi?</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_done" xml:space="preserve">
+    <value>Aihe on kiinnitetty ja merkattu ilmoitukseksi</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.show" xml:space="preserve">
+    <value>Näytä poistetut viestit</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.hide" xml:space="preserve">
+    <value>Piilota poistetut viestit</value>
+  </data>
+  <data name="topics.show.deleted-posts" xml:space="preserve">
+    <value>Poistetut viestit</value>
+  </data>
+  <data name="topics.show.total_posts" xml:space="preserve">
+    <value>Vastauksia</value>
+  </data>
+  <data name="topics.show.feature_vote.current" xml:space="preserve">
+    <value>Tärkeys tällä hetkellä: +{0}</value>
+  </data>
+  <data name="topics.show.feature_vote.do" xml:space="preserve">
+    <value>Ehdota tätä</value>
+  </data>
+  <data name="topics.show.feature_vote.info._" xml:space="preserve">
+    <value>Tämä on {0}. {1} voivat äänestää ominaisuuspyyntöjä.</value>
+  </data>
+  <data name="topics.show.feature_vote.info.feature_request" xml:space="preserve">
+    <value>ominaisuuspyyntö</value>
+  </data>
+  <data name="topics.show.feature_vote.info.supporters" xml:space="preserve">
+    <value>tukijat</value>
+  </data>
+  <data name="topics.show.feature_vote.user.count" xml:space="preserve">
+    <value>{0} ei ääniä |{1}{0} ääni|[2,*]{0} ääntä</value>
+  </data>
+  <data name="topics.show.feature_vote.user.current" xml:space="preserve">
+    <value>Sinulla on {0} jäljellä.</value>
+  </data>
+  <data name="topics.show.feature_vote.user.not_enough" xml:space="preserve">
+    <value>Sinulla ei ole enää ääniä jäljellä</value>
+  </data>
+  <data name="topics.show.poll.vote" xml:space="preserve">
+    <value>Äänestä</value>
+  </data>
+  <data name="topics.show.poll.button.vote" xml:space="preserve">
+    <value>Äänestä</value>
+  </data>
+  <data name="topics.show.poll.detail.end_time" xml:space="preserve">
+    <value>Kysely loppuu {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.ended" xml:space="preserve">
+    <value>Kysely on loppunut {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.results_hidden" xml:space="preserve">
+    <value>Tulokset näytetään äänestyksen jälkeen.</value>
+  </data>
+  <data name="topics.show.poll.detail.total" xml:space="preserve">
+    <value>Ääniä yhteensä: {0}</value>
+  </data>
+  <data name="topics.watch.to_not_watching" xml:space="preserve">
+    <value>Lisäämättä kirjanmerkkeihin</value>
+  </data>
+  <data name="topics.watch.to_watching" xml:space="preserve">
+    <value>Kirjanmerkkeihin</value>
+  </data>
+  <data name="topics.watch.to_watching_mail" xml:space="preserve">
+    <value>Kirjanmerkkeihin ilmoituksella</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_disable" xml:space="preserve">
+    <value>Ilmoitus on päällä. Klikkaa poistaaksesi käytöstä</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_enable" xml:space="preserve">
+    <value>Ilmoitus on pois käytöstä. Klikkaa laittaaksesi päälle</value>
+  </data>
+</root>

@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="index.description" xml:space="preserve">
+    <value>Färdigförpackade samlingar med beatmaps som är baserade på ett gemensamt tema.</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>listning</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmap-samlingar</value>
+  </data>
+  <data name="index.blurb.important" xml:space="preserve">
+    <value>LÄS DETTA INNAN NEDLADDNING</value>
+  </data>
+  <data name="index.blurb.instruction._" xml:space="preserve">
+    <value>Installation: När en samling har laddats ner, extrahera .rar filen till din osu! Songs mapp.
+                    Alla låtar är fortfarande i .zip/.osz-samlingen, så osu! kommer behöva extrahera beatmapsen nästa gång du går in i spelläget.
+                    Extrahera {0} .zip/.osz själv,
+                    annars kommer beatmapsen visas inkorrekt i osu! och kommer inte fungera korrekt.</value>
+  </data>
+  <data name="index.blurb.instruction.scary" xml:space="preserve">
+    <value>INTE</value>
+  </data>
+  <data name="index.blurb.note._" xml:space="preserve">
+    <value>Notera att det är som högst rekommenderat att {0}, eftersom de äldsta mapparna är av mycket lägre kvalité jämfört med de nyaste mapparna.</value>
+  </data>
+  <data name="index.blurb.note.scary" xml:space="preserve">
+    <value>ladda ner samlingarna från nyaste till äldsta</value>
+  </data>
+  <data name="show.download" xml:space="preserve">
+    <value>Ladda ner</value>
+  </data>
+  <data name="show.item.cleared" xml:space="preserve">
+    <value>rensad</value>
+  </data>
+  <data name="show.item.not_cleared" xml:space="preserve">
+    <value>ej rensad</value>
+  </data>
+  <data name="show.no_diff_reduction.link" xml:space="preserve">
+    <value>Mods för minskad svårighetsgrad</value>
+  </data>
+  <data name="mode.artist" xml:space="preserve">
+    <value>Artist/Album</value>
+  </data>
+  <data name="mode.chart" xml:space="preserve">
+    <value>I rampljuset</value>
+  </data>
+  <data name="mode.standard" xml:space="preserve">
+    <value>Standard</value>
+  </data>
+  <data name="mode.theme" xml:space="preserve">
+    <value>Tema</value>
+  </data>
+  <data name="require_login._" xml:space="preserve">
+    <value>Du behöver vara {0} för att ladda ner</value>
+  </data>
+  <data name="require_login.link_text" xml:space="preserve">
+    <value>inloggad</value>
+  </data>
+</root>

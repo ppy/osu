@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="authorise.request" xml:space="preserve">
+    <value>is requesting permission to access your account.</value>
+  </data>
+  <data name="authorise.scopes_title" xml:space="preserve">
+    <value>This application will be able to:</value>
+  </data>
+  <data name="authorise.title" xml:space="preserve">
+    <value>Authorisation Request</value>
+  </data>
+  <data name="authorized_clients.confirm_revoke" xml:space="preserve">
+    <value>Are you sure you want to revoke this client's permissions?</value>
+  </data>
+  <data name="authorized_clients.scopes_title" xml:space="preserve">
+    <value>This application can:</value>
+  </data>
+  <data name="authorized_clients.owned_by" xml:space="preserve">
+    <value>Owned by {0}</value>
+  </data>
+  <data name="authorized_clients.none" xml:space="preserve">
+    <value>No Clients</value>
+  </data>
+  <data name="authorized_clients.revoked.false" xml:space="preserve">
+    <value>Revoke Access</value>
+  </data>
+  <data name="authorized_clients.revoked.true" xml:space="preserve">
+    <value>Access Revoked</value>
+  </data>
+  <data name="client.id" xml:space="preserve">
+    <value>Client ID</value>
+  </data>
+  <data name="client.name" xml:space="preserve">
+    <value>Application Name</value>
+  </data>
+  <data name="client.redirect" xml:space="preserve">
+    <value>Application Callback URL</value>
+  </data>
+  <data name="client.reset" xml:space="preserve">
+    <value>Reset client secret</value>
+  </data>
+  <data name="client.reset_failed" xml:space="preserve">
+    <value>Failed to reset client secret</value>
+  </data>
+  <data name="client.secret" xml:space="preserve">
+    <value>Client Secret</value>
+  </data>
+  <data name="client.secret_visible.false" xml:space="preserve">
+    <value>Show client secret</value>
+  </data>
+  <data name="client.secret_visible.true" xml:space="preserve">
+    <value>Hide client secret</value>
+  </data>
+  <data name="new_client.header" xml:space="preserve">
+    <value>Register a new OAuth application</value>
+  </data>
+  <data name="new_client.register" xml:space="preserve">
+    <value>Register application</value>
+  </data>
+  <data name="new_client.terms_of_use._" xml:space="preserve">
+    <value>By using the API you are agreeing to the {0}.</value>
+  </data>
+  <data name="new_client.terms_of_use.link" xml:space="preserve">
+    <value>Terms of Use</value>
+  </data>
+  <data name="own_clients.confirm_delete" xml:space="preserve">
+    <value>Are you sure you want to delete this client?</value>
+  </data>
+  <data name="own_clients.confirm_reset" xml:space="preserve">
+    <value>Are you sure you want to reset the client secret? This will revoke all existing tokens.</value>
+  </data>
+  <data name="own_clients.new" xml:space="preserve">
+    <value>New OAuth Application</value>
+  </data>
+  <data name="own_clients.none" xml:space="preserve">
+    <value>No Clients</value>
+  </data>
+  <data name="own_clients.revoked.false" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="own_clients.revoked.true" xml:space="preserve">
+    <value>Deleted</value>
+  </data>
+</root>

@@ -1,0 +1,478 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="pinned_topics" xml:space="preserve">
+    <value>Καρφιτσωμένα Θέματα</value>
+  </data>
+  <data name="slogan" xml:space="preserve">
+    <value>είναι επικίνδυνο να παίζετε μόνοι σας.</value>
+  </data>
+  <data name="subforums" xml:space="preserve">
+    <value>Υπο-φόρουμ</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>osu! φόρουμ</value>
+  </data>
+  <data name="covers.create._" xml:space="preserve">
+    <value>Επιλογή εικόνας εξωφύλλου</value>
+  </data>
+  <data name="covers.create.button" xml:space="preserve">
+    <value>Ανεβάστε εικόνα</value>
+  </data>
+  <data name="covers.create.info" xml:space="preserve">
+    <value>Το μέγεθος εξωφύλλου θα πρέπει να είναι {0}. Μπορείτε επίσης να αφήσετε την εικόνα σας εδώ για να την ανεβάσετε.</value>
+  </data>
+  <data name="covers.destroy._" xml:space="preserve">
+    <value>Αφαίρεση εικόνας εξωφύλλου</value>
+  </data>
+  <data name="covers.destroy.confirm" xml:space="preserve">
+    <value>Είστε σίγουροι ότι θέλετε να αφαιρέσετε την εικόνα εξωφύλλου;</value>
+  </data>
+  <data name="forums.topics.empty" xml:space="preserve">
+    <value>Δεν υπάρχουν θέματα!</value>
+  </data>
+  <data name="mark_as_read.forum" xml:space="preserve">
+    <value>Επισήμανση forum ως αναγνωσμένo</value>
+  </data>
+  <data name="mark_as_read.forums" xml:space="preserve">
+    <value>Επισήμανση forum ως αναγνωσμένα</value>
+  </data>
+  <data name="mark_as_read.busy" xml:space="preserve">
+    <value>Σήμανση ως αναγνωσμένου...</value>
+  </data>
+  <data name="post.confirm_destroy" xml:space="preserve">
+    <value>Σίγουρα διαγραφή της δημοσίευσης;</value>
+  </data>
+  <data name="post.confirm_restore" xml:space="preserve">
+    <value>Σίγουρα επαναφορά της δημοσίευσης;</value>
+  </data>
+  <data name="post.edited" xml:space="preserve">
+    <value>Τελευταία τροποποίηση από τον χρήστη {0} {1}, τροποποιήθηκε {2} φορές συνολικά.</value>
+  </data>
+  <data name="post.posted_at" xml:space="preserve">
+    <value>δημοσιεύτηκε {0}</value>
+  </data>
+  <data name="post.actions.destroy" xml:space="preserve">
+    <value>Διαγραφή δημοσίευσης</value>
+  </data>
+  <data name="post.actions.edit" xml:space="preserve">
+    <value>Επεξεργασία δημοσίευσης</value>
+  </data>
+  <data name="post.actions.restore" xml:space="preserve">
+    <value>Επαναφορά δημοσίευσης</value>
+  </data>
+  <data name="post.info.post_count" xml:space="preserve">
+    <value>{0} δημοσίευση|{0} δημοσιεύσεις</value>
+  </data>
+  <data name="post.info.topic_starter" xml:space="preserve">
+    <value>Δημιουργός του Θέματος</value>
+  </data>
+  <data name="search.go_to_post" xml:space="preserve">
+    <value>Μετάβαση στη δημοσίευση</value>
+  </data>
+  <data name="search.post_number_input" xml:space="preserve">
+    <value>εισάγετε τον αριθμό δημοσίευσης</value>
+  </data>
+  <data name="search.total_posts" xml:space="preserve">
+    <value>{0} δημοσιεύσεις συνολικά</value>
+  </data>
+  <data name="topic.deleted" xml:space="preserve">
+    <value>διαγραμμένο θέμα</value>
+  </data>
+  <data name="topic.go_to_latest" xml:space="preserve">
+    <value>δείτε την πιο πρόσφατη δημοσίευση</value>
+  </data>
+  <data name="topic.latest_post" xml:space="preserve">
+    <value>{0} από τον {1}</value>
+  </data>
+  <data name="topic.latest_reply_by" xml:space="preserve">
+    <value>τελευταία απάντηση από τον {0}</value>
+  </data>
+  <data name="topic.new_topic" xml:space="preserve">
+    <value>Δημοσιεύστε νέο θέμα</value>
+  </data>
+  <data name="topic.new_topic_login" xml:space="preserve">
+    <value>Συνδεθείτε για να δημοσιεύσετε νέο θέμα</value>
+  </data>
+  <data name="topic.post_reply" xml:space="preserve">
+    <value>Δημοσίευση</value>
+  </data>
+  <data name="topic.reply_box_placeholder" xml:space="preserve">
+    <value>Πληκτρολογήστε εδώ για να απαντήσετε</value>
+  </data>
+  <data name="topic.reply_title_prefix" xml:space="preserve">
+    <value>Re</value>
+  </data>
+  <data name="topic.started_by" xml:space="preserve">
+    <value>από τον {0}</value>
+  </data>
+  <data name="topic.started_by_verbose" xml:space="preserve">
+    <value>ξεκίνησε από {0}</value>
+  </data>
+  <data name="topic.create.preview" xml:space="preserve">
+    <value>Προεπισκόπηση</value>
+  </data>
+  <data name="topic.create.preview_hide" xml:space="preserve">
+    <value>Γράψτε</value>
+  </data>
+  <data name="topic.create.submit" xml:space="preserve">
+    <value>Δημοσίευση</value>
+  </data>
+  <data name="topic.create.necropost.default" xml:space="preserve">
+    <value>Αυτό το θέμα έχει παραμείνει ανενεργό για κάποιο καιρό. Δημοσιεύστε εδώ μόνο αν έχετε κάποιο συγκεκριμένο λόγο.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic._" xml:space="preserve">
+    <value>Αυτό το θέμα έχει παραμείνει ανενεργό για κάποιο καιρό. Αν δεν έχετε κάποιο συγκεκριμένο λόγο για να δημοσιεύσετε εδώ, παρακαλώ {0} αντ' αυτού.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic.create" xml:space="preserve">
+    <value>δημιουργήστε ένα νέο θέμα</value>
+  </data>
+  <data name="topic.create.placeholder.body" xml:space="preserve">
+    <value>Πληκτρολογήστε το περιεχόμενο της δημοσίευσης εδώ</value>
+  </data>
+  <data name="topic.create.placeholder.title" xml:space="preserve">
+    <value>Κάντε κλικ εδώ για να ορίσετε τον τίτλο</value>
+  </data>
+  <data name="topic.jump.enter" xml:space="preserve">
+    <value>κάντε κλικ για να βάλετε συγκεκριμένο αριθμό δημοσίευσης</value>
+  </data>
+  <data name="topic.jump.first" xml:space="preserve">
+    <value>μεταβείτε στην πρώτη δημοσίευση</value>
+  </data>
+  <data name="topic.jump.last" xml:space="preserve">
+    <value>μεταβείτε στην τελευταία δημοσίευση</value>
+  </data>
+  <data name="topic.jump.next" xml:space="preserve">
+    <value>παράλειψη των 10 επόμενων δημοσιεύσεων</value>
+  </data>
+  <data name="topic.jump.previous" xml:space="preserve">
+    <value>μετάβαση σε 10 δημοσιεύσεις πίσω</value>
+  </data>
+  <data name="topic.post_edit.cancel" xml:space="preserve">
+    <value>Ακύρωση</value>
+  </data>
+  <data name="topic.post_edit.post" xml:space="preserve">
+    <value>Αποθήκευση</value>
+  </data>
+  <data name="topic_watches.index.title_compact" xml:space="preserve">
+    <value>εγγραφές φόρουμ</value>
+  </data>
+  <data name="topic_watches.index.box.total" xml:space="preserve">
+    <value>Θέματα στα οποία έχετε εγγραφεί</value>
+  </data>
+  <data name="topic_watches.index.box.unread" xml:space="preserve">
+    <value>Θέματα με νέες απαντήσεις</value>
+  </data>
+  <data name="topic_watches.index.info.total" xml:space="preserve">
+    <value>Έχετε εγγραφεί σε {0} θέματα.</value>
+  </data>
+  <data name="topic_watches.index.info.unread" xml:space="preserve">
+    <value>Έχετε {0} μη αναγνωσμένες απαντήσεις σε θέματα που έχετε εγγραφεί.</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.confirmation" xml:space="preserve">
+    <value>Κατάργηση εγγραφής από το θέμα;</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.title" xml:space="preserve">
+    <value>Κατάργηση εγγραφής</value>
+  </data>
+  <data name="topics._" xml:space="preserve">
+    <value>Θέματα</value>
+  </data>
+  <data name="topics.actions.login_reply" xml:space="preserve">
+    <value>Συνδεθείτε για να Aπαντήσετε</value>
+  </data>
+  <data name="topics.actions.reply" xml:space="preserve">
+    <value>Απάντηση</value>
+  </data>
+  <data name="topics.actions.reply_with_quote" xml:space="preserve">
+    <value>Ανάφερε post ως απάντηση</value>
+  </data>
+  <data name="topics.actions.search" xml:space="preserve">
+    <value>Αναζήτηση</value>
+  </data>
+  <data name="topics.create.create_poll" xml:space="preserve">
+    <value>Δημιουργία ψηφοφορίας</value>
+  </data>
+  <data name="topics.create.preview" xml:space="preserve">
+    <value>Προεπισκόπηση Δημοσίευσης</value>
+  </data>
+  <data name="topics.create.create_poll_button.add" xml:space="preserve">
+    <value>Δημιούργησε ψηφοφορία</value>
+  </data>
+  <data name="topics.create.create_poll_button.remove" xml:space="preserve">
+    <value>Ακύρωση δημιουργίας ψηφοφορίας</value>
+  </data>
+  <data name="topics.create.poll.hide_results" xml:space="preserve">
+    <value>Απόκρυψη των αποτελεσμάτων της ψηφοφορίας.</value>
+  </data>
+  <data name="topics.create.poll.hide_results_info" xml:space="preserve">
+    <value>Θα φανερωθούν μόνο μετά τη λήξη της ψηφοφορίας.</value>
+  </data>
+  <data name="topics.create.poll.length" xml:space="preserve">
+    <value>Διεξαγωγή ψηφοφορίας για</value>
+  </data>
+  <data name="topics.create.poll.length_days_suffix" xml:space="preserve">
+    <value>μέρες</value>
+  </data>
+  <data name="topics.create.poll.length_info" xml:space="preserve">
+    <value>Αφήστε κενό για μία ατελείωτη ψηφοφορία</value>
+  </data>
+  <data name="topics.create.poll.max_options" xml:space="preserve">
+    <value>Επιλογές ανά χρήστη</value>
+  </data>
+  <data name="topics.create.poll.max_options_info" xml:space="preserve">
+    <value>Αυτός είναι ο αριθμός επιλογών που μπορεί να επιλέξει ο κάθε χρήστης όταν ψηφίζει.</value>
+  </data>
+  <data name="topics.create.poll.options" xml:space="preserve">
+    <value>Επιλογές</value>
+  </data>
+  <data name="topics.create.poll.options_info" xml:space="preserve">
+    <value>Τοποθέτησε κάθε επιλογή σε καινούργια γραμμή. Μπορείτε να εισάγετε μέχρι 10 επιλογές.</value>
+  </data>
+  <data name="topics.create.poll.title" xml:space="preserve">
+    <value>Ερώτηση</value>
+  </data>
+  <data name="topics.create.poll.vote_change" xml:space="preserve">
+    <value>Επιτρέπεται η αλλαγή ψήφου.</value>
+  </data>
+  <data name="topics.create.poll.vote_change_info" xml:space="preserve">
+    <value>Αν ενεργοποιηθεί. οι χρήστες θα μπορούν να αλλάξουν την ψήφο τους.</value>
+  </data>
+  <data name="topics.edit_title.start" xml:space="preserve">
+    <value>Επεξεργασία τίτλου</value>
+  </data>
+  <data name="topics.index.feature_votes" xml:space="preserve">
+    <value>βάσει αστεριών</value>
+  </data>
+  <data name="topics.index.replies" xml:space="preserve">
+    <value>απαντήσεις</value>
+  </data>
+  <data name="topics.index.views" xml:space="preserve">
+    <value>προβολές</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0" xml:space="preserve">
+    <value>Αφαίρεση του tag ''added''</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0_done" xml:space="preserve">
+    <value>Το tag ''added'' αφαιρέθηκε</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1" xml:space="preserve">
+    <value>Πρόσθεση του tag ''added''</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1_done" xml:space="preserve">
+    <value>To tag ''added'' προστέθηκε</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0" xml:space="preserve">
+    <value>Αφαίρεση του tag ''assigned"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0_done" xml:space="preserve">
+    <value>Το tag "assigned" αφαιρέθηκε</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1" xml:space="preserve">
+    <value>Πρόσθεση του tag "assigned"</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1_done" xml:space="preserve">
+    <value>To tag "assigned" προστέθηκε</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0" xml:space="preserve">
+    <value>Αφαίρεση του tag "confirmed"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0_done" xml:space="preserve">
+    <value>Το tag "confirmed" αφαιρέθηκε</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1" xml:space="preserve">
+    <value>Πρόσθεση του tag "confirmed"</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1_done" xml:space="preserve">
+    <value>Το tag "confirmed" προστέθηκε</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0" xml:space="preserve">
+    <value>Αφαίρεση του tag "duplicate"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0_done" xml:space="preserve">
+    <value>To tag "duplicate" αφαιρέθηκε</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1" xml:space="preserve">
+    <value>Πρόσθεση του tag "duplicate"</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1_done" xml:space="preserve">
+    <value>To tag "duplicate" προστέθηκε</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0" xml:space="preserve">
+    <value>Αφαίρεση του tag "invalid"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0_done" xml:space="preserve">
+    <value>To tag "invalid" αφαιρέθηκε</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1" xml:space="preserve">
+    <value>Πρόσθεση του tag "invalid"</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1_done" xml:space="preserve">
+    <value>To tag "invalid" προστέθηκε</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0" xml:space="preserve">
+    <value>Αφαίρεση του tag "resolved"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0_done" xml:space="preserve">
+    <value>To tag "resolved" αφαιρέθηκε</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1" xml:space="preserve">
+    <value>Πρόσθεση του tag "resolved"</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1_done" xml:space="preserve">
+    <value>Το tag "resolved" προστέθηκε</value>
+  </data>
+  <data name="topics.lock.is_locked" xml:space="preserve">
+    <value>Η συζήτηση κλειδώθηκε και δεν δέχεται άλλες απαντήσεις</value>
+  </data>
+  <data name="topics.lock.to_0" xml:space="preserve">
+    <value>Ξεκλειδώστε το θέμα</value>
+  </data>
+  <data name="topics.lock.to_0_done" xml:space="preserve">
+    <value>Το θέμα ξεκλειδώθηκε</value>
+  </data>
+  <data name="topics.lock.to_1" xml:space="preserve">
+    <value>Κλειδώστε το θέμα</value>
+  </data>
+  <data name="topics.lock.to_1_done" xml:space="preserve">
+    <value>Το θέμα κλειδώθηκε</value>
+  </data>
+  <data name="topics.moderate_move.title" xml:space="preserve">
+    <value>Πηγαίντε σε άλλο φόρουμ</value>
+  </data>
+  <data name="topics.moderate_pin.to_0" xml:space="preserve">
+    <value>Ξεκαρφίτσωμα θέματος</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_done" xml:space="preserve">
+    <value>Το θέμα ξεκαρφιτσώθηκε</value>
+  </data>
+  <data name="topics.moderate_pin.to_1" xml:space="preserve">
+    <value>Καρφίτσωμα θέματος</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_done" xml:space="preserve">
+    <value>Το θέμα καρφιτσώθηκε</value>
+  </data>
+  <data name="topics.moderate_pin.to_2" xml:space="preserve">
+    <value>Καρφίτσωμα θέματος και σήμανση ως ανακοίνωση</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_done" xml:space="preserve">
+    <value>Το θέμα καρφιτσώθηκε και σημάνθηκε ως ανακοίνωση</value>
+  </data>
+  <data name="topics.show.deleted-posts" xml:space="preserve">
+    <value>Διαγραμμένες Δημοσιεύσεις</value>
+  </data>
+  <data name="topics.show.total_posts" xml:space="preserve">
+    <value>Σύνολο Δημοσιεύσεων</value>
+  </data>
+  <data name="topics.show.feature_vote.current" xml:space="preserve">
+    <value>Τρέχουσα Προτεραιότητα +{0}</value>
+  </data>
+  <data name="topics.show.feature_vote.do" xml:space="preserve">
+    <value>Προαγωγή αυτού του αιτήματος</value>
+  </data>
+  <data name="topics.show.feature_vote.info._" xml:space="preserve">
+    <value>Αυτό είναι ένα {0}. Τα αιτήματα για λειτουργίες μπορούν να ψηφισθούν από τους {1}.</value>
+  </data>
+  <data name="topics.show.feature_vote.info.feature_request" xml:space="preserve">
+    <value>αίτημα για λειτουργία</value>
+  </data>
+  <data name="topics.show.feature_vote.info.supporters" xml:space="preserve">
+    <value>supporters</value>
+  </data>
+  <data name="topics.show.feature_vote.user.count" xml:space="preserve">
+    <value>{0} καμία ψήφος|{1} {0} ψήφος|[2,*] {0} ψήφοι</value>
+  </data>
+  <data name="topics.show.feature_vote.user.current" xml:space="preserve">
+    <value>Σας απομένουν {0}.</value>
+  </data>
+  <data name="topics.show.feature_vote.user.not_enough" xml:space="preserve">
+    <value>Δε σας απομένουν ψήφοι</value>
+  </data>
+  <data name="topics.show.poll.vote" xml:space="preserve">
+    <value>Ψηφίστε</value>
+  </data>
+  <data name="topics.show.poll.detail.end_time" xml:space="preserve">
+    <value>Η ψηφοφορία θα λήξει στις {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.ended" xml:space="preserve">
+    <value>H ψηφοφορία έληξε στις {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.results_hidden" xml:space="preserve">
+    <value>Τα αποτελέσματα θα φανερωθούν μόνο μετά τη λήξη της ψηφοφορίας.</value>
+  </data>
+  <data name="topics.show.poll.detail.total" xml:space="preserve">
+    <value>Σύνολο ψήφων: {0}</value>
+  </data>
+  <data name="topics.watch.to_not_watching" xml:space="preserve">
+    <value>Χωρίς σελιδοδείκτη</value>
+  </data>
+  <data name="topics.watch.to_watching" xml:space="preserve">
+    <value>Βάλτε Σελιδοδείκτη</value>
+  </data>
+  <data name="topics.watch.to_watching_mail" xml:space="preserve">
+    <value>Βάλτε σελιδοδείκτη με ειδοποίηση</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_disable" xml:space="preserve">
+    <value>Η Ειδοποίηση είναι ενεργοποιημένη. Κάντε κλικ για να απενεργοποίηση</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_enable" xml:space="preserve">
+    <value>Η ειδοποίηση είναι απενεργοποιημένη. Κάντε κλικ για ενεργοποίηση</value>
+  </data>
+</root>

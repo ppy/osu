@@ -1,0 +1,550 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="pinned_topics" xml:space="preserve">
+    <value>Nålade Ämnen</value>
+  </data>
+  <data name="slogan" xml:space="preserve">
+    <value>det är farligt att spela ensam.</value>
+  </data>
+  <data name="subforums" xml:space="preserve">
+    <value>Subforums</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>osu! forumen</value>
+  </data>
+  <data name="covers.edit" xml:space="preserve">
+    <value>Redigera omslag</value>
+  </data>
+  <data name="covers.create._" xml:space="preserve">
+    <value>Välj omslagsbild</value>
+  </data>
+  <data name="covers.create.button" xml:space="preserve">
+    <value>Ladda upp bild</value>
+  </data>
+  <data name="covers.create.info" xml:space="preserve">
+    <value>Omslagsstorlek bör vara {0}. Du kan också släppa din bild här för att ladda upp.</value>
+  </data>
+  <data name="covers.destroy._" xml:space="preserve">
+    <value>Ta bort omslagsbild</value>
+  </data>
+  <data name="covers.destroy.confirm" xml:space="preserve">
+    <value>Är du säker på att du vill ta bort omslagsbilden?</value>
+  </data>
+  <data name="forums.latest_post" xml:space="preserve">
+    <value>Senaste inlägg</value>
+  </data>
+  <data name="forums.index.title" xml:space="preserve">
+    <value>Forumets index</value>
+  </data>
+  <data name="forums.topics.empty" xml:space="preserve">
+    <value>Inga ämnen!</value>
+  </data>
+  <data name="mark_as_read.forum" xml:space="preserve">
+    <value>Markera forumet som läst</value>
+  </data>
+  <data name="mark_as_read.forums" xml:space="preserve">
+    <value>Markera forumen som läst</value>
+  </data>
+  <data name="mark_as_read.busy" xml:space="preserve">
+    <value>Markera som läst....</value>
+  </data>
+  <data name="post.confirm_destroy" xml:space="preserve">
+    <value>Vill du verkligen radera inlägget?</value>
+  </data>
+  <data name="post.confirm_restore" xml:space="preserve">
+    <value>Vill du verkligen återställa inlägget?</value>
+  </data>
+  <data name="post.edited" xml:space="preserve">
+    <value>Senast redigerad av {0} {1}, redigerad {2} gånger totalt.</value>
+  </data>
+  <data name="post.posted_at" xml:space="preserve">
+    <value>upplagd {0}</value>
+  </data>
+  <data name="post.posted_by" xml:space="preserve">
+    <value>upplagd av {0}</value>
+  </data>
+  <data name="post.actions.destroy" xml:space="preserve">
+    <value>Radera inlägg</value>
+  </data>
+  <data name="post.actions.edit" xml:space="preserve">
+    <value>Redigera inlägg</value>
+  </data>
+  <data name="post.actions.report" xml:space="preserve">
+    <value>Anmäl inlägg</value>
+  </data>
+  <data name="post.actions.restore" xml:space="preserve">
+    <value>Återställ inlägg</value>
+  </data>
+  <data name="post.create.title.reply" xml:space="preserve">
+    <value>Nytt svar</value>
+  </data>
+  <data name="post.info.post_count" xml:space="preserve">
+    <value>{0} inlägg|{0} inlägg</value>
+  </data>
+  <data name="post.info.topic_starter" xml:space="preserve">
+    <value>Ämnestartare </value>
+  </data>
+  <data name="search.go_to_post" xml:space="preserve">
+    <value>Gå till inlägg</value>
+  </data>
+  <data name="search.post_number_input" xml:space="preserve">
+    <value>skriv inläggsnummer</value>
+  </data>
+  <data name="search.total_posts" xml:space="preserve">
+    <value>{0} inlägg totalt</value>
+  </data>
+  <data name="topic.deleted" xml:space="preserve">
+    <value>raderat ämne</value>
+  </data>
+  <data name="topic.go_to_latest" xml:space="preserve">
+    <value>visa senaste inlägg</value>
+  </data>
+  <data name="topic.has_replied" xml:space="preserve">
+    <value>Du har svarat på detta ämne</value>
+  </data>
+  <data name="topic.in_forum" xml:space="preserve">
+    <value>i {0}</value>
+  </data>
+  <data name="topic.latest_post" xml:space="preserve">
+    <value>{0} av {1}</value>
+  </data>
+  <data name="topic.latest_reply_by" xml:space="preserve">
+    <value>senaste svar av {0}</value>
+  </data>
+  <data name="topic.new_topic" xml:space="preserve">
+    <value>Lägg upp nytt ämne</value>
+  </data>
+  <data name="topic.new_topic_login" xml:space="preserve">
+    <value>Logga in för att lägga upp ett nytt ämne</value>
+  </data>
+  <data name="topic.post_reply" xml:space="preserve">
+    <value>Skicka</value>
+  </data>
+  <data name="topic.reply_box_placeholder" xml:space="preserve">
+    <value>Skriv här för att svara</value>
+  </data>
+  <data name="topic.reply_title_prefix" xml:space="preserve">
+    <value>Åter</value>
+  </data>
+  <data name="topic.started_by" xml:space="preserve">
+    <value>av {0}</value>
+  </data>
+  <data name="topic.started_by_verbose" xml:space="preserve">
+    <value>startad av {0}</value>
+  </data>
+  <data name="topic.actions.destroy" xml:space="preserve">
+    <value>Ta bort ämne</value>
+  </data>
+  <data name="topic.actions.restore" xml:space="preserve">
+    <value>Återställ ämne</value>
+  </data>
+  <data name="topic.create.close" xml:space="preserve">
+    <value>Stäng</value>
+  </data>
+  <data name="topic.create.preview" xml:space="preserve">
+    <value>Förhandsvisning</value>
+  </data>
+  <data name="topic.create.preview_hide" xml:space="preserve">
+    <value>Skriv</value>
+  </data>
+  <data name="topic.create.submit" xml:space="preserve">
+    <value>Lägg upp</value>
+  </data>
+  <data name="topic.create.necropost.default" xml:space="preserve">
+    <value>Detta ämne har varit inaktiv ett tag. Skapa endast ett inlägg om du har en särskild skäl till att göra så.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic._" xml:space="preserve">
+    <value>Detta ämne har varit inaktiv ett tag. Om du inte har ett särskilt skäl att lägga upp här, vänligen {0} istället.</value>
+  </data>
+  <data name="topic.create.necropost.new_topic.create" xml:space="preserve">
+    <value>skapa ett nytt ämne</value>
+  </data>
+  <data name="topic.create.placeholder.body" xml:space="preserve">
+    <value>Skriv ditt inläggs innehåll här</value>
+  </data>
+  <data name="topic.create.placeholder.title" xml:space="preserve">
+    <value>Klicka här för att sätta titel</value>
+  </data>
+  <data name="topic.jump.enter" xml:space="preserve">
+    <value>klicka för att skriva ett specifik inläggs nummer</value>
+  </data>
+  <data name="topic.jump.first" xml:space="preserve">
+    <value>gå till första inlägget</value>
+  </data>
+  <data name="topic.jump.last" xml:space="preserve">
+    <value>gå till sista inlägget</value>
+  </data>
+  <data name="topic.jump.next" xml:space="preserve">
+    <value>hoppa över nästa 10 inlägg</value>
+  </data>
+  <data name="topic.jump.previous" xml:space="preserve">
+    <value>gå bakåt 10 inlägg</value>
+  </data>
+  <data name="topic.post_edit.cancel" xml:space="preserve">
+    <value>Avbryt</value>
+  </data>
+  <data name="topic.post_edit.post" xml:space="preserve">
+    <value>Spara</value>
+  </data>
+  <data name="topic_watches.index.title_compact" xml:space="preserve">
+    <value>forum prenumerationer</value>
+  </data>
+  <data name="topic_watches.index.box.total" xml:space="preserve">
+    <value>Ämne prenumererade</value>
+  </data>
+  <data name="topic_watches.index.box.unread" xml:space="preserve">
+    <value>Ämnen med nya svar</value>
+  </data>
+  <data name="topic_watches.index.info.total" xml:space="preserve">
+    <value>Du prenumererade till {0} ämnen.</value>
+  </data>
+  <data name="topic_watches.index.info.unread" xml:space="preserve">
+    <value>Du har {0} olästa svar till prenumererade ämnen.</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.confirmation" xml:space="preserve">
+    <value>Säga upp prenumeration från ämne?</value>
+  </data>
+  <data name="topic_watches.topic_buttons.remove.title" xml:space="preserve">
+    <value>Säga upp prenumeration</value>
+  </data>
+  <data name="topics._" xml:space="preserve">
+    <value>Ämnen</value>
+  </data>
+  <data name="topics.actions.login_reply" xml:space="preserve">
+    <value>Logga in för att svara</value>
+  </data>
+  <data name="topics.actions.reply" xml:space="preserve">
+    <value>Svara</value>
+  </data>
+  <data name="topics.actions.reply_with_quote" xml:space="preserve">
+    <value>Citera inlägg för svar</value>
+  </data>
+  <data name="topics.actions.search" xml:space="preserve">
+    <value>Sök</value>
+  </data>
+  <data name="topics.create.create_poll" xml:space="preserve">
+    <value>Skapande av enkät</value>
+  </data>
+  <data name="topics.create.preview" xml:space="preserve">
+    <value>Skicka förhandsvisningen</value>
+  </data>
+  <data name="topics.create.create_poll_button.add" xml:space="preserve">
+    <value>Skapa en enkät</value>
+  </data>
+  <data name="topics.create.create_poll_button.remove" xml:space="preserve">
+    <value>Avbryt skapande av enkät</value>
+  </data>
+  <data name="topics.create.poll.hide_results" xml:space="preserve">
+    <value>Dölj resultaten av enkäten.</value>
+  </data>
+  <data name="topics.create.poll.hide_results_info" xml:space="preserve">
+    <value>De kommer att visas först efter enkätens avslutande.</value>
+  </data>
+  <data name="topics.create.poll.length" xml:space="preserve">
+    <value>Kör enkät i</value>
+  </data>
+  <data name="topics.create.poll.length_days_suffix" xml:space="preserve">
+    <value>dagar</value>
+  </data>
+  <data name="topics.create.poll.length_info" xml:space="preserve">
+    <value>Lämna tom för inget avslut av enkät</value>
+  </data>
+  <data name="topics.create.poll.max_options" xml:space="preserve">
+    <value>Val per användare</value>
+  </data>
+  <data name="topics.create.poll.max_options_info" xml:space="preserve">
+    <value>Detta är antalet val varje användare kan välja när man röstar.</value>
+  </data>
+  <data name="topics.create.poll.options" xml:space="preserve">
+    <value>Val</value>
+  </data>
+  <data name="topics.create.poll.options_info" xml:space="preserve">
+    <value>Sätt varje val på en ny linje. Du kan skriva upp till 10 val.</value>
+  </data>
+  <data name="topics.create.poll.title" xml:space="preserve">
+    <value>Fråga</value>
+  </data>
+  <data name="topics.create.poll.vote_change" xml:space="preserve">
+    <value>Tillåt omröstning.</value>
+  </data>
+  <data name="topics.create.poll.vote_change_info" xml:space="preserve">
+    <value>Om aktiverad, så kan användare ändra sina röster.</value>
+  </data>
+  <data name="topics.edit_title.start" xml:space="preserve">
+    <value>Ändra titel</value>
+  </data>
+  <data name="topics.index.feature_votes" xml:space="preserve">
+    <value>stjärnprioritet</value>
+  </data>
+  <data name="topics.index.replies" xml:space="preserve">
+    <value>svar</value>
+  </data>
+  <data name="topics.index.views" xml:space="preserve">
+    <value>visningar</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0" xml:space="preserve">
+    <value>Ta bort "tillagd" tagg</value>
+  </data>
+  <data name="topics.issue_tag_added.to_0_done" xml:space="preserve">
+    <value>Tog bort "tillagd" tagg</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1" xml:space="preserve">
+    <value>Lägg till "tillagd" tagg</value>
+  </data>
+  <data name="topics.issue_tag_added.to_1_done" xml:space="preserve">
+    <value>La till "tillagd" tagg</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0" xml:space="preserve">
+    <value>Ta bort "tilldelad" tagg</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_0_done" xml:space="preserve">
+    <value>Tog bort "tilldelad" tagg</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1" xml:space="preserve">
+    <value>Lägg till "tilldelad" tagg</value>
+  </data>
+  <data name="topics.issue_tag_assigned.to_1_done" xml:space="preserve">
+    <value>La till "tilldelad" tagg</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0" xml:space="preserve">
+    <value>Ta bort "bekräftad" tagg</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_0_done" xml:space="preserve">
+    <value>Tog bort "bekräftad" tagg</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1" xml:space="preserve">
+    <value>Lägg till "bekräftad" tagg</value>
+  </data>
+  <data name="topics.issue_tag_confirmed.to_1_done" xml:space="preserve">
+    <value>La till "bekräftad" tagg</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0" xml:space="preserve">
+    <value>Ta bort "duplikat" tagg</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_0_done" xml:space="preserve">
+    <value>Tog bort "duplikat" tagg</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1" xml:space="preserve">
+    <value>Lägg till "duplikat" tagg</value>
+  </data>
+  <data name="topics.issue_tag_duplicate.to_1_done" xml:space="preserve">
+    <value>La till "duplikat" tagg</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0" xml:space="preserve">
+    <value>Ta bort "ogiltlig" tagg</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_0_done" xml:space="preserve">
+    <value>Tog bort "ogiltlig" tagg</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1" xml:space="preserve">
+    <value>Lägg till "ogiltlig" tagg</value>
+  </data>
+  <data name="topics.issue_tag_invalid.to_1_done" xml:space="preserve">
+    <value>La till "ogiltlig" tagg</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0" xml:space="preserve">
+    <value>Ta bort "löst" tagg</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_0_done" xml:space="preserve">
+    <value>Tog bort "löst" tagg</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1" xml:space="preserve">
+    <value>Lägg till "löst" tagg</value>
+  </data>
+  <data name="topics.issue_tag_resolved.to_1_done" xml:space="preserve">
+    <value>La till "löst" tagg</value>
+  </data>
+  <data name="topics.lock.is_locked" xml:space="preserve">
+    <value>Detta ämne är låst och kan ej svaras på</value>
+  </data>
+  <data name="topics.lock.to_0" xml:space="preserve">
+    <value>Lås upp ämne</value>
+  </data>
+  <data name="topics.lock.to_0_confirm" xml:space="preserve">
+    <value>Lås upp ämnet?</value>
+  </data>
+  <data name="topics.lock.to_0_done" xml:space="preserve">
+    <value>Ämne har blivit upplåst</value>
+  </data>
+  <data name="topics.lock.to_1" xml:space="preserve">
+    <value>Lås ämne</value>
+  </data>
+  <data name="topics.lock.to_1_confirm" xml:space="preserve">
+    <value>Lås ämnet?</value>
+  </data>
+  <data name="topics.lock.to_1_done" xml:space="preserve">
+    <value>Ämne har blivit låst</value>
+  </data>
+  <data name="topics.moderate_move.title" xml:space="preserve">
+    <value>Flytta till annat forum</value>
+  </data>
+  <data name="topics.moderate_pin.to_0" xml:space="preserve">
+    <value>Ta bort nålat ämne</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_confirm" xml:space="preserve">
+    <value>Lossa ämnet?</value>
+  </data>
+  <data name="topics.moderate_pin.to_0_done" xml:space="preserve">
+    <value>Nål på ämne har tagits bort</value>
+  </data>
+  <data name="topics.moderate_pin.to_1" xml:space="preserve">
+    <value>Nåla ämne</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_confirm" xml:space="preserve">
+    <value>Fäst ämnet?</value>
+  </data>
+  <data name="topics.moderate_pin.to_1_done" xml:space="preserve">
+    <value>Ämne har blivit nålat</value>
+  </data>
+  <data name="topics.moderate_pin.to_2" xml:space="preserve">
+    <value>Nåla ämne och markera som meddelande</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_confirm" xml:space="preserve">
+    <value>Fäst ämnet och markera det som meddelande?</value>
+  </data>
+  <data name="topics.moderate_pin.to_2_done" xml:space="preserve">
+    <value>Ämne har blivit nålat och markerat som meddelande</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.show" xml:space="preserve">
+    <value>Visa raderade inlägg</value>
+  </data>
+  <data name="topics.moderate_toggle_deleted.hide" xml:space="preserve">
+    <value>Dölj raderade inlägg</value>
+  </data>
+  <data name="topics.show.deleted-posts" xml:space="preserve">
+    <value>Raderade Inlägg</value>
+  </data>
+  <data name="topics.show.total_posts" xml:space="preserve">
+    <value>Totala Inlägg</value>
+  </data>
+  <data name="topics.show.feature_vote.current" xml:space="preserve">
+    <value>Nuvarande Prioritet: +{0}</value>
+  </data>
+  <data name="topics.show.feature_vote.do" xml:space="preserve">
+    <value>Uppmuntra denna begäran</value>
+  </data>
+  <data name="topics.show.feature_vote.info._" xml:space="preserve">
+    <value>Detta är en {0}. Funktionsförfrågningar kan röstas upp av {1}.</value>
+  </data>
+  <data name="topics.show.feature_vote.info.feature_request" xml:space="preserve">
+    <value>funktionönskemål</value>
+  </data>
+  <data name="topics.show.feature_vote.info.supporters" xml:space="preserve">
+    <value>supportrar</value>
+  </data>
+  <data name="topics.show.feature_vote.user.count" xml:space="preserve">
+    <value>{0} ingen röst|{1} {0} röst|[2,*] {0} röster</value>
+  </data>
+  <data name="topics.show.feature_vote.user.current" xml:space="preserve">
+    <value>Du har {0} kvar.</value>
+  </data>
+  <data name="topics.show.feature_vote.user.not_enough" xml:space="preserve">
+    <value>Du har inga röster kvar</value>
+  </data>
+  <data name="topics.show.poll.edit" xml:space="preserve">
+    <value>Redigera enkät</value>
+  </data>
+  <data name="topics.show.poll.edit_warning" xml:space="preserve">
+    <value>Redigering av en enkät kommer att ta bort det aktuella resultatet!</value>
+  </data>
+  <data name="topics.show.poll.vote" xml:space="preserve">
+    <value>Rösta</value>
+  </data>
+  <data name="topics.show.poll.button.change_vote" xml:space="preserve">
+    <value>Ändra röst</value>
+  </data>
+  <data name="topics.show.poll.button.edit" xml:space="preserve">
+    <value>Redigera enkät</value>
+  </data>
+  <data name="topics.show.poll.button.view_results" xml:space="preserve">
+    <value>Hoppa till resultaten</value>
+  </data>
+  <data name="topics.show.poll.button.vote" xml:space="preserve">
+    <value>Rösta</value>
+  </data>
+  <data name="topics.show.poll.detail.end_time" xml:space="preserve">
+    <value>Enkät kommer avslutas {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.ended" xml:space="preserve">
+    <value>Enkät avslutades {0}</value>
+  </data>
+  <data name="topics.show.poll.detail.results_hidden" xml:space="preserve">
+    <value>Resultaten kommer att visas efter enkätröstningens slut.</value>
+  </data>
+  <data name="topics.show.poll.detail.total" xml:space="preserve">
+    <value>Totala röster: {0}</value>
+  </data>
+  <data name="topics.watch.to_not_watching" xml:space="preserve">
+    <value>Inte bokmärkt</value>
+  </data>
+  <data name="topics.watch.to_watching" xml:space="preserve">
+    <value>Bokmärk</value>
+  </data>
+  <data name="topics.watch.to_watching_mail" xml:space="preserve">
+    <value>Bokmärke med notifikation</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_disable" xml:space="preserve">
+    <value>Avisering är aktiverad. Klicka för att inaktivera</value>
+  </data>
+  <data name="topics.watch.tooltip_mail_enable" xml:space="preserve">
+    <value>Avisering är inaktiverad. Klicka för att aktivera</value>
+  </data>
+</root>

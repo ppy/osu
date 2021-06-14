@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="invalid" xml:space="preserve">
+    <value>Указан неверный {0}.</value>
+  </data>
+  <data name="not_negative" xml:space="preserve">
+    <value>{0} не может быть отрицательным.</value>
+  </data>
+  <data name="required" xml:space="preserve">
+    <value>{0} является необходимым.</value>
+  </data>
+  <data name="too_long" xml:space="preserve">
+    <value>{0} превышает максимальное количество символов - можно использовать только до {1} characters символов.</value>
+  </data>
+  <data name="wrong_confirmation" xml:space="preserve">
+    <value>Повторы не совпадают.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmap_missing" xml:space="preserve">
+    <value>Временная отметка указана, но карта не найдена.</value>
+  </data>
+  <data name="beatmapset_discussion.beatmapset_no_hype" xml:space="preserve">
+    <value>К карте нельзя применить функции хайпа.</value>
+  </data>
+  <data name="beatmapset_discussion.hype_requires_null_beatmap" xml:space="preserve">
+    <value>Хайп может быть применен только в Общей (все сложности) секции.</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmap_id" xml:space="preserve">
+    <value>Указана неверная сложность.</value>
+  </data>
+  <data name="beatmapset_discussion.invalid_beatmapset_id" xml:space="preserve">
+    <value>Указана неправильная карта.</value>
+  </data>
+  <data name="beatmapset_discussion.locked" xml:space="preserve">
+    <value>Обсуждение закрыто.</value>
+  </data>
+  <data name="beatmapset_discussion.attributes.message_type" xml:space="preserve">
+    <value>Тип сообщения</value>
+  </data>
+  <data name="beatmapset_discussion.attributes.timestamp" xml:space="preserve">
+    <value>Временная отметка</value>
+  </data>
+  <data name="beatmapset_discussion.hype.discussion_locked" xml:space="preserve">
+    <value>Данная карта в текущий момент закрыта для обсуждения и не может быть хайпанута</value>
+  </data>
+  <data name="beatmapset_discussion.hype.guest" xml:space="preserve">
+    <value>Вам нужно войти, чтобы хайпить.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.hyped" xml:space="preserve">
+    <value>Вы уже хайпили на этой карте.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.limit_exceeded" xml:space="preserve">
+    <value>Вы уже использовали весь свой хайп.</value>
+  </data>
+  <data name="beatmapset_discussion.hype.not_hypeable" xml:space="preserve">
+    <value>Эта карта не может быть расхайплена</value>
+  </data>
+  <data name="beatmapset_discussion.hype.owner" xml:space="preserve">
+    <value>Вы не можете хайпить свои карты.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.exceeds_beatmapset_length" xml:space="preserve">
+    <value>Указанная временная отметка выходит за рамки её длины.</value>
+  </data>
+  <data name="beatmapset_discussion.timestamp.negative" xml:space="preserve">
+    <value>Временная отметка не может быть отрицательной.</value>
+  </data>
+  <data name="beatmapset_discussion_post.discussion_locked" xml:space="preserve">
+    <value>Обсуждение закрыто.</value>
+  </data>
+  <data name="beatmapset_discussion_post.first_post" xml:space="preserve">
+    <value>Невозможно удалить первую публикацию.</value>
+  </data>
+  <data name="beatmapset_discussion_post.attributes.message" xml:space="preserve">
+    <value>Сообщение</value>
+  </data>
+  <data name="comment.deleted_parent" xml:space="preserve">
+    <value>Нельзя ответить на удалённый комментарий.</value>
+  </data>
+  <data name="comment.top_only" xml:space="preserve">
+    <value>Не допускается закреплять ответы на комментарии.</value>
+  </data>
+  <data name="comment.attributes.message" xml:space="preserve">
+    <value>Сообщение</value>
+  </data>
+  <data name="follow.invalid" xml:space="preserve">
+    <value>Указан неверный {0}.</value>
+  </data>
+  <data name="forum.feature_vote.not_feature_topic" xml:space="preserve">
+    <value>Можно только проголосовать за запрос функции.</value>
+  </data>
+  <data name="forum.feature_vote.not_enough_feature_votes" xml:space="preserve">
+    <value>Недостаточно голосов.</value>
+  </data>
+  <data name="forum.poll_vote.invalid" xml:space="preserve">
+    <value>Указан недопустимый вариант.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_delete" xml:space="preserve">
+    <value>Нельзя удалить метаданные карты.</value>
+  </data>
+  <data name="forum.post.beatmapset_post_no_edit" xml:space="preserve">
+    <value>Нельзя изменить метаданные карты.</value>
+  </data>
+  <data name="forum.post.first_post_no_delete" xml:space="preserve">
+    <value>Невозможно удалить первую публикацию</value>
+  </data>
+  <data name="forum.post.missing_topic" xml:space="preserve">
+    <value>В публикации отсутствует тема</value>
+  </data>
+  <data name="forum.post.only_quote" xml:space="preserve">
+    <value>Ваш ответ содержит только цитату.</value>
+  </data>
+  <data name="forum.post.attributes.post_text" xml:space="preserve">
+    <value>Тело сообщения</value>
+  </data>
+  <data name="forum.topic.attributes.topic_title" xml:space="preserve">
+    <value>Заголовок темы</value>
+  </data>
+  <data name="forum.topic_poll.duplicate_options" xml:space="preserve">
+    <value>Повторение вариантов недопустимо.</value>
+  </data>
+  <data name="forum.topic_poll.grace_period_expired" xml:space="preserve">
+    <value>Нельзя отредактировать опрос спустя {0} часов</value>
+  </data>
+  <data name="forum.topic_poll.hiding_results_forever" xml:space="preserve">
+    <value>Нельзя скрыть результаты опроса, если он никогда не закончится.</value>
+  </data>
+  <data name="forum.topic_poll.invalid_max_options" xml:space="preserve">
+    <value>Вариант на пользователя не может превышать количество доступных опций.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_one_selection" xml:space="preserve">
+    <value>Требуется минимум один вариант для каждого пользователя.</value>
+  </data>
+  <data name="forum.topic_poll.minimum_two_options" xml:space="preserve">
+    <value>Нужно как минимум два варианта.</value>
+  </data>
+  <data name="forum.topic_poll.too_many_options" xml:space="preserve">
+    <value>Превышено максимальное количество вариантов.</value>
+  </data>
+  <data name="forum.topic_poll.attributes.title" xml:space="preserve">
+    <value>Заголовок опроса</value>
+  </data>
+  <data name="forum.topic_vote.required" xml:space="preserve">
+    <value>Выберите вариант, за который хотите проголосовать.</value>
+  </data>
+  <data name="forum.topic_vote.too_many" xml:space="preserve">
+    <value>Выбрано больше вариантов, чем разрешено.</value>
+  </data>
+  <data name="oauth.client.too_many" xml:space="preserve">
+    <value>Превышено максимально количество приложений OAuth.</value>
+  </data>
+  <data name="oauth.client.url" xml:space="preserve">
+    <value>Пожалуйста, введите действительный URL.</value>
+  </data>
+  <data name="oauth.client.attributes.name" xml:space="preserve">
+    <value>Имя приложения</value>
+  </data>
+  <data name="oauth.client.attributes.redirect" xml:space="preserve">
+    <value>Callback URL приложения</value>
+  </data>
+  <data name="user.contains_username" xml:space="preserve">
+    <value>Пароль не должен содержать никнейм.</value>
+  </data>
+  <data name="user.email_already_used" xml:space="preserve">
+    <value>Почта уже использована.</value>
+  </data>
+  <data name="user.email_not_allowed" xml:space="preserve">
+    <value>Недопустимый адрес электронной почты.</value>
+  </data>
+  <data name="user.invalid_country" xml:space="preserve">
+    <value>Вашей страны нет в базе данных.</value>
+  </data>
+  <data name="user.invalid_discord" xml:space="preserve">
+    <value>Неверное имя пользователя Discord.</value>
+  </data>
+  <data name="user.invalid_email" xml:space="preserve">
+    <value>Это не похоже на адрес электронной почты.</value>
+  </data>
+  <data name="user.invalid_twitter" xml:space="preserve">
+    <value>Неверное имя пользователя Twitter.</value>
+  </data>
+  <data name="user.too_short" xml:space="preserve">
+    <value>Новый пароль слишком короткий.</value>
+  </data>
+  <data name="user.unknown_duplicate" xml:space="preserve">
+    <value>Имя пользователя или почта уже занята.</value>
+  </data>
+  <data name="user.username_available_in" xml:space="preserve">
+    <value>Это имя будет доступно только спустя {0}.</value>
+  </data>
+  <data name="user.username_available_soon" xml:space="preserve">
+    <value>Это имя будет доступно для выбора в любую минуту!</value>
+  </data>
+  <data name="user.username_invalid_characters" xml:space="preserve">
+    <value>Выбранное имя содержит недопустимые символы.</value>
+  </data>
+  <data name="user.username_in_use" xml:space="preserve">
+    <value>Это имя уже используется!</value>
+  </data>
+  <data name="user.username_locked" xml:space="preserve">
+    <value>Это имя уже используется!</value>
+  </data>
+  <data name="user.username_no_space_userscore_mix" xml:space="preserve">
+    <value>Пожалуйста не используйте пробелы и подчёркивания одновременно!</value>
+  </data>
+  <data name="user.username_no_spaces" xml:space="preserve">
+    <value>Имя не может начинаться и заканчиваться пробелами!</value>
+  </data>
+  <data name="user.username_not_allowed" xml:space="preserve">
+    <value>Это имя недоступно.</value>
+  </data>
+  <data name="user.username_too_short" xml:space="preserve">
+    <value>Выбранное имя слишком короткое.</value>
+  </data>
+  <data name="user.username_too_long" xml:space="preserve">
+    <value>Выбранное имя слишком длинное.</value>
+  </data>
+  <data name="user.weak" xml:space="preserve">
+    <value>Слишком лёгкий пароль.</value>
+  </data>
+  <data name="user.wrong_current_password" xml:space="preserve">
+    <value>Текущий пароль неверный.</value>
+  </data>
+  <data name="user.wrong_email_confirmation" xml:space="preserve">
+    <value>Подтверждения почты не совпадают.</value>
+  </data>
+  <data name="user.wrong_password_confirmation" xml:space="preserve">
+    <value>Подтверждения пароля не совпадают.</value>
+  </data>
+  <data name="user.too_long" xml:space="preserve">
+    <value>Превышено максимальное количество символов - можно использовать только до {0} characters символов.</value>
+  </data>
+  <data name="user.attributes.username" xml:space="preserve">
+    <value>Имя пользователя</value>
+  </data>
+  <data name="user.attributes.user_email" xml:space="preserve">
+    <value>E-mail адрес</value>
+  </data>
+  <data name="user.attributes.password" xml:space="preserve">
+    <value>Пароль</value>
+  </data>
+  <data name="user.change_username.restricted" xml:space="preserve">
+    <value>Вы не можете сменить своё имя, пока ваш аккаунт ограничен.</value>
+  </data>
+  <data name="user.change_username.supporter_required._" xml:space="preserve">
+    <value>Вы должны {0} , чтобы изменить свое имя!</value>
+  </data>
+  <data name="user.change_username.supporter_required.link_text" xml:space="preserve">
+    <value>поддержать osu!</value>
+  </data>
+  <data name="user.change_username.username_is_same" xml:space="preserve">
+    <value>Это имя уже используется!</value>
+  </data>
+  <data name="user_report.reason_not_valid" xml:space="preserve">
+    <value>{0} не подходит для данного типа отчета.</value>
+  </data>
+  <data name="user_report.self" xml:space="preserve">
+    <value>Вы не можете пожаловаться на себя!</value>
+  </data>
+  <data name="store.order_item.attributes.quantity" xml:space="preserve">
+    <value>Кол-во</value>
+  </data>
+  <data name="store.order_item.attributes.cost" xml:space="preserve">
+    <value>Цена</value>
+  </data>
+</root>

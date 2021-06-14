@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authorizations.update.null_user" xml:space="preserve">
+    <value>Anda harus masuk untuk dapat menyunting.</value>
+  </data>
+  <data name="authorizations.update.system_generated" xml:space="preserve">
+    <value>Post yang dihasilkan secara otomatis tidak dapat disunting.</value>
+  </data>
+  <data name="authorizations.update.wrong_user" xml:space="preserve">
+    <value>Hanya pembuat post yang diperbolehkan untuk menyunting post.</value>
+  </data>
+  <data name="events.empty" xml:space="preserve">
+    <value>Belum ada yang terjadi.</value>
+  </data>
+  <data name="index.deleted_beatmap" xml:space="preserve">
+    <value>telah dihapus</value>
+  </data>
+  <data name="index.none_found" xml:space="preserve">
+    <value>Tidak ada diskusi yang memenuhi kriteria pencarian.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Laman Diskusi Beatmap</value>
+  </data>
+  <data name="index.form._" xml:space="preserve">
+    <value>Cari</value>
+  </data>
+  <data name="index.form.deleted" xml:space="preserve">
+    <value>Sertakan diskusi yang telah dihapus</value>
+  </data>
+  <data name="index.form.mode" xml:space="preserve">
+    <value>Mode beatmap</value>
+  </data>
+  <data name="index.form.only_unresolved" xml:space="preserve">
+    <value>Hanya tampilkan diskusi yang belum selesai</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Tipe pesan</value>
+  </data>
+  <data name="index.form.username" xml:space="preserve">
+    <value>Nama Pengguna</value>
+  </data>
+  <data name="index.form.beatmapset_status._" xml:space="preserve">
+    <value>Status Beatmap</value>
+  </data>
+  <data name="index.form.beatmapset_status.all" xml:space="preserve">
+    <value>Semua</value>
+  </data>
+  <data name="index.form.beatmapset_status.disqualified" xml:space="preserve">
+    <value>Disqualified</value>
+  </data>
+  <data name="index.form.beatmapset_status.never_qualified" xml:space="preserve">
+    <value>Tidak pernah Qualified</value>
+  </data>
+  <data name="index.form.beatmapset_status.qualified" xml:space="preserve">
+    <value>Qualified</value>
+  </data>
+  <data name="index.form.beatmapset_status.ranked" xml:space="preserve">
+    <value>Ranked</value>
+  </data>
+  <data name="index.form.user.label" xml:space="preserve">
+    <value>Pengguna</value>
+  </data>
+  <data name="index.form.user.overview" xml:space="preserve">
+    <value>Ringkasan aktivitas</value>
+  </data>
+  <data name="item.created_at" xml:space="preserve">
+    <value>Tanggal kiriman</value>
+  </data>
+  <data name="item.deleted_at" xml:space="preserve">
+    <value>Tanggal penghapusan</value>
+  </data>
+  <data name="item.message_type" xml:space="preserve">
+    <value>Jenis</value>
+  </data>
+  <data name="item.permalink" xml:space="preserve">
+    <value>Tautan</value>
+  </data>
+  <data name="nearby_posts.confirm" xml:space="preserve">
+    <value>Tidak ada postingan yang membahas masalah saya</value>
+  </data>
+  <data name="nearby_posts.notice" xml:space="preserve">
+    <value>Terdapat postingan pada {0} ({1}). Silakan periksa sebelum memposting.</value>
+  </data>
+  <data name="nearby_posts.unsaved" xml:space="preserve">
+    <value>{0} pada kajian ini</value>
+  </data>
+  <data name="owner_editor.button" xml:space="preserve">
+    <value>Kepemilikan Tingkat Kesulitan</value>
+  </data>
+  <data name="owner_editor.reset_confirm" xml:space="preserve">
+    <value>Atur ulang pemilik tingkat kesulitan ini?</value>
+  </data>
+  <data name="owner_editor.user" xml:space="preserve">
+    <value>Pemilik</value>
+  </data>
+  <data name="owner_editor.version" xml:space="preserve">
+    <value>Tingkat Kesulitan</value>
+  </data>
+  <data name="reply.open.guest" xml:space="preserve">
+    <value>Masuk untuk Menanggapi</value>
+  </data>
+  <data name="reply.open.user" xml:space="preserve">
+    <value>Tanggapi</value>
+  </data>
+  <data name="review.block_count" xml:space="preserve">
+    <value>{0} / {1} blok telah dipergunakan</value>
+  </data>
+  <data name="review.go_to_parent" xml:space="preserve">
+    <value>Lihat Kajian</value>
+  </data>
+  <data name="review.go_to_child" xml:space="preserve">
+    <value>Lihat Topik Diskusi</value>
+  </data>
+  <data name="review.validation.block_too_large" xml:space="preserve">
+    <value>masing-masing poin yang dikaji terbatas pada {0} karakter</value>
+  </data>
+  <data name="review.validation.external_references" xml:space="preserve">
+    <value>kajian ini mengandung satu atau lebih poin yang mengacu pada isu-isu yang tidak berasal dari beatmap ini</value>
+  </data>
+  <data name="review.validation.invalid_block_type" xml:space="preserve">
+    <value>tipe blok tidak sah</value>
+  </data>
+  <data name="review.validation.invalid_document" xml:space="preserve">
+    <value>kajian tidak sah</value>
+  </data>
+  <data name="review.validation.minimum_issues" xml:space="preserve">
+    <value>kajian harus tersusun atas setidaknya {0} isu|kajian harus tersusun atas setidaknya {0} isu</value>
+  </data>
+  <data name="review.validation.missing_text" xml:space="preserve">
+    <value>tidak terdapat tulisan pada blok</value>
+  </data>
+  <data name="review.validation.too_many_blocks" xml:space="preserve">
+    <value>kajian hanya dapat tersusun sepanjang maksimal {0} paragraf/isu|kajian hanya dapat tersusun sepanjang maksimal {0} paragraf/isu</value>
+  </data>
+  <data name="system.resolved.true" xml:space="preserve">
+    <value>Ditandai sebagai telah terjawab oleh {0}</value>
+  </data>
+  <data name="system.resolved.false" xml:space="preserve">
+    <value>Dibuka ulang oleh {0}</value>
+  </data>
+  <data name="timestamp_display.general" xml:space="preserve">
+    <value>umum</value>
+  </data>
+  <data name="timestamp_display.general_all" xml:space="preserve">
+    <value>umum (semua)</value>
+  </data>
+  <data name="user_filter.everyone" xml:space="preserve">
+    <value>Semua orang</value>
+  </data>
+  <data name="user_filter.label" xml:space="preserve">
+    <value>Saring berdasarkan pengguna</value>
+  </data>
+</root>

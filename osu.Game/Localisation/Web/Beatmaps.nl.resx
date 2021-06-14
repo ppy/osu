@@ -1,0 +1,688 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="discussion-votes.update.error" xml:space="preserve">
+    <value>Stem bijwerken mislukt</value>
+  </data>
+  <data name="discussions.allow_kudosu" xml:space="preserve">
+    <value>kudosu toestaan</value>
+  </data>
+  <data name="discussions.beatmap_information" xml:space="preserve">
+    <value>Beatmap pagina</value>
+  </data>
+  <data name="discussions.delete" xml:space="preserve">
+    <value>verwijder</value>
+  </data>
+  <data name="discussions.deleted" xml:space="preserve">
+    <value>Verwijderd door {0} {1}.</value>
+  </data>
+  <data name="discussions.deny_kudosu" xml:space="preserve">
+    <value>kudosu ontzeggen</value>
+  </data>
+  <data name="discussions.edit" xml:space="preserve">
+    <value>bewerk</value>
+  </data>
+  <data name="discussions.edited" xml:space="preserve">
+    <value>Laatst bewerkt door {0} {1}</value>
+  </data>
+  <data name="discussions.kudosu_denied" xml:space="preserve">
+    <value>Verkrijgen van kudosu ontkend.</value>
+  </data>
+  <data name="discussions.message_placeholder_deleted_beatmap" xml:space="preserve">
+    <value>Deze moeilijkheidsgraad is verwijderd en mag niet meer besproken worden.</value>
+  </data>
+  <data name="discussions.message_placeholder_locked" xml:space="preserve">
+    <value>Discussie voor deze beatmap is uitgeschakeld.</value>
+  </data>
+  <data name="discussions.message_placeholder_silenced" xml:space="preserve">
+    <value>Kan discussie niet plaatsen als je je misdragen hebt.</value>
+  </data>
+  <data name="discussions.message_type_select" xml:space="preserve">
+    <value>Selecteer Commentaartype</value>
+  </data>
+  <data name="discussions.reply_notice" xml:space="preserve">
+    <value>Druk op enter om te antwoorden.</value>
+  </data>
+  <data name="discussions.reply_placeholder" xml:space="preserve">
+    <value>Type hier je reactie</value>
+  </data>
+  <data name="discussions.require-login" xml:space="preserve">
+    <value>Log in om te posten of te antwoorden</value>
+  </data>
+  <data name="discussions.resolved" xml:space="preserve">
+    <value>Opgelost</value>
+  </data>
+  <data name="discussions.restore" xml:space="preserve">
+    <value>herstel</value>
+  </data>
+  <data name="discussions.show_deleted" xml:space="preserve">
+    <value>Toon verwijderde discussies</value>
+  </data>
+  <data name="discussions.title" xml:space="preserve">
+    <value>Discussies</value>
+  </data>
+  <data name="discussions.collapse.all-collapse" xml:space="preserve">
+    <value>Sluit alles</value>
+  </data>
+  <data name="discussions.collapse.all-expand" xml:space="preserve">
+    <value>Open alles</value>
+  </data>
+  <data name="discussions.empty.empty" xml:space="preserve">
+    <value>Nog geen bestaande discussie!</value>
+  </data>
+  <data name="discussions.empty.hidden" xml:space="preserve">
+    <value>Geen discussies komen overeen met de geselecteerde filter.</value>
+  </data>
+  <data name="discussions.lock.button.lock" xml:space="preserve">
+    <value>Vergrendel discussie</value>
+  </data>
+  <data name="discussions.lock.button.unlock" xml:space="preserve">
+    <value>Ontgrendel discussie</value>
+  </data>
+  <data name="discussions.lock.prompt.lock" xml:space="preserve">
+    <value>Reden voor vergrendelen</value>
+  </data>
+  <data name="discussions.lock.prompt.unlock" xml:space="preserve">
+    <value>Weet je zeker dat je het wilt ontgrendelen?</value>
+  </data>
+  <data name="discussions.message_hint.in_general" xml:space="preserve">
+    <value>Deze post gaat naar de algemene beatmapset discussie. Om deze map te modden moet je beginnen met een tijdstip (bijv. 00:12:345).</value>
+  </data>
+  <data name="discussions.message_hint.in_timeline" xml:space="preserve">
+    <value>Om meerdere tijdstippen te modden moet je meerdere keren posten (een post per tijdstip).</value>
+  </data>
+  <data name="discussions.message_placeholder.general" xml:space="preserve">
+    <value>Typ hier om in General te posten ({0})</value>
+  </data>
+  <data name="discussions.message_placeholder.generalall" xml:space="preserve">
+    <value>Typ hier om in General te posten (Alle moeilijkheden)</value>
+  </data>
+  <data name="discussions.message_placeholder.review" xml:space="preserve">
+    <value>Typ hier om een recensie te plaatsen</value>
+  </data>
+  <data name="discussions.message_placeholder.timeline" xml:space="preserve">
+    <value>Typ hier om naar de tijdlijn te posten ({0})</value>
+  </data>
+  <data name="discussions.message_type.disqualify" xml:space="preserve">
+    <value>Diskwalificeer</value>
+  </data>
+  <data name="discussions.message_type.hype" xml:space="preserve">
+    <value>Hype!</value>
+  </data>
+  <data name="discussions.message_type.mapper_note" xml:space="preserve">
+    <value>Opmerking</value>
+  </data>
+  <data name="discussions.message_type.nomination_reset" xml:space="preserve">
+    <value>Reset Nominatie</value>
+  </data>
+  <data name="discussions.message_type.praise" xml:space="preserve">
+    <value>Prijs</value>
+  </data>
+  <data name="discussions.message_type.problem" xml:space="preserve">
+    <value>Probleem</value>
+  </data>
+  <data name="discussions.message_type.review" xml:space="preserve">
+    <value>Recensie</value>
+  </data>
+  <data name="discussions.message_type.suggestion" xml:space="preserve">
+    <value>Suggestie</value>
+  </data>
+  <data name="discussions.mode.events" xml:space="preserve">
+    <value>Geschiedenis</value>
+  </data>
+  <data name="discussions.mode.general" xml:space="preserve">
+    <value>Algemeen {0}</value>
+  </data>
+  <data name="discussions.mode.reviews" xml:space="preserve">
+    <value>Recensies</value>
+  </data>
+  <data name="discussions.mode.timeline" xml:space="preserve">
+    <value>Tijdlijn</value>
+  </data>
+  <data name="discussions.mode.scopes.general" xml:space="preserve">
+    <value>Deze moeilijkheidsgraad</value>
+  </data>
+  <data name="discussions.mode.scopes.generalall" xml:space="preserve">
+    <value>Alle moeilijkheidsgraden</value>
+  </data>
+  <data name="discussions.new.pin" xml:space="preserve">
+    <value>Vastzetten</value>
+  </data>
+  <data name="discussions.new.timestamp" xml:space="preserve">
+    <value>Tijdstip</value>
+  </data>
+  <data name="discussions.new.timestamp_missing" xml:space="preserve">
+    <value>ctrl+c in de bewerkmodus en plak in je bericht om een tijdstip toe te voegen!</value>
+  </data>
+  <data name="discussions.new.title" xml:space="preserve">
+    <value>Nieuwe Discussie</value>
+  </data>
+  <data name="discussions.new.unpin" xml:space="preserve">
+    <value>Losmaken</value>
+  </data>
+  <data name="discussions.review.new" xml:space="preserve">
+    <value>Nieuwe Recensie</value>
+  </data>
+  <data name="discussions.review.embed.delete" xml:space="preserve">
+    <value>Verwijderen</value>
+  </data>
+  <data name="discussions.review.embed.missing" xml:space="preserve">
+    <value>[DISCUSSIE VERWIJDERD]</value>
+  </data>
+  <data name="discussions.review.embed.unlink" xml:space="preserve">
+    <value>Ontkoppelen</value>
+  </data>
+  <data name="discussions.review.embed.unsaved" xml:space="preserve">
+    <value>Niet-opgeslagen</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.all-diff" xml:space="preserve">
+    <value>Posts op "All difficulties" kunnen niet worden getimestamped.</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.diff" xml:space="preserve">
+    <value>Als {0} begint met een tijdstempel, dan wordt deze getoond onder de tijdlijn.</value>
+  </data>
+  <data name="discussions.review.insert-block.paragraph" xml:space="preserve">
+    <value>paragraaf invoegen</value>
+  </data>
+  <data name="discussions.review.insert-block.praise" xml:space="preserve">
+    <value>praise toevoegen</value>
+  </data>
+  <data name="discussions.review.insert-block.problem" xml:space="preserve">
+    <value>probleem toevoegen</value>
+  </data>
+  <data name="discussions.review.insert-block.suggestion" xml:space="preserve">
+    <value>suggestie toevoegen</value>
+  </data>
+  <data name="discussions.show.title" xml:space="preserve">
+    <value>Beatmapdiscussie</value>
+  </data>
+  <data name="discussions.sort.created_at" xml:space="preserve">
+    <value>Gemaakt op</value>
+  </data>
+  <data name="discussions.sort.timeline" xml:space="preserve">
+    <value>Tijdlijn</value>
+  </data>
+  <data name="discussions.sort.updated_at" xml:space="preserve">
+    <value>Laatst bijgewerkt</value>
+  </data>
+  <data name="discussions.stats.deleted" xml:space="preserve">
+    <value>Verwijderd</value>
+  </data>
+  <data name="discussions.stats.mapper_notes" xml:space="preserve">
+    <value>Opmerkingen</value>
+  </data>
+  <data name="discussions.stats.mine" xml:space="preserve">
+    <value>Van Mij</value>
+  </data>
+  <data name="discussions.stats.pending" xml:space="preserve">
+    <value>Afwachtend</value>
+  </data>
+  <data name="discussions.stats.praises" xml:space="preserve">
+    <value>Aangeprezen</value>
+  </data>
+  <data name="discussions.stats.resolved" xml:space="preserve">
+    <value>Opgelost</value>
+  </data>
+  <data name="discussions.stats.total" xml:space="preserve">
+    <value>Alle</value>
+  </data>
+  <data name="discussions.status-messages.approved" xml:space="preserve">
+    <value>Deze beatmap werd goedgekeurd op {0}!</value>
+  </data>
+  <data name="discussions.status-messages.graveyard" xml:space="preserve">
+    <value>Deze beatmap is niet meer bijgewerkt sinds {0} en is waarschijnlijk opgegeven door de maker...</value>
+  </data>
+  <data name="discussions.status-messages.loved" xml:space="preserve">
+    <value>Deze map was bij de geliefde categorie toegevoegd op: datum!</value>
+  </data>
+  <data name="discussions.status-messages.ranked" xml:space="preserve">
+    <value>Deze beatmap werd ranked op {0}!</value>
+  </data>
+  <data name="discussions.status-messages.wip" xml:space="preserve">
+    <value>Deze beatmap is gemarkeerd als work-in-progress door de maker.</value>
+  </data>
+  <data name="discussions.votes.none.down" xml:space="preserve">
+    <value>Nog geen downvotes</value>
+  </data>
+  <data name="discussions.votes.none.up" xml:space="preserve">
+    <value>Nog geen upvotes</value>
+  </data>
+  <data name="discussions.votes.latest.down" xml:space="preserve">
+    <value>Laatste downvotes</value>
+  </data>
+  <data name="discussions.votes.latest.up" xml:space="preserve">
+    <value>Laatste upvotes</value>
+  </data>
+  <data name="hype.button" xml:space="preserve">
+    <value>Hype Beatmap!</value>
+  </data>
+  <data name="hype.button_done" xml:space="preserve">
+    <value>Al Gehyped!</value>
+  </data>
+  <data name="hype.confirm" xml:space="preserve">
+    <value>Weet je dat zeker? Dit zal een van je {0} hypes gebruiken en kan niet ongedaan gemaakt worden.</value>
+  </data>
+  <data name="hype.explanation" xml:space="preserve">
+    <value>Hype deze beatmap om ze zichtbaarder te maken voor nominatie en ranking!</value>
+  </data>
+  <data name="hype.explanation_guest" xml:space="preserve">
+    <value>Log in en hype deze beatmap om ze zichtbaarder te maken voor nominatie en ranking!</value>
+  </data>
+  <data name="hype.new_time" xml:space="preserve">
+    <value>Je krijgt nog een hype {0}.</value>
+  </data>
+  <data name="hype.remaining" xml:space="preserve">
+    <value>Je hebt nog {0} hype over.</value>
+  </data>
+  <data name="hype.required_text" xml:space="preserve">
+    <value>Hype: {0}/{1}</value>
+  </data>
+  <data name="hype.section_title" xml:space="preserve">
+    <value>Hype Train</value>
+  </data>
+  <data name="hype.title" xml:space="preserve">
+    <value>Hype</value>
+  </data>
+  <data name="feedback.button" xml:space="preserve">
+    <value>Geef Feedback</value>
+  </data>
+  <data name="nominations.delete" xml:space="preserve">
+    <value>Verwijder</value>
+  </data>
+  <data name="nominations.delete_own_confirm" xml:space="preserve">
+    <value>Weet je het zeker? De beatmap zal worden verwijderd en je zult worden terug gestuurd naar je profiel.</value>
+  </data>
+  <data name="nominations.delete_other_confirm" xml:space="preserve">
+    <value>Weet je het zeker? De beatmap zal worden verwijderd en je zult worden terug gestuurd naar het profiel van de gebruiker.</value>
+  </data>
+  <data name="nominations.disqualification_prompt" xml:space="preserve">
+    <value>Reden voor diskwalificatie?</value>
+  </data>
+  <data name="nominations.disqualified_at" xml:space="preserve">
+    <value>Gediskwalificeerd {0} ({1}).</value>
+  </data>
+  <data name="nominations.disqualified_no_reason" xml:space="preserve">
+    <value>geen reden opgegeven</value>
+  </data>
+  <data name="nominations.disqualify" xml:space="preserve">
+    <value>Diskwalificeer</value>
+  </data>
+  <data name="nominations.incorrect_state" xml:space="preserve">
+    <value>Fout tijdens het uitvoeren van deze bewerking, probeer de pagina te herladen.</value>
+  </data>
+  <data name="nominations.love" xml:space="preserve">
+    <value>Love</value>
+  </data>
+  <data name="nominations.love_confirm" xml:space="preserve">
+    <value>Love deze beatmap?</value>
+  </data>
+  <data name="nominations.nominate" xml:space="preserve">
+    <value>Nomineer</value>
+  </data>
+  <data name="nominations.nominate_confirm" xml:space="preserve">
+    <value>Nomineer deze beatmap?</value>
+  </data>
+  <data name="nominations.nominated_by" xml:space="preserve">
+    <value>genomineerd door {0}</value>
+  </data>
+  <data name="nominations.not_enough_hype" xml:space="preserve">
+    <value>Er is niet genoeg hype.</value>
+  </data>
+  <data name="nominations.remove_from_loved" xml:space="preserve">
+    <value>Verwijderen uit Loved</value>
+  </data>
+  <data name="nominations.remove_from_loved_prompt" xml:space="preserve">
+    <value>Reden voor het verwijderen uit Loved:</value>
+  </data>
+  <data name="nominations.required_text" xml:space="preserve">
+    <value>Nimonaties: {0}/{1}</value>
+  </data>
+  <data name="nominations.reset_message_deleted" xml:space="preserve">
+    <value>verwijderd</value>
+  </data>
+  <data name="nominations.title" xml:space="preserve">
+    <value>Nominatiestatus</value>
+  </data>
+  <data name="nominations.unresolved_issues" xml:space="preserve">
+    <value>Er zijn nog steeds onopgeloste problemen die eerst moeten worden aangepakt.</value>
+  </data>
+  <data name="nominations.rank_estimate._" xml:space="preserve">
+    <value>Deze map staat gepland om ranked te worden op {0} als er geen problemen worden gevonden. Het is #{1} in de {2}.</value>
+  </data>
+  <data name="nominations.rank_estimate.queue" xml:space="preserve">
+    <value>ranking wachtlijst</value>
+  </data>
+  <data name="nominations.rank_estimate.soon" xml:space="preserve">
+    <value>binnenkort</value>
+  </data>
+  <data name="nominations.reset_at.nomination_reset" xml:space="preserve">
+    <value>Nominatieprocess {0} gereset door {1} met nieuw probleem {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_at.disqualify" xml:space="preserve">
+    <value>Gediskwalificeerd {0} door {1} met nieuw probleem {2} ({3}).</value>
+  </data>
+  <data name="nominations.reset_confirm.nomination_reset" xml:space="preserve">
+    <value>Weet je dat zeker? Een nieuw probleem posten zal het nominatieproces resetten.</value>
+  </data>
+  <data name="nominations.reset_confirm.disqualify" xml:space="preserve">
+    <value>Weet je het zeker? Hierdoor zal de beatmap worden verwijderd van kwalificatie en wordt het nominatie proces gereset.</value>
+  </data>
+  <data name="listing.search.prompt" xml:space="preserve">
+    <value>typ sleutelwoorden in...</value>
+  </data>
+  <data name="listing.search.login_required" xml:space="preserve">
+    <value>Log in om te zoeken.</value>
+  </data>
+  <data name="listing.search.options" xml:space="preserve">
+    <value>Meer Zoekopties</value>
+  </data>
+  <data name="listing.search.supporter_filter" xml:space="preserve">
+    <value>Filteren met {0} vereist een actieve osu!supporter tag</value>
+  </data>
+  <data name="listing.search.not-found" xml:space="preserve">
+    <value>geen resultaten</value>
+  </data>
+  <data name="listing.search.not-found-quote" xml:space="preserve">
+    <value>... nope, niets gevonden.</value>
+  </data>
+  <data name="listing.search.filters.extra" xml:space="preserve">
+    <value>extra</value>
+  </data>
+  <data name="listing.search.filters.general" xml:space="preserve">
+    <value>Algemeen</value>
+  </data>
+  <data name="listing.search.filters.genre" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+  <data name="listing.search.filters.language" xml:space="preserve">
+    <value>Taal</value>
+  </data>
+  <data name="listing.search.filters.mode" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="listing.search.filters.nsfw" xml:space="preserve">
+    <value>Expliciete inhoud</value>
+  </data>
+  <data name="listing.search.filters.played" xml:space="preserve">
+    <value>Gespeeld</value>
+  </data>
+  <data name="listing.search.filters.rank" xml:space="preserve">
+    <value>Rank Behaald</value>
+  </data>
+  <data name="listing.search.filters.status" xml:space="preserve">
+    <value>Categorieën</value>
+  </data>
+  <data name="listing.search.sorting.title" xml:space="preserve">
+    <value>Titel</value>
+  </data>
+  <data name="listing.search.sorting.artist" xml:space="preserve">
+    <value>Artiest</value>
+  </data>
+  <data name="listing.search.sorting.difficulty" xml:space="preserve">
+    <value>Moeilijkheidsgraad</value>
+  </data>
+  <data name="listing.search.sorting.favourites" xml:space="preserve">
+    <value>Favorieten</value>
+  </data>
+  <data name="listing.search.sorting.updated" xml:space="preserve">
+    <value>Bijgewerkt</value>
+  </data>
+  <data name="listing.search.sorting.ranked" xml:space="preserve">
+    <value>Ranked</value>
+  </data>
+  <data name="listing.search.sorting.rating" xml:space="preserve">
+    <value>Beoordeling</value>
+  </data>
+  <data name="listing.search.sorting.plays" xml:space="preserve">
+    <value>Keren gespeeld</value>
+  </data>
+  <data name="listing.search.sorting.relevance" xml:space="preserve">
+    <value>Relevantie</value>
+  </data>
+  <data name="listing.search.sorting.nominations" xml:space="preserve">
+    <value>Nominaties</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote._" xml:space="preserve">
+    <value>Filteren met {0} vereist een {1}</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote.link_text" xml:space="preserve">
+    <value>osu!supporter tag</value>
+  </data>
+  <data name="general.converts" xml:space="preserve">
+    <value>Tel geconverteerde beatmaps mee</value>
+  </data>
+  <data name="general.follows" xml:space="preserve">
+    <value>Geabonneerde mappers</value>
+  </data>
+  <data name="general.recommended" xml:space="preserve">
+    <value>Aanbevolen moeilijkheid</value>
+  </data>
+  <data name="mode.all" xml:space="preserve">
+    <value>Alle</value>
+  </data>
+  <data name="mode.any" xml:space="preserve">
+    <value>Alles</value>
+  </data>
+  <data name="status.any" xml:space="preserve">
+    <value>Alles</value>
+  </data>
+  <data name="status.approved" xml:space="preserve">
+    <value>Goedgekeurd</value>
+  </data>
+  <data name="status.favourites" xml:space="preserve">
+    <value>Favorieten</value>
+  </data>
+  <data name="status.graveyard" xml:space="preserve">
+    <value>Begraafplaats</value>
+  </data>
+  <data name="status.leaderboard" xml:space="preserve">
+    <value>Heeft Ranglijst</value>
+  </data>
+  <data name="status.loved" xml:space="preserve">
+    <value>Loved</value>
+  </data>
+  <data name="status.mine" xml:space="preserve">
+    <value>Mijn Mappen</value>
+  </data>
+  <data name="status.pending" xml:space="preserve">
+    <value>Pending &amp; WIP</value>
+  </data>
+  <data name="status.qualified" xml:space="preserve">
+    <value>Gekwalificeerd</value>
+  </data>
+  <data name="status.ranked" xml:space="preserve">
+    <value>Ranked</value>
+  </data>
+  <data name="genre.any" xml:space="preserve">
+    <value>Alles</value>
+  </data>
+  <data name="genre.unspecified" xml:space="preserve">
+    <value>Niet Gespecificeerd</value>
+  </data>
+  <data name="genre.video-game" xml:space="preserve">
+    <value>Video Game</value>
+  </data>
+  <data name="genre.anime" xml:space="preserve">
+    <value>Anime</value>
+  </data>
+  <data name="genre.rock" xml:space="preserve">
+    <value>Rock</value>
+  </data>
+  <data name="genre.pop" xml:space="preserve">
+    <value>Pop</value>
+  </data>
+  <data name="genre.other" xml:space="preserve">
+    <value>Anders</value>
+  </data>
+  <data name="genre.novelty" xml:space="preserve">
+    <value>Novelty</value>
+  </data>
+  <data name="genre.hip-hop" xml:space="preserve">
+    <value>Hip Hop</value>
+  </data>
+  <data name="genre.electronic" xml:space="preserve">
+    <value>Electronic</value>
+  </data>
+  <data name="genre.metal" xml:space="preserve">
+    <value>Metal</value>
+  </data>
+  <data name="genre.classical" xml:space="preserve">
+    <value>Klassiek</value>
+  </data>
+  <data name="genre.folk" xml:space="preserve">
+    <value>Volksmuziek</value>
+  </data>
+  <data name="genre.jazz" xml:space="preserve">
+    <value>Jazz</value>
+  </data>
+  <data name="mods.v2" xml:space="preserve">
+    <value>Score V2</value>
+  </data>
+  <data name="language.any" xml:space="preserve">
+    <value>Alles</value>
+  </data>
+  <data name="language.english" xml:space="preserve">
+    <value>Engels</value>
+  </data>
+  <data name="language.chinese" xml:space="preserve">
+    <value>Chinees</value>
+  </data>
+  <data name="language.french" xml:space="preserve">
+    <value>Frans</value>
+  </data>
+  <data name="language.german" xml:space="preserve">
+    <value>Duits</value>
+  </data>
+  <data name="language.italian" xml:space="preserve">
+    <value>Italiaans</value>
+  </data>
+  <data name="language.japanese" xml:space="preserve">
+    <value>Japans</value>
+  </data>
+  <data name="language.korean" xml:space="preserve">
+    <value>Koreaans</value>
+  </data>
+  <data name="language.spanish" xml:space="preserve">
+    <value>Spaans</value>
+  </data>
+  <data name="language.swedish" xml:space="preserve">
+    <value>Zweeds</value>
+  </data>
+  <data name="language.russian" xml:space="preserve">
+    <value>Russisch</value>
+  </data>
+  <data name="language.polish" xml:space="preserve">
+    <value>Pools</value>
+  </data>
+  <data name="language.instrumental" xml:space="preserve">
+    <value>Instrumentaal</value>
+  </data>
+  <data name="language.other" xml:space="preserve">
+    <value>Anders</value>
+  </data>
+  <data name="language.unspecified" xml:space="preserve">
+    <value>Niet Gespecificeerd</value>
+  </data>
+  <data name="nsfw.exclude" xml:space="preserve">
+    <value>Verbergen</value>
+  </data>
+  <data name="nsfw.include" xml:space="preserve">
+    <value>Weergeven</value>
+  </data>
+  <data name="played.any" xml:space="preserve">
+    <value>Alles</value>
+  </data>
+  <data name="played.played" xml:space="preserve">
+    <value>Gespeeld</value>
+  </data>
+  <data name="played.unplayed" xml:space="preserve">
+    <value>Ongespeeld</value>
+  </data>
+  <data name="extra.video" xml:space="preserve">
+    <value>Heeft Video</value>
+  </data>
+  <data name="extra.storyboard" xml:space="preserve">
+    <value>Heeft Storyboard</value>
+  </data>
+  <data name="rank.any" xml:space="preserve">
+    <value>Alles</value>
+  </data>
+  <data name="rank.xh" xml:space="preserve">
+    <value>Zilveren SS</value>
+  </data>
+  <data name="rank.sh" xml:space="preserve">
+    <value>Zilveren S</value>
+  </data>
+  <data name="panel.playcount" xml:space="preserve">
+    <value>Speelaantal {0}</value>
+  </data>
+  <data name="panel.favourites" xml:space="preserve">
+    <value>Favorieten: {0}</value>
+  </data>
+  <data name="variant.mania.4k" xml:space="preserve">
+    <value>4K</value>
+  </data>
+  <data name="variant.mania.7k" xml:space="preserve">
+    <value>7K</value>
+  </data>
+  <data name="variant.mania.all" xml:space="preserve">
+    <value>Alles</value>
+  </data>
+</root>

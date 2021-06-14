@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="play_more" xml:space="preserve">
+    <value>osu!를 조금 더 해보시는 건 어떨까요?</value>
+  </data>
+  <data name="require_login" xml:space="preserve">
+    <value>계속하려면 로그인해 주세요.</value>
+  </data>
+  <data name="require_verification" xml:space="preserve">
+    <value>계속하려면 인증해 주세요.</value>
+  </data>
+  <data name="restricted" xml:space="preserve">
+    <value>제한된 상태에서는 할 수 없습니다.</value>
+  </data>
+  <data name="silenced" xml:space="preserve">
+    <value>침묵 상태에서는 할 수 없습니다.</value>
+  </data>
+  <data name="unauthorized" xml:space="preserve">
+    <value>접근이 거부되었습니다.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.is_hype" xml:space="preserve">
+    <value>Hype한 것은 되돌릴 수 없습니다.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.has_reply" xml:space="preserve">
+    <value>답글이 달린 토론은 삭제할 수 없습니다</value>
+  </data>
+  <data name="beatmap_discussion.nominate.exhausted" xml:space="preserve">
+    <value>오늘은 더 이상 추천할 수 없습니다. 내일 다시 시도해주세요.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.incorrect_state" xml:space="preserve">
+    <value>해당 작업을 수행하는 중 오류가 발생했습니다. 페이지를 새로 고쳐주세요.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.owner" xml:space="preserve">
+    <value>자신의 비트맵을 추천할 수 없습니다.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.set_metadata" xml:space="preserve">
+    <value>추천하려면 먼저 장르와 언어를 지정해야 합니다.</value>
+  </data>
+  <data name="beatmap_discussion.resolve.not_owner" xml:space="preserve">
+    <value>게시글 작성자 또는 비트맵 제작자만 토론을 가결할 수 있습니다.</value>
+  </data>
+  <data name="beatmap_discussion.store.mapper_note_wrong_user" xml:space="preserve">
+    <value>비트맵 소유자나 nominator/QAT그룹 구성원만이 mapper notes를 작성할 수 있습니다.</value>
+  </data>
+  <data name="beatmap_discussion.vote.bot" xml:space="preserve">
+    <value>봇이 만든 토론에는 투표할 수 없습니다.</value>
+  </data>
+  <data name="beatmap_discussion.vote.limit_exceeded" xml:space="preserve">
+    <value>투표를 더 하기 전에 조금 기다려주세요</value>
+  </data>
+  <data name="beatmap_discussion.vote.owner" xml:space="preserve">
+    <value>자신이 시작한 토론에는 투표할 수 없습니다.</value>
+  </data>
+  <data name="beatmap_discussion.vote.wrong_beatmapset_state" xml:space="preserve">
+    <value>Pending인 비트맵의 토론에만 투표할 수 있습니다.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.not_owner" xml:space="preserve">
+    <value>자신의 게시글만 삭제할 수 있습니다.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.resolved" xml:space="preserve">
+    <value>해결된 토론의 게시글은 삭제할 수 없습니다.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.system_generated" xml:space="preserve">
+    <value>자동으로 생성된 글은 삭제할 수 없습니다.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.not_owner" xml:space="preserve">
+    <value>본인이 쓴 글만 수정할 수 있습니다.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.resolved" xml:space="preserve">
+    <value>해결된 토론의 게시글은 수정할 수 없습니다.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.system_generated" xml:space="preserve">
+    <value>자동으로 생성된 글은 수정할 수 없습니다.</value>
+  </data>
+  <data name="beatmap_discussion_post.store.beatmapset_locked" xml:space="preserve">
+    <value>이 비트맵은 토론을 할 수 없도록 잠겨 있습니다.</value>
+  </data>
+  <data name="beatmapset.metadata.nominated" xml:space="preserve">
+    <value>추천된 맵의 메타데이터를 변경할 순 없습니다. 잘못 지정된 것 같으면 BN이나 NAT 멤버에게 알려주세요.</value>
+  </data>
+  <data name="chat.blocked" xml:space="preserve">
+    <value>당신을 차단하였거나 당신이 차단한 유저에게 메시지를 보낼 수 없습니다.</value>
+  </data>
+  <data name="chat.friends_only" xml:space="preserve">
+    <value>해당 유저는 친구가 아닌 유저의 메시지를 차단한 상태입니다.</value>
+  </data>
+  <data name="chat.moderated" xml:space="preserve">
+    <value>채널은 현재 관리 중입니다.</value>
+  </data>
+  <data name="chat.no_access" xml:space="preserve">
+    <value>해당 채널에 대한 접근 권한이 없습니다.</value>
+  </data>
+  <data name="chat.restricted" xml:space="preserve">
+    <value>침목이나 제한, 밴이 된 상태인 동안에는 메시지를 보낼 수 없습니다.</value>
+  </data>
+  <data name="chat.silenced" xml:space="preserve">
+    <value>침묵, 제한, 차단 상태에서는 메시지를 전송할 수 없습니다.</value>
+  </data>
+  <data name="comment.update.deleted" xml:space="preserve">
+    <value>삭제된 게시물을 수정 할 수 없습니다.</value>
+  </data>
+  <data name="contest.voting_over" xml:space="preserve">
+    <value>투표 기간 이후에는 콘테스트가 끝날 때 까지 선택한 투표를 바꿀 수 없습니다.</value>
+  </data>
+  <data name="contest.entry.limit_reached" xml:space="preserve">
+    <value>이 콘테스트에서 참가 가능한 작품 수를 초과했습니다.</value>
+  </data>
+  <data name="contest.entry.over" xml:space="preserve">
+    <value>콘테스트에 참가해주셔서 감사합니다! 작품 제출이 마감되었고, 투표가 곧 시작됩니다.</value>
+  </data>
+  <data name="forum.moderate.no_permission" xml:space="preserve">
+    <value>이 포럼을 관리할 권한이 없습니다.</value>
+  </data>
+  <data name="forum.post.delete.only_last_post" xml:space="preserve">
+    <value>마지막 답글만 삭제할 수 있습니다.</value>
+  </data>
+  <data name="forum.post.delete.locked" xml:space="preserve">
+    <value>잠긴 주제에 달린 답글은 삭제할 수 없습니다.</value>
+  </data>
+  <data name="forum.post.delete.no_forum_access" xml:space="preserve">
+    <value>요청하신 포럼에 대한 접근 권한이 필요합니다.</value>
+  </data>
+  <data name="forum.post.delete.not_owner" xml:space="preserve">
+    <value>본인이 쓴 답글만 삭제할 수 있습니다.</value>
+  </data>
+  <data name="forum.post.edit.deleted" xml:space="preserve">
+    <value>삭제된 답글은 수정할 수 없습니다.</value>
+  </data>
+  <data name="forum.post.edit.locked" xml:space="preserve">
+    <value>이 답글은 잠겨있어 수정할 수 없습니다.</value>
+  </data>
+  <data name="forum.post.edit.no_forum_access" xml:space="preserve">
+    <value>요청하신 포럼에 대한 접근 권한이 필요합니다.</value>
+  </data>
+  <data name="forum.post.edit.not_owner" xml:space="preserve">
+    <value>본인이 쓴 답글만 수정할 수 있습니다.</value>
+  </data>
+  <data name="forum.post.edit.topic_locked" xml:space="preserve">
+    <value>잠긴 주제에 달린 답글은 수정할 수 없습니다.</value>
+  </data>
+  <data name="forum.post.store.play_more" xml:space="preserve">
+    <value>포럼에 글을 올리기 전에 게임을 플레이해주세요, 제발요! 만약 플레이하는데 문제가 있다면, Help and Support 포럼에 글을 남겨주세요.</value>
+  </data>
+  <data name="forum.post.store.too_many_help_posts" xml:space="preserve">
+    <value>글을 더 남기려면 게임을 플레이해야 합니다. 만약 게임 진행에 문제가 있다면, support@ppy.sh 에 이메일을 보내주세요.</value>
+  </data>
+  <data name="forum.topic.reply.double_post" xml:space="preserve">
+    <value>다시 작성하기보단 마지막으로 작성한 글을 수정 해 주세요.</value>
+  </data>
+  <data name="forum.topic.reply.locked" xml:space="preserve">
+    <value>게시글이 잠겨있어 답변할 수 없습니다.</value>
+  </data>
+  <data name="forum.topic.reply.no_forum_access" xml:space="preserve">
+    <value>요청하신 포럼에 대한 접근 권한이 필요합니다.</value>
+  </data>
+  <data name="forum.topic.reply.no_permission" xml:space="preserve">
+    <value>답변할 권한이 없습니다.</value>
+  </data>
+  <data name="forum.topic.reply.user.require_login" xml:space="preserve">
+    <value>답글을 게시하려면 로그인해 주세요.</value>
+  </data>
+  <data name="forum.topic.reply.user.restricted" xml:space="preserve">
+    <value>제한된 상태의 계정은 답글을 게시할 수 없습니다.</value>
+  </data>
+  <data name="forum.topic.reply.user.silenced" xml:space="preserve">
+    <value>침묵 상태의 계정은 답글을 게시할 수 없습니다.</value>
+  </data>
+  <data name="forum.topic.store.no_forum_access" xml:space="preserve">
+    <value>요청하신 포럼에 대한 접근 권한이 필요합니다.</value>
+  </data>
+  <data name="forum.topic.store.no_permission" xml:space="preserve">
+    <value>새 주제글을 게시할 권한이 없습니다.</value>
+  </data>
+  <data name="forum.topic.store.forum_closed" xml:space="preserve">
+    <value>포럼이 닫혀있어 현재 포럼에 글을 올릴 수 없습니다.</value>
+  </data>
+  <data name="forum.topic.vote.no_forum_access" xml:space="preserve">
+    <value>요청하신 포럼에 대한 접근 권한이 필요합니다.</value>
+  </data>
+  <data name="forum.topic.vote.over" xml:space="preserve">
+    <value>투표가 종료되어 더이상 투표할 수 없습니다.</value>
+  </data>
+  <data name="forum.topic.vote.play_more" xml:space="preserve">
+    <value>포럼에 투표를 하기 전에 게임을 조금 더 플레이하셔야 해요.</value>
+  </data>
+  <data name="forum.topic.vote.voted" xml:space="preserve">
+    <value>투표한 뒤에는 변경할 수 없습니다.</value>
+  </data>
+  <data name="forum.topic.vote.user.require_login" xml:space="preserve">
+    <value>투표하려면 로그인해 주세요.</value>
+  </data>
+  <data name="forum.topic.vote.user.restricted" xml:space="preserve">
+    <value>제한된 상태에서는 투표할 수 없습니다.</value>
+  </data>
+  <data name="forum.topic.vote.user.silenced" xml:space="preserve">
+    <value>침묵 상태의 계정은 투표할 수 없습니다.</value>
+  </data>
+  <data name="forum.topic.watch.no_forum_access" xml:space="preserve">
+    <value>요청하신 포럼에 대한 접근 권한이 필요합니다.</value>
+  </data>
+  <data name="forum.topic_cover.edit.uneditable" xml:space="preserve">
+    <value>유효하지 않은 표지입니다.</value>
+  </data>
+  <data name="forum.topic_cover.edit.not_owner" xml:space="preserve">
+    <value>주제글을 올린 사람만 표지를 수정할 수 있습니다.</value>
+  </data>
+  <data name="forum.topic_cover.store.forum_not_allowed" xml:space="preserve">
+    <value>이 포럼은 주제 커버를 허용하지 않습니다.</value>
+  </data>
+  <data name="forum.view.admin_only" xml:space="preserve">
+    <value>관리자만 열람이 가능한 포럼입니다.</value>
+  </data>
+  <data name="user.page.edit.locked" xml:space="preserve">
+    <value>유저 페이지가 잠겨있습니다.</value>
+  </data>
+  <data name="user.page.edit.not_owner" xml:space="preserve">
+    <value>본인의 유저 페이지만 수정할 수 있습니다.</value>
+  </data>
+  <data name="user.page.edit.require_supporter_tag" xml:space="preserve">
+    <value>osu! 서포터 태그가 필요합니다.</value>
+  </data>
+</root>

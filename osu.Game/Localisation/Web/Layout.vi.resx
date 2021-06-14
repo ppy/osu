@@ -1,0 +1,361 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="audio.autoplay" xml:space="preserve">
+    <value>Chơi bản nhạc tiếp theo tự động</value>
+  </data>
+  <data name="defaults.page_description" xml:space="preserve">
+    <value>osu! - Chỉ bắt đầu bằng một cái *click* chuột!  Với Ouendan/EBA, Taiko và những chế độ chơi nguyên bản, cũng như một level editor đầy đủ chức năng.</value>
+  </data>
+  <data name="header.admin.beatmapset" xml:space="preserve">
+    <value>beatmapset</value>
+  </data>
+  <data name="header.admin.beatmapset_covers" xml:space="preserve">
+    <value>bìa beatmapset</value>
+  </data>
+  <data name="header.admin.contest" xml:space="preserve">
+    <value>cuộc thi</value>
+  </data>
+  <data name="header.admin.contests" xml:space="preserve">
+    <value>các cuộc thi</value>
+  </data>
+  <data name="header.artists.index" xml:space="preserve">
+    <value>danh sách</value>
+  </data>
+  <data name="header.changelog.index" xml:space="preserve">
+    <value>danh sách</value>
+  </data>
+  <data name="header.help.index" xml:space="preserve">
+    <value>mục lục</value>
+  </data>
+  <data name="header.store.cart" xml:space="preserve">
+    <value>giỏ hàng</value>
+  </data>
+  <data name="header.store.orders" xml:space="preserve">
+    <value>lịch sử đơn hàng</value>
+  </data>
+  <data name="header.store.products" xml:space="preserve">
+    <value>mặt hàng</value>
+  </data>
+  <data name="header.tournaments.index" xml:space="preserve">
+    <value>danh sách</value>
+  </data>
+  <data name="header.users.modding" xml:space="preserve">
+    <value>modding</value>
+  </data>
+  <data name="header.users.show" xml:space="preserve">
+    <value>thông tin</value>
+  </data>
+  <data name="gallery.close" xml:space="preserve">
+    <value>Đóng (Esc)</value>
+  </data>
+  <data name="gallery.fullscreen" xml:space="preserve">
+    <value>Bật/tắt toàn màn hình</value>
+  </data>
+  <data name="gallery.zoom" xml:space="preserve">
+    <value>Thu phóng</value>
+  </data>
+  <data name="gallery.previous" xml:space="preserve">
+    <value>Trước (mũi tên trái)</value>
+  </data>
+  <data name="gallery.next" xml:space="preserve">
+    <value>Tiếp theo (mũi tên phải)</value>
+  </data>
+  <data name="menu.beatmaps._" xml:space="preserve">
+    <value>beatmaps</value>
+  </data>
+  <data name="menu.beatmaps.artists" xml:space="preserve">
+    <value>nghệ sĩ tiêu biểu</value>
+  </data>
+  <data name="menu.beatmaps.index" xml:space="preserve">
+    <value>danh sách</value>
+  </data>
+  <data name="menu.beatmaps.packs" xml:space="preserve">
+    <value>gói</value>
+  </data>
+  <data name="menu.community._" xml:space="preserve">
+    <value>cộng đồng</value>
+  </data>
+  <data name="menu.community.chat" xml:space="preserve">
+    <value>chat</value>
+  </data>
+  <data name="menu.community.contests" xml:space="preserve">
+    <value>cuộc thi</value>
+  </data>
+  <data name="menu.community.dev" xml:space="preserve">
+    <value>phát triển</value>
+  </data>
+  <data name="menu.community.forum-forums-index" xml:space="preserve">
+    <value>diễn đàn</value>
+  </data>
+  <data name="menu.community.getlive" xml:space="preserve">
+    <value>live stream</value>
+  </data>
+  <data name="menu.community.tournaments" xml:space="preserve">
+    <value>giải đấu</value>
+  </data>
+  <data name="menu.help._" xml:space="preserve">
+    <value>trợ giúp</value>
+  </data>
+  <data name="menu.help.getabuse" xml:space="preserve">
+    <value>báo cáo lạm dụng</value>
+  </data>
+  <data name="menu.help.getfaq" xml:space="preserve">
+    <value>faq</value>
+  </data>
+  <data name="menu.help.getrules" xml:space="preserve">
+    <value>quy tắc</value>
+  </data>
+  <data name="menu.help.getsupport" xml:space="preserve">
+    <value>không, thật đó, tôi cần giúp đỡ!</value>
+  </data>
+  <data name="menu.help.getwiki" xml:space="preserve">
+    <value>wiki</value>
+  </data>
+  <data name="menu.home._" xml:space="preserve">
+    <value>trang chủ</value>
+  </data>
+  <data name="menu.home.changelog-index" xml:space="preserve">
+    <value>changelog</value>
+  </data>
+  <data name="menu.home.getdownload" xml:space="preserve">
+    <value>tải xuống</value>
+  </data>
+  <data name="menu.home.news-index" xml:space="preserve">
+    <value>tin tức</value>
+  </data>
+  <data name="menu.home.search" xml:space="preserve">
+    <value>tìm kiếm</value>
+  </data>
+  <data name="menu.home.team" xml:space="preserve">
+    <value>team</value>
+  </data>
+  <data name="menu.rankings._" xml:space="preserve">
+    <value>xếp hạng</value>
+  </data>
+  <data name="menu.rankings.charts" xml:space="preserve">
+    <value>tiêu điểm</value>
+  </data>
+  <data name="menu.rankings.country" xml:space="preserve">
+    <value>quốc gia</value>
+  </data>
+  <data name="menu.rankings.index" xml:space="preserve">
+    <value>performance</value>
+  </data>
+  <data name="menu.rankings.kudosu" xml:space="preserve">
+    <value>kudosu</value>
+  </data>
+  <data name="menu.rankings.score" xml:space="preserve">
+    <value>điểm</value>
+  </data>
+  <data name="menu.store._" xml:space="preserve">
+    <value>cửa hàng</value>
+  </data>
+  <data name="menu.store.cart-show" xml:space="preserve">
+    <value>giỏ hàng</value>
+  </data>
+  <data name="menu.store.getlisting" xml:space="preserve">
+    <value>danh sách</value>
+  </data>
+  <data name="menu.store.orders-index" xml:space="preserve">
+    <value>lịch sử đơn hàng</value>
+  </data>
+  <data name="footer.general._" xml:space="preserve">
+    <value>Tổng quát</value>
+  </data>
+  <data name="footer.general.home" xml:space="preserve">
+    <value>Trang Chủ</value>
+  </data>
+  <data name="footer.general.changelog-index" xml:space="preserve">
+    <value>Changelog</value>
+  </data>
+  <data name="footer.general.beatmaps" xml:space="preserve">
+    <value>Danh Sách Beatmap</value>
+  </data>
+  <data name="footer.general.download" xml:space="preserve">
+    <value>Tải Xuống osu!</value>
+  </data>
+  <data name="footer.help._" xml:space="preserve">
+    <value>Giúp Đỡ &amp; Cộng Đồng</value>
+  </data>
+  <data name="footer.help.faq" xml:space="preserve">
+    <value>Những Câu Hỏi Thường Gặp</value>
+  </data>
+  <data name="footer.help.forum" xml:space="preserve">
+    <value>Diễn Đàn</value>
+  </data>
+  <data name="footer.help.livestreams" xml:space="preserve">
+    <value>Live Streams</value>
+  </data>
+  <data name="footer.help.report" xml:space="preserve">
+    <value>Báo Cáo Một Vấn Đề</value>
+  </data>
+  <data name="footer.help.wiki" xml:space="preserve">
+    <value>Wiki</value>
+  </data>
+  <data name="footer.legal._" xml:space="preserve">
+    <value>Pháp Lý &amp; Trạng Thái</value>
+  </data>
+  <data name="footer.legal.copyright" xml:space="preserve">
+    <value>Bản Quyền (DMCA)</value>
+  </data>
+  <data name="footer.legal.privacy" xml:space="preserve">
+    <value>Quyền Riêng Tư</value>
+  </data>
+  <data name="footer.legal.server_status" xml:space="preserve">
+    <value>Trạng Thái Server</value>
+  </data>
+  <data name="footer.legal.source_code" xml:space="preserve">
+    <value>Mã Nguồn</value>
+  </data>
+  <data name="footer.legal.terms" xml:space="preserve">
+    <value>Điều Khoản Và Điều Kiện</value>
+  </data>
+  <data name="errors.404.error" xml:space="preserve">
+    <value>Không Tìm Thấy Trang</value>
+  </data>
+  <data name="errors.404.description" xml:space="preserve">
+    <value>Xin lỗi, nhưng trang bạn yêu cầu không có ở đây!</value>
+  </data>
+  <data name="errors.403.error" xml:space="preserve">
+    <value>Bạn không nên ở đây.</value>
+  </data>
+  <data name="errors.403.description" xml:space="preserve">
+    <value>Nhưng bạn vẫn có thể thử quay trở lại mà.</value>
+  </data>
+  <data name="errors.401.error" xml:space="preserve">
+    <value>Bạn không nên ở đây.</value>
+  </data>
+  <data name="errors.401.description" xml:space="preserve">
+    <value>Nhưng bạn vẫn có thể thử quay trở lại mà. Hoặc có thể đăng nhập vào.</value>
+  </data>
+  <data name="errors.405.error" xml:space="preserve">
+    <value>Không Tìm Thấy Trang</value>
+  </data>
+  <data name="errors.405.description" xml:space="preserve">
+    <value>Xin lỗi, nhưng trang bạn yêu cầu không có ở đây!</value>
+  </data>
+  <data name="errors.500.error" xml:space="preserve">
+    <value>Ồ không! Có gì đó đã bị hỏng! ;_;</value>
+  </data>
+  <data name="errors.500.description" xml:space="preserve">
+    <value>Chúng tôi sẽ được tự động thông báo về mọi lỗi.</value>
+  </data>
+  <data name="errors.fatal.error" xml:space="preserve">
+    <value>Ồ không! Có gì đó đã bị hỏng (rất tệ)! ;_;</value>
+  </data>
+  <data name="errors.fatal.description" xml:space="preserve">
+    <value>Chúng tôi sẽ được tự động thông báo về mọi lỗi.</value>
+  </data>
+  <data name="errors.503.error" xml:space="preserve">
+    <value>Đang bảo trì!</value>
+  </data>
+  <data name="errors.503.description" xml:space="preserve">
+    <value>Thông thường bảo trì sẽ tốn khoảng 5 giây đến 10 phút. Nếu chúng tôi vẫn chưa trở lại sau khoảng thời gian trên, truy cập {0} để biết thêm thông tin.</value>
+  </data>
+  <data name="errors.reference" xml:space="preserve">
+    <value>Khi cần thiết, đây là một đoạn code bạn có thể cung cấp để được hỗ trợ!</value>
+  </data>
+  <data name="popup_login.login.forgot" xml:space="preserve">
+    <value>Quên mật khẩu</value>
+  </data>
+  <data name="popup_login.login.password" xml:space="preserve">
+    <value>password</value>
+  </data>
+  <data name="popup_login.login.title" xml:space="preserve">
+    <value>Đăng Nhập Để Tiếp Tục</value>
+  </data>
+  <data name="popup_login.login.username" xml:space="preserve">
+    <value>tên người dùng</value>
+  </data>
+  <data name="popup_login.login.error.email" xml:space="preserve">
+    <value>Tài khoản hoặc địa chỉ email không tồn tại</value>
+  </data>
+  <data name="popup_login.login.error.password" xml:space="preserve">
+    <value>Sai mật khẩu</value>
+  </data>
+  <data name="popup_login.register.download" xml:space="preserve">
+    <value>Tải xuống</value>
+  </data>
+  <data name="popup_login.register.info" xml:space="preserve">
+    <value>Bạn cần một tài khoản. Tại sao bạn lại không có chứ?</value>
+  </data>
+  <data name="popup_login.register.title" xml:space="preserve">
+    <value>Chưa có tài khoản?</value>
+  </data>
+  <data name="popup_user.links.account-edit" xml:space="preserve">
+    <value>Cài Đặt</value>
+  </data>
+  <data name="popup_user.links.friends" xml:space="preserve">
+    <value>Bạn bè</value>
+  </data>
+  <data name="popup_user.links.logout" xml:space="preserve">
+    <value>Đăng Xuất</value>
+  </data>
+  <data name="popup_user.links.profile" xml:space="preserve">
+    <value>Trang Cá Nhân</value>
+  </data>
+  <data name="popup_search.initial" xml:space="preserve">
+    <value>Nhập để tìm kiếm!</value>
+  </data>
+  <data name="popup_search.retry" xml:space="preserve">
+    <value>Tìm kiếm thất bại. Nhấp vào đây để thử lại.</value>
+  </data>
+</root>

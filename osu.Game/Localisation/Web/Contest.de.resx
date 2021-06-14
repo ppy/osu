@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="header.small" xml:space="preserve">
+    <value>Tritt gegen mehr als nur Kreise an.</value>
+  </data>
+  <data name="header.large" xml:space="preserve">
+    <value>Community Wettbewerbe</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>liste</value>
+  </data>
+  <data name="voting.login_required" xml:space="preserve">
+    <value>Zum Abstimmen bitte einloggen.</value>
+  </data>
+  <data name="voting.over" xml:space="preserve">
+    <value>Die Abstimmung für diesen Wettbewerb ist beendet</value>
+  </data>
+  <data name="voting.show_voted_only" xml:space="preserve">
+    <value>Stimmen anzeigen</value>
+  </data>
+  <data name="voting.best_of.none_played" xml:space="preserve">
+    <value>Es scheint, als hättest du keine der Beatmaps gespielt, die dich für den Wettbewerb qualifiziert hätten!</value>
+  </data>
+  <data name="voting.button.add" xml:space="preserve">
+    <value>Abstimmen</value>
+  </data>
+  <data name="voting.button.remove" xml:space="preserve">
+    <value>Vote entfernen</value>
+  </data>
+  <data name="voting.button.used_up" xml:space="preserve">
+    <value>Du hast alle deine Votes verwendet</value>
+  </data>
+  <data name="entry._" xml:space="preserve">
+    <value>entry</value>
+  </data>
+  <data name="entry.login_required" xml:space="preserve">
+    <value>Zum Beitreten bitte einloggen.</value>
+  </data>
+  <data name="entry.silenced_or_restricted" xml:space="preserve">
+    <value>Man kann restricted oder stummgeschaltet nicht an Wettbewerben teilnehmen.</value>
+  </data>
+  <data name="entry.preparation" xml:space="preserve">
+    <value>Wir bereiten diesen Wettbewerb gerade vor. Bitte habe Geduld!</value>
+  </data>
+  <data name="entry.drop_here" xml:space="preserve">
+    <value>Lege deine Einsendung hier ab</value>
+  </data>
+  <data name="entry.download" xml:space="preserve">
+    <value>.osz herunterladen</value>
+  </data>
+  <data name="entry.wrong_type.art" xml:space="preserve">
+    <value>Nur .jpg und .png-Dateien werden in diesem Wettbewerb akzeptiert.</value>
+  </data>
+  <data name="entry.wrong_type.beatmap" xml:space="preserve">
+    <value>Nur .osu-Dateien werden in diesem Wettbewerb akzeptiert.</value>
+  </data>
+  <data name="entry.wrong_type.music" xml:space="preserve">
+    <value>Nur .mp3-Dateien werden in diesem Wettbewerb akzeptiert.</value>
+  </data>
+  <data name="entry.too_big" xml:space="preserve">
+    <value>Einsendungen in diesem Wettbewerb können nur bis zu {0} groß sein.</value>
+  </data>
+  <data name="beatmaps.download" xml:space="preserve">
+    <value>Einsendung herunterladen</value>
+  </data>
+  <data name="vote.list" xml:space="preserve">
+    <value>stimmen</value>
+  </data>
+  <data name="vote.count" xml:space="preserve">
+    <value>{0} Vote |{0} Votes</value>
+  </data>
+  <data name="vote.points" xml:space="preserve">
+    <value>{0} Punkt |{0} Punkte</value>
+  </data>
+  <data name="dates.ended" xml:space="preserve">
+    <value>Endete am {0}</value>
+  </data>
+  <data name="dates.ended_no_date" xml:space="preserve">
+    <value>Beendet</value>
+  </data>
+  <data name="dates.starts._" xml:space="preserve">
+    <value>Startet am {0}</value>
+  </data>
+  <data name="dates.starts.soon" xml:space="preserve">
+    <value>soon™</value>
+  </data>
+  <data name="states.entry" xml:space="preserve">
+    <value>Einsendungen offen</value>
+  </data>
+  <data name="states.voting" xml:space="preserve">
+    <value>Abstimmung gestartet</value>
+  </data>
+  <data name="states.results" xml:space="preserve">
+    <value>Ergebnisse bekanntgegeben</value>
+  </data>
+</root>

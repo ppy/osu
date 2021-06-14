@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="beatmapset_update_notice.new" xml:space="preserve">
+    <value>نود اِعلامَك ان هنالك تحديثاََ جديداََ للأغنية "{0}" منذ اخر زيارة لك.</value>
+  </data>
+  <data name="beatmapset_update_notice.subject" xml:space="preserve">
+    <value>تحديث جديد لـ الأغنية "{0}"</value>
+  </data>
+  <data name="beatmapset_update_notice.unwatch" xml:space="preserve">
+    <value>ان لم تكن ترغب في تتبع هذه الأغنية بعد الأن, يمكن اما ان تضغط على رابط "اِلغاء المشاهدة" في الصفحة ادناه, او من صفحة قائمة الاِقتراحات:</value>
+  </data>
+  <data name="beatmapset_update_notice.visit" xml:space="preserve">
+    <value>عرض صفحة المناقشة هنا:</value>
+  </data>
+  <data name="common.closing" xml:space="preserve">
+    <value>مع التحيات،</value>
+  </data>
+  <data name="common.hello" xml:space="preserve">
+    <value>مرحبا {0},</value>
+  </data>
+  <data name="common.report" xml:space="preserve">
+    <value>نرجو الرد على الرسالة فورا اذا لم تكن قد طلبت تغييرا.</value>
+  </data>
+  <data name="donation_thanks.benefit_more" xml:space="preserve">
+    <value>خدمات الداعم الجديدة ستظهر قريبا مع الوقت!</value>
+  </data>
+  <data name="donation_thanks.feedback" xml:space="preserve">
+    <value>ان كانت لديك اي اسألة او مراجعات, لا تتردد في الرد على هذه الرسالة; سوف نتحقق منها في اقرب فرصة!</value>
+  </data>
+  <data name="donation_thanks.keep_free" xml:space="preserve">
+    <value>انه بفضل الناس امثالك الذين يقومون بجعل osu! ومجتمعها قادرين على العمل بسلاسة دون اي اعلانات او دفعات اجبارية.</value>
+  </data>
+  <data name="donation_thanks.keep_running" xml:space="preserve">
+    <value>دعمك يجعل osu! قيد العمل لحوالي لـ{0}! قد لا يبدو رقما كبيرا, لكنه يفي بالغرض :).</value>
+  </data>
+  <data name="donation_thanks.subject" xml:space="preserve">
+    <value>شكرا, osu! تحبك &lt;3</value>
+  </data>
+  <data name="donation_thanks.translation" xml:space="preserve">
+    <value>ألترجمة ألمقدمة من المجتمع المحلي لأغراض الإعلام تتبع:</value>
+  </data>
+  <data name="donation_thanks.benefit.gift" xml:space="preserve">
+    <value>الأن مع هديتك(هداياك) ستحصل على اذن وصول الى osu!direct والعديد من الأفضليات الأُخرى.</value>
+  </data>
+  <data name="donation_thanks.benefit.self" xml:space="preserve">
+    <value>الأن ستحصل على اذن الوصول الى osu!direct والعديد من الأفضليات الأُخرى لـ{0}.</value>
+  </data>
+  <data name="donation_thanks.support._" xml:space="preserve">
+    <value>شكرا جزيلاََ لـ{0} تجاه osu!.</value>
+  </data>
+  <data name="donation_thanks.support.first" xml:space="preserve">
+    <value>دَعمِك</value>
+  </data>
+  <data name="donation_thanks.support.repeat" xml:space="preserve">
+    <value>دعم متواصل</value>
+  </data>
+  <data name="forum_new_reply.new" xml:space="preserve">
+    <value>نود اِعلامَك ان هنالك رداََ جديداََ على "{0}" منذ اخر زيارة لك.</value>
+  </data>
+  <data name="forum_new_reply.subject" xml:space="preserve">
+    <value>[osu!] رد جديد للموضوع "{0}"</value>
+  </data>
+  <data name="forum_new_reply.unwatch" xml:space="preserve">
+    <value>ان اِنتهت رغبتك في تتبع هذا الموضوع, يمكنك الضغط على اِما رابط "الغاء اشتراك الموضوع" في اسغل صفحة الموضوع, او من صفحة ادارة اِشتراكات المواضيع:</value>
+  </data>
+  <data name="forum_new_reply.visit" xml:space="preserve">
+    <value>قم بالاِنتقال الى اخر رد باستعمال الرابط ادناهُ:</value>
+  </data>
+  <data name="password_reset.code" xml:space="preserve">
+    <value>رمز التحقق الخاص بك هو:</value>
+  </data>
+  <data name="password_reset.requested" xml:space="preserve">
+    <value>أما انتَ او شخص يَدَعِ انه انت قام بطلب إعادة تعيين كلمة مرور حسابِك على !ْosu.</value>
+  </data>
+  <data name="password_reset.subject" xml:space="preserve">
+    <value>اِستعادة حساب osu!</value>
+  </data>
+  <data name="store_payment_completed.prepare_shipping" xml:space="preserve">
+    <value>لقد تلقينا دفعتك ونحن الأن نجهز طلبيتك للشحن. قد تأخذنا عدة ايام لأرسالها, اعتماداََ على كمية الطلبات. يمكنك متابعة نشاط طلبيتك هنا, مع تفاصيل المتابعة عند توفرها:</value>
+  </data>
+  <data name="store_payment_completed.processing" xml:space="preserve">
+    <value>لقد تلقينا دفعتك ونحن الأن نقوم بمعالجة طلبك. يمكنك متابعة نشاط طلبيتك من هنا:</value>
+  </data>
+  <data name="store_payment_completed.questions" xml:space="preserve">
+    <value>إن كان لديك أي أسئلة, لا تترد في الرد على هذه الرسالة.</value>
+  </data>
+  <data name="store_payment_completed.shipping" xml:space="preserve">
+    <value>الشحن</value>
+  </data>
+  <data name="store_payment_completed.subject" xml:space="preserve">
+    <value>تلقينا طلب osu!store الخاص بك!</value>
+  </data>
+  <data name="store_payment_completed.thank_you" xml:space="preserve">
+    <value>شكرا لطلبك من osu!store!</value>
+  </data>
+  <data name="store_payment_completed.total" xml:space="preserve">
+    <value>المجموع</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift" xml:space="preserve">
+    <value>قد يفضل الشخص الذي وَهَبَك الهدية ان يبقى مُتخفِياََ, لذلك لم يذكروا في هذا الاِشعار.</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift_maybe_not" xml:space="preserve">
+    <value>ولكِنَك غالِباََ تَعرِفُه ;).</value>
+  </data>
+  <data name="supporter_gift.duration" xml:space="preserve">
+    <value>بفضلِهِم, لديك وصول الى osu!direct و فوائِد osu!supporter الأخرى لمدة {0}.</value>
+  </data>
+  <data name="supporter_gift.features" xml:space="preserve">
+    <value>يمكنك معرفة مزيد من التفاصيل عن هذهِ المميزات هنا:</value>
+  </data>
+  <data name="supporter_gift.gifted" xml:space="preserve">
+    <value>قام احدُهٌم بهِبتِكَ شارة osu!supporter للتو!</value>
+  </data>
+  <data name="supporter_gift.subject" xml:space="preserve">
+    <value>لقد حصلت على شارة osu!supporter كهدية!</value>
+  </data>
+  <data name="user_email_updated.changed_to" xml:space="preserve">
+    <value>هذا البريد للتأكيد على ان بريدك الالكتروني في osu! قم تم تغييرهُ الى "{0}".</value>
+  </data>
+  <data name="user_email_updated.check" xml:space="preserve">
+    <value>نرجو قيامك بالتأكد من وصول البريد الى عنوانك الحديث لضمان عدم فقدان وصولِك الى حساب osu! في المستقبل.</value>
+  </data>
+  <data name="user_email_updated.sent" xml:space="preserve">
+    <value>لأسباب امنية, تم ارسال البريد الى كلاََ مِن بريدك الأِلكتروني القديم و بريدك الألكتروني الحديث.</value>
+  </data>
+  <data name="user_email_updated.subject" xml:space="preserve">
+    <value>تأكيد تغيير البريد الإلكتروني لـosu!</value>
+  </data>
+  <data name="user_force_reactivation.main" xml:space="preserve">
+    <value>حِسابُك مُعلَم على انه مكشوف, يحوي مؤخراََ على نشاط مشبوه او كلمة مرور ضعيفة جداََ. كنتيجة, نطلب منك اِستبدال كلمة المرور. نرجو تأكدك من اختيار كلمة مرور قوية.</value>
+  </data>
+  <data name="user_force_reactivation.perform_reset" xml:space="preserve">
+    <value>يمكنك طلب الأستعادة من {0}</value>
+  </data>
+  <data name="user_force_reactivation.reason" xml:space="preserve">
+    <value>السبب:</value>
+  </data>
+  <data name="user_force_reactivation.subject" xml:space="preserve">
+    <value>حساب osu! يحتاج لأعادة تفعيل</value>
+  </data>
+  <data name="user_notification_digest.new" xml:space="preserve">
+    <value>لمعلوماتك, يوجد تحديثات جديدة عن عناصر تتابعها.</value>
+  </data>
+  <data name="user_notification_digest.settings" xml:space="preserve">
+    <value>تغيير تفضيلات إشعار البريد الإلكتروني:</value>
+  </data>
+  <data name="user_notification_digest.subject" xml:space="preserve">
+    <value>إشعار osu! جديد</value>
+  </data>
+  <data name="user_password_updated.confirmation" xml:space="preserve">
+    <value>هذا فقط للتأكد من ان كلمة سر حسابك في osu! قم تغيرت.</value>
+  </data>
+  <data name="user_password_updated.subject" xml:space="preserve">
+    <value>تأكيد تغيير كلمة المرور لـosu!</value>
+  </data>
+  <data name="user_verification.code" xml:space="preserve">
+    <value>رمز التحقق الخاص بك هو:</value>
+  </data>
+  <data name="user_verification.code_hint" xml:space="preserve">
+    <value>يمكن ادخال الرمز معوبدون مسافات.</value>
+  </data>
+  <data name="user_verification.link" xml:space="preserve">
+    <value>كبديل, يمكنك زيارة الرابط بالأسغل لأنهاء التحقق:</value>
+  </data>
+  <data name="user_verification.report" xml:space="preserve">
+    <value>اذا لم تطلب هذا, نرجو الرد فورا فقد يكون حسابك في خطر.</value>
+  </data>
+  <data name="user_verification.subject" xml:space="preserve">
+    <value>التحقق من حساب osu!</value>
+  </data>
+  <data name="user_verification.action_from._" xml:space="preserve">
+    <value>طرأ على حسابك تغيير يحتاج لموافقة من {0}.</value>
+  </data>
+  <data name="user_verification.action_from.unknown_country" xml:space="preserve">
+    <value>بلد غير معروف</value>
+  </data>
+</root>

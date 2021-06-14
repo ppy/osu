@@ -1,0 +1,721 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="deleted" xml:space="preserve">
+    <value>[slettet bruger]</value>
+  </data>
+  <data name="beatmapset_activities.title" xml:space="preserve">
+    <value>{0}'s Modding Historie</value>
+  </data>
+  <data name="beatmapset_activities.title_compact" xml:space="preserve">
+    <value>Modding</value>
+  </data>
+  <data name="beatmapset_activities.discussions.title_recent" xml:space="preserve">
+    <value>Senest startede diskussioner</value>
+  </data>
+  <data name="beatmapset_activities.events.title_recent" xml:space="preserve">
+    <value>Seneste begivenheder</value>
+  </data>
+  <data name="beatmapset_activities.posts.title_recent" xml:space="preserve">
+    <value>Seneste opslag</value>
+  </data>
+  <data name="beatmapset_activities.votes_received.title_most" xml:space="preserve">
+    <value>&gt;Mest stemt på af (over de sidste 3 måneder)</value>
+  </data>
+  <data name="beatmapset_activities.votes_made.title_most" xml:space="preserve">
+    <value>&gt;Mest stemt på (over de sidste 3 måneder)</value>
+  </data>
+  <data name="blocks.banner_text" xml:space="preserve">
+    <value>Du har blokeret denne bruger.</value>
+  </data>
+  <data name="blocks.blocked_count" xml:space="preserve">
+    <value>blokerede brugere ({0})</value>
+  </data>
+  <data name="blocks.hide_profile" xml:space="preserve">
+    <value>Skjul profil</value>
+  </data>
+  <data name="blocks.not_blocked" xml:space="preserve">
+    <value>Denne bruger er ikke blokeret.</value>
+  </data>
+  <data name="blocks.show_profile" xml:space="preserve">
+    <value>Vis profil</value>
+  </data>
+  <data name="blocks.too_many" xml:space="preserve">
+    <value>Blokeringsgrænsen er nået.</value>
+  </data>
+  <data name="blocks.button.block" xml:space="preserve">
+    <value>Bloker</value>
+  </data>
+  <data name="blocks.button.unblock" xml:space="preserve">
+    <value>Fjern blokering</value>
+  </data>
+  <data name="card.loading" xml:space="preserve">
+    <value>Indlæser...</value>
+  </data>
+  <data name="card.send_message" xml:space="preserve">
+    <value>Send besked</value>
+  </data>
+  <data name="disabled.title" xml:space="preserve">
+    <value>Uh-oh! Det ser ud som om din account er blevet midlertidigt lukket.</value>
+  </data>
+  <data name="disabled.warning" xml:space="preserve">
+    <value>I tilfælde af at du har brudt en regel, bør du vide at der er en cool-down periode på en måned hvori vi ikke vil overveje nogen former for forespørgsler om lempelser eller ophævninger. Efter denne periode kan du kontakte os igen hvis du føler det er nødvendigt. Bemærk, hvis du laver flere konti efter at have fået en lukket vil det resultere i en &lt;strong&gt;forlængelse af din ene måneds cool-down&lt;/strong&gt;. Bemærk også at for &lt;strong&gt;hver account du laver, bryder du reglerne yderligere&lt;/strong&gt;. Vi anbefaler stærkt at du ikke gør dette!</value>
+  </data>
+  <data name="disabled.if_mistake._" xml:space="preserve">
+    <value>Hvis du føler at dette var en fejltagelse er du velkommen til at kontakte os (via {0} eller ved at klike på "?" i hjørnet nederst til højre). Bemærk venligst at vi altid har fuld tillid til vores handlinger da de er baseret på solidt data. Vi reserverer retten til at se bort fra din anmodning skulle vi føle at du handler i dårlig ånd eller er uærlig.</value>
+  </data>
+  <data name="disabled.if_mistake.email" xml:space="preserve">
+    <value>email</value>
+  </data>
+  <data name="disabled.reasons.compromised" xml:space="preserve">
+    <value>Din account synes at være blevet infiltreret. Den kan muligvis være blevet midlertidigt lukket mens ejerens identitet bekræftes.</value>
+  </data>
+  <data name="disabled.reasons.opening" xml:space="preserve">
+    <value>Der er en række grunde til at din accoung can blive midlertidigt lukket:</value>
+  </data>
+  <data name="disabled.reasons.tos._" xml:space="preserve">
+    <value>Du har brudt en eller flere af vores {0} eller {1}.</value>
+  </data>
+  <data name="disabled.reasons.tos.community_rules" xml:space="preserve">
+    <value>fællesskabs-regler</value>
+  </data>
+  <data name="disabled.reasons.tos.tos" xml:space="preserve">
+    <value>tjenestevilkår</value>
+  </data>
+  <data name="filtering.by_game_mode" xml:space="preserve">
+    <value>Medlemmer efter spiltilstand</value>
+  </data>
+  <data name="force_reactivation.reason.inactive_different_country" xml:space="preserve">
+    <value>Din account har ikke været i brug i lang tid.</value>
+  </data>
+  <data name="login._" xml:space="preserve">
+    <value>Log ind</value>
+  </data>
+  <data name="login.button" xml:space="preserve">
+    <value>Log Ind</value>
+  </data>
+  <data name="login.button_posting" xml:space="preserve">
+    <value>Logger ind...</value>
+  </data>
+  <data name="login.email_login_disabled" xml:space="preserve">
+    <value>Login via email er i øjeblikket deaktiveret. Brug venligst dit brugernavn i stedet.</value>
+  </data>
+  <data name="login.failed" xml:space="preserve">
+    <value>Ugyldigt login</value>
+  </data>
+  <data name="login.forgot" xml:space="preserve">
+    <value>Glemt din adgangskode?</value>
+  </data>
+  <data name="login.info" xml:space="preserve">
+    <value>Log ind for at fortsætte</value>
+  </data>
+  <data name="login.invalid_captcha" xml:space="preserve">
+    <value>For mange mislykkede loginforsøg. Udfyld venligst captcha og prøv igen. (Opdater side, hvis captcha ikke er synlig)</value>
+  </data>
+  <data name="login.locked_ip" xml:space="preserve">
+    <value>din IP-adresse er låst. Vent venligst et par minutter.</value>
+  </data>
+  <data name="login.password" xml:space="preserve">
+    <value>Adgangskode</value>
+  </data>
+  <data name="login.register" xml:space="preserve">
+    <value>Har du ikke en osu! konto? Opret en ny én!</value>
+  </data>
+  <data name="login.remember" xml:space="preserve">
+    <value>Husk denne computer</value>
+  </data>
+  <data name="login.title" xml:space="preserve">
+    <value>Log venligst ind for at fortsætte</value>
+  </data>
+  <data name="login.username" xml:space="preserve">
+    <value>Brugernavn</value>
+  </data>
+  <data name="login.beta.main" xml:space="preserve">
+    <value>Adgang til betaversionen er i øjeblikket begrænset til priveligerede brugere.</value>
+  </data>
+  <data name="login.beta.small" xml:space="preserve">
+    <value>(osu!supportere ville kunne komme ind snart)</value>
+  </data>
+  <data name="posts.title" xml:space="preserve">
+    <value>{0}'s opslag</value>
+  </data>
+  <data name="anonymous.login_link" xml:space="preserve">
+    <value>klik for at logge ind</value>
+  </data>
+  <data name="anonymous.login_text" xml:space="preserve">
+    <value>log ind</value>
+  </data>
+  <data name="anonymous.username" xml:space="preserve">
+    <value>Gæst</value>
+  </data>
+  <data name="anonymous.error" xml:space="preserve">
+    <value>Du skal være logget ind for at gøre dette.</value>
+  </data>
+  <data name="logout_confirm" xml:space="preserve">
+    <value>Er du sikker på, at du vil logge ud? :(</value>
+  </data>
+  <data name="report.button_text" xml:space="preserve">
+    <value>Anmeld</value>
+  </data>
+  <data name="report.comments" xml:space="preserve">
+    <value>Yderligere Kommentarer</value>
+  </data>
+  <data name="report.placeholder" xml:space="preserve">
+    <value>Vær venlig at tilføje alle informationer du tror vil kunne være nyttige.</value>
+  </data>
+  <data name="report.reason" xml:space="preserve">
+    <value>Begrundelse</value>
+  </data>
+  <data name="report.thanks" xml:space="preserve">
+    <value>Tak for din anmeldelse!</value>
+  </data>
+  <data name="report.title" xml:space="preserve">
+    <value>Anmeld {0}?</value>
+  </data>
+  <data name="report.actions.send" xml:space="preserve">
+    <value>Send anmeldelse</value>
+  </data>
+  <data name="report.actions.cancel" xml:space="preserve">
+    <value>Annullér</value>
+  </data>
+  <data name="report.options.cheating" xml:space="preserve">
+    <value>Uærligt spil / Snyd</value>
+  </data>
+  <data name="report.options.insults" xml:space="preserve">
+    <value>Fornærmede mig / andre</value>
+  </data>
+  <data name="report.options.spam" xml:space="preserve">
+    <value>Spamming</value>
+  </data>
+  <data name="report.options.unwanted_content" xml:space="preserve">
+    <value>Sender links med upassende indhold</value>
+  </data>
+  <data name="report.options.nonsense" xml:space="preserve">
+    <value>Nonsens</value>
+  </data>
+  <data name="report.options.other" xml:space="preserve">
+    <value>Andet (Skriv under)</value>
+  </data>
+  <data name="restricted_banner.title" xml:space="preserve">
+    <value>Du konto er blevet begrænset!</value>
+  </data>
+  <data name="restricted_banner.message" xml:space="preserve">
+    <value>Når du er begrænset, kan du ikke interagere med andre spillere, og dine scores vil kun være synlige for dig. Dette er som regel en automatisk proces, og begrænsningen vil blive fjernet indenfor 24 timer. Hvis du ønsker at appellere din begrænsning, &lt;a href="mailto{0}@ppy.sh"&gt;kontakt supporten&lt;/a&gt;.</value>
+  </data>
+  <data name="show.age" xml:space="preserve">
+    <value>{0} år gammel</value>
+  </data>
+  <data name="show.change_avatar" xml:space="preserve">
+    <value>ændre din avatar!</value>
+  </data>
+  <data name="show.first_members" xml:space="preserve">
+    <value>Var her fra starten</value>
+  </data>
+  <data name="show.is_developer" xml:space="preserve">
+    <value>osu!developer</value>
+  </data>
+  <data name="show.is_supporter" xml:space="preserve">
+    <value>osu!supporter</value>
+  </data>
+  <data name="show.joined_at" xml:space="preserve">
+    <value>Blev medlem {0}</value>
+  </data>
+  <data name="show.lastvisit" xml:space="preserve">
+    <value>Sidst set {0}</value>
+  </data>
+  <data name="show.lastvisit_online" xml:space="preserve">
+    <value>Online nu</value>
+  </data>
+  <data name="show.missingtext" xml:space="preserve">
+    <value>Du har formentlig lavet en stavefejl! (eller også er brugeren blevet bannet)</value>
+  </data>
+  <data name="show.origin_country" xml:space="preserve">
+    <value>Fra {0}</value>
+  </data>
+  <data name="show.previous_usernames" xml:space="preserve">
+    <value>tidligere kendt som</value>
+  </data>
+  <data name="show.plays_with" xml:space="preserve">
+    <value>Spiller med {0}</value>
+  </data>
+  <data name="show.title" xml:space="preserve">
+    <value>{0}´s profil</value>
+  </data>
+  <data name="show.comments_count._" xml:space="preserve">
+    <value>Slået op {0}</value>
+  </data>
+  <data name="show.comments_count.count" xml:space="preserve">
+    <value>{0} kommentar|{0} kommentarer</value>
+  </data>
+  <data name="show.edit.cover.button" xml:space="preserve">
+    <value>Skift Coverbillede</value>
+  </data>
+  <data name="show.edit.cover.defaults_info" xml:space="preserve">
+    <value>Flere muligheder for coverbillede kommer snart</value>
+  </data>
+  <data name="show.edit.cover.upload.broken_file" xml:space="preserve">
+    <value>Kunne ikke uploade billedet. Prøv igen.</value>
+  </data>
+  <data name="show.edit.cover.upload.button" xml:space="preserve">
+    <value>Upload billede</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone" xml:space="preserve">
+    <value>Smid her for at uploade</value>
+  </data>
+  <data name="show.edit.cover.upload.dropzone_info" xml:space="preserve">
+    <value>Du kan også smide dit billede her for at uploade</value>
+  </data>
+  <data name="show.edit.cover.upload.size_info" xml:space="preserve">
+    <value>Coverbilledet burde være 2400x620</value>
+  </data>
+  <data name="show.edit.cover.upload.too_large" xml:space="preserve">
+    <value>Den uploadede fil er for stor.</value>
+  </data>
+  <data name="show.edit.cover.upload.unsupported_format" xml:space="preserve">
+    <value>Ikke-understøttet format.</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info._" xml:space="preserve">
+    <value>Upload er kun tilgængelig for {0}</value>
+  </data>
+  <data name="show.edit.cover.upload.restriction_info.link" xml:space="preserve">
+    <value>osu!supporters</value>
+  </data>
+  <data name="show.edit.default_playmode.is_default_tooltip" xml:space="preserve">
+    <value>standardspiltilstand</value>
+  </data>
+  <data name="show.edit.default_playmode.set" xml:space="preserve">
+    <value>sæt {0} som din default mode</value>
+  </data>
+  <data name="show.extra.none" xml:space="preserve">
+    <value>ingen</value>
+  </data>
+  <data name="show.extra.unranked" xml:space="preserve">
+    <value>Ingen beatmaps spillet for nyligt</value>
+  </data>
+  <data name="show.extra.achievements.achieved-on" xml:space="preserve">
+    <value>Opnået den {0}</value>
+  </data>
+  <data name="show.extra.achievements.locked" xml:space="preserve">
+    <value>Låst</value>
+  </data>
+  <data name="show.extra.achievements.title" xml:space="preserve">
+    <value>Præstationer</value>
+  </data>
+  <data name="show.extra.beatmaps.by_artist" xml:space="preserve">
+    <value>af {0}</value>
+  </data>
+  <data name="show.extra.beatmaps.title" xml:space="preserve">
+    <value>Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.favourite.title" xml:space="preserve">
+    <value>Favorit Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.graveyard.title" xml:space="preserve">
+    <value>Beatmaps på Kirkegården</value>
+  </data>
+  <data name="show.extra.beatmaps.loved.title" xml:space="preserve">
+    <value>Elskede beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.ranked_and_approved.title" xml:space="preserve">
+    <value>Ranked &amp; Godkendte Beatmaps</value>
+  </data>
+  <data name="show.extra.beatmaps.unranked.title" xml:space="preserve">
+    <value>Afventende Beatmaps</value>
+  </data>
+  <data name="show.extra.discussions.title" xml:space="preserve">
+    <value>Diskussioner</value>
+  </data>
+  <data name="show.extra.discussions.title_longer" xml:space="preserve">
+    <value>Seneste Diskussioner</value>
+  </data>
+  <data name="show.extra.discussions.show_more" xml:space="preserve">
+    <value>se flere diskussioner</value>
+  </data>
+  <data name="show.extra.events.title" xml:space="preserve">
+    <value>Begivenheder</value>
+  </data>
+  <data name="show.extra.events.title_longer" xml:space="preserve">
+    <value>Seneste Begivenheder</value>
+  </data>
+  <data name="show.extra.events.show_more" xml:space="preserve">
+    <value>se flere begivenheder</value>
+  </data>
+  <data name="show.extra.historical.title" xml:space="preserve">
+    <value>Historik</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.title" xml:space="preserve">
+    <value>Spille-historik</value>
+  </data>
+  <data name="show.extra.historical.monthly_playcounts.count_label" xml:space="preserve">
+    <value>Plays</value>
+  </data>
+  <data name="show.extra.historical.most_played.count" xml:space="preserve">
+    <value>gange spillet</value>
+  </data>
+  <data name="show.extra.historical.most_played.title" xml:space="preserve">
+    <value>Mest Spillede Beatmaps</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.accuracy" xml:space="preserve">
+    <value>præcision: {0}</value>
+  </data>
+  <data name="show.extra.historical.recent_plays.title" xml:space="preserve">
+    <value>Senest spillet (24 timer)</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.title" xml:space="preserve">
+    <value>Replays Set Historik</value>
+  </data>
+  <data name="show.extra.historical.replays_watched_counts.count_label" xml:space="preserve">
+    <value>Replays Set</value>
+  </data>
+  <data name="show.extra.kudosu.recent_entries" xml:space="preserve">
+    <value>Seneste Kudosu Historie</value>
+  </data>
+  <data name="show.extra.kudosu.title" xml:space="preserve">
+    <value>Kudosu!</value>
+  </data>
+  <data name="show.extra.kudosu.total" xml:space="preserve">
+    <value>Total Kudosu Optjent</value>
+  </data>
+  <data name="show.extra.kudosu.entry.amount" xml:space="preserve">
+    <value>{0} kudosu</value>
+  </data>
+  <data name="show.extra.kudosu.entry.empty" xml:space="preserve">
+    <value>Denne bruger har ikke modtaget nogen kudosu!</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.allow_kudosu.give" xml:space="preserve">
+    <value>Modtog {0} fra kudosu benægtelsesophævelse af modding opslaget {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.deny_kudosu.reset" xml:space="preserve">
+    <value>Benægtet {0} fra modding opslaget {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.delete.reset" xml:space="preserve">
+    <value>Mistede {0} fra sletning af modding opslag {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.restore.give" xml:space="preserve">
+    <value>Modtog {0} fra modding opslag genetablering af {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.give" xml:space="preserve">
+    <value>Modtog {0} fra at få stemmer på modding opslaget {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.vote.reset" xml:space="preserve">
+    <value>Mistede {0} fra at miste stemmer på modding opslaget {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.give" xml:space="preserve">
+    <value>Modtog {0} fra genberegning af stemmer i modding opslaget {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.beatmap_discussion.recalculate.reset" xml:space="preserve">
+    <value>Mistede {0} fra genberegning af stemmer i modding opslaget {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.give" xml:space="preserve">
+    <value>Modtog {0} fra {1} for opslaget {2}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.reset" xml:space="preserve">
+    <value>Kudosu nulstillet af {0} for opslaget {1}</value>
+  </data>
+  <data name="show.extra.kudosu.entry.forum_post.revoke" xml:space="preserve">
+    <value>Benægtet kudosu af {0} for opslaget {1}</value>
+  </data>
+  <data name="show.extra.kudosu.total_info._" xml:space="preserve">
+    <value>Baseret på hvor stort et bidrag brugeren har givet til moderation af beatmaps. Se {0} for mere information.</value>
+  </data>
+  <data name="show.extra.kudosu.total_info.link" xml:space="preserve">
+    <value>denne side</value>
+  </data>
+  <data name="show.extra.me.title" xml:space="preserve">
+    <value>me!</value>
+  </data>
+  <data name="show.extra.medals.empty" xml:space="preserve">
+    <value>Denne bruger har ikke fået nogle endnu. ;_;</value>
+  </data>
+  <data name="show.extra.medals.recent" xml:space="preserve">
+    <value>Seneste</value>
+  </data>
+  <data name="show.extra.medals.title" xml:space="preserve">
+    <value>Medaljer</value>
+  </data>
+  <data name="show.extra.posts.title" xml:space="preserve">
+    <value>Opslag</value>
+  </data>
+  <data name="show.extra.posts.title_longer" xml:space="preserve">
+    <value>Seneste Opslag</value>
+  </data>
+  <data name="show.extra.posts.show_more" xml:space="preserve">
+    <value>se flere opslag</value>
+  </data>
+  <data name="show.extra.recent_activity.title" xml:space="preserve">
+    <value>Seneste</value>
+  </data>
+  <data name="show.extra.top_ranks.download_replay" xml:space="preserve">
+    <value>Download Replay</value>
+  </data>
+  <data name="show.extra.top_ranks.not_ranked" xml:space="preserve">
+    <value>Kun rangerede beatmaps giver pp.</value>
+  </data>
+  <data name="show.extra.top_ranks.pp_weight" xml:space="preserve">
+    <value>vejede: {0}</value>
+  </data>
+  <data name="show.extra.top_ranks.view_details" xml:space="preserve">
+    <value>Vis detaljer</value>
+  </data>
+  <data name="show.extra.top_ranks.title" xml:space="preserve">
+    <value>Ranks</value>
+  </data>
+  <data name="show.extra.top_ranks.best.title" xml:space="preserve">
+    <value>Bedste Præstationer</value>
+  </data>
+  <data name="show.extra.top_ranks.first.title" xml:space="preserve">
+    <value>Førstepladser</value>
+  </data>
+  <data name="show.extra.votes.given" xml:space="preserve">
+    <value>Stemmer Givet (sidste 3 måneder)</value>
+  </data>
+  <data name="show.extra.votes.received" xml:space="preserve">
+    <value>Stemmer Modtaget (sidste 3 måneder)</value>
+  </data>
+  <data name="show.extra.votes.title" xml:space="preserve">
+    <value>Stemmer</value>
+  </data>
+  <data name="show.extra.votes.title_longer" xml:space="preserve">
+    <value>Seneste Stemmer</value>
+  </data>
+  <data name="show.extra.votes.vote_count" xml:space="preserve">
+    <value>{0} stemme|{0} stemmer</value>
+  </data>
+  <data name="show.extra.account_standing.title" xml:space="preserve">
+    <value>Account Status</value>
+  </data>
+  <data name="show.extra.account_standing.bad_standing" xml:space="preserve">
+    <value>&lt;strong&gt;{0}'s&lt;/strong&gt; account er ikke i en god position :(</value>
+  </data>
+  <data name="show.extra.account_standing.remaining_silence" xml:space="preserve">
+    <value>&lt;strong&gt;{0}&lt;/strong&gt; kan tale igen om {1}.</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.title" xml:space="preserve">
+    <value>Seneste Overtrædelser</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.date" xml:space="preserve">
+    <value>dato</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.action" xml:space="preserve">
+    <value>handling</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length" xml:space="preserve">
+    <value>længde</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.length_permanent" xml:space="preserve">
+    <value>Permanent</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.description" xml:space="preserve">
+    <value>beskrivelse</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actor" xml:space="preserve">
+    <value>af {0}</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.restriction" xml:space="preserve">
+    <value>Ban</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.silence" xml:space="preserve">
+    <value>Mute</value>
+  </data>
+  <data name="show.extra.account_standing.recent_infringements.actions.note" xml:space="preserve">
+    <value>Noter</value>
+  </data>
+  <data name="show.info.interests" xml:space="preserve">
+    <value>Interesser</value>
+  </data>
+  <data name="show.info.location" xml:space="preserve">
+    <value>Nuværende Position</value>
+  </data>
+  <data name="show.info.occupation" xml:space="preserve">
+    <value>Stilling</value>
+  </data>
+  <data name="show.info.website" xml:space="preserve">
+    <value>Hjemmeside</value>
+  </data>
+  <data name="show.not_found.reason_1" xml:space="preserve">
+    <value>De kan have ændret deres brugernavn.</value>
+  </data>
+  <data name="show.not_found.reason_2" xml:space="preserve">
+    <value>Kontoen kan være midlertidigt utilgængelig pga. sikkerhedsproblemer eller misbrug.</value>
+  </data>
+  <data name="show.not_found.reason_3" xml:space="preserve">
+    <value>Du har muligvis lavet en stavefejl!</value>
+  </data>
+  <data name="show.not_found.reason_header" xml:space="preserve">
+    <value>Der er et par mulige årsager til dette:</value>
+  </data>
+  <data name="show.not_found.title" xml:space="preserve">
+    <value>Bruger ikke fundet! ;_;</value>
+  </data>
+  <data name="show.page.button" xml:space="preserve">
+    <value>Rediger profil</value>
+  </data>
+  <data name="show.page.description" xml:space="preserve">
+    <value>&lt;strong&gt;me!&lt;/strong&gt; er et brugerdefinerbart felt på din profil.</value>
+  </data>
+  <data name="show.page.edit_big" xml:space="preserve">
+    <value>Ændr mig!</value>
+  </data>
+  <data name="show.page.placeholder" xml:space="preserve">
+    <value>Skriv indhold her</value>
+  </data>
+  <data name="show.page.restriction_info._" xml:space="preserve">
+    <value>Du skal være en {0} for at bruge denne funktion.</value>
+  </data>
+  <data name="show.page.restriction_info.link" xml:space="preserve">
+    <value>osu!supporter</value>
+  </data>
+  <data name="show.post_count._" xml:space="preserve">
+    <value>Skrevet {0}</value>
+  </data>
+  <data name="show.post_count.count" xml:space="preserve">
+    <value>{0} forum opslag|{0} forum opslag</value>
+  </data>
+  <data name="show.rank.country" xml:space="preserve">
+    <value>Lande Rang for {0}</value>
+  </data>
+  <data name="show.rank.country_simple" xml:space="preserve">
+    <value>Lande Rang</value>
+  </data>
+  <data name="show.rank.global" xml:space="preserve">
+    <value>Global rang for {0}</value>
+  </data>
+  <data name="show.rank.global_simple" xml:space="preserve">
+    <value>Global Rang</value>
+  </data>
+  <data name="show.stats.hit_accuracy" xml:space="preserve">
+    <value>Præcision</value>
+  </data>
+  <data name="show.stats.level" xml:space="preserve">
+    <value>Level {0}</value>
+  </data>
+  <data name="show.stats.level_progress" xml:space="preserve">
+    <value>Progression til næste level</value>
+  </data>
+  <data name="show.stats.maximum_combo" xml:space="preserve">
+    <value>Højeste Combo</value>
+  </data>
+  <data name="show.stats.medals" xml:space="preserve">
+    <value>Medaljer</value>
+  </data>
+  <data name="show.stats.play_count" xml:space="preserve">
+    <value>Antal Forsøg</value>
+  </data>
+  <data name="show.stats.play_time" xml:space="preserve">
+    <value>Total Spilletid</value>
+  </data>
+  <data name="show.stats.ranked_score" xml:space="preserve">
+    <value>Ranked Score</value>
+  </data>
+  <data name="show.stats.replays_watched_by_others" xml:space="preserve">
+    <value>Replays Set af Andre</value>
+  </data>
+  <data name="show.stats.score_ranks" xml:space="preserve">
+    <value>Score Ranks</value>
+  </data>
+  <data name="show.stats.total_hits" xml:space="preserve">
+    <value>Totale Hits</value>
+  </data>
+  <data name="show.stats.total_score" xml:space="preserve">
+    <value>Total Score</value>
+  </data>
+  <data name="show.stats.ranked_and_approved_beatmapset_count" xml:space="preserve">
+    <value>Ranked &amp; Godkendte Beatmaps</value>
+  </data>
+  <data name="show.stats.loved_beatmapset_count" xml:space="preserve">
+    <value>Elskede Beatmaps</value>
+  </data>
+  <data name="show.stats.unranked_beatmapset_count" xml:space="preserve">
+    <value>Afventende Beatmaps</value>
+  </data>
+  <data name="show.stats.graveyard_beatmapset_count" xml:space="preserve">
+    <value>Beatmaps på Kirkegården</value>
+  </data>
+  <data name="silenced_banner.title" xml:space="preserve">
+    <value>Du er i øjeblikket gjort tavs.</value>
+  </data>
+  <data name="silenced_banner.message" xml:space="preserve">
+    <value>Nogle handlinger kan være utilgængelige.</value>
+  </data>
+  <data name="status.all" xml:space="preserve">
+    <value>Alle</value>
+  </data>
+  <data name="status.online" xml:space="preserve">
+    <value>Online</value>
+  </data>
+  <data name="status.offline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="store.saved" xml:space="preserve">
+    <value>Bruger Oprettet</value>
+  </data>
+  <data name="verify.title" xml:space="preserve">
+    <value>Kontobekræftelse</value>
+  </data>
+  <data name="view_mode.brick" xml:space="preserve">
+    <value>Klods visning</value>
+  </data>
+  <data name="view_mode.card" xml:space="preserve">
+    <value>Kortvisning</value>
+  </data>
+  <data name="view_mode.list" xml:space="preserve">
+    <value>Listevisning</value>
+  </data>
+</root>

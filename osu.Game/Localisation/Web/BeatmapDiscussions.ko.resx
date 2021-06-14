@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authorizations.update.null_user" xml:space="preserve">
+    <value>로그인하셔야 수정하실 수 있습니다.</value>
+  </data>
+  <data name="authorizations.update.system_generated" xml:space="preserve">
+    <value>시스템이 작성한 글은 수정할 수 없습니다.</value>
+  </data>
+  <data name="authorizations.update.wrong_user" xml:space="preserve">
+    <value>답글을 쓴 사람만 수정할 수 있습니다.</value>
+  </data>
+  <data name="events.empty" xml:space="preserve">
+    <value>아무 일도 일어나지 않았네요... 아직은요.</value>
+  </data>
+  <data name="index.deleted_beatmap" xml:space="preserve">
+    <value>삭제됨</value>
+  </data>
+  <data name="index.none_found" xml:space="preserve">
+    <value>해당 검색 기준과 일치하는 토론을 찾을 수 없습니다.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>비트맵 토론</value>
+  </data>
+  <data name="index.form._" xml:space="preserve">
+    <value>검색</value>
+  </data>
+  <data name="index.form.deleted" xml:space="preserve">
+    <value>삭제된 토론 포함</value>
+  </data>
+  <data name="index.form.mode" xml:space="preserve">
+    <value>비트맵 모드</value>
+  </data>
+  <data name="index.form.only_unresolved" xml:space="preserve">
+    <value>미해결 토론만 보기</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>메시지 종류</value>
+  </data>
+  <data name="index.form.username" xml:space="preserve">
+    <value>사용자 이름</value>
+  </data>
+  <data name="index.form.beatmapset_status._" xml:space="preserve">
+    <value>비트맵 상태</value>
+  </data>
+  <data name="index.form.beatmapset_status.all" xml:space="preserve">
+    <value>전체</value>
+  </data>
+  <data name="index.form.beatmapset_status.disqualified" xml:space="preserve">
+    <value>Disqualified</value>
+  </data>
+  <data name="index.form.beatmapset_status.never_qualified" xml:space="preserve">
+    <value>Qualified 된 적 없음</value>
+  </data>
+  <data name="index.form.beatmapset_status.qualified" xml:space="preserve">
+    <value>Qualified</value>
+  </data>
+  <data name="index.form.beatmapset_status.ranked" xml:space="preserve">
+    <value>Ranked</value>
+  </data>
+  <data name="index.form.user.label" xml:space="preserve">
+    <value>사용자</value>
+  </data>
+  <data name="index.form.user.overview" xml:space="preserve">
+    <value>활동 개요</value>
+  </data>
+  <data name="item.created_at" xml:space="preserve">
+    <value>게시일</value>
+  </data>
+  <data name="item.deleted_at" xml:space="preserve">
+    <value>삭제일</value>
+  </data>
+  <data name="item.message_type" xml:space="preserve">
+    <value>종류</value>
+  </data>
+  <data name="item.permalink" xml:space="preserve">
+    <value>고유 주소</value>
+  </data>
+  <data name="nearby_posts.confirm" xml:space="preserve">
+    <value>지금 작성하는 토론과 연관된 토론이 없습니다</value>
+  </data>
+  <data name="nearby_posts.notice" xml:space="preserve">
+    <value>{0} ({1})주위에 달린 답글이 있습니다. 포스팅하기 전에 한 번 확인해보세요.</value>
+  </data>
+  <data name="nearby_posts.unsaved" xml:space="preserve">
+    <value>이 리뷰에서 {0}개</value>
+  </data>
+  <data name="owner_editor.button" xml:space="preserve">
+    <value>난이도 주인</value>
+  </data>
+  <data name="owner_editor.reset_confirm" xml:space="preserve">
+    <value>이 난이도의 주인을 재설정할까요?</value>
+  </data>
+  <data name="owner_editor.user" xml:space="preserve">
+    <value>주인</value>
+  </data>
+  <data name="owner_editor.version" xml:space="preserve">
+    <value>난이도</value>
+  </data>
+  <data name="reply.open.guest" xml:space="preserve">
+    <value>답글을 달려면 로그인하세요</value>
+  </data>
+  <data name="reply.open.user" xml:space="preserve">
+    <value>답글 달기</value>
+  </data>
+  <data name="review.block_count" xml:space="preserve">
+    <value>{0} / {1} 블록 사용됨</value>
+  </data>
+  <data name="review.go_to_parent" xml:space="preserve">
+    <value>평가 글 보기</value>
+  </data>
+  <data name="review.go_to_child" xml:space="preserve">
+    <value>토론 글 보기</value>
+  </data>
+  <data name="review.validation.block_too_large" xml:space="preserve">
+    <value>각 문단은 최대 {0}자까지 입력할 수 있습니다.</value>
+  </data>
+  <data name="review.validation.external_references" xml:space="preserve">
+    <value>이 리뷰는 관련 없는 이슈 참조를 포함하고 있습니다.</value>
+  </data>
+  <data name="review.validation.invalid_block_type" xml:space="preserve">
+    <value>잘못된 블록 종류</value>
+  </data>
+  <data name="review.validation.invalid_document" xml:space="preserve">
+    <value>잘못된 리뷰</value>
+  </data>
+  <data name="review.validation.minimum_issues" xml:space="preserve">
+    <value>리뷰는 최소한 {0}개의 이슈를 포함해야 합니다</value>
+  </data>
+  <data name="review.validation.missing_text" xml:space="preserve">
+    <value>블록이 텍스트를 포함하고 있지 않음</value>
+  </data>
+  <data name="review.validation.too_many_blocks" xml:space="preserve">
+    <value>리뷰는 최대 {0}개의 문단 및 이슈를 포함할 수 있습니다.</value>
+  </data>
+  <data name="system.resolved.true" xml:space="preserve">
+    <value>{0} 님이 해결함으로 표시함.</value>
+  </data>
+  <data name="system.resolved.false" xml:space="preserve">
+    <value>{0}님이 토론을 재개했습니다</value>
+  </data>
+  <data name="timestamp_display.general" xml:space="preserve">
+    <value>일반</value>
+  </data>
+  <data name="timestamp_display.general_all" xml:space="preserve">
+    <value>일반 (전체)</value>
+  </data>
+  <data name="user_filter.everyone" xml:space="preserve">
+    <value>모두</value>
+  </data>
+  <data name="user_filter.label" xml:space="preserve">
+    <value>사용자순 필터링</value>
+  </data>
+</root>

@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="box.sent" xml:space="preserve">
+    <value>تم ارسال بريد الكتروني الى {0} مع رمز التحقق. ادخل الرمز.</value>
+  </data>
+  <data name="box.title" xml:space="preserve">
+    <value>التحقق من الحساب</value>
+  </data>
+  <data name="box.verifying" xml:space="preserve">
+    <value>جار التحقق...</value>
+  </data>
+  <data name="box.issuing" xml:space="preserve">
+    <value>إصدار رمز جديد...</value>
+  </data>
+  <data name="box.info.check_spam" xml:space="preserve">
+    <value>تأكد من التحقق من مجلد البريد المزعج الخاص بك إذا تعذر العثور على عنوان البريد الإلكتروني.</value>
+  </data>
+  <data name="box.info.recover" xml:space="preserve">
+    <value>اذا لم يكن لديك وصول الى بريدك الألكتروني او نسيت ماذا استخدمت, رجائاََ اتبع الـ {0}.</value>
+  </data>
+  <data name="box.info.recover_link" xml:space="preserve">
+    <value>عملية استرداد البريد الإلكتروني هنا</value>
+  </data>
+  <data name="box.info.reissue" xml:space="preserve">
+    <value>يمكنك أيضا {0} أو {1}.</value>
+  </data>
+  <data name="box.info.reissue_link" xml:space="preserve">
+    <value>طلب رمز آخر</value>
+  </data>
+  <data name="box.info.logout_link" xml:space="preserve">
+    <value>تسجيل الخروج</value>
+  </data>
+  <data name="errors.expired" xml:space="preserve">
+    <value>رمز التحقق منتهي الصلاحية، تم ارسال بريد تحقق جديد.</value>
+  </data>
+  <data name="errors.incorrect_key" xml:space="preserve">
+    <value>رمز التحقق غير صحيح.</value>
+  </data>
+  <data name="errors.retries_exceeded" xml:space="preserve">
+    <value>رمز التحقق غير صحيح. تجاوزت حد إعادة المحاولة، تم ارسال بريد تحقق جديد.</value>
+  </data>
+  <data name="errors.reissued" xml:space="preserve">
+    <value>تم اصدار رمز جديد، تم ارسال بريد تحقق جديد.</value>
+  </data>
+  <data name="errors.unknown" xml:space="preserve">
+    <value>حدثت مشكلة غير معروفة، تم ارسال بريد تحقق جديد.</value>
+  </data>
+</root>

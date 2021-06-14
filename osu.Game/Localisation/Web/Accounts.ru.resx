@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="edit.title_compact" xml:space="preserve">
+    <value>настройки</value>
+  </data>
+  <data name="edit.username" xml:space="preserve">
+    <value>имя пользователя</value>
+  </data>
+  <data name="edit.avatar.title" xml:space="preserve">
+    <value>Аватар</value>
+  </data>
+  <data name="edit.avatar.rules" xml:space="preserve">
+    <value>Пожалуйста, убедитесь, что ваш аватар придерживается {0}.&lt;br/&gt;Это значит, что он обязан &lt;strong&gt;подходить для всех возрастов&lt;/strong&gt;, то есть, никакой наготы, ругательств или вызывающего контента.</value>
+  </data>
+  <data name="edit.avatar.rules_link" xml:space="preserve">
+    <value>правила сообщества</value>
+  </data>
+  <data name="edit.email.current" xml:space="preserve">
+    <value>текущая почта</value>
+  </data>
+  <data name="edit.email.new" xml:space="preserve">
+    <value>новая почта</value>
+  </data>
+  <data name="edit.email.new_confirmation" xml:space="preserve">
+    <value>повторите почту</value>
+  </data>
+  <data name="edit.email.title" xml:space="preserve">
+    <value>Смена почты</value>
+  </data>
+  <data name="edit.password.current" xml:space="preserve">
+    <value>текущий пароль</value>
+  </data>
+  <data name="edit.password.new" xml:space="preserve">
+    <value>новый пароль</value>
+  </data>
+  <data name="edit.password.new_confirmation" xml:space="preserve">
+    <value>повторите пароль</value>
+  </data>
+  <data name="edit.password.title" xml:space="preserve">
+    <value>Смена пароля</value>
+  </data>
+  <data name="edit.profile.title" xml:space="preserve">
+    <value>Профиль</value>
+  </data>
+  <data name="edit.profile.user.user_from" xml:space="preserve">
+    <value>место проживания</value>
+  </data>
+  <data name="edit.profile.user.user_interests" xml:space="preserve">
+    <value>интересы</value>
+  </data>
+  <data name="edit.profile.user.user_occ" xml:space="preserve">
+    <value>род деятельности</value>
+  </data>
+  <data name="edit.profile.user.user_website" xml:space="preserve">
+    <value>веб-сайт</value>
+  </data>
+  <data name="edit.signature.title" xml:space="preserve">
+    <value>Подпись на форуме</value>
+  </data>
+  <data name="edit.signature.update" xml:space="preserve">
+    <value>сохранить</value>
+  </data>
+  <data name="notifications.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>следить за проблемами в номинированных картах</value>
+  </data>
+  <data name="notifications.beatmapset_disqualify" xml:space="preserve">
+    <value>получать уведомления, когда карты для следующих режимов будут дисквалифицированы</value>
+  </data>
+  <data name="notifications.comment_reply" xml:space="preserve">
+    <value>следить за ответами на мои комментарии</value>
+  </data>
+  <data name="notifications.title" xml:space="preserve">
+    <value>Уведомления</value>
+  </data>
+  <data name="notifications.topic_auto_subscribe" xml:space="preserve">
+    <value>следить за форумными темами, которые я создаю</value>
+  </data>
+  <data name="notifications.options._" xml:space="preserve">
+    <value>способы доставки</value>
+  </data>
+  <data name="notifications.options.beatmap_owner_change" xml:space="preserve">
+    <value>гостевая сложность</value>
+  </data>
+  <data name="notifications.options.beatmapset:modding" xml:space="preserve">
+    <value>новые моды</value>
+  </data>
+  <data name="notifications.options.channel_message" xml:space="preserve">
+    <value>личные сообщения</value>
+  </data>
+  <data name="notifications.options.comment_new" xml:space="preserve">
+    <value>новые комментарии</value>
+  </data>
+  <data name="notifications.options.forum_topic_reply" xml:space="preserve">
+    <value>ответы на форуме</value>
+  </data>
+  <data name="notifications.options.mail" xml:space="preserve">
+    <value>почта</value>
+  </data>
+  <data name="notifications.options.mapping" xml:space="preserve">
+    <value>замапанные карты</value>
+  </data>
+  <data name="notifications.options.push" xml:space="preserve">
+    <value>пуши</value>
+  </data>
+  <data name="notifications.options.user_achievement_unlock" xml:space="preserve">
+    <value>новые медали</value>
+  </data>
+  <data name="oauth.authorized_clients" xml:space="preserve">
+    <value>имеющие доступ</value>
+  </data>
+  <data name="oauth.own_clients" xml:space="preserve">
+    <value>мои приложения</value>
+  </data>
+  <data name="oauth.title" xml:space="preserve">
+    <value>Приложения и доступ</value>
+  </data>
+  <data name="options.beatmapset_show_nsfw" xml:space="preserve">
+    <value>скрыть предупреждения об откровенном содержании в картах</value>
+  </data>
+  <data name="options.beatmapset_title_show_original" xml:space="preserve">
+    <value>показывать метаданные карт на языке оригинала</value>
+  </data>
+  <data name="options.title" xml:space="preserve">
+    <value>Веб-сайт</value>
+  </data>
+  <data name="options.beatmapset_download._" xml:space="preserve">
+    <value>по умолчанию скачивать карты</value>
+  </data>
+  <data name="options.beatmapset_download.all" xml:space="preserve">
+    <value>с видео (если есть)</value>
+  </data>
+  <data name="options.beatmapset_download.direct" xml:space="preserve">
+    <value>через osu!direct</value>
+  </data>
+  <data name="options.beatmapset_download.no_video" xml:space="preserve">
+    <value>без видео</value>
+  </data>
+  <data name="playstyles.keyboard" xml:space="preserve">
+    <value>клавиатура</value>
+  </data>
+  <data name="playstyles.mouse" xml:space="preserve">
+    <value>мышь</value>
+  </data>
+  <data name="playstyles.tablet" xml:space="preserve">
+    <value>графический планшет</value>
+  </data>
+  <data name="playstyles.title" xml:space="preserve">
+    <value>Устройства</value>
+  </data>
+  <data name="playstyles.touch" xml:space="preserve">
+    <value>сенсорный экран</value>
+  </data>
+  <data name="privacy.friends_only" xml:space="preserve">
+    <value>блокировать сообщения не от друзей</value>
+  </data>
+  <data name="privacy.hide_online" xml:space="preserve">
+    <value>скрывать, что я в сети</value>
+  </data>
+  <data name="privacy.title" xml:space="preserve">
+    <value>Конфиденциальность</value>
+  </data>
+  <data name="security.current_session" xml:space="preserve">
+    <value>текущая</value>
+  </data>
+  <data name="security.end_session" xml:space="preserve">
+    <value>Завершить</value>
+  </data>
+  <data name="security.end_session_confirmation" xml:space="preserve">
+    <value>Сеанс на этом устройстве будет немедленно завершён. Вы уверены?</value>
+  </data>
+  <data name="security.last_active" xml:space="preserve">
+    <value>Последняя активность:</value>
+  </data>
+  <data name="security.title" xml:space="preserve">
+    <value>Безопасность</value>
+  </data>
+  <data name="security.web_sessions" xml:space="preserve">
+    <value>веб-сессии</value>
+  </data>
+  <data name="update_email.update" xml:space="preserve">
+    <value>сохранить</value>
+  </data>
+  <data name="update_password.update" xml:space="preserve">
+    <value>сохранить</value>
+  </data>
+  <data name="verification_completed.text" xml:space="preserve">
+    <value>Эту вкладку можно закрыть</value>
+  </data>
+  <data name="verification_completed.title" xml:space="preserve">
+    <value>Проверка завершена</value>
+  </data>
+  <data name="verification_invalid.title" xml:space="preserve">
+    <value>Неверная или истёкшая ссылка для подтверждения</value>
+  </data>
+</root>

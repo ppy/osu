@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="authorizations.update.null_user" xml:space="preserve">
+    <value>編輯前請先登入。</value>
+  </data>
+  <data name="authorizations.update.system_generated" xml:space="preserve">
+    <value>無法編輯系統發佈的貼文。</value>
+  </data>
+  <data name="authorizations.update.wrong_user" xml:space="preserve">
+    <value>只有作者可以編輯。</value>
+  </data>
+  <data name="events.empty" xml:space="preserve">
+    <value>還沒有事件...</value>
+  </data>
+  <data name="index.deleted_beatmap" xml:space="preserve">
+    <value>已刪除</value>
+  </data>
+  <data name="index.none_found" xml:space="preserve">
+    <value>找不到符合條件的討論內容</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>圖譜討論</value>
+  </data>
+  <data name="index.form._" xml:space="preserve">
+    <value>搜尋</value>
+  </data>
+  <data name="index.form.deleted" xml:space="preserve">
+    <value>包含已經刪除的討論</value>
+  </data>
+  <data name="index.form.mode" xml:space="preserve">
+    <value>圖譜遊戲模式</value>
+  </data>
+  <data name="index.form.only_unresolved" xml:space="preserve">
+    <value>只顯示未解決的討論</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>訊息類別</value>
+  </data>
+  <data name="index.form.username" xml:space="preserve">
+    <value>使用者名稱</value>
+  </data>
+  <data name="index.form.beatmapset_status._" xml:space="preserve">
+    <value>圖譜狀態</value>
+  </data>
+  <data name="index.form.beatmapset_status.all" xml:space="preserve">
+    <value>全部</value>
+  </data>
+  <data name="index.form.beatmapset_status.disqualified" xml:space="preserve">
+    <value>Disqualified</value>
+  </data>
+  <data name="index.form.beatmapset_status.never_qualified" xml:space="preserve">
+    <value>Never Qualified</value>
+  </data>
+  <data name="index.form.beatmapset_status.qualified" xml:space="preserve">
+    <value>Qualified</value>
+  </data>
+  <data name="index.form.beatmapset_status.ranked" xml:space="preserve">
+    <value>已進榜</value>
+  </data>
+  <data name="index.form.user.label" xml:space="preserve">
+    <value>用戶</value>
+  </data>
+  <data name="index.form.user.overview" xml:space="preserve">
+    <value>活動總覽</value>
+  </data>
+  <data name="item.created_at" xml:space="preserve">
+    <value>發佈日期</value>
+  </data>
+  <data name="item.deleted_at" xml:space="preserve">
+    <value>刪除日期</value>
+  </data>
+  <data name="item.message_type" xml:space="preserve">
+    <value>類型</value>
+  </data>
+  <data name="item.permalink" xml:space="preserve">
+    <value>固定連結</value>
+  </data>
+  <data name="nearby_posts.confirm" xml:space="preserve">
+    <value>在這個時間點上沒有相關的討論記錄。</value>
+  </data>
+  <data name="nearby_posts.notice" xml:space="preserve">
+    <value>在 {0} 附近（{1}）有討論記錄，發表前請檢查。</value>
+  </data>
+  <data name="owner_editor.button" xml:space="preserve">
+    <value>難度作者</value>
+  </data>
+  <data name="owner_editor.reset_confirm" xml:space="preserve">
+    <value>要重設此難度的作者嗎？</value>
+  </data>
+  <data name="owner_editor.user" xml:space="preserve">
+    <value>作者</value>
+  </data>
+  <data name="owner_editor.version" xml:space="preserve">
+    <value>難度</value>
+  </data>
+  <data name="reply.open.guest" xml:space="preserve">
+    <value>登入以回覆</value>
+  </data>
+  <data name="reply.open.user" xml:space="preserve">
+    <value>回覆</value>
+  </data>
+  <data name="review.block_count" xml:space="preserve">
+    <value>已耗用 {0} / {1} 個方塊</value>
+  </data>
+  <data name="review.go_to_parent" xml:space="preserve">
+    <value>檢視其他人的評論</value>
+  </data>
+  <data name="review.go_to_child" xml:space="preserve">
+    <value>查看討論</value>
+  </data>
+  <data name="system.resolved.true" xml:space="preserve">
+    <value>被 {0} 標記為 “已解決”</value>
+  </data>
+  <data name="system.resolved.false" xml:space="preserve">
+    <value>被 {0} 標記為 “未解決”</value>
+  </data>
+  <data name="timestamp_display.general" xml:space="preserve">
+    <value>一般</value>
+  </data>
+  <data name="timestamp_display.general_all" xml:space="preserve">
+    <value>一般(所有)</value>
+  </data>
+  <data name="user_filter.everyone" xml:space="preserve">
+    <value>所有人</value>
+  </data>
+  <data name="user_filter.label" xml:space="preserve">
+    <value>按使用者篩選</value>
+  </data>
+</root>

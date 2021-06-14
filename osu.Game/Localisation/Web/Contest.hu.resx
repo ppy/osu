@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="header.small" xml:space="preserve">
+    <value>Versenyezz kör kattintgatáson kívüli módokban.</value>
+  </data>
+  <data name="header.large" xml:space="preserve">
+    <value>Közösségi Versenyek</value>
+  </data>
+  <data name="index.nav_title" xml:space="preserve">
+    <value>lista</value>
+  </data>
+  <data name="voting.login_required" xml:space="preserve">
+    <value>Kérlek jelentkezz be a szavazáshoz.</value>
+  </data>
+  <data name="voting.over" xml:space="preserve">
+    <value>Erre a versenyre már véget ért a szavazás</value>
+  </data>
+  <data name="voting.best_of.none_played" xml:space="preserve">
+    <value>Úgy tűnik, hogy egyetlen beatmap-et sem játszottál ami megfelelne ennek a versenynek!</value>
+  </data>
+  <data name="voting.button.add" xml:space="preserve">
+    <value>Szavazás</value>
+  </data>
+  <data name="voting.button.remove" xml:space="preserve">
+    <value>Szavazat eltávolítása</value>
+  </data>
+  <data name="voting.button.used_up" xml:space="preserve">
+    <value>Felhasználtad az összes szavazatodat</value>
+  </data>
+  <data name="entry._" xml:space="preserve">
+    <value>jelentkezés</value>
+  </data>
+  <data name="entry.login_required" xml:space="preserve">
+    <value>Kérlek jelentkezz be a versenyhez való csatlakozáshoz.</value>
+  </data>
+  <data name="entry.silenced_or_restricted" xml:space="preserve">
+    <value>Felfüggesztve illetve némítva nem jelentkezhetsz versenyekre.</value>
+  </data>
+  <data name="entry.preparation" xml:space="preserve">
+    <value>Ez a verseny előkészítés alatt áll. Kérjük várj türelmesen!</value>
+  </data>
+  <data name="entry.drop_here" xml:space="preserve">
+    <value>Húzd a jelentkezésedet ide</value>
+  </data>
+  <data name="entry.download" xml:space="preserve">
+    <value>.osz letöltése</value>
+  </data>
+  <data name="entry.wrong_type.art" xml:space="preserve">
+    <value>Csak .jpg és .png kiterjesztésű fájlok engedélyezettek erre a versenyre.</value>
+  </data>
+  <data name="entry.wrong_type.beatmap" xml:space="preserve">
+    <value>Csak .osu kiterjesztésű fájlok engedélyezettek erre a versenyre.</value>
+  </data>
+  <data name="entry.wrong_type.music" xml:space="preserve">
+    <value>Csak .mp3 kiterjesztésű fájlok engedélyezettek erre a versenyre.</value>
+  </data>
+  <data name="entry.too_big" xml:space="preserve">
+    <value>A jelentkezések száma erre a versenyre csak {0} lehet.</value>
+  </data>
+  <data name="beatmaps.download" xml:space="preserve">
+    <value>Jelentkezés letöltése</value>
+  </data>
+  <data name="vote.list" xml:space="preserve">
+    <value>szavazatok</value>
+  </data>
+  <data name="vote.count" xml:space="preserve">
+    <value>{0} szavazat|{0} szavazatok</value>
+  </data>
+  <data name="vote.points" xml:space="preserve">
+    <value>{0} pont|{0} pontok</value>
+  </data>
+  <data name="dates.ended" xml:space="preserve">
+    <value>Vége: {0}</value>
+  </data>
+  <data name="dates.ended_no_date" xml:space="preserve">
+    <value>Befejezve</value>
+  </data>
+  <data name="dates.starts._" xml:space="preserve">
+    <value>Kezdete: {0}</value>
+  </data>
+  <data name="dates.starts.soon" xml:space="preserve">
+    <value>hamarosan™</value>
+  </data>
+  <data name="states.entry" xml:space="preserve">
+    <value>Nyitott Jelentkezés</value>
+  </data>
+  <data name="states.voting" xml:space="preserve">
+    <value>Szavazás Folyamatban</value>
+  </data>
+  <data name="states.results" xml:space="preserve">
+    <value>Kihirdetett Eredmény</value>
+  </data>
+</root>

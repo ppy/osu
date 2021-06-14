@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="support.convinced.title" xml:space="preserve">
+    <value>Sunt convins! {0}</value>
+  </data>
+  <data name="support.convinced.support" xml:space="preserve">
+    <value>sprijină osu!</value>
+  </data>
+  <data name="support.convinced.gift" xml:space="preserve">
+    <value>sau oferă altor jucători</value>
+  </data>
+  <data name="support.convinced.instructions" xml:space="preserve">
+    <value>Faceți clic pe butonul în formă de inimă pentru a merge la magazinul osu!</value>
+  </data>
+  <data name="support.why-support.title" xml:space="preserve">
+    <value>De ce ar trebui să suport osu!? Unde se duc bani?</value>
+  </data>
+  <data name="support.why-support.team.title" xml:space="preserve">
+    <value>Ajută echipa</value>
+  </data>
+  <data name="support.why-support.team.description" xml:space="preserve">
+    <value>O echipă mică dezvoltează și rulează osu!. Suportul tău îi ajută pe ei să, știi tu... trăiască.</value>
+  </data>
+  <data name="support.why-support.infra.title" xml:space="preserve">
+    <value>Infrastructura de Server</value>
+  </data>
+  <data name="support.why-support.infra.description" xml:space="preserve">
+    <value>Contribuțiile merg către servere pentru a menține website-ul, Serviciile multiplayer, Clasamente Online, etc.</value>
+  </data>
+  <data name="support.why-support.featured-artists.title" xml:space="preserve">
+    <value>Artiști renumiți</value>
+  </data>
+  <data name="support.why-support.featured-artists.description" xml:space="preserve">
+    <value>Cu suportul tău, putem să ajungem la și mai mulți artiști geniali și să licităm și mai multă muzică grozavă pentru folosirea în osu!</value>
+  </data>
+  <data name="support.why-support.featured-artists.link_text" xml:space="preserve">
+    <value>Vezi roster-ul curent &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.ads.title" xml:space="preserve">
+    <value>Menține osu! sine-stătător</value>
+  </data>
+  <data name="support.why-support.ads.description" xml:space="preserve">
+    <value>Contribuțiile tale țin jocul independent și complet gratuit de reclame și sponsori de afară.</value>
+  </data>
+  <data name="support.why-support.tournaments.title" xml:space="preserve">
+    <value>Turnee Oficiale</value>
+  </data>
+  <data name="support.why-support.tournaments.description" xml:space="preserve">
+    <value>Ajută fondatul și menținerea (și premiile pentru) osu oficial! Turnee mondiale.</value>
+  </data>
+  <data name="support.why-support.tournaments.link_text" xml:space="preserve">
+    <value>Explorează turnee &amp;raquo;</value>
+  </data>
+  <data name="support.why-support.bounty-program.title" xml:space="preserve">
+    <value>Deschide Programul Sursă Bounty</value>
+  </data>
+  <data name="support.why-support.bounty-program.description" xml:space="preserve">
+    <value>Sprijină contribuitorii comunității care și-au dat timpul și efortul să ajute creerea osu! mai bună.</value>
+  </data>
+  <data name="support.why-support.bounty-program.link_text" xml:space="preserve">
+    <value>Află mai mult &amp;raquo;</value>
+  </data>
+  <data name="support.perks.title" xml:space="preserve">
+    <value>Oh? Ce primesc?!</value>
+  </data>
+  <data name="support.perks.osu_direct.title" xml:space="preserve">
+    <value>osu!direct</value>
+  </data>
+  <data name="support.perks.osu_direct.description" xml:space="preserve">
+    <value>acces rapid și ușor pentru a căuta beatmaps fără a părăsi jocul.</value>
+  </data>
+  <data name="support.perks.friend_ranking.title" xml:space="preserve">
+    <value>Clasament Prieteni</value>
+  </data>
+  <data name="support.perks.friend_ranking.description" xml:space="preserve">
+    <value>Să vedem cum concurezi peste prietenii tăi pe un clasament într-un beatmap, ambele în joc și pe website.</value>
+  </data>
+  <data name="support.perks.country_ranking.title" xml:space="preserve">
+    <value>Clasament Țară</value>
+  </data>
+  <data name="support.perks.country_ranking.description" xml:space="preserve">
+    <value>Cucerește țara ta înainte de a cuceri lumea.</value>
+  </data>
+  <data name="support.perks.mod_filtering.title" xml:space="preserve">
+    <value>Filtrează după Moderatori</value>
+  </data>
+  <data name="support.perks.mod_filtering.description" xml:space="preserve">
+    <value>Asociază doar cu oamenii care joacă HDHR? Nicio problemă!</value>
+  </data>
+  <data name="support.perks.auto_downloads.title" xml:space="preserve">
+    <value>Descărcări automate</value>
+  </data>
+  <data name="support.perks.auto_downloads.description" xml:space="preserve">
+    <value>Descărcări automate când joci în modul multiplayer, când îi urmărești pe alții, sau când dai clic pe link-uri în chat!</value>
+  </data>
+  <data name="support.perks.upload_more.title" xml:space="preserve">
+    <value>Încarcă mai mult</value>
+  </data>
+  <data name="support.perks.upload_more.description" xml:space="preserve">
+    <value>Sloturi suplimentare pentru beatmaps în așteptare (pe beatmap clasificat) până la un maxim de 10.</value>
+  </data>
+  <data name="support.perks.early_access.title" xml:space="preserve">
+    <value>Acces anticipat</value>
+  </data>
+  <data name="support.perks.early_access.description" xml:space="preserve">
+    <value>Acces la lansări timpurii, unde poți încerca noi funcții înainte de toți ceilalți!</value>
+  </data>
+  <data name="support.perks.customisation.title" xml:space="preserve">
+    <value>Personalizare</value>
+  </data>
+  <data name="support.perks.customisation.description" xml:space="preserve">
+    <value>Personalizează-ți profilul adăugând o pagină de utilizator complet personalizabilă.</value>
+  </data>
+  <data name="support.perks.beatmap_filters.title" xml:space="preserve">
+    <value>Organizarea beatmap</value>
+  </data>
+  <data name="support.perks.beatmap_filters.description" xml:space="preserve">
+    <value>Filtrează cautările de beatmaps, prin mape jucate și nejucate, dar și prin clasamentul obținut (dacă există).</value>
+  </data>
+  <data name="support.perks.yellow_fellow.title" xml:space="preserve">
+    <value>Porecla de aur</value>
+  </data>
+  <data name="support.perks.yellow_fellow.description" xml:space="preserve">
+    <value>Fii recunoscut în joc cu o nouă culoare galben-deschis.</value>
+  </data>
+  <data name="support.perks.speedy_downloads.title" xml:space="preserve">
+    <value>Descărcări rapide</value>
+  </data>
+  <data name="support.perks.speedy_downloads.description" xml:space="preserve">
+    <value>Mai puține restricții de descărcare, mai ales când folosești osu!direct.</value>
+  </data>
+  <data name="support.perks.change_username.title" xml:space="preserve">
+    <value>Schimbarea numelui de utilizator</value>
+  </data>
+  <data name="support.perks.change_username.description" xml:space="preserve">
+    <value>Abilitatea de a-ți schimba numele fără costuri suplimentare. (o singură dată)</value>
+  </data>
+  <data name="support.perks.skinnables.title" xml:space="preserve">
+    <value>Posibilități de personalizare</value>
+  </data>
+  <data name="support.perks.skinnables.description" xml:space="preserve">
+    <value>Posibilități extra de personalizare în joc, ca fundalul din meniul principal.</value>
+  </data>
+  <data name="support.perks.feature_votes.title" xml:space="preserve">
+    <value>Voturi pentru funcționalități</value>
+  </data>
+  <data name="support.perks.feature_votes.description" xml:space="preserve">
+    <value>Votează pentru funcționalități noi. (2 pe lună)</value>
+  </data>
+  <data name="support.perks.sort_options.title" xml:space="preserve">
+    <value>Opțiuni de sortare</value>
+  </data>
+  <data name="support.perks.sort_options.description" xml:space="preserve">
+    <value>Abilitatea de a vedea clasarea după țară / prieteni / moduri specifice în joc.</value>
+  </data>
+  <data name="support.perks.more_favourites.title" xml:space="preserve">
+    <value>Mai multe favorite</value>
+  </data>
+  <data name="support.perks.more_favourites.description" xml:space="preserve">
+    <value>Numărul maxim de beatmap-uri care poți favoriza este mărit din {0} &amp;rarr; {1}</value>
+  </data>
+  <data name="support.perks.more_friends.title" xml:space="preserve">
+    <value>Mai Mulți Prieteni</value>
+  </data>
+  <data name="support.perks.more_friends.description" xml:space="preserve">
+    <value>Numărul maxim de prieteni pe care în poți avea este mărit din {0} &amp;rarr; {1}</value>
+  </data>
+  <data name="support.perks.more_beatmaps.title" xml:space="preserve">
+    <value>Distribuie mai multe Beatmap-uri</value>
+  </data>
+  <data name="support.perks.more_beatmaps.description" xml:space="preserve">
+    <value>Câte beatmap-uri neclasate poți avea în același timp este calculat dintr-o bază valută plus încă un bonus pentru fiecare beatmap clasat acum ai (până la limită).&lt;br/&gt;&lt;br/&gt;Normal acesta este 4 plus 1 per beatmap clasat (până la 2). Cu ajutător, aceste se mărește la 8 plus 1 per beatmap clasat (până la 12).</value>
+  </data>
+  <data name="support.perks.friend_filtering.title" xml:space="preserve">
+    <value>Clasamente Prieteni</value>
+  </data>
+  <data name="support.perks.friend_filtering.description" xml:space="preserve">
+    <value>Completează cu prietenii tăi și vezi cât clasezi înpotriva lor!*&lt;br/&gt;&lt;br/&gt;&lt;small&gt;* nu este încă disponibil pe site-ul nou, disponibilcurând(tm)&lt;/small&gt;</value>
+  </data>
+  <data name="support.supporter_status.contribution" xml:space="preserve">
+    <value>Mulțumim pentru sprijinul vostru de până acum! Ai contribuit cu un total de {0} pentru {1} achiziționări de tag-uri!</value>
+  </data>
+  <data name="support.supporter_status.gifted" xml:space="preserve">
+    <value>{0} din achiziționările tale de tag-uri au fost dăruite (pentru un total de {1} dăruiți), cât de generos!</value>
+  </data>
+  <data name="support.supporter_status.not_yet" xml:space="preserve">
+    <value>Încă nu ai eticheta de suporter :(</value>
+  </data>
+  <data name="support.supporter_status.valid_until" xml:space="preserve">
+    <value>Tag-ul tău curent de suporter este valid până la {0}!</value>
+  </data>
+  <data name="support.supporter_status.was_valid_until" xml:space="preserve">
+    <value>Tag-ul tău de suporter a fost valid pâna la data de {0}.</value>
+  </data>
+</root>

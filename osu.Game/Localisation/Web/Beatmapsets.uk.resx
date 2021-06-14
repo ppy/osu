@@ -1,0 +1,391 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>Ця карта тимчасово недоступна для завантаження.</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>Деякі частини цієї карти були видалені на вимогу учасника або правовласників.</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>Натисніть тут для отримання більш детальної інформації.</value>
+  </data>
+  <data name="availability.rule_violation" xml:space="preserve">
+    <value>Деякі об’єкти, що містяться на цій карті, були видалені після визнання непридатними для використання в osu!.</value>
+  </data>
+  <data name="download.limit_exceeded" xml:space="preserve">
+    <value>Повільніше, грайте більше.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Бібліотека мап</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>Бітмапи</value>
+  </data>
+  <data name="panel.empty" xml:space="preserve">
+    <value> бітмапи відсутні</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>завантажити</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>завантажити з вiдео</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>завантажити без вiдео</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>відкрити в osu!direct</value>
+  </data>
+  <data name="nominate.hybrid_requires_modes" xml:space="preserve">
+    <value>Гібридний набір біт-карт вимагає від вас принаймні одного режиму відтворення, на який висуватимуться.</value>
+  </data>
+  <data name="nominate.incorrect_mode" xml:space="preserve">
+    <value>Ви не маєте дозволу призначати для режиму мод: {0}</value>
+  </data>
+  <data name="nominate.full_bn_required" xml:space="preserve">
+    <value>Ви повинні бути повноправним номінатором, щоб виконати цю кваліфікаційну номінацію.</value>
+  </data>
+  <data name="nominate.too_many" xml:space="preserve">
+    <value>Вимога щодо номінації вже виконана.</value>
+  </data>
+  <data name="nominate.dialog.confirmation" xml:space="preserve">
+    <value>Ви впевнені, що хочете призначити цю Beatmap?</value>
+  </data>
+  <data name="nominate.dialog.header" xml:space="preserve">
+    <value>Номінувати Beatmap</value>
+  </data>
+  <data name="nominate.dialog.hybrid_warning" xml:space="preserve">
+    <value>Примітка: Ви можете номінувати лише один раз, тому, будь ласка, переконайтеся, що ви призначаєте всі ігрові режими, які ви плануєте</value>
+  </data>
+  <data name="nominate.dialog.which_modes" xml:space="preserve">
+    <value>Номінувати для яких режимів?</value>
+  </data>
+  <data name="nsfw_badge.label" xml:space="preserve">
+    <value>Явний</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>Обговорення</value>
+  </data>
+  <data name="show.details.by_artist" xml:space="preserve">
+    <value>за :виконавцем</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>Додати в обране</value>
+  </data>
+  <data name="show.details.favourite_login" xml:space="preserve">
+    <value>Увійдіть, щоб додати цю карту</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>Ви повинні увійти для завантаження карти!</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>створена {0}</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>Видалити з Обраного</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>оновлена {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>Завантажити</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>без відео</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>з відео</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>щоб завантажити</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>Увійдіть</value>
+  </data>
+  <data name="show.details_date.approved" xml:space="preserve">
+    <value>затверджено {0}</value>
+  </data>
+  <data name="show.details_date.loved" xml:space="preserve">
+    <value>улюблена {0}</value>
+  </data>
+  <data name="show.details_date.qualified" xml:space="preserve">
+    <value>кваліфікована {0}</value>
+  </data>
+  <data name="show.details_date.ranked" xml:space="preserve">
+    <value>рейтингова {0}</value>
+  </data>
+  <data name="show.details_date.submitted" xml:space="preserve">
+    <value>завантажена {0}</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>оновлена {0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>У вас занадто багато обраних карт! Видаліть деякі з них і спробуйте знову.</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>Хайпніть цю мапу, якщо вам сподобалося в неї грати, для того щоб допомогти їй отримати статус&lt;strong&gt;Рангової&lt;/strong&gt;.</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>Ця карта зараз {0}.</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>на розгляді</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>кваліфікована</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>робота в процесі</value>
+  </data>
+  <data name="show.hype.disqualify._" xml:space="preserve">
+    <value>Якщо ви знайшли помилку в цій карті, будь ласка, позбавите її кваліфікації {0}.</value>
+  </data>
+  <data name="show.hype.report._" xml:space="preserve">
+    <value>Якщо ви знайшли проблему в цій мапі, повідомте про це {0} щоб наша команда дізналася.</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>Повідомити про проблему</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>тут</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>Опис</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>Жанр</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>Мова</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>Дані все ще обробляються...</value>
+  </data>
+  <data name="show.info.nsfw" xml:space="preserve">
+    <value>Явний контент</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>Шкала провалів</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>Джерело</value>
+  </data>
+  <data name="show.info.storyboard" xml:space="preserve">
+    <value>Бітмапа містить сторіборд</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>Шанс успіху</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>Теги</value>
+  </data>
+  <data name="show.info.video" xml:space="preserve">
+    <value>Ця карта містить відео</value>
+  </data>
+  <data name="show.nsfw_warning.details" xml:space="preserve">
+    <value>Ця бітова карта містить явний, образливий або тривожний вміст. Хотіли б ви все-таки переглянути його?</value>
+  </data>
+  <data name="show.nsfw_warning.title" xml:space="preserve">
+    <value>Явний Контент</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.disable" xml:space="preserve">
+    <value>Вимкнути попередження</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.listing" xml:space="preserve">
+    <value>Список бітмап</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.show" xml:space="preserve">
+    <value>Показати</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>досягнуто {0}</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>Рейтинг країн</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>Рейтинг серед друзів</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>Рейтинг в світі</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>Натисніть &lt;a href="{0}"&gt;сюди&lt;/a&gt; для перегляду всіх можливостей які ви отримаєте!</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>Ви повинні мати osu!прихильник для використання даної можливості!</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>Табло</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>Точність</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>Максимальне комбо</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>Промахи</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>Модифікатори</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>Гравець</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>Ранг</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>Всього очок</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>Очки</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>Час</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>Ніхто з вашої країни ще не грав на цій карті!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>Ніхто з ваших друзів ще не грав на цій карті!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>Ніхто ще не грав на цій карті! Може бути ви спробуєте?</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>Результати завантажуються...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>Нерангова карта.</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>Лідирує</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>Ваш рекорд</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>Розмір нот</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>Кількість нот</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>Втрата HP</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>Точність</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>Швидкість проходження</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>Складність</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>Тривалість</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>Кількість нот</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>Кількість слайдерів</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>Рейтинг користувачів</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>Шкала рейтингу</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>Номінації</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>Кількість ігор</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>Ранкнуті</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>Схвалені</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>Улюблені</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>Кваліфіковані</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>В процесі створення</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>На розгляді</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>Закинуті</value>
+  </data>
+</root>

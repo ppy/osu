@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="event.approve" xml:space="preserve">
+    <value>Godkjent.</value>
+  </data>
+  <data name="event.discussion_delete" xml:space="preserve">
+    <value>Moderator slettet diskusjonen {0}.</value>
+  </data>
+  <data name="event.discussion_lock" xml:space="preserve">
+    <value>Diskusjon for dette beatmappet har blitt deaktivert. ({0})</value>
+  </data>
+  <data name="event.discussion_post_delete" xml:space="preserve">
+    <value>Moderator slettet innlegg fra diskusjonen {0}.</value>
+  </data>
+  <data name="event.discussion_post_restore" xml:space="preserve">
+    <value>Moderator gjenopprettet innlegg fra diskusjonen {0}.</value>
+  </data>
+  <data name="event.discussion_restore" xml:space="preserve">
+    <value>Moderator gjenopprettet diskusjon {0}.</value>
+  </data>
+  <data name="event.discussion_unlock" xml:space="preserve">
+    <value>Diskusjon for dette beatmappet har blitt aktivert.</value>
+  </data>
+  <data name="event.disqualify" xml:space="preserve">
+    <value>Diskvalifisert av {0}. Årsak: {1} ({2}).</value>
+  </data>
+  <data name="event.disqualify_legacy" xml:space="preserve">
+    <value>Diskvalifisert av {0}. Årsak: {1}.</value>
+  </data>
+  <data name="event.genre_edit" xml:space="preserve">
+    <value>Sjanger endret fra {0} til {1}.</value>
+  </data>
+  <data name="event.issue_reopen" xml:space="preserve">
+    <value>Løst problem ved {0} har blitt gjenåpnet.</value>
+  </data>
+  <data name="event.issue_resolve" xml:space="preserve">
+    <value>Problemet med {0} har blitt markert som løst.</value>
+  </data>
+  <data name="event.kudosu_allow" xml:space="preserve">
+    <value>Kudosu fornektelse for diskusjon {0} har blitt fjernet.</value>
+  </data>
+  <data name="event.kudosu_deny" xml:space="preserve">
+    <value>Diskusjonen {0} ble nektet for kudosu.</value>
+  </data>
+  <data name="event.kudosu_gain" xml:space="preserve">
+    <value>Diskusjonen {0} av {1} oppnådde nok stemmer til kudosu.</value>
+  </data>
+  <data name="event.kudosu_lost" xml:space="preserve">
+    <value>Diskusjonen {0} av {1} har mistet stemmer og innvilget kudosu er blitt fjernet.</value>
+  </data>
+  <data name="event.kudosu_recalculate" xml:space="preserve">
+    <value>Diskusjonen {0} har fått kudosu tilskuddene rekalkulert.</value>
+  </data>
+  <data name="event.language_edit" xml:space="preserve">
+    <value>Språk endret fra {0} til {1}.</value>
+  </data>
+  <data name="event.love" xml:space="preserve">
+    <value>Elsket av {0}</value>
+  </data>
+  <data name="event.nominate" xml:space="preserve">
+    <value>Nominert av {0}.</value>
+  </data>
+  <data name="event.nominate_modes" xml:space="preserve">
+    <value>Nominert av {0} ({1}).</value>
+  </data>
+  <data name="event.nomination_reset" xml:space="preserve">
+    <value>Nytt problem {0} ({1}) utløste en tilbakestilling av nominasjonen.</value>
+  </data>
+  <data name="event.qualify" xml:space="preserve">
+    <value>Dette beatmappet har nådd det nødvendige antallet med nominasjoner og har nå blitt kvalifisert.</value>
+  </data>
+  <data name="event.rank" xml:space="preserve">
+    <value>Rangert.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmapset Hendelser</value>
+  </data>
+  <data name="index.form.period" xml:space="preserve">
+    <value>Periode</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>Typer</value>
+  </data>
+  <data name="item.content" xml:space="preserve">
+    <value>Innhold</value>
+  </data>
+  <data name="item.discussion_deleted" xml:space="preserve">
+    <value>[deleted]</value>
+  </data>
+  <data name="item.type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="type.approve" xml:space="preserve">
+    <value>Godkjenning</value>
+  </data>
+  <data name="type.discussion_delete" xml:space="preserve">
+    <value>Diskusjon sletting</value>
+  </data>
+  <data name="type.discussion_post_delete" xml:space="preserve">
+    <value>Diskusjonsvar sletting</value>
+  </data>
+  <data name="type.discussion_post_restore" xml:space="preserve">
+    <value>Diskusjonsvar gjenopprettelse</value>
+  </data>
+  <data name="type.discussion_restore" xml:space="preserve">
+    <value>Gjenopprett diskusjon</value>
+  </data>
+  <data name="type.disqualify" xml:space="preserve">
+    <value>Diskvalifikasjon</value>
+  </data>
+  <data name="type.genre_edit" xml:space="preserve">
+    <value>Sjanger redigering</value>
+  </data>
+  <data name="type.issue_reopen" xml:space="preserve">
+    <value>Gjenåpne diskusjon</value>
+  </data>
+  <data name="type.issue_resolve" xml:space="preserve">
+    <value>Løs diskusjon</value>
+  </data>
+  <data name="type.kudosu_allow" xml:space="preserve">
+    <value>Kudosu kvote</value>
+  </data>
+  <data name="type.kudosu_deny" xml:space="preserve">
+    <value>Kudosu benektelse</value>
+  </data>
+  <data name="type.kudosu_gain" xml:space="preserve">
+    <value>Kudosu gevinst</value>
+  </data>
+  <data name="type.kudosu_lost" xml:space="preserve">
+    <value>Kudosu tap</value>
+  </data>
+  <data name="type.kudosu_recalculate" xml:space="preserve">
+    <value>Kudosu rekalkulering</value>
+  </data>
+  <data name="type.language_edit" xml:space="preserve">
+    <value>Språk redigering</value>
+  </data>
+  <data name="type.love" xml:space="preserve">
+    <value>Elsk</value>
+  </data>
+  <data name="type.nominate" xml:space="preserve">
+    <value>Nominasjon</value>
+  </data>
+  <data name="type.nomination_reset" xml:space="preserve">
+    <value>Nominasjon nullstilling</value>
+  </data>
+  <data name="type.qualify" xml:space="preserve">
+    <value>Kvalifikasjon</value>
+  </data>
+  <data name="type.rank" xml:space="preserve">
+    <value>Rangering</value>
+  </data>
+</root>

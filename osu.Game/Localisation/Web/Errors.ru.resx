@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="missing_route" xml:space="preserve">
+    <value>Неверный url или неправильный метод запроса.</value>
+  </data>
+  <data name="no_restricted_access" xml:space="preserve">
+    <value>Вы не можете использовать данную функцию пока ваши права ограничены.</value>
+  </data>
+  <data name="supporter_only" xml:space="preserve">
+    <value>Вы должны иметь osu!supporter для использования этой возможности.</value>
+  </data>
+  <data name="unknown" xml:space="preserve">
+    <value>Возникла неизвестная ошибка.</value>
+  </data>
+  <data name="codes.http-401" xml:space="preserve">
+    <value>Войдите для продолжения.</value>
+  </data>
+  <data name="codes.http-403" xml:space="preserve">
+    <value>Доступ запрещён.</value>
+  </data>
+  <data name="codes.http-404" xml:space="preserve">
+    <value>Не найдено.</value>
+  </data>
+  <data name="codes.http-429" xml:space="preserve">
+    <value>Слишком много попыток. Попробуйте позже.</value>
+  </data>
+  <data name="account.profile-order.generic" xml:space="preserve">
+    <value>Возникла ошибка. Попробуй перезагрузить страницу.</value>
+  </data>
+  <data name="beatmaps.invalid_mode" xml:space="preserve">
+    <value>Указан недопустимый мод.</value>
+  </data>
+  <data name="beatmaps.standard_converts_only" xml:space="preserve">
+    <value>Результатов для запрашиваемого мода нет.</value>
+  </data>
+  <data name="checkout.generic" xml:space="preserve">
+    <value>Произошла ошибка при обработке заказа.</value>
+  </data>
+  <data name="search.default" xml:space="preserve">
+    <value>Ничего не найдено, попробуйте позже.</value>
+  </data>
+  <data name="search.operation_timeout_exception" xml:space="preserve">
+    <value>Поиск сейчас перегружен, попробуйте позже.</value>
+  </data>
+</root>

@@ -1,0 +1,265 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="admin.warehouse" xml:space="preserve">
+    <value>웨어하우스</value>
+  </data>
+  <data name="cart.checkout" xml:space="preserve">
+    <value>결제</value>
+  </data>
+  <data name="cart.info" xml:space="preserve">
+    <value>장바구니에 담긴 {0}개의 항목 (${1})</value>
+  </data>
+  <data name="cart.more_goodies" xml:space="preserve">
+    <value>주문을 끝내기 전에 더 둘러볼게요.</value>
+  </data>
+  <data name="cart.shipping_fees" xml:space="preserve">
+    <value>배송료</value>
+  </data>
+  <data name="cart.title" xml:space="preserve">
+    <value>장바구니</value>
+  </data>
+  <data name="cart.total" xml:space="preserve">
+    <value>합계</value>
+  </data>
+  <data name="cart.errors_no_checkout.line_1" xml:space="preserve">
+    <value>음, 장바구니에 문제가 있어 결제할 수 없네요!</value>
+  </data>
+  <data name="cart.errors_no_checkout.line_2" xml:space="preserve">
+    <value>위에 있는 항목을 제거하거나 수정해서 계속하세요.</value>
+  </data>
+  <data name="cart.empty.text" xml:space="preserve">
+    <value>장바구니가 비어 있습니다.</value>
+  </data>
+  <data name="cart.empty.return_link._" xml:space="preserve">
+    <value>{0}으로 돌아가 상품을 찾아보세요!</value>
+  </data>
+  <data name="cart.empty.return_link.link_text" xml:space="preserve">
+    <value>상품 목록</value>
+  </data>
+  <data name="checkout.cart_problems" xml:space="preserve">
+    <value>장바구니에 문제가 생겼어요!</value>
+  </data>
+  <data name="checkout.cart_problems_edit" xml:space="preserve">
+    <value>편집하려면 클릭하세요.</value>
+  </data>
+  <data name="checkout.declined" xml:space="preserve">
+    <value>결제가 취소되었습니다.</value>
+  </data>
+  <data name="checkout.delayed_shipping" xml:space="preserve">
+    <value>현재 주문이 밀려있습니다! 주문을 해주시는건 기쁘지만, 지금 주문을 처리하는데 **1~2 주 지연**될 수 있다는 걸 알려드립니다.</value>
+  </data>
+  <data name="checkout.old_cart" xml:space="preserve">
+    <value>장바구니가 오래되어 새로 고쳐졌습니다, 다시 시도해 주세요.</value>
+  </data>
+  <data name="checkout.pay" xml:space="preserve">
+    <value>Paypal로 결제</value>
+  </data>
+  <data name="checkout.title_compact" xml:space="preserve">
+    <value>결제</value>
+  </data>
+  <data name="checkout.has_pending._" xml:space="preserve">
+    <value>완료되지 않은 결제가 있습니다. {0}를 눌러 확인하세요.</value>
+  </data>
+  <data name="checkout.has_pending.link_text" xml:space="preserve">
+    <value>여기</value>
+  </data>
+  <data name="checkout.pending_checkout.line_1" xml:space="preserve">
+    <value>이전에 시작했던 결제가 끝나지 않았습니다.</value>
+  </data>
+  <data name="checkout.pending_checkout.line_2" xml:space="preserve">
+    <value>결제 수단을 선택하여 결제를 계속하세요.</value>
+  </data>
+  <data name="discount" xml:space="preserve">
+    <value>{0}% 절약 가능</value>
+  </data>
+  <data name="invoice.echeck_delay" xml:space="preserve">
+    <value>eCheck로 결제하셨다면 10일까지 PayPal을 통해 결제할 수 있도록 허용해주세요.</value>
+  </data>
+  <data name="invoice.title_compact" xml:space="preserve">
+    <value>청구서</value>
+  </data>
+  <data name="invoice.status.processing.title" xml:space="preserve">
+    <value>당신의 결제가 아직 확인되지 않았습니다!</value>
+  </data>
+  <data name="invoice.status.processing.line_1" xml:space="preserve">
+    <value>당신이 이미 결제하셨다면, 저희는 아직 당신의 결제의 확인을 받는것을 기다리고 있을 수 있습니다. 1~2분 후 이 페이지를 새로고침 해주세요!</value>
+  </data>
+  <data name="invoice.status.processing.line_2._" xml:space="preserve">
+    <value>결제 도중 문제가 발생하셨다면, {0}</value>
+  </data>
+  <data name="invoice.status.processing.line_2.link_text" xml:space="preserve">
+    <value>여기를 눌러 결제를 계속하세요</value>
+  </data>
+  <data name="order.cancel" xml:space="preserve">
+    <value>주문 취소</value>
+  </data>
+  <data name="order.cancel_confirm" xml:space="preserve">
+    <value>이 주문이 취소될 것이고, 결제가 처리되지 않습니다. 몇몇 경우에는 결제 공급자가 거래 대금을 즉시 반환하지 않을 수도 있습니다. 정말 계속할까요?</value>
+  </data>
+  <data name="order.cancel_not_allowed" xml:space="preserve">
+    <value>지금은 이 주문을 취소할 수 없습니다.</value>
+  </data>
+  <data name="order.invoice" xml:space="preserve">
+    <value>청구서 보기</value>
+  </data>
+  <data name="order.no_orders" xml:space="preserve">
+    <value>주문 내역이 없습니다.</value>
+  </data>
+  <data name="order.paid_on" xml:space="preserve">
+    <value>{0}에 주문함</value>
+  </data>
+  <data name="order.resume" xml:space="preserve">
+    <value>결제 계속하기</value>
+  </data>
+  <data name="order.shopify_expired" xml:space="preserve">
+    <value>이 주문의 결제 링크가 만료되었습니다.</value>
+  </data>
+  <data name="order.item.display_name.supporter_tag" xml:space="preserve">
+    <value>{0} for {1} ({2})</value>
+  </data>
+  <data name="order.item.quantity" xml:space="preserve">
+    <value>수량</value>
+  </data>
+  <data name="order.not_modifiable_exception.cancelled" xml:space="preserve">
+    <value>취소된 주문은 수정할 수 없습니다.</value>
+  </data>
+  <data name="order.not_modifiable_exception.checkout" xml:space="preserve">
+    <value>제품 처리 중인 경우엔 주문을 수정할 수 없습니다.</value>
+  </data>
+  <data name="order.not_modifiable_exception.default" xml:space="preserve">
+    <value>주문을 수정할 수 없음</value>
+  </data>
+  <data name="order.not_modifiable_exception.delivered" xml:space="preserve">
+    <value>배달된 주문을 수정할 수 없습니다.</value>
+  </data>
+  <data name="order.not_modifiable_exception.paid" xml:space="preserve">
+    <value>이미 결제하여 주문을 수정할 수 없습니다.</value>
+  </data>
+  <data name="order.not_modifiable_exception.processing" xml:space="preserve">
+    <value>제품 처리 중인 경우엔 주문을 수정할 수 없습니다.</value>
+  </data>
+  <data name="order.not_modifiable_exception.shipped" xml:space="preserve">
+    <value>배송된 주문을 수정할 수 없습니다.</value>
+  </data>
+  <data name="order.status.cancelled" xml:space="preserve">
+    <value>취소됨</value>
+  </data>
+  <data name="order.status.checkout" xml:space="preserve">
+    <value>준비 중</value>
+  </data>
+  <data name="order.status.delivered" xml:space="preserve">
+    <value>배송 완료</value>
+  </data>
+  <data name="order.status.paid" xml:space="preserve">
+    <value>결제 완료</value>
+  </data>
+  <data name="order.status.processing" xml:space="preserve">
+    <value>확인 대기 중</value>
+  </data>
+  <data name="order.status.shipped" xml:space="preserve">
+    <value>운송 중</value>
+  </data>
+  <data name="product.name" xml:space="preserve">
+    <value>상품명</value>
+  </data>
+  <data name="product.stock.out" xml:space="preserve">
+    <value>현재 재고가 모두 떨어졌네요 :(. 나중에 다시 확인해주세요.</value>
+  </data>
+  <data name="product.stock.out_with_alternative" xml:space="preserve">
+    <value>이 옵션은 재고가 모두 떨어졌네요 :(. 다른 옵션을 선택하시거나, 나중에 다시 확인해주세요.</value>
+  </data>
+  <data name="product.add_to_cart" xml:space="preserve">
+    <value>장바구니에 추가</value>
+  </data>
+  <data name="product.notify" xml:space="preserve">
+    <value>구매할 수 있을 때 알려주세요!</value>
+  </data>
+  <data name="product.notification_success" xml:space="preserve">
+    <value>재고가 들어오면 알려드리겠습니다. 취소하려면 {0}를 누르세요.</value>
+  </data>
+  <data name="product.notification_remove_text" xml:space="preserve">
+    <value>여기</value>
+  </data>
+  <data name="product.notification_in_stock" xml:space="preserve">
+    <value>이 상품의 재고가 있습니다!</value>
+  </data>
+  <data name="supporter_tag.gift" xml:space="preserve">
+    <value>선물하기</value>
+  </data>
+  <data name="supporter_tag.require_login._" xml:space="preserve">
+    <value>서포터 권한을 구매하려면 {0}하셔야 합니다!</value>
+  </data>
+  <data name="supporter_tag.require_login.link_text" xml:space="preserve">
+    <value>로그인</value>
+  </data>
+  <data name="username_change.check" xml:space="preserve">
+    <value>사용 가능한 이름인지 확인하려면 입력하세요!</value>
+  </data>
+  <data name="username_change.checking" xml:space="preserve">
+    <value>{0} 사용 가능 여부 확인중..</value>
+  </data>
+  <data name="username_change.require_login._" xml:space="preserve">
+    <value>유저이름을 바꾸려면 {0}하셔야 합니다!</value>
+  </data>
+  <data name="username_change.require_login.link_text" xml:space="preserve">
+    <value>로그인</value>
+  </data>
+</root>

@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="box.sent" xml:space="preserve">
+    <value>Een e-mail is gestuurd naar {0} met een bevestigingscode. Vul de code in.</value>
+  </data>
+  <data name="box.title" xml:space="preserve">
+    <value>Accountverificatie</value>
+  </data>
+  <data name="box.verifying" xml:space="preserve">
+    <value>Verifiëren...</value>
+  </data>
+  <data name="box.issuing" xml:space="preserve">
+    <value>Nieuwe code versturen...</value>
+  </data>
+  <data name="box.info.check_spam" xml:space="preserve">
+    <value>Controleer zeker je spam folder als je de e-mail niet terugvindt.</value>
+  </data>
+  <data name="box.info.recover" xml:space="preserve">
+    <value>Als je je e-mail niet kan bereiken of je bent vergeten wat je hebt gebruikt, volg dan de {0}.</value>
+  </data>
+  <data name="box.info.recover_link" xml:space="preserve">
+    <value>e-mail herstelproces hier</value>
+  </data>
+  <data name="box.info.reissue" xml:space="preserve">
+    <value>Je kan ook {0} of {1}.</value>
+  </data>
+  <data name="box.info.reissue_link" xml:space="preserve">
+    <value>vraag een andere code aan</value>
+  </data>
+  <data name="box.info.logout_link" xml:space="preserve">
+    <value>uitloggen</value>
+  </data>
+  <data name="errors.expired" xml:space="preserve">
+    <value>Verificatiecode is verlopen, nieuwe verificatie e-mail verstuurd.</value>
+  </data>
+  <data name="errors.incorrect_key" xml:space="preserve">
+    <value>Onjuiste verificatiecode.</value>
+  </data>
+  <data name="errors.retries_exceeded" xml:space="preserve">
+    <value>Onjuiste verificatiecode. Limiet opnieuw proberen overschreden, nieuwe verificatie e-mail verstuurd.</value>
+  </data>
+  <data name="errors.reissued" xml:space="preserve">
+    <value>Verificatiecode is hermaakt, nieuwe verificatie e-mail verstuurd.</value>
+  </data>
+  <data name="errors.unknown" xml:space="preserve">
+    <value>Onbekend probleem trad op, nieuwe verificatie e-mail verstuurd.</value>
+  </data>
+</root>

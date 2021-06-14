@@ -1,0 +1,694 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="discussion-votes.update.error" xml:space="preserve">
+    <value>更新投票失败</value>
+  </data>
+  <data name="discussions.allow_kudosu" xml:space="preserve">
+    <value>给予 kudosu</value>
+  </data>
+  <data name="discussions.beatmap_information" xml:space="preserve">
+    <value>谱面信息页</value>
+  </data>
+  <data name="discussions.delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="discussions.deleted" xml:space="preserve">
+    <value>被 {0} 于 {1} 删除。</value>
+  </data>
+  <data name="discussions.deny_kudosu" xml:space="preserve">
+    <value>收回 kudosu</value>
+  </data>
+  <data name="discussions.edit" xml:space="preserve">
+    <value>编辑</value>
+  </data>
+  <data name="discussions.edited" xml:space="preserve">
+    <value>最后由 {0} 编辑于 {1} 。</value>
+  </data>
+  <data name="discussions.guest" xml:space="preserve">
+    <value>{0}制作的客串难度</value>
+  </data>
+  <data name="discussions.kudosu_denied" xml:space="preserve">
+    <value>kudosu 被收回</value>
+  </data>
+  <data name="discussions.message_placeholder_deleted_beatmap" xml:space="preserve">
+    <value>该难度已被删除，无法继续讨论</value>
+  </data>
+  <data name="discussions.message_placeholder_locked" xml:space="preserve">
+    <value>该谱面下的讨论已关闭。</value>
+  </data>
+  <data name="discussions.message_placeholder_silenced" xml:space="preserve">
+    <value>禁言时无法发布讨论。</value>
+  </data>
+  <data name="discussions.message_type_select" xml:space="preserve">
+    <value>选择回复类型</value>
+  </data>
+  <data name="discussions.reply_notice" xml:space="preserve">
+    <value>按下回车以提交</value>
+  </data>
+  <data name="discussions.reply_placeholder" xml:space="preserve">
+    <value>在此处输入您的回复</value>
+  </data>
+  <data name="discussions.require-login" xml:space="preserve">
+    <value>登录以继续</value>
+  </data>
+  <data name="discussions.resolved" xml:space="preserve">
+    <value>已解决</value>
+  </data>
+  <data name="discussions.restore" xml:space="preserve">
+    <value>已修复</value>
+  </data>
+  <data name="discussions.show_deleted" xml:space="preserve">
+    <value>显示已删除的消息</value>
+  </data>
+  <data name="discussions.title" xml:space="preserve">
+    <value>讨论</value>
+  </data>
+  <data name="discussions.collapse.all-collapse" xml:space="preserve">
+    <value>全部折叠</value>
+  </data>
+  <data name="discussions.collapse.all-expand" xml:space="preserve">
+    <value>全部展开</value>
+  </data>
+  <data name="discussions.empty.empty" xml:space="preserve">
+    <value>还没有讨论！</value>
+  </data>
+  <data name="discussions.empty.hidden" xml:space="preserve">
+    <value>没有符合过滤条件的讨论。</value>
+  </data>
+  <data name="discussions.lock.button.lock" xml:space="preserve">
+    <value>锁定该讨论</value>
+  </data>
+  <data name="discussions.lock.button.unlock" xml:space="preserve">
+    <value>解锁该讨论</value>
+  </data>
+  <data name="discussions.lock.prompt.lock" xml:space="preserve">
+    <value>锁定讨论的原因</value>
+  </data>
+  <data name="discussions.lock.prompt.unlock" xml:space="preserve">
+    <value>确认解锁该讨论吗？</value>
+  </data>
+  <data name="discussions.message_hint.in_general" xml:space="preserve">
+    <value>这个信息将提交到整个谱面集讨论中。如果需要单独针对某处，请在开头使用时间戳 (例如: 00:12:345)。</value>
+  </data>
+  <data name="discussions.message_hint.in_timeline" xml:space="preserve">
+    <value>需要 Mod 多处，请在每一个时间戳后写下意见并发表。</value>
+  </data>
+  <data name="discussions.message_placeholder.general" xml:space="preserve">
+    <value>在此处输入以发布到常规 ({0})</value>
+  </data>
+  <data name="discussions.message_placeholder.generalall" xml:space="preserve">
+    <value>在此处输入以发布到常规 (所有难度)</value>
+  </data>
+  <data name="discussions.message_placeholder.review" xml:space="preserve">
+    <value>在此处输入以发布审阅</value>
+  </data>
+  <data name="discussions.message_placeholder.timeline" xml:space="preserve">
+    <value>在此处输入以发布到时间轴 ({0})</value>
+  </data>
+  <data name="discussions.message_type.disqualify" xml:space="preserve">
+    <value>取消提名</value>
+  </data>
+  <data name="discussions.message_type.hype" xml:space="preserve">
+    <value>推荐！</value>
+  </data>
+  <data name="discussions.message_type.mapper_note" xml:space="preserve">
+    <value>备注</value>
+  </data>
+  <data name="discussions.message_type.nomination_reset" xml:space="preserve">
+    <value>取消提名</value>
+  </data>
+  <data name="discussions.message_type.praise" xml:space="preserve">
+    <value>赞</value>
+  </data>
+  <data name="discussions.message_type.problem" xml:space="preserve">
+    <value>问题</value>
+  </data>
+  <data name="discussions.message_type.review" xml:space="preserve">
+    <value>审核</value>
+  </data>
+  <data name="discussions.message_type.suggestion" xml:space="preserve">
+    <value>建议</value>
+  </data>
+  <data name="discussions.mode.events" xml:space="preserve">
+    <value>历史</value>
+  </data>
+  <data name="discussions.mode.general" xml:space="preserve">
+    <value>常规 {0}</value>
+  </data>
+  <data name="discussions.mode.reviews" xml:space="preserve">
+    <value>审阅记录</value>
+  </data>
+  <data name="discussions.mode.timeline" xml:space="preserve">
+    <value>时间轴</value>
+  </data>
+  <data name="discussions.mode.scopes.general" xml:space="preserve">
+    <value>当前难度</value>
+  </data>
+  <data name="discussions.mode.scopes.generalall" xml:space="preserve">
+    <value>所有难度</value>
+  </data>
+  <data name="discussions.new.pin" xml:space="preserve">
+    <value>置顶</value>
+  </data>
+  <data name="discussions.new.timestamp" xml:space="preserve">
+    <value>时间戳</value>
+  </data>
+  <data name="discussions.new.timestamp_missing" xml:space="preserve">
+    <value>在编辑模式下按 Ctrl+C 然后在您的输入框中粘贴以添加时间戳！</value>
+  </data>
+  <data name="discussions.new.title" xml:space="preserve">
+    <value>新的讨论</value>
+  </data>
+  <data name="discussions.new.unpin" xml:space="preserve">
+    <value>取消置顶</value>
+  </data>
+  <data name="discussions.review.new" xml:space="preserve">
+    <value>新的审阅</value>
+  </data>
+  <data name="discussions.review.embed.delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="discussions.review.embed.missing" xml:space="preserve">
+    <value>[该讨论已删除]</value>
+  </data>
+  <data name="discussions.review.embed.unlink" xml:space="preserve">
+    <value>取消链接</value>
+  </data>
+  <data name="discussions.review.embed.unsaved" xml:space="preserve">
+    <value>尚未保存</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.all-diff" xml:space="preserve">
+    <value>你不能在“所有难度”中发布时间戳。</value>
+  </data>
+  <data name="discussions.review.embed.timestamp.diff" xml:space="preserve">
+    <value>如果此 {0} 以时间戳开头，它将显示在时间轴下。</value>
+  </data>
+  <data name="discussions.review.insert-block.paragraph" xml:space="preserve">
+    <value>插入段落</value>
+  </data>
+  <data name="discussions.review.insert-block.praise" xml:space="preserve">
+    <value>插入赞</value>
+  </data>
+  <data name="discussions.review.insert-block.problem" xml:space="preserve">
+    <value>插入问题</value>
+  </data>
+  <data name="discussions.review.insert-block.suggestion" xml:space="preserve">
+    <value>加入建议</value>
+  </data>
+  <data name="discussions.show.title" xml:space="preserve">
+    <value>由 {0} 制作的 {1}</value>
+  </data>
+  <data name="discussions.sort.created_at" xml:space="preserve">
+    <value>创建时间</value>
+  </data>
+  <data name="discussions.sort.timeline" xml:space="preserve">
+    <value>时间轴</value>
+  </data>
+  <data name="discussions.sort.updated_at" xml:space="preserve">
+    <value>最后更新时间</value>
+  </data>
+  <data name="discussions.stats.deleted" xml:space="preserve">
+    <value>已删除</value>
+  </data>
+  <data name="discussions.stats.mapper_notes" xml:space="preserve">
+    <value>备注</value>
+  </data>
+  <data name="discussions.stats.mine" xml:space="preserve">
+    <value>我的</value>
+  </data>
+  <data name="discussions.stats.pending" xml:space="preserve">
+    <value>待处理</value>
+  </data>
+  <data name="discussions.stats.praises" xml:space="preserve">
+    <value>赞</value>
+  </data>
+  <data name="discussions.stats.resolved" xml:space="preserve">
+    <value>已解决</value>
+  </data>
+  <data name="discussions.stats.total" xml:space="preserve">
+    <value>所有</value>
+  </data>
+  <data name="discussions.status-messages.approved" xml:space="preserve">
+    <value>这张谱面于 {0} 被 Approved !</value>
+  </data>
+  <data name="discussions.status-messages.graveyard" xml:space="preserve">
+    <value>这张谱面自 {0} 就未更新了，或许它已经被作者抛弃了 ;w;</value>
+  </data>
+  <data name="discussions.status-messages.loved" xml:space="preserve">
+    <value>这张谱面于 {0} 被 Loved !</value>
+  </data>
+  <data name="discussions.status-messages.ranked" xml:space="preserve">
+    <value>这张谱面于 {0} 被 Ranked !</value>
+  </data>
+  <data name="discussions.status-messages.wip" xml:space="preserve">
+    <value>注意：这张谱面被作者标记为 WIP（work-in-progress）</value>
+  </data>
+  <data name="discussions.votes.none.down" xml:space="preserve">
+    <value>还没有差评</value>
+  </data>
+  <data name="discussions.votes.none.up" xml:space="preserve">
+    <value>还没有好评</value>
+  </data>
+  <data name="discussions.votes.latest.down" xml:space="preserve">
+    <value>最新差评</value>
+  </data>
+  <data name="discussions.votes.latest.up" xml:space="preserve">
+    <value>最新好评</value>
+  </data>
+  <data name="hype.button" xml:space="preserve">
+    <value>推荐谱面！</value>
+  </data>
+  <data name="hype.button_done" xml:space="preserve">
+    <value>已经推荐！</value>
+  </data>
+  <data name="hype.confirm" xml:space="preserve">
+    <value>你确定吗？这将会使用你剩下的 {0} 次推荐次数并且无法撤销。</value>
+  </data>
+  <data name="hype.explanation" xml:space="preserve">
+    <value>推荐这张谱面让它更容易被提名然后 ranked ！</value>
+  </data>
+  <data name="hype.explanation_guest" xml:space="preserve">
+    <value>登录并推荐这张谱面让它更容易被提名然后 ranked ！</value>
+  </data>
+  <data name="hype.new_time" xml:space="preserve">
+    <value>你将在 {0} 后获得新的推荐次数。</value>
+  </data>
+  <data name="hype.remaining" xml:space="preserve">
+    <value>你还可以推荐 {0} 次。</value>
+  </data>
+  <data name="hype.required_text" xml:space="preserve">
+    <value>推荐进度： {0}/{1}</value>
+  </data>
+  <data name="hype.section_title" xml:space="preserve">
+    <value>推荐进度</value>
+  </data>
+  <data name="hype.title" xml:space="preserve">
+    <value>推荐</value>
+  </data>
+  <data name="feedback.button" xml:space="preserve">
+    <value>留下建议</value>
+  </data>
+  <data name="nominations.delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="nominations.delete_own_confirm" xml:space="preserve">
+    <value>你确定要删除吗？删除后你将回到个人资料页。</value>
+  </data>
+  <data name="nominations.delete_other_confirm" xml:space="preserve">
+    <value>你确定要删除吗？删除后你将回到他的个人资料页。</value>
+  </data>
+  <data name="nominations.disqualification_prompt" xml:space="preserve">
+    <value>认为不合格(DQ)的理由？</value>
+  </data>
+  <data name="nominations.disqualified_at" xml:space="preserve">
+    <value>于 {0} 被 DQ （{1}）。</value>
+  </data>
+  <data name="nominations.disqualified_no_reason" xml:space="preserve">
+    <value>没有指定原因</value>
+  </data>
+  <data name="nominations.disqualify" xml:space="preserve">
+    <value>Disqualify</value>
+  </data>
+  <data name="nominations.incorrect_state" xml:space="preserve">
+    <value>操作出错了，请刷新页面。</value>
+  </data>
+  <data name="nominations.love" xml:space="preserve">
+    <value>喜欢</value>
+  </data>
+  <data name="nominations.love_confirm" xml:space="preserve">
+    <value>喜欢这张谱面吗？</value>
+  </data>
+  <data name="nominations.nominate" xml:space="preserve">
+    <value>提名</value>
+  </data>
+  <data name="nominations.nominate_confirm" xml:space="preserve">
+    <value>提名这张谱面？</value>
+  </data>
+  <data name="nominations.nominated_by" xml:space="preserve">
+    <value>由 {0} 提名</value>
+  </data>
+  <data name="nominations.not_enough_hype" xml:space="preserve">
+    <value>没有足够的推荐。</value>
+  </data>
+  <data name="nominations.remove_from_loved" xml:space="preserve">
+    <value>从 Loved 中移除</value>
+  </data>
+  <data name="nominations.remove_from_loved_prompt" xml:space="preserve">
+    <value>从 Loved 中移除的原因：</value>
+  </data>
+  <data name="nominations.required_text" xml:space="preserve">
+    <value>提名数: {0}/{1}</value>
+  </data>
+  <data name="nominations.reset_message_deleted" xml:space="preserve">
+    <value>已删除</value>
+  </data>
+  <data name="nominations.title" xml:space="preserve">
+    <value>提名状态</value>
+  </data>
+  <data name="nominations.unresolved_issues" xml:space="preserve">
+    <value>仍然有需解决的问题 。</value>
+  </data>
+  <data name="nominations.rank_estimate._" xml:space="preserve">
+    <value>如果没有问题，该谱面将于 {0} ranked。位于 {1} 中的第 {2} 位。</value>
+  </data>
+  <data name="nominations.rank_estimate.queue" xml:space="preserve">
+    <value>ranking 队列</value>
+  </data>
+  <data name="nominations.rank_estimate.soon" xml:space="preserve">
+    <value>不久后</value>
+  </data>
+  <data name="nominations.reset_at.nomination_reset" xml:space="preserve">
+    <value>由于 {0} 提出的新问题 {1}（{2}），提名过程于 {3} 被重置。</value>
+  </data>
+  <data name="nominations.reset_at.disqualify" xml:space="preserve">
+    <value>{0} 被 {1} 因为新问题 {2} ({3}) 而 DQ.</value>
+  </data>
+  <data name="nominations.reset_confirm.nomination_reset" xml:space="preserve">
+    <value>你确定吗？提出新的问题会重置提名。</value>
+  </data>
+  <data name="nominations.reset_confirm.disqualify" xml:space="preserve">
+    <value>你确定吗？这将使该谱面不再Qualified并重置提名。</value>
+  </data>
+  <data name="listing.search.prompt" xml:space="preserve">
+    <value>输入关键字...</value>
+  </data>
+  <data name="listing.search.login_required" xml:space="preserve">
+    <value>登录以搜索。</value>
+  </data>
+  <data name="listing.search.options" xml:space="preserve">
+    <value>更多搜索选项</value>
+  </data>
+  <data name="listing.search.supporter_filter" xml:space="preserve">
+    <value>按 {0} 筛选需要成为支持者</value>
+  </data>
+  <data name="listing.search.not-found" xml:space="preserve">
+    <value>没有结果</value>
+  </data>
+  <data name="listing.search.not-found-quote" xml:space="preserve">
+    <value>呃，什么也没有...</value>
+  </data>
+  <data name="listing.search.filters.extra" xml:space="preserve">
+    <value>其他</value>
+  </data>
+  <data name="listing.search.filters.general" xml:space="preserve">
+    <value>常规</value>
+  </data>
+  <data name="listing.search.filters.genre" xml:space="preserve">
+    <value>流派</value>
+  </data>
+  <data name="listing.search.filters.language" xml:space="preserve">
+    <value>语言</value>
+  </data>
+  <data name="listing.search.filters.mode" xml:space="preserve">
+    <value>模式</value>
+  </data>
+  <data name="listing.search.filters.nsfw" xml:space="preserve">
+    <value>少儿不宜谱面</value>
+  </data>
+  <data name="listing.search.filters.played" xml:space="preserve">
+    <value>玩过</value>
+  </data>
+  <data name="listing.search.filters.rank" xml:space="preserve">
+    <value>成绩</value>
+  </data>
+  <data name="listing.search.filters.status" xml:space="preserve">
+    <value>分类</value>
+  </data>
+  <data name="listing.search.sorting.title" xml:space="preserve">
+    <value>标题</value>
+  </data>
+  <data name="listing.search.sorting.artist" xml:space="preserve">
+    <value>艺术家</value>
+  </data>
+  <data name="listing.search.sorting.difficulty" xml:space="preserve">
+    <value>难度</value>
+  </data>
+  <data name="listing.search.sorting.favourites" xml:space="preserve">
+    <value>收藏量</value>
+  </data>
+  <data name="listing.search.sorting.updated" xml:space="preserve">
+    <value>已更新</value>
+  </data>
+  <data name="listing.search.sorting.ranked" xml:space="preserve">
+    <value>Ranked 时间</value>
+  </data>
+  <data name="listing.search.sorting.rating" xml:space="preserve">
+    <value>评分</value>
+  </data>
+  <data name="listing.search.sorting.plays" xml:space="preserve">
+    <value>游玩次数</value>
+  </data>
+  <data name="listing.search.sorting.relevance" xml:space="preserve">
+    <value>相关性</value>
+  </data>
+  <data name="listing.search.sorting.nominations" xml:space="preserve">
+    <value>提名状态</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote._" xml:space="preserve">
+    <value>按 {0} 筛选需要成为 {1}</value>
+  </data>
+  <data name="listing.search.supporter_filter_quote.link_text" xml:space="preserve">
+    <value>支持者</value>
+  </data>
+  <data name="general.converts" xml:space="preserve">
+    <value>包括转谱</value>
+  </data>
+  <data name="general.follows" xml:space="preserve">
+    <value>已关注谱师</value>
+  </data>
+  <data name="general.recommended" xml:space="preserve">
+    <value>推荐难度</value>
+  </data>
+  <data name="mode.all" xml:space="preserve">
+    <value>全部</value>
+  </data>
+  <data name="mode.any" xml:space="preserve">
+    <value>所有</value>
+  </data>
+  <data name="status.any" xml:space="preserve">
+    <value>所有</value>
+  </data>
+  <data name="status.approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="status.favourites" xml:space="preserve">
+    <value>收藏夹</value>
+  </data>
+  <data name="status.graveyard" xml:space="preserve">
+    <value>坟图</value>
+  </data>
+  <data name="status.leaderboard" xml:space="preserve">
+    <value>计入排名</value>
+  </data>
+  <data name="status.loved" xml:space="preserve">
+    <value>Loved</value>
+  </data>
+  <data name="status.mine" xml:space="preserve">
+    <value>我的谱面</value>
+  </data>
+  <data name="status.pending" xml:space="preserve">
+    <value>Pending &amp; WIP</value>
+  </data>
+  <data name="status.qualified" xml:space="preserve">
+    <value>Qualified</value>
+  </data>
+  <data name="status.ranked" xml:space="preserve">
+    <value>Ranked</value>
+  </data>
+  <data name="genre.any" xml:space="preserve">
+    <value>所有</value>
+  </data>
+  <data name="genre.unspecified" xml:space="preserve">
+    <value>尚未指定</value>
+  </data>
+  <data name="genre.video-game" xml:space="preserve">
+    <value>电子游戏</value>
+  </data>
+  <data name="genre.anime" xml:space="preserve">
+    <value>动漫</value>
+  </data>
+  <data name="genre.rock" xml:space="preserve">
+    <value>摇滚</value>
+  </data>
+  <data name="genre.pop" xml:space="preserve">
+    <value>流行乐</value>
+  </data>
+  <data name="genre.other" xml:space="preserve">
+    <value>其他</value>
+  </data>
+  <data name="genre.novelty" xml:space="preserve">
+    <value>新奇</value>
+  </data>
+  <data name="genre.hip-hop" xml:space="preserve">
+    <value>嘻哈</value>
+  </data>
+  <data name="genre.electronic" xml:space="preserve">
+    <value>电子</value>
+  </data>
+  <data name="genre.metal" xml:space="preserve">
+    <value>金属</value>
+  </data>
+  <data name="genre.classical" xml:space="preserve">
+    <value>古典</value>
+  </data>
+  <data name="genre.folk" xml:space="preserve">
+    <value>民谣</value>
+  </data>
+  <data name="genre.jazz" xml:space="preserve">
+    <value>爵士</value>
+  </data>
+  <data name="mods.rx" xml:space="preserve">
+    <value>Relax</value>
+  </data>
+  <data name="mods.v2" xml:space="preserve">
+    <value>Score V2</value>
+  </data>
+  <data name="language.any" xml:space="preserve">
+    <value>所有</value>
+  </data>
+  <data name="language.english" xml:space="preserve">
+    <value>英语</value>
+  </data>
+  <data name="language.chinese" xml:space="preserve">
+    <value>汉语</value>
+  </data>
+  <data name="language.french" xml:space="preserve">
+    <value>法语</value>
+  </data>
+  <data name="language.german" xml:space="preserve">
+    <value>德语</value>
+  </data>
+  <data name="language.italian" xml:space="preserve">
+    <value>意大利语</value>
+  </data>
+  <data name="language.japanese" xml:space="preserve">
+    <value>日语</value>
+  </data>
+  <data name="language.korean" xml:space="preserve">
+    <value>韩语</value>
+  </data>
+  <data name="language.spanish" xml:space="preserve">
+    <value>西班牙语</value>
+  </data>
+  <data name="language.swedish" xml:space="preserve">
+    <value>瑞典语</value>
+  </data>
+  <data name="language.russian" xml:space="preserve">
+    <value>俄语</value>
+  </data>
+  <data name="language.polish" xml:space="preserve">
+    <value>波兰语</value>
+  </data>
+  <data name="language.instrumental" xml:space="preserve">
+    <value>器乐</value>
+  </data>
+  <data name="language.other" xml:space="preserve">
+    <value>其他</value>
+  </data>
+  <data name="language.unspecified" xml:space="preserve">
+    <value>未指定</value>
+  </data>
+  <data name="nsfw.exclude" xml:space="preserve">
+    <value>隐藏</value>
+  </data>
+  <data name="nsfw.include" xml:space="preserve">
+    <value>显示</value>
+  </data>
+  <data name="played.any" xml:space="preserve">
+    <value>任意</value>
+  </data>
+  <data name="played.played" xml:space="preserve">
+    <value>玩过</value>
+  </data>
+  <data name="played.unplayed" xml:space="preserve">
+    <value>没玩过</value>
+  </data>
+  <data name="extra.video" xml:space="preserve">
+    <value>有视频</value>
+  </data>
+  <data name="extra.storyboard" xml:space="preserve">
+    <value>有 Storyboard</value>
+  </data>
+  <data name="rank.any" xml:space="preserve">
+    <value>任意</value>
+  </data>
+  <data name="rank.xh" xml:space="preserve">
+    <value>白银 SS</value>
+  </data>
+  <data name="rank.sh" xml:space="preserve">
+    <value>白银 S</value>
+  </data>
+  <data name="panel.playcount" xml:space="preserve">
+    <value>游戏次数：{0}</value>
+  </data>
+  <data name="panel.favourites" xml:space="preserve">
+    <value>收藏次数：{0}</value>
+  </data>
+  <data name="variant.mania.4k" xml:space="preserve">
+    <value>4K</value>
+  </data>
+  <data name="variant.mania.7k" xml:space="preserve">
+    <value>7K</value>
+  </data>
+  <data name="variant.mania.all" xml:space="preserve">
+    <value>全部</value>
+  </data>
+</root>

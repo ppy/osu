@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="beatmapset_update_notice.new" xml:space="preserve">
+    <value>Laat je weten dat er sinds je laatste bezoek een nieuwe update in beatmap "{0}" heeft plaatsgevonden.</value>
+  </data>
+  <data name="beatmapset_update_notice.subject" xml:space="preserve">
+    <value>Nieuwe update voor beatmap "{0}"</value>
+  </data>
+  <data name="beatmapset_update_notice.unwatch" xml:space="preserve">
+    <value>Als je deze beatkaart niet meer wilt zien, je kunt ofwel op de "Unwatch" link klikken die je vindt in de pagina hierboven, ofwel op de pagina van de modding watchlist pagina:</value>
+  </data>
+  <data name="beatmapset_update_notice.visit" xml:space="preserve">
+    <value>Bezoek de discussiepagina hier:</value>
+  </data>
+  <data name="common.closing" xml:space="preserve">
+    <value>Met vriendelijke groet,</value>
+  </data>
+  <data name="common.hello" xml:space="preserve">
+    <value>Hallo {0},</value>
+  </data>
+  <data name="common.report" xml:space="preserve">
+    <value>Reageer op deze e-mail met SPOED als je niet om deze wijziging hebt verzocht.</value>
+  </data>
+  <data name="donation_thanks.benefit_more" xml:space="preserve">
+    <value>Er zullen na verloop van tijd ook meer nieuwe voordelen bijkomen voor supporters!</value>
+  </data>
+  <data name="donation_thanks.feedback" xml:space="preserve">
+    <value>Als je vragen of feedback hebt, aarzel dan niet om deze mail te beantwoorden; ik neem zo snel mogelijk contact met je op!</value>
+  </data>
+  <data name="donation_thanks.keep_free" xml:space="preserve">
+    <value>Het is aan mensen zoals jij te danken dat osu! het mogelijk maakt om het spel en de gemeenschap probleemloos draaiende te houden zonder advertenties of gedwongen betalingen.</value>
+  </data>
+  <data name="donation_thanks.keep_running" xml:space="preserve">
+    <value>Je support houdt osu! draait gedurende ongeveer {0}! Het lijkt misschien niet zo veel, maar het voegt allemaal toe :).</value>
+  </data>
+  <data name="donation_thanks.subject" xml:space="preserve">
+    <value>Bedankt, osu! &lt;3 van je</value>
+  </data>
+  <data name="donation_thanks.translation" xml:space="preserve">
+    <value>Een gebruiker-ingegeven vertaling voor informatieve doeleinden:</value>
+  </data>
+  <data name="donation_thanks.benefit.gift" xml:space="preserve">
+    <value>De mensen die je supporter hebt gegift zullen nu toegang hebben tot osu! direct en vele andere voordelen.</value>
+  </data>
+  <data name="donation_thanks.benefit.self" xml:space="preserve">
+    <value>Je krijgt nu toegang tot osu!direct en vele andere supporter voordelen gedurende {0}.</value>
+  </data>
+  <data name="donation_thanks.support._" xml:space="preserve">
+    <value>Bedankt voor je {0} naar osu!.</value>
+  </data>
+  <data name="donation_thanks.support.first" xml:space="preserve">
+    <value>ondersteuning</value>
+  </data>
+  <data name="donation_thanks.support.repeat" xml:space="preserve">
+    <value>voortdurende ondersteuning</value>
+  </data>
+  <data name="forum_new_reply.new" xml:space="preserve">
+    <value>Laat je maar weten dat er sinds je laatste bezoek een nieuw antwoord in "{0}" is geweest.</value>
+  </data>
+  <data name="forum_new_reply.subject" xml:space="preserve">
+    <value>[osu!] Nieuwe reactie voor topic "{0}"</value>
+  </data>
+  <data name="forum_new_reply.unwatch" xml:space="preserve">
+    <value>Als je niet langer dit onderwerp wilt bekijken, kan je ook op de link "Afmeld onderwerp" klikken die je onderaan het topic hierboven vindt of vanaf topicabonnementen managementpagina:</value>
+  </data>
+  <data name="forum_new_reply.visit" xml:space="preserve">
+    <value>Ga direct naar het laatste antwoord met de volgende link:</value>
+  </data>
+  <data name="password_reset.code" xml:space="preserve">
+    <value>Uw verificatiecode is:</value>
+  </data>
+  <data name="password_reset.requested" xml:space="preserve">
+    <value>Of jij of iemand anders die zich voor doet als jou, heeft een wachtwoord reset aangevraagd op jou osu! account.</value>
+  </data>
+  <data name="password_reset.subject" xml:space="preserve">
+    <value>osu! account herstellen</value>
+  </data>
+  <data name="store_payment_completed.prepare_shipping" xml:space="preserve">
+    <value>We hebben uw betaling ontvangen en bereiden uw bestelling voor, voor verzending. Het kan enkele dagen duren voordat we het versturen, afhankelijk van het aantal bestellingen. U kunt de voortgang van uw bestelling hier volgen, inclusief tracking details indien beschikbaar:</value>
+  </data>
+  <data name="store_payment_completed.processing" xml:space="preserve">
+    <value>We hebben uw betaling ontvangen en zijn uw bestelling aan het verwerken. U kunt de voortgang van uw bestelling hier volgen:</value>
+  </data>
+  <data name="store_payment_completed.questions" xml:space="preserve">
+    <value>Als je vragen hebt, aarzel dan niet om op deze e-mail te antwoorden.</value>
+  </data>
+  <data name="store_payment_completed.shipping" xml:space="preserve">
+    <value>Verzending</value>
+  </data>
+  <data name="store_payment_completed.subject" xml:space="preserve">
+    <value>We hebben uw osu!store bestelling ontvangen!</value>
+  </data>
+  <data name="store_payment_completed.thank_you" xml:space="preserve">
+    <value>Bedankt voor uw osu!store bestelling!</value>
+  </data>
+  <data name="store_payment_completed.total" xml:space="preserve">
+    <value>Totaal</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift" xml:space="preserve">
+    <value>De persoon die je deze tag gegeven heeft, kan ervoor kiezen anoniem te blijven, dus ze zijn niet genoemd in deze melding.</value>
+  </data>
+  <data name="supporter_gift.anonymous_gift_maybe_not" xml:space="preserve">
+    <value>Maar je weet waarschijnlijk al wie het is ;).</value>
+  </data>
+  <data name="supporter_gift.duration" xml:space="preserve">
+    <value>Dankzij hen, heb je toegang tot osu!direct en andere osu!supporter voordelen voor de volgende {0}.</value>
+  </data>
+  <data name="supporter_gift.features" xml:space="preserve">
+    <value>Je kunt hier meer details over deze functies vinden:</value>
+  </data>
+  <data name="supporter_gift.gifted" xml:space="preserve">
+    <value>Iemand heeft je zojuist een osu! supporter tag cadeau gedaan!</value>
+  </data>
+  <data name="supporter_gift.subject" xml:space="preserve">
+    <value>Je hebt een osu!supporter tag cadeau gekregen!</value>
+  </data>
+  <data name="user_email_updated.changed_to" xml:space="preserve">
+    <value>Dit is een bevestigingsmail om je te laten weten dat je osu! E-mailadres is veranderd naar: "{0}".</value>
+  </data>
+  <data name="user_email_updated.check" xml:space="preserve">
+    <value>Zorg ervoor dat u deze e-mail heeft ontvangen op uw nieuwe adres om te voorkomen dat u toegang tot uw osu! account verliest.</value>
+  </data>
+  <data name="user_email_updated.sent" xml:space="preserve">
+    <value>Om veiligheidsredenen is deze e-mail zowel naar je nieuwe als oude e-mailadres verzonden.</value>
+  </data>
+  <data name="user_email_updated.subject" xml:space="preserve">
+    <value>osu! e-mail wijziging bevestigen</value>
+  </data>
+  <data name="user_force_reactivation.main" xml:space="preserve">
+    <value>Er wordt vermoed dat je account is gecompromitteerd, met recente verdachte activiteiten of een ZEER zwak wachtwoord. Als gevolg hiervan hebben we je nodig om een nieuw wachtwoord in te stellen. Zorg ervoor dat je een VEILIG wachtwoord kiest.</value>
+  </data>
+  <data name="user_force_reactivation.perform_reset" xml:space="preserve">
+    <value>U kunt de reset uitvoeren van {0}</value>
+  </data>
+  <data name="user_force_reactivation.reason" xml:space="preserve">
+    <value>Reden:</value>
+  </data>
+  <data name="user_force_reactivation.subject" xml:space="preserve">
+    <value>osu! Account Reactivatie vereist</value>
+  </data>
+  <data name="user_notification_digest.new" xml:space="preserve">
+    <value>Er zijn nieuwe updates op dingen die je volgt.</value>
+  </data>
+  <data name="user_notification_digest.settings" xml:space="preserve">
+    <value>Verander voorkeuren voor email meldingen:</value>
+  </data>
+  <data name="user_notification_digest.subject" xml:space="preserve">
+    <value>Nieuwe osu! meldingen</value>
+  </data>
+  <data name="user_password_updated.confirmation" xml:space="preserve">
+    <value>Dit is een bevestiging dat uw osu! wachtwoord is gewijzigd.</value>
+  </data>
+  <data name="user_password_updated.subject" xml:space="preserve">
+    <value>osu! wachtwoord wijziging bevestiging</value>
+  </data>
+  <data name="user_verification.code" xml:space="preserve">
+    <value>Uw verificatiecode is:</value>
+  </data>
+  <data name="user_verification.code_hint" xml:space="preserve">
+    <value>U kunt de code invoeren met of zonder spaties.</value>
+  </data>
+  <data name="user_verification.link" xml:space="preserve">
+    <value>Als alternatief kunt u ook onderstaande link bezoeken om de verificatie te voltooien:</value>
+  </data>
+  <data name="user_verification.report" xml:space="preserve">
+    <value>Als je dit niet hebt aangevraagd, REAGEER METEEN TERUG! omdat je account mogelijk in gevaar is.</value>
+  </data>
+  <data name="user_verification.subject" xml:space="preserve">
+    <value>osu! account verificatie</value>
+  </data>
+  <data name="user_verification.action_from._" xml:space="preserve">
+    <value>Een actie uitgevoerd op je account van {0} vereist verificatie.</value>
+  </data>
+  <data name="user_verification.action_from.unknown_country" xml:space="preserve">
+    <value>onbekend land</value>
+  </data>
+</root>

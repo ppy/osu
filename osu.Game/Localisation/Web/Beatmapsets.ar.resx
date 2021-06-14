@@ -1,0 +1,391 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="availability.disabled" xml:space="preserve">
+    <value>هذه الخريطة غير متوفرة حاليا للتحميل.</value>
+  </data>
+  <data name="availability.parts-removed" xml:space="preserve">
+    <value>تمت إزالة أجزاء من هذه الخريطة بناء على طلب المنشئ أو صاحب حقوق من طرف ثالث.</value>
+  </data>
+  <data name="availability.more-info" xml:space="preserve">
+    <value>تحقق هنا للمزيد من المعلومات.</value>
+  </data>
+  <data name="availability.rule_violation" xml:space="preserve">
+    <value>تمت إزالة بعض المحتويات من هذه الخريطة بعد معرفة آنها غير ملائمة لـosu!.</value>
+  </data>
+  <data name="download.limit_exceeded" xml:space="preserve">
+    <value>تَمهل, ألعب أكثر.</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>قائمة الخرائط</value>
+  </data>
+  <data name="index.guest_title" xml:space="preserve">
+    <value>الخرائط</value>
+  </data>
+  <data name="panel.empty" xml:space="preserve">
+    <value>لا توجد خرائط</value>
+  </data>
+  <data name="panel.download.all" xml:space="preserve">
+    <value>تنزيل</value>
+  </data>
+  <data name="panel.download.video" xml:space="preserve">
+    <value>تنزيل مع الفيديو</value>
+  </data>
+  <data name="panel.download.no_video" xml:space="preserve">
+    <value>تنزيل بدون فيديو</value>
+  </data>
+  <data name="panel.download.direct" xml:space="preserve">
+    <value>فتح في osu!direct</value>
+  </data>
+  <data name="nominate.hybrid_requires_modes" xml:space="preserve">
+    <value>تحتاج الخرائط الهجينة إلى تحديد وضع تشغيل واحد على الأقل لِتَرشيحِها.</value>
+  </data>
+  <data name="nominate.incorrect_mode" xml:space="preserve">
+    <value>ليس لديك الصلاحيّات الكافية للترشيح للوضوع: {0}</value>
+  </data>
+  <data name="nominate.full_bn_required" xml:space="preserve">
+    <value>يجب أن تكون مرشحا كاملا لأداء هذا الترشيح المؤهل.</value>
+  </data>
+  <data name="nominate.too_many" xml:space="preserve">
+    <value>تم بالفعل استيفاء شرط الترشيح.</value>
+  </data>
+  <data name="nominate.dialog.confirmation" xml:space="preserve">
+    <value>هل أنت متأكد من أنك تريد ترشيح هذه الخريطة؟</value>
+  </data>
+  <data name="nominate.dialog.header" xml:space="preserve">
+    <value>ترشيح خريطة</value>
+  </data>
+  <data name="nominate.dialog.hybrid_warning" xml:space="preserve">
+    <value>ملاحظة: يمكنك أن ترشح مرة واحدة فقط، لذا يرجى التأكد من أنك ترشح لجميع أنماط اللعبة التي تنويها</value>
+  </data>
+  <data name="nominate.dialog.which_modes" xml:space="preserve">
+    <value>ترشيح لأي وضع؟</value>
+  </data>
+  <data name="nsfw_badge.label" xml:space="preserve">
+    <value>حَساس</value>
+  </data>
+  <data name="show.discussion" xml:space="preserve">
+    <value>مناقشة</value>
+  </data>
+  <data name="show.details.by_artist" xml:space="preserve">
+    <value>بواسطة {0}</value>
+  </data>
+  <data name="show.details.favourite" xml:space="preserve">
+    <value>تفضيل هذه الخريطة</value>
+  </data>
+  <data name="show.details.favourite_login" xml:space="preserve">
+    <value>قم بتسجيل الدخول لتفضيل هذه الخريطة</value>
+  </data>
+  <data name="show.details.logged-out" xml:space="preserve">
+    <value>تحتاج إلى تسجيل الدخول قبل تنزيل أي خريطة!</value>
+  </data>
+  <data name="show.details.mapped_by" xml:space="preserve">
+    <value>نشأت بواسطة {0}</value>
+  </data>
+  <data name="show.details.unfavourite" xml:space="preserve">
+    <value>إلغاء تفضيل هذه الخريطة</value>
+  </data>
+  <data name="show.details.updated_timeago" xml:space="preserve">
+    <value>آخر تحديث {0}</value>
+  </data>
+  <data name="show.details.download._" xml:space="preserve">
+    <value>تنزيل</value>
+  </data>
+  <data name="show.details.download.no-video" xml:space="preserve">
+    <value>دون الفيديو</value>
+  </data>
+  <data name="show.details.download.video" xml:space="preserve">
+    <value>مع الفيديو</value>
+  </data>
+  <data name="show.details.login_required.bottom" xml:space="preserve">
+    <value>للحصول على المزيد من الميزات</value>
+  </data>
+  <data name="show.details.login_required.top" xml:space="preserve">
+    <value>تسجيل الدخول</value>
+  </data>
+  <data name="show.details_date.approved" xml:space="preserve">
+    <value>مقبولة {0}</value>
+  </data>
+  <data name="show.details_date.loved" xml:space="preserve">
+    <value>محبوب timeago:</value>
+  </data>
+  <data name="show.details_date.qualified" xml:space="preserve">
+    <value>مؤهل timeago:</value>
+  </data>
+  <data name="show.details_date.ranked" xml:space="preserve">
+    <value>مصفوفة {0}</value>
+  </data>
+  <data name="show.details_date.submitted" xml:space="preserve">
+    <value>مُقدَمَة {0}</value>
+  </data>
+  <data name="show.details_date.updated" xml:space="preserve">
+    <value>آخر تحديث {0}</value>
+  </data>
+  <data name="show.favourites.limit_reached" xml:space="preserve">
+    <value>لديك عدد كبير جداََ من الخرائط المحبوبة! رجائاََ قم بألغاء بعضها قبل المحاولة مجدداََ.</value>
+  </data>
+  <data name="show.hype.action" xml:space="preserve">
+    <value>اَشِد هذه الخريطة ان احببت لعبها لمساعدتها لاِحتلال حالة &lt;strong&gt;التصفيف&lt;/strong&gt;.</value>
+  </data>
+  <data name="show.hype.current._" xml:space="preserve">
+    <value>هذه الخريطة حاليا {0}.</value>
+  </data>
+  <data name="show.hype.current.status.pending" xml:space="preserve">
+    <value>مُعلَقة</value>
+  </data>
+  <data name="show.hype.current.status.qualified" xml:space="preserve">
+    <value>مؤهلة</value>
+  </data>
+  <data name="show.hype.current.status.wip" xml:space="preserve">
+    <value>قيد العمل</value>
+  </data>
+  <data name="show.hype.disqualify._" xml:space="preserve">
+    <value>اذا وجدت مشكلة مع الأغنية, ارجوك قم بأِلغاء تأهيلها {0}.</value>
+  </data>
+  <data name="show.hype.report._" xml:space="preserve">
+    <value>اذا كانت لديك مشكلة مع الخريطة رجائا ابلغ عنها {0} لتنبيه فريق الدعم.</value>
+  </data>
+  <data name="show.hype.report.button" xml:space="preserve">
+    <value>الإبلاغ عن مشكلة</value>
+  </data>
+  <data name="show.hype.report.link" xml:space="preserve">
+    <value>هنا</value>
+  </data>
+  <data name="show.info.description" xml:space="preserve">
+    <value>الوصف</value>
+  </data>
+  <data name="show.info.genre" xml:space="preserve">
+    <value>النوع</value>
+  </data>
+  <data name="show.info.language" xml:space="preserve">
+    <value>اللغة</value>
+  </data>
+  <data name="show.info.no_scores" xml:space="preserve">
+    <value>لا تزال البيانات تُحسب...</value>
+  </data>
+  <data name="show.info.nsfw" xml:space="preserve">
+    <value>محتوى حساس</value>
+  </data>
+  <data name="show.info.points-of-failure" xml:space="preserve">
+    <value>نقاط الفشل</value>
+  </data>
+  <data name="show.info.source" xml:space="preserve">
+    <value>المصدر</value>
+  </data>
+  <data name="show.info.storyboard" xml:space="preserve">
+    <value>تحتوي هذه الخريطة على لوحة قصصية</value>
+  </data>
+  <data name="show.info.success-rate" xml:space="preserve">
+    <value>معدل النجاح</value>
+  </data>
+  <data name="show.info.tags" xml:space="preserve">
+    <value>العلامات</value>
+  </data>
+  <data name="show.info.video" xml:space="preserve">
+    <value>تحتوي هذه الخريطة على فيديو</value>
+  </data>
+  <data name="show.nsfw_warning.details" xml:space="preserve">
+    <value>تحتوي هذه الخريطة على محتوى حساس أو مسيء أو مقلق. هل ترغب في عرضها على أي حال؟</value>
+  </data>
+  <data name="show.nsfw_warning.title" xml:space="preserve">
+    <value>محتوى حساس</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.disable" xml:space="preserve">
+    <value>تعطيل التحذيرات</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.listing" xml:space="preserve">
+    <value>قائمة الخرائط</value>
+  </data>
+  <data name="show.nsfw_warning.buttons.show" xml:space="preserve">
+    <value>عرض</value>
+  </data>
+  <data name="show.scoreboard.achieved" xml:space="preserve">
+    <value>احتُلت عند {0}</value>
+  </data>
+  <data name="show.scoreboard.country" xml:space="preserve">
+    <value>ترتيب الدولة</value>
+  </data>
+  <data name="show.scoreboard.friend" xml:space="preserve">
+    <value>ترتيب الأصدقاء</value>
+  </data>
+  <data name="show.scoreboard.global" xml:space="preserve">
+    <value>الترتيب العالمي</value>
+  </data>
+  <data name="show.scoreboard.supporter-link" xml:space="preserve">
+    <value>اضغط &lt;a href="{0}"&gt;هنا&lt;/a&gt; لمشاهدة كل الميزات الرائعة التي تحصل عليها!</value>
+  </data>
+  <data name="show.scoreboard.supporter-only" xml:space="preserve">
+    <value>تحتاج ان تكون osu!supporter للوصول الى ترتيب الدولة والأصدقاء!</value>
+  </data>
+  <data name="show.scoreboard.title" xml:space="preserve">
+    <value>لوح النتائج</value>
+  </data>
+  <data name="show.scoreboard.headers.accuracy" xml:space="preserve">
+    <value>الدقة</value>
+  </data>
+  <data name="show.scoreboard.headers.combo" xml:space="preserve">
+    <value>اقصى مجموع</value>
+  </data>
+  <data name="show.scoreboard.headers.miss" xml:space="preserve">
+    <value>اِخفاق</value>
+  </data>
+  <data name="show.scoreboard.headers.mods" xml:space="preserve">
+    <value>المودات</value>
+  </data>
+  <data name="show.scoreboard.headers.player" xml:space="preserve">
+    <value>اللاعب</value>
+  </data>
+  <data name="show.scoreboard.headers.rank" xml:space="preserve">
+    <value>المرتبه</value>
+  </data>
+  <data name="show.scoreboard.headers.score_total" xml:space="preserve">
+    <value>مجموع النقاط</value>
+  </data>
+  <data name="show.scoreboard.headers.score" xml:space="preserve">
+    <value>المجموع</value>
+  </data>
+  <data name="show.scoreboard.headers.time" xml:space="preserve">
+    <value>الوقت</value>
+  </data>
+  <data name="show.scoreboard.no_scores.country" xml:space="preserve">
+    <value>لا احد من دولتك حصل على نتيجة بهذه الخريطة بعد!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.friend" xml:space="preserve">
+    <value>لا احد من اصدقائك حصل على نتيجة بهذه الخريطة بعد!</value>
+  </data>
+  <data name="show.scoreboard.no_scores.global" xml:space="preserve">
+    <value>لا نتيجة بعد. ربما عليك الحصول على واحدة؟</value>
+  </data>
+  <data name="show.scoreboard.no_scores.loading" xml:space="preserve">
+    <value>جارِ تحميل النتائج...</value>
+  </data>
+  <data name="show.scoreboard.no_scores.unranked" xml:space="preserve">
+    <value>خريطة غير مصنفة.</value>
+  </data>
+  <data name="show.scoreboard.score.first" xml:space="preserve">
+    <value>في المقدمة</value>
+  </data>
+  <data name="show.scoreboard.score.own" xml:space="preserve">
+    <value>أفضل ما لديك</value>
+  </data>
+  <data name="show.stats.cs" xml:space="preserve">
+    <value>حجم الدائرة</value>
+  </data>
+  <data name="show.stats.cs-mania" xml:space="preserve">
+    <value>عدد المفاتيح</value>
+  </data>
+  <data name="show.stats.drain" xml:space="preserve">
+    <value>استنزاف HP</value>
+  </data>
+  <data name="show.stats.accuracy" xml:space="preserve">
+    <value>الدقة</value>
+  </data>
+  <data name="show.stats.ar" xml:space="preserve">
+    <value>معدل الوصول</value>
+  </data>
+  <data name="show.stats.stars" xml:space="preserve">
+    <value>نجوم الصعوبة</value>
+  </data>
+  <data name="show.stats.total_length" xml:space="preserve">
+    <value>الطول</value>
+  </data>
+  <data name="show.stats.bpm" xml:space="preserve">
+    <value>نبضات في الدقيقة</value>
+  </data>
+  <data name="show.stats.count_circles" xml:space="preserve">
+    <value>عدد الدوائر</value>
+  </data>
+  <data name="show.stats.count_sliders" xml:space="preserve">
+    <value>عدد المنزلقات</value>
+  </data>
+  <data name="show.stats.user-rating" xml:space="preserve">
+    <value>تصنيف المستخدم</value>
+  </data>
+  <data name="show.stats.rating-spread" xml:space="preserve">
+    <value>انتشار التصنيف</value>
+  </data>
+  <data name="show.stats.nominations" xml:space="preserve">
+    <value>الترشيحات</value>
+  </data>
+  <data name="show.stats.playcount" xml:space="preserve">
+    <value>مرات اللعب</value>
+  </data>
+  <data name="show.status.ranked" xml:space="preserve">
+    <value>مقيّمة</value>
+  </data>
+  <data name="show.status.approved" xml:space="preserve">
+    <value>مقبولة</value>
+  </data>
+  <data name="show.status.loved" xml:space="preserve">
+    <value>محبوبة</value>
+  </data>
+  <data name="show.status.qualified" xml:space="preserve">
+    <value>مؤهلة</value>
+  </data>
+  <data name="show.status.wip" xml:space="preserve">
+    <value>جارية</value>
+  </data>
+  <data name="show.status.pending" xml:space="preserve">
+    <value>معلقة</value>
+  </data>
+  <data name="show.status.graveyard" xml:space="preserve">
+    <value>مقبورة</value>
+  </data>
+</root>

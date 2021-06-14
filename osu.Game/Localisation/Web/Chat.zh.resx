@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="talking_in" xml:space="preserve">
+    <value>在 {0} 中聊天</value>
+  </data>
+  <data name="talking_with" xml:space="preserve">
+    <value>与 {0} 聊天</value>
+  </data>
+  <data name="title_compact" xml:space="preserve">
+    <value>聊天</value>
+  </data>
+  <data name="cannot_send.channel" xml:space="preserve">
+    <value>现在无法向该频道发送消息，这可能是由于以下原因：</value>
+  </data>
+  <data name="cannot_send.user" xml:space="preserve">
+    <value>现在不能向该玩家发送消息，这可能是由于以下原因：</value>
+  </data>
+  <data name="cannot_send.reasons.blocked" xml:space="preserve">
+    <value>你已被对方屏蔽</value>
+  </data>
+  <data name="cannot_send.reasons.channel_moderated" xml:space="preserve">
+    <value>该频道正在被管制中</value>
+  </data>
+  <data name="cannot_send.reasons.friends_only" xml:space="preserve">
+    <value>对方只接受来自好友的消息</value>
+  </data>
+  <data name="cannot_send.reasons.not_enough_plays" xml:space="preserve">
+    <value>你的游戏次数还不够</value>
+  </data>
+  <data name="cannot_send.reasons.not_verified" xml:space="preserve">
+    <value>你的会话未认证</value>
+  </data>
+  <data name="cannot_send.reasons.restricted" xml:space="preserve">
+    <value>你正处于限制状态</value>
+  </data>
+  <data name="cannot_send.reasons.silenced" xml:space="preserve">
+    <value>你已被禁言</value>
+  </data>
+  <data name="cannot_send.reasons.target_restricted" xml:space="preserve">
+    <value>对方正处于限制状态</value>
+  </data>
+  <data name="input.disabled" xml:space="preserve">
+    <value>无法发送消息……</value>
+  </data>
+  <data name="input.placeholder" xml:space="preserve">
+    <value>输入消息……</value>
+  </data>
+  <data name="input.send" xml:space="preserve">
+    <value>发送</value>
+  </data>
+  <data name="no-conversations.howto" xml:space="preserve">
+    <value>点击用户的个人资料/卡片上的信封图标以开始聊天</value>
+  </data>
+  <data name="no-conversations.lazer" xml:space="preserve">
+    <value>在 &lt;a href="{0}"&gt;osu!lazer&lt;/a&gt; 中加入的频道将会被显示在这里。</value>
+  </data>
+  <data name="no-conversations.title" xml:space="preserve">
+    <value>暂无对话</value>
+  </data>
+</root>

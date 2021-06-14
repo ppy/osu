@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="event.approve" xml:space="preserve">
+    <value>Approved.</value>
+  </data>
+  <data name="event.beatmap_owner_change" xml:space="preserve">
+    <value>{0} 난이도의 주인이 {1}로 변경되었습니다.</value>
+  </data>
+  <data name="event.discussion_delete" xml:space="preserve">
+    <value>Moderator가 {0} 토론을 삭제했습니다.</value>
+  </data>
+  <data name="event.discussion_lock" xml:space="preserve">
+    <value>이 비트맵에 대한 토론이 비활성화되었습니다. ({0})</value>
+  </data>
+  <data name="event.discussion_post_delete" xml:space="preserve">
+    <value>Moderator가 {0} 토론에 달린 글을 삭제했습니다.</value>
+  </data>
+  <data name="event.discussion_post_restore" xml:space="preserve">
+    <value>Moderator가 {0} 토론에서 삭제된 글을 복원했습니다.</value>
+  </data>
+  <data name="event.discussion_restore" xml:space="preserve">
+    <value>Moderator가 삭제된 {0} 토론을 복원했습니다.</value>
+  </data>
+  <data name="event.discussion_unlock" xml:space="preserve">
+    <value>이 비트맵에 대한 토론이 활성화되었습니다.</value>
+  </data>
+  <data name="event.disqualify" xml:space="preserve">
+    <value>{0} 님에게 Disqualified 처리 받음. 이유: {1} ({2}).</value>
+  </data>
+  <data name="event.disqualify_legacy" xml:space="preserve">
+    <value>{0} 님에게 Disqualified 처리 받음. 이유: {1}.</value>
+  </data>
+  <data name="event.genre_edit" xml:space="preserve">
+    <value>장르가 {0}에서 {1} 으(로) 변경되었습니다.</value>
+  </data>
+  <data name="event.issue_reopen" xml:space="preserve">
+    <value>마무리된 토론 {0}이 재개되었습니다.</value>
+  </data>
+  <data name="event.issue_resolve" xml:space="preserve">
+    <value>토론 {0}이 마무리되었습니다.</value>
+  </data>
+  <data name="event.kudosu_allow" xml:space="preserve">
+    <value>토론 {0}이 다시 kudosu 획득 자격을 얻었습니다.</value>
+  </data>
+  <data name="event.kudosu_deny" xml:space="preserve">
+    <value>토론 {0}에서 kudosu 획득이 박탈당했습니다.</value>
+  </data>
+  <data name="event.kudosu_gain" xml:space="preserve">
+    <value>토론 {0}에서 {1} 님이 kudosu를 받을 충분한 표를 얻었습니다.</value>
+  </data>
+  <data name="event.kudosu_lost" xml:space="preserve">
+    <value>토론 {0}에서 {1} 님이 표를 잃어 획득한 kudosu가 사라졌습니다.</value>
+  </data>
+  <data name="event.kudosu_recalculate" xml:space="preserve">
+    <value>토론 {0}에서 kudosu 획득량이 재조정되었습니다.</value>
+  </data>
+  <data name="event.language_edit" xml:space="preserve">
+    <value>언어가 {0}에서 {1} 으(로) 변경되었습니다.</value>
+  </data>
+  <data name="event.love" xml:space="preserve">
+    <value>{0} 님에게 Loved 받음</value>
+  </data>
+  <data name="event.nominate" xml:space="preserve">
+    <value>{0} 님이 추천함.</value>
+  </data>
+  <data name="event.nominate_modes" xml:space="preserve">
+    <value>{0} ({1}) 님이 추천함.</value>
+  </data>
+  <data name="event.nomination_reset" xml:space="preserve">
+    <value>새로운 문제 {0} ({1})가 추천 상태를 초기화시켰습니다.</value>
+  </data>
+  <data name="event.qualify" xml:space="preserve">
+    <value>이 비트맵은 충분한 추천을 받았고 qualified 상태로 전환되었습니다.</value>
+  </data>
+  <data name="event.rank" xml:space="preserve">
+    <value>Ranked.</value>
+  </data>
+  <data name="event.remove_from_loved" xml:space="preserve">
+    <value>{0} 님에 의해 Loved 상태에서 제거됨 ({1})</value>
+  </data>
+  <data name="event.nsfw_toggle.to_0" xml:space="preserve">
+    <value>부적절한 콘텐츠 표시가 해제됨</value>
+  </data>
+  <data name="event.nsfw_toggle.to_1" xml:space="preserve">
+    <value>부적절한 콘텐츠로 표시됨</value>
+  </data>
+  <data name="index.title" xml:space="preserve">
+    <value>Beatmapset Events</value>
+  </data>
+  <data name="index.form.period" xml:space="preserve">
+    <value>기간</value>
+  </data>
+  <data name="index.form.types" xml:space="preserve">
+    <value>종류</value>
+  </data>
+  <data name="item.content" xml:space="preserve">
+    <value>내용</value>
+  </data>
+  <data name="item.discussion_deleted" xml:space="preserve">
+    <value>[삭제됨]</value>
+  </data>
+  <data name="item.type" xml:space="preserve">
+    <value>종류</value>
+  </data>
+  <data name="type.approve" xml:space="preserve">
+    <value>승인</value>
+  </data>
+  <data name="type.beatmap_owner_change" xml:space="preserve">
+    <value>난이도 주인 변경</value>
+  </data>
+  <data name="type.discussion_delete" xml:space="preserve">
+    <value>토론 삭제</value>
+  </data>
+  <data name="type.discussion_post_delete" xml:space="preserve">
+    <value>토론 답글 삭제</value>
+  </data>
+  <data name="type.discussion_post_restore" xml:space="preserve">
+    <value>토론 답글 복원</value>
+  </data>
+  <data name="type.discussion_restore" xml:space="preserve">
+    <value>토론 복원</value>
+  </data>
+  <data name="type.disqualify" xml:space="preserve">
+    <value>Disqualification</value>
+  </data>
+  <data name="type.genre_edit" xml:space="preserve">
+    <value>장르 수정</value>
+  </data>
+  <data name="type.issue_reopen" xml:space="preserve">
+    <value>토론 재개</value>
+  </data>
+  <data name="type.issue_resolve" xml:space="preserve">
+    <value>토론 해결</value>
+  </data>
+  <data name="type.kudosu_allow" xml:space="preserve">
+    <value>Kudosu 허용</value>
+  </data>
+  <data name="type.kudosu_deny" xml:space="preserve">
+    <value>Kudosu 거부</value>
+  </data>
+  <data name="type.kudosu_gain" xml:space="preserve">
+    <value>Kudosu 획득</value>
+  </data>
+  <data name="type.kudosu_lost" xml:space="preserve">
+    <value>Kudosu 잃음</value>
+  </data>
+  <data name="type.kudosu_recalculate" xml:space="preserve">
+    <value>Kudosu 재계산</value>
+  </data>
+  <data name="type.language_edit" xml:space="preserve">
+    <value>언어 수정</value>
+  </data>
+  <data name="type.love" xml:space="preserve">
+    <value>러브</value>
+  </data>
+  <data name="type.nominate" xml:space="preserve">
+    <value>추천</value>
+  </data>
+  <data name="type.nomination_reset" xml:space="preserve">
+    <value>추천 초기화</value>
+  </data>
+  <data name="type.nsfw_toggle" xml:space="preserve">
+    <value>부적절한 콘텐츠로 표시</value>
+  </data>
+  <data name="type.qualify" xml:space="preserve">
+    <value>Qualification</value>
+  </data>
+  <data name="type.rank" xml:space="preserve">
+    <value>랭킹</value>
+  </data>
+  <data name="type.remove_from_loved" xml:space="preserve">
+    <value>Loved 상태 제거</value>
+  </data>
+</root>

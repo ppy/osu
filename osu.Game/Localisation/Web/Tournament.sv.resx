@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="index.none_running" xml:space="preserve">
+    <value>Det finns inga pågående turneringar just nu, var vänlig kolla igen senare!</value>
+  </data>
+  <data name="index.registration_period" xml:space="preserve">
+    <value>Registrering: {0} till {1}</value>
+  </data>
+  <data name="index.header.title" xml:space="preserve">
+    <value>Gemenskapsturneringar</value>
+  </data>
+  <data name="index.item.registered" xml:space="preserve">
+    <value>Registrerade spelare</value>
+  </data>
+  <data name="index.state.current" xml:space="preserve">
+    <value>Aktiva turneringar</value>
+  </data>
+  <data name="index.state.previous" xml:space="preserve">
+    <value>Tidigare turneringar</value>
+  </data>
+  <data name="show.banner" xml:space="preserve">
+    <value>Stöd ditt lag</value>
+  </data>
+  <data name="show.entered" xml:space="preserve">
+    <value>Du är registrerad för denna turnering.&lt;br&gt;&lt;br&gt;Vänligen notera att detta &lt;b&gt;inte&lt;/b&gt; betyder att du har blivit tilldelad till ett lag.&lt;br&gt;&lt;br&gt;Ytterligare instruktioner kommer att skickas till dig via e-post när datumet för turneringen närmar sig, så var vänlig att kontrollera att din e-postadress för ditt osu!-konto är korrekt!</value>
+  </data>
+  <data name="show.info_page" xml:space="preserve">
+    <value>Informationssida</value>
+  </data>
+  <data name="show.login_to_register" xml:space="preserve">
+    <value>Var vänlig {0} för att visa registreringsdetaljer!</value>
+  </data>
+  <data name="show.not_yet_entered" xml:space="preserve">
+    <value>Du är inte registrerad för denna turnering.</value>
+  </data>
+  <data name="show.rank_too_low" xml:space="preserve">
+    <value>Tyvärr, du uppfyller inte rangkriterierna för denna turneringen!</value>
+  </data>
+  <data name="show.registration_ends" xml:space="preserve">
+    <value>Registreringar stänger {0}</value>
+  </data>
+  <data name="show.button.cancel" xml:space="preserve">
+    <value>Avbryt registrering</value>
+  </data>
+  <data name="show.button.register" xml:space="preserve">
+    <value>Skriv upp mig!</value>
+  </data>
+  <data name="show.period.end" xml:space="preserve">
+    <value>Slut</value>
+  </data>
+  <data name="show.period.start" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="show.state.before_registration" xml:space="preserve">
+    <value>Registreringen till denna turnering har ännu inte öppnats.</value>
+  </data>
+  <data name="show.state.ended" xml:space="preserve">
+    <value>Denna turnering har avslutats. Kontrollera informationssidan för resultaten.</value>
+  </data>
+  <data name="show.state.registration_closed" xml:space="preserve">
+    <value>Registrering för denna turnering har stängts. Kontrollera informationssidan för de senaste uppdateringarna.</value>
+  </data>
+  <data name="show.state.running" xml:space="preserve">
+    <value>Denna turnering pågår för närvarande. Kontrollera informationssidan för mer information.</value>
+  </data>
+  <data name="tournament_period" xml:space="preserve">
+    <value>{0} till {1}</value>
+  </data>
+</root>

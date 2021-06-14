@@ -1,0 +1,265 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="admin.warehouse" xml:space="preserve">
+    <value>Magasin</value>
+  </data>
+  <data name="cart.checkout" xml:space="preserve">
+    <value>Acheter</value>
+  </data>
+  <data name="cart.info" xml:space="preserve">
+    <value>{0} produit dans le panier (${1})|{0} produits dans le panier (${1})</value>
+  </data>
+  <data name="cart.more_goodies" xml:space="preserve">
+    <value>Je souhaite regarder d'autres goodies avant de passer commande</value>
+  </data>
+  <data name="cart.shipping_fees" xml:space="preserve">
+    <value>frais de livraison</value>
+  </data>
+  <data name="cart.title" xml:space="preserve">
+    <value>Panier</value>
+  </data>
+  <data name="cart.total" xml:space="preserve">
+    <value>total</value>
+  </data>
+  <data name="cart.errors_no_checkout.line_1" xml:space="preserve">
+    <value>Uh oh, des problèmes avec votre panier empêchent le paiement !</value>
+  </data>
+  <data name="cart.errors_no_checkout.line_2" xml:space="preserve">
+    <value>Supprimez ou mettez à jour les articles ci-dessus pour continuer.</value>
+  </data>
+  <data name="cart.empty.text" xml:space="preserve">
+    <value>Votre panier est vide.</value>
+  </data>
+  <data name="cart.empty.return_link._" xml:space="preserve">
+    <value>Retourner à {0} pour trouver quelques goodies !</value>
+  </data>
+  <data name="cart.empty.return_link.link_text" xml:space="preserve">
+    <value>articles</value>
+  </data>
+  <data name="checkout.cart_problems" xml:space="preserve">
+    <value>Oh oh, il y a quelques problèmes avec votre panier !</value>
+  </data>
+  <data name="checkout.cart_problems_edit" xml:space="preserve">
+    <value>Cliquez ici pour l'éditer.</value>
+  </data>
+  <data name="checkout.declined" xml:space="preserve">
+    <value>Le paiement a été annulé.</value>
+  </data>
+  <data name="checkout.delayed_shipping" xml:space="preserve">
+    <value>Nous sommes actuellement submergés de commandes ! Vous pouvez tout de même commander, mais attendez-vous à **une à deux semaines de délai supplémentaire** le temps que nous puissions traiter toutes ces commandes.</value>
+  </data>
+  <data name="checkout.old_cart" xml:space="preserve">
+    <value>Votre panier semble être obsolète et a donc été actualisé, merci de réessayer.</value>
+  </data>
+  <data name="checkout.pay" xml:space="preserve">
+    <value>Payer avec PayPal</value>
+  </data>
+  <data name="checkout.title_compact" xml:space="preserve">
+    <value>commander</value>
+  </data>
+  <data name="checkout.has_pending._" xml:space="preserve">
+    <value>Vous avez un paiement en attente, cliquez sur {0} pour y accéder.</value>
+  </data>
+  <data name="checkout.has_pending.link_text" xml:space="preserve">
+    <value>ici</value>
+  </data>
+  <data name="checkout.pending_checkout.line_1" xml:space="preserve">
+    <value>Une commande précédente a été commencée mais non finalisée.</value>
+  </data>
+  <data name="checkout.pending_checkout.line_2" xml:space="preserve">
+    <value>Reprenez votre commande en sélectionnant un moyen de paiement.</value>
+  </data>
+  <data name="discount" xml:space="preserve">
+    <value>économisez {0}%</value>
+  </data>
+  <data name="invoice.echeck_delay" xml:space="preserve">
+    <value>Si votre paiement est en eCheck, comptez jusqu'à 10 jours supplémentaires pour le paiement via PayPal !</value>
+  </data>
+  <data name="invoice.title_compact" xml:space="preserve">
+    <value>facture</value>
+  </data>
+  <data name="invoice.status.processing.title" xml:space="preserve">
+    <value>Votre paiement n'a pas encore été confirmé !</value>
+  </data>
+  <data name="invoice.status.processing.line_1" xml:space="preserve">
+    <value>Si vous avez déjà payé, nous attendons toujours de recevoir une confirmation de votre paiement. Veuillez rafraîchir cette page dans une minute ou deux !</value>
+  </data>
+  <data name="invoice.status.processing.line_2._" xml:space="preserve">
+    <value>Si vous avez rencontré un problème lors de votre commande, {0}</value>
+  </data>
+  <data name="invoice.status.processing.line_2.link_text" xml:space="preserve">
+    <value>cliquez ici pour reprendre votre commande</value>
+  </data>
+  <data name="order.cancel" xml:space="preserve">
+    <value>Annuler la commande</value>
+  </data>
+  <data name="order.cancel_confirm" xml:space="preserve">
+    <value>Cette commande sera annulée et le paiement ne sera pas accepté. Le fournisseur de paiement peut ne pas libérer immédiatement les fonds réservés. Êtes-vous sûr ?</value>
+  </data>
+  <data name="order.cancel_not_allowed" xml:space="preserve">
+    <value>Cette commande ne peut pas être annulée pour le moment.</value>
+  </data>
+  <data name="order.invoice" xml:space="preserve">
+    <value>Afficher la facture</value>
+  </data>
+  <data name="order.no_orders" xml:space="preserve">
+    <value>Aucune commande à voir.</value>
+  </data>
+  <data name="order.paid_on" xml:space="preserve">
+    <value>Commande passée le {0}</value>
+  </data>
+  <data name="order.resume" xml:space="preserve">
+    <value>Reprendre la commande</value>
+  </data>
+  <data name="order.shopify_expired" xml:space="preserve">
+    <value>Le lien de commande pour cette commande a expiré.</value>
+  </data>
+  <data name="order.item.display_name.supporter_tag" xml:space="preserve">
+    <value>{0} pour {1} ({2})</value>
+  </data>
+  <data name="order.item.quantity" xml:space="preserve">
+    <value>Quantité</value>
+  </data>
+  <data name="order.not_modifiable_exception.cancelled" xml:space="preserve">
+    <value>Vous ne pouvez pas modifier votre commande, puisqu'elle a été annulée.</value>
+  </data>
+  <data name="order.not_modifiable_exception.checkout" xml:space="preserve">
+    <value>Vous ne pouvez pas modifier votre commande puisqu'elle est en préparation.</value>
+  </data>
+  <data name="order.not_modifiable_exception.default" xml:space="preserve">
+    <value>La commande n'est pas modifiable</value>
+  </data>
+  <data name="order.not_modifiable_exception.delivered" xml:space="preserve">
+    <value>Vous ne pouvez pas modifier votre commande puisqu'elle a été expédiée.</value>
+  </data>
+  <data name="order.not_modifiable_exception.paid" xml:space="preserve">
+    <value>Vous ne pouvez pas modifier votre commande puisqu'elle a déjà été payée.</value>
+  </data>
+  <data name="order.not_modifiable_exception.processing" xml:space="preserve">
+    <value>Vous ne pouvez pas modifier votre commande puisqu'elle est en préparation.</value>
+  </data>
+  <data name="order.not_modifiable_exception.shipped" xml:space="preserve">
+    <value>Vous ne pouvez pas modifier votre commande puisqu'elle a été expédiée.</value>
+  </data>
+  <data name="order.status.cancelled" xml:space="preserve">
+    <value>Annulée</value>
+  </data>
+  <data name="order.status.checkout" xml:space="preserve">
+    <value>Préparation</value>
+  </data>
+  <data name="order.status.delivered" xml:space="preserve">
+    <value>Livrée</value>
+  </data>
+  <data name="order.status.paid" xml:space="preserve">
+    <value>Payée</value>
+  </data>
+  <data name="order.status.processing" xml:space="preserve">
+    <value>En attente de confirmation</value>
+  </data>
+  <data name="order.status.shipped" xml:space="preserve">
+    <value>Expédié</value>
+  </data>
+  <data name="product.name" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="product.stock.out" xml:space="preserve">
+    <value>Cet article est en rupture de stock pour le moment. Revenez plus tard !</value>
+  </data>
+  <data name="product.stock.out_with_alternative" xml:space="preserve">
+    <value>Malheureusement cet article est en rupture de stock. Sélectionnez-en un autre à l'aide du menu déroulant ou revenez plus tard !</value>
+  </data>
+  <data name="product.add_to_cart" xml:space="preserve">
+    <value>Ajouter au panier</value>
+  </data>
+  <data name="product.notify" xml:space="preserve">
+    <value>Prévenez-moi quand cet article sera disponible !</value>
+  </data>
+  <data name="product.notification_success" xml:space="preserve">
+    <value>vous serez prévenu quand cet article sera de nouveau en stock. cliquez {0} pour annuler</value>
+  </data>
+  <data name="product.notification_remove_text" xml:space="preserve">
+    <value>ici</value>
+  </data>
+  <data name="product.notification_in_stock" xml:space="preserve">
+    <value>Ce produit est déjà en stock !</value>
+  </data>
+  <data name="supporter_tag.gift" xml:space="preserve">
+    <value>offrir à un joueur</value>
+  </data>
+  <data name="supporter_tag.require_login._" xml:space="preserve">
+    <value>Vous devez être {0} pour obtenir un tag osu!supporter !</value>
+  </data>
+  <data name="supporter_tag.require_login.link_text" xml:space="preserve">
+    <value>connecté</value>
+  </data>
+  <data name="username_change.check" xml:space="preserve">
+    <value>Entrez un nom d'utilisateur pour vérifier sa disponibilité !</value>
+  </data>
+  <data name="username_change.checking" xml:space="preserve">
+    <value>Vérification de la disponibilité de {0}...</value>
+  </data>
+  <data name="username_change.require_login._" xml:space="preserve">
+    <value>Vous devez être {0} pour changer de nom !</value>
+  </data>
+  <data name="username_change.require_login.link_text" xml:space="preserve">
+    <value>connecté</value>
+  </data>
+</root>

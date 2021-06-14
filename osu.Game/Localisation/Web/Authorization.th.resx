@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="play_more" xml:space="preserve">
+    <value>ทำไมไม่ลองเล่น osu! ดูละ?</value>
+  </data>
+  <data name="require_login" xml:space="preserve">
+    <value>กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อไป</value>
+  </data>
+  <data name="require_verification" xml:space="preserve">
+    <value>กรุณายืนยันเพื่อดำเนินการต่อไป</value>
+  </data>
+  <data name="restricted" xml:space="preserve">
+    <value>ไม่สามารถทำสิ่งนั้นได้ในขณะที่ถูกจำกัด</value>
+  </data>
+  <data name="silenced" xml:space="preserve">
+    <value>ไม่สามารถทำสิ่งนั้นได้ในขณะที่ถูกเงียบ</value>
+  </data>
+  <data name="unauthorized" xml:space="preserve">
+    <value>ปฏิเสธการเข้าใช้.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.is_hype" xml:space="preserve">
+    <value>ไม่สามารถยกเลิกการ Hype</value>
+  </data>
+  <data name="beatmap_discussion.destroy.has_reply" xml:space="preserve">
+    <value>ไม่สามารถลบการสนทนาที่มีข้อความตอบกลับ</value>
+  </data>
+  <data name="beatmap_discussion.nominate.exhausted" xml:space="preserve">
+    <value>คุณถึงขีดจำกัดของการเสนอชื่อแล้วสำหรับวันนี้ โปรดลองอีกครั้งในวันพรุ่งนี้</value>
+  </data>
+  <data name="beatmap_discussion.nominate.incorrect_state" xml:space="preserve">
+    <value>เกิดข้อผิดพลาดในการดำเนินการ ลองรีเฟรชหน้านี้ดู</value>
+  </data>
+  <data name="beatmap_discussion.nominate.owner" xml:space="preserve">
+    <value>ไม่สามารถเสนอชื่อบีทแมพของตัวเองได้</value>
+  </data>
+  <data name="beatmap_discussion.nominate.set_metadata" xml:space="preserve">
+    <value>คุณต้องตั้งค่าหมวดหมู่เพลงและภาษาก่อนเสนอชื่อบีทแมพ</value>
+  </data>
+  <data name="beatmap_discussion.resolve.not_owner" xml:space="preserve">
+    <value>เฉพาะผู้เริ่มกระทู้ และเจ้าของ Beatmap สามารถทำเครื่องหมายว่าการสนทนาถูกแก้ไขแล้ว</value>
+  </data>
+  <data name="beatmap_discussion.store.mapper_note_wrong_user" xml:space="preserve">
+    <value>เจ้าของบีทแมพหรือ nominator/สมาชิกในกลุ่ม QAT เท่านั้นที่สามารถโพสบันทึกย่อของนักทำบีทแมพได้</value>
+  </data>
+  <data name="beatmap_discussion.vote.bot" xml:space="preserve">
+    <value>ไม่สามารถโหวตบนการสนทนาที่สร้างขึ้นโดยบอต</value>
+  </data>
+  <data name="beatmap_discussion.vote.limit_exceeded" xml:space="preserve">
+    <value>กรุณารอสักครู่ก่อนโหวตเพิ่ม</value>
+  </data>
+  <data name="beatmap_discussion.vote.owner" xml:space="preserve">
+    <value>ไม่สามารถโหวตการสนทนาของตัวเองได้</value>
+  </data>
+  <data name="beatmap_discussion.vote.wrong_beatmapset_state" xml:space="preserve">
+    <value>สามารถโหวตในการสนทนาของบีทแมพที่อยู่ในสถานะอยู่ระหว่างดำเนินการเท่านั้น</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.not_owner" xml:space="preserve">
+    <value>คุณลบได้แค่โพสต์ของตัวเองเท่านั้น</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.resolved" xml:space="preserve">
+    <value>คุณไม่สามารถลบโพสต์ที่ถูกแก้ไขแล้วได้</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.system_generated" xml:space="preserve">
+    <value>โพสต์ที่ระบบสร้างเองจะลบไม่ได้</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.not_owner" xml:space="preserve">
+    <value>เฉพาะคนโพสต์เท่านั้นที่สามารถแก้ไขโพสต์ได้</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.resolved" xml:space="preserve">
+    <value>คุณไม่สามารถแก้ไขโพสต์ที่ถูกแก้ไขแล้วได้</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.system_generated" xml:space="preserve">
+    <value>โพสต์ที่ระบบสร้างเองจะไม่สามารถถูกแก้ไขได้</value>
+  </data>
+  <data name="beatmap_discussion_post.store.beatmapset_locked" xml:space="preserve">
+    <value>บีทแมพนี้ปิดการสนทนาไว้</value>
+  </data>
+  <data name="beatmapset.metadata.nominated" xml:space="preserve">
+    <value>คุณไม่สามารถเปลี่ยน metadata ของบีทแมพที่ทำการเสนอชื่อเป็นที่เรียบร้อยแล้ว ติดต่อ BN หรือ NAT หากคุณคิดว่ามีข้อผิดพลาดประการใด</value>
+  </data>
+  <data name="chat.blocked" xml:space="preserve">
+    <value>ไม่สามารถส่งข้อความถึงผู้ใช้ที่บล็อกคุณหรือที่คุณบล็อกได้</value>
+  </data>
+  <data name="chat.friends_only" xml:space="preserve">
+    <value>ผู้ใช้นี้บล็อกข้อความจากคนที่ไม่ใช่เพื่อนของเขา</value>
+  </data>
+  <data name="chat.moderated" xml:space="preserve">
+    <value>แชแนลนี้อยู่ระหว่างการขัดกรอง</value>
+  </data>
+  <data name="chat.no_access" xml:space="preserve">
+    <value>คุณไม่มีสิทธิ์เข้าถึงช่องนี้</value>
+  </data>
+  <data name="chat.restricted" xml:space="preserve">
+    <value>คุณไม่สามารถส่งข้อความได้ในสถานะเงียบ ถูกจำกัดการใช้งานหรือถูกแบน</value>
+  </data>
+  <data name="chat.silenced" xml:space="preserve">
+    <value>คุณไม่สามารถส่งข้อความได้ในสถานะเงียบ ถูกจำกัดการใช้งาน หรือถูกแบน</value>
+  </data>
+  <data name="comment.update.deleted" xml:space="preserve">
+    <value>ไม่สามารถแก้ไขโพสต์ที่ถูกลบได้</value>
+  </data>
+  <data name="contest.voting_over" xml:space="preserve">
+    <value>คุณไม่สามารถเปลี่ยนการโหวตหลังจากระยะเวลาลงคะแนนเสียงสำหรับการประกวดนี้ได้สิ้นสุดลง</value>
+  </data>
+  <data name="contest.entry.limit_reached" xml:space="preserve">
+    <value>คุณถึงขีดจำกัดของปริมาณงานที่ส่งเข้าประกวดได้แล้ว</value>
+  </data>
+  <data name="contest.entry.over" xml:space="preserve">
+    <value>ขอบคุณที่เข้าร่วมการประกวดในครั้งนี้ เราได้ปิดรับผลงานสำหรับการประกวดครั้งนี้แล้วและการโหวตจะเริ่มขึ้นเร็วๆนี้</value>
+  </data>
+  <data name="forum.moderate.no_permission" xml:space="preserve">
+    <value>ไม่มีสิทธิในการจัดการฟอรั่มนี้</value>
+  </data>
+  <data name="forum.post.delete.only_last_post" xml:space="preserve">
+    <value>สามารถลบได้แค่โพสต์ล่าสุดเท่านั้น</value>
+  </data>
+  <data name="forum.post.delete.locked" xml:space="preserve">
+    <value>ไม่สามารถลบโพสต์หัวเรื่องที่ถูกล็อกได้</value>
+  </data>
+  <data name="forum.post.delete.no_forum_access" xml:space="preserve">
+    <value>ต้องการการอนุญาติในการเข้าถึงฟอรั่มนี้</value>
+  </data>
+  <data name="forum.post.delete.not_owner" xml:space="preserve">
+    <value>เฉพาะคนโพสต์เท่านั้นที่สามารถลบโพสต์ได้</value>
+  </data>
+  <data name="forum.post.edit.deleted" xml:space="preserve">
+    <value>ไม่สามารถแก้ไขโพสต์ที่ถูกลบ</value>
+  </data>
+  <data name="forum.post.edit.locked" xml:space="preserve">
+    <value>โพสต์นี้ถูกล็อคจากการแก้ไข</value>
+  </data>
+  <data name="forum.post.edit.no_forum_access" xml:space="preserve">
+    <value>ต้องการการอนุญาติในการเข้าถึงฟอรั่มนี้</value>
+  </data>
+  <data name="forum.post.edit.not_owner" xml:space="preserve">
+    <value>เฉพาะคนโพสต์เท่านั้นที่สามารถแก้ไขโพสต์ได้</value>
+  </data>
+  <data name="forum.post.edit.topic_locked" xml:space="preserve">
+    <value>ไม่สามารถแก้ไขโพสต์ในกระทู้ที่ถูกล้อค</value>
+  </data>
+  <data name="forum.post.store.play_more" xml:space="preserve">
+    <value>โปรดลองเล่นเกมก่อนที่จะโพสต์ในฟอรั่ม หากคุณมีปัญหากับการเล่น กรุณาโพสต์ฟอรั่มความช่วยเหลือและสนับสนุน</value>
+  </data>
+  <data name="forum.post.store.too_many_help_posts" xml:space="preserve">
+    <value>คุณต้องเล่นเกมเพิ่มก่อนที่คุณสามารถจะโพสต์อีกในฟอรั่ม หากคุณมีปัญหาในการเล่นเกม อีเมล์ support@ppy.sh</value>
+  </data>
+  <data name="forum.topic.reply.double_post" xml:space="preserve">
+    <value>กรุณาแก้ไขโพสต์ล่าสุดของคุณแทนที่จะโพสต์อีกที</value>
+  </data>
+  <data name="forum.topic.reply.locked" xml:space="preserve">
+    <value>ไม่สามารถตอบกลับในกระทู้ที่ถูกล็อก</value>
+  </data>
+  <data name="forum.topic.reply.no_forum_access" xml:space="preserve">
+    <value>ต้องการการอนุญาติในการเข้าถึงฟอรั่มนี้</value>
+  </data>
+  <data name="forum.topic.reply.no_permission" xml:space="preserve">
+    <value>ไม่ได้รับอนุญาตให้ตอบกลับ</value>
+  </data>
+  <data name="forum.topic.reply.user.require_login" xml:space="preserve">
+    <value>กรุณาเข้าสู่ระบบเพื่อตอบกลับ</value>
+  </data>
+  <data name="forum.topic.reply.user.restricted" xml:space="preserve">
+    <value>ไม่สามารถตอบกลับได้ในขณะที่ถูกจำกัด</value>
+  </data>
+  <data name="forum.topic.reply.user.silenced" xml:space="preserve">
+    <value>ไม่สามารถตอบกลับได้ในขณะที่ถูกเงียบ</value>
+  </data>
+  <data name="forum.topic.store.no_forum_access" xml:space="preserve">
+    <value>ต้องการการอนุญาติในการเข้าถึงฟอรั่มนี้</value>
+  </data>
+  <data name="forum.topic.store.no_permission" xml:space="preserve">
+    <value>ไม่มีสิทธิ์ในการสร้างกระทู้ใหม่</value>
+  </data>
+  <data name="forum.topic.store.forum_closed" xml:space="preserve">
+    <value>ฟอรั่มถูกปิด และไม่สามารถโพสต์ในนี้ได้</value>
+  </data>
+  <data name="forum.topic.vote.no_forum_access" xml:space="preserve">
+    <value>ต้องการการอนุญาติในการเข้าถึงฟอรั่มนี้</value>
+  </data>
+  <data name="forum.topic.vote.over" xml:space="preserve">
+    <value>การโหวตได้จบลงแล้วและไม่สามารถโหวตได้อีก</value>
+  </data>
+  <data name="forum.topic.vote.play_more" xml:space="preserve">
+    <value>คุณจำเป็นต้องเล่นมากกว่านี้ถึงจะโหวตในฟอรั่มนี้ได้</value>
+  </data>
+  <data name="forum.topic.vote.voted" xml:space="preserve">
+    <value>ไม่อนุญาติให้เปลี่ยนผลโหวต</value>
+  </data>
+  <data name="forum.topic.vote.user.require_login" xml:space="preserve">
+    <value>กรุณาเข้าสู่ระบบเพื่อทำการโหวต</value>
+  </data>
+  <data name="forum.topic.vote.user.restricted" xml:space="preserve">
+    <value>ไม่สามารถโหวตได้ในขณะที่ถูกจำกัด</value>
+  </data>
+  <data name="forum.topic.vote.user.silenced" xml:space="preserve">
+    <value>ไม่สามารถโหลตได้ในขณะที่ถูกเงียบ</value>
+  </data>
+  <data name="forum.topic.watch.no_forum_access" xml:space="preserve">
+    <value>ต้องการการอนุญาติในการเข้าถึงฟอรั่มนี้</value>
+  </data>
+  <data name="forum.topic_cover.edit.uneditable" xml:space="preserve">
+    <value>หน้าปกที่ระบุไม่ถูกต้อง</value>
+  </data>
+  <data name="forum.topic_cover.edit.not_owner" xml:space="preserve">
+    <value>มีแค่เจ้าของเท่านั้นที่สามารถแก้ไขหน้าปกได้</value>
+  </data>
+  <data name="forum.topic_cover.store.forum_not_allowed" xml:space="preserve">
+    <value>แบบฟอรั่มนี้ไม่รับ Topic covers</value>
+  </data>
+  <data name="forum.view.admin_only" xml:space="preserve">
+    <value>มีแค่ผู้ดูแลระบบเท่านั้นที่สามารถดูฟอรั่มนี้</value>
+  </data>
+  <data name="user.page.edit.locked" xml:space="preserve">
+    <value>Userpage ถูกล็อก</value>
+  </data>
+  <data name="user.page.edit.not_owner" xml:space="preserve">
+    <value>สามารถแก้ไขได้แค่ Userpage ของตนเอง</value>
+  </data>
+  <data name="user.page.edit.require_supporter_tag" xml:space="preserve">
+    <value>จำเป็นต้องมี Supporter Tag</value>
+  </data>
+</root>

@@ -1,0 +1,274 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="require_login" xml:space="preserve">
+    <value>Моля влезте в профила си, за да продължите.</value>
+  </data>
+  <data name="require_verification" xml:space="preserve">
+    <value>Моля потвърдете, за да продължите.</value>
+  </data>
+  <data name="restricted" xml:space="preserve">
+    <value>Не може да правите това докато сте с ограничен статут.</value>
+  </data>
+  <data name="silenced" xml:space="preserve">
+    <value>Не може докато сте заглушен.</value>
+  </data>
+  <data name="unauthorized" xml:space="preserve">
+    <value>Достъпът е отказан.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.is_hype" xml:space="preserve">
+    <value>Не може да отмените надъхването.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.has_reply" xml:space="preserve">
+    <value>Не може да изтриете дискусия с отговори</value>
+  </data>
+  <data name="beatmap_discussion.nominate.exhausted" xml:space="preserve">
+    <value>Вие стигнахте вашия лимит за номиниране за деня, моля опитайте пак утре.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.incorrect_state" xml:space="preserve">
+    <value>Грешка при извършване на това действие, опитайте да презаредите страницата.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.owner" xml:space="preserve">
+    <value>Не може да номинирате собствения си бийтмап.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.set_metadata" xml:space="preserve">
+    <value>Трябва да зададете жанр и език преди номиниране.</value>
+  </data>
+  <data name="beatmap_discussion.resolve.not_owner" xml:space="preserve">
+    <value>Само автор и притежател на бийтмап могат да разрешат дискусия.</value>
+  </data>
+  <data name="beatmap_discussion.store.mapper_note_wrong_user" xml:space="preserve">
+    <value>Само собственикът на биийтмапа или номинатор/член на QAT групата може да публикува бележки по картата.</value>
+  </data>
+  <data name="beatmap_discussion.vote.bot" xml:space="preserve">
+    <value>Не може да гласувате на дискусия създадена от бот</value>
+  </data>
+  <data name="beatmap_discussion.vote.limit_exceeded" xml:space="preserve">
+    <value>Моля изчакайте малко преди да гласувате отново</value>
+  </data>
+  <data name="beatmap_discussion.vote.owner" xml:space="preserve">
+    <value>Не може да гласувате на собствена дискусия.</value>
+  </data>
+  <data name="beatmap_discussion.vote.wrong_beatmapset_state" xml:space="preserve">
+    <value>Може да се гласува само в дускусии на бийтмапове чакащи одобрение.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.not_owner" xml:space="preserve">
+    <value>Можете да триете само собствените си публикации.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.resolved" xml:space="preserve">
+    <value>Не можете да триете публикация на разрешена дискусия.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.system_generated" xml:space="preserve">
+    <value>Автоматично създадената публикация не може да бъде изтрита.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.not_owner" xml:space="preserve">
+    <value>Само създателят на публикацията може да я редактира.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.resolved" xml:space="preserve">
+    <value>Не можете да редактирате публикация на разрешена дискусия.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.system_generated" xml:space="preserve">
+    <value>Автоматично създанената публикация не може да бъде редактирана.</value>
+  </data>
+  <data name="beatmap_discussion_post.store.beatmapset_locked" xml:space="preserve">
+    <value>Този бийтмап е заключен за дискусии.</value>
+  </data>
+  <data name="beatmapset.metadata.nominated" xml:space="preserve">
+    <value>Не можете да промените на метаданните на номиниран мап. Свържете се с BN или NAT член ако смятате, че са зададени погрешно.</value>
+  </data>
+  <data name="chat.blocked" xml:space="preserve">
+    <value>Не може да пращате съобщения на потребител, който ви блокира, или сте го блокирали.</value>
+  </data>
+  <data name="chat.friends_only" xml:space="preserve">
+    <value>Потребителят блокира съобщенията от всички, които не са в списъка му с приятели.</value>
+  </data>
+  <data name="chat.moderated" xml:space="preserve">
+    <value>Този канал в момента бива модериран.</value>
+  </data>
+  <data name="chat.no_access" xml:space="preserve">
+    <value>Нямате достъп до този канал.</value>
+  </data>
+  <data name="chat.restricted" xml:space="preserve">
+    <value>Не може да пращате съобщения докато сте заклушени, в ограничен режим или баннати.</value>
+  </data>
+  <data name="comment.update.deleted" xml:space="preserve">
+    <value>Не може да редактирате вече изтрити публикации.</value>
+  </data>
+  <data name="contest.voting_over" xml:space="preserve">
+    <value>Не можете да промените гласа си след като периода за гласуване е свършил.</value>
+  </data>
+  <data name="contest.entry.limit_reached" xml:space="preserve">
+    <value>Достигнахте ограничението на записи за този конкурс</value>
+  </data>
+  <data name="contest.entry.over" xml:space="preserve">
+    <value>Благодарим Ви за участието! Записването затвори за този конкурс и гласуването ще започне скоро.</value>
+  </data>
+  <data name="forum.moderate.no_permission" xml:space="preserve">
+    <value>Нямате право да модерирате този форум.</value>
+  </data>
+  <data name="forum.post.delete.only_last_post" xml:space="preserve">
+    <value>Само последната публикация може да бъде изтрита.</value>
+  </data>
+  <data name="forum.post.delete.locked" xml:space="preserve">
+    <value>Не може да изтриете публикация в заключена тема.</value>
+  </data>
+  <data name="forum.post.delete.no_forum_access" xml:space="preserve">
+    <value>Достъп до исканият форум е нужен.</value>
+  </data>
+  <data name="forum.post.delete.not_owner" xml:space="preserve">
+    <value>Само създателят на публицатията може да я изтрие.</value>
+  </data>
+  <data name="forum.post.edit.deleted" xml:space="preserve">
+    <value>Не можете да редактирате изтрита публикация.</value>
+  </data>
+  <data name="forum.post.edit.locked" xml:space="preserve">
+    <value>Тази публикация е заключена от редактиране.</value>
+  </data>
+  <data name="forum.post.edit.no_forum_access" xml:space="preserve">
+    <value>Достъп до исканият форум е нужен.</value>
+  </data>
+  <data name="forum.post.edit.not_owner" xml:space="preserve">
+    <value>Само създателят на публикацията може да я редактира.</value>
+  </data>
+  <data name="forum.post.edit.topic_locked" xml:space="preserve">
+    <value>Не може да изтриете публикация в заключена тема.</value>
+  </data>
+  <data name="forum.post.store.play_more" xml:space="preserve">
+    <value>Опитайте се да играете играта преди да публикувате във форумите, моля! Ако имате проблем с играта, моля направете пост във форума за Помощ и Поддръжка.</value>
+  </data>
+  <data name="forum.post.store.too_many_help_posts" xml:space="preserve">
+    <value>Трябва да играете играта повече, преди да можете да направите допълнителни публикации. Ако все още срещате проблеми с играта, пишете имейл към support@ppy.sh</value>
+  </data>
+  <data name="forum.topic.reply.double_post" xml:space="preserve">
+    <value>Моля редактирайте последната Ви публикация вместо да публикувате отново.</value>
+  </data>
+  <data name="forum.topic.reply.locked" xml:space="preserve">
+    <value>Не можете да отговаряте във заключен форум.</value>
+  </data>
+  <data name="forum.topic.reply.no_forum_access" xml:space="preserve">
+    <value>Достъп до исканият форум е нужен.</value>
+  </data>
+  <data name="forum.topic.reply.no_permission" xml:space="preserve">
+    <value>Няма разрешение за отговор.</value>
+  </data>
+  <data name="forum.topic.reply.user.require_login" xml:space="preserve">
+    <value>Моля влезте в профила си за да отговорите.</value>
+  </data>
+  <data name="forum.topic.reply.user.restricted" xml:space="preserve">
+    <value>Не може да отговорите докато сте с ограничен статут.</value>
+  </data>
+  <data name="forum.topic.reply.user.silenced" xml:space="preserve">
+    <value>Не може да отговорите докато сте заглушен.</value>
+  </data>
+  <data name="forum.topic.store.no_forum_access" xml:space="preserve">
+    <value>Достъп до исканият форум е нужен.</value>
+  </data>
+  <data name="forum.topic.store.no_permission" xml:space="preserve">
+    <value>Няма разрешение за създаване на нова тема.</value>
+  </data>
+  <data name="forum.topic.store.forum_closed" xml:space="preserve">
+    <value>Форумът е затворен и не може да се публикува в него.</value>
+  </data>
+  <data name="forum.topic.vote.no_forum_access" xml:space="preserve">
+    <value>Достъп до исканият форум е нужен.</value>
+  </data>
+  <data name="forum.topic.vote.over" xml:space="preserve">
+    <value>Гласуването е приключило, не може да се гласува повече.</value>
+  </data>
+  <data name="forum.topic.vote.play_more" xml:space="preserve">
+    <value>Необходимо е да играете повече преди да можете да гласувате във форума.</value>
+  </data>
+  <data name="forum.topic.vote.voted" xml:space="preserve">
+    <value>Промяната на глас не е разрешена.</value>
+  </data>
+  <data name="forum.topic.vote.user.require_login" xml:space="preserve">
+    <value>Моля влезте в профила си, за да гласувате.</value>
+  </data>
+  <data name="forum.topic.vote.user.restricted" xml:space="preserve">
+    <value>Не може да гласувате докато сте с ограничен статут.</value>
+  </data>
+  <data name="forum.topic.vote.user.silenced" xml:space="preserve">
+    <value>Не може да гласувате докато сте заглушен.</value>
+  </data>
+  <data name="forum.topic.watch.no_forum_access" xml:space="preserve">
+    <value>Достъп до исканият форум е нужен.</value>
+  </data>
+  <data name="forum.topic_cover.edit.uneditable" xml:space="preserve">
+    <value>Невалидна зададена корица.</value>
+  </data>
+  <data name="forum.topic_cover.edit.not_owner" xml:space="preserve">
+    <value>Само собственикът може да редактира корицата.</value>
+  </data>
+  <data name="forum.topic_cover.store.forum_not_allowed" xml:space="preserve">
+    <value>Този форум не приема тематични корици.</value>
+  </data>
+  <data name="forum.view.admin_only" xml:space="preserve">
+    <value>Само админ може да види този форум.</value>
+  </data>
+  <data name="user.page.edit.locked" xml:space="preserve">
+    <value>Профилната страница е заключена.</value>
+  </data>
+  <data name="user.page.edit.not_owner" xml:space="preserve">
+    <value>Може да редактирате само собствената си профилна страница.</value>
+  </data>
+  <data name="user.page.edit.require_supporter_tag" xml:space="preserve">
+    <value>необходим е osu!supporter</value>
+  </data>
+</root>

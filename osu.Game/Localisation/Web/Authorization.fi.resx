@@ -1,0 +1,259 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="play_more" xml:space="preserve">
+    <value>Mitä jos pelaisit vähän osu! sen sijaan?</value>
+  </data>
+  <data name="require_login" xml:space="preserve">
+    <value>Kirjaudu sisään jatkaaksesi.</value>
+  </data>
+  <data name="require_verification" xml:space="preserve">
+    <value>Vahvista jatkaaksesi.</value>
+  </data>
+  <data name="restricted" xml:space="preserve">
+    <value>Et voi tehdä tätä rajoitettuna.</value>
+  </data>
+  <data name="silenced" xml:space="preserve">
+    <value>Et voi tehdä tätä mykistettynä.</value>
+  </data>
+  <data name="unauthorized" xml:space="preserve">
+    <value>Pääsy evätty.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.is_hype" xml:space="preserve">
+    <value>Hurrausta ei voi peruuttaa.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.has_reply" xml:space="preserve">
+    <value>Keskustelua, jossa on vastauksia, ei voi poistaa</value>
+  </data>
+  <data name="beatmap_discussion.nominate.exhausted" xml:space="preserve">
+    <value>Olet saavuttanut suosittelurajan tälle päivälle, yritä huomenna uudelleen.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.incorrect_state" xml:space="preserve">
+    <value>Virhe toimintoa suorittaessa, kokeile sivun päivittämistä.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.owner" xml:space="preserve">
+    <value>Omaa beatmappia ei voi suositella.</value>
+  </data>
+  <data name="beatmap_discussion.resolve.not_owner" xml:space="preserve">
+    <value>Vain aiheen aloittaja sekä beatmapin omistaja voivat ratkaista keskustelun.</value>
+  </data>
+  <data name="beatmap_discussion.store.mapper_note_wrong_user" xml:space="preserve">
+    <value>Ainoastaan beatmapin omistaja, suosittelija tai QAT-ryhmän jäsen voi lisätä muistiinpanoja.</value>
+  </data>
+  <data name="beatmap_discussion.vote.bot" xml:space="preserve">
+    <value>Et voi äänestää botin tekemässä keskustelussa</value>
+  </data>
+  <data name="beatmap_discussion.vote.limit_exceeded" xml:space="preserve">
+    <value>Odota hetki ennen uusien äänien antamista</value>
+  </data>
+  <data name="beatmap_discussion.vote.owner" xml:space="preserve">
+    <value>Omia keskusteluja ei voi äänestää.</value>
+  </data>
+  <data name="beatmap_discussion.vote.wrong_beatmapset_state" xml:space="preserve">
+    <value>Voit äänestää vain vireillä olevien beatmappien keskusteluissa.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.not_owner" xml:space="preserve">
+    <value>Voit poistaa vaan omia viestejä.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.not_owner" xml:space="preserve">
+    <value>Vain lähettäjä voi muokata viestiä.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.system_generated" xml:space="preserve">
+    <value>Automaattisesti luotua viestiä ei voi muokata.</value>
+  </data>
+  <data name="beatmap_discussion_post.store.beatmapset_locked" xml:space="preserve">
+    <value>Tämä beatmap on lukittu keskustelulta.</value>
+  </data>
+  <data name="chat.blocked" xml:space="preserve">
+    <value>Et voi lähettää viestejä käyttäjälle, joka on estänyt sinut tai jonka olet estänyt.</value>
+  </data>
+  <data name="chat.friends_only" xml:space="preserve">
+    <value>Käyttäjä on estänyt viestit henkilöiltä, jotka eivät ole hänen kaverilistassaan.</value>
+  </data>
+  <data name="chat.moderated" xml:space="preserve">
+    <value>Tätä kanavaa moderoidaan.</value>
+  </data>
+  <data name="chat.no_access" xml:space="preserve">
+    <value>Sinulla ei ole oikeuksia tälle kanavalle.</value>
+  </data>
+  <data name="chat.restricted" xml:space="preserve">
+    <value>Et voi lähettää viestejä mykistettynä, rajoitettuna tai bännättynä.</value>
+  </data>
+  <data name="comment.update.deleted" xml:space="preserve">
+    <value>Poistettuja viestejä ei voi mukata.</value>
+  </data>
+  <data name="contest.voting_over" xml:space="preserve">
+    <value>Et voi muuttaa ääntäsi tälle kilpailulle äänestysajan loppumisen jälkeen.</value>
+  </data>
+  <data name="contest.entry.limit_reached" xml:space="preserve">
+    <value>Olet saavuttanut kilpailuun lähetettävien töiden rajan</value>
+  </data>
+  <data name="contest.entry.over" xml:space="preserve">
+    <value>Kiitos lähettämistänne töistä! Kilpailuun ei oteta enää ehdokkaita ja äänestys avataan pian.</value>
+  </data>
+  <data name="forum.moderate.no_permission" xml:space="preserve">
+    <value>Sinulla ei ole oikeutta moderoida tätä foorumia.</value>
+  </data>
+  <data name="forum.post.delete.only_last_post" xml:space="preserve">
+    <value>Vain viimeisin viesti voidaan poistaa.</value>
+  </data>
+  <data name="forum.post.delete.locked" xml:space="preserve">
+    <value>Lukitun aiheen viestejä ei voi poistaa.</value>
+  </data>
+  <data name="forum.post.delete.no_forum_access" xml:space="preserve">
+    <value>Tarvitset pääsyn tälle foorumille.</value>
+  </data>
+  <data name="forum.post.delete.not_owner" xml:space="preserve">
+    <value>Vain lähettäjä voi poistaa viestin.</value>
+  </data>
+  <data name="forum.post.edit.deleted" xml:space="preserve">
+    <value>Poistettuja viestejä ei voi muokata.</value>
+  </data>
+  <data name="forum.post.edit.locked" xml:space="preserve">
+    <value>Viestin muokkaaminen on estetty.</value>
+  </data>
+  <data name="forum.post.edit.no_forum_access" xml:space="preserve">
+    <value>Tarvitset pääsyn tälle foorumille.</value>
+  </data>
+  <data name="forum.post.edit.not_owner" xml:space="preserve">
+    <value>Vain lähettäjä voi muokata viestiä.</value>
+  </data>
+  <data name="forum.post.edit.topic_locked" xml:space="preserve">
+    <value>Lukitun aiheen viestiä ei voi muokata.</value>
+  </data>
+  <data name="forum.post.store.play_more" xml:space="preserve">
+    <value>Pyydämme, että kokeilet peliä ennen viestin lähettämistä foorumeille! Jos kohtaat ongelmia pelatessasi, lähetä viesti foorumin apu- ja tukialueelle.</value>
+  </data>
+  <data name="forum.post.store.too_many_help_posts" xml:space="preserve">
+    <value>Sinun on pelattava peliä enemmän, ennen kuin voit luoda useampia viestejä. Jos sinulla on edelleen ongelmia pelin kanssa, lähetä sähköpostia osoitteeseen support@ppy.sh</value>
+  </data>
+  <data name="forum.topic.reply.double_post" xml:space="preserve">
+    <value>Muokkaa edellistä viestiä uuden lähettämisen sijaan.</value>
+  </data>
+  <data name="forum.topic.reply.locked" xml:space="preserve">
+    <value>Et voi vastata lukittuun aiheeseen.</value>
+  </data>
+  <data name="forum.topic.reply.no_forum_access" xml:space="preserve">
+    <value>Pääsy kyseiselle foorumille vaaditaan.</value>
+  </data>
+  <data name="forum.topic.reply.no_permission" xml:space="preserve">
+    <value>Ei vastausoikeutta.</value>
+  </data>
+  <data name="forum.topic.reply.user.require_login" xml:space="preserve">
+    <value>Kirjaudu sisään vastataksesi.</value>
+  </data>
+  <data name="forum.topic.reply.user.restricted" xml:space="preserve">
+    <value>Et voi vastata rajoitettuna.</value>
+  </data>
+  <data name="forum.topic.reply.user.silenced" xml:space="preserve">
+    <value>Et voi vastata mykistettynä.</value>
+  </data>
+  <data name="forum.topic.store.no_forum_access" xml:space="preserve">
+    <value>Pääsy kyseiselle foorumille vaaditaan.</value>
+  </data>
+  <data name="forum.topic.store.no_permission" xml:space="preserve">
+    <value>Oikeudet uuden aiheen luomiseen puuttuvat.</value>
+  </data>
+  <data name="forum.topic.store.forum_closed" xml:space="preserve">
+    <value>Foorumi on suljettu, eikä siihen voi lähettää viestejä.</value>
+  </data>
+  <data name="forum.topic.vote.no_forum_access" xml:space="preserve">
+    <value>Tarvitset pääsyn tälle foorumille.</value>
+  </data>
+  <data name="forum.topic.vote.over" xml:space="preserve">
+    <value>Äänestys on loppunut eikä uusia ääniä voida antaa.</value>
+  </data>
+  <data name="forum.topic.vote.play_more" xml:space="preserve">
+    <value>Sinun pitää pelata enemmän jotta voit äänestää foorumilla.</value>
+  </data>
+  <data name="forum.topic.vote.voted" xml:space="preserve">
+    <value>Äänen vaihtaminen ei ole sallittua.</value>
+  </data>
+  <data name="forum.topic.vote.user.require_login" xml:space="preserve">
+    <value>Kirjaudu sisään äänestääksesi.</value>
+  </data>
+  <data name="forum.topic.vote.user.restricted" xml:space="preserve">
+    <value>Et voi äänestää rajoitettuna.</value>
+  </data>
+  <data name="forum.topic.vote.user.silenced" xml:space="preserve">
+    <value>Et voi äänestää mykistettynä.</value>
+  </data>
+  <data name="forum.topic.watch.no_forum_access" xml:space="preserve">
+    <value>Tarvitset pääsyn tälle foorumille.</value>
+  </data>
+  <data name="forum.topic_cover.edit.uneditable" xml:space="preserve">
+    <value>Virheellinen kansikuva valittu.</value>
+  </data>
+  <data name="forum.topic_cover.edit.not_owner" xml:space="preserve">
+    <value>Vain omistaja voi muuttaa kansikuvaa.</value>
+  </data>
+  <data name="forum.view.admin_only" xml:space="preserve">
+    <value>Vain ylläpitäjä voi nähdä tämän foorumin.</value>
+  </data>
+  <data name="user.page.edit.locked" xml:space="preserve">
+    <value>Käyttäjäsivu on lukittu.</value>
+  </data>
+  <data name="user.page.edit.not_owner" xml:space="preserve">
+    <value>Voit muokata vain omaa käyttäjäsivuasi.</value>
+  </data>
+  <data name="user.page.edit.require_supporter_tag" xml:space="preserve">
+    <value>Sinun on oltava Tukija.</value>
+  </data>
+</root>

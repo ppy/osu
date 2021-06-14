@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="play_more" xml:space="preserve">
+    <value>Может, лучше в osu! поиграете?</value>
+  </data>
+  <data name="require_login" xml:space="preserve">
+    <value>Войдите для продолжения.</value>
+  </data>
+  <data name="require_verification" xml:space="preserve">
+    <value>Пожалуйста, подтвердите свой аккаунт.</value>
+  </data>
+  <data name="restricted" xml:space="preserve">
+    <value>Это нельзя сделать при ограниченном аккаунте.</value>
+  </data>
+  <data name="silenced" xml:space="preserve">
+    <value>Нельзя это делать, пока у вас сайленс.</value>
+  </data>
+  <data name="unauthorized" xml:space="preserve">
+    <value>Доступ запрещён.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.is_hype" xml:space="preserve">
+    <value>Нельзя отменить хайп.</value>
+  </data>
+  <data name="beatmap_discussion.destroy.has_reply" xml:space="preserve">
+    <value>Нельзя удалить обсуждение с ответами</value>
+  </data>
+  <data name="beatmap_discussion.nominate.exhausted" xml:space="preserve">
+    <value>Вы достигли своего лимита номинаций за день, повторите попытку завтра.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.incorrect_state" xml:space="preserve">
+    <value>Возникла неизвестная ошибка, попробуйте перезагрузить страницу.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.owner" xml:space="preserve">
+    <value>Нельзя номинировать свою карту.</value>
+  </data>
+  <data name="beatmap_discussion.nominate.set_metadata" xml:space="preserve">
+    <value>Вы должны указать жанр и язык карты перед её номинированием.</value>
+  </data>
+  <data name="beatmap_discussion.resolve.not_owner" xml:space="preserve">
+    <value>Только автор темы или карты может решить вопрос.</value>
+  </data>
+  <data name="beatmap_discussion.store.mapper_note_wrong_user" xml:space="preserve">
+    <value>Оставлять заметки могут только автор карты, номинатор или член NAT.</value>
+  </data>
+  <data name="beatmap_discussion.vote.bot" xml:space="preserve">
+    <value>Нельзя проголосовать за пост от бота</value>
+  </data>
+  <data name="beatmap_discussion.vote.limit_exceeded" xml:space="preserve">
+    <value>Подождите немного прежде чем голосовать дальше</value>
+  </data>
+  <data name="beatmap_discussion.vote.owner" xml:space="preserve">
+    <value>Нельзя голосовать в собственном обсуждении!</value>
+  </data>
+  <data name="beatmap_discussion.vote.wrong_beatmapset_state" xml:space="preserve">
+    <value>Можно голосовать только в обсуждениях ожидающих карт.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.not_owner" xml:space="preserve">
+    <value>Вы можете удалять только свои посты.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.resolved" xml:space="preserve">
+    <value>Вы не можете удалить пост в решённом обсуждении.</value>
+  </data>
+  <data name="beatmap_discussion_post.destroy.system_generated" xml:space="preserve">
+    <value>Нельзя удалить автоматически созданный пост.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.not_owner" xml:space="preserve">
+    <value>Только автор может редактировать публикацию.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.resolved" xml:space="preserve">
+    <value>Нельзя отредактировать пост в решённом обсуждении.</value>
+  </data>
+  <data name="beatmap_discussion_post.edit.system_generated" xml:space="preserve">
+    <value>Невозможно отредактировать автоматически созданную публикацию.</value>
+  </data>
+  <data name="beatmap_discussion_post.store.beatmapset_locked" xml:space="preserve">
+    <value>Обсуждение этой карты закрыто.</value>
+  </data>
+  <data name="beatmapset.metadata.nominated" xml:space="preserve">
+    <value>Если карта номинирована, её метаданные нельзя менять. В случае ошибок свяжитесь с номинатором или членом NAT.</value>
+  </data>
+  <data name="chat.blocked" xml:space="preserve">
+    <value>Нельзя общаться с пользователем, который заблокировал вас (или наоборот, вы — его).</value>
+  </data>
+  <data name="chat.friends_only" xml:space="preserve">
+    <value>Пользователь блокирует сообщения не от друзей.</value>
+  </data>
+  <data name="chat.moderated" xml:space="preserve">
+    <value>В этот канал сейчас нельзя писать.</value>
+  </data>
+  <data name="chat.no_access" xml:space="preserve">
+    <value>У вас нет доступа к этому каналу.</value>
+  </data>
+  <data name="chat.restricted" xml:space="preserve">
+    <value>Нельзя отправлять сообщения, пока у вас сайленс, или если вас ограничили или забанили.</value>
+  </data>
+  <data name="chat.silenced" xml:space="preserve">
+    <value>Вы не можете отправлять сообщение пока вы в сайленсе, ограниченном режиме или забанены.</value>
+  </data>
+  <data name="comment.update.deleted" xml:space="preserve">
+    <value>Нельзя редактировать удалённый пост.</value>
+  </data>
+  <data name="contest.voting_over" xml:space="preserve">
+    <value>Вы не можете изменить свой голос после окончания периода голосования.</value>
+  </data>
+  <data name="contest.entry.limit_reached" xml:space="preserve">
+    <value>Вы исчерпали количество заявок для этого конкурса.</value>
+  </data>
+  <data name="contest.entry.over" xml:space="preserve">
+    <value>Благодарим за ваши заявки на участие в этом конкурсе! Голосование начнется в ближайшее время.</value>
+  </data>
+  <data name="forum.moderate.no_permission" xml:space="preserve">
+    <value>У вас нет прав на модерацию этого форума.</value>
+  </data>
+  <data name="forum.post.delete.only_last_post" xml:space="preserve">
+    <value>Только последняя публикация может быть удалена.</value>
+  </data>
+  <data name="forum.post.delete.locked" xml:space="preserve">
+    <value>Невозможно удалить публикацию в закрытой теме.</value>
+  </data>
+  <data name="forum.post.delete.no_forum_access" xml:space="preserve">
+    <value>Необходим доступ к запрашиваемому форуму.</value>
+  </data>
+  <data name="forum.post.delete.not_owner" xml:space="preserve">
+    <value>Только автор может удалить эту публикацию.</value>
+  </data>
+  <data name="forum.post.edit.deleted" xml:space="preserve">
+    <value>Невозможно изменить удалённую публикацию.</value>
+  </data>
+  <data name="forum.post.edit.locked" xml:space="preserve">
+    <value>Публикация защищена от изменений.</value>
+  </data>
+  <data name="forum.post.edit.no_forum_access" xml:space="preserve">
+    <value>Необходим доступ к запрашиваемому форуму.</value>
+  </data>
+  <data name="forum.post.edit.not_owner" xml:space="preserve">
+    <value>Только автор может редактировать эту публикацию.</value>
+  </data>
+  <data name="forum.post.edit.topic_locked" xml:space="preserve">
+    <value>Невозможно изменить публикацию в закрытой теме.</value>
+  </data>
+  <data name="forum.post.store.play_more" xml:space="preserve">
+    <value>Поиграйте в игру, прежде чем писать что-либо на форуме. Если у вас имеются проблемы с игрой, попробуйте написать об этом на форуме «Помощи и поддержки».</value>
+  </data>
+  <data name="forum.post.store.too_many_help_posts" xml:space="preserve">
+    <value>Прежде чем вы сможете создавать дополнительные посты, вы должны поиграть в игру подольше. Если у вас имеются проблемы с игрой, напишите на support@ppy.sh</value>
+  </data>
+  <data name="forum.topic.reply.double_post" xml:space="preserve">
+    <value>Пожалуйста, отредактируйте ваш последний пост, не создавайте новый.</value>
+  </data>
+  <data name="forum.topic.reply.locked" xml:space="preserve">
+    <value>Нельзя ответить в закрытой теме.</value>
+  </data>
+  <data name="forum.topic.reply.no_forum_access" xml:space="preserve">
+    <value>Необходим доступ к запрашиваемому форуму.</value>
+  </data>
+  <data name="forum.topic.reply.no_permission" xml:space="preserve">
+    <value>Для ответа недостаточно прав.</value>
+  </data>
+  <data name="forum.topic.reply.user.require_login" xml:space="preserve">
+    <value>Чтобы ответить, войдите в аккаунт.</value>
+  </data>
+  <data name="forum.topic.reply.user.restricted" xml:space="preserve">
+    <value>Нельзя отвечать, когда аккаунт ограничен.</value>
+  </data>
+  <data name="forum.topic.reply.user.silenced" xml:space="preserve">
+    <value>Нельзя отвечать, пока у вас сайленс.</value>
+  </data>
+  <data name="forum.topic.store.no_forum_access" xml:space="preserve">
+    <value>Необходим доступ к запрашиваемому форуму.</value>
+  </data>
+  <data name="forum.topic.store.no_permission" xml:space="preserve">
+    <value>Нет прав на создание новой темы.</value>
+  </data>
+  <data name="forum.topic.store.forum_closed" xml:space="preserve">
+    <value>Нельзя публиковать пока форум закрыт.</value>
+  </data>
+  <data name="forum.topic.vote.no_forum_access" xml:space="preserve">
+    <value>Необходим доступ к запрашиваемому форуму.</value>
+  </data>
+  <data name="forum.topic.vote.over" xml:space="preserve">
+    <value>Опрос окончен и проголосовать в нём уже нельзя.</value>
+  </data>
+  <data name="forum.topic.vote.play_more" xml:space="preserve">
+    <value>Перед тем, как голосовать, нужно поиграть подольше.</value>
+  </data>
+  <data name="forum.topic.vote.voted" xml:space="preserve">
+    <value>Нельзя изменить свой голос.</value>
+  </data>
+  <data name="forum.topic.vote.user.require_login" xml:space="preserve">
+    <value>Чтобы проголосовать, войдите в аккаунт.</value>
+  </data>
+  <data name="forum.topic.vote.user.restricted" xml:space="preserve">
+    <value>Нельзя голосовать, когда аккаунт ограничен.</value>
+  </data>
+  <data name="forum.topic.vote.user.silenced" xml:space="preserve">
+    <value>Нельзя голосовать, пока у вас сайленс.</value>
+  </data>
+  <data name="forum.topic.watch.no_forum_access" xml:space="preserve">
+    <value>Необходим доступ к запрашиваемому форуму.</value>
+  </data>
+  <data name="forum.topic_cover.edit.uneditable" xml:space="preserve">
+    <value>Указана неверная обложка.</value>
+  </data>
+  <data name="forum.topic_cover.edit.not_owner" xml:space="preserve">
+    <value>Только автор темы может менять обложку.</value>
+  </data>
+  <data name="forum.topic_cover.store.forum_not_allowed" xml:space="preserve">
+    <value>В этом форуме нельзя настраивать обложки.</value>
+  </data>
+  <data name="forum.view.admin_only" xml:space="preserve">
+    <value>Только администратор может просматривать этот форум.</value>
+  </data>
+  <data name="user.page.edit.locked" xml:space="preserve">
+    <value>Страница заблокирована.</value>
+  </data>
+  <data name="user.page.edit.not_owner" xml:space="preserve">
+    <value>Вы можете редактировать только собственную страницу.</value>
+  </data>
+  <data name="user.page.edit.require_supporter_tag" xml:space="preserve">
+    <value>У вас нет osu!supporter.</value>
+  </data>
+</root>
