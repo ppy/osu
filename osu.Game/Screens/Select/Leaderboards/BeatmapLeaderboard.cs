@@ -98,18 +98,22 @@ namespace osu.Game.Screens.Select.Leaderboards
             TopScore = null;
         }
 
-        private void onScoreRemoved(ValueChangedEvent<WeakReference<ScoreInfo>> score)
+        private void onScoreRemoved(ValueChangedEvent<WeakReference<ScoreInfo>> score) =>
+            scoreStoreChanged(score);
+
+        private void onScoreAdded(ValueChangedEvent<WeakReference<ScoreInfo>> score) =>
+            scoreStoreChanged(score);
+
+        private void scoreStoreChanged(ValueChangedEvent<WeakReference<ScoreInfo>> score)
         {
             if (Scope != BeatmapLeaderboardScope.Local)
                 return;
 
-            RefreshScores();
-        }
-
-        private void onScoreAdded(ValueChangedEvent<WeakReference<ScoreInfo>> score)
-        {
-            if (Scope != BeatmapLeaderboardScope.Local)
-                return;
+            if (score.NewValue.TryGetTarget(out var scoreInfo))
+            {
+                if (Beatmap.ID != scoreInfo.BeatmapInfoID)
+                    return;
+            }
 
             RefreshScores();
         }
