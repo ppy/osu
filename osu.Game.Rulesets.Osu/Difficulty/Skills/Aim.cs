@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                         Math.Max(osuPrevious.JumpDistance - scale, 0)
                         * Math.Pow(Math.Sin(osuCurrent.Angle.Value - angle_bonus_begin), 2)
                         * Math.Max(osuCurrent.JumpDistance - scale, 0));
-                    result = 1.35 * applyDiminishingExp(Math.Max(0, angleBonus)) / Math.Max(timing_threshold, osuPrevious.StrainTime);
+                    result = 1.4 * applyDiminishingExp(Math.Max(0, angleBonus)) / Math.Max(timing_threshold, osuPrevious.StrainTime);
                 }
             }
 
