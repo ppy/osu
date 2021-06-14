@@ -8,9 +8,13 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
-    public abstract class OsuSkill : StrainSkill
+    public abstract class OsuStrainSkill : StrainSkill
     {
-        public OsuSkill(Mod[] mods) : base(mods)
+        protected virtual int ReducedSectionCount => 9;
+        protected virtual double ReducedStrainBaseline => 0.68;
+        protected virtual double DifficultyMultiplier => 1.06;
+
+        public OsuStrainSkill(Mod[] mods) : base(mods)
         {
         }
 
@@ -22,11 +26,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double strainMultiplier;
             List<double> strains = GetCurrentStrainPeaks().OrderByDescending(d => d).ToList();
 
-            double baseLine = 0.68;
-
-            for (int i = 0; i <= 9; i++)
+            for (int i = 0; i < ReducedSectionCount; i++)
             {
-                strainMultiplier = baseLine + Math.Log10(i+1) * (1.0 - baseLine);
+                strainMultiplier = ReducedStrainBaseline + Math.Log10(i * 9.0 / ReducedSectionCount + 1) * (1.0 - ReducedStrainBaseline);
                 strains[i] = strains[i] * strainMultiplier;
             }
 
@@ -38,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 weight *= DecayWeight;
             }
 
-            return difficulty * 1.06;
+            return difficulty * DifficultyMultiplier;
         }
     }
 }
