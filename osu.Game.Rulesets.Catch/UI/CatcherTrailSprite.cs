@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             Size = new Vector2(CatcherArea.CATCHER_SIZE);
             Origin = Anchor.TopCentre;
+            Blending = BlendingParameters.Additive;
             InternalChild = body = new SkinnableCatcher();
         }
 
