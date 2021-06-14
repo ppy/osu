@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -92,8 +91,6 @@ namespace osu.Game.Rulesets.Catch.UI
         /// The width of the catcher which can receive fruit. Equivalent to "catchMargin" in osu-stable.
         /// </summary>
         public const float ALLOWED_CATCH_RANGE = 0.8f;
-
-        internal Texture CurrentTexture => ((ICatcherSprite)body.Drawable).CurrentTexture;
 
         private bool dashing;
 
