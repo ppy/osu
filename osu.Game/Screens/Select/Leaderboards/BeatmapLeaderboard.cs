@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (Scope != BeatmapLeaderboardScope.Local)
                 return;
 
-            Scheduler.AddOnce(RefreshScores);
+            RefreshScores();
         }
 
         private void onScoreAdded(ValueChangedEvent<WeakReference<ScoreInfo>> score)
@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (Scope != BeatmapLeaderboardScope.Local)
                 return;
 
-            Scheduler.AddOnce(RefreshScores);
+            RefreshScores();
         }
 
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
