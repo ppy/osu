@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -37,18 +38,37 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Size = new Vector2(550f, 450f),
                 Scope = BeatmapLeaderboardScope.Global,
             });
+        }
 
+        [Test]
+        public void TestScoresDisplay()
+        {
             AddStep(@"New Scores", newScores);
+        }
+
+        [Test]
+        public void TestPersonalBest()
+        {
             AddStep(@"Show personal best", showPersonalBest);
+            AddStep("null personal best position", showPersonalBestWithNullPosition);
+        }
+
+        [Test]
+        public void TestPlaceholderStates()
+        {
             AddStep(@"Empty Scores", () => leaderboard.SetRetrievalState(PlaceholderState.NoScores));
             AddStep(@"Network failure", () => leaderboard.SetRetrievalState(PlaceholderState.NetworkFailure));
             AddStep(@"No supporter", () => leaderboard.SetRetrievalState(PlaceholderState.NotSupporter));
             AddStep(@"Not logged in", () => leaderboard.SetRetrievalState(PlaceholderState.NotLoggedIn));
             AddStep(@"Unavailable", () => leaderboard.SetRetrievalState(PlaceholderState.Unavailable));
             AddStep(@"None selected", () => leaderboard.SetRetrievalState(PlaceholderState.NoneSelected));
+        }
+
+        [Test]
+        public void TestBeatmapStates()
+        {
             foreach (BeatmapSetOnlineStatus status in Enum.GetValues(typeof(BeatmapSetOnlineStatus)))
                 AddStep($"{status} beatmap", () => showBeatmapWithStatus(status));
-            AddStep("null personal best position", showPersonalBestWithNullPosition);
         }
 
         private void showPersonalBestWithNullPosition()
