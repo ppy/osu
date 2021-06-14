@@ -53,19 +53,23 @@ namespace osu.Game.Rulesets.UI.Scrolling
         }
 
         /// <summary>
-        /// Given a position along the scrolling axis, return the time within this <see cref="HitObjectContainer"/>.
+        /// Given a position at <paramref name="currentTime"/>, return the time of the object corresponding the position.
         /// </summary>
-        /// <param name="position">The position along the scrolling axis.</param>
-        /// <param name="referenceTime">The time the scrolling speed is used.</param>
-        public double TimeAtPosition(float position, double referenceTime)
+        /// <remarks>
+        /// If there are multiple valid time values, one arbitrary time is returned.
+        /// </remarks>
+        public double TimeAtPosition(float position, double currentTime)
         {
             flipPositionIfRequired(ref position);
-            return scrollingInfo.Algorithm.TimeAt(position, referenceTime, timeRange.Value, scrollLength);
+            return scrollingInfo.Algorithm.TimeAt(position, currentTime, timeRange.Value, scrollLength);
         }
 
         /// <summary>
-        /// Given a position in screen space, return the time within this <see cref="HitObjectContainer"/>.
+        /// Given a position at the current time in screen space, return the time of the object corresponding the position.
         /// </summary>
+        /// <remarks>
+        /// If there are multiple valid time values, one arbitrary time is returned.
+        /// </remarks>
         public double TimeAtScreenSpacePosition(Vector2 screenSpacePosition)
         {
             Vector2 position = ToLocalSpace(screenSpacePosition);
