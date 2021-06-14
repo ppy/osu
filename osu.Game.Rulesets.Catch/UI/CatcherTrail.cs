@@ -7,7 +7,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatcherTrailSprite : PoolableDrawable
+    public class CatcherTrail : PoolableDrawable
     {
         public CatcherAnimationState AnimationState
         {
@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private readonly SkinnableCatcher body;
 
-        public CatcherTrailSprite()
+        public CatcherTrail()
         {
             Size = new Vector2(CatcherArea.CATCHER_SIZE);
             Origin = Anchor.TopCentre;
