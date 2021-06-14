@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (score.NewValue.TryGetTarget(out var scoreInfo))
             {
-                if (Beatmap.ID != scoreInfo.BeatmapInfoID)
+                if (Beatmap?.ID != scoreInfo.BeatmapInfoID)
                     return;
             }
 
