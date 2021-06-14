@@ -3,32 +3,24 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatcherTrailSprite : PoolableDrawable
     {
-        public Texture Texture
+        public CatcherAnimationState AnimationState
         {
-            set => sprite.Texture = value;
+            set => body.AnimationState.Value = value;
         }
 
-        private readonly Sprite sprite;
+        private readonly SkinnableCatcher body;
 
         public CatcherTrailSprite()
         {
-            InternalChild = sprite = new Sprite
-            {
-                RelativeSizeAxes = Axes.Both
-            };
-
             Size = new Vector2(CatcherArea.CATCHER_SIZE);
-
-            // Sets the origin roughly to the centre of the catcher's plate to allow for correct scaling.
-            OriginPosition = new Vector2(0.5f, 0.06f) * CatcherArea.CATCHER_SIZE;
+            Origin = Anchor.TopCentre;
+            InternalChild = body = new SkinnableCatcher();
         }
 
         protected override void FreeAfterUse()
