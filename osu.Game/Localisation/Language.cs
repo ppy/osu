@@ -7,10 +7,10 @@ namespace osu.Game.Localisation
 {
     public enum Language
     {
-        [Description("English")]
+        [Description(@"English")]
         en,
 
-        [Description("日本語")]
+        [Description(@"日本語")]
         ja
     }
 }
