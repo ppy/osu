@@ -426,9 +426,8 @@ namespace osu.Game
         {
             // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
             // to ensure all the required data for presenting a replay are present.
-            var databasedScoreInfo = score.OnlineScoreID != null
-                ? ScoreManager.Query(s => s.OnlineScoreID == score.OnlineScoreID)
-                : ScoreManager.Query(s => s.Hash == score.Hash);
+            // Todo: This should use the OnlineScoreID if available, however lazer scores are imported without an OnlineScoreID for the time being (see Player.ImportScore()).
+            var databasedScoreInfo = ScoreManager.Query(s => s.Hash == score.Hash);
 
             if (databasedScoreInfo == null)
             {
