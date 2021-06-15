@@ -19,13 +19,16 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override string Description => @"Beats fade out before you hit them!";
         public override double ScoreMultiplier => 1.06;
 
-        // In stable Taiko, hit position is 160, so playfield is essentially 160 pixels shorter
-        // than actual screen width. Normalized screen height is 480, so on a 4:3 screen the
-        // playfield ratio will actually be (640 - 160) / 480 = 1
-        // For custom resolutions (x:y), screen width with normalized height becomes 480 * x / y instead,
-        // and the playfield ratio becomes (480 * x / y - 160) / 480 = x / y - 1/3
-        // The following is 4:3 playfield ratio divided by 16:9 playfield ratio
+        /// <summary>
+        /// In stable taiko, the hit position is 160, so the active playfield is essentially 160 pixels shorter
+        /// than the actual screen width. The normalized playfield height is 480, so on a 4:3 screen the
+        /// playfield ratio of the active area up to the hit position will actually be (640 - 160) / 480 = 1.
+        /// For custom resolutions/aspect ratios (x:y), the screen width given the normalized height becomes 480 * x / y instead,
+        /// and the playfield ratio becomes (480 * x / y - 160) / 480 = x / y - 1/3.
+        /// This constant is equal to the playfield ratio on 4:3 screens divided by the playfield ratio on 16:9 screens.
+        /// </summary>
         private const double hd_sv_scale = (4.0 / 3.0 - 1.0 / 3.0) / (16.0 / 9.0 - 1.0 / 3.0);
+
         private BeatmapDifficulty difficulty;
         private ControlPointInfo controlPointInfo;
 
