@@ -20,6 +20,7 @@ using osu.Game.Skinning;
 using osuTK;
 using System.Diagnostics;
 using osu.Framework.Audio.Sample;
+using osu.Game.Rulesets.Objects.Pooling;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -91,6 +92,8 @@ namespace osu.Game.Rulesets.UI
         [Resolved]
         private ISampleStore sampleStore { get; set; }
 
+        private readonly HitObjectEntryManager entryManager;
+
         /// <summary>
         /// Creates a new <see cref="Playfield"/>.
         /// </summary>
@@ -105,6 +108,10 @@ namespace osu.Game.Rulesets.UI
                 h.HitObjectUsageBegan += o => HitObjectUsageBegan?.Invoke(o);
                 h.HitObjectUsageFinished += o => HitObjectUsageFinished?.Invoke(o);
             }));
+
+            entryManager = new HitObjectEntryManager(CreateLifetimeEntry);
+            entryManager.OnEntryAdded += onEntryAdded;
+            entryManager.OnEntryRemoved += onEntryRemoved;
         }
 
         [BackgroundDependencyLoader]
@@ -258,11 +265,7 @@ namespace osu.Game.Rulesets.UI
         /// <param name="hitObject"></param>
         public virtual void Add(HitObject hitObject)
         {
-            var entry = CreateLifetimeEntry(hitObject);
-            lifetimeEntryMap[entry.HitObject] = entry;
-
-            HitObjectContainer.Add(entry);
-            OnHitObjectAdded(entry.HitObject);
+            entryManager.Add(hitObject, null);
         }
 
         /// <summary>
@@ -272,14 +275,23 @@ namespace osu.Game.Rulesets.UI
         /// <returns>Whether the <see cref="HitObject"/> was successfully removed.</returns>
         public virtual bool Remove(HitObject hitObject)
         {
-            if (lifetimeEntryMap.Remove(hitObject, out var entry))
-            {
-                HitObjectContainer.Remove(entry);
-                OnHitObjectRemoved(hitObject);
-                return true;
-            }
+            return entryManager.Remove(hitObject) || nestedPlayfields.Any(p => p.Remove(hitObject));
+        }
 
-            return nestedPlayfields.Any(p => p.Remove(hitObject));
+        private void onEntryAdded(HitObjectLifetimeEntry entry, [CanBeNull] HitObject parentHitObject)
+        {
+            if (parentHitObject != null) return;
+
+            HitObjectContainer.Add(entry);
+            OnHitObjectAdded(entry.HitObject);
+        }
+
+        private void onEntryRemoved(HitObjectLifetimeEntry entry, [CanBeNull] HitObject parentHitObject)
+        {
+            if (parentHitObject != null) return;
+
+            HitObjectContainer.Remove(entry);
+            OnHitObjectRemoved(entry.HitObject);
         }
 
         /// <summary>
@@ -361,8 +373,8 @@ namespace osu.Game.Rulesets.UI
                     }
                 }
 
-                if (!lifetimeEntryMap.TryGetValue(hitObject, out var entry))
-                    lifetimeEntryMap[hitObject] = entry = CreateLifetimeEntry(hitObject);
+                if (!entryManager.TryGet(hitObject, out var entry))
+                    entry = entryManager.Add(hitObject, parent?.HitObject);
 
                 dho.ParentHitObject = parent;
                 dho.Apply(entry);
@@ -412,8 +424,6 @@ namespace osu.Game.Rulesets.UI
         /// </remarks>
         internal event Action<HitObject> HitObjectUsageFinished;
 
-        private readonly Dictionary<HitObject, HitObjectLifetimeEntry> lifetimeEntryMap = new Dictionary<HitObject, HitObjectLifetimeEntry>();
-
         /// <summary>
         /// Sets whether to keep a given <see cref="HitObject"/> always alive within this or any nested <see cref="Playfield"/>.
         /// </summary>
@@ -421,7 +431,7 @@ namespace osu.Game.Rulesets.UI
         /// <param name="keepAlive">Whether to keep <paramref name="hitObject"/> always alive.</param>
         internal void SetKeepAlive(HitObject hitObject, bool keepAlive)
         {
-            if (lifetimeEntryMap.TryGetValue(hitObject, out var entry))
+            if (entryManager.TryGet(hitObject, out var entry))
             {
                 entry.KeepAlive = keepAlive;
                 return;
@@ -436,7 +446,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         internal void KeepAllAlive()
         {
-            foreach (var (_, entry) in lifetimeEntryMap)
+            foreach (var entry in entryManager.AllEntries)
                 entry.KeepAlive = true;
 
             foreach (var p in nestedPlayfields)
