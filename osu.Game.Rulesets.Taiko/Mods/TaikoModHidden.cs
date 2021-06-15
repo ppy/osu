@@ -19,6 +19,16 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override string Description => @"Beats fade out before you hit them!";
         public override double ScoreMultiplier => 1.06;
 
+        [SettingSource("Fade-out Time", "The bigger this multiplier is, the sooner the notes will start fading out")]
+        public BindableNumber<double> FadeOutTimeMultiplier { get; } = new BindableDouble
+        {
+            MinValue = 0.5,
+            MaxValue = 1.5,
+            Default = 1.0,
+            Value = 1.0,
+            Precision = 0.01,
+        };
+
         /// <summary>
         /// In stable taiko, the hit position is 160, so the active playfield is essentially 160 pixels shorter
         /// than the actual screen width. The normalized playfield height is 480, so on a 4:3 screen the
@@ -31,16 +41,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private BeatmapDifficulty difficulty;
         private ControlPointInfo controlPointInfo;
-
-        [SettingSource("Fade-out Time", "The bigger this multiplier is, the sooner the notes will start fading out")]
-        public BindableNumber<double> VisibilityMod { get; } = new BindableDouble
-        {
-            MinValue = 0.5,
-            MaxValue = 1.5,
-            Default = 1.0,
-            Value = 1.0,
-            Precision = 0.01,
-        };
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             }
 
             // I *think* it's like this because stable's default velocity multiplier is 1.4
-            var preempt = 14000 / MultiplierAt(hitObject.HitObject.StartTime) * VisibilityMod.Value;
+            var preempt = 14000 / MultiplierAt(hitObject.HitObject.StartTime) * FadeOutTimeMultiplier.Value;
             var start = hitObject.HitObject.StartTime - preempt * 0.6;
             var duration = preempt * 0.3;
 
