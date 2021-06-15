@@ -716,7 +716,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (HitObject != null)
                 HitObject.DefaultsApplied -= onDefaultsApplied;
 
-            CurrentSkin.SourceChanged -= skinSourceChanged;
+            if (CurrentSkin != null)
+                CurrentSkin.SourceChanged -= skinSourceChanged;
         }
     }
 
