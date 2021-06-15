@@ -14,12 +14,12 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         where T : ManiaHitObject
     {
         [Resolved]
-        private HitObjectComposer composer { get; set; }
+        private IPlayfieldProvider playfieldProvider { get; set; }
 
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
-        protected ScrollingHitObjectContainer HitObjectContainer => ((ManiaPlayfield)composer.Playfield).GetColumn(HitObject.Column).HitObjectContainer;
+        protected ScrollingHitObjectContainer HitObjectContainer => ((ManiaPlayfield)playfieldProvider.Playfield).GetColumn(HitObject.Column).HitObjectContainer;
 
         protected ManiaSelectionBlueprint(T hitObject)
             : base(hitObject)

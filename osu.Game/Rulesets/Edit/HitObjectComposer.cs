@@ -415,7 +415,8 @@ namespace osu.Game.Rulesets.Edit
     /// </summary>
     [Cached(typeof(HitObjectComposer))]
     [Cached(typeof(IPositionSnapProvider))]
-    public abstract class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
+    [Cached(typeof(IPlayfieldProvider))]
+    public abstract class HitObjectComposer : CompositeDrawable, IPositionSnapProvider, IPlayfieldProvider
     {
         protected HitObjectComposer()
         {
