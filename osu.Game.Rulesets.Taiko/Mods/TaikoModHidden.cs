@@ -91,6 +91,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
             originalSliderMultiplier = difficulty.SliderMultiplier;
+
+            // the hidden mod on stable had an added playfield cover that essentially forced a 4:3 playfield ratio, by cutting off all objects past that size.
+            // lazer currently uses a playfield adjustment container which keeps a 16:9 ratio.
+            // therefore, increase the slider multiplier proportionally so that the notes stay on the screen for the same amount of time as on stable.
+            // note that this will means that the notes will scroll faster as they have a longer distance to travel on the screen in that same amount of time.
             difficulty.SliderMultiplier /= hd_sv_scale;
         }
 
