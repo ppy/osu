@@ -67,14 +67,31 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             Seed.Value ??= RNG.Next();
 
-            var rng = new Random(Seed.Value.GetValueOrDefault());
-
-            float nextSingle(float max = 1f) => (float)(rng.NextDouble() * max);
-
             var osuBeatmap = (OsuBeatmap)beatmap;
             var origHitObjects = osuBeatmap.HitObjects.OrderBy(x => x.StartTime).ToList();
 
-            // Only place circles between startTime and endTime
+            var hitObjects = generateBeats(osuBeatmap, origHitObjects)
+                             .Select(x =>
+                             {
+                                 var newCircle = new HitCircle();
+                                 newCircle.ApplyDefaults(osuBeatmap.ControlPointInfo, osuBeatmap.BeatmapInfo.BaseDifficulty);
+                                 newCircle.StartTime = x;
+                                 return (OsuHitObject)newCircle;
+                             }).ToList();
+
+            addHitSamples(hitObjects, origHitObjects);
+
+            fixComboInfo(hitObjects, origHitObjects);
+
+            randomizeCirclePos(hitObjects);
+
+            osuBeatmap.HitObjects = hitObjects;
+
+            base.ApplyToBeatmap(beatmap);
+        }
+
+        private IEnumerable<double> generateBeats(IBeatmap beatmap, IReadOnlyCollection<OsuHitObject> origHitObjects)
+        {
             var startTime = origHitObjects.First().StartTime;
             var endObj = origHitObjects.Last();
             var endTime = endObj switch
@@ -84,48 +101,45 @@ namespace osu.Game.Rulesets.Osu.Mods
                 _ => endObj.StartTime
             };
 
-            // Generate the beats
-            var beats = osuBeatmap.ControlPointInfo.TimingPoints
-                                  .Where(x => Precision.AlmostBigger(endTime, x.Time))
-                                  .SelectMany(tp =>
-                                  {
-                                      var tpBeats = new List<double>();
-                                      var currentTime = tp.Time;
+            var beats = beatmap.ControlPointInfo.TimingPoints
+                               .Where(x => Precision.AlmostBigger(endTime, x.Time))
+                               .SelectMany(tp =>
+                               {
+                                   var tpBeats = new List<double>();
+                                   var currentTime = tp.Time;
 
-                                      while (Precision.AlmostBigger(endTime, currentTime) && osuBeatmap.ControlPointInfo.TimingPointAt(currentTime) == tp)
-                                      {
-                                          tpBeats.Add(currentTime);
-                                          currentTime += tp.BeatLength;
-                                      }
+                                   while (Precision.AlmostBigger(endTime, currentTime) && beatmap.ControlPointInfo.TimingPointAt(currentTime) == tp)
+                                   {
+                                       tpBeats.Add(currentTime);
+                                       currentTime += tp.BeatLength;
+                                   }
 
-                                      return tpBeats;
-                                  })
-                                  // Remove beats that are before startTime
-                                  .Where(x => Precision.AlmostBigger(x, startTime))
-                                  // Remove beats during breaks
-                                  .Where(x => !osuBeatmap.Breaks.Any(b =>
-                                      Precision.AlmostBigger(x, b.StartTime)
-                                      && Precision.AlmostBigger(origHitObjects.First(y => Precision.AlmostBigger(y.StartTime, b.EndTime)).StartTime, x)
-                                  ))
-                                  .ToList();
-            // Generate a hit circle for each beat
-            var hitObjects = beats
-                             // Remove beats that are too close to the next one (e.g. due to timing point changes)
-                             .Where((x, idx) =>
-                             {
-                                 if (idx == beats.Count - 1) return true;
+                                   return tpBeats;
+                               })
+                               .Where(x => Precision.AlmostBigger(x, startTime))
+                               // Remove beats during breaks
+                               .Where(x => !beatmap.Breaks.Any(b =>
+                                   Precision.AlmostBigger(x, b.StartTime)
+                                   && Precision.AlmostBigger(origHitObjects.First(y => Precision.AlmostBigger(y.StartTime, b.EndTime)).StartTime, x)
+                               ))
+                               .ToList();
 
-                                 return !Precision.AlmostBigger(osuBeatmap.ControlPointInfo.TimingPointAt(x).BeatLength / 2, beats[idx + 1] - x);
-                             })
-                             .Select(x =>
-                             {
-                                 var newCircle = new HitCircle();
-                                 newCircle.ApplyDefaults(osuBeatmap.ControlPointInfo, osuBeatmap.BeatmapInfo.BaseDifficulty);
-                                 newCircle.StartTime = x;
-                                 return (OsuHitObject)newCircle;
-                             }).ToList();
+            // Remove beats that are too close to the next one (e.g. due to timing point changes)
+            for (int i = beats.Count - 2; i >= 0; i--)
+            {
+                var beat = beats[i];
 
-            // Add hit samples to the circles
+                if (Precision.AlmostBigger(beatmap.ControlPointInfo.TimingPointAt(beat).BeatLength / 2, beats[i + 1] - beat))
+                {
+                    beats.RemoveAt(i);
+                }
+            }
+
+            return beats;
+        }
+
+        private void addHitSamples(IReadOnlyList<OsuHitObject> hitObjects, IReadOnlyCollection<OsuHitObject> origHitObjects)
+        {
             for (int i = 0; i < hitObjects.Count; i++)
             {
                 var x = hitObjects[i];
@@ -141,8 +155,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                     x.Samples = samples;
                 }
             }
+        }
 
-            // Process combo numbers
+        private void fixComboInfo(List<OsuHitObject> hitObjects, List<OsuHitObject> origHitObjects)
+        {
             // First follow the combo indices in the original beatmap
             hitObjects.ForEach(x =>
             {
@@ -165,8 +181,14 @@ namespace osu.Game.Rulesets.Osu.Mods
                     x.IndexInCurrentCombo = j;
                 }
             }
+        }
 
-            // Position all hit circles
+        private void randomizeCirclePos(IReadOnlyList<OsuHitObject> hitObjects)
+        {
+            var rng = new Random(Seed.Value.GetValueOrDefault());
+
+            float nextSingle(float max = 1f) => (float)(rng.NextDouble() * max);
+
             var direction = MathHelper.TwoPi * nextSingle();
 
             for (int i = 0; i < hitObjects.Count; i++)
@@ -206,10 +228,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                         direction += distance / max_distance * (nextSingle() * MathHelper.TwoPi - MathHelper.Pi);
                 }
             }
-
-            osuBeatmap.HitObjects = hitObjects;
-
-            base.ApplyToBeatmap(beatmap);
         }
 
         /// <summary>
