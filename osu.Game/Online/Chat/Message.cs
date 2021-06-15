@@ -63,5 +63,7 @@ namespace osu.Game.Online.Chat
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
         public override int GetHashCode() => Id.GetHashCode();
+
+        public override string ToString() => $"[{ChannelId}] ({Id}) {Sender}: {Content}";
     }
 }

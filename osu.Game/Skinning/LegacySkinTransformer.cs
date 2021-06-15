@@ -53,8 +53,8 @@ namespace osu.Game.Skinning
 
         public event Action SourceChanged
         {
-            add { throw new NotSupportedException(); }
-            remove { }
+            add => Source.SourceChanged += value;
+            remove => Source.SourceChanged -= value;
         }
     }
 }
