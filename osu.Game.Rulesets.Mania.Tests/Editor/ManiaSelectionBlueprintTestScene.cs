@@ -30,10 +30,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             set => scrollingTestContainer.Direction = value;
         }
 
-        protected ManiaSelectionBlueprintTestScene()
+        protected ManiaSelectionBlueprintTestScene(int columns)
         {
-            var stageDefinitions = new List<StageDefinition> { new StageDefinition { Columns = 1 } };
-            base.Content.Child = scrollingTestContainer = new ScrollingTestContainer(ScrollingDirection.Down)
+            var stageDefinitions = new List<StageDefinition> { new StageDefinition { Columns = columns } };
+            base.Content.Child = scrollingTestContainer = new ScrollingTestContainer(ScrollingDirection.Up)
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
@@ -48,6 +48,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                     }
                 }
             };
+
+            AddToggleStep("Downward scroll", b => Direction = b ? ScrollingDirection.Down : ScrollingDirection.Up);
         }
     }
 }

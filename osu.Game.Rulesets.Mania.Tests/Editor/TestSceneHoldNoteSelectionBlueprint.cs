@@ -12,13 +12,22 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
     public class TestSceneHoldNoteSelectionBlueprint : ManiaSelectionBlueprintTestScene
     {
         public TestSceneHoldNoteSelectionBlueprint()
+            : base(4)
         {
-            var holdNote = new HoldNote { Column = 0, Duration = 500 };
-            holdNote.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            for (int i = 0; i < 4; i++)
+            {
+                var holdNote = new HoldNote
+                {
+                    Column = i,
+                    StartTime = i * 100,
+                    Duration = 500
+                };
+                holdNote.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            var drawableHitObject = new DrawableHoldNote(holdNote);
-            Playfield.Add(drawableHitObject);
-            AddBlueprint(new HoldNoteSelectionBlueprint(holdNote), drawableHitObject);
+                var drawableHitObject = new DrawableHoldNote(holdNote);
+                Playfield.Add(drawableHitObject);
+                AddBlueprint(new HoldNoteSelectionBlueprint(holdNote), drawableHitObject);
+            }
         }
     }
 }
