@@ -20,15 +20,7 @@ build:
   publish_nuget: true
 
 after_build:
-  - cmd: dotnet tool restore
-
-  # Temporarily disabled until the tool is upgraded to 5.0.
-  # The version specified in .config/dotnet-tools.json (3.1.37601) won't run on .NET hosts >=5.0.7.
-  # - cmd: dotnet format --dry-run --check
-
-  - cmd: dotnet CodeFileSanity
-  - cmd: dotnet jb inspectcode "osu.Desktop.slnf" --output="temp/inspectcodereport.xml" --caches-home="temp/inspectcode" --verbosity=WARN
-  - cmd: dotnet nvika parsereport "temp/inspectcodereport.xml" --treatwarningsaserrors
+  - ps: .\InspectCode.ps1
 
 test:
   assemblies:
