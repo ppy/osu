@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
                 // DrawableHitObject sets LifetimeEnd to LatestTransformEndTime if it isn't manually changed.
                 // in order for the object to not be killed before its actual end time (as the latest transform ends earlier), set lifetime end explicitly.
-                hitObject.LifetimeEnd = state == ArmedState.Idle
+                hitObject.LifetimeEnd = state == ArmedState.Idle || !hitObject.AllJudged
                     ? hitObject.HitObject.GetEndTime() + hitObject.HitObject.HitWindows.WindowFor(HitResult.Miss)
                     : hitObject.HitStateUpdateTime;
             }
