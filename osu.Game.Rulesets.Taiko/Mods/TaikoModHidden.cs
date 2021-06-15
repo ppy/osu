@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         /// </summary>
         private const double hd_sv_scale = (4.0 / 3.0 - 1.0 / 3.0) / (16.0 / 9.0 - 1.0 / 3.0);
 
-        private BeatmapDifficulty difficulty;
+        private double originalSliderMultiplier;
         private ControlPointInfo controlPointInfo;
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             var beatLength = controlPointInfo.TimingPointAt(position)?.BeatLength;
             var speedMultiplier = controlPointInfo.DifficultyPointAt(position)?.SpeedMultiplier;
-            return difficulty.SliderMultiplier * (speedMultiplier ?? 1.0) * TimingControlPoint.DEFAULT_BEAT_LENGTH / (beatLength ?? TimingControlPoint.DEFAULT_BEAT_LENGTH);
+            return originalSliderMultiplier * (speedMultiplier ?? 1.0) * TimingControlPoint.DEFAULT_BEAT_LENGTH / (beatLength ?? TimingControlPoint.DEFAULT_BEAT_LENGTH);
         }
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
@@ -68,8 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     return;
             }
 
-            // I *think* it's like this because stable's default velocity multiplier is 1.4
-            var preempt = 14000 / MultiplierAt(hitObject.HitObject.StartTime) * FadeOutTimeMultiplier.Value;
+            var preempt = 10000 / MultiplierAt(hitObject.HitObject.StartTime) * FadeOutTimeMultiplier.Value;
             var start = hitObject.HitObject.StartTime - preempt * 0.6;
             var duration = preempt * 0.3;
 
@@ -91,7 +90,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
-            this.difficulty = difficulty;
+            originalSliderMultiplier = difficulty.SliderMultiplier;
             difficulty.SliderMultiplier /= hd_sv_scale;
         }
 
