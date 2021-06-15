@@ -14,14 +14,5 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             AddInternal(new EditNotePiece { RelativeSizeAxes = Axes.X });
         }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // Todo: This shouldn't exist, mania should not reference the drawable hitobject directly.
-            if (DrawableObject.IsLoaded)
-                Size = DrawableObject.DrawSize;
-        }
     }
 }
