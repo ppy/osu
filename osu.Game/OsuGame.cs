@@ -426,7 +426,6 @@ namespace osu.Game
         {
             // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
             // to ensure all the required data for presenting a replay are present.
-            // Todo: This should use the OnlineScoreID if available, however lazer scores are imported without an OnlineScoreID for the time being (see Player.ImportScore()).
             ScoreInfo databasedScoreInfo = null;
 
             if (score.OnlineScoreID != null)
