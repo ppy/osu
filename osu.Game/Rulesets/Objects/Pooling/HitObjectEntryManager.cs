@@ -25,45 +25,75 @@ namespace osu.Game.Rulesets.Objects.Pooling
         private readonly Func<HitObject, HitObjectLifetimeEntry> createLifetimeEntry;
 
         private readonly Dictionary<HitObject, HitObjectLifetimeEntry> entryMap = new Dictionary<HitObject, HitObjectLifetimeEntry>();
-        private readonly Dictionary<HitObject, HitObject> parentMap = new Dictionary<HitObject, HitObject>();
+        private readonly Dictionary<HitObjectLifetimeEntry, HitObject?> parentMap = new Dictionary<HitObjectLifetimeEntry, HitObject?>();
+        private readonly Dictionary<HitObject, List<HitObjectLifetimeEntry>> childrenMap = new Dictionary<HitObject, List<HitObjectLifetimeEntry>>();
 
         public HitObjectEntryManager(Func<HitObject, HitObjectLifetimeEntry> createLifetimeEntry)
         {
             this.createLifetimeEntry = createLifetimeEntry;
         }
 
-        public HitObjectLifetimeEntry Add(HitObject hitObject, HitObject? parentHitObject)
+        public HitObjectLifetimeEntry Add(HitObject hitObject, HitObject? parent)
         {
-            if (parentHitObject != null && !entryMap.TryGetValue(parentHitObject, out var parentEntry))
-                throw new InvalidOperationException($@"The parent {nameof(HitObject)} must be added to this {nameof(HitObjectEntryManager)} before nested {nameof(HitObject)} is added.");
-
             if (entryMap.ContainsKey(hitObject))
                 throw new InvalidOperationException($@"The {nameof(HitObject)} is already added to this {nameof(HitObjectEntryManager)}.");
 
-            if (parentHitObject != null)
-                parentMap[hitObject] = parentHitObject;
-
             var entry = createLifetimeEntry(hitObject);
             entryMap[hitObject] = entry;
+            parentMap[entry] = parent;
 
-            OnEntryAdded?.Invoke(entry, parentHitObject);
+            if (parent != null && childrenMap.TryGetValue(parent, out var parentChildEntries))
+                parentChildEntries.Add(entry);
+
+            hitObject.DefaultsApplied += onDefaultsApplied;
+
+            childrenMap[entry.HitObject] = new List<HitObjectLifetimeEntry>();
+
+            OnEntryAdded?.Invoke(entry, parent);
             return entry;
         }
 
         public bool Remove(HitObject hitObject)
         {
-            if (!entryMap.TryGetValue(hitObject, out var entry))
+            if (!entryMap.Remove(hitObject, out var entry))
                 return false;
 
-            parentMap.Remove(hitObject, out var parentHitObject);
+            parentMap.Remove(entry, out var parent);
 
-            OnEntryRemoved?.Invoke(entry, parentHitObject);
+            if (parent != null && childrenMap.TryGetValue(parent, out var parentChildEntries))
+                parentChildEntries.Remove(entry);
+
+            hitObject.DefaultsApplied -= onDefaultsApplied;
+
+            // Remove all entries of the nested hit objects
+            if (childrenMap.Remove(entry.HitObject, out var childEntries))
+            {
+                foreach (var childEntry in childEntries)
+                    Remove(childEntry.HitObject);
+            }
+
+            OnEntryRemoved?.Invoke(entry, parent);
             return true;
         }
 
         public bool TryGet(HitObject hitObject, [MaybeNullWhen(false)] out HitObjectLifetimeEntry entry)
         {
             return entryMap.TryGetValue(hitObject, out entry);
+        }
+
+        /// <summary>
+        /// As nested hit objects are recreated, remove entries of the old nested hit objects.
+        /// </summary>
+        private void onDefaultsApplied(HitObject hitObject)
+        {
+            if (!childrenMap.Remove(hitObject, out var childEntries))
+                return;
+
+            foreach (var entry in childEntries)
+                Remove(entry.HitObject);
+
+            childEntries.Clear();
+            childrenMap[hitObject] = childEntries;
         }
     }
 }
