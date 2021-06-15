@@ -1,31 +1,53 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Timing;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    public abstract class ManiaSelectionBlueprintTestScene : SelectionBlueprintTestScene
+    [Cached(typeof(IPlayfieldProvider))]
+    public abstract class ManiaSelectionBlueprintTestScene : SelectionBlueprintTestScene, IPlayfieldProvider
     {
-        [Cached(Type = typeof(IAdjustableClock))]
-        private readonly IAdjustableClock clock = new StopwatchClock();
+        protected override Container<Drawable> Content => blueprints ?? base.Content;
+
+        private readonly Container blueprints;
+
+        public Playfield Playfield { get; }
+
+        private readonly ScrollingTestContainer scrollingTestContainer;
+
+        protected ScrollingDirection Direction
+        {
+            set => scrollingTestContainer.Direction = value;
+        }
 
         protected ManiaSelectionBlueprintTestScene()
         {
-            Add(new Column(0)
+            var stageDefinitions = new List<StageDefinition> { new StageDefinition { Columns = 1 } };
+            base.Content.Child = scrollingTestContainer = new ScrollingTestContainer(ScrollingDirection.Down)
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                AccentColour = Color4.OrangeRed,
-                Clock = new FramedClock(new StopwatchClock()), // No scroll
-            });
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    Playfield = new ManiaPlayfield(stageDefinitions)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    blueprints = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    }
+                }
+            };
         }
-
-        public ManiaPlayfield Playfield => null;
     }
 }
