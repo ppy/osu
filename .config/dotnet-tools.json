@@ -27,7 +27,7 @@
       ]
     },
     "codefilesanity": {
-      "version": "15.0.0",
+      "version": "0.0.36",
       "commands": [
         "CodeFileSanity"
       ]
