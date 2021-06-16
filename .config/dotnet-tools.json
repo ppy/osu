@@ -2,12 +2,6 @@
   "version": 1,
   "isRoot": true,
   "tools": {
-    "cake.tool": {
-      "version": "0.35.0",
-      "commands": [
-        "dotnet-cake"
-      ]
-    },
     "dotnet-format": {
       "version": "3.1.37601",
       "commands": [
@@ -20,20 +14,20 @@
         "jb"
       ]
     },
-    "nvika": {
-      "version": "2.0.0",
+    "smoogipoo.nvika": {
+      "version": "1.0.1",
       "commands": [
         "nvika"
       ]
     },
     "codefilesanity": {
-      "version": "15.0.0",
+      "version": "0.0.36",
       "commands": [
         "CodeFileSanity"
       ]
     },
     "ppy.localisationanalyser.tools": {
-      "version": "2021.524.0",
+      "version": "2021.608.0",
       "commands": [
         "localisation"
       ]

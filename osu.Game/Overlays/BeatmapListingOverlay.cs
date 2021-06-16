@@ -18,6 +18,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.BeatmapListing.Panels;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -232,7 +233,7 @@ namespace osu.Game.Overlays
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = @"... nope, nothing found.",
+                            Text = BeatmapsStrings.ListingSearchNotFoundQuote,
                         }
                     }
                 });

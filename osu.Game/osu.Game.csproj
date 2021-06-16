@@ -30,12 +30,12 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.NETCore.Targets" Version="3.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="ppy.LocalisationAnalyser" Version="2021.525.0">
+    <PackageReference Include="ppy.LocalisationAnalyser" Version="2021.608.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="ppy.osu.Framework" Version="2021.609.0" />
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2021.604.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2021.614.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2021.614.0" />
     <PackageReference Include="Sentry" Version="3.4.0" />
     <PackageReference Include="SharpCompress" Version="0.28.2" />
     <PackageReference Include="NUnit" Version="3.13.2" />
