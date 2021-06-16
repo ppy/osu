@@ -16,6 +16,9 @@ namespace osu.Game.Rulesets.Catch.UI
     /// </summary>
     public class SkinnableCatcher : SkinnableDrawable
     {
+        /// <summary>
+        /// This is used by skin elements to determine which texture of the catcher is used.
+        /// </summary>
         [Cached]
         public readonly Bindable<CatcherAnimationState> AnimationState = new Bindable<CatcherAnimationState>();
 
