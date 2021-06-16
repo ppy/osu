@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
+using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -30,7 +31,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // We are reducing the highest strains first to account for extreme difficulty spikes
             for (int i = 0; i < ReducedSectionCount; i++)
             {
-                strains[i] *= ReducedStrainBaseline + Math.Log10(i * 9.0 / ReducedSectionCount + 1) * (1.0 - ReducedStrainBaseline);
+                strains[i] *= ReducedStrainBaseline
+                              + Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((float)i / ReducedSectionCount, 0, 1)))
+                              * (1.0 - ReducedStrainBaseline);
             }
 
             // Difficulty is the weighted sum of the highest strains from every section.
