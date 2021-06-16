@@ -7,17 +7,17 @@ namespace osu.Game.Localisation
 {
     public static class NotificationsStrings
     {
-        private const string prefix = "osu.Game.Localisation.Notifications";
+        private const string prefix = @"osu.Game.Localisation.Notifications";
 
         /// <summary>
         /// "notifications"
         /// </summary>
-        public static LocalisableString HeaderTitle => new TranslatableString(getKey("header_title"), "notifications");
+        public static LocalisableString HeaderTitle => new TranslatableString(getKey(@"header_title"), @"notifications");
 
         /// <summary>
         /// "waiting for 'ya"
         /// </summary>
-        public static LocalisableString HeaderDescription => new TranslatableString(getKey("header_description"), "waiting for 'ya");
+        public static LocalisableString HeaderDescription => new TranslatableString(getKey(@"header_description"), @"waiting for 'ya");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }
