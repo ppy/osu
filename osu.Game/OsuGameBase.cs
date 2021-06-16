@@ -195,6 +195,15 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Torus-SemiBold");
             AddFont(Resources, @"Fonts/Torus-Bold");
 
+            AddFont(Resources, @"Fonts/Inter-Regular");
+            AddFont(Resources, @"Fonts/Inter-RegularItalic");
+            AddFont(Resources, @"Fonts/Inter-Light");
+            AddFont(Resources, @"Fonts/Inter-LightItalic");
+            AddFont(Resources, @"Fonts/Inter-SemiBold");
+            AddFont(Resources, @"Fonts/Inter-SemiBoldItalic");
+            AddFont(Resources, @"Fonts/Inter-Bold");
+            AddFont(Resources, @"Fonts/Inter-BoldItalic");
+
             AddFont(Resources, @"Fonts/Noto-Basic");
             AddFont(Resources, @"Fonts/Noto-Hangul");
             AddFont(Resources, @"Fonts/Noto-CJK-Basic");
