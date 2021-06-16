@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.BeatmapListing
@@ -10,7 +11,7 @@ namespace osu.Game.Overlays.BeatmapListing
     public class BeatmapSearchRulesetFilterRow : BeatmapSearchFilterRow<RulesetInfo>
     {
         public BeatmapSearchRulesetFilterRow()
-            : base(@"Mode")
+            : base(BeatmapsStrings.ListingSearchFiltersMode)
         {
         }
 
