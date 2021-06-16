@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </remarks>
         public double TimeAtPosition(float localPosition, double currentTime)
         {
-            float scrollPosition = axisInverted ? scrollLength - localPosition : localPosition;
+            float scrollPosition = axisInverted ? -localPosition : localPosition;
             return scrollingInfo.Algorithm.TimeAt(scrollPosition, currentTime, timeRange.Value, scrollLength);
         }
 
@@ -81,8 +81,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </remarks>
         public double TimeAtScreenSpacePosition(Vector2 screenSpacePosition)
         {
-            Vector2 localPosition = ToLocalSpace(screenSpacePosition);
-            return TimeAtPosition(scrollingAxis == Direction.Horizontal ? localPosition.X : localPosition.Y, Time.Current);
+            Vector2 pos = ToLocalSpace(screenSpacePosition);
+            float localPosition = scrollingAxis == Direction.Horizontal ? pos.X : pos.Y;
+            localPosition -= axisInverted ? scrollLength : 0;
+            return TimeAtPosition(localPosition, Time.Current);
         }
 
         /// <summary>
@@ -91,7 +93,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         public float PositionAtTime(double time, double currentTime)
         {
             float scrollPosition = scrollingInfo.Algorithm.PositionAt(time, currentTime, timeRange.Value, scrollLength);
-            return axisInverted ? scrollLength - scrollPosition : scrollPosition;
+            return axisInverted ? -scrollPosition : scrollPosition;
         }
 
         /// <summary>
@@ -106,6 +108,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         public Vector2 ScreenSpacePositionAtTime(double time)
         {
             float localPosition = PositionAtTime(time, Time.Current);
+            localPosition += axisInverted ? scrollLength : 0;
             return scrollingAxis == Direction.Horizontal
                 ? ToScreenSpace(new Vector2(localPosition, DrawHeight / 2))
                 : ToScreenSpace(new Vector2(DrawWidth / 2, localPosition));
@@ -236,14 +239,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             float position = PositionAtTime(hitObject.HitObject.StartTime, currentTime);
 
-            // The position returned from `PositionAtTime` is assuming the `TopLeft` anchor.
-            // A correction is needed because the hit objects are using a different anchor for each direction (e.g. `BottomCentre` for `Bottom` direction).
-            float anchorCorrection = axisInverted ? scrollLength : 0;
-
             if (scrollingAxis == Direction.Horizontal)
-                hitObject.X = position - anchorCorrection;
+                hitObject.X = position;
             else
-                hitObject.Y = position - anchorCorrection;
+                hitObject.Y = position;
         }
     }
 }
