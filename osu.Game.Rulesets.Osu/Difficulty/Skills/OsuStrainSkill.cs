@@ -12,8 +12,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public abstract class OsuStrainSkill : StrainSkill
     {
         protected virtual int ReducedSectionCount => 10;
-        protected virtual double ReducedStrainBaseline => 0.7;
-        protected virtual double DifficultyMultiplier => 1.08;
+        protected virtual double ReducedStrainBaseline => 0.75;
+        protected virtual double DifficultyMultiplier => 1.06;
 
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
