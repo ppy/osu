@@ -50,8 +50,10 @@ using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Localisation;
+using osu.Game.Performance;
 using osu.Game.Skinning.Editor;
 
 namespace osu.Game
@@ -487,6 +489,8 @@ namespace osu.Game
 
         protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
 
+        protected virtual HighPerformanceSession CreateHighPerformanceSession() => new HighPerformanceSession();
+
         protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
 
         #region Beatmap progression
@@ -580,7 +584,7 @@ namespace osu.Game
 
             foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
             {
-                var cultureCode = language.ToString();
+                var cultureCode = language.ToCultureCode();
                 Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
             }
 
@@ -754,6 +758,8 @@ namespace osu.Game
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(new DialogOverlay(), topMostOverlayContent.Add, true);
+
+            loadComponentSingleFile(CreateHighPerformanceSession(), Add);
 
             chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
