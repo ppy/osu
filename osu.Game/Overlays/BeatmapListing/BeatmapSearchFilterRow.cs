@@ -11,8 +11,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
-using Humanizer;
 using osu.Framework.Extensions.EnumExtensions;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapListing
             set => current.Current = value;
         }
 
-        public BeatmapSearchFilterRow(string headerName)
+        public BeatmapSearchFilterRow(LocalisableString header)
         {
             Drawable filter;
             AutoSizeAxes = Axes.Y;
@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.BeatmapListing
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Font = OsuFont.GetFont(size: 13),
-                            Text = headerName.Titleize()
+                            Text = header
                         },
                         filter = CreateFilter()
                     }
