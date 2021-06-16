@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -22,18 +21,16 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon { get; } = FontAwesome.Regular.Circle;
 
-        [SettingSource("Style", "Change the animation style of the approach circles.", 0)]
-        public Bindable<AnimationStyle> Style { get; } = new Bindable<AnimationStyle>();
-
-        [SettingSource("Initial size", "Change the initial size of the approach circle, relative to hit circles.", 1)]
-        public BindableFloat Scale { get; } = new BindableFloat
+        [SettingSource("Initial size", "Change the initial size of the approach circle, relative to hit circles.", 0)]
+        public BindableFloat Scale { get; } = new BindableFloat(4)
         {
             Precision = 0.1f,
             MinValue = 2,
             MaxValue = 10,
-            Default = 4,
-            Value = 4
         };
+
+        [SettingSource("Style", "Change the animation style of the approach circles.", 1)]
+        public Bindable<AnimationStyle> Style { get; } = new Bindable<AnimationStyle>();
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
