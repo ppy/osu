@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModDifferentApproach : Mod, IApplicableToDrawableHitObjects
+    public class OsuModApproachDifferent : Mod, IApplicableToDrawableHitObjects
     {
         public override string Name => "Approach Different";
         public override string Acronym => "AD";
