@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.BeatmapListing
                     return BeatmapsStrings.LanguagePolish;
 
                 case SearchLanguage.Other:
-                    return BeatmapsStrings.GenreOther;
+                    return BeatmapsStrings.LanguageOther;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), value, null);
