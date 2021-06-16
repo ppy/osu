@@ -2,16 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
     public class SettingsNumberBox : SettingsItem<string>
     {
-        protected override Drawable CreateControl() => new OsuNumberBox
+        protected override Drawable CreateControl() => new NumberBox
         {
             Margin = new MarginPadding { Top = 5 },
             RelativeSizeAxes = Axes.X,
         };
+
+        public class NumberBox : SettingsTextBox.TextBox
+        {
+            protected override bool CanAddCharacter(char character) => char.IsNumber(character);
+        }
     }
 }
