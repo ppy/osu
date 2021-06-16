@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.UI
         [Resolved(CanBeNull = true)]
         private IReadOnlyList<Mod> mods { get; set; }
 
-        private readonly HitObjectEntryManager entryManager;
+        private readonly HitObjectEntryManager entryManager = new HitObjectEntryManager();
 
         /// <summary>
         /// Creates a new <see cref="Playfield"/>.
@@ -112,7 +112,6 @@ namespace osu.Game.Rulesets.UI
                 h.HitObjectUsageFinished += o => HitObjectUsageFinished?.Invoke(o);
             }));
 
-            entryManager = new HitObjectEntryManager(CreateLifetimeEntry);
             entryManager.OnEntryAdded += onEntryAdded;
             entryManager.OnEntryRemoved += onEntryRemoved;
         }
@@ -271,7 +270,8 @@ namespace osu.Game.Rulesets.UI
         /// <param name="hitObject"></param>
         public virtual void Add(HitObject hitObject)
         {
-            entryManager.Add(hitObject, null);
+            var entry = CreateLifetimeEntry(hitObject);
+            entryManager.Add(entry, null);
         }
 
         private void preloadSamples(HitObject hitObject)
@@ -294,7 +294,13 @@ namespace osu.Game.Rulesets.UI
         /// <returns>Whether the <see cref="HitObject"/> was successfully removed.</returns>
         public virtual bool Remove(HitObject hitObject)
         {
-            return entryManager.Remove(hitObject) || nestedPlayfields.Any(p => p.Remove(hitObject));
+            if (entryManager.TryGet(hitObject, out var entry))
+            {
+                entryManager.Remove(entry);
+                return true;
+            }
+
+            return nestedPlayfields.Any(p => p.Remove(hitObject));
         }
 
         private void onEntryAdded(HitObjectLifetimeEntry entry, [CanBeNull] HitObject parentHitObject)
@@ -378,7 +384,10 @@ namespace osu.Game.Rulesets.UI
                 }
 
                 if (!entryManager.TryGet(hitObject, out var entry))
-                    entry = entryManager.Add(hitObject, parent?.HitObject);
+                {
+                    entry = CreateLifetimeEntry(hitObject);
+                    entryManager.Add(entry, parent?.HitObject);
+                }
 
                 dho.ParentHitObject = parent;
                 dho.Apply(entry);

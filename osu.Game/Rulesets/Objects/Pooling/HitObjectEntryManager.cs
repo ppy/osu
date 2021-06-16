@@ -31,8 +31,6 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// </summary>
         public event Action<HitObjectLifetimeEntry, HitObject?>? OnEntryRemoved;
 
-        private readonly Func<HitObject, HitObjectLifetimeEntry> createLifetimeEntry;
-
         /// <summary>
         /// Provides the reverse mapping of <see cref="HitObjectLifetimeEntry.HitObject"/> for each entry.
         /// </summary>
@@ -53,37 +51,33 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// </summary>
         private readonly Dictionary<HitObject, List<HitObjectLifetimeEntry>> childrenMap = new Dictionary<HitObject, List<HitObjectLifetimeEntry>>();
 
-        public HitObjectEntryManager(Func<HitObject, HitObjectLifetimeEntry> createLifetimeEntry)
+        public void Add(HitObjectLifetimeEntry entry, HitObject? parent)
         {
-            this.createLifetimeEntry = createLifetimeEntry;
-        }
+            if (parentMap.ContainsKey(entry))
+                throw new InvalidOperationException($@"The {nameof(HitObjectLifetimeEntry)} is already added to this {nameof(HitObjectEntryManager)}.");
 
-        public HitObjectLifetimeEntry Add(HitObject hitObject, HitObject? parent)
-        {
-            if (entryMap.ContainsKey(hitObject))
-                throw new InvalidOperationException($@"The {nameof(HitObject)} is already added to this {nameof(HitObjectEntryManager)}.");
-
-            var entry = createLifetimeEntry(hitObject);
-            entryMap[hitObject] = entry;
+            var hitObject = entry.HitObject;
             parentMap[entry] = parent;
+            entryMap[hitObject] = entry;
 
             if (parent != null && childrenMap.TryGetValue(parent, out var parentChildEntries))
                 parentChildEntries.Add(entry);
 
             hitObject.DefaultsApplied += onDefaultsApplied;
 
-            childrenMap[entry.HitObject] = new List<HitObjectLifetimeEntry>();
+            childrenMap[hitObject] = new List<HitObjectLifetimeEntry>();
 
             OnEntryAdded?.Invoke(entry, parent);
-            return entry;
         }
 
-        public bool Remove(HitObject hitObject)
+        public void Remove(HitObjectLifetimeEntry entry)
         {
-            if (!entryMap.Remove(hitObject, out var entry))
-                return false;
+            if (!parentMap.ContainsKey(entry))
+                throw new InvalidOperationException($@"The {nameof(HitObjectLifetimeEntry)} is not contained in this {nameof(HitObjectLifetimeEntry)}.");
 
+            var hitObject = entry.HitObject;
             parentMap.Remove(entry, out var parent);
+            entryMap.Remove(hitObject);
 
             if (parent != null && childrenMap.TryGetValue(parent, out var parentChildEntries))
                 parentChildEntries.Remove(entry);
@@ -94,11 +88,10 @@ namespace osu.Game.Rulesets.Objects.Pooling
             if (childrenMap.Remove(entry.HitObject, out var childEntries))
             {
                 foreach (var childEntry in childEntries)
-                    Remove(childEntry.HitObject);
+                    Remove(childEntry);
             }
 
             OnEntryRemoved?.Invoke(entry, parent);
-            return true;
         }
 
         public bool TryGet(HitObject hitObject, [MaybeNullWhen(false)] out HitObjectLifetimeEntry entry)
@@ -115,7 +108,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
                 return;
 
             foreach (var entry in childEntries)
-                Remove(entry.HitObject);
+                Remove(entry);
 
             childEntries.Clear();
             childrenMap[hitObject] = childEntries;
