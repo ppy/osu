@@ -49,28 +49,23 @@ namespace osu.Game.Rulesets.Taiko.Mods
             switch (hitObject)
             {
                 case DrawableDrumRollTick _:
-                    break;
-
                 case DrawableHit _:
+                    double preempt = 10000 / MultiplierAt(hitObject.HitObject.StartTime);
+                    double start = hitObject.HitObject.StartTime - preempt * 0.6;
+                    double duration = preempt * 0.3;
+
+                    using (hitObject.BeginAbsoluteSequence(start))
+                    {
+                        hitObject.FadeOut(duration);
+
+                        // DrawableHitObject sets LifetimeEnd to LatestTransformEndTime if it isn't manually changed.
+                        // in order for the object to not be killed before its actual end time (as the latest transform ends earlier), set lifetime end explicitly.
+                        hitObject.LifetimeEnd = state == ArmedState.Idle || !hitObject.AllJudged
+                            ? hitObject.HitObject.GetEndTime() + hitObject.HitObject.HitWindows.WindowFor(HitResult.Miss)
+                            : hitObject.HitStateUpdateTime;
+                    }
+
                     break;
-
-                default:
-                    return;
-            }
-
-            double preempt = 10000 / MultiplierAt(hitObject.HitObject.StartTime);
-            double start = hitObject.HitObject.StartTime - preempt * 0.6;
-            double duration = preempt * 0.3;
-
-            using (hitObject.BeginAbsoluteSequence(start))
-            {
-                hitObject.FadeOut(duration);
-
-                // DrawableHitObject sets LifetimeEnd to LatestTransformEndTime if it isn't manually changed.
-                // in order for the object to not be killed before its actual end time (as the latest transform ends earlier), set lifetime end explicitly.
-                hitObject.LifetimeEnd = state == ArmedState.Idle || !hitObject.AllJudged
-                    ? hitObject.HitObject.GetEndTime() + hitObject.HitObject.HitWindows.WindowFor(HitResult.Miss)
-                    : hitObject.HitStateUpdateTime;
             }
         }
 
