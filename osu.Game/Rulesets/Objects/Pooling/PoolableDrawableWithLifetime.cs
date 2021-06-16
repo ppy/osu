@@ -5,6 +5,7 @@
 
 using System;
 using System.Diagnostics;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Pooling;
 
@@ -16,14 +17,32 @@ namespace osu.Game.Rulesets.Objects.Pooling
     /// <typeparam name="TEntry">The <see cref="LifetimeEntry"/> type storing state and controlling this drawable.</typeparam>
     public abstract class PoolableDrawableWithLifetime<TEntry> : PoolableDrawable where TEntry : LifetimeEntry
     {
+        private TEntry? entry;
+
         /// <summary>
         /// The entry holding essential state of this <see cref="PoolableDrawableWithLifetime{TEntry}"/>.
         /// </summary>
-        public TEntry? Entry { get; private set; }
+        /// <remarks>
+        /// If a non-null value is set before loading is started, the entry is applied when the loading is completed.
+        /// </remarks>
+        public TEntry? Entry
+        {
+            get => entry;
+
+            set
+            {
+                if (LoadState < LoadState.Ready)
+                    entry = value;
+                else if (value != null)
+                    Apply(value);
+                else if (HasEntryApplied)
+                    free();
+            }
+        }
 
         /// <summary>
         /// Whether <see cref="Entry"/> is applied to this <see cref="PoolableDrawableWithLifetime{TEntry}"/>.
-        /// When an initial entry is specified in the constructor, <see cref="Entry"/> is set but not applied until loading is completed.
+        /// When an <see cref="Entry"/> is set during initialization, it is not applied until loading is completed.
         /// </summary>
         protected bool HasEntryApplied { get; private set; }
 
@@ -65,7 +84,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
         {
             base.LoadAsyncComplete();
 
-            // Apply the initial entry given in the constructor.
+            // Apply the initial entry.
             if (Entry != null && !HasEntryApplied)
                 Apply(Entry);
         }
@@ -79,7 +98,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
             if (HasEntryApplied)
                 free();
 
-            Entry = entry;
+            this.entry = entry;
             entry.LifetimeChanged += setLifetimeFromEntry;
             setLifetimeFromEntry(entry);
 
@@ -113,12 +132,12 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
         private void free()
         {
-            Debug.Assert(Entry != null && HasEntryApplied);
+            Debug.Assert(entry != null && HasEntryApplied);
 
-            OnFree(Entry);
+            OnFree(entry);
 
-            Entry.LifetimeChanged -= setLifetimeFromEntry;
-            Entry = null;
+            entry.LifetimeChanged -= setLifetimeFromEntry;
+            entry = null;
             base.LifetimeStart = double.MinValue;
             base.LifetimeEnd = double.MaxValue;
 
