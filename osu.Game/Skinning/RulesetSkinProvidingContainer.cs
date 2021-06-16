@@ -12,7 +12,7 @@ namespace osu.Game.Skinning
 {
     /// <summary>
     /// A type of <see cref="SkinProvidingContainer"/> that provides access to the beatmap skin and user skin,
-    /// each transformed with the ruleset's own skin transformer individually.
+    /// with each legacy skin source transformed with the ruleset's legacy skin transformer.
     /// </summary>
     public class RulesetSkinProvidingContainer : SkinProvidingContainer
     {
@@ -66,7 +66,7 @@ namespace osu.Game.Skinning
 
         protected ISkin GetRulesetTransformedSkin(ISkin skin)
         {
-            if (skin == null)
+            if (!(skin is LegacySkin))
                 return null;
 
             var rulesetTransformed = Ruleset.CreateLegacySkinProvider(skin, Beatmap);
