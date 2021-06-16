@@ -39,27 +39,23 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             drawables.ForEach(drawable =>
             {
-                drawable.ApplyCustomUpdateState += (drawableHitObj, state) =>
+                drawable.ApplyCustomUpdateState += (drawableObject, state) =>
                 {
-                    if (!(drawableHitObj is DrawableHitCircle hitCircle)) return;
+                    if (!(drawableObject is DrawableHitCircle drawableHitCircle)) return;
 
-                    var obj = hitCircle.HitObject;
+                    var hitCircle = drawableHitCircle.HitObject;
 
-                    hitCircle.BeginAbsoluteSequence(obj.StartTime - obj.TimePreempt, true);
-                    hitCircle.ApproachCircle.ScaleTo(Scale.Value);
+                    drawableHitCircle.ApproachCircle.ClearTransforms(targetMember: nameof(Scale));
 
-                    hitCircle.ApproachCircle.FadeIn(Math.Min(obj.TimeFadeIn, obj.TimePreempt));
-
-                    hitCircle.ApproachCircle.ScaleTo(1f, obj.TimePreempt, getEasing(Style.Value));
-
-                    hitCircle.ApproachCircle.Expire(true);
+                    using (drawableHitCircle.BeginAbsoluteSequence(hitCircle.StartTime - hitCircle.TimePreempt))
+                        drawableHitCircle.ApproachCircle.ScaleTo(Scale.Value).ScaleTo(1f, hitCircle.TimePreempt, getEasing(Style.Value));
                 };
             });
         }
 
-        private Easing getEasing(AnimationStyle approachEasing)
+        private Easing getEasing(AnimationStyle style)
         {
-            switch (approachEasing)
+            switch (style)
             {
                 default:
                     return Easing.None;
