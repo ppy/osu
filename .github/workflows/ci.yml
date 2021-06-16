@@ -89,7 +89,5 @@ jobs:
       - name: InspectCode
         run: dotnet jb inspectcode $(pwd)/osu.Desktop.slnf --output=$(pwd)/inspectcodereport.xml --cachesDir=$(pwd)/inspectcode --verbosity=WARN
 
-      - name: ReSharper
-        uses: glassechidna/resharper-action@master
-        with:
-          report: ${{github.workspace}}/inspectcodereport.xml
+      - name: NVika
+        run: dotnet nvika parsereport "${{github.workspace}}/inspectcodereport.xml" --treatwarningsaserrors
