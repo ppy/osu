@@ -12,6 +12,7 @@ using osu.Game.Online.API.Requests.Responses;
 using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Threading;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Comments
@@ -24,12 +25,13 @@ namespace osu.Game.Overlays.Comments
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
 
-        protected readonly Bindable<User> User = new Bindable<User>();
+        protected readonly IBindable<User> User = new Bindable<User>();
 
         [Resolved]
         private IAPIProvider api { get; set; }
 
         private GetCommentsRequest request;
+        private ScheduledDelegate scheduledCommentsLoad;
         private CancellationTokenSource loadCancellation;
         private int currentPage;
 
@@ -76,21 +78,22 @@ namespace osu.Game.Overlays.Comments
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = colourProvider.Background4
-                                },
                                 new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Vertical,
+                                    Margin = new MarginPadding { Bottom = 20 },
                                     Children = new Drawable[]
                                     {
                                         deletedCommentsCounter = new DeletedCommentsCounter
                                         {
-                                            ShowDeleted = { BindTarget = ShowDeleted }
+                                            ShowDeleted = { BindTarget = ShowDeleted },
+                                            Margin = new MarginPadding
+                                            {
+                                                Horizontal = 70,
+                                                Vertical = 10
+                                            }
                                         },
                                         new Container
                                         {
@@ -100,7 +103,10 @@ namespace osu.Game.Overlays.Comments
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
-                                                Margin = new MarginPadding(5),
+                                                Margin = new MarginPadding
+                                                {
+                                                    Vertical = 10
+                                                },
                                                 Action = getComments,
                                                 IsLoading = true,
                                             }
@@ -152,8 +158,9 @@ namespace osu.Game.Overlays.Comments
 
             request?.Cancel();
             loadCancellation?.Cancel();
+            scheduledCommentsLoad?.Cancel();
             request = new GetCommentsRequest(id.Value, type.Value, Sort.Value, currentPage++, 0);
-            request.Success += onSuccess;
+            request.Success += res => scheduledCommentsLoad = Schedule(() => onSuccess(res));
             api.PerformAsync(request);
         }
 

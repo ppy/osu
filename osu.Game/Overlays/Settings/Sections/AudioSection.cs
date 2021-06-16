@@ -13,9 +13,12 @@ namespace osu.Game.Overlays.Settings.Sections
     {
         public override string Header => "Audio";
 
-        public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(new[] { "sound" });
+        public override Drawable CreateIcon() => new SpriteIcon
+        {
+            Icon = FontAwesome.Solid.VolumeUp
+        };
 
-        public override IconUsage Icon => FontAwesome.Solid.VolumeUp;
+        public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(new[] { "sound" });
 
         public AudioSection()
         {
@@ -24,7 +27,6 @@ namespace osu.Game.Overlays.Settings.Sections
                 new AudioDevicesSettings(),
                 new VolumeSettings(),
                 new OffsetSettings(),
-                new MainMenuSettings()
             };
         }
     }

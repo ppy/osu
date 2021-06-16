@@ -147,7 +147,7 @@ namespace osu.Game.Graphics.UserInterface
 
             public override void DisplayAt(float scale)
             {
-                scale = Math.Clamp(scale, min_star_scale, 1);
+                scale = (float)Interpolation.Lerp(min_star_scale, 1, Math.Clamp(scale, 0, 1));
 
                 this.FadeTo(scale, fading_duration);
                 Icon.ScaleTo(scale, scaling_duration, scaling_easing);

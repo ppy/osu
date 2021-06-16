@@ -2,28 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Multiplayer.RoomStatuses;
-using osu.Game.Screens.Multi.Lounge.Components;
+using osu.Game.Online.Rooms.RoomStatuses;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneLoungeRoomInfo : MultiplayerTestScene
+    public class TestSceneLoungeRoomInfo : RoomTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(RoomInfo)
-        };
-
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
-            Room.CopyFrom(new Room());
-
             Child = new RoomInfo
             {
                 Anchor = Anchor.Centre,

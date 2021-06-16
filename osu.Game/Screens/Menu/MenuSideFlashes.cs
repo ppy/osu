@@ -3,7 +3,6 @@
 
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -16,6 +15,7 @@ using osu.Game.Skinning;
 using osu.Game.Online.API;
 using osu.Game.Users;
 using System;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Menu
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Menu
         private const double box_fade_in_time = 65;
         private const int box_width = 200;
 
-        private Bindable<User> user;
+        private IBindable<User> user;
         private Bindable<Skin> skin;
 
         [Resolved]
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Menu
             skin.BindValueChanged(_ => updateColour(), true);
         }
 
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             if (beatIndex < 0)
                 return;
@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Menu
                 flash(rightBox, timingPoint.BeatLength, effectPoint.KiaiMode, amplitudes);
         }
 
-        private void flash(Drawable d, double beatLength, bool kiai, TrackAmplitudes amplitudes)
+        private void flash(Drawable d, double beatLength, bool kiai, ChannelAmplitudes amplitudes)
         {
             d.FadeTo(Math.Max(0, ((ReferenceEquals(d, leftBox) ? amplitudes.LeftChannel : amplitudes.RightChannel) - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier)), box_fade_in_time)
              .Then()

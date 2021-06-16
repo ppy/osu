@@ -10,13 +10,10 @@ namespace osu.Game.Tests.Visual
 {
     public abstract class ModPerfectTestScene : ModTestScene
     {
-        private readonly Ruleset ruleset;
         private readonly ModPerfect mod;
 
-        protected ModPerfectTestScene(Ruleset ruleset, ModPerfect mod)
-            : base(ruleset)
+        protected ModPerfectTestScene(ModPerfect mod)
         {
-            this.ruleset = ruleset;
             this.mod = mod;
         }
 
@@ -25,7 +22,7 @@ namespace osu.Game.Tests.Visual
             Mod = mod,
             Beatmap = new Beatmap
             {
-                BeatmapInfo = { Ruleset = ruleset.RulesetInfo },
+                BeatmapInfo = { Ruleset = CreatePlayerRuleset().RulesetInfo },
                 HitObjects = { testData.HitObject }
             },
             Autoplay = !shouldMiss,
@@ -41,12 +38,12 @@ namespace osu.Game.Tests.Visual
             {
             }
 
-            protected override bool AllowFail => true;
+            protected override bool CheckModsAllowFailure() => true;
 
             public bool CheckFailed(bool failed)
             {
                 if (!failed)
-                    return ScoreProcessor.HasCompleted && !HealthProcessor.HasFailed;
+                    return ScoreProcessor.HasCompleted.Value && !HealthProcessor.HasFailed;
 
                 return HealthProcessor.HasFailed;
             }

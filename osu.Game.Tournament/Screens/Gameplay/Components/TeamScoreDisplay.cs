@@ -21,7 +21,10 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
 
         private TeamDisplay teamDisplay;
 
-        public bool ShowScore { set => teamDisplay.ShowScore = value; }
+        public bool ShowScore
+        {
+            set => teamDisplay.ShowScore = value;
+        }
 
         public TeamScoreDisplay(TeamColour teamColour)
         {
@@ -35,7 +38,9 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         private void load(LadderInfo ladder)
         {
             currentMatch.BindTo(ladder.CurrentMatch);
-            currentMatch.BindValueChanged(matchChanged, true);
+            currentMatch.BindValueChanged(matchChanged);
+
+            updateMatch();
         }
 
         private void matchChanged(ValueChangedEvent<TournamentMatch> match)
@@ -43,10 +48,19 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             currentTeamScore.UnbindBindings();
             currentTeam.UnbindBindings();
 
-            if (match.NewValue != null)
+            Scheduler.AddOnce(updateMatch);
+        }
+
+        private void updateMatch()
+        {
+            var match = currentMatch.Value;
+
+            if (match != null)
             {
-                currentTeamScore.BindTo(teamColour == TeamColour.Red ? match.NewValue.Team1Score : match.NewValue.Team2Score);
-                currentTeam.BindTo(teamColour == TeamColour.Red ? match.NewValue.Team1 : match.NewValue.Team2);
+                match.StartMatch();
+
+                currentTeamScore.BindTo(teamColour == TeamColour.Red ? match.Team1Score : match.Team2Score);
+                currentTeam.BindTo(teamColour == TeamColour.Red ? match.Team1 : match.Team2);
             }
 
             // team may change to same team, which means score is not in a good state.

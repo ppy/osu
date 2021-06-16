@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected OsuColour Colours { get; private set; }
 
         [Resolved]
-        protected IDistanceSnapProvider SnapProvider { get; private set; }
+        protected IPositionSnapProvider SnapProvider { get; private set; }
 
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var colour = BindableBeatDivisor.GetColourFor(BindableBeatDivisor.GetDivisorForBeatIndex(beatIndex + placementIndex + 1, beatDivisor.Value), Colours);
 
             int repeatIndex = placementIndex / beatDivisor.Value;
-            return colour.MultiplyAlpha(0.5f / (repeatIndex + 1));
+            return ColourInfo.SingleColour(colour).MultiplyAlpha(0.5f / (repeatIndex + 1));
         }
     }
 }

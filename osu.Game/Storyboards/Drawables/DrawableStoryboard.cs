@@ -1,12 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using System.Threading;
 using osuTK;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Platform;
 using osu.Game.IO;
 using osu.Game.Screens.Play;
 
@@ -14,7 +17,15 @@ namespace osu.Game.Storyboards.Drawables
 {
     public class DrawableStoryboard : Container<DrawableStoryboardLayer>
     {
+        [Cached]
         public Storyboard Storyboard { get; }
+
+        /// <summary>
+        /// Whether the storyboard is considered finished.
+        /// </summary>
+        public IBindable<bool> HasStoryboardEnded => hasStoryboardEnded;
+
+        private readonly BindableBool hasStoryboardEnded = new BindableBool();
 
         protected override Container<DrawableStoryboardLayer> Content { get; }
 
@@ -36,6 +47,8 @@ namespace osu.Game.Storyboards.Drawables
 
         public override bool RemoveCompletedTransforms => false;
 
+        private double? lastEventEndTime;
+
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
@@ -44,25 +57,31 @@ namespace osu.Game.Storyboards.Drawables
         public DrawableStoryboard(Storyboard storyboard)
         {
             Storyboard = storyboard;
+
             Size = new Vector2(640, 480);
+
+            bool onlyHasVideoElements = Storyboard.Layers.SelectMany(l => l.Elements).Any(e => !(e is StoryboardVideo));
+
+            Width = Height * (storyboard.BeatmapInfo.WidescreenStoryboard || onlyHasVideoElements ? 16 / 9f : 4 / 3f);
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
             AddInternal(Content = new Container<DrawableStoryboardLayer>
             {
-                Size = new Vector2(640, 480),
+                RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(FileStore fileStore, GameplayClock clock, CancellationToken? cancellationToken)
+        private void load(FileStore fileStore, GameplayClock clock, CancellationToken? cancellationToken, GameHost host)
         {
             if (clock != null)
                 Clock = clock;
 
-            dependencies.Cache(new TextureStore(new TextureLoaderStore(fileStore.Store), false, scaleAdjust: 1));
+            dependencies.Cache(new TextureStore(host.CreateTextureLoaderStore(fileStore.Store), false, scaleAdjust: 1));
 
             foreach (var layer in Storyboard.Layers)
             {
@@ -70,12 +89,22 @@ namespace osu.Game.Storyboards.Drawables
 
                 Add(layer.CreateDrawable());
             }
+
+            lastEventEndTime = Storyboard.LatestEventTime;
         }
+
+        protected override void Update()
+        {
+            base.Update();
+            hasStoryboardEnded.Value = lastEventEndTime == null || Time.Current >= lastEventEndTime;
+        }
+
+        public DrawableStoryboardLayer OverlayLayer => Children.Single(layer => layer.Name == "Overlay");
 
         private void updateLayerVisibility()
         {
             foreach (var layer in Children)
-                layer.Enabled = passing ? layer.Layer.EnabledWhenPassing : layer.Layer.EnabledWhenFailing;
+                layer.Enabled = passing ? layer.Layer.VisibleWhenPassing : layer.Layer.VisibleWhenFailing;
         }
     }
 }

@@ -61,12 +61,12 @@ namespace osu.Game.Tests.Visual.Components
         {
             createPoller(true);
 
-            AddStep("set poll interval to 1", () => poller.TimeBetweenPolls = TimePerAction * safety_adjust);
+            AddStep("set poll interval to 1", () => poller.TimeBetweenPolls.Value = TimePerAction * safety_adjust);
             checkCount(1);
             checkCount(2);
             checkCount(3);
 
-            AddStep("set poll interval to 5", () => poller.TimeBetweenPolls = TimePerAction * safety_adjust * 5);
+            AddStep("set poll interval to 5", () => poller.TimeBetweenPolls.Value = TimePerAction * safety_adjust * 5);
             checkCount(4);
             checkCount(4);
             checkCount(4);
@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.Components
             checkCount(5);
             checkCount(5);
 
-            AddStep("set poll interval to 1", () => poller.TimeBetweenPolls = TimePerAction * safety_adjust);
+            AddStep("set poll interval to 1", () => poller.TimeBetweenPolls.Value = TimePerAction * safety_adjust);
             checkCount(6);
             checkCount(7);
         }
@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Components
         {
             createPoller(false);
 
-            AddStep("set poll interval to 1", () => poller.TimeBetweenPolls = TimePerAction * safety_adjust * 5);
+            AddStep("set poll interval to 1", () => poller.TimeBetweenPolls.Value = TimePerAction * safety_adjust * 5);
             checkCount(0);
             skip();
             checkCount(0);
@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Visual.Components
 
         public class TestSlowPoller : TestPoller
         {
-            protected override Task Poll() => Task.Delay((int)(TimeBetweenPolls / 2f / Clock.Rate)).ContinueWith(_ => base.Poll());
+            protected override Task Poll() => Task.Delay((int)(TimeBetweenPolls.Value / 2f / Clock.Rate)).ContinueWith(_ => base.Poll());
         }
     }
 }
