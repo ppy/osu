@@ -87,6 +87,18 @@ namespace osu.Game.Beatmaps
             base.Purge(items, context);
         }
 
+        public IQueryable<BeatmapSetInfo> BeatmapSetsOverview => ContextFactory.Get().BeatmapSetInfo
+                                                                               .Include(s => s.Metadata)
+                                                                               .Include(s => s.Beatmaps)
+                                                                               .AsNoTracking();
+
+        public IQueryable<BeatmapSetInfo> BeatmapSetsWithoutFiles => ContextFactory.Get().BeatmapSetInfo
+                                                                                   .Include(s => s.Metadata)
+                                                                                   .Include(s => s.Beatmaps).ThenInclude(s => s.Ruleset)
+                                                                                   .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
+                                                                                   .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
+                                                                                   .AsNoTracking();
+
         public IQueryable<BeatmapInfo> Beatmaps =>
             ContextFactory.Get().BeatmapInfo
                           .Include(b => b.BeatmapSet).ThenInclude(s => s.Metadata)

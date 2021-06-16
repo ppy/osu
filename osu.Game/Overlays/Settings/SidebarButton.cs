@@ -11,12 +11,13 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Settings
 {
     public class SidebarButton : OsuButton
     {
-        private readonly SpriteIcon drawableIcon;
+        private readonly ConstrainedIconContainer iconContainer;
         private readonly SpriteText headerText;
         private readonly Box selectionIndicator;
         private readonly Container text;
@@ -30,7 +31,7 @@ namespace osu.Game.Overlays.Settings
             {
                 section = value;
                 headerText.Text = value.Header;
-                drawableIcon.Icon = value.Icon;
+                iconContainer.Icon = value.CreateIcon();
             }
         }
 
@@ -78,7 +79,7 @@ namespace osu.Game.Overlays.Settings
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },
-                        drawableIcon = new SpriteIcon
+                        iconContainer = new ConstrainedIconContainer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,

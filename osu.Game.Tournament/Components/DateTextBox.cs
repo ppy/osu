@@ -10,33 +10,34 @@ namespace osu.Game.Tournament.Components
 {
     public class DateTextBox : SettingsTextBox
     {
-        public new Bindable<DateTimeOffset> Bindable
+        public new Bindable<DateTimeOffset> Current
         {
-            get => bindable;
+            get => current;
             set
             {
-                bindable = value.GetBoundCopy();
-                bindable.BindValueChanged(dto =>
-                    base.Bindable.Value = dto.NewValue.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ"), true);
+                current = value.GetBoundCopy();
+                current.BindValueChanged(dto =>
+                    base.Current.Value = dto.NewValue.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ"), true);
             }
         }
 
         // hold a reference to the provided bindable so we don't have to in every settings section.
-        private Bindable<DateTimeOffset> bindable;
+        private Bindable<DateTimeOffset> current = new Bindable<DateTimeOffset>();
 
         public DateTextBox()
         {
-            base.Bindable = new Bindable<string>();
-            ((OsuTextBox)Control).OnCommit = (sender, newText) =>
+            base.Current = new Bindable<string>();
+
+            ((OsuTextBox)Control).OnCommit += (sender, newText) =>
             {
                 try
                 {
-                    bindable.Value = DateTimeOffset.Parse(sender.Text);
+                    current.Value = DateTimeOffset.Parse(sender.Text);
                 }
                 catch
                 {
                     // reset textbox content to its last valid state on a parse failure.
-                    bindable.TriggerChange();
+                    current.TriggerChange();
                 }
             };
         }

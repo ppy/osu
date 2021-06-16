@@ -63,7 +63,7 @@ namespace osu.Game.Beatmaps.Formats
             if (line == null)
                 throw new IOException("Unknown file format (null)");
 
-            var decoder = typedDecoders.Select(d => line.StartsWith(d.Key, StringComparison.InvariantCulture) ? d.Value : null).FirstOrDefault();
+            var decoder = typedDecoders.Where(d => line.StartsWith(d.Key, StringComparison.InvariantCulture)).Select(d => d.Value).FirstOrDefault();
 
             // it's important the magic does NOT get consumed here, since sometimes it's part of the structure
             // (see JsonBeatmapDecoder - the magic string is the opening brace)

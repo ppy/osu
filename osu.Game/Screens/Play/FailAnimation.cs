@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Play
 
         private const float duration = 2500;
 
-        private SampleChannel failSample;
+        private Sample failSample;
 
         public FailAnimation(DrawableRuleset drawableRuleset)
         {
@@ -89,6 +89,8 @@ namespace osu.Game.Screens.Play
 
         private void applyToPlayfield(Playfield playfield)
         {
+            double failTime = playfield.Time.Current;
+
             foreach (var nested in playfield.NestedPlayfields)
                 applyToPlayfield(nested);
 
@@ -97,10 +99,26 @@ namespace osu.Game.Screens.Play
                 if (appliedObjects.Contains(obj))
                     continue;
 
-                obj.RotateTo(RNG.NextSingle(-90, 90), duration);
-                obj.ScaleTo(obj.Scale * 0.5f, duration);
-                obj.MoveToOffset(new Vector2(0, 400), duration);
+                float rotation = RNG.NextSingle(-90, 90);
+                Vector2 originalPosition = obj.Position;
+                Vector2 originalScale = obj.Scale;
+
+                dropOffScreen(obj, failTime, rotation, originalScale, originalPosition);
+
+                // need to reapply the fail drop after judgement state changes
+                obj.ApplyCustomUpdateState += (o, _) => dropOffScreen(obj, failTime, rotation, originalScale, originalPosition);
+
                 appliedObjects.Add(obj);
+            }
+        }
+
+        private void dropOffScreen(DrawableHitObject obj, double failTime, float randomRotation, Vector2 originalScale, Vector2 originalPosition)
+        {
+            using (obj.BeginAbsoluteSequence(failTime))
+            {
+                obj.RotateTo(randomRotation, duration);
+                obj.ScaleTo(originalScale * 0.5f, duration);
+                obj.MoveTo(originalPosition + new Vector2(0, 400), duration);
             }
         }
 

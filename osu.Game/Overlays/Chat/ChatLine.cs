@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -114,21 +115,26 @@ namespace osu.Game.Overlays.Chat
                         Colour = Color4.Black.Opacity(0.3f),
                         Type = EdgeEffectType.Shadow,
                     },
-                    // Drop shadow effect
                     Child = new Container
                     {
                         AutoSizeAxes = Axes.Both,
+                        Y = 3,
                         Masking = true,
                         CornerRadius = 4,
-                        EdgeEffect = new EdgeEffectParameters
+                        Children = new Drawable[]
                         {
-                            Radius = 1,
-                            Colour = Color4Extensions.FromHex(message.Sender.Colour),
-                            Type = EdgeEffectType.Shadow,
-                        },
-                        Padding = new MarginPadding { Left = 3, Right = 3, Bottom = 1, Top = -3 },
-                        Y = 3,
-                        Child = username,
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4Extensions.FromHex(message.Sender.Colour),
+                            },
+                            new Container
+                            {
+                                AutoSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Left = 4, Right = 4, Bottom = 1, Top = -2 },
+                                Child = username
+                            }
+                        }
                     }
                 };
             }
@@ -184,13 +190,13 @@ namespace osu.Game.Overlays.Chat
                     }
                 }
             };
-
-            updateMessageContent();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            updateMessageContent();
             FinishTransforms(true);
         }
 

@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -35,6 +36,8 @@ namespace osu.Game.Tournament.Screens.Gameplay
         [Resolved]
         private TournamentMatchChatDisplay chat { get; set; }
 
+        private Drawable chroma;
+
         [BackgroundDependencyLoader]
         private void load(LadderInfo ladder, MatchIPCInfo ipc, Storage storage)
         {
@@ -58,17 +61,30 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     Y = 110,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
-                        new Box
+                        chroma = new Container
                         {
-                            // chroma key area for stable gameplay
-                            Name = "chroma",
-                            RelativeSizeAxes = Axes.X,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Height = 512,
-                            Colour = new Color4(0, 255, 0, 255),
+                            Children = new Drawable[]
+                            {
+                                new ChromaArea
+                                {
+                                    Name = "Left chroma",
+                                    RelativeSizeAxes = Axes.Both,
+                                    Width = 0.5f,
+                                },
+                                new ChromaArea
+                                {
+                                    Name = "Right chroma",
+                                    RelativeSizeAxes = Axes.Both,
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Width = 0.5f,
+                                }
+                            }
                         },
                     }
                 },
@@ -93,6 +109,18 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             RelativeSizeAxes = Axes.X,
                             Text = "Toggle chat",
                             Action = () => { State.Value = State.Value == TourneyState.Idle ? TourneyState.Playing : TourneyState.Idle; }
+                        },
+                        new SettingsSlider<int>
+                        {
+                            LabelText = "Chroma width",
+                            Current = LadderInfo.ChromaKeyWidth,
+                            KeyboardStep = 1,
+                        },
+                        new SettingsSlider<int>
+                        {
+                            LabelText = "Players per team",
+                            Current = LadderInfo.PlayersPerTeam,
+                            KeyboardStep = 1,
                         }
                     }
                 }
@@ -100,6 +128,8 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             State.BindTo(ipc.State);
             State.BindValueChanged(stateChanged, true);
+
+            ladder.ChromaKeyWidth.BindValueChanged(width => chroma.Width = width.NewValue, true);
 
             currentMatch.BindValueChanged(m =>
             {
@@ -189,6 +219,55 @@ namespace osu.Game.Tournament.Screens.Gameplay
             finally
             {
                 lastState = state.NewValue;
+            }
+        }
+
+        private class ChromaArea : CompositeDrawable
+        {
+            [Resolved]
+            private LadderInfo ladder { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                // chroma key area for stable gameplay
+                Colour = new Color4(0, 255, 0, 255);
+
+                ladder.PlayersPerTeam.BindValueChanged(performLayout, true);
+            }
+
+            private void performLayout(ValueChangedEvent<int> playerCount)
+            {
+                switch (playerCount.NewValue)
+                {
+                    case 3:
+                        InternalChildren = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Width = 0.5f,
+                                Height = 0.5f,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
+                                Height = 0.5f,
+                            },
+                        };
+                        break;
+
+                    default:
+                        InternalChild = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        };
+                        break;
+                }
             }
         }
     }

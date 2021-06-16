@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
@@ -35,15 +36,20 @@ namespace osu.Game.Overlays
         protected OverlayTabControl()
         {
             TabContainer.Masking = false;
-            TabContainer.Spacing = new Vector2(15, 0);
+            TabContainer.Spacing = new Vector2(20, 0);
 
             AddInternal(bar = new Box
             {
                 RelativeSizeAxes = Axes.X,
-                Height = 2,
                 Anchor = Anchor.BottomLeft,
-                Origin = Anchor.CentreLeft
+                Origin = Anchor.BottomLeft
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            AccentColour = colourProvider.Highlight1;
         }
 
         protected override Dropdown<T> CreateDropdown() => null;
@@ -90,7 +96,7 @@ namespace osu.Game.Overlays
                     Bar = new ExpandingBar
                     {
                         Anchor = Anchor.BottomCentre,
-                        ExpandedSize = 7.5f,
+                        ExpandedSize = 5f,
                         CollapsedSize = 0
                     },
                     new HoverClickSounds()
@@ -119,6 +125,7 @@ namespace osu.Game.Overlays
             {
                 HoverAction();
                 Text.Font = Text.Font.With(weight: FontWeight.Bold);
+                Text.FadeColour(Color4.White, 120, Easing.InQuad);
             }
 
             protected override void OnDeactivated()
@@ -135,11 +142,7 @@ namespace osu.Game.Overlays
                     OnDeactivated();
             }
 
-            protected virtual void HoverAction()
-            {
-                Bar.Expand();
-                Text.FadeColour(Color4.White, 120, Easing.InQuad);
-            }
+            protected virtual void HoverAction() => Bar.Expand();
 
             protected virtual void UnhoverAction()
             {

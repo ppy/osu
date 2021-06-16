@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
@@ -15,6 +16,17 @@ namespace osu.Game.Input
     public class KeyBindingStore : DatabaseBackedStore
     {
         public event Action KeyBindingChanged;
+
+        /// <summary>
+        /// Keys which should not be allowed for gameplay input purposes.
+        /// </summary>
+        private static readonly IEnumerable<InputKey> banned_keys = new[]
+        {
+            InputKey.MouseWheelDown,
+            InputKey.MouseWheelLeft,
+            InputKey.MouseWheelUp,
+            InputKey.MouseWheelRight
+        };
 
         public KeyBindingStore(DatabaseContextFactory contextFactory, RulesetStore rulesets, Storage storage = null)
             : base(contextFactory, storage)
@@ -32,7 +44,24 @@ namespace osu.Game.Input
 
         public void Register(KeyBindingContainer manager) => insertDefaults(manager.DefaultKeyBindings);
 
-        private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
+        /// <summary>
+        /// Retrieve all user-defined key combinations (in a format that can be displayed) for a specific action.
+        /// </summary>
+        /// <param name="globalAction">The action to lookup.</param>
+        /// <returns>A set of display strings for all the user's key configuration for the action.</returns>
+        public IEnumerable<string> GetReadableKeyCombinationsFor(GlobalAction globalAction)
+        {
+            foreach (var action in Query().Where(b => (GlobalAction)b.Action == globalAction))
+            {
+                string str = action.KeyCombination.ReadableString();
+
+                // even if found, the readable string may be empty for an unbound action.
+                if (str.Length > 0)
+                    yield return str;
+            }
+        }
+
+        private void insertDefaults(IEnumerable<IKeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
             using (var usage = ContextFactory.GetForWrite())
             {
@@ -55,6 +84,9 @@ namespace osu.Game.Input
                             RulesetID = rulesetId,
                             Variant = variant
                         });
+
+                        // required to ensure stable insert order (https://github.com/dotnet/efcore/issues/11686)
+                        usage.Context.SaveChanges();
                     }
                 }
             }
@@ -65,7 +97,6 @@ namespace osu.Game.Input
         /// </summary>
         /// <param name="rulesetId">The ruleset's internal ID.</param>
         /// <param name="variant">An optional variant.</param>
-        /// <returns></returns>
         public List<DatabasedKeyBinding> Query(int? rulesetId = null, int? variant = null) =>
             ContextFactory.Get().DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
 
@@ -74,6 +105,9 @@ namespace osu.Game.Input
             using (ContextFactory.GetForWrite())
             {
                 var dbKeyBinding = (DatabasedKeyBinding)keyBinding;
+
+                Debug.Assert(dbKeyBinding.RulesetID == null || CheckValidForGameplay(keyBinding.KeyCombination));
+
                 Refresh(ref dbKeyBinding);
 
                 if (dbKeyBinding.KeyCombination.Equals(keyBinding.KeyCombination))
@@ -83,6 +117,17 @@ namespace osu.Game.Input
             }
 
             KeyBindingChanged?.Invoke();
+        }
+
+        public static bool CheckValidForGameplay(KeyCombination combination)
+        {
+            foreach (var key in banned_keys)
+            {
+                if (combination.Keys.Contains(key))
+                    return false;
+            }
+
+            return true;
         }
     }
 }

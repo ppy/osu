@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -22,15 +21,6 @@ namespace osu.Game.Rulesets.Catch.Tests
 {
     public class TestSceneDrawableHitObjects : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(Catcher),
-            typeof(DrawableCatchRuleset),
-            typeof(DrawableFruit),
-            typeof(DrawableJuiceStream),
-            typeof(DrawableBanana)
-        };
-
         private DrawableCatchRuleset drawableRuleset;
         private double playfieldTime => drawableRuleset.Playfield.Time.Current;
 
@@ -146,7 +136,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             if (juice.NestedHitObjects.Last() is CatchHitObject tail)
                 tail.LastInCombo = true; // usually the (Catch)BeatmapProcessor would do this for us when necessary
 
-            addToPlayfield(new DrawableJuiceStream(juice, drawableRuleset.CreateDrawableRepresentation));
+            addToPlayfield(new DrawableJuiceStream(juice));
         }
 
         private void spawnBananas(bool hit = false)
@@ -168,8 +158,8 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private float getXCoords(bool hit)
         {
-            const float x_offset = 0.2f;
-            float xCoords = drawableRuleset.Playfield.Width / 2;
+            const float x_offset = 0.2f * CatchPlayfield.WIDTH;
+            float xCoords = CatchPlayfield.CENTER_X;
 
             if (drawableRuleset.Playfield is CatchPlayfield catchPlayfield)
                 catchPlayfield.CatcherArea.MovableCatcher.X = xCoords - x_offset;

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects;
 using System.Collections.Generic;
@@ -47,6 +48,31 @@ namespace osu.Game.Beatmaps
         IReadOnlyList<HitObject> IBeatmap.HitObjects => HitObjects;
 
         public virtual IEnumerable<BeatmapStatistic> GetStatistics() => Enumerable.Empty<BeatmapStatistic>();
+
+        public double GetMostCommonBeatLength()
+        {
+            // The last playable time in the beatmap - the last timing point extends to this time.
+            // Note: This is more accurate and may present different results because osu-stable didn't have the ability to calculate slider durations in this context.
+            double lastTime = HitObjects.LastOrDefault()?.GetEndTime() ?? ControlPointInfo.TimingPoints.LastOrDefault()?.Time ?? 0;
+
+            var mostCommon =
+                // Construct a set of (beatLength, duration) tuples for each individual timing point.
+                ControlPointInfo.TimingPoints.Select((t, i) =>
+                                {
+                                    if (t.Time > lastTime)
+                                        return (beatLength: t.BeatLength, 0);
+
+                                    var nextTime = i == ControlPointInfo.TimingPoints.Count - 1 ? lastTime : ControlPointInfo.TimingPoints[i + 1].Time;
+                                    return (beatLength: t.BeatLength, duration: nextTime - t.Time);
+                                })
+                                // Aggregate durations into a set of (beatLength, duration) tuples for each beat length
+                                .GroupBy(t => Math.Round(t.beatLength * 1000) / 1000)
+                                .Select(g => (beatLength: g.Key, duration: g.Sum(t => t.duration)))
+                                // Get the most common one, or 0 as a suitable default
+                                .OrderByDescending(i => i.duration).FirstOrDefault();
+
+            return mostCommon.beatLength;
+        }
 
         IBeatmap IBeatmap.Clone() => Clone();
 

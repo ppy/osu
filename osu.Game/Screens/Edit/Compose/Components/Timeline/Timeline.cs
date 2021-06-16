@@ -8,65 +8,32 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    [Cached(typeof(IDistanceSnapProvider))]
+    [Cached(typeof(IPositionSnapProvider))]
     [Cached]
-    public class Timeline : ZoomableScrollContainer, IDistanceSnapProvider
+    public class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
+        private readonly Drawable userContent;
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
+
+        public readonly Bindable<bool> ControlPointsVisible = new Bindable<bool>();
+
+        public readonly Bindable<bool> TicksVisible = new Bindable<bool>();
+
         public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         [Resolved]
-        private IAdjustableClock adjustableClock { get; set; }
-
-        public Timeline()
-        {
-            ZoomDuration = 200;
-            ZoomEasing = Easing.OutQuint;
-            ScrollbarVisible = false;
-        }
-
-        private WaveformGraph waveform;
-
-        [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours)
-        {
-            Add(waveform = new WaveformGraph
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = colours.Blue.Opacity(0.2f),
-                LowColour = colours.BlueLighter,
-                MidColour = colours.BlueDark,
-                HighColour = colours.BlueDarker,
-                Depth = float.MaxValue
-            });
-
-            // We don't want the centre marker to scroll
-            AddInternal(new CentreMarker());
-
-            WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
-
-            Beatmap.BindTo(beatmap);
-            Beatmap.BindValueChanged(b =>
-            {
-                waveform.Waveform = b.NewValue.Waveform;
-                track = b.NewValue.Track;
-
-                MinZoom = getZoomLevelForVisibleMilliseconds(10000);
-                MaxZoom = getZoomLevelForVisibleMilliseconds(500);
-                Zoom = getZoomLevelForVisibleMilliseconds(2000);
-            }, true);
-        }
-
-        private float getZoomLevelForVisibleMilliseconds(double milliseconds) => (float)(track.Length / milliseconds);
+        private EditorClock editorClock { get; set; }
 
         /// <summary>
         /// The timeline's scroll position in the last frame.
@@ -90,6 +57,128 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private Track track;
 
+        private const float timeline_height = 72;
+        private const float timeline_expanded_height = 156;
+
+        public Timeline(Drawable userContent)
+        {
+            this.userContent = userContent;
+
+            RelativeSizeAxes = Axes.X;
+            Height = timeline_height;
+
+            ZoomDuration = 200;
+            ZoomEasing = Easing.OutQuint;
+            ScrollbarVisible = false;
+        }
+
+        private WaveformGraph waveform;
+
+        private TimelineTickDisplay ticks;
+
+        private TimelineControlPointDisplay controlPoints;
+
+        private Container mainContent;
+
+        private Bindable<float> waveformOpacity;
+
+        [BackgroundDependencyLoader]
+        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
+        {
+            CentreMarker centreMarker;
+
+            // We don't want the centre marker to scroll
+            AddInternal(centreMarker = new CentreMarker());
+
+            AddRange(new Drawable[]
+            {
+                controlPoints = new TimelineControlPointDisplay
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = timeline_expanded_height,
+                },
+                mainContent = new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = timeline_height,
+                    Depth = float.MaxValue,
+                    Children = new[]
+                    {
+                        waveform = new WaveformGraph
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            BaseColour = colours.Blue.Opacity(0.2f),
+                            LowColour = colours.BlueLighter,
+                            MidColour = colours.BlueDark,
+                            HighColour = colours.BlueDarker,
+                        },
+                        centreMarker.CreateProxy(),
+                        ticks = new TimelineTickDisplay(),
+                        new Box
+                        {
+                            Name = "zero marker",
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 2,
+                            Origin = Anchor.TopCentre,
+                            Colour = colours.YellowDarker,
+                        },
+                        userContent,
+                    }
+                },
+            });
+
+            waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
+
+            Beatmap.BindTo(beatmap);
+            Beatmap.BindValueChanged(b =>
+            {
+                waveform.Waveform = b.NewValue.Waveform;
+                track = b.NewValue.Track;
+
+                // todo: i don't think this is safe, the track may not be loaded yet.
+                if (track.Length > 0)
+                {
+                    MaxZoom = getZoomLevelForVisibleMilliseconds(500);
+                    MinZoom = getZoomLevelForVisibleMilliseconds(10000);
+                    Zoom = getZoomLevelForVisibleMilliseconds(2000);
+                }
+            }, true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            waveformOpacity.BindValueChanged(_ => updateWaveformOpacity(), true);
+
+            WaveformVisible.ValueChanged += _ => updateWaveformOpacity();
+            TicksVisible.ValueChanged += visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            ControlPointsVisible.BindValueChanged(visible =>
+            {
+                if (visible.NewValue)
+                {
+                    this.ResizeHeightTo(timeline_expanded_height, 200, Easing.OutQuint);
+                    mainContent.MoveToY(36, 200, Easing.OutQuint);
+
+                    // delay the fade in else masking looks weird.
+                    controlPoints.Delay(180).FadeIn(400, Easing.OutQuint);
+                }
+                else
+                {
+                    controlPoints.FadeOut(200, Easing.OutQuint);
+
+                    // likewise, delay the resize until the fade is complete.
+                    this.Delay(180).ResizeHeightTo(timeline_height, 200, Easing.OutQuint);
+                    mainContent.Delay(180).MoveToY(0, 200, Easing.OutQuint);
+                }
+            }, true);
+        }
+
+        private void updateWaveformOpacity() =>
+            waveform.FadeTo(WaveformVisible.Value ? waveformOpacity.Value : 0, 200, Easing.OutQuint);
+
+        private float getZoomLevelForVisibleMilliseconds(double milliseconds) => Math.Max(1, (float)(track.Length / milliseconds));
+
         protected override void Update()
         {
             base.Update();
@@ -98,8 +187,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Content.Margin = new MarginPadding { Horizontal = DrawWidth / 2 };
 
             // This needs to happen after transforms are updated, but before the scroll position is updated in base.UpdateAfterChildren
-            if (adjustableClock.IsRunning)
+            if (editorClock.IsRunning)
                 scrollToTrackTime();
+        }
+
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            // if this is not a precision scroll event, let the editor handle the seek itself (for snapping support)
+            if (!e.AltPressed && !e.IsPrecise)
+                return false;
+
+            return base.OnScroll(e);
         }
 
         protected override void UpdateAfterChildren()
@@ -108,21 +206,23 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             if (handlingDragInput)
                 seekTrackToCurrent();
-            else if (!adjustableClock.IsRunning)
+            else if (!editorClock.IsRunning)
             {
-                // The track isn't running. There are two cases we have to be wary of:
-                // 1) The user flick-drags on this timeline: We want the track to follow us
-                // 2) The user changes the track time through some other means (scrolling in the editor or overview timeline): We want to follow the track time
+                // The track isn't running. There are three cases we have to be wary of:
+                // 1) The user flick-drags on this timeline and we are applying an interpolated seek on the clock, until interrupted by 2 or 3.
+                // 2) The user changes the track time through some other means (scrolling in the editor or overview timeline; clicking a hitobject etc.). We want the timeline to track the clock's time.
+                // 3) An ongoing seek transform is running from an external seek. We want the timeline to track the clock's time.
 
-                // The simplest way to cover both cases is by checking whether the scroll position has changed and the audio hasn't been changed externally
-                if (Current != lastScrollPosition && adjustableClock.CurrentTime == lastTrackTime)
+                // The simplest way to cover the first two cases is by checking whether the scroll position has changed and the audio hasn't been changed externally
+                // Checking IsSeeking covers the third case, where the transform may not have been applied yet.
+                if (Current != lastScrollPosition && editorClock.CurrentTime == lastTrackTime && !editorClock.IsSeeking)
                     seekTrackToCurrent();
                 else
                     scrollToTrackTime();
             }
 
             lastScrollPosition = Current;
-            lastTrackTime = adjustableClock.CurrentTime;
+            lastTrackTime = editorClock.CurrentTime;
         }
 
         private void seekTrackToCurrent()
@@ -130,15 +230,21 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (!track.IsLoaded)
                 return;
 
-            adjustableClock.Seek(Current / Content.DrawWidth * track.Length);
+            double target = Current / Content.DrawWidth * track.Length;
+            editorClock.Seek(Math.Min(track.Length, target));
         }
 
         private void scrollToTrackTime()
         {
-            if (!track.IsLoaded)
+            if (!track.IsLoaded || track.Length == 0)
                 return;
 
-            ScrollTo((float)(adjustableClock.CurrentTime / track.Length) * Content.DrawWidth, false);
+            // covers the case where the user starts playback after a drag is in progress.
+            // we want to ensure the clock is always stopped during drags to avoid weird audio playback.
+            if (handlingDragInput)
+                editorClock.Stop();
+
+            ScrollTo((float)(editorClock.CurrentTime / track.Length) * Content.DrawWidth, false);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -161,15 +267,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private void beginUserDrag()
         {
             handlingDragInput = true;
-            trackWasPlaying = adjustableClock.IsRunning;
-            adjustableClock.Stop();
+            trackWasPlaying = editorClock.IsRunning;
+            editorClock.Stop();
         }
 
         private void endUserDrag()
         {
             handlingDragInput = false;
             if (trackWasPlaying)
-                adjustableClock.Start();
+                editorClock.Start();
         }
 
         [Resolved]
@@ -178,11 +284,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private IBeatSnapProvider beatSnapProvider { get; set; }
 
-        public double GetTimeFromScreenSpacePosition(Vector2 position)
-            => getTimeFromPosition(Content.ToLocalSpace(position));
+        /// <summary>
+        /// The total amount of time visible on the timeline.
+        /// </summary>
+        public double VisibleRange => track.Length / Zoom;
 
-        public (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time) =>
-            (position, beatSnapProvider.SnapTime(getTimeFromPosition(position)));
+        public SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
+            new SnapResult(screenSpacePosition, null);
+
+        public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) =>
+            new SnapResult(screenSpacePosition, beatSnapProvider.SnapTime(getTimeFromPosition(Content.ToLocalSpace(screenSpacePosition))));
 
         private double getTimeFromPosition(Vector2 localPosition) =>
             (localPosition.X / Content.DrawWidth) * track.Length;

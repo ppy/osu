@@ -2,10 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
@@ -14,6 +19,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         private readonly EditBodyPiece bodyPiece;
         private readonly EditNotePiece headPiece;
         private readonly EditNotePiece tailPiece;
+
+        [Resolved]
+        private IScrollingInfo scrollingInfo { get; set; }
 
         public HoldNotePlacementBlueprint()
             : base(new HoldNote())
@@ -34,8 +42,21 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             if (Column != null)
             {
-                headPiece.Y = PositionAt(HitObject.StartTime);
-                tailPiece.Y = PositionAt(HitObject.EndTime);
+                headPiece.Y = Parent.ToLocalSpace(Column.ScreenSpacePositionAtTime(HitObject.StartTime)).Y;
+                tailPiece.Y = Parent.ToLocalSpace(Column.ScreenSpacePositionAtTime(HitObject.EndTime)).Y;
+
+                switch (scrollingInfo.Direction.Value)
+                {
+                    case ScrollingDirection.Down:
+                        headPiece.Y -= headPiece.DrawHeight / 2;
+                        tailPiece.Y -= tailPiece.DrawHeight / 2;
+                        break;
+
+                    case ScrollingDirection.Up:
+                        headPiece.Y += headPiece.DrawHeight / 2;
+                        tailPiece.Y += tailPiece.DrawHeight / 2;
+                        break;
+                }
             }
 
             var topPosition = new Vector2(headPiece.DrawPosition.X, Math.Min(headPiece.DrawPosition.Y, tailPiece.DrawPosition.Y));
@@ -46,25 +67,39 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             bodyPiece.Height = (bottomPosition - topPosition).Y;
         }
 
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            if (e.Button != MouseButton.Left)
+                return;
+
+            base.OnMouseUp(e);
+            EndPlacement(HitObject.Duration > 0);
+        }
+
         private double originalStartTime;
 
-        public override void UpdatePosition(Vector2 screenSpacePosition)
+        public override void UpdateTimeAndPosition(SnapResult result)
         {
-            base.UpdatePosition(screenSpacePosition);
+            base.UpdateTimeAndPosition(result);
 
-            if (PlacementActive)
+            if (PlacementActive == PlacementState.Active)
             {
-                var endTime = TimeAt(screenSpacePosition);
-
-                HitObject.StartTime = endTime < originalStartTime ? endTime : originalStartTime;
-                HitObject.Duration = Math.Abs(endTime - originalStartTime);
+                if (result.Time is double endTime)
+                {
+                    HitObject.StartTime = endTime < originalStartTime ? endTime : originalStartTime;
+                    HitObject.Duration = Math.Abs(endTime - originalStartTime);
+                }
             }
             else
             {
-                headPiece.Width = tailPiece.Width = SnappedWidth;
-                headPiece.X = tailPiece.X = SnappedMousePosition.X;
+                if (result.Playfield != null)
+                {
+                    headPiece.Width = tailPiece.Width = result.Playfield.DrawWidth;
+                    headPiece.X = tailPiece.X = ToLocalSpace(result.ScreenSpacePosition).X;
+                }
 
-                originalStartTime = HitObject.StartTime = TimeAt(screenSpacePosition);
+                if (result.Time is double startTime)
+                    originalStartTime = HitObject.StartTime = startTime;
             }
         }
     }

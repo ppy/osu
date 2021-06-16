@@ -4,116 +4,141 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Judgements;
-using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatcherArea : Container
+    public class CatcherArea : Container, IKeyBindingHandler<CatchAction>
     {
         public const float CATCHER_SIZE = 106.75f;
 
-        public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> CreateDrawableRepresentation;
+        public readonly Catcher MovableCatcher;
+        private readonly CatchComboDisplay comboDisplay;
 
-        public Container ExplodingFruitTarget
+        /// <summary>
+        /// <c>-1</c> when only left button is pressed.
+        /// <c>1</c> when only right button is pressed.
+        /// <c>0</c> when none or both left and right buttons are pressed.
+        /// </summary>
+        private int currentDirection;
+
+        public CatcherArea(Container<CaughtObject> droppedObjectContainer, BeatmapDifficulty difficulty = null)
         {
-            set => MovableCatcher.ExplodingFruitTarget = value;
-        }
-
-        private DrawableCatchHitObject lastPlateableFruit;
-
-        public CatcherArea(BeatmapDifficulty difficulty = null)
-        {
-            RelativeSizeAxes = Axes.X;
-            Height = CATCHER_SIZE;
-            Child = MovableCatcher = new Catcher(difficulty)
+            Size = new Vector2(CatchPlayfield.WIDTH, CATCHER_SIZE);
+            Children = new Drawable[]
             {
-                AdditiveTarget = this,
+                comboDisplay = new CatchComboDisplay
+                {
+                    RelativeSizeAxes = Axes.None,
+                    AutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.Centre,
+                    Margin = new MarginPadding { Bottom = 350f },
+                    X = CatchPlayfield.CENTER_X
+                },
+                MovableCatcher = new Catcher(this, droppedObjectContainer, difficulty) { X = CatchPlayfield.CENTER_X },
             };
         }
 
-        public static float GetCatcherSize(BeatmapDifficulty difficulty)
+        public void OnNewResult(DrawableCatchHitObject hitObject, JudgementResult result)
         {
-            return CATCHER_SIZE / CatchPlayfield.BASE_WIDTH * (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
-        }
+            MovableCatcher.OnNewResult(hitObject, result);
 
-        public void OnResult(DrawableCatchHitObject fruit, JudgementResult result)
-        {
-            if (result.Judgement is IgnoreJudgement)
+            if (!result.Type.IsScorable())
                 return;
 
-            void runAfterLoaded(Action action)
-            {
-                if (lastPlateableFruit == null)
-                    return;
-
-                // this is required to make this run after the last caught fruit runs updateState() at least once.
-                // TODO: find a better alternative
-                if (lastPlateableFruit.IsLoaded)
-                    action();
-                else
-                    lastPlateableFruit.OnLoadComplete += _ => action();
-            }
-
-            if (result.IsHit && fruit.CanBePlated)
-            {
-                // create a new (cloned) fruit to stay on the plate. the original is faded out immediately.
-                var caughtFruit = (DrawableCatchHitObject)CreateDrawableRepresentation?.Invoke(fruit.HitObject);
-
-                if (caughtFruit == null) return;
-
-                caughtFruit.RelativePositionAxes = Axes.None;
-                caughtFruit.Position = new Vector2(MovableCatcher.ToLocalSpace(fruit.ScreenSpaceDrawQuad.Centre).X - MovableCatcher.DrawSize.X / 2, 0);
-                caughtFruit.IsOnPlate = true;
-
-                caughtFruit.Anchor = Anchor.TopCentre;
-                caughtFruit.Origin = Anchor.Centre;
-                caughtFruit.Scale *= 0.5f;
-                caughtFruit.LifetimeStart = caughtFruit.HitObject.StartTime;
-                caughtFruit.LifetimeEnd = double.MaxValue;
-
-                MovableCatcher.PlaceOnPlate(caughtFruit);
-                lastPlateableFruit = caughtFruit;
-
-                if (!fruit.StaysOnPlate)
-                    runAfterLoaded(() => MovableCatcher.Explode(caughtFruit));
-            }
-
-            if (fruit.HitObject.LastInCombo)
+            if (hitObject.HitObject.LastInCombo)
             {
                 if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
-                    runAfterLoaded(() => MovableCatcher.Explode());
+                    MovableCatcher.Explode();
                 else
                     MovableCatcher.Drop();
             }
+
+            comboDisplay.OnNewResult(hitObject, result);
         }
 
-        public void OnReleased(CatchAction action)
+        public void OnRevertResult(DrawableCatchHitObject hitObject, JudgementResult result)
         {
+            comboDisplay.OnRevertResult(hitObject, result);
+            MovableCatcher.OnRevertResult(hitObject, result);
         }
 
-        public bool AttemptCatch(CatchHitObject obj)
+        protected override void Update()
         {
-            return MovableCatcher.AttemptCatch(obj);
+            base.Update();
+
+            var replayState = (GetContainingInputManager().CurrentState as RulesetInputManagerInputState<CatchAction>)?.LastReplayState as CatchFramedReplayInputHandler.CatchReplayState;
+
+            SetCatcherPosition(
+                replayState?.CatcherX ??
+                (float)(MovableCatcher.X + MovableCatcher.Speed * currentDirection * Clock.ElapsedFrameTime));
         }
 
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
 
-            var state = (GetContainingInputManager().CurrentState as RulesetInputManagerInputState<CatchAction>)?.LastReplayState as CatchFramedReplayInputHandler.CatchReplayState;
-
-            if (state?.CatcherX != null)
-                MovableCatcher.X = state.CatcherX.Value;
+            comboDisplay.X = MovableCatcher.X;
         }
 
-        protected internal readonly Catcher MovableCatcher;
+        public void SetCatcherPosition(float X)
+        {
+            float lastPosition = MovableCatcher.X;
+            float newPosition = Math.Clamp(X, 0, CatchPlayfield.WIDTH);
+
+            MovableCatcher.X = newPosition;
+
+            if (lastPosition < newPosition)
+                MovableCatcher.VisualDirection = Direction.Right;
+            else if (lastPosition > newPosition)
+                MovableCatcher.VisualDirection = Direction.Left;
+        }
+
+        public bool OnPressed(CatchAction action)
+        {
+            switch (action)
+            {
+                case CatchAction.MoveLeft:
+                    currentDirection--;
+                    return true;
+
+                case CatchAction.MoveRight:
+                    currentDirection++;
+                    return true;
+
+                case CatchAction.Dash:
+                    MovableCatcher.Dashing = true;
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(CatchAction action)
+        {
+            switch (action)
+            {
+                case CatchAction.MoveLeft:
+                    currentDirection++;
+                    break;
+
+                case CatchAction.MoveRight:
+                    currentDirection--;
+                    break;
+
+                case CatchAction.Dash:
+                    MovableCatcher.Dashing = false;
+                    break;
+            }
+        }
     }
 }

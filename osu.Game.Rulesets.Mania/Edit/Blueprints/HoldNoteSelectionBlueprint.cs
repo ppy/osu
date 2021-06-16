@@ -4,17 +4,18 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class HoldNoteSelectionBlueprint : ManiaSelectionBlueprint
+    public class HoldNoteSelectionBlueprint : ManiaSelectionBlueprint<HoldNote>
     {
         public new DrawableHoldNote DrawableObject => (DrawableHoldNote)base.DrawableObject;
 
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public HoldNoteSelectionBlueprint(DrawableHoldNote hold)
+        public HoldNoteSelectionBlueprint(HoldNote hold)
             : base(hold)
         {
         }
@@ -32,21 +33,24 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         private void load(IScrollingInfo scrollingInfo)
         {
             direction.BindTo(scrollingInfo.Direction);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
 
             InternalChildren = new Drawable[]
             {
-                new HoldNoteNoteSelectionBlueprint(DrawableObject, HoldNotePosition.Start),
-                new HoldNoteNoteSelectionBlueprint(DrawableObject, HoldNotePosition.End),
-                new BodyPiece
+                new HoldNoteNoteOverlay(this, HoldNotePosition.Start),
+                new HoldNoteNoteOverlay(this, HoldNotePosition.End),
+                new Container
                 {
-                    AccentColour = Color4.Transparent,
-                    BorderColour = colours.Yellow
-                },
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    BorderThickness = 1,
+                    BorderColour = colours.Yellow,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        AlwaysPresent = true,
+                    }
+                }
             };
         }
 
@@ -68,5 +72,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         }
 
         public override Quad SelectionQuad => ScreenSpaceDrawQuad;
+
+        public override Vector2 ScreenSpaceSelectionPoint => DrawableObject.Head.ScreenSpaceDrawQuad.Centre;
     }
 }

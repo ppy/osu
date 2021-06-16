@@ -1,10 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osuTK;
 
 namespace osu.Game.Graphics.Sprites
@@ -13,7 +15,7 @@ namespace osu.Game.Graphics.Sprites
     {
         private readonly OsuSpriteText spriteText, blurredText;
 
-        public string Text
+        public LocalisableString Text
         {
             get => spriteText.Text;
             set => blurredText.Text = spriteText.Text = value;
@@ -41,6 +43,24 @@ namespace osu.Game.Graphics.Sprites
         {
             get => blurredText.Colour;
             set => blurredText.Colour = value;
+        }
+
+        public Vector2 Spacing
+        {
+            get => spriteText.Spacing;
+            set => spriteText.Spacing = blurredText.Spacing = value;
+        }
+
+        public bool UseFullGlyphHeight
+        {
+            get => spriteText.UseFullGlyphHeight;
+            set => spriteText.UseFullGlyphHeight = blurredText.UseFullGlyphHeight = value;
+        }
+
+        public Bindable<string> Current
+        {
+            get => spriteText.Current;
+            set => spriteText.Current = value;
         }
 
         public GlowingSpriteText()

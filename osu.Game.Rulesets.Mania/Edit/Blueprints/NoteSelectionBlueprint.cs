@@ -3,13 +3,13 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Objects;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class NoteSelectionBlueprint : ManiaSelectionBlueprint
+    public class NoteSelectionBlueprint : ManiaSelectionBlueprint<Note>
     {
-        public NoteSelectionBlueprint(DrawableNote note)
+        public NoteSelectionBlueprint(Note note)
             : base(note)
         {
             AddInternal(new EditNotePiece { RelativeSizeAxes = Axes.X });

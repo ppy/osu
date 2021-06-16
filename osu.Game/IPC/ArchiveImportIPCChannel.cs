@@ -32,13 +32,13 @@ namespace osu.Game.IPC
         {
             if (importer == null)
             {
-                //we want to contact a remote osu! to handle the import.
-                await SendMessageAsync(new ArchiveImportMessage { Path = path });
+                // we want to contact a remote osu! to handle the import.
+                await SendMessageAsync(new ArchiveImportMessage { Path = path }).ConfigureAwait(false);
                 return;
             }
 
             if (importer.HandledExtensions.Contains(Path.GetExtension(path)?.ToLowerInvariant()))
-                await importer.Import(path);
+                await importer.Import(path).ConfigureAwait(false);
         }
     }
 

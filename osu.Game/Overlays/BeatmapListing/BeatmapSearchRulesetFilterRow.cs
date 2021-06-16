@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.BeatmapListing
@@ -13,7 +14,7 @@ namespace osu.Game.Overlays.BeatmapListing
         {
         }
 
-        protected override BeatmapSearchFilter CreateFilter() => new RulesetFilter();
+        protected override Drawable CreateFilter() => new RulesetFilter();
 
         private class RulesetFilter : BeatmapSearchFilter
         {

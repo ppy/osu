@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace osu.Game.Screens.Select.Carousel
@@ -54,6 +55,14 @@ namespace osu.Game.Screens.Select.Carousel
                 updateSelectedIndex();
         }
 
+        public void AddChildren(IEnumerable<CarouselItem> items)
+        {
+            foreach (var i in items)
+                base.AddChild(i);
+
+            attemptSelection();
+        }
+
         public override void AddChild(CarouselItem i)
         {
             base.AddChild(i);
@@ -90,11 +99,15 @@ namespace osu.Game.Screens.Select.Carousel
             PerformSelection();
         }
 
+        protected virtual CarouselItem GetNextToSelect()
+        {
+            return Children.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value) ??
+                   Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value);
+        }
+
         protected virtual void PerformSelection()
         {
-            CarouselItem nextToSelect =
-                Children.Skip(lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value) ??
-                Children.Reverse().Skip(InternalChildren.Count - lastSelectedIndex).FirstOrDefault(i => !i.Filtered.Value);
+            CarouselItem nextToSelect = GetNextToSelect();
 
             if (nextToSelect != null)
                 nextToSelect.State.Value = CarouselItemState.Selected;
@@ -104,7 +117,8 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void updateSelected(CarouselItem newSelection)
         {
-            LastSelected = newSelection;
+            if (newSelection != null)
+                LastSelected = newSelection;
             updateSelectedIndex();
         }
 

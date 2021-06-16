@@ -3,6 +3,7 @@
 
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Configuration;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Configuration
 {
@@ -16,9 +17,10 @@ namespace osu.Game.Rulesets.Osu.Configuration
         protected override void InitialiseDefaults()
         {
             base.InitialiseDefaults();
-            Set(OsuRulesetSetting.SnakingInSliders, true);
-            Set(OsuRulesetSetting.SnakingOutSliders, true);
-            Set(OsuRulesetSetting.ShowCursorTrail, true);
+            SetDefault(OsuRulesetSetting.SnakingInSliders, true);
+            SetDefault(OsuRulesetSetting.SnakingOutSliders, true);
+            SetDefault(OsuRulesetSetting.ShowCursorTrail, true);
+            SetDefault(OsuRulesetSetting.PlayfieldBorderStyle, PlayfieldBorderStyle.None);
         }
     }
 
@@ -26,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
     {
         SnakingInSliders,
         SnakingOutSliders,
-        ShowCursorTrail
+        ShowCursorTrail,
+        PlayfieldBorderStyle,
     }
 }

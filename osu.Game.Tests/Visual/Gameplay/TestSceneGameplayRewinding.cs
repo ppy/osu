@@ -5,41 +5,28 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Utils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Storyboards;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneGameplayRewinding : PlayerTestScene
+    public class TestSceneGameplayRewinding : OsuPlayerTestScene
     {
         [Resolved]
         private AudioManager audioManager { get; set; }
 
-        public TestSceneGameplayRewinding()
-            : base(new OsuRuleset())
-        {
-        }
-
-        private Track track;
-
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
-        {
-            var working = new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
-            track = working.Track;
-            return working;
-        }
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) =>
+            new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
 
         [Test]
         public void TestNoJudgementsOnRewind()
         {
-            AddUntilStep("wait for track to start running", () => track.IsRunning);
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
             addSeekStep(3000);
             AddAssert("all judged", () => Player.DrawableRuleset.Playfield.AllHitObjects.All(h => h.Judged));
             AddUntilStep("key counter counted keys", () => Player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses >= 7));
@@ -52,7 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void addSeekStep(double time)
         {
-            AddStep($"seek to {time}", () => track.Seek(time));
+            AddStep($"seek to {time}", () => Beatmap.Value.Track.Seek(time));
 
             // Allow a few frames of lenience
             AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(time, Player.DrawableRuleset.FrameStableClock.CurrentTime, 100));

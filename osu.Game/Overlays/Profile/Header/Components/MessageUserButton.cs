@@ -33,7 +33,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
         public MessageUserButton()
         {
             Content.Alpha = 0;
-            RelativeSizeAxes = Axes.Y;
 
             Child = new SpriteIcon
             {

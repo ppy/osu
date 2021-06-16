@@ -8,10 +8,11 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing.Input;
 using osu.Game.Audio;
-using osu.Game.Rulesets.Osu.Skinning;
+using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
@@ -38,18 +39,28 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestLegacySmoothCursorTrail()
         {
-            createTest(() => new LegacySkinContainer(false)
+            createTest(() =>
             {
-                Child = new LegacyCursorTrail()
+                var skinContainer = new LegacySkinContainer(false);
+                var legacyCursorTrail = new LegacyCursorTrail(skinContainer);
+
+                skinContainer.Child = legacyCursorTrail;
+
+                return skinContainer;
             });
         }
 
         [Test]
         public void TestLegacyDisjointCursorTrail()
         {
-            createTest(() => new LegacySkinContainer(true)
+            createTest(() =>
             {
-                Child = new LegacyCursorTrail()
+                var skinContainer = new LegacySkinContainer(true);
+                var legacyCursorTrail = new LegacyCursorTrail(skinContainer);
+
+                skinContainer.Child = legacyCursorTrail;
+
+                return skinContainer;
             });
         }
 
@@ -77,9 +88,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 RelativeSizeAxes = Axes.Both;
             }
 
-            public Drawable GetDrawableComponent(ISkinComponent component) => throw new NotImplementedException();
+            public Drawable GetDrawableComponent(ISkinComponent component) => null;
 
-            public Texture GetTexture(string componentName)
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
             {
                 switch (componentName)
                 {
@@ -97,9 +108,11 @@ namespace osu.Game.Rulesets.Osu.Tests
                 return null;
             }
 
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
+            public ISample GetSample(ISampleInfo sampleInfo) => null;
 
-            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
+            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;
+
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
 
             public event Action SourceChanged
             {

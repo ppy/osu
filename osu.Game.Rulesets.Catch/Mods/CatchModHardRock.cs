@@ -10,7 +10,6 @@ namespace osu.Game.Rulesets.Catch.Mods
     public class CatchModHardRock : ModHardRock, IApplicableToBeatmap
     {
         public override double ScoreMultiplier => 1.12;
-        public override bool Ranked => true;
 
         public void ApplyToBeatmap(IBeatmap beatmap) => CatchBeatmapProcessor.ApplyPositionOffsets(beatmap, this);
     }

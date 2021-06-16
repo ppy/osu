@@ -11,6 +11,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -21,7 +22,6 @@ namespace osu.Game.Graphics.UserInterface
     {
         private readonly Box box;
         private readonly SpriteText text;
-        private readonly SpriteIcon icon;
 
         private Color4? accentColour;
 
@@ -32,17 +32,11 @@ namespace osu.Game.Graphics.UserInterface
             {
                 accentColour = value;
 
-                if (Current.Value)
-                {
-                    text.Colour = AccentColour;
-                    icon.Colour = AccentColour;
-                }
-
                 updateFade();
             }
         }
 
-        public string Text
+        public LocalisableString Text
         {
             get => text.Text;
             set => text.Text = value;
@@ -52,6 +46,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public OsuTabControlCheckbox()
         {
+            SpriteIcon icon;
+
             AutoSizeAxes = Axes.Both;
 
             Children = new Drawable[]
@@ -89,6 +85,8 @@ namespace osu.Game.Graphics.UserInterface
             {
                 icon.Icon = selected.NewValue ? FontAwesome.Regular.CheckCircle : FontAwesome.Regular.Circle;
                 text.Font = text.Font.With(weight: selected.NewValue ? FontWeight.Bold : FontWeight.Medium);
+
+                updateFade();
             };
         }
 
@@ -115,8 +113,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateFade()
         {
-            box.FadeTo(IsHovered ? 1 : 0, transition_length, Easing.OutQuint);
-            text.FadeColour(IsHovered ? Color4.White : AccentColour, transition_length, Easing.OutQuint);
+            box.FadeTo(Current.Value || IsHovered ? 1 : 0, transition_length, Easing.OutQuint);
+            text.FadeColour(Current.Value || IsHovered ? Color4.White : AccentColour, transition_length, Easing.OutQuint);
         }
     }
 }
