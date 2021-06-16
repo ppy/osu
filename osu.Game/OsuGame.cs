@@ -50,6 +50,7 @@ using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Skinning.Editor;
@@ -580,7 +581,7 @@ namespace osu.Game
 
             foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
             {
-                var cultureCode = language.ToString();
+                var cultureCode = language.ToCultureCode();
                 Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
             }
 
