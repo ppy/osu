@@ -350,7 +350,7 @@ namespace osu.Game.Tests.Visual
                     if (CurrentTime >= Length)
                     {
                         Stop();
-                        RaiseCompleted();
+                        // `RaiseCompleted` is not called here to prevent transitioning to the next song.
                     }
                 }
             }
