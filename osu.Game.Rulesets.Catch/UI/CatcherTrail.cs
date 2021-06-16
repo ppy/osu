@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
+using osu.Framework.Timing;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
@@ -11,8 +12,6 @@ namespace osu.Game.Rulesets.Catch.UI
     /// A trail of the catcher.
     /// It also represents a hyper dash afterimage.
     /// </summary>
-    // TODO: Trails shouldn't be animated when the skin has an animated catcher.
-    // The animation should be frozen at the animation frame at the time of the trail generation.
     public class CatcherTrail : PoolableDrawable
     {
         public CatcherAnimationState AnimationState
@@ -27,7 +26,12 @@ namespace osu.Game.Rulesets.Catch.UI
             Size = new Vector2(CatcherArea.CATCHER_SIZE);
             Origin = Anchor.TopCentre;
             Blending = BlendingParameters.Additive;
-            InternalChild = body = new SkinnableCatcher();
+            InternalChild = body = new SkinnableCatcher
+            {
+                // Using a frozen clock because trails should not be animated when the skin has an animated catcher.
+                // TODO: The animation should be frozen at the animation frame at the time of the trail generation.
+                Clock = new FramedClock(new ManualClock()),
+            };
         }
 
         protected override void FreeAfterUse()
