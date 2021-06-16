@@ -83,7 +83,7 @@ namespace osu.Game.Localisation
         sk,
 
         [Description(@"Svenska")]
-        se,
+        sv,
 
         [Description(@"ไทย")]
         th,
@@ -99,7 +99,7 @@ namespace osu.Game.Localisation
         // uk,
 
         [Description(@"Tiếng Việt")]
-        vn,
+        vi,
 
         [Description(@"简体中文")]
         zh,
