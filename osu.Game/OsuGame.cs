@@ -426,9 +426,12 @@ namespace osu.Game
         {
             // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
             // to ensure all the required data for presenting a replay are present.
-            var databasedScoreInfo = score.OnlineScoreID != null
-                ? ScoreManager.Query(s => s.OnlineScoreID == score.OnlineScoreID)
-                : ScoreManager.Query(s => s.Hash == score.Hash);
+            ScoreInfo databasedScoreInfo = null;
+
+            if (score.OnlineScoreID != null)
+                databasedScoreInfo = ScoreManager.Query(s => s.OnlineScoreID == score.OnlineScoreID);
+
+            databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == score.Hash);
 
             if (databasedScoreInfo == null)
             {
@@ -712,7 +715,6 @@ namespace osu.Game
                 PostNotification = n => notifications.Post(n),
             }, Add, true);
 
-            loadComponentSingleFile(difficultyRecommender, Add);
             loadComponentSingleFile(stableImportManager, Add);
 
             loadComponentSingleFile(screenshotManager, Add);
@@ -728,6 +730,7 @@ namespace osu.Game
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
             loadComponentSingleFile(Settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
@@ -754,6 +757,7 @@ namespace osu.Game
 
             chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
+            Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
 

@@ -61,6 +61,9 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.ShowOnlineExplicitContent, false);
 
+            SetDefault(OsuSetting.NotifyOnUsernameMentioned, true);
+            SetDefault(OsuSetting.NotifyOnPrivateMessage, true);
+
             // Audio
             SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
 
@@ -259,6 +262,8 @@ namespace osu.Game.Configuration
         ScalingSizeY,
         UIScale,
         IntroSequence,
+        NotifyOnUsernameMentioned,
+        NotifyOnPrivateMessage,
         UIHoldActivationDelay,
         HitLighting,
         MenuBackgroundSource,
