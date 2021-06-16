@@ -715,7 +715,6 @@ namespace osu.Game
                 PostNotification = n => notifications.Post(n),
             }, Add, true);
 
-            loadComponentSingleFile(difficultyRecommender, Add);
             loadComponentSingleFile(stableImportManager, Add);
 
             loadComponentSingleFile(screenshotManager, Add);
@@ -758,6 +757,7 @@ namespace osu.Game
 
             chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
+            Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
 
