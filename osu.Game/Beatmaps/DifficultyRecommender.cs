@@ -101,10 +101,20 @@ namespace osu.Game.Beatmaps
         /// Rulesets ordered descending by their respective recommended difficulties.
         /// The currently selected ruleset will always be first.
         /// </returns>
-        private IEnumerable<RulesetInfo> orderedRulesets =>
-            recommendedDifficultyMapping
-                .OrderByDescending(pair => pair.Value).Select(pair => pair.Key).Where(r => !r.Equals(ruleset.Value))
-                .Prepend(ruleset.Value);
+        private IEnumerable<RulesetInfo> orderedRulesets
+        {
+            get
+            {
+                if (LoadState < LoadState.Ready || ruleset.Value == null)
+                    return Enumerable.Empty<RulesetInfo>();
+
+                return recommendedDifficultyMapping
+                       .OrderByDescending(pair => pair.Value)
+                       .Select(pair => pair.Key)
+                       .Where(r => !r.Equals(ruleset.Value))
+                       .Prepend(ruleset.Value);
+            }
+        }
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
