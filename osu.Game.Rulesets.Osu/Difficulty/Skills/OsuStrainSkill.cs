@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             List<double> strains = GetCurrentStrainPeaks().OrderByDescending(d => d).ToList();
 
             // We are reducing the highest strains first to account for extreme difficulty spikes
-            for (int i = 0; i < ReducedSectionCount; i++)
+            for (int i = 0; i < Math.Min(strains.Count, ReducedSectionCount); i++)
             {
                 strains[i] *= ReducedStrainBaseline
                               + Math.Log10(Interpolation.Lerp(1, 10, Math.Clamp((float)i / ReducedSectionCount, 0, 1)))
