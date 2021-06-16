@@ -1,11 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -18,16 +16,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public override string Description => @"Beats fade out before you hit them!";
         public override double ScoreMultiplier => 1.06;
-
-        [SettingSource("Fade-out Time", "The bigger this multiplier is, the sooner the notes will start fading out")]
-        public BindableNumber<double> FadeOutTimeMultiplier { get; } = new BindableDouble
-        {
-            MinValue = 0.5,
-            MaxValue = 1.5,
-            Default = 1.0,
-            Value = 1.0,
-            Precision = 0.01,
-        };
 
         /// <summary>
         /// In stable taiko, the hit position is 160, so the active playfield is essentially 160 pixels shorter
@@ -68,7 +56,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     return;
             }
 
-            var preempt = 10000 / MultiplierAt(hitObject.HitObject.StartTime) * FadeOutTimeMultiplier.Value;
+            var preempt = 10000 / MultiplierAt(hitObject.HitObject.StartTime);
             var start = hitObject.HitObject.StartTime - preempt * 0.6;
             var duration = preempt * 0.3;
 
