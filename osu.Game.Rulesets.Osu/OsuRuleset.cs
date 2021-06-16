@@ -187,7 +187,7 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new ModWindUp(), new ModWindDown()),
                         new OsuModTraceable(),
                         new OsuModBarrelRoll(),
-                        new OsuModApproachCircle(),
+                        new OsuModDifferentApproach(),
                     };
 
                 case ModType.System:
