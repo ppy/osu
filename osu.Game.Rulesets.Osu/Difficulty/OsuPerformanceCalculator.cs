@@ -113,14 +113,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
 
             double flashlightBonus = 1.0;
+
             if (mods.Any(h => h is OsuModFlashlight))
             {
                 // Apply object-based bonus for flashlight.
                 flashlightBonus = 1.0 + 0.35 * Math.Min(1.0, totalHits / 200.0) +
-                            (totalHits > 200
-                                ? 0.3 * Math.Min(1.0, (totalHits - 200) / 300.0) +
-                                  (totalHits > 500 ? (totalHits - 500) / 1200.0 : 0.0)
-                                : 0.0);
+                                  (totalHits > 200
+                                      ? 0.3 * Math.Min(1.0, (totalHits - 200) / 300.0) +
+                                        (totalHits > 500 ? (totalHits - 500) / 1200.0 : 0.0)
+                                      : 0.0);
             }
 
             aimValue *= Math.Max(flashlightBonus, approachRateFactor);
