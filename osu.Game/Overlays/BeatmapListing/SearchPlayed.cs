@@ -7,32 +7,32 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-[LocalisableEnum(typeof(SearchPlayedEnumLocalisationMapper))]
-public enum SearchPlayed
-{
-    Any,
-    Played,
-    Unplayed
-}
-
-public class SearchPlayedEnumLocalisationMapper : EnumLocalisationMapper<SearchPlayed>
-{
-    public override LocalisableString Map(SearchPlayed value)
+    [LocalisableEnum(typeof(SearchPlayedEnumLocalisationMapper))]
+    public enum SearchPlayed
     {
-        switch (value)
+        Any,
+        Played,
+        Unplayed
+    }
+
+    public class SearchPlayedEnumLocalisationMapper : EnumLocalisationMapper<SearchPlayed>
+    {
+        public override LocalisableString Map(SearchPlayed value)
         {
-            case SearchPlayed.Any:
-                return BeatmapsStrings.PlayedAny;
+            switch (value)
+            {
+                case SearchPlayed.Any:
+                    return BeatmapsStrings.PlayedAny;
 
-            case SearchPlayed.Played:
-                return BeatmapsStrings.PlayedPlayed;
+                case SearchPlayed.Played:
+                    return BeatmapsStrings.PlayedPlayed;
 
-            case SearchPlayed.Unplayed:
-                return BeatmapsStrings.PlayedUnplayed;
+                case SearchPlayed.Unplayed:
+                    return BeatmapsStrings.PlayedUnplayed;
 
-            default:
-                throw new ArgumentOutOfRangeException(nameof(value), value, null);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
+            }
         }
     }
-}
 }
