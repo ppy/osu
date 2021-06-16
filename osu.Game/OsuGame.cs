@@ -50,6 +50,7 @@ using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Skinning.Editor;
@@ -426,9 +427,12 @@ namespace osu.Game
         {
             // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
             // to ensure all the required data for presenting a replay are present.
-            var databasedScoreInfo = score.OnlineScoreID != null
-                ? ScoreManager.Query(s => s.OnlineScoreID == score.OnlineScoreID)
-                : ScoreManager.Query(s => s.Hash == score.Hash);
+            ScoreInfo databasedScoreInfo = null;
+
+            if (score.OnlineScoreID != null)
+                databasedScoreInfo = ScoreManager.Query(s => s.OnlineScoreID == score.OnlineScoreID);
+
+            databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == score.Hash);
 
             if (databasedScoreInfo == null)
             {
@@ -577,7 +581,7 @@ namespace osu.Game
 
             foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
             {
-                var cultureCode = language.ToString();
+                var cultureCode = language.ToCultureCode();
                 Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
             }
 
@@ -712,7 +716,6 @@ namespace osu.Game
                 PostNotification = n => notifications.Post(n),
             }, Add, true);
 
-            loadComponentSingleFile(difficultyRecommender, Add);
             loadComponentSingleFile(stableImportManager, Add);
 
             loadComponentSingleFile(screenshotManager, Add);
@@ -755,6 +758,7 @@ namespace osu.Game
 
             chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
+            Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
             Add(new MusicKeyBindingHandler());
 
