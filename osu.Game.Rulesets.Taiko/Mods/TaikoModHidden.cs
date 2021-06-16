@@ -37,9 +37,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         protected double MultiplierAt(double position)
         {
-            var beatLength = controlPointInfo.TimingPointAt(position)?.BeatLength;
-            var speedMultiplier = controlPointInfo.DifficultyPointAt(position)?.SpeedMultiplier;
-            return originalSliderMultiplier * (speedMultiplier ?? 1.0) * TimingControlPoint.DEFAULT_BEAT_LENGTH / (beatLength ?? TimingControlPoint.DEFAULT_BEAT_LENGTH);
+            double beatLength = controlPointInfo.TimingPointAt(position).BeatLength;
+            double speedMultiplier = controlPointInfo.DifficultyPointAt(position).SpeedMultiplier;
+
+            return originalSliderMultiplier * speedMultiplier * TimingControlPoint.DEFAULT_BEAT_LENGTH / beatLength;
         }
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
@@ -56,9 +57,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
                     return;
             }
 
-            var preempt = 10000 / MultiplierAt(hitObject.HitObject.StartTime);
-            var start = hitObject.HitObject.StartTime - preempt * 0.6;
-            var duration = preempt * 0.3;
+            double preempt = 10000 / MultiplierAt(hitObject.HitObject.StartTime);
+            double start = hitObject.HitObject.StartTime - preempt * 0.6;
+            double duration = preempt * 0.3;
 
             using (hitObject.BeginAbsoluteSequence(start))
             {
