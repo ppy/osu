@@ -10,6 +10,10 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
+    /// <summary>
+    /// The visual representation of the <see cref="Catcher"/>.
+    /// It includes the body part of the catcher and the catcher plate.
+    /// </summary>
     public class SkinnableCatcher : SkinnableDrawable
     {
         [Cached]

@@ -7,6 +7,12 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
+    /// <summary>
+    /// A trail of the catcher.
+    /// It also represents a hyper dash afterimage.
+    /// </summary>
+    // TODO: Trails shouldn't be animated when the skin has an animated catcher.
+    // The animation should be frozen at the animation frame at the time of the trail generation.
     public class CatcherTrail : PoolableDrawable
     {
         public CatcherAnimationState AnimationState
