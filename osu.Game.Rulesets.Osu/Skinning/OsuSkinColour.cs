@@ -7,6 +7,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
     {
         SliderTrackOverride,
         SliderBorder,
-        SliderBall
+        SliderBall,
+        SpinnerBackground,
     }
 }

@@ -8,11 +8,11 @@ namespace osu.Game.Rulesets.Difficulty
 {
     public class DifficultyAttributes
     {
-        public Mod[] Mods;
-        public Skill[] Skills;
+        public Mod[] Mods { get; set; }
+        public Skill[] Skills { get; set; }
 
-        public double StarRating;
-        public int MaxCombo;
+        public double StarRating { get; set; }
+        public int MaxCombo { get; set; }
 
         public DifficultyAttributes()
         {

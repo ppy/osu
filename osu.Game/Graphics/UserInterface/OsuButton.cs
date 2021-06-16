@@ -49,7 +49,7 @@ namespace osu.Game.Graphics.UserInterface
         protected Box Background;
         protected SpriteText SpriteText;
 
-        public OsuButton(HoverSampleSet? hoverSounds = HoverSampleSet.Loud)
+        public OsuButton(HoverSampleSet? hoverSounds = HoverSampleSet.Button)
         {
             Height = 40;
 
