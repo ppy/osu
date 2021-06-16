@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public override double ScoreMultiplier => 1.06;
 
         /// <summary>
-        /// In stable taiko, the hit position is 160, so the active playfield is essentially 160 pixels shorter
+        /// In osu-stable, the hit position is 160, so the active playfield is essentially 160 pixels shorter
         /// than the actual screen width. The normalized playfield height is 480, so on a 4:3 screen the
         /// playfield ratio of the active area up to the hit position will actually be (640 - 160) / 480 = 1.
         /// For custom resolutions/aspect ratios (x:y), the screen width given the normalized height becomes 480 * x / y instead,
@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         private const double hd_sv_scale = (4.0 / 3.0 - 1.0 / 3.0) / (16.0 / 9.0 - 1.0 / 3.0);
 
         private double originalSliderMultiplier;
+
         private ControlPointInfo controlPointInfo;
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
@@ -79,12 +80,13 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
+            // needs to be read after all processing has been run (TaikoBeatmapConverter applies an adjustment which would otherwise be omitted).
             originalSliderMultiplier = difficulty.SliderMultiplier;
 
-            // the hidden mod on stable had an added playfield cover that essentially forced a 4:3 playfield ratio, by cutting off all objects past that size.
-            // lazer currently uses a playfield adjustment container which keeps a 16:9 ratio.
-            // therefore, increase the slider multiplier proportionally so that the notes stay on the screen for the same amount of time as on stable.
-            // note that this will means that the notes will scroll faster as they have a longer distance to travel on the screen in that same amount of time.
+            // osu-stable has an added playfield cover that essentially forces a 4:3 playfield ratio, by cutting off all objects past that size.
+            // This is not yet implemented; instead a playfield adjustment container is present which maintains a 16:9 ratio.
+            // For now, increase the slider multiplier proportionally so that the notes stay on the screen for the same amount of time as on stable.
+            // Note that this means that the notes will scroll faster as they have a longer distance to travel on the screen in that same amount of time.
             difficulty.SliderMultiplier /= hd_sv_scale;
         }
 
