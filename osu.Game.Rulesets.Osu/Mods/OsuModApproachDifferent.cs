@@ -1,9 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
@@ -13,7 +11,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModApproachDifferent : Mod, IApplicableToDrawableHitObjects
+    public class OsuModApproachDifferent : Mod, IApplicableToDrawableHitObject
     {
         public override string Name => "Approach Different";
         public override string Acronym => "AD";
@@ -32,22 +30,19 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Style", "Change the animation style of the approach circles.", 1)]
         public Bindable<AnimationStyle> Style { get; } = new Bindable<AnimationStyle>();
 
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
-            drawables.ForEach(drawable =>
+            drawable.ApplyCustomUpdateState += (drawableObject, state) =>
             {
-                drawable.ApplyCustomUpdateState += (drawableObject, state) =>
-                {
-                    if (!(drawableObject is DrawableHitCircle drawableHitCircle)) return;
+                if (!(drawableObject is DrawableHitCircle drawableHitCircle)) return;
 
-                    var hitCircle = drawableHitCircle.HitObject;
+                var hitCircle = drawableHitCircle.HitObject;
 
-                    drawableHitCircle.ApproachCircle.ClearTransforms(targetMember: nameof(Scale));
+                drawableHitCircle.ApproachCircle.ClearTransforms(targetMember: nameof(Scale));
 
-                    using (drawableHitCircle.BeginAbsoluteSequence(hitCircle.StartTime - hitCircle.TimePreempt))
-                        drawableHitCircle.ApproachCircle.ScaleTo(Scale.Value).ScaleTo(1f, hitCircle.TimePreempt, getEasing(Style.Value));
-                };
-            });
+                using (drawableHitCircle.BeginAbsoluteSequence(hitCircle.StartTime - hitCircle.TimePreempt))
+                    drawableHitCircle.ApproachCircle.ScaleTo(Scale.Value).ScaleTo(1f, hitCircle.TimePreempt, getEasing(Style.Value));
+            };
         }
 
         private Easing getEasing(AnimationStyle style)
