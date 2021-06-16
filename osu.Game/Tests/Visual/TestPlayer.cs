@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual
                 base.UpdateSkins();
 
                 if (skin != null)
-                    SkinSources.Insert(0, Ruleset.CreateLegacySkinProvider(skin, Beatmap));
+                    SkinSources.Insert(0, GetRulesetTransformedSkin(skin));
             }
         }
     }
