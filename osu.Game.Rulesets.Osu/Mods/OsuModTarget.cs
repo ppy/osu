@@ -193,15 +193,17 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             for (int i = 0; i < hitObjects.Count; i++)
             {
-                var x = hitObjects[i];
+                var obj = hitObjects[i];
 
                 if (i == 0)
                 {
-                    x.Position = new Vector2(nextSingle(OsuPlayfield.BASE_SIZE.X), nextSingle(OsuPlayfield.BASE_SIZE.Y));
+                    obj.Position = new Vector2(nextSingle(OsuPlayfield.BASE_SIZE.X), nextSingle(OsuPlayfield.BASE_SIZE.Y));
                 }
                 else
                 {
-                    var distance = Math.Min(max_distance, 40f * (float)Math.Pow(1.05, x.ComboIndex));
+                    var distance = 40f * (float)Math.Pow(1.05, obj.ComboIndex);
+                    if (obj.NewCombo) distance *= 1.5f;
+                    distance = Math.Min(max_distance, distance);
                     var relativePos = new Vector2(
                         distance * (float)Math.Cos(direction),
                         distance * (float)Math.Sin(direction)
@@ -220,9 +222,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                     else if (newPosition.X > OsuPlayfield.BASE_SIZE.X)
                         newPosition.X = OsuPlayfield.BASE_SIZE.X;
 
-                    x.Position = newPosition;
+                    obj.Position = newPosition;
 
-                    if (x.LastInCombo)
+                    if (obj.LastInCombo)
                         direction = MathHelper.TwoPi * nextSingle();
                     else
                         direction += distance / max_distance * (nextSingle() * MathHelper.TwoPi - MathHelper.Pi);
@@ -354,7 +356,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             return rotateVectorTowardsVector(
                 posRelativeToPrev,
                 Vector2.Subtract(playfieldMiddle, prevPosChanged),
-                relativeRotationDistance / 2
+                relativeRotationDistance * 0.75f
             );
         }
 
