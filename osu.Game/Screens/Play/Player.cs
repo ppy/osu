@@ -509,16 +509,18 @@ namespace osu.Game.Screens.Play
         /// Attempts to complete a user request to exit gameplay.
         /// </summary>
         /// <remarks>
-        /// - This should only be called in response to a user interaction. Exiting is not guaranteed.
-        /// - This will interrupt any pending progression to the results screen, even if the transition has begun.
+        /// <list type="bullet">
+        /// <item>This should only be called in response to a user interaction. Exiting is not guaranteed.</item>
+        /// <item>This will interrupt any pending progression to the results screen, even if the transition has begun.</item>
+        /// </list>
         /// </remarks>
         /// <param name="showDialogFirst">
         /// Whether the pause or fail dialog should be shown before performing an exit.
-        /// If <c>true</c> and a dialog is not yet displayed, the exit will be blocked the relevant dialog will display instead.
+        /// If <see langword="true"/> and a dialog is not yet displayed, the exit will be blocked and the relevant dialog will display instead.
         /// </param>
         protected void PerformExit(bool showDialogFirst)
         {
-            // if an exit has been requested, cancel any pending completion (the user has showing intention to exit).
+            // if an exit has been requested, cancel any pending completion (the user has shown intention to exit).
             resultsDisplayDelegate?.Cancel();
 
             // there is a chance that an exit request occurs after the transition to results has already started.
