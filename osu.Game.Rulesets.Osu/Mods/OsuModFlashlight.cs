@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -19,7 +17,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModFlashlight : ModFlashlight<OsuHitObject>, IApplicableToDrawableHitObjects
+    public class OsuModFlashlight : ModFlashlight<OsuHitObject>, IApplicableToDrawableHitObject
     {
         public override double ScoreMultiplier => 1.12;
 
@@ -31,12 +29,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight();
 
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
-            foreach (var s in drawables.OfType<DrawableSlider>())
-            {
+            if (drawable is DrawableSlider s)
                 s.Tracking.ValueChanged += flashlight.OnSliderTrackingChange;
-            }
         }
 
         public override void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
