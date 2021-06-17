@@ -522,11 +522,11 @@ namespace osu.Game.Screens.Play
         /// </remarks>
         /// <param name="showDialogFirst">
         /// Whether the pause or fail dialog should be shown before performing an exit.
-        /// If <see langword="true"/> and a dialog is not yet displayed, the exit will be blocked the relevant dialog will display instead.
+        /// If <see langword="true"/> and a dialog is not yet displayed, the exit will be blocked and the relevant dialog will display instead.
         /// </param>
         protected void PerformExit(bool showDialogFirst)
         {
-            // if an exit has been requested, cancel any pending completion (the user has showing intention to exit).
+            // if an exit has been requested, cancel any pending completion (the user has shown intention to exit).
             completionProgressDelegate?.Cancel();
 
             // there is a chance that an exit request occurs after the transition to results has already started.
