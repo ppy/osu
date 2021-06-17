@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         protected DrawableSpinner DrawableSpinner { get; private set; }
 
+        private Drawable approachCircle;
+
         private Sprite spin;
         private Sprite clear;
 
@@ -57,8 +59,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             {
                 Depth = float.MinValue,
                 RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                Children = new[]
                 {
+                    approachCircle = getSpinnerApproachCircle(source),
                     spin = new Sprite
                     {
                         Anchor = Anchor.TopCentre,
@@ -101,6 +104,25 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     }.With(s => s.Font = s.Font.With(fixedWidth: false)),
                 }
             });
+
+            static Drawable getSpinnerApproachCircle(ISkinSource source)
+            {
+                var spinnerProvider = source.FindProvider(s =>
+                    s.GetTexture("spinner-circle") != null ||
+                    s.GetTexture("spinner-top") != null);
+
+                if (spinnerProvider is DefaultLegacySkin)
+                    return Empty();
+
+                return new Sprite
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.Centre,
+                    Texture = source.GetTexture("spinner-approachcircle"),
+                    Scale = new Vector2(SPRITE_SCALE * 1.86f),
+                    Y = SPINNER_Y_CENTRE,
+                };
+            }
         }
 
         private IBindable<double> gainedBonus;
@@ -174,6 +196,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         spmBackground.MoveToOffset(new Vector2(0, -spm_hide_offset), d.HitObject.TimeFadeIn, Easing.Out);
                         spmCounter.MoveToOffset(new Vector2(0, -spm_hide_offset), d.HitObject.TimeFadeIn, Easing.Out);
                     }
+
+                    using (BeginAbsoluteSequence(d.HitObject.StartTime))
+                        approachCircle.ScaleTo(SPRITE_SCALE * 1.86f).ScaleTo(SPRITE_SCALE * 0.1f, d.HitObject.Duration);
 
                     double spinFadeOutLength = Math.Min(400, d.HitObject.Duration);
 
