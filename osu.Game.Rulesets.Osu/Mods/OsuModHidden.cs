@@ -110,6 +110,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                     // hide elements we don't care about.
                     // todo: hide background
 
+                    using (spinner.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
+                        spinner.HideApproachCircle();
+
                     using (spinner.BeginAbsoluteSequence(fadeStartTime))
                         spinner.FadeOut(fadeDuration);
 
