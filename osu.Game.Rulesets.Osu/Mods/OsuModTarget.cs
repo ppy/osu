@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                                    while (Precision.AlmostBigger(endTime, currentTime) && beatmap.ControlPointInfo.TimingPointAt(currentTime) == tp)
                                    {
-                                       tpBeats.Add(currentTime);
+                                       tpBeats.Add(Math.Floor(currentTime));
                                        currentTime += tp.BeatLength;
                                    }
 
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (samples == null)
                 {
                     if (i > 0)
-                        x.Samples = hitObjects[i - 1].Samples;
+                        x.Samples = hitObjects[i - 1].Samples.Where(s => !HitSampleInfo.AllAdditions.Contains(s.Name)).ToList();
                 }
                 else
                 {
@@ -289,7 +289,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 drawable.ScaleTo(0.4f)
                         .Then().ScaleTo(1.6f, h.TimePreempt * 2);
                 drawable.FadeTo(0.5f)
-                        .Then().Delay(h.TimeFadeIn).FadeTo(1f);
+                        .Then().Delay(h.TimePreempt * 2 / 3).FadeTo(1f);
 
                 // remove approach circles
                 circle.ApproachCircle.Hide();
@@ -304,6 +304,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             // Decrease AR to increase preempt time
             difficulty.ApproachRate *= 0.5f;
+            difficulty.CircleSize *= 0.75f;
         }
 
         // The distances from the hit objects to the borders of the playfield they start to "turn around" and curve towards the middle.
