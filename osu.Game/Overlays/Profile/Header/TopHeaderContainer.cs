@@ -58,12 +58,11 @@ namespace osu.Game.Overlays.Profile.Header
                     Origin = Anchor.CentreLeft,
                     Children = new Drawable[]
                     {
-                        avatar = new UpdateableAvatar(openOnClick: false)
+                        avatar = new UpdateableAvatar(openOnClick: false, showGuestOnNull: false)
                         {
                             Size = new Vector2(avatar_size),
                             Masking = true,
                             CornerRadius = avatar_size * 0.25f,
-                            ShowGuestOnNull = false,
                         },
                         new Container
                         {
