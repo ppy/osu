@@ -21,17 +21,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         private int depthIndex;
 
         [Test]
-        public void TestVariousHitCircles()
+        public void TestHits()
         {
-            AddStep("Miss Big Single", () => SetContents(_ => testSingle(2)));
-            AddStep("Miss Medium Single", () => SetContents(_ => testSingle(5)));
-            AddStep("Miss Small Single", () => SetContents(_ => testSingle(7)));
             AddStep("Hit Big Single", () => SetContents(_ => testSingle(2, true)));
             AddStep("Hit Medium Single", () => SetContents(_ => testSingle(5, true)));
             AddStep("Hit Small Single", () => SetContents(_ => testSingle(7, true)));
-            AddStep("Miss Big Stream", () => SetContents(_ => testStream(2)));
-            AddStep("Miss Medium Stream", () => SetContents(_ => testStream(5)));
-            AddStep("Miss Small Stream", () => SetContents(_ => testStream(7)));
             AddStep("Hit Big Stream", () => SetContents(_ => testStream(2, true)));
             AddStep("Hit Medium Stream", () => SetContents(_ => testStream(5, true)));
             AddStep("Hit Small Stream", () => SetContents(_ => testStream(7, true)));
@@ -41,6 +35,17 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestHittingEarly()
         {
             AddStep("Hit stream early", () => SetContents(_ => testStream(5, true, -150)));
+        }
+
+        [Test]
+        public void TestMisses()
+        {
+            AddStep("Miss Big Single", () => SetContents(_ => testSingle(2)));
+            AddStep("Miss Medium Single", () => SetContents(_ => testSingle(5)));
+            AddStep("Miss Small Single", () => SetContents(_ => testSingle(7)));
+            AddStep("Miss Big Stream", () => SetContents(_ => testStream(2)));
+            AddStep("Miss Medium Stream", () => SetContents(_ => testStream(5)));
+            AddStep("Miss Small Stream", () => SetContents(_ => testStream(7)));
         }
 
         [Test]
