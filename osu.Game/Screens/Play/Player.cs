@@ -629,7 +629,7 @@ namespace osu.Game.Screens.Play
         /// The display of the results screen may be delayed by any work being done in <see cref="PrepareScoreForResults"/> and <see cref="PrepareScoreForResultsAsync"/>.
         /// </summary>
         /// <remarks>
-        /// Once set, this can *only* be cancelled by rewinding, ie. if <see cref="JudgementProcessor.HasCompleted"/>ScoreProcessor.HasCompleted</see> becomes <see langword="false"/>.
+        /// Once set, this can *only* be cancelled by rewinding, ie. if <see cref="JudgementProcessor.HasCompleted">ScoreProcessor.HasCompleted</see> becomes <see langword="false"/>.
         /// Even if the user requests an exit, it will forcefully proceed to the results screen (see special case in <see cref="OnExiting"/>).
         /// </remarks>
         private ScheduledDelegate resultsDisplayDelegate;
