@@ -512,19 +512,23 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
-        /// Exits the <see cref="Player"/>.
+        /// Attempts to complete a user request to exit gameplay.
         /// </summary>
+        /// <remarks>
+        /// - This should only be called in response to a user interaction. Exiting is not guaranteed.
+        /// - This will interrupt any pending progression to the results screen, even if the transition has begun.
+        /// </remarks>
         /// <param name="showDialogFirst">
         /// Whether the pause or fail dialog should be shown before performing an exit.
-        /// If true and a dialog is not yet displayed, the exit will be blocked the the relevant dialog will display instead.
+        /// If <c>true</c> and a dialog is not yet displayed, the exit will be blocked the relevant dialog will display instead.
         /// </param>
         protected void PerformExit(bool showDialogFirst)
         {
-            // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
+            // if an exit has been requested, cancel any pending completion (the user has showing intention to exit).
             completionProgressDelegate?.Cancel();
 
-            // there is a chance that the exit was performed after the transition to results has started.
-            // we want to give the user what they want, so forcefully return to this screen (to proceed with the upwards exit process).
+            // there is a chance that an exit request occurs after the transition to results has already started.
+            // even in such a case, the user has shown intent, so forcefully return to this screen (to proceed with the upwards exit process).
             if (!this.IsCurrentScreen())
             {
                 ValidForResume = false;
@@ -547,7 +551,7 @@ namespace osu.Game.Screens.Play
                     return;
                 }
 
-                // there's a chance the pausing is not supported in the current state, at which point immediate exit should be preferred.
+                // even if this call has requested a dialog, there is a chance the current player mode doesn't support pausing.
                 if (pausingSupportedByCurrentState)
                 {
                     // in the case a dialog needs to be shown, attempt to pause and show it.
@@ -563,6 +567,10 @@ namespace osu.Game.Screens.Play
                 }
             }
 
+            // The actual exit is performed if
+            // - the pause / fail dialog was not requested
+            // - the pause / fail dialog was requested but is already displayed (user showing intention to exit).
+            // - the pause / fail dialog was requested but couldn't be displayed due to the type or state of this Player instance.
             this.Exit();
         }
 
