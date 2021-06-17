@@ -132,11 +132,11 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
         private void free()
         {
-            Debug.Assert(entry != null && HasEntryApplied);
+            Debug.Assert(Entry != null && HasEntryApplied);
 
-            OnFree(entry);
+            OnFree(Entry);
 
-            entry.LifetimeChanged -= setLifetimeFromEntry;
+            Entry.LifetimeChanged -= setLifetimeFromEntry;
             entry = null;
             base.LifetimeStart = double.MinValue;
             base.LifetimeEnd = double.MaxValue;
