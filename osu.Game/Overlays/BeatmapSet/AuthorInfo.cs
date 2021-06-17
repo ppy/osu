@@ -53,9 +53,8 @@ namespace osu.Game.Overlays.BeatmapSet
                     AutoSizeAxes = Axes.Both,
                     CornerRadius = 4,
                     Masking = true,
-                    Child = avatar = new UpdateableAvatar
+                    Child = avatar = new UpdateableAvatar(showGuestOnNull: false)
                     {
-                        ShowGuestOnNull = false,
                         Size = new Vector2(height),
                     },
                     EdgeEffect = new EdgeEffectParameters
