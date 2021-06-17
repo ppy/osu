@@ -629,7 +629,7 @@ namespace osu.Game.Screens.Play
         /// The display of the results screen may be delayed by any work being done in <see cref="PrepareScoreForResults"/> and <see cref="PrepareScoreForResultsAsync"/>.
         /// </summary>
         /// <remarks>
-        /// Once set, this can *only* be cancelled by rewinding, ie. if ScoreProcessor.HasCompleted becomes <c>false</c>.
+        /// Once set, this can *only* be cancelled by rewinding, ie. if <see cref="JudgementProcessor.HasCompleted"/>ScoreProcessor.HasCompleted</see> becomes <see langword="false"/>.
         /// Even if the user requests an exit, it will forcefully proceed to the results screen (see special case in <see cref="OnExiting"/>).
         /// </remarks>
         private ScheduledDelegate resultsDisplayDelegate;
@@ -647,7 +647,7 @@ namespace osu.Game.Screens.Play
         /// <exception cref="InvalidOperationException">Thrown if this method is called more than once without changing state.</exception>
         private void updateCompletionState(bool skipStoryboardOutro = false)
         {
-            // If this player instance is already exiting upwards, don't attempt any kind of forward progress.
+            // If this player instance is in the middle of an exit, don't attempt any kind of state update.
             if (!this.IsCurrentScreen())
                 return;
 
