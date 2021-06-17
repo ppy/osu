@@ -114,11 +114,11 @@ namespace osu.Game.Rulesets.Osu.Tests
                 this.hitOffset = hitOffset;
             }
 
-            public void TriggerJudgement() => UpdateResult(true);
+            public void TriggerJudgement() => Schedule(() => UpdateResult(true));
 
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
-                if (auto && !userTriggered && timeOffset > hitOffset)
+                if (auto && !userTriggered && timeOffset > hitOffset && CheckHittable?.Invoke(this, Time.Current) != false)
                 {
                     // force success
                     ApplyResult(r => r.Type = HitResult.Great);
