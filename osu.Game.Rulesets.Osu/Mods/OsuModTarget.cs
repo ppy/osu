@@ -26,6 +26,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -46,11 +47,22 @@ namespace osu.Game.Rulesets.Osu.Mods
             Value = null
         };
 
-        public bool PerformFail() => true;
-
         public bool RestartOnFail => false;
 
         public bool DisplayResultsOnFail => true;
+
+        // Maximum distance to jump
+        private const float max_distance = 250f;
+
+        // The distances from the hit objects to the borders of the playfield they start to "turn around" and curve towards the middle.
+        // The closer the hit objects draw to the border, the sharper the turn
+        private const byte border_distance_x = 192;
+        private const byte border_distance_y = 144;
+
+        public bool PerformFail()
+        {
+            return true;
+        }
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
@@ -59,9 +71,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 => result.Type.AffectsCombo()
                    && !result.IsHit;
         }
-
-        // Maximum distance to jump
-        private const float max_distance = 250f;
 
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
@@ -88,6 +97,55 @@ namespace osu.Game.Rulesets.Osu.Mods
             osuBeatmap.HitObjects = hitObjects;
 
             base.ApplyToBeatmap(beatmap);
+        }
+
+        public void ReadFromDifficulty(BeatmapDifficulty difficulty)
+        {
+        }
+
+        public void ApplyToDifficulty(BeatmapDifficulty difficulty)
+        {
+            // Decrease AR to increase preempt time
+            difficulty.ApproachRate *= 0.5f;
+            difficulty.CircleSize *= 0.75f;
+        }
+
+        // Background metronome
+
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
+        {
+            drawableRuleset.Overlays.Add(new TargetBeatContainer());
+        }
+
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject drawable, ArmedState state)
+        {
+        }
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject drawable, ArmedState state)
+        {
+            if (!(drawable is DrawableHitCircle circle)) return;
+
+            var h = (OsuHitObject)drawable.HitObject;
+
+            using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
+            {
+                drawable.ScaleTo(0.5f)
+                        .Then().ScaleTo(1f, h.TimePreempt);
+
+                var colour = drawable.Colour;
+
+                var avgColour = colour.AverageColour.Linear;
+                drawable.FadeColour(new Color4(avgColour.R * 0.45f, avgColour.G * 0.45f, avgColour.B * 0.45f, avgColour.A))
+                        .Then().Delay(h.TimeFadeIn).FadeColour(colour);
+
+                // remove approach circles
+                circle.ApproachCircle.Hide();
+            }
+        }
+
+        private static float map(float value, float fromLow, float fromHigh, float toLow, float toHigh)
+        {
+            return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
         }
 
         private IEnumerable<double> generateBeats(IBeatmap beatmap, IReadOnlyCollection<OsuHitObject> origHitObjects)
@@ -125,35 +183,43 @@ namespace osu.Game.Rulesets.Osu.Mods
                                .ToList();
 
             // Remove beats that are too close to the next one (e.g. due to timing point changes)
-            for (int i = beats.Count - 2; i >= 0; i--)
+            for (var i = beats.Count - 2; i >= 0; i--)
             {
                 var beat = beats[i];
 
-                if (Precision.AlmostBigger(beatmap.ControlPointInfo.TimingPointAt(beat).BeatLength / 2, beats[i + 1] - beat))
-                {
-                    beats.RemoveAt(i);
-                }
+                if (Precision.AlmostBigger(beatmap.ControlPointInfo.TimingPointAt(beat).BeatLength / 2, beats[i + 1] - beat)) beats.RemoveAt(i);
             }
 
             return beats;
         }
 
-        private void addHitSamples(IReadOnlyList<OsuHitObject> hitObjects, IReadOnlyCollection<OsuHitObject> origHitObjects)
+        private void addHitSamples(IEnumerable<OsuHitObject> hitObjects, IReadOnlyList<OsuHitObject> origHitObjects)
         {
-            for (int i = 0; i < hitObjects.Count; i++)
+            var lastSampleIdx = 0;
+
+            foreach (var x in hitObjects)
             {
-                var x = hitObjects[i];
                 var samples = getSamplesAtTime(origHitObjects, x.StartTime);
 
                 if (samples == null)
                 {
-                    if (i > 0)
-                        x.Samples = hitObjects[i - 1].Samples.Where(s => !HitSampleInfo.AllAdditions.Contains(s.Name)).ToList();
+                    while (lastSampleIdx < origHitObjects.Count && origHitObjects[lastSampleIdx].StartTime <= x.StartTime)
+                        lastSampleIdx++;
+                    lastSampleIdx--;
+
+                    if (lastSampleIdx < 0 && lastSampleIdx >= origHitObjects.Count) continue;
+
+                    if (lastSampleIdx < origHitObjects.Count - 1)
+                    {
+                        // get samples from the next hit object if it is closer in time
+                        if (origHitObjects[lastSampleIdx + 1].StartTime - x.StartTime < x.StartTime - origHitObjects[lastSampleIdx].StartTime)
+                            lastSampleIdx++;
+                    }
+
+                    x.Samples = origHitObjects[lastSampleIdx].Samples.Where(s => !HitSampleInfo.AllAdditions.Contains(s.Name)).ToList();
                 }
                 else
-                {
                     x.Samples = samples;
-                }
             }
         }
 
@@ -168,13 +234,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             // Then reprocess them to ensure continuity in the combo indices and add indices in current combo
             var combos = hitObjects.GroupBy(x => x.ComboIndex).ToList();
 
-            for (int i = 0; i < combos.Count; i++)
+            for (var i = 0; i < combos.Count; i++)
             {
                 var group = combos[i].ToList();
                 group.First().NewCombo = true;
                 group.Last().LastInCombo = true;
 
-                for (int j = 0; j < group.Count; j++)
+                for (var j = 0; j < group.Count; j++)
                 {
                     var x = group[j];
                     x.ComboIndex = i;
@@ -190,53 +256,52 @@ namespace osu.Game.Rulesets.Osu.Mods
             float nextSingle(float max = 1f) => (float)(rng.NextDouble() * max);
 
             var direction = MathHelper.TwoPi * nextSingle();
+            var maxComboIndex = hitObjects.Last().ComboIndex;
 
-            for (int i = 0; i < hitObjects.Count; i++)
+            for (var i = 0; i < hitObjects.Count; i++)
             {
                 var obj = hitObjects[i];
+                var lastPos = i == 0
+                    ? Vector2.Divide(OsuPlayfield.BASE_SIZE, 2)
+                    : hitObjects[i - 1].Position;
 
-                if (i == 0)
-                {
-                    obj.Position = new Vector2(nextSingle(OsuPlayfield.BASE_SIZE.X), nextSingle(OsuPlayfield.BASE_SIZE.Y));
-                }
+                var distance = map(obj.ComboIndex, 0, maxComboIndex, (float)obj.Radius, 333f);
+                if (obj.NewCombo) distance *= 1.5f;
+                if (obj.Kiai) distance *= 1.2f;
+                distance = Math.Min(max_distance, distance);
+
+                var relativePos = new Vector2(
+                    distance * (float)Math.Cos(direction),
+                    distance * (float)Math.Sin(direction)
+                );
+                relativePos = getRotatedVector(lastPos, relativePos);
+                direction = (float)Math.Atan2(relativePos.Y, relativePos.X);
+
+                var newPosition = Vector2.Add(lastPos, relativePos);
+
+                if (newPosition.Y < 0)
+                    newPosition.Y = 0;
+                else if (newPosition.Y > OsuPlayfield.BASE_SIZE.Y)
+                    newPosition.Y = OsuPlayfield.BASE_SIZE.Y;
+                if (newPosition.X < 0)
+                    newPosition.X = 0;
+                else if (newPosition.X > OsuPlayfield.BASE_SIZE.X)
+                    newPosition.X = OsuPlayfield.BASE_SIZE.X;
+
+                obj.Position = newPosition;
+
+                if (obj.LastInCombo)
+                    direction = MathHelper.TwoPi * nextSingle();
                 else
-                {
-                    var distance = 40f * (float)Math.Pow(1.05, obj.ComboIndex);
-                    if (obj.NewCombo) distance *= 1.5f;
-                    distance = Math.Min(max_distance, distance);
-                    var relativePos = new Vector2(
-                        distance * (float)Math.Cos(direction),
-                        distance * (float)Math.Sin(direction)
-                    );
-                    relativePos = getRotatedVector(hitObjects[i - 1].Position, relativePos);
-                    direction = (float)Math.Atan2(relativePos.Y, relativePos.X);
-
-                    var newPosition = Vector2.Add(hitObjects[i - 1].Position, relativePos);
-
-                    if (newPosition.Y < 0)
-                        newPosition.Y = 0;
-                    else if (newPosition.Y > OsuPlayfield.BASE_SIZE.Y)
-                        newPosition.Y = OsuPlayfield.BASE_SIZE.Y;
-                    if (newPosition.X < 0)
-                        newPosition.X = 0;
-                    else if (newPosition.X > OsuPlayfield.BASE_SIZE.X)
-                        newPosition.X = OsuPlayfield.BASE_SIZE.X;
-
-                    obj.Position = newPosition;
-
-                    if (obj.LastInCombo)
-                        direction = MathHelper.TwoPi * nextSingle();
-                    else
-                        direction += distance / max_distance * (nextSingle() * MathHelper.TwoPi - MathHelper.Pi);
-                }
+                    direction += distance / max_distance * (nextSingle() * MathHelper.TwoPi - MathHelper.Pi);
             }
         }
 
         /// <summary>
-        /// Get samples (if any) for a specific point in time.
+        ///     Get samples (if any) for a specific point in time.
         /// </summary>
         /// <remarks>
-        /// Samples will be returned if a hit circle or a slider node exists at that point of time.
+        ///     Samples will be returned if a hit circle or a slider node exists at that point of time.
         /// </remarks>
         /// <param name="hitObjects">The list of hit objects in a beatmap, ordered by StartTime</param>
         /// <param name="time">The point in time to get samples for</param>
@@ -260,62 +325,15 @@ namespace osu.Game.Rulesets.Osu.Mods
             IList<HitSampleInfo> samples;
 
             if (sampleObj is Slider slider)
-            {
                 samples = slider.NodeSamples[(int)Math.Round((time - slider.StartTime) % slider.SpanDuration)];
-            }
             else
-            {
                 samples = sampleObj.Samples;
-            }
 
             return samples;
         }
 
-        protected override void ApplyIncreasedVisibilityState(DrawableHitObject drawable, ArmedState state)
-        {
-        }
-
-        protected override void ApplyNormalVisibilityState(DrawableHitObject drawable, ArmedState state)
-        {
-            if (drawable is DrawableSpinner)
-                return;
-
-            var h = (OsuHitObject)drawable.HitObject;
-
-            // apply grow and fade effect
-            if (!(drawable is DrawableHitCircle circle)) return;
-
-            using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
-            {
-                // todo: this doesn't feel quite right yet
-                drawable.ScaleTo(0.4f)
-                        .Then().ScaleTo(1.6f, h.TimePreempt * 2);
-                drawable.FadeTo(0.5f)
-                        .Then().Delay(h.TimePreempt * 2 / 3).FadeTo(1f);
-
-                // remove approach circles
-                circle.ApproachCircle.Hide();
-            }
-        }
-
-        public void ReadFromDifficulty(BeatmapDifficulty difficulty)
-        {
-        }
-
-        public void ApplyToDifficulty(BeatmapDifficulty difficulty)
-        {
-            // Decrease AR to increase preempt time
-            difficulty.ApproachRate *= 0.5f;
-            difficulty.CircleSize *= 0.75f;
-        }
-
-        // The distances from the hit objects to the borders of the playfield they start to "turn around" and curve towards the middle.
-        // The closer the hit objects draw to the border, the sharper the turn
-        private const byte border_distance_x = 192;
-        private const byte border_distance_y = 144;
-
         /// <summary>
-        /// Determines the position of the current hit object relative to the previous one.
+        ///     Determines the position of the current hit object relative to the previous one.
         /// </summary>
         /// <returns>The position of the current hit object relative to the previous one</returns>
         private Vector2 getRotatedVector(Vector2 prevPosChanged, Vector2 posRelativeToPrev)
@@ -356,16 +374,19 @@ namespace osu.Game.Rulesets.Osu.Mods
             return rotateVectorTowardsVector(
                 posRelativeToPrev,
                 Vector2.Subtract(playfieldMiddle, prevPosChanged),
-                relativeRotationDistance * 0.75f
+                Math.Min(1, relativeRotationDistance * 0.75f)
             );
         }
 
         /// <summary>
-        /// Rotates vector "initial" towards vector "destination"
+        ///     Rotates vector "initial" towards vector "destination"
         /// </summary>
         /// <param name="initial">Vector to rotate to "destination"</param>
         /// <param name="destination">Vector "initial" should be rotated to</param>
-        /// <param name="relativeDistance">The angle the vector should be rotated relative to the difference between the angles of the the two vectors.</param>
+        /// <param name="relativeDistance">
+        ///     The angle the vector should be rotated relative to the difference between the angles of
+        ///     the the two vectors.
+        /// </param>
         /// <returns>Resulting vector</returns>
         private Vector2 rotateVectorTowardsVector(Vector2 initial, Vector2 destination, float relativeDistance)
         {
@@ -374,15 +395,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var diff = destAngleRad - initialAngleRad;
 
-            while (diff < -Math.PI)
-            {
-                diff += 2 * Math.PI;
-            }
+            while (diff < -Math.PI) diff += 2 * Math.PI;
 
-            while (diff > Math.PI)
-            {
-                diff -= 2 * Math.PI;
-            }
+            while (diff > Math.PI) diff -= 2 * Math.PI;
 
             var finalAngleRad = initialAngleRad + relativeDistance * diff;
 
@@ -390,13 +405,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 initial.Length * (float)Math.Cos(finalAngleRad),
                 initial.Length * (float)Math.Sin(finalAngleRad)
             );
-        }
-
-        // Background metronome
-
-        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
-        {
-            drawableRuleset.Overlays.Add(new TargetBeatContainer());
         }
 
         public class TargetBeatContainer : BeatSyncedContainer
@@ -408,15 +416,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 Divisor = 1;
             }
 
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                InternalChildren = new Drawable[]
-                {
-                    sample = new PausableSkinnableSound(new SampleInfo("spinnerbonus")) // todo: use another sample?
-                };
-            }
-
             protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
@@ -424,6 +423,15 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (!IsBeatSyncedWithTrack) return;
 
                 sample?.Play();
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                InternalChildren = new Drawable[]
+                {
+                    sample = new PausableSkinnableSound(new SampleInfo("spinnerbonus")) // todo: use another sample
+                };
             }
         }
     }
