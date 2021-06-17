@@ -559,12 +559,6 @@ namespace osu.Game.Screens.Play
                     Pause();
                     return;
                 }
-
-                // if the score is ready for display but results screen has not been pushed yet (e.g. storyboard is still playing beyond gameplay), then transition to results screen instead of exiting.
-                if (prepareScoreForDisplayTask != null && completionProgressDelegate == null)
-                {
-                    updateCompletionState(true);
-                }
             }
 
             // The actual exit is performed if
