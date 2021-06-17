@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI;
@@ -14,13 +13,13 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
 {
-    [Cached(typeof(IPlayfieldProvider))]
-    public abstract class ManiaSelectionBlueprintTestScene : SelectionBlueprintTestScene, IPlayfieldProvider
+    public abstract class ManiaSelectionBlueprintTestScene : SelectionBlueprintTestScene
     {
         protected override Container<Drawable> Content => blueprints ?? base.Content;
 
         private readonly Container blueprints;
 
+        [Cached(typeof(Playfield))]
         public Playfield Playfield { get; }
 
         private readonly ScrollingTestContainer scrollingTestContainer;
