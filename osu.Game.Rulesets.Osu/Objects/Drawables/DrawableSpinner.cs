@@ -42,6 +42,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private const float spinning_sample_initial_frequency = 1.0f;
         private const float spinning_sample_modulated_base_frequency = 0.5f;
 
+        internal readonly Bindable<Visibility> ApproachCircleVisibility = new Bindable<Visibility>(Visibility.Visible);
+
         /// <summary>
         /// The amount of bonus score gained from spinning after the required number of spins, for display purposes.
         /// </summary>
@@ -284,6 +286,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             updateBonusScore();
         }
+
+        /// <summary>
+        /// Hides the spinner's approach circle if it has one.
+        /// </summary>
+        public void HideApproachCircle() => this.TransformBindableTo(ApproachCircleVisibility, Visibility.Hidden);
 
         private static readonly int score_per_tick = new SpinnerBonusTick.OsuSpinnerBonusTickJudgement().MaxNumericResult;
 

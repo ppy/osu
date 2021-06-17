@@ -125,6 +125,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             }
         }
 
+        private IBindable<Visibility> approachCircleVisibility;
         private IBindable<double> gainedBonus;
         private IBindable<double> spinsPerMinute;
 
@@ -133,6 +134,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            approachCircleVisibility = DrawableSpinner.ApproachCircleVisibility.GetBoundCopy();
+            approachCircleVisibility.BindValueChanged(v =>
+            {
+                approachCircle.Alpha = v.NewValue == Visibility.Hidden ? 0 : 1;
+            }, true);
 
             gainedBonus = DrawableSpinner.GainedBonus.GetBoundCopy();
             gainedBonus.BindValueChanged(bonus =>
