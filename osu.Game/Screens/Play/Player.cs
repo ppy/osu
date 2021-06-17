@@ -680,11 +680,11 @@ namespace osu.Game.Screens.Play
             // Ensure we are not writing to the replay any more, as we are about to consume and store the score.
             DrawableRuleset.SetRecordTarget(null);
 
-            // Asynchronously run score preparation operations (database import, online submission etc.).
-            prepareScoreForDisplayTask ??= Task.Run(prepareScoreForResults);
-
             if (!Configuration.ShowResults)
                 return;
+
+            // Asynchronously run score preparation operations (database import, online submission etc.).
+            prepareScoreForDisplayTask ??= Task.Run(prepareScoreForResults);
 
             if (skipStoryboardOutro)
             {
