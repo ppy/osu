@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
@@ -14,12 +15,12 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         where T : ManiaHitObject
     {
         [Resolved]
-        private IPlayfieldProvider playfieldProvider { get; set; }
+        private Playfield playfield { get; set; }
 
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
-        protected ScrollingHitObjectContainer HitObjectContainer => ((ManiaPlayfield)playfieldProvider.Playfield).GetColumn(HitObject.Column).HitObjectContainer;
+        protected ScrollingHitObjectContainer HitObjectContainer => ((ManiaPlayfield)playfield).GetColumn(HitObject.Column).HitObjectContainer;
 
         protected ManiaSelectionBlueprint(T hitObject)
             : base(hitObject)

@@ -43,6 +43,9 @@ namespace osu.Game.Rulesets.Edit
 
         protected readonly Ruleset Ruleset;
 
+        // Provides `Playfield`
+        private DependencyContainer dependencies;
+
         [Resolved]
         protected EditorClock EditorClock { get; private set; }
 
@@ -69,6 +72,9 @@ namespace osu.Game.Rulesets.Edit
             Ruleset = ruleset;
         }
 
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -87,6 +93,8 @@ namespace osu.Game.Rulesets.Edit
                 Logger.Error(e, "Could not load beatmap successfully!");
                 return;
             }
+
+            dependencies.CacheAs(Playfield);
 
             const float toolbar_width = 200;
 
@@ -415,8 +423,7 @@ namespace osu.Game.Rulesets.Edit
     /// </summary>
     [Cached(typeof(HitObjectComposer))]
     [Cached(typeof(IPositionSnapProvider))]
-    [Cached(typeof(IPlayfieldProvider))]
-    public abstract class HitObjectComposer : CompositeDrawable, IPositionSnapProvider, IPlayfieldProvider
+    public abstract class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
     {
         protected HitObjectComposer()
         {
