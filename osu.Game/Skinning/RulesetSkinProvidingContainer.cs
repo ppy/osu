@@ -64,7 +64,7 @@ namespace osu.Game.Skinning
         protected ISkin GetRulesetTransformedSkin(ISkin skin)
         {
             if (!(skin is LegacySkin))
-                return null;
+                return skin;
 
             var rulesetTransformed = Ruleset.CreateLegacySkinProvider(skin, Beatmap);
             if (rulesetTransformed != null)
