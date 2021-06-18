@@ -20,6 +20,9 @@ namespace osu.Game.Graphics.UserInterface
         Toolbar,
 
         [Description("songselect")]
-        SongSelect
+        SongSelect,
+
+        [Description("scrolltotop")]
+        ScrollToTop
     }
 }
