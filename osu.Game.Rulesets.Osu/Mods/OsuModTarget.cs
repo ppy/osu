@@ -59,6 +59,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const byte border_distance_x = 192;
         private const byte border_distance_y = 144;
 
+        private ControlPointInfo controlPointInfo;
+
         public bool PerformFail()
         {
             return true;
@@ -77,13 +79,14 @@ namespace osu.Game.Rulesets.Osu.Mods
             Seed.Value ??= RNG.Next();
 
             var osuBeatmap = (OsuBeatmap)beatmap;
+            controlPointInfo = osuBeatmap.ControlPointInfo;
             var origHitObjects = osuBeatmap.HitObjects.OrderBy(x => x.StartTime).ToList();
 
             var hitObjects = generateBeats(osuBeatmap, origHitObjects)
                              .Select(x =>
                              {
                                  var newCircle = new HitCircle();
-                                 newCircle.ApplyDefaults(osuBeatmap.ControlPointInfo, osuBeatmap.BeatmapInfo.BaseDifficulty);
+                                 newCircle.ApplyDefaults(controlPointInfo, osuBeatmap.BeatmapInfo.BaseDifficulty);
                                  newCircle.StartTime = x;
                                  return (OsuHitObject)newCircle;
                              }).ToList();
@@ -136,7 +139,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 var avgColour = colour.AverageColour.Linear;
                 drawable.FadeColour(new Color4(avgColour.R * 0.45f, avgColour.G * 0.45f, avgColour.B * 0.45f, avgColour.A))
-                        .Then().Delay(h.TimeFadeIn).FadeColour(colour);
+                        .Then().Delay(h.TimePreempt - controlPointInfo.TimingPointAt(h.StartTime).BeatLength).FadeColour(colour);
 
                 // remove approach circles
                 circle.ApproachCircle.Hide();
