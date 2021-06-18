@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModSpinIn : ModWithVisibilityAdjustment
+    public class OsuModSpinIn : ModWithVisibilityAdjustment, IMutateApproachCircles
     {
         public override string Name => "Spin In";
         public override string Acronym => "SI";
@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
 
         // todo: this mod should be able to be compatible with hidden with a bit of further implementation.
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModObjectScaleTween), typeof(OsuModHidden), typeof(OsuModTraceable) };
+        public override Type[] IncompatibleMods => new[] { typeof(IMutateApproachCircles) };
 
         private const int rotate_offset = 360;
         private const float rotate_starting_width = 2;
