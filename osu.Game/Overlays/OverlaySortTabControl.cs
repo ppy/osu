@@ -148,6 +148,8 @@ namespace osu.Game.Overlays
                         }
                     }
                 });
+
+                AddInternal(new HoverClickSounds());
             }
 
             protected override void LoadComplete()

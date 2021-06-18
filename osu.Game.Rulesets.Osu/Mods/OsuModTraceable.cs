@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Osu.Skinning.Default;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModTraceable : ModWithVisibilityAdjustment
+    public class OsuModTraceable : ModWithVisibilityAdjustment, IMutateApproachCircles
     {
         public override string Name => "Traceable";
         public override string Acronym => "TC";
@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Put your faith in the approach circles...";
         public override double ScoreMultiplier => 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModHidden), typeof(OsuModSpinIn), typeof(OsuModObjectScaleTween) };
+        public override Type[] IncompatibleMods => new[] { typeof(IMutateApproachCircles) };
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
