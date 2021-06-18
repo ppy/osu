@@ -665,9 +665,6 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            if (resultsDisplayDelegate != null)
-                throw new InvalidOperationException(@$"{nameof(scoreCompletionChanged)} should never be fired more than once.");
-
             // Only show the completion screen if the player hasn't failed
             if (HealthProcessor.HasFailed)
                 return;
@@ -703,6 +700,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <remarks>
         /// A final display will only occur once all work is completed in <see cref="PrepareScoreForResultsAsync"/>.
+        /// This means that even after calling this method, the results screen will never be shown until <see cref="JudgementProcessor.HasCompleted">ScoreProcessor.HasCompleted</see> becomes <see langword="true"/>.
         /// </remarks>
         /// <param name="withDelay">Whether a minimum delay (<see cref="RESULTS_DISPLAY_DELAY"/>) should be added before the screen is displayed.</param>
         private void progressToResults(bool withDelay)
@@ -755,30 +753,6 @@ namespace osu.Game.Screens.Play
 
             return Score.ScoreInfo;
         }
-
-        private void scheduleCompletion() => resultsDisplayDelegate = Schedule(() =>
-        {
-            if (!prepareScoreForDisplayTask.IsCompleted)
-            {
-                resultsDisplayDelegate = Schedule(() =>
-                {
-                    if (!prepareScoreForDisplayTask.IsCompleted)
-                    {
-                        scheduleCompletion();
-                        return;
-                    }
-
-                    // screen may be in the exiting transition phase.
-                    if (this.IsCurrentScreen())
-                        this.Push(CreateResults(prepareScoreForDisplayTask.Result));
-                });
-                return;
-            }
-
-            // screen may be in the exiting transition phase.
-            if (this.IsCurrentScreen())
-                this.Push(CreateResults(prepareScoreForDisplayTask.Result));
-        });
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
 
