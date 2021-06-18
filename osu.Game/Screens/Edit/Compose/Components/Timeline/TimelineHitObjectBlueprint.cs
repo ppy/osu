@@ -39,6 +39,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private Bindable<int> indexInCurrentComboBindable;
         private Bindable<int> comboIndexBindable;
+        private Bindable<Color4> displayColourBindable;
 
         private readonly ExtendableCircle circle;
         private readonly Border border;
@@ -108,44 +109,64 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.LoadComplete();
 
-            if (Item is IHasComboInformation comboInfo)
+            switch (Item)
             {
-                indexInCurrentComboBindable = comboInfo.IndexInCurrentComboBindable.GetBoundCopy();
-                indexInCurrentComboBindable.BindValueChanged(_ => updateComboIndex(), true);
+                case IHasDisplayColour displayColour:
+                    displayColourBindable = displayColour.DisplayColour.GetBoundCopy();
+                    displayColourBindable.BindValueChanged(_ => updateColour(), true);
+                    break;
 
-                comboIndexBindable = comboInfo.ComboIndexBindable.GetBoundCopy();
-                comboIndexBindable.BindValueChanged(_ => updateComboColour(), true);
+                case IHasComboInformation comboInfo:
+                    indexInCurrentComboBindable = comboInfo.IndexInCurrentComboBindable.GetBoundCopy();
+                    indexInCurrentComboBindable.BindValueChanged(_ => updateComboIndex(), true);
 
-                skin.SourceChanged += updateComboColour;
+                    comboIndexBindable = comboInfo.ComboIndexBindable.GetBoundCopy();
+                    comboIndexBindable.BindValueChanged(_ => updateColour(), true);
+
+                    skin.SourceChanged += updateColour;
+                    break;
             }
         }
 
         protected override void OnSelected()
         {
             // base logic hides selected blueprints when not selected, but timeline doesn't do that.
-            updateComboColour();
+            updateColour();
         }
 
         protected override void OnDeselected()
         {
             // base logic hides selected blueprints when not selected, but timeline doesn't do that.
-            updateComboColour();
+            updateColour();
         }
 
         private void updateComboIndex() => comboIndexText.Text = (indexInCurrentComboBindable.Value + 1).ToString();
 
-        private void updateComboColour()
+        private void updateColour()
         {
-            if (!(Item is IHasComboInformation combo))
-                return;
+            Color4 colour;
 
-            var comboColours = skin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value ?? Array.Empty<Color4>();
-            var comboColour = combo.GetComboColour(comboColours);
+            switch (Item)
+            {
+                case IHasDisplayColour displayColour:
+                    colour = displayColour.DisplayColour.Value;
+                    break;
+
+                case IHasComboInformation combo:
+                {
+                    var comboColours = skin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value ?? Array.Empty<Color4>();
+                    colour = combo.GetComboColour(comboColours);
+                    break;
+                }
+
+                default:
+                    return;
+            }
 
             if (IsSelected)
             {
                 border.Show();
-                comboColour = comboColour.Lighten(0.3f);
+                colour = colour.Lighten(0.3f);
             }
             else
             {
@@ -153,9 +174,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             if (Item is IHasDuration duration && duration.Duration > 0)
-                circle.Colour = ColourInfo.GradientHorizontal(comboColour, comboColour.Lighten(0.4f));
+                circle.Colour = ColourInfo.GradientHorizontal(colour, colour.Lighten(0.4f));
             else
-                circle.Colour = comboColour;
+                circle.Colour = colour;
 
             var col = circle.Colour.TopLeft.Linear;
             colouredComponents.Colour = OsuColour.ForegroundTextColourFor(col);

@@ -199,8 +199,11 @@ namespace osu.Game.Rulesets.UI
 
             Playfield.PostProcess();
 
-            foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
-                mod.ApplyToDrawableHitObjects(Playfield.AllHitObjects);
+            foreach (var mod in Mods.OfType<IApplicableToDrawableHitObject>())
+            {
+                foreach (var drawableHitObject in Playfield.AllHitObjects)
+                    mod.ApplyToDrawableHitObject(drawableHitObject);
+            }
         }
 
         public override void RequestResume(Action continueResume)
