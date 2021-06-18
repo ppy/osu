@@ -25,7 +25,7 @@ namespace osu.Game.Storyboards.Drawables
         /// </summary>
         public IBindable<bool> HasStoryboardEnded => hasStoryboardEnded;
 
-        private readonly BindableBool hasStoryboardEnded = new BindableBool();
+        private readonly BindableBool hasStoryboardEnded = new BindableBool(true);
 
         protected override Container<DrawableStoryboardLayer> Content { get; }
 
