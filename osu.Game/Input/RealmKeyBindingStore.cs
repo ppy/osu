@@ -26,16 +26,23 @@ namespace osu.Game.Input
         /// </summary>
         /// <param name="globalAction">The action to lookup.</param>
         /// <returns>A set of display strings for all the user's key configuration for the action.</returns>
-        public IEnumerable<string> GetReadableKeyCombinationsFor(GlobalAction globalAction)
+        public IReadOnlyList<string> GetReadableKeyCombinationsFor(GlobalAction globalAction)
         {
-            foreach (var action in realmFactory.Context.All<RealmKeyBinding>().Where(b => (GlobalAction)b.ActionInt == globalAction))
-            {
-                string str = action.KeyCombination.ReadableString();
+            List<string> combinations = new List<string>();
 
-                // even if found, the readable string may be empty for an unbound action.
-                if (str.Length > 0)
-                    yield return str;
+            using (var context = realmFactory.GetForRead())
+            {
+                foreach (var action in context.Realm.All<RealmKeyBinding>().Where(b => (GlobalAction)b.ActionInt == globalAction))
+                {
+                    string str = action.KeyCombination.ReadableString();
+
+                    // even if found, the readable string may be empty for an unbound action.
+                    if (str.Length > 0)
+                        combinations.Add(str);
+                }
             }
+
+            return combinations;
         }
 
         /// <summary>
