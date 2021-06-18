@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
 
                 case ParagraphBlock paragraphBlock:
                     // Check if paragraph only contains an image
-                    if (paragraphBlock.Inline.Count() == 1 && paragraphBlock.Inline.FirstChild is LinkInline { IsImage: true } linkInline)
+                    if (paragraphBlock.Inline?.Count() == 1 && paragraphBlock.Inline.FirstChild is LinkInline { IsImage: true } linkInline)
                     {
                         container.Add(new WikiMarkdownImageBlock(linkInline));
                         return;

@@ -14,18 +14,21 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
     {
         private readonly Drawable animationContent;
 
+        private readonly ISkin skin;
+
         private Sprite layerNd;
         private Sprite layerSpec;
 
-        public LegacySliderBall(Drawable animationContent)
+        public LegacySliderBall(Drawable animationContent, ISkin skin)
         {
             this.animationContent = animationContent;
+            this.skin = skin;
 
             AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin)
+        private void load()
         {
             var ballColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBall)?.Value ?? Color4.White;
 

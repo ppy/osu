@@ -161,7 +161,7 @@ namespace osu.Game.Screens.OnlinePlay
         /// </summary>
         /// <param name="mod">The <see cref="Mod"/> to check.</param>
         /// <returns>Whether <paramref name="mod"/> is a valid mod for online play.</returns>
-        protected virtual bool IsValidMod(Mod mod) => mod.HasImplementation && !ModUtils.FlattenMod(mod).Any(m => m is ModAutoplay);
+        protected virtual bool IsValidMod(Mod mod) => mod.HasImplementation && ModUtils.FlattenMod(mod).All(m => m.UserPlayable);
 
         /// <summary>
         /// Checks whether a given <see cref="Mod"/> is valid for per-player free-mod selection.

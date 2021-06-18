@@ -4,7 +4,7 @@
 using osu.Framework.Graphics.Textures;
 using osuTK;
 
-namespace osu.Game.Rulesets.Catch.Skinning
+namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
     public class LegacyDropletPiece : LegacyCatchHitObjectPiece
     {

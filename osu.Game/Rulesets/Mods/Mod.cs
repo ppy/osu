@@ -108,10 +108,14 @@ namespace osu.Game.Rulesets.Mods
         public virtual bool HasImplementation => this is IApplicableMod;
 
         /// <summary>
-        /// Returns if this mod is ranked.
+        /// Whether this mod is playable by an end user.
+        /// Should be <c>false</c> for cases where the user is not interacting with the game (so it can be excluded from mutliplayer selection, for example).
         /// </summary>
         [JsonIgnore]
-        public virtual bool Ranked => false;
+        public virtual bool UserPlayable => true;
+
+        [Obsolete("Going forward, the concept of \"ranked\" doesn't exist. The only exceptions are automation mods, which should now override and set UserPlayable to true.")] // Can be removed 20211009
+        public virtual bool IsRanked => false;
 
         /// <summary>
         /// Whether this mod requires configuration to apply changes to the game.

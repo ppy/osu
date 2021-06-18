@@ -166,6 +166,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => default;
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
 
             public event Action SourceChanged;
 

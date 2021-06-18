@@ -18,6 +18,8 @@ namespace osu.Game.Skinning
 
         private readonly BindableList<ISkinnableDrawable> components = new BindableList<ISkinnableDrawable>();
 
+        public bool ComponentsLoaded { get; private set; }
+
         public SkinnableTargetContainer(SkinnableTarget target)
         {
             Target = target;
@@ -30,6 +32,7 @@ namespace osu.Game.Skinning
         {
             ClearInternal();
             components.Clear();
+            ComponentsLoaded = false;
 
             content = CurrentSkin.GetDrawableComponent(new SkinnableTargetComponent(Target)) as SkinnableTargetComponentsContainer;
 
@@ -39,8 +42,11 @@ namespace osu.Game.Skinning
                 {
                     AddInternal(wrapper);
                     components.AddRange(wrapper.Children.OfType<ISkinnableDrawable>());
+                    ComponentsLoaded = true;
                 });
             }
+            else
+                ComponentsLoaded = true;
         }
 
         /// <inheritdoc cref="ISkinnableTarget"/>
@@ -73,9 +79,9 @@ namespace osu.Game.Skinning
             components.Remove(component);
         }
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected override void SkinChanged(ISkinSource skin)
         {
-            base.SkinChanged(skin, allowFallback);
+            base.SkinChanged(skin);
 
             Reload();
         }

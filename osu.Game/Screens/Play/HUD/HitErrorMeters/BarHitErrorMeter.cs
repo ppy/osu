@@ -214,7 +214,10 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         protected override void OnNewJudgement(JudgementResult judgement)
         {
-            if (!judgement.IsHit)
+            if (!judgement.IsHit || judgement.HitObject.HitWindows?.WindowFor(HitResult.Miss) == 0)
+                return;
+
+            if (!judgement.Type.IsScorable() || judgement.Type.IsBonus())
                 return;
 
             if (judgementsContainer.Count > max_concurrent_judgements)
@@ -244,7 +247,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private float getRelativeJudgementPosition(double value) => Math.Clamp((float)((value / maxHitWindow) + 1) / 2, 0, 1);
 
-        private class JudgementLine : CompositeDrawable
+        internal class JudgementLine : CompositeDrawable
         {
             private const int judgement_fade_duration = 5000;
 

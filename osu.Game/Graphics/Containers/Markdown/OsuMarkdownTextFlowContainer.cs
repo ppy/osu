@@ -17,6 +17,8 @@ namespace osu.Game.Graphics.Containers.Markdown
         protected override void AddLinkText(string text, LinkInline linkInline)
             => AddDrawable(new OsuMarkdownLinkText(text, linkInline));
 
+        protected override void AddImage(LinkInline linkInline) => AddDrawable(new OsuMarkdownImage(linkInline));
+
         // TODO : Change font to monospace
         protected override void AddCodeInLine(CodeInline codeInline) => AddDrawable(new OsuMarkdownInlineCode
         {
