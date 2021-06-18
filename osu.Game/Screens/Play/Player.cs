@@ -295,12 +295,12 @@ namespace osu.Game.Screens.Play
 
             DimmableStoryboard.HasStoryboardEnded.ValueChanged += storyboardEnded =>
             {
-                if (storyboardEnded.NewValue && resultsDisplayDelegate == null)
-                    updateCompletionState();
+                if (storyboardEnded.NewValue)
+                    progressToResults(true);
             };
 
             // Bind the judgement processors to ourselves
-            ScoreProcessor.HasCompleted.BindValueChanged(_ => updateCompletionState());
+            ScoreProcessor.HasCompleted.BindValueChanged(scoreCompletionChanged);
             HealthProcessor.Failed += onFail;
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
@@ -374,7 +374,7 @@ namespace osu.Game.Screens.Play
                     },
                     skipOutroOverlay = new SkipOverlay(Beatmap.Value.Storyboard.LatestEventTime ?? 0)
                     {
-                        RequestSkip = () => updateCompletionState(true),
+                        RequestSkip = () => progressToResults(false),
                         Alpha = 0
                     },
                     FailOverlay = new FailOverlay
@@ -626,7 +626,7 @@ namespace osu.Game.Screens.Play
 
         /// <summary>
         /// This delegate, when set, means the results screen has been queued to appear.
-        /// The display of the results screen may be delayed by any work being done in <see cref="PrepareScoreForResults"/> and <see cref="PrepareScoreForResultsAsync"/>.
+        /// The display of the results screen may be delayed by any work being done in <see cref="PrepareScoreForResultsAsync"/>.
         /// </summary>
         /// <remarks>
         /// Once set, this can *only* be cancelled by rewinding, ie. if <see cref="JudgementProcessor.HasCompleted">ScoreProcessor.HasCompleted</see> becomes <see langword="false"/>.
@@ -643,9 +643,8 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Handles changes in player state which may progress the completion of gameplay / this screen's lifetime.
         /// </summary>
-        /// <param name="skipStoryboardOutro">If in a state where a storyboard outro is to be played, offers the choice of skipping beyond it.</param>
         /// <exception cref="InvalidOperationException">Thrown if this method is called more than once without changing state.</exception>
-        private void updateCompletionState(bool skipStoryboardOutro = false)
+        private void scoreCompletionChanged(ValueChangedEvent<bool> completed)
         {
             // If this player instance is in the middle of an exit, don't attempt any kind of state update.
             if (!this.IsCurrentScreen())
@@ -656,7 +655,7 @@ namespace osu.Game.Screens.Play
             // Currently, even if this scenario is hit, prepareScoreForDisplay has already been queued (and potentially run).
             // In scenarios where rewinding is possible (replay, spectating) this is a non-issue as no submission/import work is done,
             // but it still doesn't feel right that this exists here.
-            if (!ScoreProcessor.HasCompleted.Value)
+            if (!completed.NewValue)
             {
                 resultsDisplayDelegate?.Cancel();
                 resultsDisplayDelegate = null;
@@ -665,9 +664,6 @@ namespace osu.Game.Screens.Play
                 skipOutroOverlay.Hide();
                 return;
             }
-
-            if (resultsDisplayDelegate != null)
-                throw new InvalidOperationException(@$"{nameof(updateCompletionState)} should never be fired more than once.");
 
             // Only show the completion screen if the player hasn't failed
             if (HealthProcessor.HasFailed)
@@ -683,32 +679,27 @@ namespace osu.Game.Screens.Play
             if (!Configuration.ShowResults)
                 return;
 
-            // Asynchronously run score preparation operations (database import, online submission etc.).
             prepareScoreForDisplayTask ??= Task.Run(prepareScoreForResults);
-
-            if (skipStoryboardOutro)
-            {
-                scheduleCompletion();
-                return;
-            }
 
             bool storyboardHasOutro = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
 
             if (storyboardHasOutro)
             {
+                // if the current beatmap has a storyboard, the progression to results will be handled by the storyboard ending
+                // or the user pressing the skip outro button.
                 skipOutroOverlay.Show();
                 return;
             }
 
-            using (BeginDelayedSequence(RESULTS_DISPLAY_DELAY))
-                scheduleCompletion();
+            progressToResults(true);
         }
 
+        /// <summary>
+        /// Asynchronously run score preparation operations (database import, online submission etc.).
+        /// </summary>
+        /// <returns>The final score.</returns>
         private async Task<ScoreInfo> prepareScoreForResults()
         {
-            // ReSharper disable once MethodHasAsyncOverload
-            PrepareScoreForResults(Score);
-
             try
             {
                 await PrepareScoreForResultsAsync(Score).ConfigureAwait(false);
@@ -730,18 +721,44 @@ namespace osu.Game.Screens.Play
             return Score.ScoreInfo;
         }
 
-        private void scheduleCompletion() => resultsDisplayDelegate = Schedule(() =>
+        /// <summary>
+        /// Queue the results screen for display.
+        /// </summary>
+        /// <remarks>
+        /// A final display will only occur once all work is completed in <see cref="PrepareScoreForResultsAsync"/>. This means that even after calling this method, the results screen will never be shown until <see cref="JudgementProcessor.HasCompleted">ScoreProcessor.HasCompleted</see> becomes <see langword="true"/>.
+        ///
+        /// Calling this method multiple times will have no effect.
+        /// </remarks>
+        /// <param name="withDelay">Whether a minimum delay (<see cref="RESULTS_DISPLAY_DELAY"/>) should be added before the screen is displayed.</param>
+        private void progressToResults(bool withDelay)
         {
-            if (!prepareScoreForDisplayTask.IsCompleted)
-            {
-                scheduleCompletion();
+            if (resultsDisplayDelegate != null)
+                // Note that if progressToResults is called one withDelay=true and then withDelay=false, this no-delay timing will not be
+                // accounted for. shouldn't be a huge concern (a user pressing the skip button after a results progression has already been queued
+                // may take x00 more milliseconds than expected in the very rare edge case).
+                //
+                // If required we can handle this more correctly by rescheduling here.
                 return;
-            }
 
-            // screen may be in the exiting transition phase.
-            if (this.IsCurrentScreen())
+            double delay = withDelay ? RESULTS_DISPLAY_DELAY : 0;
+
+            resultsDisplayDelegate = new ScheduledDelegate(() =>
+            {
+                if (prepareScoreForDisplayTask?.IsCompleted != true)
+                    // If the asynchronous preparation has not completed, keep repeating this delegate.
+                    return;
+
+                resultsDisplayDelegate?.Cancel();
+
+                if (!this.IsCurrentScreen())
+                    // This player instance may already be in the process of exiting.
+                    return;
+
                 this.Push(CreateResults(prepareScoreForDisplayTask.Result));
-        });
+            }, Time.Current + delay, 50);
+
+            Scheduler.Add(resultsDisplayDelegate);
+        }
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
 
@@ -939,14 +956,6 @@ namespace osu.Game.Screens.Play
         {
             screenSuspension?.Expire();
 
-            // if the results screen is prepared to be displayed, forcefully show it on an exit request.
-            // usually if a user has completed a play session they do want to see results. and if they don't they can hit the same key a second time.
-            if (resultsDisplayDelegate != null && !resultsDisplayDelegate.Cancelled && !resultsDisplayDelegate.Completed)
-            {
-                resultsDisplayDelegate.RunTask();
-                return true;
-            }
-
             // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
             // To resolve test failures, forcefully end playing synchronously when this screen exits.
             // Todo: Replace this with a more permanent solution once osu-framework has a synchronous cleanup method.
@@ -1007,22 +1016,15 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Prepare the <see cref="Scoring.Score"/> for display at results.
         /// </summary>
-        /// <remarks>
-        /// This is run synchronously before <see cref="PrepareScoreForResultsAsync"/> is run.
-        /// </remarks>
         /// <param name="score">The <see cref="Scoring.Score"/> to prepare.</param>
-        protected virtual void PrepareScoreForResults(Score score)
+        /// <returns>A task that prepares the provided score. On completion, the score is assumed to be ready for display.</returns>
+        protected virtual Task PrepareScoreForResultsAsync(Score score)
         {
             // perform one final population to ensure everything is up-to-date.
             ScoreProcessor.PopulateScore(score.ScoreInfo);
-        }
 
-        /// <summary>
-        /// Prepare the <see cref="Scoring.Score"/> for display at results.
-        /// </summary>
-        /// <param name="score">The <see cref="Scoring.Score"/> to prepare.</param>
-        /// <returns>A task that prepares the provided score. On completion, the score is assumed to be ready for display.</returns>
-        protected virtual Task PrepareScoreForResultsAsync(Score score) => Task.CompletedTask;
+            return Task.CompletedTask;
+        }
 
         /// <summary>
         /// Creates the <see cref="ResultsScreen"/> for a <see cref="ScoreInfo"/>.
