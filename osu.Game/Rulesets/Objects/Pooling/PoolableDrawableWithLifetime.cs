@@ -30,7 +30,9 @@ namespace osu.Game.Rulesets.Objects.Pooling
             get => entry;
             set
             {
-                if (value != null)
+                if (LoadState == LoadState.NotLoaded)
+                    entry = value;
+                else if (value != null)
                     Apply(value);
                 else if (HasEntryApplied)
                     free();
