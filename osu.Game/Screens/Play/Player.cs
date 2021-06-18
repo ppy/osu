@@ -679,7 +679,6 @@ namespace osu.Game.Screens.Play
             if (!Configuration.ShowResults)
                 return;
 
-            // Asynchronously run score preparation operations (database import, online submission etc.).
             prepareScoreForDisplayTask ??= Task.Run(prepareScoreForResults);
 
             bool storyboardHasOutro = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
@@ -695,6 +694,10 @@ namespace osu.Game.Screens.Play
             progressToResults(true);
         }
 
+        /// <summary>
+        /// Asynchronously run score preparation operations (database import, online submission etc.).
+        /// </summary>
+        /// <returns>The final score.</returns>
         private async Task<ScoreInfo> prepareScoreForResults()
         {
             try
