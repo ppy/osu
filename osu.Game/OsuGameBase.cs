@@ -95,7 +95,7 @@ namespace osu.Game
 
         protected RulesetStore RulesetStore { get; private set; }
 
-        protected KeyBindingStore KeyBindingStore { get; private set; }
+        protected RealmKeyBindingStore KeyBindingStore { get; private set; }
 
         protected MenuCursorContainer MenuCursorContainer { get; private set; }
 
@@ -144,6 +144,8 @@ namespace osu.Game
 
         private DatabaseContextFactory contextFactory;
 
+        private RealmContextFactory realmFactory;
+
         protected override Container<Drawable> Content => content;
 
         private Container content;
@@ -178,6 +180,9 @@ namespace osu.Game
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
+
+            dependencies.Cache(realmFactory = new RealmContextFactory(Storage));
+            AddInternal(realmFactory);
 
             dependencies.CacheAs(Storage);
 
@@ -284,7 +289,8 @@ namespace osu.Game
             dependencies.Cache(scorePerformanceManager);
             AddInternal(scorePerformanceManager);
 
-            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
+            migrateDataToRealm();
+
             dependencies.Cache(settingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(rulesetConfigCache = new RulesetConfigCache(settingsStore));
 
@@ -332,7 +338,12 @@ namespace osu.Game
 
             base.Content.Add(CreateScalingContainer().WithChildren(mainContent));
 
+            KeyBindingStore = new RealmKeyBindingStore(realmFactory);
             KeyBindingStore.Register(globalBindings);
+
+            foreach (var r in RulesetStore.AvailableRulesets)
+                KeyBindingStore.Register(r);
+
             dependencies.Cache(globalBindings);
 
             PreviewTrackManager previewTrackManager;
@@ -387,8 +398,11 @@ namespace osu.Game
 
         public void Migrate(string path)
         {
-            contextFactory.FlushConnections();
-            (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
+            using (realmFactory.BlockAllOperations())
+            {
+                contextFactory.FlushConnections();
+                (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
+            }
         }
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
@@ -398,6 +412,34 @@ namespace osu.Game
         protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
+
+        private void migrateDataToRealm()
+        {
+            using (var db = contextFactory.GetForWrite())
+            using (var usage = realmFactory.GetForWrite())
+            {
+                var existingBindings = db.Context.DatabasedKeyBinding;
+
+                // only migrate data if the realm database is empty.
+                if (!usage.Realm.All<RealmKeyBinding>().Any())
+                {
+                    foreach (var dkb in existingBindings)
+                    {
+                        usage.Realm.Add(new RealmKeyBinding
+                        {
+                            KeyCombinationString = dkb.KeyCombination.ToString(),
+                            ActionInt = (int)dkb.Action,
+                            RulesetID = dkb.RulesetID,
+                            Variant = dkb.Variant
+                        });
+                    }
+                }
+
+                db.Context.RemoveRange(existingBindings);
+
+                usage.Commit();
+            }
+        }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {
