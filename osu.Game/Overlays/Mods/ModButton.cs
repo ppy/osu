@@ -302,7 +302,7 @@ namespace osu.Game.Overlays.Mods
                     Anchor = Anchor.TopCentre,
                     Font = OsuFont.GetFont(size: 18)
                 },
-                new HoverClickSounds(buttons: new[] { MouseButton.Left, MouseButton.Right })
+                new HoverSounds()
             };
 
             Mod = mod;
