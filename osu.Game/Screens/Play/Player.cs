@@ -295,12 +295,12 @@ namespace osu.Game.Screens.Play
 
             DimmableStoryboard.HasStoryboardEnded.ValueChanged += storyboardEnded =>
             {
-                if (storyboardEnded.NewValue && resultsDisplayDelegate == null)
-                    updateCompletionState();
+                if (storyboardEnded.NewValue)
+                    progressToResults(true);
             };
 
             // Bind the judgement processors to ourselves
-            ScoreProcessor.HasCompleted.BindValueChanged(_ => updateCompletionState());
+            ScoreProcessor.HasCompleted.BindValueChanged(scoreCompletionChanged);
             HealthProcessor.Failed += onFail;
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
@@ -374,7 +374,7 @@ namespace osu.Game.Screens.Play
                     },
                     skipOutroOverlay = new SkipOverlay(Beatmap.Value.Storyboard.LatestEventTime ?? 0)
                     {
-                        RequestSkip = () => updateCompletionState(true),
+                        RequestSkip = () => progressToResults(false),
                         Alpha = 0
                     },
                     FailOverlay = new FailOverlay
@@ -643,9 +643,8 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Handles changes in player state which may progress the completion of gameplay / this screen's lifetime.
         /// </summary>
-        /// <param name="skipStoryboardOutro">If in a state where a storyboard outro is to be played, offers the choice of skipping beyond it.</param>
         /// <exception cref="InvalidOperationException">Thrown if this method is called more than once without changing state.</exception>
-        private void updateCompletionState(bool skipStoryboardOutro = false)
+        private void scoreCompletionChanged(ValueChangedEvent<bool> completed)
         {
             // If this player instance is in the middle of an exit, don't attempt any kind of state update.
             if (!this.IsCurrentScreen())
@@ -656,7 +655,7 @@ namespace osu.Game.Screens.Play
             // Currently, even if this scenario is hit, prepareScoreForDisplay has already been queued (and potentially run).
             // In scenarios where rewinding is possible (replay, spectating) this is a non-issue as no submission/import work is done,
             // but it still doesn't feel right that this exists here.
-            if (!ScoreProcessor.HasCompleted.Value)
+            if (!completed.NewValue)
             {
                 resultsDisplayDelegate?.Cancel();
                 resultsDisplayDelegate = null;
@@ -667,7 +666,7 @@ namespace osu.Game.Screens.Play
             }
 
             if (resultsDisplayDelegate != null)
-                throw new InvalidOperationException(@$"{nameof(updateCompletionState)} should never be fired more than once.");
+                throw new InvalidOperationException(@$"{nameof(scoreCompletionChanged)} should never be fired more than once.");
 
             // Only show the completion screen if the player hasn't failed
             if (HealthProcessor.HasFailed)
@@ -686,22 +685,49 @@ namespace osu.Game.Screens.Play
             // Asynchronously run score preparation operations (database import, online submission etc.).
             prepareScoreForDisplayTask ??= Task.Run(prepareScoreForResults);
 
-            if (skipStoryboardOutro)
-            {
-                scheduleCompletion();
-                return;
-            }
-
             bool storyboardHasOutro = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
 
             if (storyboardHasOutro)
             {
+                // if the current beatmap has a storyboard, the progression to results will be handled by the storyboard ending
+                // or the user pressing the skip outro button.
                 skipOutroOverlay.Show();
                 return;
             }
 
-            using (BeginDelayedSequence(RESULTS_DISPLAY_DELAY))
-                scheduleCompletion();
+            progressToResults(true);
+        }
+
+        /// <summary>
+        /// Queue the results screen for display.
+        /// </summary>
+        /// <remarks>
+        /// A final display will only occur once all work is completed in <see cref="PrepareScoreForResultsAsync"/>.
+        /// </remarks>
+        /// <param name="withDelay">Whether a minimum delay (<see cref="RESULTS_DISPLAY_DELAY"/>) should be added before the screen is displayed.</param>
+        private void progressToResults(bool withDelay)
+        {
+            if (resultsDisplayDelegate != null)
+                return;
+
+            double delay = withDelay ? RESULTS_DISPLAY_DELAY : 0;
+
+            resultsDisplayDelegate = new ScheduledDelegate(() =>
+            {
+                if (prepareScoreForDisplayTask?.IsCompleted != true)
+                    // if the asynchronous preparation has not completed, keep repeating this delegate.
+                    return;
+
+                resultsDisplayDelegate?.Cancel();
+
+                if (!this.IsCurrentScreen())
+                    // This player instance may already be in the process of exiting.
+                    return;
+
+                this.Push(CreateResults(prepareScoreForDisplayTask.Result));
+            }, Time.Current + delay, 50);
+
+            Scheduler.Add(resultsDisplayDelegate);
         }
 
         private async Task<ScoreInfo> prepareScoreForResults()
@@ -734,7 +760,18 @@ namespace osu.Game.Screens.Play
         {
             if (!prepareScoreForDisplayTask.IsCompleted)
             {
-                scheduleCompletion();
+                resultsDisplayDelegate = Schedule(() =>
+                {
+                    if (!prepareScoreForDisplayTask.IsCompleted)
+                    {
+                        scheduleCompletion();
+                        return;
+                    }
+
+                    // screen may be in the exiting transition phase.
+                    if (this.IsCurrentScreen())
+                        this.Push(CreateResults(prepareScoreForDisplayTask.Result));
+                });
                 return;
             }
 
