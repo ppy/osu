@@ -13,6 +13,7 @@ using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 
@@ -28,25 +29,27 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         public void TestHitCircleAnimationDisable()
         {
             HitCircle hitCircle = null;
+            DrawableHitCircle drawableHitCircle = null;
 
             AddStep("retrieve first hit circle", () => hitCircle = getHitCircle(0));
             toggleAnimations(true);
             seekSmoothlyTo(() => hitCircle.StartTime + 10);
 
-            AddAssert("hit circle piece has transforms", () =>
-            {
-                var drawableHitCircle = (DrawableHitCircle)getDrawableObjectFor(hitCircle);
-                return getTransformsRecursively(drawableHitCircle.CirclePiece).Any(t => t.EndTime > EditorClock.CurrentTime);
-            });
+            AddStep("retrieve drawable", () => drawableHitCircle = (DrawableHitCircle)getDrawableObjectFor(hitCircle));
+            AddAssert("hit circle piece has transforms",
+                () => getTransformsRecursively(drawableHitCircle.CirclePiece).Any(t => t.EndTime > EditorClock.CurrentTime));
 
             AddStep("retrieve second hit circle", () => hitCircle = getHitCircle(1));
             toggleAnimations(false);
             seekSmoothlyTo(() => hitCircle.StartTime + 10);
 
-            AddAssert("hit circle piece has no transforms", () =>
+            AddStep("retrieve drawable", () => drawableHitCircle = (DrawableHitCircle)getDrawableObjectFor(hitCircle));
+            AddAssert("hit circle piece has no transforms",
+                () => getTransformsRecursively(drawableHitCircle.CirclePiece).All(t => t.EndTime <= EditorClock.CurrentTime));
+            AddAssert("hit circle has longer fade-out applied", () =>
             {
-                var drawableHitCircle = (DrawableHitCircle)getDrawableObjectFor(hitCircle);
-                return getTransformsRecursively(drawableHitCircle.CirclePiece).All(t => t.EndTime <= EditorClock.CurrentTime);
+                var alphaTransform = drawableHitCircle.Transforms.Last(t => t.TargetMember == nameof(Alpha));
+                return alphaTransform.EndTime - alphaTransform.StartTime == DrawableOsuEditorRuleset.EDITOR_HIT_OBJECT_FADE_OUT_EXTENSION;
             });
         }
 
