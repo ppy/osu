@@ -13,9 +13,6 @@ namespace osu.Game.Graphics.UserInterface
         [Description("button")]
         Button,
 
-        [Description("softer")]
-        Soft,
-
         [Description("toolbar")]
         Toolbar,
 
