@@ -36,16 +36,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             seekSmoothlyTo(() => hitCircle.StartTime + 10);
 
             AddStep("retrieve drawable", () => drawableHitCircle = (DrawableHitCircle)getDrawableObjectFor(hitCircle));
-            AddAssert("hit circle piece has transforms",
-                () => getTransformsRecursively(drawableHitCircle.CirclePiece).Any(t => t.EndTime > EditorClock.CurrentTime));
+            assertFutureTransforms(() => drawableHitCircle.CirclePiece, true);
 
             AddStep("retrieve second hit circle", () => hitCircle = getHitCircle(1));
             toggleAnimations(false);
             seekSmoothlyTo(() => hitCircle.StartTime + 10);
 
             AddStep("retrieve drawable", () => drawableHitCircle = (DrawableHitCircle)getDrawableObjectFor(hitCircle));
-            AddAssert("hit circle piece has no transforms",
-                () => getTransformsRecursively(drawableHitCircle.CirclePiece).All(t => t.EndTime <= EditorClock.CurrentTime));
+            assertFutureTransforms(() => drawableHitCircle.CirclePiece, false);
             AddAssert("hit circle has longer fade-out applied", () =>
             {
                 var alphaTransform = drawableHitCircle.Transforms.Last(t => t.TargetMember == nameof(Alpha));
@@ -53,8 +51,46 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
         }
 
+        [Test]
+        public void TestSliderAnimationDisable()
+        {
+            Slider slider = null;
+            DrawableSlider drawableSlider = null;
+            DrawableSliderRepeat sliderRepeat = null;
+
+            AddStep("retrieve first slider with repeats", () => slider = getSliderWithRepeats(0));
+            toggleAnimations(true);
+            seekSmoothlyTo(() => slider.StartTime + slider.SpanDuration + 10);
+
+            retrieveDrawables();
+            assertFutureTransforms(() => sliderRepeat, true);
+
+            AddStep("retrieve second slider with repeats", () => slider = getSliderWithRepeats(1));
+            toggleAnimations(false);
+            seekSmoothlyTo(() => slider.StartTime + slider.SpanDuration + 10);
+
+            retrieveDrawables();
+            assertFutureTransforms(() => sliderRepeat.Arrow, false);
+            seekSmoothlyTo(() => slider.GetEndTime());
+            AddAssert("slider has longer fade-out applied", () =>
+            {
+                var alphaTransform = drawableSlider.Transforms.Last(t => t.TargetMember == nameof(Alpha));
+                return alphaTransform.EndTime - alphaTransform.StartTime == DrawableOsuEditorRuleset.EDITOR_HIT_OBJECT_FADE_OUT_EXTENSION;
+            });
+
+            void retrieveDrawables() =>
+                AddStep("retrieve drawables", () =>
+                {
+                    drawableSlider = (DrawableSlider)getDrawableObjectFor(slider);
+                    sliderRepeat = (DrawableSliderRepeat)getDrawableObjectFor(slider.NestedHitObjects.OfType<SliderRepeat>().First());
+                });
+        }
+
         private HitCircle getHitCircle(int index)
             => EditorBeatmap.HitObjects.OfType<HitCircle>().ElementAt(index);
+
+        private Slider getSliderWithRepeats(int index)
+            => EditorBeatmap.HitObjects.OfType<Slider>().Where(s => s.RepeatCount >= 1).ElementAt(index);
 
         private DrawableHitObject getDrawableObjectFor(HitObject hitObject)
             => this.ChildrenOfType<DrawableHitObject>().Single(ho => ho.HitObject == hitObject);
@@ -70,5 +106,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("seek smoothly", () => EditorClock.SeekSmoothlyTo(targetTime.Invoke()));
             AddUntilStep("wait for seek", () => Precision.AlmostEquals(targetTime.Invoke(), EditorClock.CurrentTime));
         }
+
+        private void assertFutureTransforms(Func<Drawable> getDrawable, bool hasFutureTransforms)
+            => AddAssert($"object {(hasFutureTransforms ? "has" : "has no")} future transforms",
+                () => getTransformsRecursively(getDrawable()).Any(t => t.EndTime >= EditorClock.CurrentTime) == hasFutureTransforms);
     }
 }
