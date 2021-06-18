@@ -608,9 +608,9 @@ namespace osu.Game
 
             LocalConfig.LookupKeyBindings = l =>
             {
-                var combinations = KeyBindingStore.GetReadableKeyCombinationsFor(l).ToArray();
+                var combinations = KeyBindingStore.GetReadableKeyCombinationsFor(l);
 
-                if (combinations.Length == 0)
+                if (combinations.Count == 0)
                     return "none";
 
                 return string.Join(" or ", combinations);

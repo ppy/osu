@@ -14,9 +14,8 @@ namespace osu.Game.Localisation
         // [Description(@"اَلْعَرَبِيَّةُ")]
         // ar,
 
-        // TODO: Some accented glyphs are missing. Revisit when adding Inter.
-        // [Description(@"Беларуская мова")]
-        // be,
+        [Description(@"Беларуская мова")]
+        be,
 
         [Description(@"Български")]
         bg,
@@ -30,9 +29,8 @@ namespace osu.Game.Localisation
         [Description(@"Deutsch")]
         de,
 
-        // TODO: Some accented glyphs are missing. Revisit when adding Inter.
-        // [Description(@"Ελληνικά")]
-        // el,
+        [Description(@"Ελληνικά")]
+        el,
 
         [Description(@"Español")]
         es,
@@ -94,9 +92,8 @@ namespace osu.Game.Localisation
         [Description(@"Türkçe")]
         tr,
 
-        // TODO: Some accented glyphs are missing. Revisit when adding Inter.
-        // [Description(@"Українська мова")]
-        // uk,
+        [Description(@"Українська мова")]
+        uk,
 
         [Description(@"Tiếng Việt")]
         vi,

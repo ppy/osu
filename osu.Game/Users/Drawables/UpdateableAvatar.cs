@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -45,32 +44,37 @@ namespace osu.Game.Users.Drawables
 
         protected override double LoadDelay => 200;
 
-        /// <summary>
-        /// Whether to show a default guest representation on null user (as opposed to nothing).
-        /// </summary>
-        public bool ShowGuestOnNull = true;
+        private readonly bool openOnClick;
+        private readonly bool showUsernameTooltip;
+        private readonly bool showGuestOnNull;
 
         /// <summary>
-        /// Whether to open the user's profile when clicked.
+        /// Construct a new UpdateableAvatar.
         /// </summary>
-        public readonly BindableBool OpenOnClick = new BindableBool(true);
-
-        public UpdateableAvatar(User user = null)
+        /// <param name="user">The initial user to display.</param>
+        /// <param name="openOnClick">Whether to open the user's profile when clicked.</param>
+        /// <param name="showUsernameTooltip">Whether to show the username rather than "view profile" on the tooltip.</param>
+        /// <param name="showGuestOnNull">Whether to show a default guest representation on null user (as opposed to nothing).</param>
+        public UpdateableAvatar(User user = null, bool openOnClick = true, bool showUsernameTooltip = false, bool showGuestOnNull = true)
         {
+            this.openOnClick = openOnClick;
+            this.showUsernameTooltip = showUsernameTooltip;
+            this.showGuestOnNull = showGuestOnNull;
+
             User = user;
         }
 
         protected override Drawable CreateDrawable(User user)
         {
-            if (user == null && !ShowGuestOnNull)
+            if (user == null && !showGuestOnNull)
                 return null;
 
             var avatar = new ClickableAvatar(user)
             {
+                OpenOnClick = openOnClick,
+                ShowUsernameTooltip = showUsernameTooltip,
                 RelativeSizeAxes = Axes.Both,
             };
-
-            avatar.OpenOnClick.BindTo(OpenOnClick);
 
             return avatar;
         }
