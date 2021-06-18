@@ -626,7 +626,7 @@ namespace osu.Game.Screens.Play
 
         /// <summary>
         /// This delegate, when set, means the results screen has been queued to appear.
-        /// The display of the results screen may be delayed by any work being done in <see cref="PrepareScoreForResults"/> and <see cref="PrepareScoreForResultsAsync"/>.
+        /// The display of the results screen may be delayed by any work being done in <see cref="PrepareScoreForResultsAsync"/>.
         /// </summary>
         /// <remarks>
         /// Once set, this can *only* be cancelled by rewinding, ie. if <see cref="JudgementProcessor.HasCompleted">ScoreProcessor.HasCompleted</see> becomes <see langword="false"/>.
@@ -706,9 +706,6 @@ namespace osu.Game.Screens.Play
 
         private async Task<ScoreInfo> prepareScoreForResults()
         {
-            // ReSharper disable once MethodHasAsyncOverload
-            PrepareScoreForResults(Score);
-
             try
             {
                 await PrepareScoreForResultsAsync(Score).ConfigureAwait(false);
@@ -1007,22 +1004,15 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Prepare the <see cref="Scoring.Score"/> for display at results.
         /// </summary>
-        /// <remarks>
-        /// This is run synchronously before <see cref="PrepareScoreForResultsAsync"/> is run.
-        /// </remarks>
         /// <param name="score">The <see cref="Scoring.Score"/> to prepare.</param>
-        protected virtual void PrepareScoreForResults(Score score)
+        /// <returns>A task that prepares the provided score. On completion, the score is assumed to be ready for display.</returns>
+        protected virtual Task PrepareScoreForResultsAsync(Score score)
         {
             // perform one final population to ensure everything is up-to-date.
             ScoreProcessor.PopulateScore(score.ScoreInfo);
-        }
 
-        /// <summary>
-        /// Prepare the <see cref="Scoring.Score"/> for display at results.
-        /// </summary>
-        /// <param name="score">The <see cref="Scoring.Score"/> to prepare.</param>
-        /// <returns>A task that prepares the provided score. On completion, the score is assumed to be ready for display.</returns>
-        protected virtual Task PrepareScoreForResultsAsync(Score score) => Task.CompletedTask;
+            return Task.CompletedTask;
+        }
 
         /// <summary>
         /// Creates the <see cref="ResultsScreen"/> for a <see cref="ScoreInfo"/>.
