@@ -28,12 +28,9 @@ namespace osu.Game.Rulesets.Objects.Pooling
         public TEntry? Entry
         {
             get => entry;
-
             set
             {
-                if (LoadState < LoadState.Ready)
-                    entry = value;
-                else if (value != null)
+                if (value != null)
                     Apply(value);
                 else if (HasEntryApplied)
                     free();
@@ -86,7 +83,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
 
             // Apply the initial entry.
             if (Entry != null && !HasEntryApplied)
-                Apply(Entry);
+                apply(Entry);
         }
 
         /// <summary>
@@ -95,16 +92,10 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// </summary>
         public void Apply(TEntry entry)
         {
-            if (HasEntryApplied)
-                free();
+            if (LoadState == LoadState.Loading)
+                throw new InvalidOperationException($"Cannot apply a new {nameof(TEntry)} while currently loading.");
 
-            this.entry = entry;
-            entry.LifetimeChanged += setLifetimeFromEntry;
-            setLifetimeFromEntry(entry);
-
-            OnApply(entry);
-
-            HasEntryApplied = true;
+            apply(entry);
         }
 
         protected sealed override void FreeAfterUse()
@@ -128,6 +119,20 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// </summary>
         protected virtual void OnFree(TEntry entry)
         {
+        }
+
+        private void apply(TEntry entry)
+        {
+            if (HasEntryApplied)
+                free();
+
+            this.entry = entry;
+            entry.LifetimeChanged += setLifetimeFromEntry;
+            setLifetimeFromEntry(entry);
+
+            OnApply(entry);
+
+            HasEntryApplied = true;
         }
 
         private void free()
