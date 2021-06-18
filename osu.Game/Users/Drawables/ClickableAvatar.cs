@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
@@ -13,15 +12,31 @@ namespace osu.Game.Users.Drawables
 {
     public class ClickableAvatar : Container
     {
+        private const string default_tooltip_text = "view profile";
+
         /// <summary>
         /// Whether to open the user's profile when clicked.
         /// </summary>
-        public readonly BindableBool OpenOnClick = new BindableBool(true);
+        public bool OpenOnClick
+        {
+            set => clickableArea.Enabled.Value = value;
+        }
+
+        /// <summary>
+        /// By default, the tooltip will show "view profile" as avatars are usually displayed next to a username.
+        /// Setting this to <c>true</c> exposes the username via tooltip for special cases where this is not true.
+        /// </summary>
+        public bool ShowUsernameTooltip
+        {
+            set => clickableArea.TooltipText = value ? (user?.Username ?? string.Empty) : default_tooltip_text;
+        }
 
         private readonly User user;
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
+
+        private readonly ClickableArea clickableArea;
 
         /// <summary>
         /// A clickable avatar for the specified user, with UI sounds included.
@@ -31,35 +46,35 @@ namespace osu.Game.Users.Drawables
         public ClickableAvatar(User user = null)
         {
             this.user = user;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(LargeTextureStore textures)
-        {
-            ClickableArea clickableArea;
             Add(clickableArea = new ClickableArea
             {
                 RelativeSizeAxes = Axes.Both,
                 Action = openProfile
             });
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(LargeTextureStore textures)
+        {
             LoadComponentAsync(new DrawableAvatar(user), clickableArea.Add);
-
-            clickableArea.Enabled.BindTo(OpenOnClick);
         }
 
         private void openProfile()
         {
-            if (!OpenOnClick.Value)
-                return;
-
             if (user?.Id > 1)
                 game?.ShowUser(user.Id);
         }
 
         private class ClickableArea : OsuClickableContainer
         {
-            public override string TooltipText => Enabled.Value ? @"view profile" : null;
+            private string tooltip = default_tooltip_text;
+
+            public override string TooltipText
+            {
+                get => Enabled.Value ? tooltip : null;
+                set => tooltip = value;
+            }
 
             protected override bool OnClick(ClickEvent e)
             {

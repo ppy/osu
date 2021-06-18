@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
 using osu.Game.Users;
@@ -91,15 +90,13 @@ namespace osu.Game.Screens.OnlinePlay.Components
             });
         }
 
-        private class UserTile : CompositeDrawable, IHasTooltip
+        private class UserTile : CompositeDrawable
         {
             public User User
             {
                 get => avatar.User;
                 set => avatar.User = value;
             }
-
-            public string TooltipText => User?.Username ?? string.Empty;
 
             private readonly UpdateableAvatar avatar;
 
@@ -116,7 +113,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4Extensions.FromHex(@"27252d"),
                     },
-                    avatar = new UpdateableAvatar { RelativeSizeAxes = Axes.Both },
+                    avatar = new UpdateableAvatar(showUsernameTooltip: true) { RelativeSizeAxes = Axes.Both },
                 };
             }
         }
