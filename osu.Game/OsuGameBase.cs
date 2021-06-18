@@ -190,29 +190,29 @@ namespace osu.Game
 
             AddFont(Resources, @"Fonts/osuFont");
 
-            AddFont(Resources, @"Fonts/Torus-Regular");
-            AddFont(Resources, @"Fonts/Torus-Light");
-            AddFont(Resources, @"Fonts/Torus-SemiBold");
-            AddFont(Resources, @"Fonts/Torus-Bold");
+            AddFont(Resources, @"Fonts/Torus/Torus-Regular");
+            AddFont(Resources, @"Fonts/Torus/Torus-Light");
+            AddFont(Resources, @"Fonts/Torus/Torus-SemiBold");
+            AddFont(Resources, @"Fonts/Torus/Torus-Bold");
 
-            AddFont(Resources, @"Fonts/Inter-Regular");
-            AddFont(Resources, @"Fonts/Inter-RegularItalic");
-            AddFont(Resources, @"Fonts/Inter-Light");
-            AddFont(Resources, @"Fonts/Inter-LightItalic");
-            AddFont(Resources, @"Fonts/Inter-SemiBold");
-            AddFont(Resources, @"Fonts/Inter-SemiBoldItalic");
-            AddFont(Resources, @"Fonts/Inter-Bold");
-            AddFont(Resources, @"Fonts/Inter-BoldItalic");
+            AddFont(Resources, @"Fonts/Inter/Inter-Regular");
+            AddFont(Resources, @"Fonts/Inter/Inter-RegularItalic");
+            AddFont(Resources, @"Fonts/Inter/Inter-Light");
+            AddFont(Resources, @"Fonts/Inter/Inter-LightItalic");
+            AddFont(Resources, @"Fonts/Inter/Inter-SemiBold");
+            AddFont(Resources, @"Fonts/Inter/Inter-SemiBoldItalic");
+            AddFont(Resources, @"Fonts/Inter/Inter-Bold");
+            AddFont(Resources, @"Fonts/Inter/Inter-BoldItalic");
 
-            AddFont(Resources, @"Fonts/Noto-Basic");
-            AddFont(Resources, @"Fonts/Noto-Hangul");
-            AddFont(Resources, @"Fonts/Noto-CJK-Basic");
-            AddFont(Resources, @"Fonts/Noto-CJK-Compatibility");
-            AddFont(Resources, @"Fonts/Noto-Thai");
+            AddFont(Resources, @"Fonts/Noto/Noto-Basic");
+            AddFont(Resources, @"Fonts/Noto/Noto-Hangul");
+            AddFont(Resources, @"Fonts/Noto/Noto-CJK-Basic");
+            AddFont(Resources, @"Fonts/Noto/Noto-CJK-Compatibility");
+            AddFont(Resources, @"Fonts/Noto/Noto-Thai");
 
-            AddFont(Resources, @"Fonts/Venera-Light");
-            AddFont(Resources, @"Fonts/Venera-Bold");
-            AddFont(Resources, @"Fonts/Venera-Black");
+            AddFont(Resources, @"Fonts/Venera/Venera-Light");
+            AddFont(Resources, @"Fonts/Venera/Venera-Bold");
+            AddFont(Resources, @"Fonts/Venera/Venera-Black");
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
