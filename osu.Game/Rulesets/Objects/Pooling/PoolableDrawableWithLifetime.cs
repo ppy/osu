@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// </summary>
         /// <remarks>
         /// If a non-null value is set before loading is started, the entry is applied when the loading is completed.
+        /// It is not valid to set an entry while this <see cref="PoolableDrawableWithLifetime{TEntry}"/> is loading.
         /// </remarks>
         public TEntry? Entry
         {
