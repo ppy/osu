@@ -699,13 +699,19 @@ namespace osu.Game.Screens.Play
         /// Queue the results screen for display.
         /// </summary>
         /// <remarks>
-        /// A final display will only occur once all work is completed in <see cref="PrepareScoreForResultsAsync"/>.
-        /// This means that even after calling this method, the results screen will never be shown until <see cref="JudgementProcessor.HasCompleted">ScoreProcessor.HasCompleted</see> becomes <see langword="true"/>.
+        /// A final display will only occur once all work is completed in <see cref="PrepareScoreForResultsAsync"/>. This means that even after calling this method, the results screen will never be shown until <see cref="JudgementProcessor.HasCompleted">ScoreProcessor.HasCompleted</see> becomes <see langword="true"/>.
+        ///
+        /// Calling this method multiple times will have no effect.
         /// </remarks>
         /// <param name="withDelay">Whether a minimum delay (<see cref="RESULTS_DISPLAY_DELAY"/>) should be added before the screen is displayed.</param>
         private void progressToResults(bool withDelay)
         {
             if (resultsDisplayDelegate != null)
+                // Note that if progressToResults is called one withDelay=true and then withDelay=false, this no-delay timing will not be
+                // accounted for. shouldn't be a huge concern (a user pressing the skip button after a results progression has already been queued
+                // may take x00 more milliseconds than expected in the very rare edge case).
+                //
+                // If required we can handle this more correctly by rescheduling here.
                 return;
 
             double delay = withDelay ? RESULTS_DISPLAY_DELAY : 0;
@@ -713,7 +719,7 @@ namespace osu.Game.Screens.Play
             resultsDisplayDelegate = new ScheduledDelegate(() =>
             {
                 if (prepareScoreForDisplayTask?.IsCompleted != true)
-                    // if the asynchronous preparation has not completed, keep repeating this delegate.
+                    // If the asynchronous preparation has not completed, keep repeating this delegate.
                     return;
 
                 resultsDisplayDelegate?.Cancel();
