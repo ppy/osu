@@ -52,12 +52,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         public bool DisplayResultsOnFail => true;
 
         /// <summary>
-        ///     Jump distance for circles in the last combo
+        /// Jump distance for circles in the last combo
         /// </summary>
         private const float max_base_distance = 250f;
 
         /// <summary>
-        ///     The maximum allowed jump distance after multipliers are applied
+        /// The maximum allowed jump distance after multipliers are applied
         /// </summary>
         private const float distance_cap = 350f;
 
@@ -67,7 +67,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const byte border_distance_y = 144;
 
         /// <summary>
-        ///     Duration of the undimming animation
+        /// The extent of rotation towards playfield centre when a circle is near the edge
+        /// </summary>
+        private const float edge_rotation_multiplier = 0.75f;
+
+        /// <summary>
+        /// Duration of the undimming animation
         /// </summary>
         private const double undim_duration = 96;
 
@@ -295,14 +300,16 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 var newPosition = Vector2.Add(lastPos, relativePos);
 
-                if (newPosition.Y < 0)
-                    newPosition.Y = 0;
-                else if (newPosition.Y > OsuPlayfield.BASE_SIZE.Y)
-                    newPosition.Y = OsuPlayfield.BASE_SIZE.Y;
-                if (newPosition.X < 0)
-                    newPosition.X = 0;
-                else if (newPosition.X > OsuPlayfield.BASE_SIZE.X)
-                    newPosition.X = OsuPlayfield.BASE_SIZE.X;
+                var radius = (float)obj.Radius;
+
+                if (newPosition.Y < radius)
+                    newPosition.Y = radius;
+                else if (newPosition.Y > OsuPlayfield.BASE_SIZE.Y - radius)
+                    newPosition.Y = OsuPlayfield.BASE_SIZE.Y - radius;
+                if (newPosition.X < radius)
+                    newPosition.X = radius;
+                else if (newPosition.X > OsuPlayfield.BASE_SIZE.X - radius)
+                    newPosition.X = OsuPlayfield.BASE_SIZE.X - radius;
 
                 obj.Position = newPosition;
 
@@ -314,10 +321,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
 
         /// <summary>
-        ///     Get samples (if any) for a specific point in time.
+        /// Get samples (if any) for a specific point in time.
         /// </summary>
         /// <remarks>
-        ///     Samples will be returned if a hit circle or a slider node exists at that point of time.
+        /// Samples will be returned if a hit circle or a slider node exists at that point of time.
         /// </remarks>
         /// <param name="hitObjects">The list of hit objects in a beatmap, ordered by StartTime</param>
         /// <param name="time">The point in time to get samples for</param>
@@ -349,7 +356,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
 
         /// <summary>
-        ///     Determines the position of the current hit object relative to the previous one.
+        /// Determines the position of the current hit object relative to the previous one.
         /// </summary>
         /// <returns>The position of the current hit object relative to the previous one</returns>
         private Vector2 getRotatedVector(Vector2 prevPosChanged, Vector2 posRelativeToPrev)
@@ -390,18 +397,18 @@ namespace osu.Game.Rulesets.Osu.Mods
             return rotateVectorTowardsVector(
                 posRelativeToPrev,
                 Vector2.Subtract(playfieldMiddle, prevPosChanged),
-                Math.Min(1, relativeRotationDistance * 0.75f)
+                Math.Min(1, relativeRotationDistance * edge_rotation_multiplier)
             );
         }
 
         /// <summary>
-        ///     Rotates vector "initial" towards vector "destination"
+        /// Rotates vector "initial" towards vector "destination"
         /// </summary>
         /// <param name="initial">Vector to rotate to "destination"</param>
         /// <param name="destination">Vector "initial" should be rotated to</param>
         /// <param name="relativeDistance">
-        ///     The angle the vector should be rotated relative to the difference between the angles of
-        ///     the the two vectors.
+        /// The angle the vector should be rotated relative to the difference between the angles of
+        /// the the two vectors.
         /// </param>
         /// <returns>Resulting vector</returns>
         private Vector2 rotateVectorTowardsVector(Vector2 initial, Vector2 destination, float relativeDistance)
