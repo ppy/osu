@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
@@ -84,6 +85,7 @@ namespace osu.Game.Overlays
             private readonly Box background;
 
             public ScrollToTopButton()
+                : base(HoverSampleSet.ScrollToTop)
             {
                 Size = new Vector2(50);
                 Alpha = 0;
