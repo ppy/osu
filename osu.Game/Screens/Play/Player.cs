@@ -950,14 +950,6 @@ namespace osu.Game.Screens.Play
         {
             screenSuspension?.Expire();
 
-            // if the results screen is prepared to be displayed, forcefully show it on an exit request.
-            // usually if a user has completed a play session they do want to see results. and if they don't they can hit the same key a second time.
-            if (resultsDisplayDelegate != null && !resultsDisplayDelegate.Cancelled && !resultsDisplayDelegate.Completed)
-            {
-                resultsDisplayDelegate.RunTask();
-                return true;
-            }
-
             // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
             // To resolve test failures, forcefully end playing synchronously when this screen exits.
             // Todo: Replace this with a more permanent solution once osu-framework has a synchronous cleanup method.
