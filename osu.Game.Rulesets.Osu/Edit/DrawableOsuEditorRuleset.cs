@@ -69,8 +69,14 @@ namespace osu.Game.Rulesets.Osu.Edit
                 if (hitObject is IHasMainCirclePiece mainPieceContainer)
                 {
                     // clear any explode animation logic.
-                    mainPieceContainer.CirclePiece.ApplyTransformsAt(hitObject.HitStateUpdateTime, true);
-                    mainPieceContainer.CirclePiece.ClearTransformsAfter(hitObject.HitStateUpdateTime, true);
+                    // this is scheduled after children to ensure that the clear happens after invocations of ApplyCustomUpdateState on the circle piece's nested skinnables.
+                    ScheduleAfterChildren(() =>
+                    {
+                        if (hitObject.HitObject == null) return;
+
+                        mainPieceContainer.CirclePiece.ApplyTransformsAt(hitObject.HitStateUpdateTime, true);
+                        mainPieceContainer.CirclePiece.ClearTransformsAfter(hitObject.HitStateUpdateTime, true);
+                    });
                 }
 
                 if (hitObject is DrawableSliderRepeat repeat)
