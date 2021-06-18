@@ -32,7 +32,7 @@ namespace osu.Game.Input
 
             using (var context = realmFactory.GetForRead())
             {
-                foreach (var action in context.Realm.All<RealmKeyBinding>().Where(b => (GlobalAction)b.ActionInt == globalAction))
+                foreach (var action in context.Realm.All<RealmKeyBinding>().Where(b => b.RulesetID == null && (GlobalAction)b.ActionInt == globalAction))
                 {
                     string str = action.KeyCombination.ReadableString();
 
