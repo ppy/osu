@@ -16,9 +16,6 @@ namespace osu.Game.Graphics.UserInterface
         [Description("toolbar")]
         Toolbar,
 
-        [Description("songselect")]
-        SongSelect,
-
         [Description("tabselect")]
         TabSelect,
 
