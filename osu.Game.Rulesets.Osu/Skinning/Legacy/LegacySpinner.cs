@@ -15,8 +15,10 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public abstract class LegacySpinner : CompositeDrawable
+    public abstract class LegacySpinner : CompositeDrawable, IProxiesApproachCircle
     {
+        public const float SPRITE_SCALE = 0.625f;
+
         /// <remarks>
         /// All constants are in osu!stable's gamefield space, which is shifted 16px downwards.
         /// This offset is negated in both osu!stable and osu!lazer to bring all constants into window-space.
@@ -26,12 +28,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         protected const float SPINNER_Y_CENTRE = SPINNER_TOP_OFFSET + 219f;
 
-        protected const float SPRITE_SCALE = 0.625f;
-
         private const float spm_hide_offset = 50f;
 
         protected DrawableSpinner DrawableSpinner { get; private set; }
 
+        public Container ApproachCircleTarget { get; private set; }
 
         private Sprite spin;
         private Sprite clear;
@@ -58,8 +59,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             {
                 Depth = float.MinValue,
                 RelativeSizeAxes = Axes.Both,
-                Children = new[]
+                Children = new Drawable[]
                 {
+                    ApproachCircleTarget = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
                     spin = new Sprite
                     {
                         Anchor = Anchor.TopCentre,
