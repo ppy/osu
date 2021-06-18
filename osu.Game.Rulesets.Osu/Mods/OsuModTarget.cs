@@ -51,13 +51,25 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public bool DisplayResultsOnFail => true;
 
-        // Maximum distance to jump
-        private const float max_distance = 250f;
+        /// <summary>
+        ///     Jump distance for circles in the last combo
+        /// </summary>
+        private const float max_base_distance = 250f;
+
+        /// <summary>
+        ///     The maximum allowed jump distance after multipliers are applied
+        /// </summary>
+        private const float distance_cap = 350f;
 
         // The distances from the hit objects to the borders of the playfield they start to "turn around" and curve towards the middle.
         // The closer the hit objects draw to the border, the sharper the turn
         private const byte border_distance_x = 192;
         private const byte border_distance_y = 144;
+
+        /// <summary>
+        ///     Duration of the undimming animation
+        /// </summary>
+        private const double undim_duration = 96;
 
         private ControlPointInfo controlPointInfo;
 
@@ -139,7 +151,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 var avgColour = colour.AverageColour.Linear;
                 drawable.FadeColour(new Color4(avgColour.R * 0.45f, avgColour.G * 0.45f, avgColour.B * 0.45f, avgColour.A))
-                        .Then().Delay(h.TimePreempt - controlPointInfo.TimingPointAt(h.StartTime).BeatLength - 96).FadeColour(colour, 96);
+                        .Then().Delay(h.TimePreempt - controlPointInfo.TimingPointAt(h.StartTime).BeatLength - undim_duration)
+                        .FadeColour(colour, undim_duration);
 
                 // remove approach circles
                 circle.ApproachCircle.Hide();
@@ -268,10 +281,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                     ? Vector2.Divide(OsuPlayfield.BASE_SIZE, 2)
                     : hitObjects[i - 1].Position;
 
-                var distance = map(obj.ComboIndex, 0, maxComboIndex, (float)obj.Radius, 333f);
+                var distance = map(obj.ComboIndex, 0, maxComboIndex, (float)obj.Radius, max_base_distance);
                 if (obj.NewCombo) distance *= 1.5f;
                 if (obj.Kiai) distance *= 1.2f;
-                distance = Math.Min(max_distance, distance);
+                distance = Math.Min(distance_cap, distance);
 
                 var relativePos = new Vector2(
                     distance * (float)Math.Cos(direction),
@@ -296,7 +309,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (obj.LastInCombo)
                     direction = MathHelper.TwoPi * nextSingle();
                 else
-                    direction += distance / max_distance * (nextSingle() * MathHelper.TwoPi - MathHelper.Pi);
+                    direction += distance / distance_cap * (nextSingle() * MathHelper.TwoPi - MathHelper.Pi);
             }
         }
 
