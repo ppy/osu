@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     // todo: hide background
 
                     using (spinner.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
-                        spinner.HideApproachCircle();
+                        spinner.ApproachCircle.Hide();
 
                     using (spinner.BeginAbsoluteSequence(fadeStartTime))
                         spinner.FadeOut(fadeDuration);
