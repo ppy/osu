@@ -695,6 +695,29 @@ namespace osu.Game.Screens.Play
             progressToResults(true);
         }
 
+        private async Task<ScoreInfo> prepareScoreForResults()
+        {
+            try
+            {
+                await PrepareScoreForResultsAsync(Score).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, @"Score preparation failed!");
+            }
+
+            try
+            {
+                await ImportScore(Score).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, @"Score import failed!");
+            }
+
+            return Score.ScoreInfo;
+        }
+
         /// <summary>
         /// Queue the results screen for display.
         /// </summary>
@@ -732,29 +755,6 @@ namespace osu.Game.Screens.Play
             }, Time.Current + delay, 50);
 
             Scheduler.Add(resultsDisplayDelegate);
-        }
-
-        private async Task<ScoreInfo> prepareScoreForResults()
-        {
-            try
-            {
-                await PrepareScoreForResultsAsync(Score).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, @"Score preparation failed!");
-            }
-
-            try
-            {
-                await ImportScore(Score).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, @"Score import failed!");
-            }
-
-            return Score.ScoreInfo;
         }
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
