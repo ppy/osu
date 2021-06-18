@@ -172,6 +172,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateStartTimeStateTransforms();
 
+            // always fade out at the circle's start time (to match user expectations).
             ApproachCircle.FadeOut(50);
         }
 
@@ -181,6 +182,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             // todo: temporary / arbitrary, used for lifetime optimisation.
             this.Delay(800).FadeOut();
+
+            // in the case of an early state change, the fade should be expedited to the current point in time.
+            if (HitStateUpdateTime < HitObject.StartTime)
+                ApproachCircle.FadeOut(50);
 
             switch (state)
             {
