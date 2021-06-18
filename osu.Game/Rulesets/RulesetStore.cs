@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
