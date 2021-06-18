@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 var avgColour = colour.AverageColour.Linear;
                 drawable.FadeColour(new Color4(avgColour.R * 0.45f, avgColour.G * 0.45f, avgColour.B * 0.45f, avgColour.A))
-                        .Then().Delay(h.TimePreempt - controlPointInfo.TimingPointAt(h.StartTime).BeatLength).FadeColour(colour);
+                        .Then().Delay(h.TimePreempt - controlPointInfo.TimingPointAt(h.StartTime).BeatLength - 96).FadeColour(colour, 96);
 
                 // remove approach circles
                 circle.ApproachCircle.Hide();
