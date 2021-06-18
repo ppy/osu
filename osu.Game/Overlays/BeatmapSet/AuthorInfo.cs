@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -22,8 +23,8 @@ namespace osu.Game.Overlays.BeatmapSet
     {
         private const float height = 50;
 
-        private readonly UpdateableAvatar avatar;
-        private readonly FillFlowContainer fields;
+        private UpdateableAvatar avatar;
+        private FillFlowContainer fields;
 
         private BeatmapSetInfo beatmapSet;
 
@@ -35,9 +36,44 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmapSet) return;
 
                 beatmapSet = value;
-
-                updateDisplay();
+                Scheduler.AddOnce(updateDisplay);
             }
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            RelativeSizeAxes = Axes.X;
+            Height = height;
+
+            Children = new Drawable[]
+            {
+                new Container
+                {
+                    AutoSizeAxes = Axes.Both,
+                    CornerRadius = 4,
+                    Masking = true,
+                    Child = avatar = new UpdateableAvatar(showGuestOnNull: false)
+                    {
+                        Size = new Vector2(height),
+                    },
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Colour = Color4.Black.Opacity(0.25f),
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 4,
+                        Offset = new Vector2(0f, 1f),
+                    },
+                },
+                fields = new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Padding = new MarginPadding { Left = height + 5 },
+                },
+            };
+
+            Scheduler.AddOnce(updateDisplay);
         }
 
         private void updateDisplay()
@@ -67,45 +103,6 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 fields.Add(new Field("last updated", online.LastUpdated.Value, OsuFont.GetFont(weight: FontWeight.Bold)));
             }
-        }
-
-        public AuthorInfo()
-        {
-            RelativeSizeAxes = Axes.X;
-            Height = height;
-
-            Children = new Drawable[]
-            {
-                new Container
-                {
-                    AutoSizeAxes = Axes.Both,
-                    CornerRadius = 4,
-                    Masking = true,
-                    Child = avatar = new UpdateableAvatar
-                    {
-                        ShowGuestOnNull = false,
-                        Size = new Vector2(height),
-                    },
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Colour = Color4.Black.Opacity(0.25f),
-                        Type = EdgeEffectType.Shadow,
-                        Radius = 4,
-                        Offset = new Vector2(0f, 1f),
-                    },
-                },
-                fields = new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Padding = new MarginPadding { Left = height + 5 },
-                },
-            };
-        }
-
-        private void load()
-        {
-            updateDisplay();
         }
 
         private class Field : FillFlowContainer
