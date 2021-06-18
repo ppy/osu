@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Screens;
@@ -54,9 +55,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             return new PlaylistsResultsScreen(score, RoomId.Value.Value, PlaylistItem, true);
         }
 
-        protected override void PrepareScoreForResults(Score score)
+        protected override async Task PrepareScoreForResultsAsync(Score score)
         {
-            base.PrepareScoreForResults(score);
+            await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
 
             Score.ScoreInfo.TotalScore = (int)Math.Round(ScoreProcessor.GetStandardisedScore());
         }
