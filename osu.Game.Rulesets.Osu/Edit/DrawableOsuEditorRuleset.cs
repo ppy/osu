@@ -74,15 +74,15 @@ namespace osu.Game.Rulesets.Osu.Edit
                     {
                         if (hitObject.HitObject == null) return;
 
-                        mainPieceContainer.CirclePiece.ApplyTransformsAt(hitObject.HitStateUpdateTime, true);
-                        mainPieceContainer.CirclePiece.ClearTransformsAfter(hitObject.HitStateUpdateTime, true);
+                        mainPieceContainer.CirclePiece.ApplyTransformsAt(hitObject.StateUpdateTime, true);
+                        mainPieceContainer.CirclePiece.ClearTransformsAfter(hitObject.StateUpdateTime, true);
                     });
                 }
 
                 if (hitObject is DrawableSliderRepeat repeat)
                 {
-                    repeat.Arrow.ApplyTransformsAt(hitObject.HitStateUpdateTime, true);
-                    repeat.Arrow.ClearTransformsAfter(hitObject.HitStateUpdateTime, true);
+                    repeat.Arrow.ApplyTransformsAt(hitObject.StateUpdateTime, true);
+                    repeat.Arrow.ClearTransformsAfter(hitObject.StateUpdateTime, true);
                 }
 
                 // adjust the visuals of top-level object types to make them stay on screen for longer than usual.
