@@ -55,6 +55,7 @@ using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Performance;
 using osu.Game.Skinning.Editor;
+using osu.Framework.Extensions;
 
 namespace osu.Game
 {
@@ -585,7 +586,15 @@ namespace osu.Game
             foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
             {
                 var cultureCode = language.ToCultureCode();
-                Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
+
+                try
+                {
+                    Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Could not load localisations for language \"{cultureCode}\"");
+                }
             }
 
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
