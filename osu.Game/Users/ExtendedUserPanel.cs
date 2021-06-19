@@ -48,11 +48,7 @@ namespace osu.Game.Users
             statusIcon.FinishTransforms();
         }
 
-        protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar
-        {
-            User = User,
-            OpenOnClick = { Value = false }
-        };
+        protected UpdateableAvatar CreateAvatar() => new UpdateableAvatar(User, false);
 
         protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.Country)
         {

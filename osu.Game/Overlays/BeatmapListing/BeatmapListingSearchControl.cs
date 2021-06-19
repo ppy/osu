@@ -14,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osuTK.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -126,15 +127,15 @@ namespace osu.Game.Overlays.BeatmapListing
                                 Padding = new MarginPadding { Horizontal = 10 },
                                 Children = new Drawable[]
                                 {
-                                    generalFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchGeneral>(@"整体"),
+                                    generalFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchGeneral>(BeatmapsStrings.ListingSearchFiltersGeneral),
                                     modeFilter = new BeatmapSearchRulesetFilterRow(),
-                                    categoryFilter = new BeatmapSearchFilterRow<SearchCategory>(@"分类"),
-                                    genreFilter = new BeatmapSearchFilterRow<SearchGenre>(@"流派"),
-                                    languageFilter = new BeatmapSearchFilterRow<SearchLanguage>(@"语言"),
-                                    extraFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchExtra>(@"其他"),
+                                    categoryFilter = new BeatmapSearchFilterRow<SearchCategory>(BeatmapsStrings.ListingSearchFiltersStatus),
+                                    genreFilter = new BeatmapSearchFilterRow<SearchGenre>(BeatmapsStrings.ListingSearchFiltersGenre),
+                                    languageFilter = new BeatmapSearchFilterRow<SearchLanguage>(BeatmapsStrings.ListingSearchFiltersLanguage),
+                                    extraFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchExtra>(BeatmapsStrings.ListingSearchFiltersExtra),
                                     ranksFilter = new BeatmapSearchScoreFilterRow(),
-                                    playedFilter = new BeatmapSearchFilterRow<SearchPlayed>(@"玩过"),
-                                    explicitContentFilter = new BeatmapSearchFilterRow<SearchExplicit>(@"不合适的内容"),
+                                    playedFilter = new BeatmapSearchFilterRow<SearchPlayed>(BeatmapsStrings.ListingSearchFiltersPlayed),
+                                    explicitContentFilter = new BeatmapSearchFilterRow<SearchExplicit>(BeatmapsStrings.ListingSearchFiltersNsfw),
                                 }
                             }
                         }
@@ -172,7 +173,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
             public BeatmapSearchTextBox()
             {
-                PlaceholderText = @"键入关键字以搜索";
+                PlaceholderText = BeatmapsStrings.ListingSearchPrompt;
             }
 
             protected override bool OnKeyDown(KeyDownEvent e)
