@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public new OsuSpinnerJudgementResult Result => (OsuSpinnerJudgementResult)base.Result;
 
-        public SkinnableDrawable ApproachCircle { get; private set; }
+        public SkinnableDrawable Body { get; private set; }
 
         public SpinnerRotationTracker RotationTracker { get; private set; }
 
@@ -88,8 +88,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     RelativeSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        ApproachCircle = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerApproachCircle)),
-                        new SkinnableSpinnerBody(ApproachCircle.CreateProxy(), _ => new DefaultSpinner()),
+                        Body = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBody), _ => new DefaultSpinner()),
                         RotationTracker = new SpinnerRotationTracker(this)
                     }
                 },
