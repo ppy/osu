@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             effectiveMissCount = Math.Max(countMiss, (int)comboBasedMissCount);
-            
+
             double multiplier = 1.12; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
             // Custom multipliers for NoFail and SpunOut.
