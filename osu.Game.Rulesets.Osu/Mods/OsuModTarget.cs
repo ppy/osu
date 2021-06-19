@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => @"Practice keeping up with the beat of the song.";
         public override double ScoreMultiplier => 1;
 
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModTraceable) };
+
         [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(SeedSettingsControl))]
         public Bindable<int?> Seed { get; } = new Bindable<int?>
         {
@@ -319,18 +321,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     var newPosition = Vector2.Add(lastPos, relativePos);
 
-                    var radius = (float)obj.Radius;
-
-                    if (newPosition.Y < radius)
-                        newPosition.Y = radius;
-                    else if (newPosition.Y > OsuPlayfield.BASE_SIZE.Y - radius)
-                        newPosition.Y = OsuPlayfield.BASE_SIZE.Y - radius;
-                    if (newPosition.X < radius)
-                        newPosition.X = radius;
-                    else if (newPosition.X > OsuPlayfield.BASE_SIZE.X - radius)
-                        newPosition.X = OsuPlayfield.BASE_SIZE.X - radius;
-
                     obj.Position = newPosition;
+
+                    clampToPlayfield(obj);
 
                     tryCount++;
                     if (tryCount % 10 == 0) distance *= 0.9f;
@@ -458,6 +451,24 @@ namespace osu.Game.Rulesets.Osu.Mods
                 initial.Length * (float)Math.Cos(finalAngleRad),
                 initial.Length * (float)Math.Sin(finalAngleRad)
             );
+        }
+
+        private void clampToPlayfield(OsuHitObject obj)
+        {
+            var position = obj.Position;
+            var radius = (float)obj.Radius;
+
+            if (position.Y < radius)
+                position.Y = radius;
+            else if (position.Y > OsuPlayfield.BASE_SIZE.Y - radius)
+                position.Y = OsuPlayfield.BASE_SIZE.Y - radius;
+
+            if (position.X < radius)
+                position.X = radius;
+            else if (position.X > OsuPlayfield.BASE_SIZE.X - radius)
+                position.X = OsuPlayfield.BASE_SIZE.X - radius;
+
+            obj.Position = position;
         }
 
         public class TargetBeatContainer : BeatSyncedContainer
