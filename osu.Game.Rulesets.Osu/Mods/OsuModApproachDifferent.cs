@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.ComponentModel;
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -14,15 +15,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModApproachDifferent : Mod, IApplicableToDrawableHitObject, IMutateApproachCircles
     {
-        public override string Name => "Approach Different";
+        public override string Name => "嗦圈";
         public override string Acronym => "AD";
-        public override string Description => "Never trust the approach circles...";
+        public override string Description => "永远，不要相信，缩圈";
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon { get; } = FontAwesome.Regular.Circle;
 
         public override Type[] IncompatibleMods => new[] { typeof(IMutateApproachCircles) };
 
-        [SettingSource("Initial size", "Change the initial size of the approach circle, relative to hit circles.", 0)]
+        [SettingSource("初始大小", "更改缩圈相较与圆圈的的初始大小。", 0)]
         public BindableFloat Scale { get; } = new BindableFloat(4)
         {
             Precision = 0.1f,
@@ -30,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             MaxValue = 10,
         };
 
-        [SettingSource("Style", "Change the animation style of the approach circles.", 1)]
+        [SettingSource("风格", "更改缩圈的动画模式。", 1)]
         public Bindable<AnimationStyle> Style { get; } = new Bindable<AnimationStyle>();
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
@@ -86,14 +87,27 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public enum AnimationStyle
         {
+            [Description("重力")]
             Gravity,
             InOut1,
             InOut2,
+
+            [Description("加速1")]
             Accelerate1,
+
+            [Description("加速2")]
             Accelerate2,
+
+            [Description("加速3")]
             Accelerate3,
+
+            [Description("减速1")]
             Decelerate1,
+
+            [Description("减速2")]
             Decelerate2,
+
+            [Description("减速3")]
             Decelerate3,
         }
     }

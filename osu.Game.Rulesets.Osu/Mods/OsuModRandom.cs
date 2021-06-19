@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     /// </summary>
     public class OsuModRandom : ModRandom, IApplicableToBeatmap
     {
-        public override string Description => "It never gets boring!";
+        public override string Description => "打个措手不及！";
 
         // The relative distance to the edge of the playfield before objects' positions should start to "turn around" and curve towards the middle.
         // The closer the hit objects draw to the border, the sharper the turn
