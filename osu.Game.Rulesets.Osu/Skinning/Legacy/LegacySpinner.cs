@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public abstract class LegacySpinner : CompositeDrawable, IProxiesApproachCircle
+    public abstract class LegacySpinner : CompositeDrawable, IHasSpinnerApproachCircle
     {
         public const float SPRITE_SCALE = 0.625f;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         protected DrawableSpinner DrawableSpinner { get; private set; }
 
-        public Container ApproachCircleTarget { get; private set; }
+        public Drawable ApproachCircle { get; private set; }
 
         private Sprite spin;
         private Sprite clear;
@@ -59,11 +59,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             {
                 Depth = float.MinValue,
                 RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                Children = new[]
                 {
-                    ApproachCircleTarget = new Container
+                    ApproachCircle = new LegacySpinnerApproachCircle
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(SPRITE_SCALE),
+                        Y = SPINNER_Y_CENTRE,
                     },
                     spin = new Sprite
                     {

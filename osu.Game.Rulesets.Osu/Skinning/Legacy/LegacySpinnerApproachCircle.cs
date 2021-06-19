@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
-using static osu.Game.Rulesets.Osu.Skinning.Legacy.LegacySpinner;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
@@ -19,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private DrawableSpinner drawableSpinner;
 
         [CanBeNull]
-        private Sprite sprite;
+        private Sprite approachCircle;
 
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableHitObject, ISkinSource source)
@@ -35,12 +34,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (spinnerProvider is DefaultLegacySkin)
                 return;
 
-            InternalChild = sprite = new Sprite
+            InternalChild = approachCircle = new Sprite
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Texture = source.GetTexture("spinner-approachcircle"),
-                Scale = new Vector2(SPRITE_SCALE * 1.86f),
+                Scale = new Vector2(1.86f),
             };
         }
 
@@ -58,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 return;
 
             using (BeginAbsoluteSequence(spinner.HitObject.StartTime))
-                sprite?.ScaleTo(SPRITE_SCALE * 0.1f, spinner.HitObject.Duration);
+                approachCircle?.ScaleTo(0.1f, spinner.HitObject.Duration);
         }
     }
 }
