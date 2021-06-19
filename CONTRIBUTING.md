@@ -8,6 +8,7 @@ These are not "official rules" *per se*, but following them will help everyone d
 
 1. [I would like to submit an issue!](#i-would-like-to-submit-an-issue)
 2. [I would like to submit a pull request!](#i-would-like-to-submit-a-pull-request)
+3. [I would like to help translate the game!](#i-would-like-to-help-translate-the-game)
 
 ## I would like to submit an issue!
 
@@ -135,3 +136,18 @@ Here are some key things to note before jumping in:
   If you're uncertain about some part of the codebase or some inner workings of the game and framework, please reach out either by leaving a comment in the relevant issue or PR thread, or by posting a message in the [development Discord server](https://discord.gg/ppy). We will try to help you as much as we can.
 
   When it comes to which form of communication is best, GitHub generally lends better to longer-form discussions, while Discord is better for snappy call-and-response answers. Use your best discretion when deciding, and try to keep a single discussion in one place instead of moving back and forth.
+
+## I would like to help translate the game!
+
+Thanks for expressing interest in translating lazer to other languages! The process of translating a screen or view in lazer is as follows:
+
+1. Because translation support was added some time into development, the given screen or view has to be written in a way that allows it to consume translations first. Therefore, if you are not a developer, we recommend waiting until such support is added by someone with programming proficiency; if you are a developer, you can look at how other localised views, like [the beatmap listing](https://github.com/ppy/osu/blob/master/osu.Game/Overlays/BeatmapListingOverlay.cs) and its subcomponents, consume translations.
+2. Once the screen or view supports consuming translations, the actual translation process no longer requires manually modifying the source code in this repository. Instead, [crowdin](https://crowdin.com/) is used as the platform for adding and editing translations.
+3. Finally, one of the maintainers of this repository will periodically export translations from crowdin to files, which will be embedded in the [osu-resources](https://github.com/ppy/osu-resources/) repository and automatically consumed by the game in the proper manner.
+
+When it comes to crowdin, the location to look for a particular translatable piece of text (also referred to as a *string*) is different dependent on whether the string is also shared with [the website](https://osu.ppy.sh/home).
+
+* Translations of strings that are shared with [the website](https://osu.ppy.sh/home) reside in the [osu-web](https://crowdin.com/project/osu-web) crowdin project.
+* Game-exclusive strings are not yet available for translation. They will start becoming available over time as existing views are modified in order to support translation (step 1 above).
+
+The important thing to note is that **the translations should not be manually PRed to any of the ppy organisation repositories. The crowdin projects are the primary sources of truth.** Any copies residing in any of the ppy organisation repositories will be periodically updated by their maintainers in an automated fashion.
