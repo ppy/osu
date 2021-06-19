@@ -135,7 +135,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             // Decrease AR to increase preempt time
             difficulty.ApproachRate *= 0.5f;
-            difficulty.CircleSize *= 0.75f;
         }
 
         // Background metronome
