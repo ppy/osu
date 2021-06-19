@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Mods
@@ -21,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.Dice;
         public override double ScoreMultiplier => 1;
 
-        [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(ModRandomSettingsControl))]
+        [SettingSource("种子", "使用自定义种子，留空则随机生成", SettingControlType = typeof(ModRandomSettingsControl))]
         public Bindable<int?> Seed { get; } = new Bindable<int?>
         {
             Default = null,
@@ -50,7 +49,7 @@ namespace osu.Game.Rulesets.Mods
                     }
                 }
 
-                private readonly OsuNumberBox seedNumberBox;
+                private readonly SettingsNumberBox.NumberBox seedNumberBox;
 
                 public SeedControl()
                 {
@@ -76,7 +75,7 @@ namespace osu.Game.Rulesets.Mods
                             {
                                 new Drawable[]
                                 {
-                                    seedNumberBox = new OsuNumberBox
+                                    seedNumberBox = new SettingsNumberBox.NumberBox
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         CommitOnFocusLost = true

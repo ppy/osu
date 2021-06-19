@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             },
                         }
                     },
-                    avatar = new UpdateableAvatar
+                    avatar = new UpdateableAvatar(showGuestOnNull: false)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -75,7 +75,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             Offset = new Vector2(0, 2),
                             Radius = 1,
                         },
-                        ShowGuestOnNull = false,
                     },
                     new FillFlowContainer
                     {

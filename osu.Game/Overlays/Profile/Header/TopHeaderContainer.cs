@@ -211,13 +211,11 @@ namespace osu.Game.Overlays.Profile.Header
                                                     CornerRadius = avatar_size * 0.25f,
                                                     Children = new Drawable[]
                                                     {
-                                                        avatar = new UpdateableAvatar
+                                                        avatar = new UpdateableAvatar(openOnClick: false, showGuestOnNull: false)
                                                         {
                                                             Anchor = Anchor.Centre,
                                                             Origin = Anchor.Centre,
-                                                            RelativeSizeAxes = Axes.Both,
-                                                            OpenOnClick = { Value = false },
-                                                            ShowGuestOnNull = false,
+                                                            RelativeSizeAxes = Axes.Both
                                                         },
                                                         supporterTag = new SupporterIcon
                                                         {

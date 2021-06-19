@@ -18,6 +18,7 @@ using JetBrains.Annotations;
 using System;
 using osu.Framework.Extensions;
 using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays
 {
@@ -53,8 +54,8 @@ namespace osu.Game.Overlays
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Font = OsuFont.GetFont(size: 17),
-                        Text = @"排序方法:"
+                        Font = OsuFont.GetFont(size: 17, weight: FontWeight.SemiBold),
+                        Text = SortStrings.Default
                     },
                     CreateControl().With(c =>
                     {
@@ -142,11 +143,13 @@ namespace osu.Game.Overlays
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 17),
-                            Text = (value as Enum)?.GetDescription() ?? value.ToString()
+                            Font = OsuFont.GetFont(size: 17, weight: FontWeight.SemiBold),
+                            Text = (value as Enum)?.GetLocalisableDescription() ?? value.ToString()
                         }
                     }
                 });
+
+                AddInternal(new HoverClickSounds());
             }
 
             protected override void LoadComplete()
