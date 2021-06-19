@@ -17,6 +17,8 @@ using osu.Game.Overlays.Comments;
 using JetBrains.Annotations;
 using System;
 using osu.Framework.Extensions;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays
 {
@@ -30,7 +32,7 @@ namespace osu.Game.Overlays
             set => current.Current = value;
         }
 
-        public string Title
+        public LocalisableString Title
         {
             get => text.Text;
             set => text.Text = value;
@@ -53,7 +55,7 @@ namespace osu.Game.Overlays
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                        Text = @"Sort by"
+                        Text = SortStrings.Default
                     },
                     CreateControl().With(c =>
                     {
@@ -142,7 +144,7 @@ namespace osu.Game.Overlays
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                            Text = (value as Enum)?.GetDescription() ?? value.ToString()
+                            Text = (value as Enum)?.GetLocalisableDescription() ?? value.ToString()
                         }
                     }
                 });

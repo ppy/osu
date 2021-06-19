@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 
@@ -21,9 +22,9 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class OsuButton : Button
     {
-        public string Text
+        public LocalisableString Text
         {
-            get => SpriteText?.Text;
+            get => SpriteText?.Text ?? default;
             set
             {
                 if (SpriteText != null)
@@ -48,7 +49,7 @@ namespace osu.Game.Graphics.UserInterface
         protected Box Background;
         protected SpriteText SpriteText;
 
-        public OsuButton(HoverSampleSet? hoverSounds = HoverSampleSet.Loud)
+        public OsuButton(HoverSampleSet? hoverSounds = HoverSampleSet.Button)
         {
             Height = 40;
 

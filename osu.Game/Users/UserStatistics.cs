@@ -26,26 +26,26 @@ namespace osu.Game.Users
             public int Progress;
         }
 
+        [JsonProperty(@"global_rank")]
+        public int? GlobalRank;
+
+        [JsonProperty(@"country_rank")]
+        public int? CountryRank;
+
+        // populated via User model, as that's where the data currently lives.
+        public RankHistoryData RankHistory;
+
         [JsonProperty(@"pp")]
         public decimal? PP;
-
-        [JsonProperty(@"pp_rank")] // the API sometimes only returns this value in condensed user responses
-        private int? rank
-        {
-            set => Ranks.Global = value;
-        }
-
-        [JsonProperty(@"rank")]
-        public UserRanks Ranks;
 
         [JsonProperty(@"ranked_score")]
         public long RankedScore;
 
         [JsonProperty(@"hit_accuracy")]
-        public decimal Accuracy;
+        public double Accuracy;
 
         [JsonIgnore]
-        public string DisplayAccuracy => Accuracy.FormatAccuracy();
+        public string DisplayAccuracy => (Accuracy / 100).FormatAccuracy();
 
         [JsonProperty(@"play_count")]
         public int PlayCount;
@@ -112,16 +112,5 @@ namespace osu.Game.Users
                 }
             }
         }
-
-        public struct UserRanks
-        {
-            [JsonProperty(@"global")]
-            public int? Global;
-
-            [JsonProperty(@"country")]
-            public int? Country;
-        }
-
-        public RankHistoryData RankHistory;
     }
 }

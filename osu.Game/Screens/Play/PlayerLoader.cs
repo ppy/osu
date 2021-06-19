@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -25,6 +24,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Users;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -113,6 +113,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private AudioManager audioManager { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private BatteryInfo batteryInfo { get; set; }
+
         public PlayerLoader(Func<Player> createPlayer)
         {
             this.createPlayer = createPlayer;
@@ -122,6 +125,7 @@ namespace osu.Game.Screens.Play
         private void load(SessionStatics sessionStatics)
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
+            batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce);
 
             InternalChild = (content = new LogoTrackingContainer
             {
@@ -180,8 +184,6 @@ namespace osu.Game.Screens.Play
             {
                 if (epilepsyWarning != null)
                     epilepsyWarning.DimmableBackground = b;
-
-                b?.FadeColour(Color4.White, 800, Easing.OutQuint);
             });
 
             Beatmap.Value.Track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
@@ -197,6 +199,7 @@ namespace osu.Game.Screens.Play
             Scheduler.Add(new ScheduledDelegate(pushWhenLoaded, Clock.CurrentTime + 1800, 0));
 
             showMuteWarningIfNeeded();
+            showBatteryWarningIfNeeded();
         }
 
         public override void OnResuming(IScreen last)
@@ -230,7 +233,7 @@ namespace osu.Game.Screens.Play
             content.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
 
-            ApplyToBackground(b => b.EnableUserDim.Value = false);
+            ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
 
             BackgroundBrightnessReduction = false;
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
@@ -278,7 +281,7 @@ namespace osu.Game.Screens.Play
                 // Preview user-defined background dim and blur when hovered on the visual settings panel.
                 ApplyToBackground(b =>
                 {
-                    b.EnableUserDim.Value = true;
+                    b.IgnoreUserSettings.Value = false;
                     b.BlurAmount.Value = 0;
                 });
 
@@ -289,7 +292,7 @@ namespace osu.Game.Screens.Play
                 ApplyToBackground(b =>
                 {
                     // Returns background dim and blur to the values specified by PlayerLoader.
-                    b.EnableUserDim.Value = false;
+                    b.IgnoreUserSettings.Value = true;
                     b.BlurAmount.Value = BACKGROUND_BLUR;
                 });
 
@@ -310,10 +313,8 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
-            var restartCount = player?.RestartCount + 1 ?? 0;
-
             player = createPlayer();
-            player.RestartCount = restartCount;
+            player.RestartCount = restartCount++;
             player.RestartRequested = restartRequested;
 
             LoadTask = LoadComponentAsync(player, _ => MetadataInfo.Loading = false);
@@ -331,6 +332,8 @@ namespace osu.Game.Screens.Play
 
             content.FadeInFromZero(400);
             content.ScaleTo(1, 650, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
+
+            ApplyToBackground(b => b?.FadeColour(Color4.White, 800, Easing.OutQuint));
         }
 
         private void contentOut()
@@ -429,6 +432,8 @@ namespace osu.Game.Screens.Play
 
         private Bindable<bool> muteWarningShownOnce;
 
+        private int restartCount;
+
         private void showMuteWarningIfNeeded()
         {
             if (!muteWarningShownOnce.Value)
@@ -465,6 +470,49 @@ namespace osu.Game.Screens.Play
                     audioManager.Volume.SetDefault();
                     audioManager.VolumeTrack.SetDefault();
 
+                    return true;
+                };
+            }
+        }
+
+        #endregion
+
+        #region Low battery warning
+
+        private Bindable<bool> batteryWarningShownOnce;
+
+        private void showBatteryWarningIfNeeded()
+        {
+            if (batteryInfo == null) return;
+
+            if (!batteryWarningShownOnce.Value)
+            {
+                if (!batteryInfo.IsCharging && batteryInfo.ChargeLevel <= 0.25)
+                {
+                    notificationOverlay?.Post(new BatteryWarningNotification());
+                    batteryWarningShownOnce.Value = true;
+                }
+            }
+        }
+
+        private class BatteryWarningNotification : SimpleNotification
+        {
+            public override bool IsImportant => true;
+
+            public BatteryWarningNotification()
+            {
+                Text = "Your battery level is low! Charge your device to prevent interruptions during gameplay.";
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours, NotificationOverlay notificationOverlay)
+            {
+                Icon = FontAwesome.Solid.BatteryQuarter;
+                IconBackgound.Colour = colours.RedDark;
+
+                Activated = delegate
+                {
+                    notificationOverlay.Hide();
                     return true;
                 };
             }

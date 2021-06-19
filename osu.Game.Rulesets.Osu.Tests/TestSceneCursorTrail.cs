@@ -39,18 +39,28 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestLegacySmoothCursorTrail()
         {
-            createTest(() => new LegacySkinContainer(false)
+            createTest(() =>
             {
-                Child = new LegacyCursorTrail()
+                var skinContainer = new LegacySkinContainer(false);
+                var legacyCursorTrail = new LegacyCursorTrail(skinContainer);
+
+                skinContainer.Child = legacyCursorTrail;
+
+                return skinContainer;
             });
         }
 
         [Test]
         public void TestLegacyDisjointCursorTrail()
         {
-            createTest(() => new LegacySkinContainer(true)
+            createTest(() =>
             {
-                Child = new LegacyCursorTrail()
+                var skinContainer = new LegacySkinContainer(true);
+                var legacyCursorTrail = new LegacyCursorTrail(skinContainer);
+
+                skinContainer.Child = legacyCursorTrail;
+
+                return skinContainer;
             });
         }
 
@@ -78,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 RelativeSizeAxes = Axes.Both;
             }
 
-            public Drawable GetDrawableComponent(ISkinComponent component) => throw new NotImplementedException();
+            public Drawable GetDrawableComponent(ISkinComponent component) => null;
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
             {
@@ -98,9 +108,11 @@ namespace osu.Game.Rulesets.Osu.Tests
                 return null;
             }
 
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
+            public ISample GetSample(ISampleInfo sampleInfo) => null;
 
-            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
+            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;
+
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
 
             public event Action SourceChanged
             {

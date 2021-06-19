@@ -69,10 +69,10 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
         private void sourceChanged()
         {
-            isLegacySkin = new Lazy<bool>(() => Source.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version) != null);
-            hasKeyTexture = new Lazy<bool>(() => Source.GetAnimation(
-                this.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.KeyImage, 0)?.Value
-                ?? "mania-key1", true, true) != null);
+            isLegacySkin = new Lazy<bool>(() => FindProvider(s => s.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version) != null) != null);
+            hasKeyTexture = new Lazy<bool>(() => FindProvider(s => s.GetAnimation(
+                s.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.KeyImage, 0)?.Value
+                ?? "mania-key1", true, true) != null) != null);
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     break;
             }
 
-            return null;
+            return Source.GetDrawableComponent(component);
         }
 
         private Drawable getResult(HitResult result)
@@ -140,11 +140,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             return animation == null ? null : new LegacyManiaJudgementPiece(result, animation);
         }
 
-        public override SampleChannel GetSample(ISampleInfo sampleInfo)
+        public override ISample GetSample(ISampleInfo sampleInfo)
         {
             // layered hit sounds never play in mania
             if (sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacySample && legacySample.IsLayered)
-                return new SampleChannelVirtual();
+                return new SampleVirtual();
 
             return Source.GetSample(sampleInfo);
         }

@@ -7,18 +7,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyAttributes : DifficultyAttributes
     {
-        public double AimStrain;
-        public double[] AimComboStarRatings;
-        public double[] AimMissCounts;
+        public double AimStrain { get; set; }
+        public double[] AimComboStarRatings { get; set; }
+        public double[] AimMissCounts { get; set; }
 
-        public double SpeedStrain;
-        public double[] SpeedComboStarRatings;
-        public double[] SpeedMissCounts;
+        public double SpeedStrain { get; set; }
+        public double[] SpeedComboStarRatings { get; set; }
+        public double[] SpeedMissCounts { get; set; }
 
-        public double ApproachRate;
-        public double OverallDifficulty;
-        public int HitCircleCount;
-        public int HitSliderCount;
-        public int SpinnerCount;
+        public double ApproachRate { get; set; }
+        public double OverallDifficulty { get; set; }
+        public int HitCircleCount { get; set; }
+        public int HitSliderCount { get; set; }
+        public int SpinnerCount { get; set; }
     }
 }

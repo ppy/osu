@@ -4,28 +4,43 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using MessagePack;
 using Newtonsoft.Json;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Users;
 
 namespace osu.Game.Online.Multiplayer
 {
     [Serializable]
+    [MessagePackObject]
     public class MultiplayerRoomUser : IEquatable<MultiplayerRoomUser>
     {
+        [Key(0)]
         public readonly int UserID;
 
+        [Key(1)]
         public MultiplayerUserState State { get; set; } = MultiplayerUserState.Idle;
 
         /// <summary>
         /// The availability state of the current beatmap.
         /// </summary>
+        [Key(2)]
         public BeatmapAvailability BeatmapAvailability { get; set; } = BeatmapAvailability.LocallyAvailable();
 
+        /// <summary>
+        /// Any mods applicable only to the local user.
+        /// </summary>
+        [Key(3)]
+        public IEnumerable<APIMod> Mods { get; set; } = Enumerable.Empty<APIMod>();
+
+        [IgnoreMember]
         public User? User { get; set; }
 
         [JsonConstructor]
-        public MultiplayerRoomUser(in int userId)
+        public MultiplayerRoomUser(int userId)
         {
             UserID = userId;
         }

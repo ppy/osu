@@ -21,21 +21,19 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         public readonly HitObject LastObject;
 
         /// <summary>
-        /// Amount of time elapsed between <see cref="BaseObject"/> and <see cref="LastObject"/>,
-        /// taking <see cref="ClockRate"/> into account.
+        /// Amount of time elapsed between <see cref="BaseObject"/> and <see cref="LastObject"/>, adjusted by clockrate.
         /// </summary>
         public readonly double DeltaTime;
 
         /// <summary>
-        /// Adjusted start time of the <see cref="BaseObject"/>,
-        /// taking <see cref="ClockRate"/> into account.
+        /// Clockrate adjusted start time of <see cref="BaseObject"/>.
         /// </summary>
         public readonly double StartTime;
 
         /// <summary>
-        /// The rate of the gameplay clock, as determined by the selected mods.
+        /// Clockrate adjusted end time of <see cref="BaseObject"/>.
         /// </summary>
-        public readonly double ClockRate;
+        public readonly double EndTime;
 
         /// <summary>
         /// Creates a new <see cref="DifficultyHitObject"/>.
@@ -49,7 +47,7 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
             LastObject = lastObject;
             DeltaTime = (hitObject.StartTime - lastObject.StartTime) / clockRate;
             StartTime = hitObject.StartTime / clockRate;
-            ClockRate = clockRate;
+            EndTime = hitObject.GetEndTime() / clockRate;
         }
     }
 }

@@ -1,16 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -18,20 +15,13 @@ namespace osu.Game.Graphics.UserInterface
     /// Adds hover sounds to a drawable.
     /// Does not draw anything.
     /// </summary>
-    public class HoverSounds : CompositeDrawable
+    public class HoverSounds : HoverSampleDebounceComponent
     {
-        private SampleChannel sampleHover;
-
-        /// <summary>
-        /// Length of debounce for hover sound playback, in milliseconds.
-        /// </summary>
-        public double HoverDebounceTime { get; } = 20;
+        private Sample sampleHover;
 
         protected readonly HoverSampleSet SampleSet;
 
-        private Bindable<double?> lastPlaybackTime;
-
-        public HoverSounds(HoverSampleSet sampleSet = HoverSampleSet.Normal)
+        public HoverSounds(HoverSampleSet sampleSet = HoverSampleSet.Default)
         {
             SampleSet = sampleSet;
             RelativeSizeAxes = Axes.Both;
@@ -40,34 +30,14 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, SessionStatics statics)
         {
-            lastPlaybackTime = statics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime);
-
-            sampleHover = audio.Samples.Get($@"UI/generic-hover{SampleSet.GetDescription()}");
+            sampleHover = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-hover")
+                          ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-hover");
         }
 
-        protected override bool OnHover(HoverEvent e)
+        public override void PlayHoverSample()
         {
-            bool enoughTimePassedSinceLastPlayback = !lastPlaybackTime.Value.HasValue || Time.Current - lastPlaybackTime.Value >= HoverDebounceTime;
-
-            if (enoughTimePassedSinceLastPlayback)
-            {
-                sampleHover?.Play();
-                lastPlaybackTime.Value = Time.Current;
-            }
-
-            return base.OnHover(e);
+            sampleHover.Frequency.Value = 0.98 + RNG.NextDouble(0.04);
+            sampleHover.Play();
         }
-    }
-
-    public enum HoverSampleSet
-    {
-        [Description("")]
-        Loud,
-
-        [Description("-soft")]
-        Normal,
-
-        [Description("-softer")]
-        Soft
     }
 }

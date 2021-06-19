@@ -5,10 +5,11 @@ using System;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
-    public class Movement : Skill
+    public class Movement : StrainSkill
     {
         private const float absolute_player_positioning_error = 16f;
         private const float normalized_hitobject_radius = 41.0f;
@@ -26,9 +27,21 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         private float lastDistanceMoved;
         private double lastStrainTime;
 
-        public Movement(float halfCatcherWidth)
+        /// <summary>
+        /// The speed multiplier applied to the player's catcher.
+        /// </summary>
+        private readonly double catcherSpeedMultiplier;
+
+        public Movement(Mod[] mods, float halfCatcherWidth, double clockRate)
+            : base(mods)
         {
             HalfCatcherWidth = halfCatcherWidth;
+
+            // In catch, clockrate adjustments do not only affect the timings of hitobjects,
+            // but also the speed of the player's catcher, which has an impact on difficulty
+            // TODO: Support variable clockrates caused by mods such as ModTimeRamp
+            //  (perhaps by using IApplicableToRate within the CatchDifficultyHitObject constructor to set a catcher speed for each object before processing)
+            catcherSpeedMultiplier = clockRate;
         }
 
         protected override double StrainValueOf(DifficultyHitObject current)
@@ -45,7 +58,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
             float distanceMoved = playerPosition - lastPlayerPosition.Value;
 
-            double weightedStrainTime = catchCurrent.StrainTime + 13 + (3 / catchCurrent.ClockRate);
+            double weightedStrainTime = catchCurrent.StrainTime + 13 + (3 / catcherSpeedMultiplier);
 
             double distanceAddition = (Math.Pow(Math.Abs(distanceMoved), 1.3) / 510);
             double sqrtStrain = Math.Sqrt(weightedStrainTime);
@@ -78,7 +91,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                     playerPosition = catchCurrent.NormalizedPosition;
                 }
 
-                distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20) * Math.Pow((Math.Min(catchCurrent.StrainTime * catchCurrent.ClockRate, 265) / 265), 1.5); // Edge Dashes are easier at lower ms values
+                distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20) * Math.Pow((Math.Min(catchCurrent.StrainTime * catcherSpeedMultiplier, 265) / 265), 1.5); // Edge Dashes are easier at lower ms values
             }
 
             lastPlayerPosition = playerPosition;

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -10,12 +12,13 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Rulesets;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -30,8 +33,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        private StateDisplay userStateDisplay;
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
         private SpriteIcon crown;
+        private OsuSpriteText userRankText;
+        private ModDisplay userModsDisplay;
+        private StateDisplay userStateDisplay;
 
         public ParticipantPanel(MultiplayerRoomUser user)
         {
@@ -113,13 +121,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                         Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                                         Text = user?.Username
                                     },
-                                    new OsuSpriteText
+                                    userRankText = new OsuSpriteText
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         Font = OsuFont.GetFont(size: 14),
-                                        Text = user?.CurrentModeRank != null ? $"#{user.CurrentModeRank}" : string.Empty
                                     }
+                                }
+                            },
+                            new Container
+                            {
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                AutoSizeAxes = Axes.Both,
+                                Margin = new MarginPadding { Right = 70 },
+                                Child = userModsDisplay = new ModDisplay
+                                {
+                                    Scale = new Vector2(0.5f),
+                                    ExpansionMode = ExpansionMode.AlwaysContracted,
                                 }
                             },
                             userStateDisplay = new StateDisplay
@@ -143,12 +162,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             const double fade_time = 50;
 
-            userStateDisplay.Status = User.State;
+            var ruleset = rulesets.GetRuleset(Room.Settings.RulesetID).CreateInstance();
+
+            var currentModeRank = User.User?.RulesetsStatistics?.GetValueOrDefault(ruleset.ShortName)?.GlobalRank;
+            userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
+
+            userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);
 
             if (Room.Host?.Equals(User) == true)
                 crown.FadeIn(fade_time);
             else
                 crown.FadeOut(fade_time);
+
+            // If the mods are updated at the end of the frame, the flow container will skip a reflow cycle: https://github.com/ppy/osu-framework/issues/4187
+            // This looks particularly jarring here, so re-schedule the update to that start of our frame as a fix.
+            Schedule(() => userModsDisplay.Current.Value = User.Mods.Select(m => m.ToMod(ruleset)).ToList());
         }
 
         public MenuItem[] ContextMenuItems
@@ -176,7 +204,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                         if (Room.Host?.UserID != api.LocalUser.Value.Id)
                             return;
 
-                        Client.TransferHost(targetUser).CatchUnobservedExceptions(true);
+                        Client.TransferHost(targetUser);
                     })
                 };
             }

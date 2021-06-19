@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -26,7 +27,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneMultiplayerReadyButton : MultiplayerTestScene
     {
         private MultiplayerReadyButton button;
+        private OnlinePlayBeatmapAvailabilityTracker beatmapTracker;
         private BeatmapSetInfo importedSet;
+
+        private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
 
         private BeatmapManager beatmaps;
         private RulesetStore rulesets;
@@ -37,8 +41,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, Beatmap.Default));
-            beatmaps.Import(TestResources.GetTestBeatmapForImport(true)).Wait();
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+
+            Add(beatmapTracker = new OnlinePlayBeatmapAvailabilityTracker
+            {
+                SelectedItem = { BindTarget = selectedItem }
+            });
+
+            Dependencies.Cache(beatmapTracker);
         }
 
         [SetUp]
@@ -46,20 +57,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
             Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
+            selectedItem.Value = new PlaylistItem
+            {
+                Beatmap = { Value = Beatmap.Value.BeatmapInfo },
+                Ruleset = { Value = Beatmap.Value.BeatmapInfo.Ruleset },
+            };
 
-            Child = button = new MultiplayerReadyButton
+            if (button != null)
+                Remove(button);
+
+            Add(button = new MultiplayerReadyButton
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(200, 50),
-                SelectedItem =
-                {
-                    Value = new PlaylistItem
-                    {
-                        Beatmap = { Value = Beatmap.Value.BeatmapInfo },
-                        Ruleset = { Value = Beatmap.Value.BeatmapInfo.Ruleset }
-                    }
-                },
                 OnReadyClick = async () =>
                 {
                     readyClickOperation = OngoingOperationTracker.BeginOperation();
@@ -73,7 +84,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     await Client.ToggleReady();
                     readyClickOperation.Dispose();
                 }
-            };
+            });
         });
 
         [Test]
@@ -198,9 +209,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             addClickButtonStep();
             AddAssert("user waiting for load", () => Client.Room?.Users[0].State == MultiplayerUserState.WaitingForLoad);
-            AddAssert("ready button disabled", () => !button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
 
+            AddAssert("ready button disabled", () => !button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
             AddStep("transitioned to gameplay", () => readyClickOperation.Dispose());
+
+            AddStep("finish gameplay", () =>
+            {
+                Client.ChangeUserState(Client.Room?.Users[0].UserID ?? 0, MultiplayerUserState.Loaded);
+                Client.ChangeUserState(Client.Room?.Users[0].UserID ?? 0, MultiplayerUserState.FinishedPlay);
+            });
+
             AddAssert("ready button enabled", () => button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
         }
     }

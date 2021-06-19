@@ -1,8 +1,9 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -11,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// <summary>
     /// Represents the skill required to press keys with regards to keeping up with the speed at which objects need to be hit.
     /// </summary>
-    public class Speed : OsuSkill
+    public class Speed : ProbabilityBasedSkill
     {
         private const double single_spacing_threshold = 125;
 
@@ -28,6 +29,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double speed_balancing_factor = 40;
 
         protected override double DifficultyMultiplierPerRepeat => 1.0425;
+
+        public Speed(Mod[] mods)
+            : base(mods)
+        {
+        }
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {

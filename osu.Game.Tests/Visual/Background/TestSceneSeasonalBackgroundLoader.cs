@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Background
         public void SetUp() => Schedule(() =>
         {
             // reset API response in statics to avoid test crosstalk.
-            statics.Set<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
+            statics.SetValue<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
             textureStore.PerformedLookups.Clear();
             dummyAPI.SetState(APIState.Online);
 
@@ -135,18 +135,20 @@ namespace osu.Game.Tests.Visual.Background
                 dummyAPI.HandleRequest = request =>
                 {
                     if (dummyAPI.State.Value != APIState.Online || !(request is GetSeasonalBackgroundsRequest backgroundsRequest))
-                        return;
+                        return false;
 
                     backgroundsRequest.TriggerSuccess(new APISeasonalBackgrounds
                     {
                         Backgrounds = seasonal_background_urls.Select(url => new APISeasonalBackground { Url = url }).ToList(),
                         EndDate = endDate
                     });
+
+                    return true;
                 };
             });
 
         private void setSeasonalBackgroundMode(SeasonalBackgroundMode mode)
-            => AddStep($"set seasonal mode to {mode}", () => config.Set(OsuSetting.SeasonalBackgroundMode, mode));
+            => AddStep($"set seasonal mode to {mode}", () => config.SetValue(OsuSetting.SeasonalBackgroundMode, mode));
 
         private void createLoader()
             => AddStep("create loader", () =>
@@ -159,15 +161,18 @@ namespace osu.Game.Tests.Visual.Background
 
         private void loadNextBackground()
         {
+            SeasonalBackground previousBackground = null;
             SeasonalBackground background = null;
 
             AddStep("create next background", () =>
             {
+                previousBackground = (SeasonalBackground)backgroundContainer.SingleOrDefault();
                 background = backgroundLoader.LoadNextBackground();
                 LoadComponentAsync(background, bg => backgroundContainer.Child = bg);
             });
 
             AddUntilStep("background loaded", () => background.IsLoaded);
+            AddAssert("background is different", () => !background.Equals(previousBackground));
         }
 
         private void assertAnyBackground()

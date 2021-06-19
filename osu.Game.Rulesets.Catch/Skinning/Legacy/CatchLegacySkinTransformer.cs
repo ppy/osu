@@ -1,11 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osuTK.Graphics;
-using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
@@ -14,7 +15,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         /// <summary>
         /// For simplicity, let's use legacy combo font texture existence as a way to identify legacy skins from default.
         /// </summary>
-        private bool providesComboCounter => this.HasFont(GetConfig<LegacySetting, string>(LegacySetting.ComboPrefix)?.Value ?? "score");
+        private bool providesComboCounter => this.HasFont(LegacyFont.Combo);
 
         public CatchLegacySkinTransformer(ISkinSource source)
             : base(source)
@@ -23,60 +24,72 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
-            if (component is HUDSkinComponent hudComponent)
+            if (component is SkinnableTargetComponent targetComponent)
             {
-                switch (hudComponent.Component)
+                switch (targetComponent.Target)
                 {
-                    case HUDSkinComponents.ComboCounter:
-                        // catch may provide its own combo counter; hide the default.
-                        return providesComboCounter ? Drawable.Empty() : null;
+                    case SkinnableTarget.MainHUDComponents:
+                        var components = Source.GetDrawableComponent(component) as SkinnableTargetComponentsContainer;
+
+                        if (providesComboCounter && components != null)
+                        {
+                            // catch may provide its own combo counter; hide the default.
+                            // todo: this should be done in an elegant way per ruleset, defining which HUD skin components should be displayed.
+                            foreach (var legacyComboCounter in components.OfType<LegacyComboCounter>())
+                                legacyComboCounter.HiddenByRulesetImplementation = false;
+                        }
+
+                        return components;
                 }
             }
 
-            if (!(component is CatchSkinComponent catchSkinComponent))
-                return null;
-
-            switch (catchSkinComponent.Component)
+            if (component is CatchSkinComponent catchSkinComponent)
             {
-                case CatchSkinComponents.Fruit:
-                    if (GetTexture("fruit-pear") != null)
-                        return new LegacyFruitPiece();
+                switch (catchSkinComponent.Component)
+                {
+                    case CatchSkinComponents.Fruit:
+                        if (GetTexture("fruit-pear") != null)
+                            return new LegacyFruitPiece();
 
-                    break;
+                        return null;
 
-                case CatchSkinComponents.Banana:
-                    if (GetTexture("fruit-bananas") != null)
-                        return new LegacyBananaPiece();
+                    case CatchSkinComponents.Banana:
+                        if (GetTexture("fruit-bananas") != null)
+                            return new LegacyBananaPiece();
 
-                    break;
+                        return null;
 
-                case CatchSkinComponents.Droplet:
-                    if (GetTexture("fruit-drop") != null)
-                        return new LegacyDropletPiece();
+                    case CatchSkinComponents.Droplet:
+                        if (GetTexture("fruit-drop") != null)
+                            return new LegacyDropletPiece();
 
-                    break;
+                        return null;
 
-                case CatchSkinComponents.CatcherIdle:
-                    return this.GetAnimation("fruit-catcher-idle", true, true, true) ??
-                           this.GetAnimation("fruit-ryuuta", true, true, true);
+                    case CatchSkinComponents.Catcher:
+                        var version = Source.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value ?? 1;
 
-                case CatchSkinComponents.CatcherFail:
-                    return this.GetAnimation("fruit-catcher-fail", true, true, true) ??
-                           this.GetAnimation("fruit-ryuuta", true, true, true);
+                        if (version < 2.3m)
+                        {
+                            if (GetTexture(@"fruit-ryuuta") != null ||
+                                GetTexture(@"fruit-ryuuta-0") != null)
+                                return new LegacyCatcherOld();
+                        }
 
-                case CatchSkinComponents.CatcherKiai:
-                    return this.GetAnimation("fruit-catcher-kiai", true, true, true) ??
-                           this.GetAnimation("fruit-ryuuta", true, true, true);
+                        if (GetTexture(@"fruit-catcher-idle") != null ||
+                            GetTexture(@"fruit-catcher-idle-0") != null)
+                            return new LegacyCatcherNew();
 
-                case CatchSkinComponents.CatchComboCounter:
+                        return null;
 
-                    if (providesComboCounter)
-                        return new LegacyCatchComboCounter(Source);
+                    case CatchSkinComponents.CatchComboCounter:
+                        if (providesComboCounter)
+                            return new LegacyCatchComboCounter(Source);
 
-                    break;
+                        return null;
+                }
             }
 
-            return null;
+            return Source.GetDrawableComponent(component);
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)

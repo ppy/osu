@@ -5,8 +5,8 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Setup
@@ -18,18 +18,17 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledSliderBar<float> approachRateSlider;
         private LabelledSliderBar<float> overallDifficultySlider;
 
+        public override LocalisableString Title => "Difficulty";
+
         [BackgroundDependencyLoader]
         private void load()
         {
             Children = new Drawable[]
             {
-                new OsuSpriteText
-                {
-                    Text = "Difficulty settings"
-                },
                 circleSizeSlider = new LabelledSliderBar<float>
                 {
                     Label = "Object Size",
+                    FixedLabelWidth = LABEL_WIDTH,
                     Description = "The size of all hit objects",
                     Current = new BindableFloat(Beatmap.BeatmapInfo.BaseDifficulty.CircleSize)
                     {
@@ -42,6 +41,7 @@ namespace osu.Game.Screens.Edit.Setup
                 healthDrainSlider = new LabelledSliderBar<float>
                 {
                     Label = "Health Drain",
+                    FixedLabelWidth = LABEL_WIDTH,
                     Description = "The rate of passive health drain throughout playable time",
                     Current = new BindableFloat(Beatmap.BeatmapInfo.BaseDifficulty.DrainRate)
                     {
@@ -54,6 +54,7 @@ namespace osu.Game.Screens.Edit.Setup
                 approachRateSlider = new LabelledSliderBar<float>
                 {
                     Label = "Approach Rate",
+                    FixedLabelWidth = LABEL_WIDTH,
                     Description = "The speed at which objects are presented to the player",
                     Current = new BindableFloat(Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate)
                     {
@@ -66,6 +67,7 @@ namespace osu.Game.Screens.Edit.Setup
                 overallDifficultySlider = new LabelledSliderBar<float>
                 {
                     Label = "Overall Difficulty",
+                    FixedLabelWidth = LABEL_WIDTH,
                     Description = "The harshness of hit windows and difficulty of special objects (ie. spinners)",
                     Current = new BindableFloat(Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty)
                     {

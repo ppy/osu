@@ -68,10 +68,7 @@ namespace osu.Game.Rulesets.UI
 
         private bool frameStablePlayback = true;
 
-        /// <summary>
-        /// Whether to enable frame-stable playback.
-        /// </summary>
-        internal bool FrameStablePlayback
+        internal override bool FrameStablePlayback
         {
             get => frameStablePlayback;
             set
@@ -85,6 +82,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The beatmap.
         /// </summary>
+        [Cached(typeof(IBeatmap))]
         public readonly Beatmap<TObject> Beatmap;
 
         public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
@@ -92,7 +90,7 @@ namespace osu.Game.Rulesets.UI
         protected IRulesetConfigManager Config { get; private set; }
 
         [Cached(typeof(IReadOnlyList<Mod>))]
-        protected override IReadOnlyList<Mod> Mods { get; }
+        public sealed override IReadOnlyList<Mod> Mods { get; }
 
         private FrameStabilityContainer frameStabilityContainer;
 
@@ -181,16 +179,9 @@ namespace osu.Game.Rulesets.UI
                         .WithChild(ResumeOverlay)));
             }
 
-            RegenerateAutoplay();
+            applyRulesetMods(Mods, config);
 
             loadObjects(cancellationToken ?? default);
-        }
-
-        public void RegenerateAutoplay()
-        {
-            // for now this is applying mods which aren't just autoplay.
-            // we'll need to reconsider this flow in the future.
-            applyRulesetMods(Mods, config);
         }
 
         /// <summary>
@@ -208,8 +199,11 @@ namespace osu.Game.Rulesets.UI
 
             Playfield.PostProcess();
 
-            foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
-                mod.ApplyToDrawableHitObjects(Playfield.AllHitObjects);
+            foreach (var mod in Mods.OfType<IApplicableToDrawableHitObject>())
+            {
+                foreach (var drawableHitObject in Playfield.AllHitObjects)
+                    mod.ApplyToDrawableHitObject(drawableHitObject);
+            }
         }
 
         public override void RequestResume(Action continueResume)
@@ -272,6 +266,12 @@ namespace osu.Game.Rulesets.UI
         {
             if (!(KeyBindingInputManager is IHasRecordingHandler recordingInputManager))
                 throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports recording is not available");
+
+            if (score == null)
+            {
+                recordingInputManager.Recorder = null;
+                return;
+            }
 
             var recorder = CreateReplayRecorder(score);
 
@@ -432,9 +432,14 @@ namespace osu.Game.Rulesets.UI
         public abstract IFrameStableClock FrameStableClock { get; }
 
         /// <summary>
+        /// Whether to enable frame-stable playback.
+        /// </summary>
+        internal abstract bool FrameStablePlayback { get; set; }
+
+        /// <summary>
         /// The mods which are to be applied.
         /// </summary>
-        protected abstract IReadOnlyList<Mod> Mods { get; }
+        public abstract IReadOnlyList<Mod> Mods { get; }
 
         /// <summary>~
         /// The associated ruleset.
@@ -517,7 +522,7 @@ namespace osu.Game.Rulesets.UI
         /// Sets a replay to be used to record gameplay.
         /// </summary>
         /// <param name="score">The target to be recorded to.</param>
-        public abstract void SetRecordTarget(Score score);
+        public abstract void SetRecordTarget([CanBeNull] Score score);
 
         /// <summary>
         /// Invoked when the interactive user requests resuming from a paused state.

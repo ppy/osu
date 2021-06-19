@@ -69,14 +69,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             effectiveMissCount = Math.Max(countMiss, (int)comboBasedMissCount);
-
-            // Don't count scores made with supposedly unranked mods
-            if (mods.Any(m => !m.Ranked))
-                return 0;
-
-            // Custom multipliers for NoFail and SpunOut.
+            
             double multiplier = 1.12; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
+            // Custom multipliers for NoFail and SpunOut.
             if (mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * countMiss);
 
@@ -103,14 +99,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return totalValue;
         }
 
+        /// <summary>
+        /// Calculates achieved star rating for current score
+        /// </summary>
+        /// <param name="comboDifficulties">Array of map star ratings</param>
+        /// <returns>Current score star rating</returns>
         private double comboStarRating(double[] comboDifficulties)
         {
-            return LinearSpline.InterpolateSorted(OsuSkill.COMBO_PERCENTAGES, comboDifficulties).Interpolate(scoreMaxCombo / (double)Attributes.MaxCombo);
+            double achievedComboPercentage = scoreMaxCombo / (double)Attributes.MaxCombo;
+            return LinearSpline.InterpolateSorted(ProbabilityBasedSkill.COMBO_PERCENTAGES, comboDifficulties)
+                               .Interpolate(achievedComboPercentage);
         }
 
         private double missCountStarRating(double[] missCounts, double difficulty)
         {
-            double missCountMultiplier = (countMiss == 0) ? 1 : LinearSpline.InterpolateSorted(missCounts, OsuSkill.MISS_STAR_RATING_MULTIPLIERS).Interpolate(countMiss);
+            double missCountMultiplier = (countMiss == 0) ? 1 : LinearSpline.InterpolateSorted(missCounts, ProbabilityBasedSkill.MISS_STAR_RATING_MULTIPLIERS).Interpolate(countMiss);
             return difficulty * missCountMultiplier;
         }
 

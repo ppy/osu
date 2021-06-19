@@ -43,6 +43,9 @@ namespace osu.Game.Rulesets.Edit
 
         protected readonly Ruleset Ruleset;
 
+        // Provides `Playfield`
+        private DependencyContainer dependencies;
+
         [Resolved]
         protected EditorClock EditorClock { get; private set; }
 
@@ -54,7 +57,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
 
-        private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
+        private DrawableEditorRulesetWrapper<TObject> drawableRulesetWrapper;
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
 
@@ -69,6 +72,9 @@ namespace osu.Game.Rulesets.Edit
             Ruleset = ruleset;
         }
 
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -76,7 +82,7 @@ namespace osu.Game.Rulesets.Edit
 
             try
             {
-                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() }))
+                drawableRulesetWrapper = new DrawableEditorRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() }))
                 {
                     Clock = EditorClock,
                     ProcessCustomClock = false
@@ -87,6 +93,8 @@ namespace osu.Game.Rulesets.Edit
                 Logger.Error(e, "Could not load beatmap successfully!");
                 return;
             }
+
+            dependencies.CacheAs(Playfield);
 
             const float toolbar_width = 200;
 
@@ -182,8 +190,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
         /// </summary>
-        protected virtual ComposeBlueprintContainer CreateBlueprintContainer()
-            => new ComposeBlueprintContainer(this);
+        protected virtual ComposeBlueprintContainer CreateBlueprintContainer() => new ComposeBlueprintContainer(this);
 
         /// <summary>
         /// Construct a drawable ruleset for the provided ruleset.
@@ -437,6 +444,8 @@ namespace osu.Game.Rulesets.Edit
         /// Whether the user's cursor is currently in an area of the <see cref="HitObjectComposer"/> that is valid for placement.
         /// </summary>
         public abstract bool CursorInPlacementArea { get; }
+
+        public virtual string ConvertSelectionToString() => string.Empty;
 
         #region IPositionSnapProvider
 

@@ -28,7 +28,7 @@ using osuTK;
 namespace osu.Game.Screens.OnlinePlay
 {
     [Cached]
-    public abstract class OnlinePlayScreen : OsuScreen
+    public abstract class OnlinePlayScreen : OsuScreen, IHasSubScreenStack
     {
         public override bool CursorVisible => (screenStack.CurrentScreen as IOnlinePlaySubScreen)?.CursorVisible ?? true;
 
@@ -253,7 +253,10 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override bool OnBackButton()
         {
-            if ((screenStack.CurrentScreen as IOnlinePlaySubScreen)?.OnBackButton() == true)
+            if (!(screenStack.CurrentScreen is IOnlinePlaySubScreen onlineSubScreen))
+                return false;
+
+            if (((Drawable)onlineSubScreen).IsLoaded && onlineSubScreen.AllowBackButton && onlineSubScreen.OnBackButton())
                 return true;
 
             if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
@@ -355,5 +358,7 @@ namespace osu.Game.Screens.OnlinePlay
                 protected override double TransformDuration => 200;
             }
         }
+
+        ScreenStack IHasSubScreenStack.SubScreenStack => screenStack;
     }
 }

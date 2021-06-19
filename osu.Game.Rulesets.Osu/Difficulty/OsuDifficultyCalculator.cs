@@ -29,14 +29,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
-            var aim = (OsuSkill)skills[0];
-            var speed = (OsuSkill)skills[1];
+            var aim = (ProbabilityBasedSkill)skills[0];
+            var speed = (ProbabilityBasedSkill)skills[1];
 
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods, Skills = skills };
 
-            double aimRating = aim.Difficulty;
-            double speedRating = speed.Difficulty;
+            double aimRating = aim.DifficultyValue();
+            double speedRating = speed.DifficultyValue();
             double starRating = star_rating_scale_factor * (aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2);
 
             HitWindows hitWindows = new OsuHitWindows();
@@ -88,10 +88,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[]
         {
-            new Aim(),
-            new Speed()
+            new Aim(mods),
+            new Speed(mods)
         };
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]

@@ -8,9 +8,11 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Scoring;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -226,7 +228,6 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Enumerates all <see cref="ScorePanel"/>s contained in this <see cref="ScorePanelList"/>.
         /// </summary>
-        /// <returns></returns>
         public IEnumerable<ScorePanel> GetScorePanels() => flow.Select(t => t.Panel);
 
         /// <summary>
@@ -262,6 +263,26 @@ namespace osu.Game.Screens.Ranking
                 throw new InvalidOperationException("Panel is not contained by the score panel list.");
 
             container.Attach();
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            var expandedPanelIndex = flow.GetPanelIndex(expandedPanel.Score);
+
+            switch (e.Key)
+            {
+                case Key.Left:
+                    if (expandedPanelIndex > 0)
+                        SelectedScore.Value = flow.Children[expandedPanelIndex - 1].Panel.Score;
+                    return true;
+
+                case Key.Right:
+                    if (expandedPanelIndex < flow.Count - 1)
+                        SelectedScore.Value = flow.Children[expandedPanelIndex + 1].Panel.Score;
+                    return true;
+            }
+
+            return base.OnKeyDown(e);
         }
 
         private class Flow : FillFlowContainer<ScorePanelTrackingContainer>

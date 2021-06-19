@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,7 +16,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// Transformer used to handle support of legacy features for individual rulesets.
     /// </summary>
-    public abstract class LegacySkinTransformer : ISkin
+    public abstract class LegacySkinTransformer : ISkinSource
     {
         /// <summary>
         /// Source of the <see cref="ISkin"/> which is being transformed.
@@ -34,18 +35,26 @@ namespace osu.Game.Skinning
         public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
             => Source.GetTexture(componentName, wrapModeS, wrapModeT);
 
-        public virtual SampleChannel GetSample(ISampleInfo sampleInfo)
+        public virtual ISample GetSample(ISampleInfo sampleInfo)
         {
             if (!(sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacySample))
                 return Source.GetSample(sampleInfo);
 
             var playLayeredHitSounds = GetConfig<LegacySetting, bool>(LegacySetting.LayeredHitSounds);
             if (legacySample.IsLayered && playLayeredHitSounds?.Value == false)
-                return new SampleChannelVirtual();
+                return new SampleVirtual();
 
             return Source.GetSample(sampleInfo);
         }
 
         public abstract IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
+
+        public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => Source.FindProvider(lookupFunction);
+
+        public event Action SourceChanged
+        {
+            add => Source.SourceChanged += value;
+            remove => Source.SourceChanged -= value;
+        }
     }
 }

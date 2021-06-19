@@ -11,12 +11,12 @@ namespace osu.Game.Online.Rooms
 {
     public class SubmitRoomScoreRequest : APIRequest<MultiplayerScore>
     {
-        private readonly int scoreId;
-        private readonly int roomId;
-        private readonly int playlistItemId;
+        private readonly long scoreId;
+        private readonly long roomId;
+        private readonly long playlistItemId;
         private readonly ScoreInfo scoreInfo;
 
-        public SubmitRoomScoreRequest(int scoreId, int roomId, int playlistItemId, ScoreInfo scoreInfo)
+        public SubmitRoomScoreRequest(long scoreId, long roomId, long playlistItemId, ScoreInfo scoreInfo)
         {
             this.scoreId = scoreId;
             this.roomId = roomId;

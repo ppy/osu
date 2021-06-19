@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
@@ -24,126 +23,129 @@ namespace osu.Game.Configuration
         protected override void InitialiseDefaults()
         {
             // UI/selection defaults
-            Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
-            Set(OsuSetting.Skin, 0, -1, int.MaxValue);
+            SetDefault(OsuSetting.Ruleset, 0, 0, int.MaxValue);
+            SetDefault(OsuSetting.Skin, 0, -1, int.MaxValue);
 
-            Set(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
-            Set(OsuSetting.BeatmapDetailModsFilter, false);
+            SetDefault(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
+            SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
 
-            Set(OsuSetting.ShowConvertedBeatmaps, true);
-            Set(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
-            Set(OsuSetting.DisplayStarsMaximum, 10.1, 0, 10.1, 0.1);
+            SetDefault(OsuSetting.ShowConvertedBeatmaps, true);
+            SetDefault(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
+            SetDefault(OsuSetting.DisplayStarsMaximum, 10.1, 0, 10.1, 0.1);
 
-            Set(OsuSetting.SongSelectGroupingMode, GroupMode.All);
-            Set(OsuSetting.SongSelectSortingMode, SortMode.Title);
+            SetDefault(OsuSetting.SongSelectGroupingMode, GroupMode.All);
+            SetDefault(OsuSetting.SongSelectSortingMode, SortMode.Title);
 
-            Set(OsuSetting.RandomSelectAlgorithm, RandomSelectAlgorithm.RandomPermutation);
+            SetDefault(OsuSetting.RandomSelectAlgorithm, RandomSelectAlgorithm.RandomPermutation);
 
-            Set(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2f, 1f);
+            SetDefault(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2f, 1f);
 
             // Online settings
-            Set(OsuSetting.Username, string.Empty);
-            Set(OsuSetting.Token, string.Empty);
+            SetDefault(OsuSetting.Username, string.Empty);
+            SetDefault(OsuSetting.Token, string.Empty);
 
-            Set(OsuSetting.AutomaticallyDownloadWhenSpectating, false);
+            SetDefault(OsuSetting.AutomaticallyDownloadWhenSpectating, false);
 
-            Set(OsuSetting.SavePassword, false).ValueChanged += enabled =>
+            SetDefault(OsuSetting.SavePassword, false).ValueChanged += enabled =>
             {
-                if (enabled.NewValue) Set(OsuSetting.SaveUsername, true);
+                if (enabled.NewValue) SetValue(OsuSetting.SaveUsername, true);
             };
 
-            Set(OsuSetting.SaveUsername, true).ValueChanged += enabled =>
+            SetDefault(OsuSetting.SaveUsername, true).ValueChanged += enabled =>
             {
-                if (!enabled.NewValue) Set(OsuSetting.SavePassword, false);
+                if (!enabled.NewValue) SetValue(OsuSetting.SavePassword, false);
             };
 
-            Set(OsuSetting.ExternalLinkWarning, true);
-            Set(OsuSetting.PreferNoVideo, false);
+            SetDefault(OsuSetting.ExternalLinkWarning, true);
+            SetDefault(OsuSetting.PreferNoVideo, false);
 
-            Set(OsuSetting.ShowOnlineExplicitContent, false);
+            SetDefault(OsuSetting.ShowOnlineExplicitContent, false);
+
+            SetDefault(OsuSetting.NotifyOnUsernameMentioned, true);
+            SetDefault(OsuSetting.NotifyOnPrivateMessage, true);
 
             // Audio
-            Set(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
+            SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
 
-            Set(OsuSetting.MenuVoice, true);
-            Set(OsuSetting.MenuMusic, true);
+            SetDefault(OsuSetting.MenuVoice, true);
+            SetDefault(OsuSetting.MenuMusic, true);
 
-            Set(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
+            SetDefault(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
 
             // Input
-            Set(OsuSetting.MenuCursorSize, 1.0f, 0.5f, 2f, 0.01f);
-            Set(OsuSetting.GameplayCursorSize, 1.0f, 0.1f, 2f, 0.01f);
-            Set(OsuSetting.AutoCursorSize, false);
+            SetDefault(OsuSetting.MenuCursorSize, 1.0f, 0.5f, 2f, 0.01f);
+            SetDefault(OsuSetting.GameplayCursorSize, 1.0f, 0.1f, 2f, 0.01f);
+            SetDefault(OsuSetting.AutoCursorSize, false);
 
-            Set(OsuSetting.MouseDisableButtons, false);
-            Set(OsuSetting.MouseDisableWheel, false);
-            Set(OsuSetting.ConfineMouseMode, OsuConfineMouseMode.DuringGameplay);
+            SetDefault(OsuSetting.MouseDisableButtons, false);
+            SetDefault(OsuSetting.MouseDisableWheel, false);
+            SetDefault(OsuSetting.ConfineMouseMode, OsuConfineMouseMode.DuringGameplay);
 
             // Graphics
-            Set(OsuSetting.ShowFpsDisplay, false);
+            SetDefault(OsuSetting.ShowFpsDisplay, false);
 
-            Set(OsuSetting.ShowStoryboard, true);
-            Set(OsuSetting.BeatmapSkins, true);
-            Set(OsuSetting.BeatmapColours, true);
-            Set(OsuSetting.BeatmapHitsounds, true);
+            SetDefault(OsuSetting.ShowStoryboard, true);
+            SetDefault(OsuSetting.BeatmapSkins, true);
+            SetDefault(OsuSetting.BeatmapColours, true);
+            SetDefault(OsuSetting.BeatmapHitsounds, true);
 
-            Set(OsuSetting.CursorRotation, true);
+            SetDefault(OsuSetting.CursorRotation, true);
 
-            Set(OsuSetting.MenuParallax, true);
+            SetDefault(OsuSetting.MenuParallax, true);
 
             // Gameplay
-            Set(OsuSetting.DimLevel, 0.8, 0, 1, 0.01);
-            Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
-            Set(OsuSetting.LightenDuringBreaks, true);
+            SetDefault(OsuSetting.DimLevel, 0.8, 0, 1, 0.01);
+            SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
+            SetDefault(OsuSetting.LightenDuringBreaks, true);
 
-            Set(OsuSetting.HitLighting, true);
+            SetDefault(OsuSetting.HitLighting, true);
 
-            Set(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
-            Set(OsuSetting.ShowProgressGraph, true);
-            Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
-            Set(OsuSetting.FadePlayfieldWhenHealthLow, true);
-            Set(OsuSetting.KeyOverlay, false);
-            Set(OsuSetting.PositionalHitSounds, true);
-            Set(OsuSetting.AlwaysPlayFirstComboBreak, true);
-            Set(OsuSetting.ScoreMeter, ScoreMeterType.HitErrorBoth);
+            SetDefault(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Always);
+            SetDefault(OsuSetting.ShowProgressGraph, true);
+            SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
+            SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
+            SetDefault(OsuSetting.KeyOverlay, false);
+            SetDefault(OsuSetting.PositionalHitSounds, true);
+            SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
-            Set(OsuSetting.FloatingComments, false);
+            SetDefault(OsuSetting.FloatingComments, false);
 
-            Set(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised);
+            SetDefault(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised);
 
-            Set(OsuSetting.IncreaseFirstObjectVisibility, true);
-            Set(OsuSetting.GameplayDisableWinKey, true);
+            SetDefault(OsuSetting.IncreaseFirstObjectVisibility, true);
+            SetDefault(OsuSetting.GameplayDisableWinKey, true);
 
             // Update
-            Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
+            SetDefault(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
 
-            Set(OsuSetting.Version, string.Empty);
+            SetDefault(OsuSetting.Version, string.Empty);
 
-            Set(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
-            Set(OsuSetting.ScreenshotCaptureMenuCursor, false);
+            SetDefault(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
+            SetDefault(OsuSetting.ScreenshotCaptureMenuCursor, false);
 
-            Set(OsuSetting.SongSelectRightMouseScroll, false);
+            SetDefault(OsuSetting.SongSelectRightMouseScroll, false);
 
-            Set(OsuSetting.Scaling, ScalingMode.Off);
+            SetDefault(OsuSetting.Scaling, ScalingMode.Off);
 
-            Set(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f);
-            Set(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f);
+            SetDefault(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f);
+            SetDefault(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f);
 
-            Set(OsuSetting.ScalingPositionX, 0.5f, 0f, 1f);
-            Set(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f);
+            SetDefault(OsuSetting.ScalingPositionX, 0.5f, 0f, 1f);
+            SetDefault(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f);
 
-            Set(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
+            SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
 
-            Set(OsuSetting.UIHoldActivationDelay, 200f, 0f, 500f, 50f);
+            SetDefault(OsuSetting.UIHoldActivationDelay, 200f, 0f, 500f, 50f);
 
-            Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
+            SetDefault(OsuSetting.IntroSequence, IntroSequence.Triangles);
 
-            Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
-            Set(OsuSetting.SeasonalBackgroundMode, SeasonalBackgroundMode.Sometimes);
+            SetDefault(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
+            SetDefault(OsuSetting.SeasonalBackgroundMode, SeasonalBackgroundMode.Sometimes);
 
-            Set(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
+            SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
-            Set(OsuSetting.EditorWaveformOpacity, 1f);
+            SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
+            SetDefault(OsuSetting.EditorHitAnimations, false);
         }
 
         public OsuConfigManager(Storage storage)
@@ -169,14 +171,9 @@ namespace osu.Game.Configuration
 
             int combined = (year * 10000) + monthDay;
 
-            if (combined < 20200305)
+            if (combined < 20210413)
             {
-                // the maximum value of this setting was changed.
-                // if we don't manually increase this, it causes song select to filter out beatmaps the user expects to see.
-                var maxStars = (BindableDouble)GetOriginalBindable<double>(OsuSetting.DisplayStarsMaximum);
-
-                if (maxStars.Value == 10)
-                    maxStars.Value = maxStars.MaxValue;
+                SetValue(OsuSetting.EditorWaveformOpacity, 0.25f);
             }
         }
 
@@ -218,7 +215,6 @@ namespace osu.Game.Configuration
         KeyOverlay,
         PositionalHitSounds,
         AlwaysPlayFirstComboBreak,
-        ScoreMeter,
         FloatingComments,
         HUDVisibilityMode,
         ShowProgressGraph,
@@ -266,12 +262,15 @@ namespace osu.Game.Configuration
         ScalingSizeY,
         UIScale,
         IntroSequence,
+        NotifyOnUsernameMentioned,
+        NotifyOnPrivateMessage,
         UIHoldActivationDelay,
         HitLighting,
         MenuBackgroundSource,
         GameplayDisableWinKey,
         SeasonalBackgroundMode,
         EditorWaveformOpacity,
+        EditorHitAnimations,
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
         ShowOnlineExplicitContent,

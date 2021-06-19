@@ -75,5 +75,10 @@ namespace osu.Game.Utils
         /// </param>
         public static float NextSingle(int seed, int series = 0) =>
             (float)(NextULong(seed, series) & ((1 << 24) - 1)) / (1 << 24); // float has 24-bit precision
+
+        /// <summary>
+        /// Compute a random floating point value between <paramref name="min"/> and <paramref name="max"/> from given seed and series number.
+        /// </summary>
+        public static float NextSingle(float min, float max, int seed, int series = 0) => min + NextSingle(seed, series) * (max - min);
     }
 }
