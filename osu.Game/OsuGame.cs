@@ -55,7 +55,6 @@ using osu.Game.IO;
 using osu.Game.Localisation;
 using osu.Game.Performance;
 using osu.Game.Skinning.Editor;
-using osu.Framework.Extensions;
 
 namespace osu.Game
 {
