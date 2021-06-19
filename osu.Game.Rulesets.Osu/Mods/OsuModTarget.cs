@@ -101,6 +101,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             Seed.Value ??= RNG.Next();
 
             var osuBeatmap = (OsuBeatmap)beatmap;
+
+            if (osuBeatmap.HitObjects.Count == 0) return;
+
             controlPointInfo = osuBeatmap.ControlPointInfo;
             var origHitObjects = osuBeatmap.HitObjects.OrderBy(x => x.StartTime).ToList();
 
@@ -277,6 +280,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void randomizeCirclePos(IReadOnlyList<OsuHitObject> hitObjects)
         {
+            if (hitObjects.Count == 0) return;
+
             var rng = new Random(Seed.Value.GetValueOrDefault());
 
             float nextSingle(float max = 1f) => (float)(rng.NextDouble() * max);
@@ -291,7 +296,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                     ? Vector2.Divide(OsuPlayfield.BASE_SIZE, 2)
                     : hitObjects[i - 1].Position;
 
-                var distance = map(obj.ComboIndex, 0, maxComboIndex, (float)obj.Radius, max_base_distance);
+                var distance = maxComboIndex == 0
+                    ? (float)obj.Radius
+                    : map(obj.ComboIndex, 0, maxComboIndex, (float)obj.Radius, max_base_distance);
                 if (obj.NewCombo) distance *= 1.5f;
                 if (obj.Kiai) distance *= 1.2f;
                 distance = Math.Min(distance_cap, distance);
