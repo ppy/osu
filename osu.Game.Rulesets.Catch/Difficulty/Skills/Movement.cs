@@ -17,9 +17,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
         protected override double SkillMultiplier => 900;
         protected override double StrainDecayBase => 0.2;
-        protected override int SectionLength => 750;
 
         protected override double DecayWeight => 0.94;
+
+        protected override int SectionLength => 750;
 
         protected readonly float HalfCatcherWidth;
 

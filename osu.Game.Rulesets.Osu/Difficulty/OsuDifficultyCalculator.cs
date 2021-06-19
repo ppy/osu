@@ -50,9 +50,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
             maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
 
-            int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
             int hitCircleCount = beatmap.HitObjects.Count(h => h is HitCircle);
             int hitSliderCount = beatmap.HitObjects.Count(h => h is Slider);
+            int spinnerCount = beatmap.HitObjects.Count(h => h is Spinner);
 
             return new OsuDifficultyAttributes
             {
