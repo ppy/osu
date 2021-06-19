@@ -15,7 +15,9 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Resources.Localisation.Web;
@@ -33,6 +35,7 @@ namespace osu.Game.Overlays
         private Container panelTarget;
         private FillFlowContainer<BeatmapPanel> foundContent;
         private NotFoundDrawable notFoundContent;
+        private SupporterRequiredDrawable supporterRequiredContent;
         private BeatmapListingFilterControl filterControl;
 
         public BeatmapListingOverlay()
@@ -76,6 +79,7 @@ namespace osu.Game.Overlays
                                 {
                                     foundContent = new FillFlowContainer<BeatmapPanel>(),
                                     notFoundContent = new NotFoundDrawable(),
+                                    supporterRequiredContent = new SupporterRequiredDrawable(),
                                 }
                             }
                         },
@@ -117,6 +121,13 @@ namespace osu.Game.Overlays
 
         private void onSearchFinished(List<BeatmapSetInfo> beatmaps)
         {
+            // non-supporter user used supporter-only filters
+            if (beatmaps == null)
+            {
+                LoadComponentAsync(supporterRequiredContent, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+                return;
+            }
+
             var newPanels = beatmaps.Select<BeatmapSetInfo, BeatmapPanel>(b => new GridBeatmapPanel(b)
             {
                 Anchor = Anchor.TopCentre,
@@ -170,7 +181,7 @@ namespace osu.Game.Overlays
             {
                 var transform = lastContent.FadeOut(100, Easing.OutQuint);
 
-                if (lastContent == notFoundContent)
+                if (lastContent == notFoundContent || lastContent == supporterRequiredContent)
                 {
                     // not found display may be used multiple times, so don't expire/dispose it.
                     transform.Schedule(() => panelTarget.Remove(lastContent));
@@ -237,6 +248,107 @@ namespace osu.Game.Overlays
                         }
                     }
                 });
+            }
+        }
+
+        public class SupporterRequiredDrawable : CompositeDrawable
+        {
+            public SupporterRequiredDrawable()
+            {
+                RelativeSizeAxes = Axes.X;
+                Height = 250;
+                Alpha = 0;
+                Margin = new MarginPadding { Top = 15 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                AddInternal(new FillFlowContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(10, 0),
+                    Children = new Drawable[]
+                    {
+                        new Sprite
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            FillMode = FillMode.Fit,
+                            Texture = textures.Get(@"Online/supporter-required"),
+                        },
+                        createSupportRequiredText(),
+                    }
+                });
+            }
+
+            private Drawable createSupportRequiredText()
+            {
+                LinkFlowContainer linkFlowContainer;
+                string[] text = BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(
+                                    BeatmapsStrings.ListingSearchFiltersRank.ToString(),
+                                    "{1}"
+                                    ).ToString().Split("{1}");
+
+                // var titleContainer = new Container
+                //     {
+                //         RelativeSizeAxes = Axes.X,
+                //         Margin = new MarginPadding { Vertical = 5 },
+                //         Children = new Drawable[]
+                //         {
+                //             linkFlowContainer = new LinkFlowContainer
+                //             {
+                //                 Anchor = Anchor.Centre,
+                //                 Origin = Anchor.Centre,
+                //             }
+                //         }
+                //     };
+
+                linkFlowContainer = new LinkFlowContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both,
+                    Margin = new MarginPadding
+                    {
+                        Bottom = 10,
+                    }
+                };
+
+                linkFlowContainer.AddText(
+                    text[0],
+                    t =>
+                    {
+                        t.Font = OsuFont.GetFont(size: 16);
+                        t.Colour = Colour4.White;
+                    }
+                );
+
+                linkFlowContainer.AddLink(
+                    BeatmapsStrings.ListingSearchSupporterFilterQuoteLinkText.ToString(),
+                    "https://osu.ppy.sh/store/products/supporter-tag",
+                    t =>
+                    {
+                        t.Font = OsuFont.GetFont(size: 16);
+                        t.Colour = Colour4.AliceBlue;
+                    }
+                );
+
+                linkFlowContainer.AddText(
+                    text[1],
+                    t =>
+                    {
+                        t.Font = OsuFont.GetFont(size: 16);
+                        t.Colour = Colour4.White;
+                    }
+                );
+
+                return linkFlowContainer;
             }
         }
 
