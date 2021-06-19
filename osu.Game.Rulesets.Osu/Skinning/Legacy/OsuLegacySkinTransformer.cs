@@ -121,12 +121,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                             return new LegacyOldStyleSpinner();
 
                         return null;
-
-                    case OsuSkinComponents.SpinnerApproachCircle:
-                        if (Source.GetTexture("spinner-approachcircle") != null)
-                            return new LegacySpinnerApproachCircle();
-
-                        return null;
                 }
             }
 
