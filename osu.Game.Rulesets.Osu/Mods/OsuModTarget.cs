@@ -54,12 +54,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <summary>
         /// Jump distance for circles in the last combo
         /// </summary>
-        private const float max_base_distance = 250f;
+        private const float max_base_distance = 333f;
 
         /// <summary>
         /// The maximum allowed jump distance after multipliers are applied
         /// </summary>
-        private const float distance_cap = 350f;
+        private const float distance_cap = 380f;
 
         // The distances from the hit objects to the borders of the playfield they start to "turn around" and curve towards the middle.
         // The closer the hit objects draw to the border, the sharper the turn
@@ -70,6 +70,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// The extent of rotation towards playfield centre when a circle is near the edge
         /// </summary>
         private const float edge_rotation_multiplier = 0.75f;
+
+        /// <summary>
+        /// Number of recent circles to check for overlap
+        /// </summary>
+        private const int overlap_check_count = 5;
 
         /// <summary>
         /// Duration of the undimming animation
@@ -291,27 +296,39 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (obj.Kiai) distance *= 1.2f;
                 distance = Math.Min(distance_cap, distance);
 
-                var relativePos = new Vector2(
-                    distance * (float)Math.Cos(direction),
-                    distance * (float)Math.Sin(direction)
-                );
-                relativePos = getRotatedVector(lastPos, relativePos);
-                direction = (float)Math.Atan2(relativePos.Y, relativePos.X);
+                // Attempt to place the circle at a place that does not overlap with previous ones
 
-                var newPosition = Vector2.Add(lastPos, relativePos);
+                var tryCount = 0;
 
-                var radius = (float)obj.Radius;
+                do
+                {
+                    if (tryCount > 0) direction = MathHelper.TwoPi * nextSingle();
 
-                if (newPosition.Y < radius)
-                    newPosition.Y = radius;
-                else if (newPosition.Y > OsuPlayfield.BASE_SIZE.Y - radius)
-                    newPosition.Y = OsuPlayfield.BASE_SIZE.Y - radius;
-                if (newPosition.X < radius)
-                    newPosition.X = radius;
-                else if (newPosition.X > OsuPlayfield.BASE_SIZE.X - radius)
-                    newPosition.X = OsuPlayfield.BASE_SIZE.X - radius;
+                    var relativePos = new Vector2(
+                        distance * (float)Math.Cos(direction),
+                        distance * (float)Math.Sin(direction)
+                    );
+                    relativePos = getRotatedVector(lastPos, relativePos);
+                    direction = (float)Math.Atan2(relativePos.Y, relativePos.X);
 
-                obj.Position = newPosition;
+                    var newPosition = Vector2.Add(lastPos, relativePos);
+
+                    var radius = (float)obj.Radius;
+
+                    if (newPosition.Y < radius)
+                        newPosition.Y = radius;
+                    else if (newPosition.Y > OsuPlayfield.BASE_SIZE.Y - radius)
+                        newPosition.Y = OsuPlayfield.BASE_SIZE.Y - radius;
+                    if (newPosition.X < radius)
+                        newPosition.X = radius;
+                    else if (newPosition.X > OsuPlayfield.BASE_SIZE.X - radius)
+                        newPosition.X = OsuPlayfield.BASE_SIZE.X - radius;
+
+                    obj.Position = newPosition;
+
+                    tryCount++;
+                    if (tryCount % 10 == 0) distance *= 0.9f;
+                } while (distance >= obj.Radius * 2 && isOverlappingWithRecent(hitObjects, i));
 
                 if (obj.LastInCombo)
                     direction = MathHelper.TwoPi * nextSingle();
@@ -353,6 +370,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                 samples = sampleObj.Samples;
 
             return samples;
+        }
+
+        private bool isOverlappingWithRecent(IReadOnlyList<OsuHitObject> hitObjects, int idx)
+        {
+            var target = hitObjects[idx];
+            return hitObjects.SkipLast(hitObjects.Count - idx).TakeLast(overlap_check_count)
+                             .Any(h => Vector2.Distance(h.Position, target.Position) < target.Radius * 2);
         }
 
         /// <summary>
