@@ -181,10 +181,15 @@ namespace osu.Game.Overlays
             {
                 var transform = lastContent.FadeOut(100, Easing.OutQuint);
 
-                if (lastContent == notFoundContent || lastContent == supporterRequiredContent)
+                if (lastContent == notFoundContent)
                 {
                     // not found display may be used multiple times, so don't expire/dispose it.
                     transform.Schedule(() => panelTarget.Remove(lastContent));
+                }
+                else if (lastContent == supporterRequiredContent)
+                {
+                    // supporter required display may be used multiple times, so don't expire/dispose it.
+                    transform.Schedule(() => panelTarget.Remove(supporterRequiredContent));
                 }
                 else
                 {
@@ -256,9 +261,8 @@ namespace osu.Game.Overlays
             public SupporterRequiredDrawable()
             {
                 RelativeSizeAxes = Axes.X;
-                Height = 250;
+                Height = 225;
                 Alpha = 0;
-                Margin = new MarginPadding { Top = 15 };
             }
 
             [BackgroundDependencyLoader]
@@ -271,7 +275,6 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(10, 0),
                     Children = new Drawable[]
                     {
                         new Sprite
@@ -290,24 +293,7 @@ namespace osu.Game.Overlays
             private Drawable createSupportRequiredText()
             {
                 LinkFlowContainer linkFlowContainer;
-                string[] text = BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(
-                                    BeatmapsStrings.ListingSearchFiltersRank.ToString(),
-                                    "{1}"
-                                    ).ToString().Split("{1}");
-
-                // var titleContainer = new Container
-                //     {
-                //         RelativeSizeAxes = Axes.X,
-                //         Margin = new MarginPadding { Vertical = 5 },
-                //         Children = new Drawable[]
-                //         {
-                //             linkFlowContainer = new LinkFlowContainer
-                //             {
-                //                 Anchor = Anchor.Centre,
-                //                 Origin = Anchor.Centre,
-                //             }
-                //         }
-                //     };
+                string[] text = BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(BeatmapsStrings.ListingSearchFiltersRank.ToString(), "{1}").ToString().Split("{1}");
 
                 linkFlowContainer = new LinkFlowContainer
                 {
@@ -335,7 +321,7 @@ namespace osu.Game.Overlays
                     t =>
                     {
                         t.Font = OsuFont.GetFont(size: 16);
-                        t.Colour = Colour4.AliceBlue;
+                        t.Colour = Colour4.FromHex("#A6C8D9");
                     }
                 );
 
