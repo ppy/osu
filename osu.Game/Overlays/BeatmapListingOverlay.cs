@@ -119,11 +119,17 @@ namespace osu.Game.Overlays
 
         private Task panelLoadDelegate;
 
-        private void onSearchFinished(List<BeatmapSetInfo> beatmaps)
+        private void onSearchFinished(List<BeatmapSetInfo> beatmaps, BeatmapListingSearchControl searchControl)
         {
             // non-supporter user used supporter-only filters
-            if (beatmaps == null)
+            if (searchControl != null)
             {
+                // compose filter string
+                List<string> filtersStrs = new List<string>();
+                if (searchControl.Ranks.Any()) filtersStrs.Add(BeatmapsStrings.ListingSearchFiltersRank.ToString());
+                if (searchControl.Played.Value != SearchPlayed.Any) filtersStrs.Add(BeatmapsStrings.ListingSearchFiltersPlayed.ToString());
+                supporterRequiredContent.UpdateSupportRequiredText(string.Join(" and ", filtersStrs));
+
                 LoadComponentAsync(supporterRequiredContent, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
                 return;
             }
@@ -258,11 +264,24 @@ namespace osu.Game.Overlays
 
         public class SupporterRequiredDrawable : CompositeDrawable
         {
+            private LinkFlowContainer linkFlowContainer;
+
             public SupporterRequiredDrawable()
             {
                 RelativeSizeAxes = Axes.X;
                 Height = 225;
                 Alpha = 0;
+
+                linkFlowContainer = linkFlowContainer = new LinkFlowContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both,
+                    Margin = new MarginPadding
+                    {
+                        Bottom = 10,
+                    }
+                };
             }
 
             [BackgroundDependencyLoader]
@@ -285,27 +304,15 @@ namespace osu.Game.Overlays
                             FillMode = FillMode.Fit,
                             Texture = textures.Get(@"Online/supporter-required"),
                         },
-                        createSupportRequiredText(),
+                        linkFlowContainer,
                     }
                 });
             }
 
-            private Drawable createSupportRequiredText()
-            {
-                LinkFlowContainer linkFlowContainer;
-                string[] text = BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(BeatmapsStrings.ListingSearchFiltersRank.ToString(), "{1}").ToString().Split("{1}");
+            public void UpdateSupportRequiredText(string filtersStr) {
+                string[] text = BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(filtersStr, "{1}").ToString().Split("{1}");
 
-                linkFlowContainer = new LinkFlowContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both,
-                    Margin = new MarginPadding
-                    {
-                        Bottom = 10,
-                    }
-                };
-
+                linkFlowContainer.Clear();
                 linkFlowContainer.AddText(
                     text[0],
                     t =>
@@ -333,8 +340,6 @@ namespace osu.Game.Overlays
                         t.Colour = Colour4.White;
                     }
                 );
-
-                return linkFlowContainer;
             }
         }
 
