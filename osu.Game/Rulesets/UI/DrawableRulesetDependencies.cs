@@ -10,6 +10,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
@@ -35,6 +36,11 @@ namespace osu.Game.Rulesets.UI
         public ISampleStore SampleStore { get; }
 
         /// <summary>
+        /// The shader manager to be used for the ruleset.
+        /// </summary>
+        public ShaderManager ShaderManager { get; }
+
+        /// <summary>
         /// The ruleset config manager.
         /// </summary>
         public IRulesetConfigManager RulesetConfigManager { get; private set; }
@@ -52,6 +58,9 @@ namespace osu.Game.Rulesets.UI
                 SampleStore = parent.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, @"Samples"));
                 SampleStore.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
                 CacheAs(SampleStore = new FallbackSampleStore(SampleStore, parent.Get<ISampleStore>()));
+
+                ShaderManager = new ShaderManager(new NamespacedResourceStore<byte[]>(resources, @"Shaders"));
+                CacheAs(ShaderManager = new FallbackShaderManager(ShaderManager, parent.Get<ShaderManager>()));
             }
 
             RulesetConfigManager = parent.Get<RulesetConfigCache>().GetConfigFor(ruleset);
@@ -84,6 +93,7 @@ namespace osu.Game.Rulesets.UI
 
             SampleStore?.Dispose();
             TextureStore?.Dispose();
+            ShaderManager?.Dispose();
             RulesetConfigManager = null;
         }
 
@@ -165,6 +175,26 @@ namespace osu.Game.Rulesets.UI
 
             public override Texture Get(string name, WrapMode wrapModeS, WrapMode wrapModeT)
                 => primary.Get(name, wrapModeS, wrapModeT) ?? fallback.Get(name, wrapModeS, wrapModeT);
+
+            protected override void Dispose(bool disposing)
+            {
+                base.Dispose(disposing);
+                primary?.Dispose();
+            }
+        }
+
+        private class FallbackShaderManager : ShaderManager
+        {
+            private readonly ShaderManager primary;
+            private readonly ShaderManager fallback;
+
+            public FallbackShaderManager(ShaderManager primary, ShaderManager fallback)
+            {
+                this.primary = primary;
+                this.fallback = fallback;
+            }
+
+            public override byte[] LoadRaw(string name) => primary.LoadRaw(name) ?? fallback.LoadRaw(name);
 
             protected override void Dispose(bool disposing)
             {
