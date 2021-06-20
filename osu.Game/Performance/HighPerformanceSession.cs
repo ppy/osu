@@ -10,26 +10,25 @@ namespace osu.Game.Performance
 {
     public class HighPerformanceSession : Component
     {
-        private readonly IBindable<bool> localUserPlaying = new Bindable<bool>();
+        //private readonly IBindable<bool> localUserPlaying = new Bindable<bool>();
         private GCLatencyMode originalGCMode;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGame game)
-        {
-            localUserPlaying.BindTo(game.LocalUserPlaying);
-        }
+        //[BackgroundDependencyLoader]
+        //private void load(OsuGame game)
+        //{
+        //    localUserPlaying.BindTo(game.LocalUserPlaying);
+        //}
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            localUserPlaying.BindValueChanged(playing =>
-            {
-                if (playing.NewValue)
-                    EnableHighPerformanceSession();
-                else
-                    DisableHighPerformanceSession();
-            }, true);
+            originalGCMode = GCSettings.LatencyMode;
+            DisableHighPerformanceSession();
+            //localUserPlaying.BindValueChanged(playing =>
+            //{
+            //    DisableHighPerformanceSession();
+            //}, true);
         }
 
         protected virtual void EnableHighPerformanceSession()
