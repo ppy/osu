@@ -1,0 +1,44 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using JetBrains.Annotations;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.UserInterface;
+using osu.Game.Overlays;
+using osuTK;
+
+namespace osu.Game.Graphics.UserInterfaceV2
+{
+    public class OsuPopover : Popover
+    {
+        private const float fade_duration = 250;
+
+        public OsuPopover(bool withPadding = true)
+        {
+            Content.Padding = withPadding ? new MarginPadding(20) : new MarginPadding();
+            Body.Masking = true;
+            Body.CornerRadius = 10;
+            Body.Margin = new MarginPadding(10);
+            Body.EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Shadow,
+                Offset = new Vector2(0, 2),
+                Radius = 5,
+                Colour = Colour4.Black.Opacity(0.3f)
+            };
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load([CanBeNull] OverlayColourProvider colourProvider, OsuColour osuColour)
+        {
+            Background.Colour = Arrow.Colour = colourProvider?.Background4 ?? osuColour.GreySeafoamDarker;
+        }
+
+        protected override Drawable CreateArrow() => Empty();
+
+        protected override void PopIn() => this.FadeIn(fade_duration, Easing.OutQuint);
+        protected override void PopOut() => this.FadeOut(fade_duration, Easing.OutQuint);
+    }
+}
