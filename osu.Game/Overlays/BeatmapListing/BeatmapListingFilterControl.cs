@@ -24,9 +24,9 @@ namespace osu.Game.Overlays.BeatmapListing
     {
         /// <summary>
         /// Fired when a search finishes. Contains only new items in the case of pagination.
-        /// Null when non-supporter user used supporter-only filters
+        /// Fired with BeatmapListingSearchControl when non-supporter user used supporter-only filters.
         /// </summary>
-        public Action<List<BeatmapSetInfo>> SearchFinished;
+        public Action<List<BeatmapSetInfo>, BeatmapListingSearchControl> SearchFinished;
 
         /// <summary>
         /// Fired when search criteria change.
@@ -216,11 +216,11 @@ namespace osu.Game.Overlays.BeatmapListing
                 // check if an non-supporter user used supporter-only filters
                 if (!api.LocalUser.Value.IsSupporter && (searchControl.Ranks.Any() || searchControl.Played.Value != SearchPlayed.Any))
                 {
-                    SearchFinished?.Invoke(null);
+                    SearchFinished?.Invoke(sets, searchControl);
                 }
                 else
                 {
-                    SearchFinished?.Invoke(sets);
+                    SearchFinished?.Invoke(sets, null);
                 }
             };
 
