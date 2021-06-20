@@ -126,8 +126,8 @@ namespace osu.Game.Overlays
             {
                 // compose filter string
                 List<string> filtersStrs = new List<string>();
-                if (searchControl.Ranks.Any()) filtersStrs.Add(BeatmapsStrings.ListingSearchFiltersRank.ToString());
                 if (searchControl.Played.Value != SearchPlayed.Any) filtersStrs.Add(BeatmapsStrings.ListingSearchFiltersPlayed.ToString());
+                if (searchControl.Ranks.Any()) filtersStrs.Add(BeatmapsStrings.ListingSearchFiltersRank.ToString());
                 supporterRequiredContent.UpdateSupportRequiredText(string.Join(" and ", filtersStrs));
 
                 LoadComponentAsync(supporterRequiredContent, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
