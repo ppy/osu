@@ -58,11 +58,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 StarRating = starRating,
                 Mods = mods,
-                AimStrain = aimRating,
-                AimComboStarRatings = aim.ComboStarRatings,
+                AimComboBasedDifficulties = aim.ComboStarRatings,
                 AimMissCounts = aim.MissCounts,
-                SpeedStrain = speedRating,
-                SpeedComboStarRatings = speed.ComboStarRatings,
+                SpeedComboBasedDifficulties = speed.ComboStarRatings,
                 SpeedMissCounts = speed.MissCounts,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,

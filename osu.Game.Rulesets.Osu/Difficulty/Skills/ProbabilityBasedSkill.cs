@@ -293,7 +293,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             int last = first + count - 1;
 
-            // TODO: clarify - is this just the approximate time needed to restart the map?
             var result = new MapSectionPerformanceData
             {
                 ExpectedTimeUntilFullCombo = map_retry_time,
