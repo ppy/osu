@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -11,22 +10,21 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
     /// <summary>
     /// A component which displays a colour along with related description text.
     /// </summary>
-    public class ColourDisplay : CompositeDrawable, IHasCurrentValue<Color4>
+    public class ColourDisplay : CompositeDrawable, IHasCurrentValue<Colour4>
     {
-        private readonly BindableWithCurrent<Color4> current = new BindableWithCurrent<Color4>();
+        private readonly BindableWithCurrent<Colour4> current = new BindableWithCurrent<Colour4>();
 
         private Box fill;
         private OsuSpriteText colourHexCode;
         private OsuSpriteText colourName;
 
-        public Bindable<Color4> Current
+        public Bindable<Colour4> Current
         {
             get => current.Current;
             set => current.Current = value;

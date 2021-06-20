@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -17,7 +16,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
     /// </summary>
     public class ColourPalette : CompositeDrawable
     {
-        public BindableList<Color4> Colours { get; } = new BindableList<Color4>();
+        public BindableList<Colour4> Colours { get; } = new BindableList<Colour4>();
 
         private string colourNamePrefix = "Colour";
 
