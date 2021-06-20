@@ -86,8 +86,10 @@ namespace osu.Game.Localisation
         [Description(@"ไทย")]
         th,
 
-        [Description(@"Tagalog")]
-        tl,
+        // Tagalog has no associated localisations yet, and is not supported on Xamarin platforms or Windows versions <10.
+        // Can be revisited if localisations ever arrive.
+        //[Description(@"Tagalog")]
+        //tl,
 
         [Description(@"Türkçe")]
         tr,
