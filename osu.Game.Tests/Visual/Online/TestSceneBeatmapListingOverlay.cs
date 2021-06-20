@@ -40,6 +40,16 @@ namespace osu.Game.Tests.Visual.Online
 
                 return true;
             };
+
+            AddStep("initialize dummy", () =>
+            {
+                // non-supporter user
+                ((DummyAPIAccess)API).LocalUser.Value = new User
+                {
+                    Username = "TestBot",
+                    Id = API.LocalUser.Value.Id + 1,
+                };
+            });
         }
 
         [Test]
@@ -60,77 +70,94 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestSupporterOnlyFiltersPlaceholder() {
+        public void TestSupporterOnlyFiltersPlaceholderNoBeatmaps()
+        {
+            AddStep("set dummy as non-supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = false);
 
-            AddStep("toggle non-supporter", () =>
-            {
-                // non-supporter user
-                ((DummyAPIAccess)API).LocalUser.Value = new User
-                {
-                    Username = API.LocalUser.Value.Username,
-                    Id = API.LocalUser.Value.Id + 1,
-                    IsSupporter = false,
-                };
-            });
-            AddStep("fetch for 1 beatmap", () => fetchFor(CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet));
+            // test non-supporter on Rank Achieved filter
+            toggleRandomRankFilter();
+            AddUntilStep("supporter-placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().SingleOrDefault()?.IsPresent == true);
+            AddUntilStep("not-found-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
 
-            AddStep("toggle Random Rank Achieved filter", () => {
-                overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Ranks.Clear();
-                Scoring.ScoreRank r = (Scoring.ScoreRank)(TestContext.CurrentContext.Random.NextShort() % 8);
-                overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Ranks.Add(r);
-                // overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Ranks.
-            });
-
-            AddUntilStep("supporter-placeholder show", () => overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().SingleOrDefault()?.IsPresent == true);
-
-            AddStep("Clear Rank Achieved filter", () => {
-                overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Ranks.Clear();
-            });
+            AddStep("Clear Rank Achieved filter", () => overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Ranks.Clear());
             AddUntilStep("supporter-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any());
+            AddUntilStep("not-found-placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
 
-            AddStep("toggle Random Played filter", () => {
-                SearchPlayed r = (SearchPlayed)(TestContext.CurrentContext.Random.NextShort() % 2 + 1);
-                overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Played.Value = r;
-            });
+            // test non-supporter on Played filter
+            toggleRandomSupporterOnlyPlayedFilter();
+            AddUntilStep("supporter-placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().SingleOrDefault()?.IsPresent == true);
+            AddUntilStep("not-found-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
 
-            AddUntilStep("supporter-placeholder show", () => overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().SingleOrDefault()?.IsPresent == true);
-
-            AddStep("Clear Played filter", () => {
-                overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Played.Value = SearchPlayed.Any;
-            });
+            AddStep("Set Played filter to Any", () => overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Played.Value = SearchPlayed.Any);
             AddUntilStep("supporter-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any());
+            AddUntilStep("not-found-placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
 
-            AddStep("toggle supporter", () =>
-            {
-                // supporter user
-                ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = true;
-            });
+            AddStep("set dummy as supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = true);
 
-            AddStep("toggle Random Rank Achieved filter", () => {
-                overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Ranks.Clear();
-                Scoring.ScoreRank r = (Scoring.ScoreRank)(TestContext.CurrentContext.Random.NextShort() % 8);
-                overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Ranks.Add(r);
-            });
-
+            // test supporter on Rank Achieved filter
+            toggleRandomRankFilter();
             AddUntilStep("supporter-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any());
+            AddUntilStep("not-found-placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
 
-            AddStep("Clear Rank Achieved filter", () => {
-                overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Ranks.Clear();
-            });
+            AddStep("Clear Rank Achieved filter", () => overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Ranks.Clear());
             AddUntilStep("supporter-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any());
+            AddUntilStep("not-found-placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
 
-            AddStep("toggle Random Played filter", () => {
-                SearchPlayed r = (SearchPlayed)(TestContext.CurrentContext.Random.NextShort() % 2 + 1);
-                overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Played.Value = r;
-            });
-
+            // test supporter on Played filter
+            toggleRandomSupporterOnlyPlayedFilter();
             AddUntilStep("supporter-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any());
+            AddUntilStep("not-found-placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
 
-            AddStep("Clear Played filter", () => {
-                overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Played.Value = SearchPlayed.Any;
-            });
+            AddStep("Set Played filter to Any", () => overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Played.Value = SearchPlayed.Any);
             AddUntilStep("supporter-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any());
+            AddUntilStep("not-found-placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
         }
+
+        [Test]
+        public void TestSupporterOnlyFiltersPlaceholderOneBeatmap()
+        {
+            AddStep("fetch for 1 beatmap", () => fetchFor(CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet));
+            AddStep("set dummy as non-supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = false);
+
+            // test non-supporter on Rank Achieved filter
+            toggleRandomRankFilter();
+            AddUntilStep("supporter-placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().SingleOrDefault()?.IsPresent == true);
+            AddUntilStep("not-found-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
+
+            AddStep("Clear Rank Achieved filter", () => overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Ranks.Clear());
+            AddUntilStep("supporter-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any());
+            AddUntilStep("not-found-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
+
+            // test non-supporter on Played filter
+            toggleRandomSupporterOnlyPlayedFilter();
+            AddUntilStep("supporter-placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().SingleOrDefault()?.IsPresent == true);
+            AddUntilStep("not-found-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
+
+            AddStep("Set Played filter to Any", () => overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Played.Value = SearchPlayed.Any);
+            AddUntilStep("supporter-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any());
+            AddUntilStep("not-found-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
+
+            AddStep("set dummy as supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = true);
+
+            // test supporter on Rank Achieved filter
+            toggleRandomRankFilter();
+            AddUntilStep("supporter-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any());
+            AddUntilStep("not-found-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
+
+            AddStep("Clear Rank Achieved filter", () => overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Ranks.Clear());
+            AddUntilStep("supporter-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any());
+            AddUntilStep("not-found-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
+
+            // test supporter on Played filter
+            toggleRandomSupporterOnlyPlayedFilter();
+            AddUntilStep("supporter-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any());
+            AddUntilStep("not-found-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
+
+            AddStep("Set Played filter to Any", () => overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Played.Value = SearchPlayed.Any);
+            AddUntilStep("supporter-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any());
+            AddUntilStep("not-found-placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
+        }
+
 
         private void fetchFor(params BeatmapSetInfo[] beatmaps)
         {
@@ -139,6 +166,22 @@ namespace osu.Game.Tests.Visual.Online
 
             // trigger arbitrary change for fetching.
             overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Query.TriggerChange();
+        }
+
+        private void toggleRandomRankFilter()
+        {
+            short r = TestContext.CurrentContext.Random.NextShort();
+            AddStep("toggle Random Rank Achieved filter", () =>
+            {
+                overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Ranks.Clear();
+                overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Ranks.Add((Scoring.ScoreRank)(r % 8));
+            });
+        }
+
+        private void toggleRandomSupporterOnlyPlayedFilter()
+        {
+            short r = TestContext.CurrentContext.Random.NextShort();
+            AddStep("toggle Random Played filter", () => overlay.ChildrenOfType<BeatmapListingSearchControl>().Single().Played.Value = (SearchPlayed)(r % 2 + 1));
         }
 
         private class TestAPIBeatmapSet : APIBeatmapSet

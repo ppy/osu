@@ -213,6 +213,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 lastResponse = response;
                 getSetsRequest = null;
 
+                // check if an non-supporter user used supporter-only filters
                 if (!api.LocalUser.Value.IsSupporter && (searchControl.Ranks.Any() || searchControl.Played.Value != SearchPlayed.Any))
                 {
                     SearchFinished?.Invoke(null);
