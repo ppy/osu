@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -72,14 +73,17 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             base.LoadComplete();
 
-            Colours.BindCollectionChanged((_, __) => updatePalette(), true);
+            Colours.BindCollectionChanged((_, args) => updatePalette(args), true);
             FinishTransforms(true);
         }
 
         private const int fade_duration = 200;
 
-        private void updatePalette()
+        private void updatePalette(NotifyCollectionChangedEventArgs args)
         {
+            if (args.Action == NotifyCollectionChangedAction.Replace)
+                return;
+
             palette.Clear();
 
             if (Colours.Any())
@@ -93,12 +97,18 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 placeholder.FadeIn(fade_duration, Easing.OutQuint);
             }
 
-            foreach (var item in Colours)
+            for (int i = 0; i < Colours.Count; ++i)
             {
-                palette.Add(new ColourDisplay
+                // copy to avoid accesses to modified closure.
+                int colourIndex = i;
+                ColourDisplay display;
+
+                palette.Add(display = new ColourDisplay
                 {
-                    Current = { Value = item }
+                    Current = { Value = Colours[colourIndex] }
                 });
+
+                display.Current.BindValueChanged(colour => Colours[colourIndex] = colour.NewValue);
             }
 
             reindexItems();

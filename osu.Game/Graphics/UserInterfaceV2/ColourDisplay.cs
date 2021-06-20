@@ -3,11 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
@@ -16,7 +19,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
     /// <summary>
     /// A component which displays a colour along with related description text.
     /// </summary>
-    public class ColourDisplay : CompositeDrawable, IHasCurrentValue<Colour4>
+    public class ColourDisplay : CompositeDrawable, IHasCurrentValue<Colour4>, IHasPopover
     {
         private readonly BindableWithCurrent<Colour4> current = new BindableWithCurrent<Colour4>();
 
@@ -60,10 +63,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Spacing = new Vector2(0, 10),
                 Children = new Drawable[]
                 {
-                    new CircularContainer
+                    new OsuClickableContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 100,
+                        CornerRadius = 50,
                         Masking = true,
                         Children = new Drawable[]
                         {
@@ -77,7 +81,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                 Origin = Anchor.Centre,
                                 Font = OsuFont.Default.With(size: 12)
                             }
-                        }
+                        },
+                        Action = this.ShowPopover
                     },
                     colourName = new OsuSpriteText
                     {
@@ -101,5 +106,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
             colourHexCode.Text = current.Value.ToHex();
             colourHexCode.Colour = OsuColour.ForegroundTextColourFor(current.Value);
         }
+
+        public Popover GetPopover() => new OsuPopover(false)
+        {
+            Child = new OsuColourPicker
+            {
+                Current = { BindTarget = Current }
+            }
+        };
     }
 }
