@@ -102,17 +102,20 @@ namespace osu.Game.Rulesets.Catch.Tests
                     RelativeSizeAxes = Axes.Both
                 };
 
+                var catcherArea = new TestCatcherArea(droppedObjectContainer, beatmapDifficulty)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.TopCentre,
+                };
+
                 return new CatchInputManager(catchRuleset)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
                         droppedObjectContainer,
-                        new TestCatcherArea(droppedObjectContainer, beatmapDifficulty)
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.TopCentre,
-                        }
+                        catcherArea.MovableCatcher.CreateProxiedContent(),
+                        catcherArea
                     }
                 };
             });

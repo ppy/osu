@@ -50,10 +50,11 @@ namespace osu.Game.Rulesets.Catch.Tests
             Child = new Container
             {
                 Anchor = Anchor.Centre,
-                Children = new Drawable[]
+                Children = new[]
                 {
                     trailContainer,
                     droppedObjectContainer,
+                    catcher.CreateProxiedContent(),
                     catcher
                 }
             };
