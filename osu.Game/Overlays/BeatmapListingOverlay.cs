@@ -320,7 +320,7 @@ namespace osu.Game.Overlays
                     Margin = new MarginPadding { Bottom = 10 },
                 };
 
-                supporterTagLink.AddLink(BeatmapsStrings.ListingSearchSupporterFilterQuoteLinkText.ToString(), Online.Chat.LinkAction.External, "https://osu.ppy.sh/store/products/supporter-tag");
+                supporterTagLink.AddLink(BeatmapsStrings.ListingSearchSupporterFilterQuoteLinkText.ToString(), "https://osu.ppy.sh/store/products/supporter-tag");
                 return supporterTagLink;
             }
         }
