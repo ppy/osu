@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -280,7 +279,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Direction = FillDirection.Horizontal,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
                         new Sprite
                         {
@@ -303,14 +302,16 @@ namespace osu.Game.Overlays
                 });
             }
 
-            public void UpdateText(bool playedFilter, bool rankFilter) {
+            public void UpdateText(bool playedFilter, bool rankFilter)
+            {
                 List<string> filters = new List<string>();
                 if (playedFilter) filters.Add(BeatmapsStrings.ListingSearchFiltersPlayed.ToString());
                 if (rankFilter) filters.Add(BeatmapsStrings.ListingSearchFiltersRank.ToString());
                 supporterRequiredText.Text = BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(string.Join(" and ", filters), "").ToString();
             }
 
-            public Drawable createSupporterTagLink() {
+            private Drawable createSupporterTagLink()
+            {
                 LinkFlowContainer supporterTagLink = new LinkFlowContainer
                 {
                     Anchor = Anchor.Centre,
