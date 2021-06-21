@@ -191,9 +191,10 @@ namespace osu.Game.Rulesets.Catch.UI
                     break;
 
                 case DropAnimation.Explode:
-                    var originalX = droppedObjectTarget.ToSpaceOfOtherDrawable(d.DrawPosition, caughtObjectContainer).X * Scale.X;
+                    Vector2 positionInStack = droppedObjectTarget.ToSpaceOfOtherDrawable(d.DrawPosition, caughtObjectContainer);
+                    Vector2 targetPosition = caughtObjectContainer.ToSpaceOfOtherDrawable(positionInStack * new Vector2(7f, 1), droppedObjectTarget);
                     d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then().MoveToY(d.Y + 50, 500, Easing.InSine);
-                    d.MoveToX(d.X + originalX * 6, 1000);
+                    d.MoveToX(targetPosition.X, 1000);
                     d.FadeOut(750);
                     break;
             }
