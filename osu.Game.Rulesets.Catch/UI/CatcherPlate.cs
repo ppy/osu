@@ -3,10 +3,10 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Pooling;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
@@ -25,9 +25,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public Bindable<bool> StackCaughtObject = new Bindable<bool>(true);
 
-        private readonly DrawablePool<CaughtFruit> caughtFruitPool;
-        private readonly DrawablePool<CaughtBanana> caughtBananaPool;
-        private readonly DrawablePool<CaughtDroplet> caughtDropletPool;
+        private CaughtObjectPool caughtObjectPool;
 
         /// <summary>
         /// Caught objects stacked on the plate.
@@ -57,10 +55,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
             InternalChildren = new Drawable[]
             {
-                caughtFruitPool = new DrawablePool<CaughtFruit>(50),
-                caughtBananaPool = new DrawablePool<CaughtBanana>(100),
-                // less capacity is needed compared to fruit because droplet is not stacked
-                caughtDropletPool = new DrawablePool<CaughtDroplet>(25),
                 caughtObjectContainer = new Container<CaughtObject>
                 {
                     // offset fruit vertically to better place "above" the plate.
@@ -68,6 +62,14 @@ namespace osu.Game.Rulesets.Catch.UI
                 },
                 hitExplosionContainer = new HitExplosionContainer()
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            // Create a pool if not provided. It is convenient for testing.
+            if (!Dependencies.TryGet(out caughtObjectPool))
+                AddInternal(caughtObjectPool = new CaughtObjectPool());
         }
 
         public Drawable CreateBackgroundLayerProxy() => caughtObjectContainer.CreateProxy();
@@ -110,9 +112,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void placeCaughtObject(DrawablePalpableCatchHitObject drawableObject, Vector2 position)
         {
-            var caughtObject = getCaughtObject(drawableObject.HitObject);
-
-            if (caughtObject == null) return;
+            var caughtObject = caughtObjectPool.Get(drawableObject.HitObject);
 
             caughtObject.CopyStateFrom(drawableObject);
             caughtObject.Anchor = Anchor.TopCentre;
@@ -123,24 +123,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (!caughtObject.StaysOnPlate)
                 removeFromPlate(caughtObject, DropAnimation.Explode);
-        }
-
-        private CaughtObject getCaughtObject(PalpableCatchHitObject source)
-        {
-            switch (source)
-            {
-                case Fruit _:
-                    return caughtFruitPool.Get();
-
-                case Banana _:
-                    return caughtBananaPool.Get();
-
-                case Droplet _:
-                    return caughtDropletPool.Get();
-
-                default:
-                    return null;
-            }
         }
 
         #endregion
@@ -161,7 +143,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private CaughtObject getDroppedObject(CaughtObject caughtObject)
         {
-            var droppedObject = getCaughtObject(caughtObject.HitObject);
+            var droppedObject = caughtObjectPool.Get(caughtObject.HitObject);
 
             droppedObject.CopyStateFrom(caughtObject);
             droppedObject.Anchor = Anchor.TopLeft;

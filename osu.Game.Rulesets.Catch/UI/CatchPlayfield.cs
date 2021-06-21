@@ -28,6 +28,9 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         public const float CENTER_X = WIDTH / 2;
 
+        [Cached]
+        private readonly CaughtObjectPool caughtObjectPool;
+
         internal readonly CatcherArea CatcherArea;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
@@ -49,6 +52,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             InternalChildren = new[]
             {
+                caughtObjectPool = new CaughtObjectPool(),
                 droppedObjectContainer,
                 CatcherArea.MovableCatcher.CreateProxiedContent(),
                 HitObjectContainer.CreateProxy(),
