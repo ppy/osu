@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public abstract class LegacySpinner : CompositeDrawable, IHasSpinnerApproachCircle
+    public abstract class LegacySpinner : CompositeDrawable, IHasApproachCircle
     {
         public const float SPRITE_SCALE = 0.625f;
 

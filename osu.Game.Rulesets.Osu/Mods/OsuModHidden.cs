@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private static void hideSpinnerApproachCircle(DrawableSpinner spinner)
         {
-            var approachCircle = (spinner.Body.Drawable as IHasSpinnerApproachCircle)?.ApproachCircle;
+            var approachCircle = (spinner.Body.Drawable as IHasApproachCircle)?.ApproachCircle;
             if (approachCircle == null)
                 return;
 

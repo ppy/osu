@@ -6,12 +6,12 @@ using osu.Framework.Graphics;
 namespace osu.Game.Rulesets.Osu.Skinning
 {
     /// <summary>
-    /// A common interface between implementations of the <see cref="OsuSkinComponents.SpinnerBody"/> component that provide approach circles for the spinner.
+    /// A common interface between skin component implementations which provide an approach circle.
     /// </summary>
-    public interface IHasSpinnerApproachCircle
+    public interface IHasApproachCircle
     {
         /// <summary>
-        /// The spinner approach circle.
+        /// The approach circle drawable.
         /// </summary>
         Drawable ApproachCircle { get; }
     }
