@@ -189,6 +189,7 @@ namespace osu.Game.Rulesets.UI
             private readonly ShaderManager fallback;
 
             public FallbackShaderManager(ShaderManager primary, ShaderManager fallback)
+                : base(new ResourceStore<byte[]>())
             {
                 this.primary = primary;
                 this.fallback = fallback;
