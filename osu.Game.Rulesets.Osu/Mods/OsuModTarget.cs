@@ -494,7 +494,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 InternalChildren = new Drawable[]
                 {
-                    sample = new PausableSkinnableSound(new SampleInfo("spinnerbonus")) // todo: use another sample
+                    sample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-hat")) // todo: use another sample
                 };
             }
         }
