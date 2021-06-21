@@ -26,7 +26,7 @@ namespace osu.Game.Skinning
             Ruleset = ruleset;
             Beatmap = beatmap;
 
-            InternalChild = new BeatmapSkinProvidingContainer(GetRulesetTransformedSkin(beatmapSkin))
+            InternalChild = new BeatmapSkinProvidingContainer(beatmapSkin is LegacySkin ? GetLegacyRulesetTransformedSkin(beatmapSkin) : beatmapSkin)
             {
                 Child = Content = new Container
                 {
@@ -54,23 +54,34 @@ namespace osu.Game.Skinning
         {
             SkinSources.Clear();
 
-            SkinSources.Add(GetRulesetTransformedSkin(skinManager.CurrentSkin.Value));
+            // TODO: we also want to insert a DefaultLegacySkin here if the current *beatmap* is providing any skinned elements.
 
-            // TODO: we also want to return a DefaultLegacySkin here if the current *beatmap* is providing any skinned elements.
-            if (skinManager.CurrentSkin.Value is LegacySkin && skinManager.CurrentSkin.Value != skinManager.DefaultLegacySkin)
-                SkinSources.Add(GetRulesetTransformedSkin(skinManager.DefaultLegacySkin));
+            switch (skinManager.CurrentSkin.Value)
+            {
+                case LegacySkin currentLegacySkin:
+                    SkinSources.Add(GetLegacyRulesetTransformedSkin(currentLegacySkin));
+
+                    if (currentLegacySkin != skinManager.DefaultLegacySkin)
+                        SkinSources.Add(GetLegacyRulesetTransformedSkin(skinManager.DefaultLegacySkin));
+
+                    break;
+
+                default:
+                    SkinSources.Add(skinManager.CurrentSkin.Value);
+                    break;
+            }
         }
 
-        protected ISkin GetRulesetTransformedSkin(ISkin skin)
+        protected ISkin GetLegacyRulesetTransformedSkin(ISkin legacySkin)
         {
-            if (!(skin is LegacySkin))
-                return skin;
+            if (legacySkin == null)
+                return null;
 
-            var rulesetTransformed = Ruleset.CreateLegacySkinProvider(skin, Beatmap);
+            var rulesetTransformed = Ruleset.CreateLegacySkinProvider(legacySkin, Beatmap);
             if (rulesetTransformed != null)
                 return rulesetTransformed;
 
-            return skin;
+            return legacySkin;
         }
     }
 }

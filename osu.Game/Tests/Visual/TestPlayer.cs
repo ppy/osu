@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual
                 base.UpdateSkins();
 
                 if (skin != null)
-                    SkinSources.Insert(0, GetRulesetTransformedSkin(skin));
+                    SkinSources.Insert(0, skin is LegacySkin ? GetLegacyRulesetTransformedSkin(skin) : skin);
             }
         }
     }
