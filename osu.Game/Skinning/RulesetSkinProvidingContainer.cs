@@ -7,17 +7,25 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// A type of <see cref="SkinProvidingContainer"/> that provides access to the beatmap skin and user skin,
-    /// with each legacy skin source transformed with the ruleset's legacy skin transformer.
+    /// A type of <see cref="SkinProvidingContainer"/> specialized for <see cref="DrawableRuleset"/> and other gameplay-related components.
+    /// Providing access to the <see cref="SkinManager"/> skin sources and the beatmap skin each surrounded with the ruleset legacy skin transformer.
+    /// While also limiting lookups from falling back to any parent <see cref="ISkinSource"/>s out of this container.
     /// </summary>
     public class RulesetSkinProvidingContainer : SkinProvidingContainer
     {
         protected readonly Ruleset Ruleset;
         protected readonly IBeatmap Beatmap;
+
+        /// <remarks>
+        /// This container already re-exposes all <see cref="SkinManager"/> skin sources in a ruleset-usable form.
+        /// Therefore disallow falling back to any parent <see cref="ISkinSource"/> any further.
+        /// </remarks>
+        protected override bool AllowFallingBackToParent => false;
 
         protected override Container<Drawable> Content { get; }
 
@@ -42,12 +50,7 @@ namespace osu.Game.Skinning
         private void load()
         {
             UpdateSkins();
-        }
-
-        protected override void OnSourceChanged()
-        {
-            UpdateSkins();
-            base.OnSourceChanged();
+            skinManager.SourceChanged += UpdateSkins;
         }
 
         protected virtual void UpdateSkins()
@@ -82,6 +85,14 @@ namespace osu.Game.Skinning
                 return rulesetTransformed;
 
             return legacySkin;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (skinManager != null)
+                skinManager.SourceChanged -= UpdateSkins;
         }
     }
 }
