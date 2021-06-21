@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         protected DrawableSpinner DrawableSpinner { get; private set; }
 
-        public Drawable ApproachCircle { get; private set; }
+        public abstract Drawable ApproachCircle { get; protected set; }
 
         private Sprite spin;
         private Sprite clear;
@@ -59,15 +59,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             {
                 Depth = float.MinValue,
                 RelativeSizeAxes = Axes.Both,
-                Children = new[]
+                Children = new Drawable[]
                 {
-                    ApproachCircle = new LegacySpinnerApproachCircle
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.Centre,
-                        Scale = new Vector2(SPRITE_SCALE),
-                        Y = SPINNER_Y_CENTRE,
-                    },
                     spin = new Sprite
                     {
                         Anchor = Anchor.TopCentre,
@@ -183,6 +176,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         spmBackground.MoveToOffset(new Vector2(0, -spm_hide_offset), d.HitObject.TimeFadeIn, Easing.Out);
                         spmCounter.MoveToOffset(new Vector2(0, -spm_hide_offset), d.HitObject.TimeFadeIn, Easing.Out);
                     }
+
+                    using (BeginAbsoluteSequence(d.HitObject.StartTime))
+                        ApproachCircle?.ScaleTo(SPRITE_SCALE * 0.1f, d.HitObject.Duration);
 
                     double spinFadeOutLength = Math.Min(400, d.HitObject.Duration);
 
