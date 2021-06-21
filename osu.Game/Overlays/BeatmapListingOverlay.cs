@@ -294,6 +294,8 @@ namespace osu.Game.Overlays
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            Font = OsuFont.GetFont(size: 16),
+                            Colour = Colour4.White,
                             Margin = new MarginPadding { Bottom = 10 },
                         },
                         createSupporterTagLink(),
