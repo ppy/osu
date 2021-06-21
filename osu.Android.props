@@ -54,4 +54,8 @@
     <PackageReference Include="ppy.osu.Game.Resources" Version="2021.618.0" />
     <PackageReference Include="ppy.osu.Framework.Android" Version="2021.616.0" />
   </ItemGroup>
+  <ItemGroup Label="Transitive Dependencies">
+    <!-- Realm needs to be directly referenced in all Xamarin projects, as it will not pull in its transitive dependencies otherwise. -->
+    <PackageReference Include="Realm" Version="10.2.0" />
+  </ItemGroup>
 </Project>
