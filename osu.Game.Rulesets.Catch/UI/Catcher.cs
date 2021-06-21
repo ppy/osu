@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private int hyperDashDirection;
         private float hyperDashTargetPosition;
 
-        public Catcher([NotNull] Container trailsTarget, [NotNull] Container<CaughtObject> droppedObjectTarget, BeatmapDifficulty difficulty = null)
+        public Catcher([NotNull] Container trailsTarget, BeatmapDifficulty difficulty = null)
         {
             this.trailsTarget = trailsTarget;
 
@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Catch.UI
             InternalChildren = new Drawable[]
             {
                 body = new SkinnableCatcher(),
-                plate = new CatcherPlate(droppedObjectTarget)
+                plate = new CatcherPlate
                 {
                     Anchor = Anchor.TopCentre
                 }

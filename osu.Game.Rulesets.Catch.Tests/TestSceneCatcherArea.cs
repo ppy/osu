@@ -6,7 +6,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -97,12 +96,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             SetContents(_ =>
             {
-                var droppedObjectContainer = new Container<CaughtObject>
-                {
-                    RelativeSizeAxes = Axes.Both
-                };
-
-                var catcherArea = new TestCatcherArea(droppedObjectContainer, beatmapDifficulty)
+                var catcherArea = new TestCatcherArea(beatmapDifficulty)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.TopCentre,
@@ -113,7 +107,6 @@ namespace osu.Game.Rulesets.Catch.Tests
                     RelativeSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        droppedObjectContainer,
                         catcherArea.MovableCatcher.CreateProxiedContent(),
                         catcherArea
                     }
@@ -129,9 +122,13 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class TestCatcherArea : CatcherArea
         {
-            public TestCatcherArea(Container<CaughtObject> droppedObjectContainer, BeatmapDifficulty beatmapDifficulty)
-                : base(droppedObjectContainer, beatmapDifficulty)
+            [Cached]
+            private readonly DroppedObjectContainer droppedObjectContainer;
+
+            public TestCatcherArea(BeatmapDifficulty beatmapDifficulty)
+                : base(beatmapDifficulty)
             {
+                AddInternal(droppedObjectContainer = new DroppedObjectContainer());
             }
 
             public void ToggleHyperDash(bool status) => MovableCatcher.SetHyperDashState(status ? 2 : 1);

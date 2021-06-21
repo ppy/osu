@@ -28,6 +28,12 @@ namespace osu.Game.Rulesets.Catch.UI
         private CaughtObjectPool caughtObjectPool;
 
         /// <summary>
+        /// The destination of objects dropped from the plate.
+        /// </summary>
+        [Resolved]
+        private DroppedObjectContainer droppedObjectContainer { get; set; }
+
+        /// <summary>
         /// Caught objects stacked on the plate.
         /// </summary>
         private readonly Container<CaughtObject> caughtObjectContainer;
@@ -38,19 +44,12 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly HitExplosionContainer hitExplosionContainer;
 
         /// <summary>
-        /// Objects dropped from the plate.
-        /// </summary>
-        private readonly Container<CaughtObject> droppedObjectTarget;
-
-        /// <summary>
         /// The amount by which caught fruit should be scaled down to fit on the plate.
         /// </summary>
         private const float caught_fruit_scale_adjust = 0.5f;
 
-        public CatcherPlate(Container<CaughtObject> droppedObjectTarget)
+        public CatcherPlate()
         {
-            this.droppedObjectTarget = droppedObjectTarget;
-
             Origin = Anchor.BottomCentre;
 
             InternalChildren = new Drawable[]
@@ -88,7 +87,7 @@ namespace osu.Game.Rulesets.Catch.UI
         public void OnRevertResult(DrawableCatchHitObject drawableHitObject)
         {
             caughtObjectContainer.RemoveAll(d => d.HitObject == drawableHitObject.HitObject);
-            droppedObjectTarget.RemoveAll(d => d.HitObject == drawableHitObject.HitObject);
+            droppedObjectContainer.OnRevertResult(drawableHitObject);
         }
 
         #region Caught object stacking
@@ -131,57 +130,17 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void DropAll(DropAnimation animation)
         {
-            var droppedObjects = caughtObjectContainer.Children.Select(getDroppedObject).ToArray();
+            foreach (var caughtObject in caughtObjectContainer)
+                droppedObjectContainer.Add(caughtObject, animation);
 
             caughtObjectContainer.Clear(false);
-
-            droppedObjectTarget.AddRange(droppedObjects);
-
-            foreach (var droppedObject in droppedObjects)
-                applyDropAnimation(droppedObject, animation);
-        }
-
-        private CaughtObject getDroppedObject(CaughtObject caughtObject)
-        {
-            var droppedObject = caughtObjectPool.Get(caughtObject.HitObject);
-
-            droppedObject.CopyStateFrom(caughtObject);
-            droppedObject.Anchor = Anchor.TopLeft;
-            droppedObject.Position = caughtObjectContainer.ToSpaceOfOtherDrawable(caughtObject.DrawPosition, droppedObjectTarget);
-
-            return droppedObject;
         }
 
         private void removeFromPlate(CaughtObject caughtObject, DropAnimation animation)
         {
-            var droppedObject = getDroppedObject(caughtObject);
+            droppedObjectContainer.Add(caughtObject, animation);
 
             caughtObjectContainer.Remove(caughtObject);
-
-            droppedObjectTarget.Add(droppedObject);
-
-            applyDropAnimation(droppedObject, animation);
-        }
-
-        private void applyDropAnimation(Drawable d, DropAnimation animation)
-        {
-            switch (animation)
-            {
-                case DropAnimation.Drop:
-                    d.MoveToY(d.Y + 75, 750, Easing.InSine);
-                    d.FadeOut(750);
-                    break;
-
-                case DropAnimation.Explode:
-                    Vector2 positionInStack = droppedObjectTarget.ToSpaceOfOtherDrawable(d.DrawPosition, caughtObjectContainer);
-                    Vector2 targetPosition = caughtObjectContainer.ToSpaceOfOtherDrawable(positionInStack * new Vector2(7f, 1), droppedObjectTarget);
-                    d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then().MoveToY(d.Y + 50, 500, Easing.InSine);
-                    d.MoveToX(targetPosition.X, 1000);
-                    d.FadeOut(750);
-                    break;
-            }
-
-            d.Expire();
         }
 
         #endregion
