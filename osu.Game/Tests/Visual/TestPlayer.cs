@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -22,8 +24,6 @@ namespace osu.Game.Tests.Visual
     /// </summary>
     public class TestPlayer : Player
     {
-        public ISkin Skin { get; set; }
-
         protected override bool PauseOnFocusLost { get; }
 
         public new DrawableRuleset DrawableRuleset => base.DrawableRuleset;
@@ -81,8 +81,22 @@ namespace osu.Game.Tests.Visual
             ScoreProcessor.NewJudgement += r => Results.Add(r);
         }
 
+        public ISkin Skin { get; private set; }
+
+        private TestSkinProvidingContainer rulesetSkinProvider;
+
+        internal void SetSkin(ISkin skin)
+        {
+            Debug.Assert(rulesetSkinProvider == null);
+
+            if (Skin != null)
+                throw new InvalidOperationException("A skin has already been set.");
+
+            Skin = skin;
+        }
+
         protected override RulesetSkinProvidingContainer CreateRulesetSkinProvider(Ruleset ruleset, IBeatmap beatmap, ISkin beatmapSkin)
-            => new TestSkinProvidingContainer(Skin, ruleset, beatmap, beatmapSkin);
+            => rulesetSkinProvider = new TestSkinProvidingContainer(Skin, ruleset, beatmap, beatmapSkin);
 
         private class TestSkinProvidingContainer : RulesetSkinProvidingContainer
         {

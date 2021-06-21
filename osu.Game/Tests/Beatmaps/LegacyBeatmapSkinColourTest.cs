@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Beatmaps
 
             ExposedPlayer player = CreateTestPlayer();
 
-            player.Skin = new TestSkin(userHasCustomColours);
+            player.SetSkin(new TestSkin(userHasCustomColours));
 
             LoadScreen(player);
 

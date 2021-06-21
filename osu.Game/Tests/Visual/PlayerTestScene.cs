@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual
             }
 
             Player = CreatePlayer(ruleset);
-            Player.Skin = GetPlayerSkin();
+            Player.SetSkin(GetPlayerSkin());
 
             LoadScreen(Player);
         }
