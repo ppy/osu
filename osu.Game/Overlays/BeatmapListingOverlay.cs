@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -121,24 +122,19 @@ namespace osu.Game.Overlays
 
         private void onSearchFinished(List<BeatmapSetInfo> beatmaps, BeatmapListingSearchControl searchControl)
         {
-            // non-supporter user used supporter-only filters
-            if (searchControl != null)
-            {
-                // compose filter string
-                List<string> filtersStrs = new List<string>();
-                if (searchControl.Played.Value != SearchPlayed.Any) filtersStrs.Add(BeatmapsStrings.ListingSearchFiltersPlayed.ToString());
-                if (searchControl.Ranks.Any()) filtersStrs.Add(BeatmapsStrings.ListingSearchFiltersRank.ToString());
-                supporterRequiredContent.UpdateSupportRequiredText(string.Join(" and ", filtersStrs));
-
-                LoadComponentAsync(supporterRequiredContent, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
-                return;
-            }
-
             var newPanels = beatmaps.Select<BeatmapSetInfo, BeatmapPanel>(b => new GridBeatmapPanel(b)
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
             });
+
+            // non-supporter user used supporter-only filters
+            if (searchControl != null)
+            {
+                supporterRequiredContent.UpdateText(searchControl.Played.Value != SearchPlayed.Any, searchControl.Ranks.Any());
+                LoadComponentAsync(supporterRequiredContent, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+                return;
+            }
 
             if (filterControl.CurrentPage == 0)
             {
@@ -262,26 +258,16 @@ namespace osu.Game.Overlays
             }
         }
 
+        // using string literals as there's no proper processing for LocalizeStrings yet
         public class SupporterRequiredDrawable : CompositeDrawable
         {
-            private LinkFlowContainer linkFlowContainer;
+            private OsuSpriteText supporterRequiredText;
 
             public SupporterRequiredDrawable()
             {
                 RelativeSizeAxes = Axes.X;
                 Height = 225;
                 Alpha = 0;
-
-                linkFlowContainer = linkFlowContainer = new LinkFlowContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both,
-                    Margin = new MarginPadding
-                    {
-                        Bottom = 10,
-                    }
-                };
             }
 
             [BackgroundDependencyLoader]
@@ -304,42 +290,35 @@ namespace osu.Game.Overlays
                             FillMode = FillMode.Fit,
                             Texture = textures.Get(@"Online/supporter-required"),
                         },
-                        linkFlowContainer,
+                        supporterRequiredText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Margin = new MarginPadding { Bottom = 10 },
+                        },
+                        createSupporterTagLink(),
                     }
                 });
             }
 
-            public void UpdateSupportRequiredText(string filtersStr) {
-                string[] text = BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(filtersStr, "{1}").ToString().Split("{1}");
+            public void UpdateText(bool playedFilter, bool rankFilter) {
+                List<string> filters = new List<string>();
+                if (playedFilter) filters.Add(BeatmapsStrings.ListingSearchFiltersPlayed.ToString());
+                if (rankFilter) filters.Add(BeatmapsStrings.ListingSearchFiltersRank.ToString());
+                supporterRequiredText.Text = BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(string.Join(" and ", filters), "").ToString();
+            }
 
-                linkFlowContainer.Clear();
-                linkFlowContainer.AddText(
-                    text[0],
-                    t =>
-                    {
-                        t.Font = OsuFont.GetFont(size: 16);
-                        t.Colour = Colour4.White;
-                    }
-                );
+            public Drawable createSupporterTagLink() {
+                LinkFlowContainer supporterTagLink = new LinkFlowContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both,
+                    Margin = new MarginPadding { Bottom = 10 },
+                };
 
-                linkFlowContainer.AddLink(
-                    BeatmapsStrings.ListingSearchSupporterFilterQuoteLinkText.ToString(),
-                    "https://osu.ppy.sh/store/products/supporter-tag",
-                    t =>
-                    {
-                        t.Font = OsuFont.GetFont(size: 16);
-                        t.Colour = Colour4.FromHex("#A6C8D9");
-                    }
-                );
-
-                linkFlowContainer.AddText(
-                    text[1],
-                    t =>
-                    {
-                        t.Font = OsuFont.GetFont(size: 16);
-                        t.Colour = Colour4.White;
-                    }
-                );
+                supporterTagLink.AddLink(BeatmapsStrings.ListingSearchSupporterFilterQuoteLinkText.ToString(), Online.Chat.LinkAction.External, "https://osu.ppy.sh/store/products/supporter-tag");
+                return supporterTagLink;
             }
         }
 
