@@ -21,9 +21,15 @@ namespace osu.Game.Rulesets.Catch.UI
     /// </summary>
     public class CatcherPlate : CompositeDrawable
     {
+        /// <summary>
+        /// Whether a hit lighting should be generated when a hit object is caught.
+        /// </summary>
         public Bindable<bool> GenerateHitLighting = new Bindable<bool>(true);
 
-        public Bindable<bool> StackCaughtObject = new Bindable<bool>(true);
+        /// <summary>
+        /// Whether caught objects should be placed on the plate (stacked on the plate or immediately dropped).
+        /// </summary>
+        public Bindable<bool> PlaceCaughtObject = new Bindable<bool>(true);
 
         private CaughtObjectPool caughtObjectPool;
 
@@ -77,7 +83,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             var positionInStack = computePositionInStack(new Vector2(drawableHitObject.X - catcherPosition, 0), drawableHitObject.DisplaySize.X);
 
-            if (StackCaughtObject.Value)
+            if (PlaceCaughtObject.Value)
                 placeCaughtObject(drawableHitObject, positionInStack);
 
             if (GenerateHitLighting.Value)
@@ -128,6 +134,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
         #region Caught object dropping
 
+        /// <summary>
+        /// Drop all caught objects on the stack.
+        /// </summary>
         public void DropAll(DropAnimation animation)
         {
             foreach (var caughtObject in caughtObjectContainer)

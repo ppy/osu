@@ -29,6 +29,9 @@ namespace osu.Game.Rulesets.Catch.UI
                 AddInternal(caughtObjectPool = new CaughtObjectPool());
         }
 
+        /// <summary>
+        /// Create a dropped object from <paramref name="source"/> and drop it immediately.
+        /// </summary>
         public void Add(CaughtObject source, DropAnimation animation)
         {
             var droppedObject = caughtObjectPool.Get(source.HitObject);

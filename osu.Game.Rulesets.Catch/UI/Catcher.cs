@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         public bool CatchFruitOnPlate
         {
-            set => plate.StackCaughtObject.Value = value;
+            set => plate.PlaceCaughtObject.Value = value;
         }
 
         /// <summary>
