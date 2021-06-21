@@ -38,6 +38,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             AddInternal(scaleContainer = new Container
             {
+                Scale = new Vector2(SPRITE_SCALE),
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
@@ -49,7 +50,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-glow"),
-                        Scale = new Vector2(SPRITE_SCALE),
                         Blending = BlendingParameters.Additive,
                         Colour = glowColour,
                     },
@@ -58,40 +58,37 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-bottom"),
-                        Scale = new Vector2(SPRITE_SCALE),
                     },
                     discTop = new Sprite
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-top"),
-                        Scale = new Vector2(SPRITE_SCALE),
                     },
                     fixedMiddle = new Sprite
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-middle"),
-                        Scale = new Vector2(SPRITE_SCALE),
                     },
                     spinningMiddle = new Sprite
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-middle2"),
-                        Scale = new Vector2(SPRITE_SCALE),
                     },
                 }
             });
 
             if (!(source.FindProvider(s => s.GetTexture("spinner-top") != null) is DefaultLegacySkin))
             {
-                scaleContainer.Add(ApproachCircle = new Sprite
+                AddInternal(ApproachCircle = new Sprite
                 {
-                    Anchor = Anchor.Centre,
+                    Anchor = Anchor.TopCentre,
                     Origin = Anchor.Centre,
                     Texture = source.GetTexture("spinner-approachcircle"),
                     Scale = new Vector2(SPRITE_SCALE * 1.86f),
+                    Y = SPINNER_Y_CENTRE,
                 });
             }
         }
@@ -143,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             glow.Alpha = DrawableSpinner.Progress;
 
-            scaleContainer.Scale = new Vector2(0.8f + (float)Interpolation.ApplyEasing(Easing.Out, DrawableSpinner.Progress) * 0.2f);
+            scaleContainer.Scale = new Vector2(SPRITE_SCALE * (0.8f + (float)Interpolation.ApplyEasing(Easing.Out, DrawableSpinner.Progress) * 0.2f));
         }
     }
 }
