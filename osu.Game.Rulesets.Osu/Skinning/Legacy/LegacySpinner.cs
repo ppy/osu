@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         protected DrawableSpinner DrawableSpinner { get; private set; }
 
-        public abstract Drawable ApproachCircle { get; protected set; }
+        public Drawable ApproachCircle { get; protected set; }
 
         private Sprite spin;
         private Sprite clear;

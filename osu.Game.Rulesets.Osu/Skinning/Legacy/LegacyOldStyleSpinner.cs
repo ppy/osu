@@ -29,8 +29,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private const float final_metre_height = 692 * SPRITE_SCALE;
 
-        public override Drawable ApproachCircle { get; protected set; }
-
         [BackgroundDependencyLoader]
         private void load(ISkinSource source)
         {

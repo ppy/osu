@@ -31,8 +31,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private Container scaleContainer;
 
-        public override Drawable ApproachCircle { get; protected set; }
-
         [BackgroundDependencyLoader]
         private void load(ISkinSource source)
         {
