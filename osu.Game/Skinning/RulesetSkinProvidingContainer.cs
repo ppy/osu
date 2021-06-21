@@ -73,6 +73,8 @@ namespace osu.Game.Skinning
                     SkinSources.Add(skinManager.CurrentSkin.Value);
                     break;
             }
+
+            SkinSources.Add(skinManager.DefaultSkin);
         }
 
         protected ISkin GetLegacyRulesetTransformedSkin(ISkin legacySkin)
