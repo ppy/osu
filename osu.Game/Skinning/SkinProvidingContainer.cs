@@ -38,6 +38,11 @@ namespace osu.Game.Skinning
         [CanBeNull]
         private ISkinSource fallbackSource;
 
+        /// <summary>
+        /// Whether falling back to parent <see cref="ISkinSource"/>s is allowed in this container.
+        /// </summary>
+        protected virtual bool AllowFallingBackToParent => true;
+
         protected virtual bool AllowDrawableLookup(ISkinComponent component) => true;
 
         protected virtual bool AllowTextureLookup(string componentName) => true;
@@ -180,9 +185,12 @@ namespace osu.Game.Skinning
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            fallbackSource = dependencies.Get<ISkinSource>();
-            if (fallbackSource != null)
-                fallbackSource.SourceChanged += OnSourceChanged;
+            if (AllowFallingBackToParent)
+            {
+                fallbackSource = dependencies.Get<ISkinSource>();
+                if (fallbackSource != null)
+                    fallbackSource.SourceChanged += OnSourceChanged;
+            }
 
             dependencies.CacheAs<ISkinSource>(this);
 
