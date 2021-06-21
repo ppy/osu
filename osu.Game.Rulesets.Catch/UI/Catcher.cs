@@ -57,11 +57,6 @@ namespace osu.Game.Rulesets.Catch.UI
         public double Speed => (Dashing ? 1 : 0.5) * BASE_SPEED * hyperDashModifier;
 
         /// <summary>
-        /// The amount by which caught fruit should be offset from the plate surface to make them look visually "caught".
-        /// </summary>
-        public const float CAUGHT_FRUIT_VERTICAL_OFFSET = -5;
-
-        /// <summary>
         /// The amount by which caught fruit should be scaled down to fit on the plate.
         /// </summary>
         private const float caught_fruit_scale_adjust = 0.5f;
@@ -157,6 +152,8 @@ namespace osu.Game.Rulesets.Catch.UI
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.BottomCentre,
+                    // offset fruit vertically to better place "above" the plate.
+                    Y = -5
                 },
                 body = new SkinnableCatcher(),
                 hitExplosionContainer = new HitExplosionContainer
@@ -387,9 +384,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
             float adjustedRadius = displayRadius * lenience_adjust;
             float checkDistance = MathF.Pow(adjustedRadius, 2);
-
-            // offset fruit vertically to better place "above" the plate.
-            position.Y += CAUGHT_FRUIT_VERTICAL_OFFSET;
 
             while (caughtObjectContainer.Any(f => Vector2Extensions.DistanceSquared(f.Position, position) < checkDistance))
             {
