@@ -53,11 +53,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
-            if (!(drawableHitObject is DrawableSpinner spinner))
-                return;
+            switch (drawableHitObject)
+            {
+                case DrawableSpinner spinner:
+                    using (BeginAbsoluteSequence(spinner.HitObject.StartTime))
+                        approachCircle?.ScaleTo(0.1f, spinner.HitObject.Duration);
 
-            using (BeginAbsoluteSequence(spinner.HitObject.StartTime))
-                approachCircle?.ScaleTo(0.1f, spinner.HitObject.Duration);
+                    break;
+            }
         }
     }
 }
