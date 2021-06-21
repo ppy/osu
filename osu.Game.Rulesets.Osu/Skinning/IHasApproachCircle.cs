@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 namespace osu.Game.Rulesets.Osu.Skinning
 {
     /// <summary>
-    /// A common interface between skin component implementations which provide an approach circle.
+    /// A common interface between implementations which provide an approach circle.
     /// </summary>
     public interface IHasApproachCircle
     {
