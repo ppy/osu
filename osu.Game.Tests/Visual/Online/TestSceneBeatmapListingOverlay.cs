@@ -179,7 +179,6 @@ namespace osu.Game.Tests.Visual.Online
             expectedPlaceholderShown(false, false);
         }
 
-
         private void fetchFor(params BeatmapSetInfo[] beatmaps)
         {
             setsForResponse.Clear();
