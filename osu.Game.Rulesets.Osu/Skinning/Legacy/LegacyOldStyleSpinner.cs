@@ -29,12 +29,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private const float final_metre_height = 692 * SPRITE_SCALE;
 
+        public override Drawable ApproachCircle { get; protected set; }
+
         [BackgroundDependencyLoader]
         private void load(ISkinSource source)
         {
             spinnerBlink = source.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerNoBlink)?.Value != true;
 
-            AddRangeInternal(new Drawable[]
+            AddRangeInternal(new[]
             {
                 new Sprite
                 {
@@ -68,6 +70,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Origin = Anchor.TopLeft,
                         Scale = new Vector2(SPRITE_SCALE)
                     }
+                },
+                ApproachCircle = new Sprite
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.Centre,
+                    Texture = source.GetTexture("spinner-approachcircle"),
+                    Scale = new Vector2(SPRITE_SCALE * 1.86f),
+                    Y = SPINNER_Y_CENTRE,
                 }
             });
         }
