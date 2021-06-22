@@ -16,6 +16,7 @@ using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.UI;
@@ -144,6 +145,11 @@ namespace osu.Game.Tests.Rulesets
 
         private class TestShaderManager : ShaderManager
         {
+            public TestShaderManager()
+                : base(new ResourceStore<byte[]>())
+            {
+            }
+
             public override byte[] LoadRaw(string name) => null;
 
             public bool IsDisposed { get; private set; }
