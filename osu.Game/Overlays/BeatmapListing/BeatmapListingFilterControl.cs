@@ -10,11 +10,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -26,7 +28,7 @@ namespace osu.Game.Overlays.BeatmapListing
         /// Fired when a search finishes. Contains only new items in the case of pagination.
         /// Fired with BeatmapListingSearchControl when non-supporter user used supporter-only filters.
         /// </summary>
-        public Action<List<BeatmapSetInfo>, BeatmapListingSearchControl> SearchFinished;
+        public Action<SearchResult> SearchFinished;
 
         /// <summary>
         /// Fired when search criteria change.
@@ -216,11 +218,19 @@ namespace osu.Game.Overlays.BeatmapListing
                 // check if an non-supporter user used supporter-only filters
                 if (!api.LocalUser.Value.IsSupporter && (searchControl.Ranks.Any() || searchControl.Played.Value != SearchPlayed.Any))
                 {
-                    SearchFinished?.Invoke(sets, searchControl);
+                    List<LocalisableString> filters = new List<LocalisableString>();
+
+                    if (searchControl.Played.Value != SearchPlayed.Any)
+                        filters.Add(BeatmapsStrings.ListingSearchFiltersPlayed);
+
+                    if (searchControl.Ranks.Any())
+                        filters.Add(BeatmapsStrings.ListingSearchFiltersRank);
+
+                    SearchFinished?.Invoke(SearchResult.SupporterOnlyFilter(filters));
                 }
                 else
                 {
-                    SearchFinished?.Invoke(sets, null);
+                    SearchFinished?.Invoke(SearchResult.ResultsReturned(sets));
                 }
             };
 
@@ -245,6 +255,31 @@ namespace osu.Game.Overlays.BeatmapListing
             resetSearch();
 
             base.Dispose(isDisposing);
+        }
+
+        public enum SearchResultType
+        {
+            ResultsReturned,
+            SupporterOnlyFilter
+        }
+
+        public struct SearchResult
+        {
+            public SearchResultType Type { get; private set; }
+            public List<BeatmapSetInfo> Results { get; private set; }
+            public List<LocalisableString> Filters { get; private set; }
+
+            public static SearchResult ResultsReturned(List<BeatmapSetInfo> results) => new SearchResult
+            {
+                Type = SearchResultType.ResultsReturned,
+                Results = results
+            };
+
+            public static SearchResult SupporterOnlyFilter(List<LocalisableString> filters) => new SearchResult
+            {
+                Type = SearchResultType.SupporterOnlyFilter,
+                Filters = filters
+            };
         }
     }
 }
