@@ -13,13 +13,13 @@ namespace osu.Game.Graphics.UserInterface
         [Description("button")]
         Button,
 
-        [Description("softer")]
-        Soft,
-
         [Description("toolbar")]
         Toolbar,
 
-        [Description("songselect")]
-        SongSelect
+        [Description("tabselect")]
+        TabSelect,
+
+        [Description("scrolltotop")]
+        ScrollToTop
     }
 }

@@ -29,6 +29,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public new OsuSpinnerJudgementResult Result => (OsuSpinnerJudgementResult)base.Result;
 
+        public SkinnableDrawable Body { get; private set; }
+
         public SpinnerRotationTracker RotationTracker { get; private set; }
 
         private SpinnerSpmCalculator spmCalculator;
@@ -86,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     RelativeSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBody), _ => new DefaultSpinner()),
+                        Body = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBody), _ => new DefaultSpinner()),
                         RotationTracker = new SpinnerRotationTracker(this)
                     }
                 },

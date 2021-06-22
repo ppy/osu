@@ -22,12 +22,34 @@ namespace osu.Game.Tests.Mods
         }
 
         [Test]
+        public void TestModIsCompatibleByItselfWithIncompatibleInterface()
+        {
+            var mod = new Mock<CustomMod1>();
+            mod.Setup(m => m.IncompatibleMods).Returns(new[] { typeof(IModCompatibilitySpecification) });
+            Assert.That(ModUtils.CheckCompatibleSet(new[] { mod.Object }));
+        }
+
+        [Test]
         public void TestIncompatibleThroughTopLevel()
         {
             var mod1 = new Mock<CustomMod1>();
             var mod2 = new Mock<CustomMod2>();
 
             mod1.Setup(m => m.IncompatibleMods).Returns(new[] { mod2.Object.GetType() });
+
+            // Test both orderings.
+            Assert.That(ModUtils.CheckCompatibleSet(new Mod[] { mod1.Object, mod2.Object }), Is.False);
+            Assert.That(ModUtils.CheckCompatibleSet(new Mod[] { mod2.Object, mod1.Object }), Is.False);
+        }
+
+        [Test]
+        public void TestIncompatibleThroughInterface()
+        {
+            var mod1 = new Mock<CustomMod1>();
+            var mod2 = new Mock<CustomMod2>();
+
+            mod1.Setup(m => m.IncompatibleMods).Returns(new[] { typeof(IModCompatibilitySpecification) });
+            mod2.Setup(m => m.IncompatibleMods).Returns(new[] { typeof(IModCompatibilitySpecification) });
 
             // Test both orderings.
             Assert.That(ModUtils.CheckCompatibleSet(new Mod[] { mod1.Object, mod2.Object }), Is.False);
@@ -149,11 +171,15 @@ namespace osu.Game.Tests.Mods
                 Assert.That(invalid.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
         }
 
-        public abstract class CustomMod1 : Mod
+        public abstract class CustomMod1 : Mod, IModCompatibilitySpecification
         {
         }
 
-        public abstract class CustomMod2 : Mod
+        public abstract class CustomMod2 : Mod, IModCompatibilitySpecification
+        {
+        }
+
+        public interface IModCompatibilitySpecification
         {
         }
     }

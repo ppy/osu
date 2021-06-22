@@ -159,11 +159,15 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         /// <param name="modTypes">The types of <see cref="Mod"/>s which should be deselected.</param>
         /// <param name="immediate">Whether the deselection should happen immediately. Should only be used when required to ensure correct selection flow.</param>
-        public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false)
+        /// <param name="newSelection">If this deselection is triggered by a user selection, this should contain the newly selected type. This type will never be deselected, even if it matches one provided in <paramref name="modTypes"/>.</param>
+        public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false, Mod newSelection = null)
         {
             foreach (var button in Buttons)
             {
                 if (button.SelectedMod == null) continue;
+
+                if (button.SelectedMod == newSelection)
+                    continue;
 
                 foreach (var type in modTypes)
                 {
