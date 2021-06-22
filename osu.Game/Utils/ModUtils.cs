@@ -60,6 +60,9 @@ namespace osu.Game.Utils
                 {
                     foreach (var invalid in combination.Where(m => type.IsInstanceOfType(m)))
                     {
+                        if (invalid == mod)
+                            continue;
+
                         invalidMods ??= new List<Mod>();
                         invalidMods.Add(invalid);
                     }

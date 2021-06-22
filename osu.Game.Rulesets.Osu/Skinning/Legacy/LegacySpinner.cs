@@ -15,8 +15,10 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public abstract class LegacySpinner : CompositeDrawable
+    public abstract class LegacySpinner : CompositeDrawable, IHasApproachCircle
     {
+        public const float SPRITE_SCALE = 0.625f;
+
         /// <remarks>
         /// All constants are in osu!stable's gamefield space, which is shifted 16px downwards.
         /// This offset is negated in both osu!stable and osu!lazer to bring all constants into window-space.
@@ -26,11 +28,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         protected const float SPINNER_Y_CENTRE = SPINNER_TOP_OFFSET + 219f;
 
-        protected const float SPRITE_SCALE = 0.625f;
-
         private const float spm_hide_offset = 50f;
 
         protected DrawableSpinner DrawableSpinner { get; private set; }
+
+        public Drawable ApproachCircle { get; protected set; }
 
         private Sprite spin;
         private Sprite clear;
@@ -174,6 +176,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         spmBackground.MoveToOffset(new Vector2(0, -spm_hide_offset), d.HitObject.TimeFadeIn, Easing.Out);
                         spmCounter.MoveToOffset(new Vector2(0, -spm_hide_offset), d.HitObject.TimeFadeIn, Easing.Out);
                     }
+
+                    using (BeginAbsoluteSequence(d.HitObject.StartTime))
+                        ApproachCircle?.ScaleTo(SPRITE_SCALE * 0.1f, d.HitObject.Duration);
 
                     double spinFadeOutLength = Math.Min(400, d.HitObject.Duration);
 

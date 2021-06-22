@@ -154,6 +154,10 @@ namespace osu.Game.Online.Chat
                             case "beatmapsets":
                             case "d":
                             {
+                                if (mainArg == "discussions")
+                                    // handle discussion links externally for now
+                                    return new LinkDetails(LinkAction.External, url);
+
                                 if (args.Length > 4 && int.TryParse(args[4], out var id))
                                     // https://osu.ppy.sh/beatmapsets/1154158#osu/2768184
                                     return new LinkDetails(LinkAction.OpenBeatmap, id.ToString());

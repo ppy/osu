@@ -9,20 +9,16 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public class LegacyCatcherNew : CompositeDrawable, ICatcherSprite
+    public class LegacyCatcherNew : CompositeDrawable
     {
         [Resolved]
         private Bindable<CatcherAnimationState> currentState { get; set; }
-
-        public Texture CurrentTexture => (currentDrawable as TextureAnimation)?.CurrentFrame ?? (currentDrawable as Sprite)?.Texture;
 
         private readonly Dictionary<CatcherAnimationState, Drawable> drawables = new Dictionary<CatcherAnimationState, Drawable>();
 

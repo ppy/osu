@@ -50,8 +50,10 @@ using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Localisation;
+using osu.Game.Performance;
 using osu.Game.Skinning.Editor;
 
 namespace osu.Game
@@ -487,6 +489,8 @@ namespace osu.Game
 
         protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
 
+        protected virtual HighPerformanceSession CreateHighPerformanceSession() => new HighPerformanceSession();
+
         protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
 
         #region Beatmap progression
@@ -580,8 +584,16 @@ namespace osu.Game
 
             foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
             {
-                var cultureCode = language.ToString();
-                Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
+                var cultureCode = language.ToCultureCode();
+
+                try
+                {
+                    Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Could not load localisations for language \"{cultureCode}\"");
+                }
             }
 
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
@@ -604,9 +616,9 @@ namespace osu.Game
 
             LocalConfig.LookupKeyBindings = l =>
             {
-                var combinations = KeyBindingStore.GetReadableKeyCombinationsFor(l).ToArray();
+                var combinations = KeyBindingStore.GetReadableKeyCombinationsFor(l);
 
-                if (combinations.Length == 0)
+                if (combinations.Count == 0)
                     return "none";
 
                 return string.Join(" or ", combinations);
@@ -754,6 +766,8 @@ namespace osu.Game
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(new DialogOverlay(), topMostOverlayContent.Add, true);
+
+            loadComponentSingleFile(CreateHighPerformanceSession(), Add);
 
             chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
