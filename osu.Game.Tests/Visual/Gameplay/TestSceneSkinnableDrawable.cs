@@ -331,7 +331,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => throw new NotImplementedException();
 
-            public IEnumerable<ISkin> AllSources => Enumerable.Empty<ISkin>();
+            public IEnumerable<ISkin> AllSources => throw new NotImplementedException();
 
             public event Action SourceChanged
             {
