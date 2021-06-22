@@ -81,8 +81,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             directoryFlow.Clear();
 
-            directory.NewValue?.Refresh();
-
             try
             {
                 if (directory.NewValue == null)
@@ -91,22 +89,24 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                     foreach (var drive in drives)
                         directoryFlow.Add(new DirectoryPiece(drive.RootDirectory));
-                }
-                else if (!directory.NewValue.Exists)
-                {
-                    var newDirectory = directory.NewValue;
 
-                    while (newDirectory != null && !newDirectory.Exists)
-                        newDirectory = newDirectory.Parent;
-
-                    CurrentPath.Value = newDirectory;
+                    return;
                 }
-                else
-                {
-                    directoryFlow.Add(new ParentDirectoryPiece(CurrentPath.Value.Parent));
 
-                    directoryFlow.AddRange(GetEntriesForPath(CurrentPath.Value));
-                }
+                directory.NewValue.Refresh();
+
+                var newDirectory = directory.NewValue;
+
+                while (newDirectory != null && !newDirectory.Exists)
+                    newDirectory = newDirectory.Parent;
+
+                CurrentPath.Value = newDirectory;
+
+                if (newDirectory == null)
+                    return;
+
+                directoryFlow.Add(new ParentDirectoryPiece(newDirectory.Parent));
+                directoryFlow.AddRange(GetEntriesForPath(newDirectory));
             }
             catch (Exception)
             {
