@@ -6,8 +6,9 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Input;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osuTK;
@@ -31,16 +32,21 @@ namespace osu.Game.Overlays.KeyBinding
         }
 
         [BackgroundDependencyLoader]
-        private void load(KeyBindingStore store)
+        private void load(RealmContextFactory realmFactory)
         {
-            var bindings = store.Query(Ruleset?.ID, variant);
+            var rulesetId = Ruleset?.ID;
+
+            List<RealmKeyBinding> bindings;
+
+            using (var usage = realmFactory.GetForRead())
+                bindings = usage.Realm.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).Detach();
 
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {
                 int intKey = (int)defaultGroup.Key;
 
                 // one row per valid action.
-                Add(new KeyBindingRow(defaultGroup.Key, bindings.Where(b => ((int)b.Action).Equals(intKey)))
+                Add(new KeyBindingRow(defaultGroup.Key, bindings.Where(b => b.ActionInt.Equals(intKey)).ToList())
                 {
                     AllowMainMouseButtons = Ruleset != null,
                     Defaults = defaultGroup.Select(d => d.KeyCombination)
