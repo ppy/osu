@@ -34,8 +34,8 @@ namespace osu.Game.Skinning
     /// Handles the storage and retrieval of <see cref="Skin"/>s.
     /// </summary>
     /// <remarks>
-    /// This is also exposed and cached as <see cref="ISkinSource"/> on a game-wide level for general components across the game.
-    /// Lookups from gameplay components are instead covered by <see cref="RulesetSkinProvidingContainer"/>, and are never hit here.
+    /// This is also exposed and cached as <see cref="ISkinSource"/> to allow for any component to potentially have skinning support.
+    /// For gameplay components, see <see cref="RulesetSkinProvidingContainer"/> which adds extra legacy and toggle logic that may affect the lookup process.
     /// </remarks>
     [ExcludeFromDynamicCompile]
     public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>, ISkinSource, IStorageResourceProvider

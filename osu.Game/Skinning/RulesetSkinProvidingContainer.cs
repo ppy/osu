@@ -13,8 +13,7 @@ namespace osu.Game.Skinning
 {
     /// <summary>
     /// A type of <see cref="SkinProvidingContainer"/> specialized for <see cref="DrawableRuleset"/> and other gameplay-related components.
-    /// Providing access to the <see cref="SkinManager"/> skin sources and the beatmap skin each surrounded with the ruleset legacy skin transformer.
-    /// While also limiting lookups from falling back to any parent <see cref="ISkinSource"/>s out of this container.
+    /// Providing access to parent skin sources and the beatmap skin each surrounded with the ruleset legacy skin transformer.
     /// </summary>
     public class RulesetSkinProvidingContainer : SkinProvidingContainer
     {
@@ -22,7 +21,7 @@ namespace osu.Game.Skinning
         protected readonly IBeatmap Beatmap;
 
         /// <remarks>
-        /// This container already re-exposes all <see cref="SkinManager"/> skin sources in a ruleset-usable form.
+        /// This container already re-exposes all parent <see cref="ISkinSource"/> sources in a ruleset-usable form.
         /// Therefore disallow falling back to any parent <see cref="ISkinSource"/> any further.
         /// </remarks>
         protected override bool AllowFallingBackToParent => false;
