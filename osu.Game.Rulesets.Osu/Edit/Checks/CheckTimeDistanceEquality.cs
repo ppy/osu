@@ -14,14 +14,36 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
 {
     public class CheckTimeDistanceEquality : ICheck
     {
-        private const double pattern_lifetime = 600; // Two objects this many ms apart or more are skipped. (200 BPM 2/1)
-        private const double stack_leniency = 12; // Two objects this distance apart or less are skipped.
+        /// <summary>
+        /// Two objects this many ms apart or more are skipped. (200 BPM 2/1)
+        /// </summary>
+        private const double pattern_lifetime = 600;
 
-        private const double observation_lifetime = 4000; // How long an observation is relevant for comparison. (120 BPM 8/1)
-        private const double similar_time_leniency = 16; // How different two delta times can be to still be compared. (240 BPM 1/16)
+        /// <summary>
+        /// Two objects this distance apart or less are skipped.
+        /// </summary>
+        private const double stack_leniency = 12;
 
-        private const double distance_leniency_absolute_warning = 10; // How many pixels are subtracted from the difference between current and expected distance.
-        private const double distance_leniency_percent_warning = 0.15; // How much of the current distance that the difference can make out.
+        /// <summary>
+        /// How long an observation is relevant for comparison. (120 BPM 8/1)
+        /// </summary>
+        private const double observation_lifetime = 4000;
+
+        /// <summary>
+        /// How different two delta times can be to still be compared. (240 BPM 1/16)
+        /// </summary>
+        private const double similar_time_leniency = 16;
+
+        /// <summary>
+        /// How many pixels are subtracted from the difference between current and expected distance.
+        /// </summary>
+        private const double distance_leniency_absolute_warning = 10;
+
+        /// <summary>
+        /// How much of the current distance that the difference can make out.
+        /// </summary>
+        private const double distance_leniency_percent_warning = 0.15;
+
         private const double distance_leniency_absolute_problem = 20;
         private const double distance_leniency_percent_problem = 0.3;
 

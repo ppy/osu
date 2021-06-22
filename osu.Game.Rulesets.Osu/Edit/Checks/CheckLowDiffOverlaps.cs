@@ -17,7 +17,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
         private const double should_probably_overlap_threshold = 175; // 170 BPM 1/2
         private const double should_not_overlap_threshold = 250; // 120 BPM 1/2 = 240 BPM 1/1
 
-        // Objects need to overlap this much before being treated as an overlap, else it may just be the borders slightly touching.
+        /// <summary>
+        /// Objects need to overlap this much before being treated as an overlap, else it may just be the borders slightly touching.
+        /// </summary>
         private const double overlap_leniency = 5;
 
         public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Spread, "Missing or unexpected overlaps");
