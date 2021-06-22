@@ -81,8 +81,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             directoryFlow.Clear();
 
-            directory.NewValue.Refresh();
-
             try
             {
                 if (directory.NewValue == null)
@@ -94,6 +92,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 }
                 else if (!directory.NewValue.Exists)
                 {
+                    directory.NewValue.Refresh();
+
                     var newDirectory = directory.NewValue;
 
                     while (newDirectory != null && !newDirectory.Exists)
