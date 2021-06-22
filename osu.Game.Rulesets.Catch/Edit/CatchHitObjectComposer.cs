@@ -17,7 +17,10 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
         }
 
-        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => System.Array.Empty<HitObjectCompositionTool>();
+        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
+        {
+            new FruitCompositionTool(),
+        };
 
         public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
         {
