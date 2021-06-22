@@ -16,8 +16,9 @@ namespace osu.Game.Skinning
         bool IsEditable => true;
 
         /// <summary>
-        /// <see langword="false"/> if this <see cref="ISkinnableDrawable"/>'s <see cref="Drawable.Anchor"/> is automatically determined by proximity,
-        /// <see langword="true"/> if the user has chosen a fixed anchor point.
+        /// In the context of the skin layout editor, whether this <see cref="ISkinnableDrawable"/> has a permanent anchor defined.
+        /// If <see langword="false"/>, this <see cref="ISkinnableDrawable"/>'s <see cref="Drawable.Anchor"/> is automatically determined by proximity,
+        /// If <see langword="true"/>, a fixed anchor point has been defined.
         /// </summary>
         bool UsesFixedAnchor { get; set; }
     }
