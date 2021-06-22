@@ -27,6 +27,8 @@ namespace osu.Game.Skinning
 
         private bool isNewStyle;
 
+        public bool UsesFixedAnchor { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(ISkinSource source)
         {
