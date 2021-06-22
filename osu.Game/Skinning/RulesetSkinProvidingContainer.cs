@@ -51,7 +51,6 @@ namespace osu.Game.Skinning
         private AudioManager audio { get; set; }
 
         [Resolved]
-        private SkinManager skinManager { get; set; }
         private ISkinSource skinSource { get; set; }
 
         [BackgroundDependencyLoader]
@@ -84,6 +83,8 @@ namespace osu.Game.Skinning
                         break;
                 }
             }
+
+            SkinSources.Add(new RulesetResourcesSkin(Ruleset, host, audio));
         }
 
         protected ISkin GetLegacyRulesetTransformedSkin(ISkin legacySkin)
@@ -102,9 +103,6 @@ namespace osu.Game.Skinning
         {
             base.Dispose(isDisposing);
 
-            SkinSources.Add(Ruleset.CreateLegacySkinProvider(skinManager.DefaultSkin, Beatmap));
-
-            SkinSources.Add(new RulesetResourcesSkin(Ruleset, host, audio));
             if (skinSource != null)
                 skinSource.SourceChanged -= OnSourceChanged;
         }
