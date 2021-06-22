@@ -14,13 +14,15 @@ namespace osu.Game.Overlays.Settings
 
         protected new class DropdownControl : OsuEnumDropdown<T>
         {
+            protected virtual int MenuMaxHeight => 200;
+
             public DropdownControl()
             {
                 Margin = new MarginPadding { Top = 5 };
                 RelativeSizeAxes = Axes.X;
             }
 
-            protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = 200);
+            protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = MenuMaxHeight);
         }
     }
 }
