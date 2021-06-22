@@ -14,5 +14,12 @@ namespace osu.Game.Skinning
         /// Whether this component should be editable by an end user.
         /// </summary>
         bool IsEditable => true;
+
+        /// <summary>
+        /// In the context of the skin layout editor, whether this <see cref="ISkinnableDrawable"/> has a permanent anchor defined.
+        /// If <see langword="false"/>, this <see cref="ISkinnableDrawable"/>'s <see cref="Drawable.Anchor"/> is automatically determined by proximity,
+        /// If <see langword="true"/>, a fixed anchor point has been defined.
+        /// </summary>
+        bool UsesFixedAnchor { get; set; }
     }
 }
