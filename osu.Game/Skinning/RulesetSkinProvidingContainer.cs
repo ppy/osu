@@ -80,7 +80,8 @@ namespace osu.Game.Skinning
                     break;
             }
 
-            SkinSources.Add(skinManager.DefaultSkin);
+            if (skinManager.CurrentSkin.Value != skinManager.DefaultSkin)
+                SkinSources.Add(skinManager.DefaultSkin);
         }
 
         protected ISkin GetLegacyRulesetTransformedSkin(ISkin legacySkin)
