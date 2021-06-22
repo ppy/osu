@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Screens.Edit.Compose.Components;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
@@ -16,5 +18,15 @@ namespace osu.Game.Rulesets.Catch.Edit
         }
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => System.Array.Empty<HitObjectCompositionTool>();
+
+        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        {
+            var result = base.SnapScreenSpacePositionToValidTime(screenSpacePosition);
+            // TODO: implement position snap
+            result.ScreenSpacePosition.X = screenSpacePosition.X;
+            return result;
+        }
+
+        protected override ComposeBlueprintContainer CreateBlueprintContainer() => new CatchBlueprintContainer(this);
     }
 }
