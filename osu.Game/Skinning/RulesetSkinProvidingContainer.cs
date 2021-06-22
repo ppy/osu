@@ -26,6 +26,7 @@ namespace osu.Game.Skinning
         /// Therefore disallow falling back to any parent <see cref="ISkinSource"/> any further.
         /// </remarks>
         protected override bool AllowFallingBackToParent => false;
+
         protected override Container<Drawable> Content { get; }
 
         public RulesetSkinProvidingContainer(Ruleset ruleset, IBeatmap beatmap, [CanBeNull] ISkin beatmapSkin)
