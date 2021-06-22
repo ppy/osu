@@ -236,14 +236,11 @@ namespace osu.Game.Skinning
 
         public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
         {
-            if (lookupFunction(CurrentSkin.Value))
-                return CurrentSkin.Value;
-
-            if (CurrentSkin.Value is LegacySkin && lookupFunction(DefaultLegacySkin))
-                return DefaultLegacySkin;
-
-            if (lookupFunction(DefaultSkin))
-                return DefaultSkin;
+            foreach (var source in AllSources)
+            {
+                if (lookupFunction(source))
+                    return source;
+            }
 
             return null;
         }
