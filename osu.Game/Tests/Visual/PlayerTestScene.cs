@@ -10,7 +10,6 @@ using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual
 {
@@ -79,8 +78,6 @@ namespace osu.Game.Tests.Visual
             }
 
             Player = CreatePlayer(ruleset);
-            Player.SetSkin(GetPlayerSkin());
-
             LoadScreen(Player);
         }
 
@@ -95,11 +92,6 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         [NotNull]
         protected abstract Ruleset CreatePlayerRuleset();
-
-        /// <summary>
-        /// Creates an <see cref="ISkin"/> to be put inside the <see cref="Player"/>'s ruleset skin providing container.
-        /// </summary>
-        protected virtual ISkin GetPlayerSkin() => null;
 
         protected sealed override Ruleset CreateRuleset() => CreatePlayerRuleset();
 
