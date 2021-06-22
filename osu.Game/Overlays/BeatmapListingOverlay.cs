@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Localisation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -119,28 +120,28 @@ namespace osu.Game.Overlays
 
         private Task panelLoadDelegate;
 
-        private void onSearchFinished(List<BeatmapSetInfo> beatmaps, BeatmapListingSearchControl searchControl)
+        private void onSearchFinished(BeatmapListingFilterControl.SearchResult searchResult)
         {
-            var newPanels = beatmaps.Select<BeatmapSetInfo, BeatmapPanel>(b => new GridBeatmapPanel(b)
+            // non-supporter user used supporter-only filters
+            if (searchResult.Type == BeatmapListingFilterControl.SearchResultType.SupporterOnlyFilter)
+            {
+                supporterRequiredContent.UpdateText(searchResult.Filters);
+                addContentToPlaceholder(supporterRequiredContent);
+                return;
+            }
+
+            var newPanels = searchResult.Results.Select<BeatmapSetInfo, BeatmapPanel>(b => new GridBeatmapPanel(b)
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
             });
-
-            // non-supporter user used supporter-only filters
-            if (searchControl != null)
-            {
-                supporterRequiredContent.UpdateText(searchControl.Played.Value != SearchPlayed.Any, searchControl.Ranks.Any());
-                LoadComponentAsync(supporterRequiredContent, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
-                return;
-            }
 
             if (filterControl.CurrentPage == 0)
             {
                 //No matches case
                 if (!newPanels.Any())
                 {
-                    LoadComponentAsync(notFoundContent, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+                    addContentToPlaceholder(notFoundContent);
                     return;
                 }
 
@@ -182,15 +183,10 @@ namespace osu.Game.Overlays
             {
                 var transform = lastContent.FadeOut(100, Easing.OutQuint);
 
-                if (lastContent == notFoundContent)
+                if (lastContent == notFoundContent || lastContent == supporterRequiredContent)
                 {
-                    // not found display may be used multiple times, so don't expire/dispose it.
+                    // the placeholder may be used multiple times, so don't expire/dispose it.
                     transform.Schedule(() => panelTarget.Remove(lastContent));
-                }
-                else if (lastContent == supporterRequiredContent)
-                {
-                    // supporter required display may be used multiple times, so don't expire/dispose it.
-                    transform.Schedule(() => panelTarget.Remove(supporterRequiredContent));
                 }
                 else
                 {
@@ -260,7 +256,7 @@ namespace osu.Game.Overlays
         // using string literals as there's no proper processing for LocalizeStrings yet
         public class SupporterRequiredDrawable : CompositeDrawable
         {
-            private OsuSpriteText supporterRequiredText;
+            private OsuSpriteText filtersText;
 
             public SupporterRequiredDrawable()
             {
@@ -289,30 +285,20 @@ namespace osu.Game.Overlays
                             FillMode = FillMode.Fit,
                             Texture = textures.Get(@"Online/supporter-required"),
                         },
-                        supporterRequiredText = new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 16),
-                            Colour = Colour4.White,
-                            Margin = new MarginPadding { Bottom = 10 },
-                        },
-                        createSupporterTagLink(),
+                        createSupporterText(),
                     }
                 });
             }
 
-            public void UpdateText(bool playedFilter, bool rankFilter)
+            public void UpdateText(List<LocalisableString> filters)
             {
-                List<string> filters = new List<string>();
-                if (playedFilter) filters.Add(BeatmapsStrings.ListingSearchFiltersPlayed.ToString());
-                if (rankFilter) filters.Add(BeatmapsStrings.ListingSearchFiltersRank.ToString());
-                supporterRequiredText.Text = BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(string.Join(" and ", filters), "").ToString();
+                // use string literals for now
+                filtersText.Text = BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(string.Join(" and ", filters), "").ToString();
             }
 
-            private Drawable createSupporterTagLink()
+            private Drawable createSupporterText()
             {
-                LinkFlowContainer supporterTagLink = new LinkFlowContainer
+                LinkFlowContainer supporterRequiredText = new LinkFlowContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -320,8 +306,18 @@ namespace osu.Game.Overlays
                     Margin = new MarginPadding { Bottom = 10 },
                 };
 
-                supporterTagLink.AddLink(BeatmapsStrings.ListingSearchSupporterFilterQuoteLinkText.ToString(), "https://osu.ppy.sh/store/products/supporter-tag");
-                return supporterTagLink;
+                filtersText = (OsuSpriteText)supporterRequiredText.AddText(
+                    "_",
+                    t =>
+                    {
+                        t.Font = OsuFont.GetFont(size: 16);
+                        t.Colour = Colour4.White;
+                    }
+                ).First();
+
+                supporterRequiredText.AddLink(BeatmapsStrings.ListingSearchSupporterFilterQuoteLinkText.ToString(), @"/store/products/supporter-tag");
+
+                return supporterRequiredText;
             }
         }
 
