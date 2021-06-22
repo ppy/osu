@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK.Graphics;
@@ -33,6 +34,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// <summary>
         /// The target fruit if we are to initiate a hyperdash.
         /// </summary>
+        [JsonIgnore]
         public CatchHitObject HyperDashTarget
         {
             get => hyperDashTarget;

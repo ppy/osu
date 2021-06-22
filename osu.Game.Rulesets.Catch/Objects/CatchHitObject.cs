@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -20,6 +21,11 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// <summary>
         /// The horizontal position of the hit object between 0 and <see cref="CatchPlayfield.WIDTH"/>.
         /// </summary>
+        /// <remarks>
+        /// Only setter is exposed.
+        /// Use <see cref="OriginalX"/> or <see cref="EffectiveX"/> to get the horizontal position.
+        /// </remarks>
+        [JsonIgnore]
         public float X
         {
             set => OriginalXBindable.Value = value;
@@ -34,6 +40,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         public float XOffset
         {
+            get => XOffsetBindable.Value;
             set => XOffsetBindable.Value = value;
         }
 
@@ -44,7 +51,11 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// This value is the original <see cref="X"/> value specified in the beatmap, not affected by the beatmap processing.
         /// Use <see cref="EffectiveX"/> for a gameplay.
         /// </remarks>
-        public float OriginalX => OriginalXBindable.Value;
+        public float OriginalX
+        {
+            get => OriginalXBindable.Value;
+            set => OriginalXBindable.Value = value;
+        }
 
         /// <summary>
         /// The effective horizontal position of the hit object between 0 and <see cref="CatchPlayfield.WIDTH"/>.
@@ -55,7 +66,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </remarks>
         public float EffectiveX => OriginalXBindable.Value + XOffsetBindable.Value;
 
-        public double TimePreempt = 1000;
+        public double TimePreempt { get; set; } = 1000;
 
         public readonly Bindable<int> IndexInBeatmapBindable = new Bindable<int>();
 
