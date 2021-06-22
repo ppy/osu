@@ -101,7 +101,7 @@ namespace osu.Game.Skinning
             base.Dispose(isDisposing);
 
             if (skinManager != null)
-                skinManager.SourceChanged -= UpdateSkins;
+                skinManager.SourceChanged -= OnSourceChanged;
         }
     }
 }
