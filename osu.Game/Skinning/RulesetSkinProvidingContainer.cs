@@ -50,7 +50,13 @@ namespace osu.Game.Skinning
         private void load()
         {
             UpdateSkins();
-            skinManager.SourceChanged += UpdateSkins;
+            skinManager.SourceChanged += OnSourceChanged;
+        }
+
+        protected override void OnSourceChanged()
+        {
+            UpdateSkins();
+            base.OnSourceChanged();
         }
 
         protected virtual void UpdateSkins()
