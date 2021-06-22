@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -147,6 +148,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public ISample GetSample(ISampleInfo sampleInfo) => source?.GetSample(sampleInfo);
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => source?.GetConfig<TLookup, TValue>(lookup);
             public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => source?.FindProvider(lookupFunction);
+            public IEnumerable<ISkin> AllSources => source.AllSources;
 
             public void TriggerSourceChanged()
             {
