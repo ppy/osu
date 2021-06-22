@@ -78,6 +78,8 @@ namespace osu.Game.Screens.Play
 
         private IClock referenceClock;
 
+        public bool UsesFixedAnchor { get; set; }
+
         public SongProgress()
         {
             RelativeSizeAxes = Axes.X;
