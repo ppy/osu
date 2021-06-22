@@ -182,6 +182,13 @@ namespace osu.Game
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
             dependencies.Cache(realmFactory = new RealmContextFactory(Storage));
+
+            Host.UpdateThreadChanging += () =>
+            {
+                var blocking = realmFactory.BlockAllOperations();
+                Schedule(() => blocking.Dispose());
+            };
+
             AddInternal(realmFactory);
 
             dependencies.CacheAs(Storage);
