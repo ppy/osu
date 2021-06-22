@@ -15,6 +15,14 @@ namespace osu.Game.Tests.Mods
     public class ModUtilsTest
     {
         [Test]
+        public void TestModIsNotCompatibleWithItself()
+        {
+            var mod = new Mock<CustomMod1>();
+            Assert.That(ModUtils.CheckCompatibleSet(new[] { mod.Object, mod.Object }, out var invalid), Is.False);
+            Assert.That(invalid, Is.EquivalentTo(new[] { mod.Object }));
+        }
+
+        [Test]
         public void TestModIsCompatibleByItself()
         {
             var mod = new Mock<CustomMod1>();
