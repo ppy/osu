@@ -63,11 +63,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
             this.beatmap = (ManiaBeatmap)beatmap;
 
-            isLegacySkin = new Lazy<bool>(() => skin.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version) != null);
+            isLegacySkin = new Lazy<bool>(() => GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version) != null);
             hasKeyTexture = new Lazy<bool>(() =>
             {
                 var keyImage = this.GetManiaSkinConfig<string>(LegacyManiaSkinConfigurationLookups.KeyImage, 0)?.Value ?? "mania-key1";
-                return skin.GetAnimation(keyImage, true, true) != null;
+                return this.GetAnimation(keyImage, true, true) != null;
             });
         }
 
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     break;
             }
 
-            return Skin.GetDrawableComponent(component);
+            return base.GetDrawableComponent(component);
         }
 
         private Drawable getResult(HitResult result)
@@ -142,15 +142,15 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             if (sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacySample && legacySample.IsLayered)
                 return new SampleVirtual();
 
-            return Skin.GetSample(sampleInfo);
+            return base.GetSample(sampleInfo);
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
             if (lookup is ManiaSkinConfigurationLookup maniaLookup)
-                return Skin.GetConfig<LegacyManiaSkinConfigurationLookup, TValue>(new LegacyManiaSkinConfigurationLookup(beatmap.TotalColumns, maniaLookup.Lookup, maniaLookup.TargetColumn));
+                return base.GetConfig<LegacyManiaSkinConfigurationLookup, TValue>(new LegacyManiaSkinConfigurationLookup(beatmap.TotalColumns, maniaLookup.Lookup, maniaLookup.TargetColumn));
 
-            return Skin.GetConfig<TLookup, TValue>(lookup);
+            return base.GetConfig<TLookup, TValue>(lookup);
         }
     }
 }

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -21,6 +22,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
+using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -98,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Resolved]
         private AudioManager audio { get; set; }
 
-        protected override ISkin GetPlayerSkin() => testUserSkin;
+        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new SkinProvidingPlayer(testUserSkin);
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) => new CustomSkinWorkingBeatmap(beatmap, storyboard, Clock, audio, testBeatmapSkin);
 
@@ -113,6 +115,27 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
 
             protected override ISkin GetSkin() => skin;
+        }
+
+        public class SkinProvidingPlayer : TestPlayer
+        {
+            private readonly TestSource userSkin;
+
+            public SkinProvidingPlayer(TestSource userSkin)
+            {
+                this.userSkin = userSkin;
+            }
+
+            private DependencyContainer dependencies;
+
+            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+            {
+                dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+                dependencies.CacheAs<ISkinSource>(userSkin);
+
+                return dependencies;
+            }
         }
 
         public class TestSource : ISkinSource
@@ -144,7 +167,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;
 
-            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(this) ? this : null;
+
+            public IEnumerable<ISkin> AllSources => new[] { this };
 
             public event Action SourceChanged;
 

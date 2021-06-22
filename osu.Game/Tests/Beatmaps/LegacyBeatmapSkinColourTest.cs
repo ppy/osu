@@ -4,11 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
 using osuTK.Graphics;
@@ -47,24 +49,36 @@ namespace osu.Game.Tests.Beatmaps
 
         protected virtual ExposedPlayer LoadBeatmap(bool userHasCustomColours)
         {
+            ExposedPlayer player;
+
             Beatmap.Value = testBeatmap;
 
-            ExposedPlayer player = CreateTestPlayer();
-
-            player.Skin = new TestSkin(userHasCustomColours);
-
-            LoadScreen(player);
+            LoadScreen(player = CreateTestPlayer(userHasCustomColours));
 
             return player;
         }
 
-        protected virtual ExposedPlayer CreateTestPlayer() => new ExposedPlayer();
+        protected virtual ExposedPlayer CreateTestPlayer(bool userHasCustomColours) => new ExposedPlayer(userHasCustomColours);
 
-        protected class ExposedPlayer : TestPlayer
+        protected class ExposedPlayer : Player
         {
-            public ExposedPlayer()
-                : base(false, false)
+            protected readonly bool UserHasCustomColours;
+
+            public ExposedPlayer(bool userHasCustomColours)
+                : base(new PlayerConfiguration
+                {
+                    AllowPause = false,
+                    ShowResults = false,
+                })
             {
+                UserHasCustomColours = userHasCustomColours;
+            }
+
+            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+            {
+                var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+                dependencies.CacheAs<ISkinSource>(new TestSkin(UserHasCustomColours));
+                return dependencies;
             }
 
             public IReadOnlyList<Color4> UsableComboColours =>
@@ -145,7 +159,9 @@ namespace osu.Game.Tests.Beatmaps
                 remove { }
             }
 
-            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(this) ? this : null;
+
+            public IEnumerable<ISkin> AllSources => new[] { this };
         }
     }
 }

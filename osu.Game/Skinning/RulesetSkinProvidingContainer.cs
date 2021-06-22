@@ -9,17 +9,24 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// A type of <see cref="SkinProvidingContainer"/> that provides access to the beatmap skin and user skin,
-    /// each transformed with the ruleset's own skin transformer individually.
+    /// A type of <see cref="SkinProvidingContainer"/> specialized for <see cref="DrawableRuleset"/> and other gameplay-related components.
+    /// Providing access to parent skin sources and the beatmap skin each surrounded with the ruleset legacy skin transformer.
     /// </summary>
     public class RulesetSkinProvidingContainer : SkinProvidingContainer
     {
         protected readonly Ruleset Ruleset;
         protected readonly IBeatmap Beatmap;
+
+        /// <remarks>
+        /// This container already re-exposes all parent <see cref="ISkinSource"/> sources in a ruleset-usable form.
+        /// Therefore disallow falling back to any parent <see cref="ISkinSource"/> any further.
+        /// </remarks>
+        protected override bool AllowFallingBackToParent => false;
 
         protected override Container<Drawable> Content { get; }
 
@@ -28,7 +35,7 @@ namespace osu.Game.Skinning
             Ruleset = ruleset;
             Beatmap = beatmap;
 
-            InternalChild = new BeatmapSkinProvidingContainer(beatmapSkin == null ? null : ruleset.CreateLegacySkinProvider(beatmapSkin, beatmap))
+            InternalChild = new BeatmapSkinProvidingContainer(beatmapSkin is LegacySkin ? GetLegacyRulesetTransformedSkin(beatmapSkin) : beatmapSkin)
             {
                 Child = Content = new Container
                 {
@@ -45,11 +52,13 @@ namespace osu.Game.Skinning
 
         [Resolved]
         private SkinManager skinManager { get; set; }
+        private ISkinSource skinSource { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
             UpdateSkins();
+            skinSource.SourceChanged += OnSourceChanged;
         }
 
         protected override void OnSourceChanged()
@@ -62,14 +71,42 @@ namespace osu.Game.Skinning
         {
             SkinSources.Clear();
 
-            SkinSources.Add(Ruleset.CreateLegacySkinProvider(skinManager.CurrentSkin.Value, Beatmap));
+            foreach (var skin in skinSource.AllSources)
+            {
+                switch (skin)
+                {
+                    case LegacySkin legacySkin:
+                        SkinSources.Add(GetLegacyRulesetTransformedSkin(legacySkin));
+                        break;
 
-            if (skinManager.CurrentSkin.Value is LegacySkin)
-                SkinSources.Add(Ruleset.CreateLegacySkinProvider(skinManager.DefaultLegacySkin, Beatmap));
+                    default:
+                        SkinSources.Add(skin);
+                        break;
+                }
+            }
+        }
+
+        protected ISkin GetLegacyRulesetTransformedSkin(ISkin legacySkin)
+        {
+            if (legacySkin == null)
+                return null;
+
+            var rulesetTransformed = Ruleset.CreateLegacySkinProvider(legacySkin, Beatmap);
+            if (rulesetTransformed != null)
+                return rulesetTransformed;
+
+            return legacySkin;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
 
             SkinSources.Add(Ruleset.CreateLegacySkinProvider(skinManager.DefaultSkin, Beatmap));
 
             SkinSources.Add(new RulesetResourcesSkin(Ruleset, host, audio));
+            if (skinSource != null)
+                skinSource.SourceChanged -= OnSourceChanged;
         }
     }
 }

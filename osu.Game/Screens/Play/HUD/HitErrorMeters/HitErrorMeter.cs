@@ -22,6 +22,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         [Resolved]
         private OsuColour colours { get; set; }
 
+        public bool UsesFixedAnchor { get; set; }
+
         [BackgroundDependencyLoader(true)]
         private void load(DrawableRuleset drawableRuleset)
         {
