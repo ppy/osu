@@ -23,5 +23,7 @@ namespace osu.Game.Database
         /// </summary>
         /// <returns>A usage containing a usable context.</returns>
         RealmContextFactory.RealmWriteUsage GetForWrite();
+
+        void BindLive(ILiveData live);
     }
 }

@@ -159,7 +159,7 @@ namespace osu.Game.Overlays.Toolbar
             };
         }
 
-        private RealmKeyBinding realmKeyBinding;
+        private Live<RealmKeyBinding> realmKeyBinding;
 
         protected override void LoadComplete()
         {
@@ -167,16 +167,16 @@ namespace osu.Game.Overlays.Toolbar
 
             if (Hotkey == null) return;
 
-            realmKeyBinding = realmFactory.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.ActionInt == (int)Hotkey.Value);
+            realmKeyBinding = realmFactory.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.ActionInt == (int)Hotkey.Value)?.Wrap(realmFactory);
 
-            if (realmKeyBinding != null)
+            realmKeyBinding?.Bind(binding =>
             {
-                realmKeyBinding.PropertyChanged += (sender, args) =>
+                binding.PropertyChanged += (sender, args) =>
                 {
-                    if (args.PropertyName == nameof(realmKeyBinding.KeyCombinationString))
+                    if (args.PropertyName == nameof(binding.KeyCombinationString))
                         updateKeyBindingTooltip();
                 };
-            }
+            });
 
             updateKeyBindingTooltip();
         }
@@ -192,8 +192,6 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool OnHover(HoverEvent e)
         {
-            updateKeyBindingTooltip();
-
             HoverBackground.FadeIn(200);
             tooltipContainer.FadeIn(100);
             return base.OnHover(e);
@@ -222,13 +220,12 @@ namespace osu.Game.Overlays.Toolbar
 
         private void updateKeyBindingTooltip()
         {
-            if (realmKeyBinding != null)
-            {
-                var keyBindingString = realmKeyBinding.KeyCombination.ReadableString();
+            if (realmKeyBinding == null) return;
 
-                if (!string.IsNullOrEmpty(keyBindingString))
-                    keyBindingTooltip.Text = $" ({keyBindingString})";
-            }
+            var keyBindingString = realmKeyBinding.Get().KeyCombination.ReadableString();
+
+            if (!string.IsNullOrEmpty(keyBindingString))
+                keyBindingTooltip.Text = $" ({keyBindingString})";
         }
     }
 

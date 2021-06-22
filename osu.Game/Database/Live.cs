@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Threading;
+using System.Collections.Generic;
 using Realms;
 
 #nullable enable
@@ -17,56 +17,44 @@ namespace osu.Game.Database
     /// To consume this as a detached instance, assign to a variable of type <typeparam ref="T"/>. The implicit conversion will handle detaching an instance.
     /// </remarks>
     /// <typeparam name="T">The underlying object type. Should be a <see cref="RealmObject"/> with a primary key provided via <see cref="IHasGuidPrimaryKey"/>.</typeparam>
-    public class Live<T> : IEquatable<Live<T>>, IHasGuidPrimaryKey
+    public class Live<T> : IEquatable<Live<T>>, IHasGuidPrimaryKey, ILiveData
         where T : RealmObject, IHasGuidPrimaryKey
     {
         /// <summary>
         /// The primary key of the object.
         /// </summary>
-        public Guid Guid { get; }
+        public Guid ID { get; set; }
 
-        public string ID
-        {
-            get => Guid.ToString();
-            set => throw new NotImplementedException();
-        }
+        private readonly List<Action<T>> bindActions = new List<Action<T>>();
 
-        private readonly ThreadLocal<T> threadValues;
+        private T current;
 
-        private readonly T original;
+        private readonly IRealmFactory? contextFactory;
 
-        private readonly IRealmFactory contextFactory;
+        private Realm? retrievalContext;
 
-        public Live(T item, IRealmFactory contextFactory)
+        public Live(T item, IRealmFactory? contextFactory)
         {
             this.contextFactory = contextFactory;
 
-            original = item;
-            Guid = item.Guid;
-
-            threadValues = new ThreadLocal<T>(getThreadLocalValue);
-
-            // the instance passed in may not be in a managed state.
-            // for now let's immediately retrieve a managed object on the current thread.
-            // in the future we may want to delay this until the first access (only populating the Guid at construction time).
-            if (!item.IsManaged)
-                original = Get();
+            ID = item.ID;
+            current = item;
         }
 
         private T getThreadLocalValue()
         {
-            var context = contextFactory.Context;
+            retrievalContext = contextFactory?.Context;
 
             // only use the original if no context is available or the source realm is the same.
-            if (context == null || original.Realm?.IsSameInstance(context) == true) return original;
+            if (retrievalContext == null || current.Realm?.IsClosed == false && current.Realm.IsSameInstance(retrievalContext)) return current;
 
-            return context.Find<T>(ID);
+            return retrievalContext.Find<T>(ID);
         }
 
         /// <summary>
         /// Retrieve a live reference to the data.
         /// </summary>
-        public T Get() => threadValues.Value;
+        public T Get() => current = getThreadLocalValue();
 
         /// <summary>
         /// Retrieve a detached copy of the data.
@@ -88,7 +76,7 @@ namespace osu.Game.Database
         /// <param name="perform">The action to perform.</param>
         public void PerformUpdate(Action<T> perform)
         {
-            using (contextFactory.GetForWrite())
+            using (contextFactory?.GetForWrite())
                 perform(Get());
         }
 
@@ -97,8 +85,27 @@ namespace osu.Game.Database
 
         public static implicit operator Live<T>(T obj) => obj.WrapAsUnmanaged();
 
-        public bool Equals(Live<T>? other) => other != null && other.Guid == Guid;
+        public bool Equals(Live<T>? other) => other != null && other.ID == ID;
 
         public override string ToString() => Get().ToString();
+
+        public void RunBindActions()
+        {
+            var fetched = Get();
+
+            foreach (var action in bindActions)
+                action(fetched);
+        }
+
+        public void Bind(Action<T> action)
+        {
+            bool isFirstAction = bindActions.Count == 0;
+
+            bindActions.Add(action);
+            action(Get());
+
+            if (isFirstAction)
+                contextFactory?.BindLive(this);
+        }
     }
 }

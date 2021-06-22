@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
@@ -35,6 +36,8 @@ namespace osu.Game.Database
 
         private readonly ManualResetEventSlim blockingResetEvent = new ManualResetEventSlim(true);
 
+        private readonly WeakList<ILiveData> liveObjects = new WeakList<ILiveData>();
+
         private Realm context;
 
         public Realm Context
@@ -47,6 +50,7 @@ namespace osu.Game.Database
                 if (context == null)
                 {
                     context = createContext();
+                    runBindActions();
                     Logger.Log($"Opened realm \"{context.Config.DatabasePath}\" at version {context.Config.SchemaVersion}");
                 }
 
@@ -56,6 +60,12 @@ namespace osu.Game.Database
             }
         }
 
+        private void runBindActions()
+        {
+            foreach (var live in liveObjects)
+                live.RunBindActions();
+        }
+
         public RealmContextFactory(Storage storage)
         {
             this.storage = storage;
@@ -63,6 +73,8 @@ namespace osu.Game.Database
 
         public RealmUsage GetForRead()
         {
+            // todo: can potentially use the main context when on update thread.
+
             reads.Value++;
             return new RealmUsage(this);
         }
@@ -77,11 +89,15 @@ namespace osu.Game.Database
             return new RealmWriteUsage(this);
         }
 
+        public void BindLive(ILiveData live) => liveObjects.Add(live);
+
         protected override void Update()
         {
             base.Update();
 
-            if (context?.Refresh() == true)
+            if (!blockingResetEvent.IsSet) return;
+
+            if (Context.Refresh())
                 refreshes.Value++;
         }
 
