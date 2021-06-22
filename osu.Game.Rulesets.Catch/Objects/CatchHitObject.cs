@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// This value is the original <see cref="X"/> value plus the offset applied by the beatmap processing.
         /// Use <see cref="OriginalX"/> if a value not affected by the offset is desired.
         /// </remarks>
-        public float EffectiveX => OriginalXBindable.Value + XOffsetBindable.Value;
+        public float EffectiveX => OriginalX + XOffset;
 
         public double TimePreempt { get; set; } = 1000;
 
