@@ -248,17 +248,29 @@ namespace osu.Game.Skinning
             return null;
         }
 
+        public IEnumerable<ISkin> AllSources
+        {
+            get
+            {
+                yield return CurrentSkin.Value;
+
+                if (CurrentSkin.Value is LegacySkin)
+                    yield return DefaultLegacySkin;
+
+                yield return DefaultSkin;
+            }
+        }
+
         private T lookupWithFallback<T>(Func<ISkin, T> lookupFunction)
             where T : class
         {
-            if (lookupFunction(CurrentSkin.Value) is T skinSourced)
-                return skinSourced;
+            foreach (var source in AllSources)
+            {
+                if (lookupFunction(source) is T skinSourced)
+                    return skinSourced;
+            }
 
-            if (CurrentSkin.Value is LegacySkin && lookupFunction(DefaultLegacySkin) is T legacySourced)
-                return legacySourced;
-
-            // Finally fall back to the (non-legacy) default.
-            return lookupFunction(DefaultSkin);
+            return null;
         }
 
         #region IResourceStorageProvider

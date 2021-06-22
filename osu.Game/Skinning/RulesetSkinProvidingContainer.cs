@@ -26,7 +26,6 @@ namespace osu.Game.Skinning
         /// Therefore disallow falling back to any parent <see cref="ISkinSource"/> any further.
         /// </remarks>
         protected override bool AllowFallingBackToParent => false;
-
         protected override Container<Drawable> Content { get; }
 
         public RulesetSkinProvidingContainer(Ruleset ruleset, IBeatmap beatmap, [CanBeNull] ISkin beatmapSkin)
@@ -44,13 +43,13 @@ namespace osu.Game.Skinning
         }
 
         [Resolved]
-        private SkinManager skinManager { get; set; }
+        private ISkinSource skinSource { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
             UpdateSkins();
-            skinManager.SourceChanged += OnSourceChanged;
+            skinSource.SourceChanged += OnSourceChanged;
         }
 
         protected override void OnSourceChanged()
@@ -63,25 +62,19 @@ namespace osu.Game.Skinning
         {
             SkinSources.Clear();
 
-            // TODO: we also want to insert a DefaultLegacySkin here if the current *beatmap* is providing any skinned elements.
-
-            switch (skinManager.CurrentSkin.Value)
+            foreach (var skin in skinSource.AllSources)
             {
-                case LegacySkin currentLegacySkin:
-                    SkinSources.Add(GetLegacyRulesetTransformedSkin(currentLegacySkin));
+                switch (skin)
+                {
+                    case LegacySkin legacySkin:
+                        SkinSources.Add(GetLegacyRulesetTransformedSkin(legacySkin));
+                        break;
 
-                    if (currentLegacySkin != skinManager.DefaultLegacySkin)
-                        SkinSources.Add(GetLegacyRulesetTransformedSkin(skinManager.DefaultLegacySkin));
-
-                    break;
-
-                default:
-                    SkinSources.Add(skinManager.CurrentSkin.Value);
-                    break;
+                    default:
+                        SkinSources.Add(skin);
+                        break;
+                }
             }
-
-            if (skinManager.CurrentSkin.Value != skinManager.DefaultSkin)
-                SkinSources.Add(skinManager.DefaultSkin);
         }
 
         protected ISkin GetLegacyRulesetTransformedSkin(ISkin legacySkin)
@@ -100,8 +93,8 @@ namespace osu.Game.Skinning
         {
             base.Dispose(isDisposing);
 
-            if (skinManager != null)
-                skinManager.SourceChanged -= OnSourceChanged;
+            if (skinSource != null)
+                skinSource.SourceChanged -= OnSourceChanged;
         }
     }
 }

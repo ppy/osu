@@ -131,6 +131,21 @@ namespace osu.Game.Skinning
             return fallbackSource?.FindProvider(lookupFunction);
         }
 
+        public IEnumerable<ISkin> AllSources
+        {
+            get
+            {
+                foreach (var skin in SkinSources)
+                    yield return skin;
+
+                if (fallbackSource != null)
+                {
+                    foreach (var skin in fallbackSource.AllSources)
+                        yield return skin;
+                }
+            }
+        }
+
         public Drawable GetDrawableComponent(ISkinComponent component)
         {
             foreach (var skin in SkinSources)
