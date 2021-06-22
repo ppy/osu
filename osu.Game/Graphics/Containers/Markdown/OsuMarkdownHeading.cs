@@ -20,7 +20,8 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         public override MarkdownTextFlowContainer CreateTextFlow() => new HeadingTextFlowContainer
         {
-            Weight = GetFontWeightByLevel(level),
+            FontSize = GetFontSizeByLevel(level),
+            FontWeight = GetFontWeightByLevel(level),
         };
 
         protected override float GetFontSizeByLevel(int level)
@@ -65,9 +66,11 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         private class HeadingTextFlowContainer : OsuMarkdownTextFlowContainer
         {
-            public FontWeight Weight { get; set; }
+            public float FontSize;
+            public FontWeight FontWeight;
 
-            protected override SpriteText CreateSpriteText() => base.CreateSpriteText().With(t => t.Font = t.Font.With(weight: Weight));
+            protected override SpriteText CreateSpriteText()
+                => base.CreateSpriteText().With(t => t.Font = t.Font.With(size: FontSize, weight: FontWeight));
         }
     }
 }
