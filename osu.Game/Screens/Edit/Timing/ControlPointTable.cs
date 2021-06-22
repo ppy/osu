@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private EditorClock clock { get; set; }
 
-        public const float TIMING_COLUMN_WIDTH = 220;
+        public const float TIMING_COLUMN_WIDTH = 230;
 
         public IEnumerable<ControlPointGroup> ControlGroups
         {
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Edit.Timing
                         {
                             Text = group.Time.ToEditorFormattedString(),
                             Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
-                            Width = 60,
+                            Width = 70,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },

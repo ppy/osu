@@ -101,10 +101,15 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddAssert("is custom hyper dash fruit colours", () => ((CatchExposedPlayer)TestPlayer).UsableHyperDashFruitColour == TestSkin.HYPER_DASH_FRUIT_COLOUR);
         }
 
-        protected override ExposedPlayer CreateTestPlayer() => new CatchExposedPlayer();
+        protected override ExposedPlayer CreateTestPlayer(bool userHasCustomColours) => new CatchExposedPlayer(userHasCustomColours);
 
         private class CatchExposedPlayer : ExposedPlayer
         {
+            public CatchExposedPlayer(bool userHasCustomColours)
+                : base(userHasCustomColours)
+            {
+            }
+
             public Color4 UsableHyperDashColour =>
                 GameplayClockContainer.ChildrenOfType<BeatmapSkinProvidingContainer>()
                                       .First()

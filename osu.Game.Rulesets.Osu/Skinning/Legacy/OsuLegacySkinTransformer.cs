@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         public OsuLegacySkinTransformer(ISkin skin)
             : base(skin)
         {
-            hasHitCircle = new Lazy<bool>(() => Skin.GetTexture("hitcircle") != null);
+            hasHitCircle = new Lazy<bool>(() => GetTexture("hitcircle") != null);
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 }
             }
 
-            return Skin.GetDrawableComponent(component);
+            return base.GetDrawableComponent(component);
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             switch (lookup)
             {
                 case OsuSkinColour colour:
-                    return Skin.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
+                    return base.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
 
                 case OsuSkinConfiguration osuLookup:
                     switch (osuLookup)
@@ -133,14 +133,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         case OsuSkinConfiguration.HitCircleOverlayAboveNumber:
                             // See https://osu.ppy.sh/help/wiki/Skinning/skin.ini#%5Bgeneral%5D
                             // HitCircleOverlayAboveNumer (with typo) should still be supported for now.
-                            return Skin.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumber) ??
-                                   Skin.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumer);
+                            return base.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumber) ??
+                                   base.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumer);
                     }
 
                     break;
             }
 
-            return Skin.GetConfig<TLookup, TValue>(lookup);
+            return base.GetConfig<TLookup, TValue>(lookup);
         }
     }
 }

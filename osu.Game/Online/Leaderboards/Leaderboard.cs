@@ -44,9 +44,9 @@ namespace osu.Game.Online.Leaderboards
 
         protected override Container<Drawable> Content => content;
 
-        private IEnumerable<TScoreInfo> scores;
+        private ICollection<TScoreInfo> scores;
 
-        public IEnumerable<TScoreInfo> Scores
+        public ICollection<TScoreInfo> Scores
         {
             get => scores;
             set
@@ -126,7 +126,7 @@ namespace osu.Game.Online.Leaderboards
                     return;
 
                 scope = value;
-                UpdateScores();
+                RefreshScores();
             }
         }
 
@@ -154,7 +154,7 @@ namespace osu.Game.Online.Leaderboards
                     case PlaceholderState.NetworkFailure:
                         replacePlaceholder(new ClickablePlaceholder(@"Couldn't fetch scores!", FontAwesome.Solid.Sync)
                         {
-                            Action = UpdateScores,
+                            Action = RefreshScores
                         });
                         break;
 
@@ -254,8 +254,6 @@ namespace osu.Game.Online.Leaderboards
             apiState.BindValueChanged(onlineStateChanged, true);
         }
 
-        public void RefreshScores() => UpdateScores();
-
         private APIRequest getScoresRequest;
 
         protected abstract bool IsOnlineScope { get; }
@@ -267,11 +265,13 @@ namespace osu.Game.Online.Leaderboards
                 case APIState.Online:
                 case APIState.Offline:
                     if (IsOnlineScope)
-                        UpdateScores();
+                        RefreshScores();
 
                     break;
             }
         });
+
+        public void RefreshScores() => Scheduler.AddOnce(UpdateScores);
 
         protected void UpdateScores()
         {
@@ -290,7 +290,7 @@ namespace osu.Game.Online.Leaderboards
 
                 getScoresRequest = FetchScores(scores => Schedule(() =>
                 {
-                    Scores = scores;
+                    Scores = scores.ToArray();
                     PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
                 }));
 

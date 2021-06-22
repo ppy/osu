@@ -3,19 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public class LegacyCatcherOld : CompositeDrawable, ICatcherSprite
+    public class LegacyCatcherOld : CompositeDrawable
     {
-        public Texture CurrentTexture => (InternalChild as TextureAnimation)?.CurrentFrame ?? (InternalChild as Sprite)?.Texture;
-
         public LegacyCatcherOld()
         {
             RelativeSizeAxes = Axes.Both;

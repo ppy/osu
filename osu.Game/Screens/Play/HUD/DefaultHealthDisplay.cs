@@ -72,6 +72,8 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
+        public bool UsesFixedAnchor { get; set; }
+
         public DefaultHealthDisplay()
         {
             Size = new Vector2(1, 5);

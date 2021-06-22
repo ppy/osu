@@ -3,17 +3,13 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
-using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual
 {
@@ -22,8 +18,6 @@ namespace osu.Game.Tests.Visual
     /// </summary>
     public class TestPlayer : Player
     {
-        public ISkin Skin { get; set; }
-
         protected override bool PauseOnFocusLost { get; }
 
         public new DrawableRuleset DrawableRuleset => base.DrawableRuleset;
@@ -79,28 +73,6 @@ namespace osu.Game.Tests.Visual
         private void load()
         {
             ScoreProcessor.NewJudgement += r => Results.Add(r);
-        }
-
-        protected override RulesetSkinProvidingContainer CreateRulesetSkinProvider(Ruleset ruleset, IBeatmap beatmap, ISkin beatmapSkin)
-            => new TestSkinProvidingContainer(Skin, ruleset, beatmap, beatmapSkin);
-
-        private class TestSkinProvidingContainer : RulesetSkinProvidingContainer
-        {
-            private readonly ISkin skin;
-
-            public TestSkinProvidingContainer(ISkin skin, Ruleset ruleset, IBeatmap beatmap, [CanBeNull] ISkin beatmapSkin)
-                : base(ruleset, beatmap, beatmapSkin)
-            {
-                this.skin = skin;
-            }
-
-            protected override void UpdateSkins()
-            {
-                base.UpdateSkins();
-
-                if (skin != null)
-                    SkinSources.Insert(0, Ruleset.CreateLegacySkinProvider(skin, Beatmap));
-            }
         }
     }
 }

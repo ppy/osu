@@ -4,6 +4,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.BeatmapListing
@@ -11,7 +13,7 @@ namespace osu.Game.Overlays.BeatmapListing
     public class BeatmapSearchScoreFilterRow : BeatmapSearchMultipleSelectionFilterRow<ScoreRank>
     {
         public BeatmapSearchScoreFilterRow()
-            : base(@"Rank Achieved")
+            : base(BeatmapsStrings.ListingSearchFiltersRank)
         {
         }
 
@@ -31,20 +33,7 @@ namespace osu.Game.Overlays.BeatmapListing
             {
             }
 
-            protected override string LabelFor(ScoreRank value)
-            {
-                switch (value)
-                {
-                    case ScoreRank.XH:
-                        return @"Silver SS";
-
-                    case ScoreRank.SH:
-                        return @"Silver S";
-
-                    default:
-                        return value.GetDescription();
-                }
-            }
+            protected override LocalisableString LabelFor(ScoreRank value) => value.GetLocalisableDescription();
         }
     }
 }
