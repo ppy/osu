@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Play
         private readonly Func<IBeatmap, IReadOnlyList<Mod>, Score> createScore;
 
         // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
-        protected override bool CheckModsAllowFailure() => false;
+        protected override bool AllowFailure => false;
 
         public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
             : this((_, __) => score, configuration)

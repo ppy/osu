@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Play
 
         private readonly Score score;
 
-        protected override bool CheckModsAllowFailure() => false; // todo: better support starting mid-way through beatmap
+        protected override bool AllowFailure => false;
 
         public SpectatorPlayer(Score score)
         {
