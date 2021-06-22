@@ -1,18 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Audio;
-using osu.Framework.Bindables;
-using osu.Game.Rulesets.UI;
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 using osuTK;
 using osuTK.Graphics;
 
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Play
 
         private readonly DrawableRuleset drawableRuleset;
 
-        private readonly BindableDouble trackFreq = new BindableDouble(1);
+        private BindableDouble trackFreq;
 
         private Track track;
 
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play
         /// Start the fail animation playing.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown if started more than once.</exception>
-        public void Start()
+        public void Start(bool adjustTrackFrequency)
         {
             if (started) throw new InvalidOperationException("Animation cannot be started more than once.");
 
@@ -62,13 +62,18 @@ namespace osu.Game.Screens.Play
 
             failSample.Play();
 
-            this.TransformBindableTo(trackFreq, 0, duration).OnComplete(_ =>
+            if (adjustTrackFrequency)
             {
-                OnComplete?.Invoke();
-                Expire();
-            });
+                trackFreq = new BindableDouble(1);
 
-            track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
+                this.TransformBindableTo(trackFreq, 0, duration).OnComplete(_ =>
+                {
+                    OnComplete?.Invoke();
+                    Expire();
+                });
+
+                track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
+            }
 
             applyToPlayfield(drawableRuleset.Playfield);
             drawableRuleset.Playfield.HitObjectContainer.FlashColour(Color4.Red, 500);
@@ -125,7 +130,8 @@ namespace osu.Game.Screens.Play
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+            if (trackFreq != null)
+                track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
         }
     }
 }

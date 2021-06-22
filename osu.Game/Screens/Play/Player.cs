@@ -133,6 +133,8 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual bool CheckModsAllowFailure() => Mods.Value.OfType<IApplicableFailOverride>().All(m => m.PerformFail());
 
+        private bool displayResultsOnFail => Mods.Value.OfType<IApplicableFailOverride>().Any(m => m.DisplayResultsOnFail);
+
         public readonly PlayerConfiguration Configuration;
 
         protected Score Score { get; private set; }
@@ -655,7 +657,7 @@ namespace osu.Game.Screens.Play
             // Currently, even if this scenario is hit, prepareScoreForDisplay has already been queued (and potentially run).
             // In scenarios where rewinding is possible (replay, spectating) this is a non-issue as no submission/import work is done,
             // but it still doesn't feel right that this exists here.
-            if (!completed.NewValue)
+            if (!completed.NewValue && !HealthProcessor.HasFailed)
             {
                 resultsDisplayDelegate?.Cancel();
                 resultsDisplayDelegate = null;
@@ -666,7 +668,7 @@ namespace osu.Game.Screens.Play
             }
 
             // Only show the completion screen if the player hasn't failed
-            if (HealthProcessor.HasFailed)
+            if (HealthProcessor.HasFailed && !displayResultsOnFail)
                 return;
 
             // Setting this early in the process means that even if something were to go wrong in the order of events following, there
@@ -683,7 +685,7 @@ namespace osu.Game.Screens.Play
 
             bool storyboardHasOutro = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
 
-            if (storyboardHasOutro)
+            if (storyboardHasOutro && !displayResultsOnFail)
             {
                 // if the current beatmap has a storyboard, the progression to results will be handled by the storyboard ending
                 // or the user pressing the skip outro button.
@@ -742,6 +744,9 @@ namespace osu.Game.Screens.Play
 
             double delay = withDelay ? RESULTS_DISPLAY_DELAY : 0;
 
+            if (HasFailed)
+                failAnimation.FinishTransforms(true);
+
             resultsDisplayDelegate = new ScheduledDelegate(() =>
             {
                 if (prepareScoreForDisplayTask?.IsCompleted != true)
@@ -781,10 +786,15 @@ namespace osu.Game.Screens.Play
             if (PauseOverlay.State.Value == Visibility.Visible)
                 PauseOverlay.Hide();
 
-            failAnimation.Start();
+            failAnimation.Start(!displayResultsOnFail);
 
             if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
                 Restart();
+
+            if (displayResultsOnFail)
+            {
+                scoreCompletionChanged(new ValueChangedEvent<bool>(false, true));
+            }
 
             return true;
         }
@@ -792,6 +802,9 @@ namespace osu.Game.Screens.Play
         // Called back when the transform finishes
         private void onFailComplete()
         {
+            if (displayResultsOnFail)
+                return;
+
             GameplayClockContainer.Stop();
 
             FailOverlay.Retries = RestartCount;
