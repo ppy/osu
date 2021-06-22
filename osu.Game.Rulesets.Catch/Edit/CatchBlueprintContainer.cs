@@ -25,6 +25,9 @@ namespace osu.Game.Rulesets.Catch.Edit
                 case Fruit fruit:
                     return new FruitSelectionBlueprint(fruit);
 
+                case JuiceStream juiceStream:
+                    return new JuiceStreamSelectionBlueprint(juiceStream);
+
                 case BananaShower bananaShower:
                     return new BananaShowerSelectionBlueprint(bananaShower);
             }
