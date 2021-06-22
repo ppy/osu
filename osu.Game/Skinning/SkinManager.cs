@@ -30,6 +30,13 @@ using osu.Game.IO.Archives;
 
 namespace osu.Game.Skinning
 {
+    /// <summary>
+    /// Handles the storage and retrieval of <see cref="Skin"/>s.
+    /// </summary>
+    /// <remarks>
+    /// This is also exposed and cached as <see cref="ISkinSource"/> on a game-wide level for general components across the game.
+    /// Lookups from gameplay components are instead covered by <see cref="RulesetSkinProvidingContainer"/>, and are never hit here.
+    /// </remarks>
     [ExcludeFromDynamicCompile]
     public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>, ISkinSource, IStorageResourceProvider
     {
