@@ -155,7 +155,7 @@ namespace osu.Game.Tests.Mods
             // multi mod.
             new object[]
             {
-                new Mod[] { new MultiMod(new OsuModHalfTime()), new OsuModHalfTime() },
+                new Mod[] { new MultiMod(new OsuModHalfTime()), new OsuModDaycore() },
                 new[] { typeof(MultiMod) }
             },
             // valid pair.
