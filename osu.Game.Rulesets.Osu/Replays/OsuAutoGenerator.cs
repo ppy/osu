@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Osu.Replays
     public class OsuAutoGenerator : OsuAutoGeneratorBase
     {
         public new OsuBeatmap Beatmap => (OsuBeatmap)base.Beatmap;
+        private readonly List<OsuReplayFrame> framesPendingAdjust = new List<OsuReplayFrame>();
+        private readonly List<OsuReplayFrame> framesAfterAdjust = new List<OsuReplayFrame>();
 
         #region Parameters
 
@@ -83,8 +85,12 @@ namespace osu.Game.Rulesets.Osu.Replays
                     addDelayedMovements(h, prev);
                 }
 
-                addHitObjectReplay(h);
+                addHitObjectReplay(h, i);
             }
+
+            //Apply key up frame adjustments
+            framesPendingAdjust.ForEach(f => Frames.Remove(f));
+            framesAfterAdjust.ForEach(AddFrameToReplay);
 
             return Replay;
         }
@@ -139,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
-        private void addHitObjectReplay(OsuHitObject h)
+        private void addHitObjectReplay(OsuHitObject h, int index)
         {
             // Default values for circles/sliders
             Vector2 startPosition = h.StackedPosition;
@@ -166,6 +172,15 @@ namespace osu.Game.Rulesets.Osu.Replays
                 }
             }
 
+            //Gets the actual next hitobject we should move to
+            var next = Beatmap.HitObjects[index == Beatmap.HitObjects.Count - 1 ? index : index + 1];
+
+            while (next is Spinner { SpinsRequired: 0 } && index < Beatmap.HitObjects.Count - 1)
+            {
+                index++;
+                next = Beatmap.HitObjects[index == Beatmap.HitObjects.Count - 1 ? index : index + 1];
+            }
+
             // Do some nice easing for cursor movements
             if (Frames.Count > 0)
             {
@@ -173,7 +188,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
 
             // Add frames to click the hitobject
-            addHitObjectClickFrames(h, startPosition, spinnerDirection);
+            addHitObjectClickFrames(h, next, startPosition, spinnerDirection);
         }
 
         #endregion
@@ -236,6 +251,9 @@ namespace osu.Game.Rulesets.Osu.Replays
 
             if (waitTime > lastFrame.Time)
             {
+                // No need to adjust frames that are too far in time
+                framesPendingAdjust.Remove(lastFrame);
+
                 lastFrame = new OsuReplayFrame(waitTime, lastFrame.Position) { Actions = lastFrame.Actions };
                 AddFrameToReplay(lastFrame);
             }
@@ -253,6 +271,17 @@ namespace osu.Game.Rulesets.Osu.Replays
                 for (double time = lastFrame.Time + GetFrameDelay(lastFrame.Time); time < h.StartTime; time += GetFrameDelay(time))
                 {
                     Vector2 currentPosition = Interpolation.ValueAt(time, lastPosition, targetPos, lastFrame.Time, h.StartTime, easing);
+
+                    //Search in framesPendingAdjust to see if any frame has time == current time
+                    //If there is, it means the cursor should be at currentPosition if it's still moving during the KEY_UP_DELAY.
+                    var adjustingFrame = framesPendingAdjust.FirstOrDefault(frame => Precision.AlmostEquals(frame.Time, time, GetFrameDelay(time)));
+
+                    if (adjustingFrame != null)
+                    {
+                        adjustingFrame.Position = currentPosition;
+                        framesAfterAdjust.Add(adjustingFrame);
+                    }
+
                     AddFrameToReplay(new OsuReplayFrame((int)time, new Vector2(currentPosition.X, currentPosition.Y)) { Actions = lastFrame.Actions });
                 }
 
@@ -273,7 +302,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         private double getReactionTime(double timeInstant) => ApplyModsToRate(timeInstant, 100);
 
         // Add frames to click the hitobject
-        private void addHitObjectClickFrames(OsuHitObject h, Vector2 startPosition, float spinnerDirection)
+        private void addHitObjectClickFrames(OsuHitObject h, OsuHitObject next, Vector2 startPosition, float spinnerDirection)
         {
             // Time to insert the first frame which clicks the object
             // Here we mainly need to determine which button to use
@@ -285,6 +314,14 @@ namespace osu.Game.Rulesets.Osu.Replays
             double hEndTime = h.GetEndTime() + KEY_UP_DELAY;
             int endDelay = h is Spinner ? 1 : 0;
             var endFrame = new OsuReplayFrame(hEndTime + endDelay, new Vector2(h.StackedEndPosition.X, h.StackedEndPosition.Y));
+
+            var timeDifference = ApplyModsToTimeDelta(endFrame.Time, next.StartTime);
+
+            //We don't know the exact position the cursor will be at end time, so add it to pending adjust
+            if (timeDifference > GetFrameDelay(endFrame.Time)) framesPendingAdjust.Add(endFrame);
+
+            //In 2B maps we cant order hitobjects by their start time, so just move on to the next one
+            else if (next != h /* is not the last hitobject */) endFrame.Position = next.StackedPosition;
 
             // Decrement because we want the previous frame, not the next one
             int index = FindInsertionIndex(startFrame) - 1;
