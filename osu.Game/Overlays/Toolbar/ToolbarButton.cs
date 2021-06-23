@@ -205,16 +205,6 @@ namespace osu.Game.Overlays.Toolbar
 
             var realmKeyBinding = realmFactory.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.ActionInt == (int)Hotkey.Value);
 
-            // TODO: temporarily disabled to avoid crashes when querying after ExecutionState is changed.
-            // if (realmKeyBinding != null)
-            // {
-            //     realmKeyBinding.PropertyChanged += (sender, args) =>
-            //     {
-            //         if (args.PropertyName == nameof(realmKeyBinding.KeyCombinationString))
-            //             updateKeyBindingTooltip();
-            //     };
-            // }
-
             if (realmKeyBinding != null)
             {
                 var keyBindingString = realmKeyBinding.KeyCombination.ReadableString();
