@@ -35,6 +35,7 @@ namespace osu.Game.Rulesets.Catch.Edit
                 // TODO: confine in bounds
                 hitObject.OriginalXBindable.Value += deltaX;
 
+                // Move the nested hit objects to give an instant result before nested objects are recreated.
                 foreach (var nested in hitObject.NestedHitObjects.OfType<CatchHitObject>())
                     nested.OriginalXBindable.Value += deltaX;
             });

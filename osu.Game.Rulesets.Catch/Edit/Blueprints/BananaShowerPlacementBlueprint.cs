@@ -38,6 +38,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
                 case PlacementState.Active:
                     if (e.Button != MouseButton.Right) break;
 
+                    // If the duration is negative, swap the start and the end time to make the duration positive.
                     if (HitObject.Duration < 0)
                     {
                         HitObject.StartTime = HitObject.EndTime;
