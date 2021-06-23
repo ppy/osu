@@ -22,7 +22,9 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using System;
 using osu.Framework.Extensions.EnumExtensions;
+using osu.Game.Rulesets.Catch.Edit;
 using osu.Game.Rulesets.Catch.Skinning.Legacy;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch
@@ -182,5 +184,7 @@ namespace osu.Game.Rulesets.Catch
         public int LegacyID => 2;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new CatchReplayFrame();
+
+        public override HitObjectComposer CreateHitObjectComposer() => new CatchHitObjectComposer(this);
     }
 }
