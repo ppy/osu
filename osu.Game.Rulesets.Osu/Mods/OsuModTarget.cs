@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             Value = null
         };
 
-        public bool RestartOnFail => false;
+        #region Constants
 
         /// <summary>
         /// Jump distance for circles in the last combo
@@ -82,12 +82,19 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// </summary>
         private const double undim_duration = 96;
 
+        #endregion
+
+        #region Private Fields
+
         private ControlPointInfo controlPointInfo;
 
-        public bool PerformFail()
-        {
-            return true;
-        }
+        #endregion
+
+        #region Sudden Death (IApplicableFailOverride)
+
+        public bool PerformFail() => true;
+
+        public bool RestartOnFail => false;
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
@@ -96,6 +103,55 @@ namespace osu.Game.Rulesets.Osu.Mods
                 => result.Type.AffectsCombo()
                    && !result.IsHit;
         }
+
+        #endregion
+
+        #region Reduce AR (IApplicableToDifficulty)
+
+        public void ReadFromDifficulty(BeatmapDifficulty difficulty)
+        {
+        }
+
+        public void ApplyToDifficulty(BeatmapDifficulty difficulty)
+        {
+            // Decrease AR to increase preempt time
+            difficulty.ApproachRate *= 0.5f;
+        }
+
+        #endregion
+
+        #region Circle Transforms (ModWithVisibilityAdjustment)
+
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject drawable, ArmedState state)
+        {
+        }
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject drawable, ArmedState state)
+        {
+            if (!(drawable is DrawableHitCircle circle)) return;
+
+            var h = (OsuHitObject)drawable.HitObject;
+
+            using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
+            {
+                drawable.ScaleTo(0.5f)
+                        .Then().ScaleTo(1f, h.TimePreempt);
+
+                var colour = drawable.Colour;
+
+                var avgColour = colour.AverageColour.Linear;
+                drawable.FadeColour(new Color4(avgColour.R * 0.45f, avgColour.G * 0.45f, avgColour.B * 0.45f, avgColour.A))
+                        .Then().Delay(h.TimePreempt - controlPointInfo.TimingPointAt(h.StartTime).BeatLength - undim_duration)
+                        .FadeColour(colour, undim_duration);
+
+                // remove approach circles
+                circle.ApproachCircle.Hide();
+            }
+        }
+
+        #endregion
+
+        #region Beatmap Generation (IApplicableToBeatmap)
 
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
@@ -126,55 +182,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             osuBeatmap.HitObjects = hitObjects;
 
             base.ApplyToBeatmap(beatmap);
-        }
-
-        public void ReadFromDifficulty(BeatmapDifficulty difficulty)
-        {
-        }
-
-        public void ApplyToDifficulty(BeatmapDifficulty difficulty)
-        {
-            // Decrease AR to increase preempt time
-            difficulty.ApproachRate *= 0.5f;
-        }
-
-        // Background metronome
-
-        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
-        {
-            drawableRuleset.Overlays.Add(new TargetBeatContainer());
-        }
-
-        protected override void ApplyIncreasedVisibilityState(DrawableHitObject drawable, ArmedState state)
-        {
-        }
-
-        protected override void ApplyNormalVisibilityState(DrawableHitObject drawable, ArmedState state)
-        {
-            if (!(drawable is DrawableHitCircle circle)) return;
-
-            var h = (OsuHitObject)drawable.HitObject;
-
-            using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
-            {
-                drawable.ScaleTo(0.5f)
-                        .Then().ScaleTo(1f, h.TimePreempt);
-
-                var colour = drawable.Colour;
-
-                var avgColour = colour.AverageColour.Linear;
-                drawable.FadeColour(new Color4(avgColour.R * 0.45f, avgColour.G * 0.45f, avgColour.B * 0.45f, avgColour.A))
-                        .Then().Delay(h.TimePreempt - controlPointInfo.TimingPointAt(h.StartTime).BeatLength - undim_duration)
-                        .FadeColour(colour, undim_duration);
-
-                // remove approach circles
-                circle.ApproachCircle.Hide();
-            }
-        }
-
-        private static float map(float value, float fromLow, float fromHigh, float toLow, float toHigh)
-        {
-            return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
         }
 
         private IEnumerable<double> generateBeats(IBeatmap beatmap, IReadOnlyCollection<OsuHitObject> origHitObjects)
@@ -335,6 +342,47 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
+        #endregion
+
+        #region Metronome (IApplicableToDrawableRuleset)
+
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
+        {
+            drawableRuleset.Overlays.Add(new TargetBeatContainer());
+        }
+
+        public class TargetBeatContainer : BeatSyncedContainer
+        {
+            private PausableSkinnableSound sample;
+
+            public TargetBeatContainer()
+            {
+                Divisor = 1;
+            }
+
+            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
+            {
+                base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+
+                if (!IsBeatSyncedWithTrack) return;
+
+                sample?.Play();
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                InternalChildren = new Drawable[]
+                {
+                    sample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-hat")) // todo: use another sample
+                };
+            }
+        }
+
+        #endregion
+
+        #region Helper Subroutines
+
         /// <summary>
         /// Get samples (if any) for a specific point in time.
         /// </summary>
@@ -470,32 +518,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             obj.Position = position;
         }
 
-        public class TargetBeatContainer : BeatSyncedContainer
+        private static float map(float value, float fromLow, float fromHigh, float toLow, float toHigh)
         {
-            private PausableSkinnableSound sample;
-
-            public TargetBeatContainer()
-            {
-                Divisor = 1;
-            }
-
-            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
-            {
-                base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
-
-                if (!IsBeatSyncedWithTrack) return;
-
-                sample?.Play();
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                InternalChildren = new Drawable[]
-                {
-                    sample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-hat")) // todo: use another sample
-                };
-            }
+            return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
         }
+
+        #endregion
     }
 }
