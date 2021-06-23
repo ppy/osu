@@ -49,12 +49,14 @@ namespace osu.Game.Rulesets.Catch.Mods
             {
                 string circleSize = CircleSize.IsDefault ? string.Empty : $"CS {CircleSize.Value:N1}";
                 string approachRate = ApproachRate.IsDefault ? string.Empty : $"AR {ApproachRate.Value:N1}";
+                string spicyPatterns = HardRockOffsets.IsDefault ? string.Empty : $"Spicy patterns";
 
                 return string.Join(", ", new[]
                 {
                     circleSize,
                     base.SettingDescription,
-                    approachRate
+                    approachRate,
+                    spicyPatterns,
                 }.Where(s => !string.IsNullOrEmpty(s)));
             }
         }
