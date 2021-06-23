@@ -7,10 +7,14 @@ using osu.Game.Rulesets.Catch.Beatmaps;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModHardRock : ModHardRock, IApplicableToBeatmap
+    public class CatchModHardRock : ModHardRock, IApplicableToBeatmapProcessor
     {
         public override double ScoreMultiplier => 1.12;
 
-        public void ApplyToBeatmap(IBeatmap beatmap) => CatchBeatmapProcessor.ApplyPositionOffsets(beatmap, this);
+        public void ApplyToBeatmapProcessor(IBeatmapProcessor beatmapProcessor)
+        {
+            var catchProcessor = (CatchBeatmapProcessor)beatmapProcessor;
+            catchProcessor.HardRockOffsets = true;
+        }
     }
 }

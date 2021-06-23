@@ -83,9 +83,9 @@ namespace osu.Game.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            beatmapSkins.BindValueChanged(_ => TriggerSourceChanged());
-            beatmapColours.BindValueChanged(_ => TriggerSourceChanged());
-            beatmapHitsounds.BindValueChanged(_ => TriggerSourceChanged());
+            beatmapSkins.BindValueChanged(_ => OnSourceChanged());
+            beatmapColours.BindValueChanged(_ => OnSourceChanged());
+            beatmapHitsounds.BindValueChanged(_ => OnSourceChanged());
         }
     }
 }
