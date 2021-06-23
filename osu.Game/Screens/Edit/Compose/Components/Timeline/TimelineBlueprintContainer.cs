@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -89,7 +90,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
             else
             {
-                placementBlueprint = CreateBlueprintFor(obj.NewValue);
+                placementBlueprint = CreateBlueprintFor(obj.NewValue).AsNonNull();
 
                 placementBlueprint.Colour = Color4.MediumPurple;
 

@@ -7,17 +7,17 @@ namespace osu.Game.Localisation
 {
     public static class ChatStrings
     {
-        private const string prefix = "osu.Game.Localisation.Chat";
+        private const string prefix = @"osu.Game.Localisation.Chat";
 
         /// <summary>
         /// "chat"
         /// </summary>
-        public static LocalisableString HeaderTitle => new TranslatableString(getKey("header_title"), "chat");
+        public static LocalisableString HeaderTitle => new TranslatableString(getKey(@"header_title"), @"chat");
 
         /// <summary>
         /// "join the real-time discussion"
         /// </summary>
-        public static LocalisableString HeaderDescription => new TranslatableString(getKey("header_description"), "join the real-time discussion");
+        public static LocalisableString HeaderDescription => new TranslatableString(getKey(@"header_description"), @"join the real-time discussion");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

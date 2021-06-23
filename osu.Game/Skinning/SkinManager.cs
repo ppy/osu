@@ -30,6 +30,13 @@ using osu.Game.IO.Archives;
 
 namespace osu.Game.Skinning
 {
+    /// <summary>
+    /// Handles the storage and retrieval of <see cref="Skin"/>s.
+    /// </summary>
+    /// <remarks>
+    /// This is also exposed and cached as <see cref="ISkinSource"/> to allow for any component to potentially have skinning support.
+    /// For gameplay components, see <see cref="RulesetSkinProvidingContainer"/> which adds extra legacy and toggle logic that may affect the lookup process.
+    /// </remarks>
     [ExcludeFromDynamicCompile]
     public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>, ISkinSource, IStorageResourceProvider
     {
@@ -48,7 +55,15 @@ namespace osu.Game.Skinning
 
         protected override string ImportFromStablePath => "Skins";
 
-        private readonly Skin defaultLegacySkin;
+        /// <summary>
+        /// The default skin.
+        /// </summary>
+        public Skin DefaultSkin { get; }
+
+        /// <summary>
+        /// The default legacy skin.
+        /// </summary>
+        public Skin DefaultLegacySkin { get; }
 
         public SkinManager(Storage storage, DatabaseContextFactory contextFactory, GameHost host, IResourceStore<byte[]> resources, AudioManager audio)
             : base(storage, contextFactory, new SkinStore(contextFactory, storage), host)
@@ -57,11 +72,12 @@ namespace osu.Game.Skinning
             this.host = host;
             this.resources = resources;
 
-            defaultLegacySkin = new DefaultLegacySkin(this);
+            DefaultLegacySkin = new DefaultLegacySkin(this);
+            DefaultSkin = new DefaultSkin(this);
 
             CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = GetSkin(skin.NewValue);
 
-            CurrentSkin.Value = new DefaultSkin(this);
+            CurrentSkin.Value = DefaultSkin;
             CurrentSkin.ValueChanged += skin =>
             {
                 if (skin.NewValue.SkinInfo != CurrentSkinInfo.Value)
@@ -80,8 +96,8 @@ namespace osu.Game.Skinning
         public List<SkinInfo> GetAllUsableSkins()
         {
             var userSkins = GetAllUserSkins();
-            userSkins.Insert(0, SkinInfo.Default);
-            userSkins.Insert(1, DefaultLegacySkin.Info);
+            userSkins.Insert(0, DefaultSkin.SkinInfo);
+            userSkins.Insert(1, DefaultLegacySkin.SkinInfo);
             return userSkins;
         }
 
@@ -220,28 +236,37 @@ namespace osu.Game.Skinning
 
         public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
         {
-            if (lookupFunction(CurrentSkin.Value))
-                return CurrentSkin.Value;
-
-            if (CurrentSkin.Value is LegacySkin && lookupFunction(defaultLegacySkin))
-                return defaultLegacySkin;
+            foreach (var source in AllSources)
+            {
+                if (lookupFunction(source))
+                    return source;
+            }
 
             return null;
         }
 
-        private T lookupWithFallback<T>(Func<ISkin, T> func)
+        public IEnumerable<ISkin> AllSources
+        {
+            get
+            {
+                yield return CurrentSkin.Value;
+
+                if (CurrentSkin.Value is LegacySkin && CurrentSkin.Value != DefaultLegacySkin)
+                    yield return DefaultLegacySkin;
+
+                if (CurrentSkin.Value != DefaultSkin)
+                    yield return DefaultSkin;
+            }
+        }
+
+        private T lookupWithFallback<T>(Func<ISkin, T> lookupFunction)
             where T : class
         {
-            var selectedSkin = func(CurrentSkin.Value);
-
-            if (selectedSkin != null)
-                return selectedSkin;
-
-            // TODO: we also want to return a DefaultLegacySkin here if the current *beatmap* is providing any skinned elements.
-            // When attempting to address this, we may want to move the full DefaultLegacySkin fallback logic to within Player itself (to better allow
-            // for beatmap skin visibility).
-            if (CurrentSkin.Value is LegacySkin)
-                return func(defaultLegacySkin);
+            foreach (var source in AllSources)
+            {
+                if (lookupFunction(source) is T skinSourced)
+                    return skinSourced;
+            }
 
             return null;
         }

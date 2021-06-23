@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -47,6 +48,8 @@ namespace osu.Game.Tests.Visual
                 LegacySkin.ResetDrawableTarget(t);
                 t.Reload();
             }));
+
+            AddUntilStep("wait for components to load", () => this.ChildrenOfType<SkinnableTargetContainer>().All(t => t.ComponentsLoaded));
         }
 
         public class SkinProvidingPlayer : TestPlayer
