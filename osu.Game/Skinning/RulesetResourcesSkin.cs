@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -20,26 +22,29 @@ namespace osu.Game.Skinning
     /// </summary>
     public class RulesetResourcesSkin : ISkin
     {
-        private readonly TextureStore rulesetTextures;
-        private readonly ISampleStore rulesetSamples;
+        private readonly TextureStore? textures;
+        private readonly ISampleStore? samples;
 
         public RulesetResourcesSkin(Ruleset ruleset, GameHost host, AudioManager audio)
         {
-            IResourceStore<byte[]> rulesetResources = ruleset.CreateResourceStore();
+            IResourceStore<byte[]>? resources = ruleset.CreateResourceStore();
 
-            rulesetTextures = new TextureStore(host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(rulesetResources, @"Textures")));
-            rulesetSamples = audio.GetSampleStore(new NamespacedResourceStore<byte[]>(rulesetResources, @"Samples"));
+            if (resources != null)
+            {
+                textures = new TextureStore(host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, @"Textures")));
+                samples = audio.GetSampleStore(new NamespacedResourceStore<byte[]>(resources, @"Samples"));
+            }
         }
 
-        public Drawable GetDrawableComponent(ISkinComponent component) => null;
+        public Drawable? GetDrawableComponent(ISkinComponent component) => null;
 
-        public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => rulesetTextures.Get(componentName, wrapModeS, wrapModeT);
+        public Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => textures?.Get(componentName, wrapModeS, wrapModeT);
 
-        public ISample GetSample(ISampleInfo sampleInfo)
+        public ISample? GetSample(ISampleInfo sampleInfo)
         {
             foreach (var lookup in sampleInfo.LookupNames)
             {
-                ISample sample = rulesetSamples.Get(lookup);
+                ISample? sample = samples?.Get(lookup);
                 if (sample != null)
                     return sample;
             }
@@ -47,7 +52,7 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;
+        public IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup) => null;
 
         #region Disposal
 
@@ -72,8 +77,8 @@ namespace osu.Game.Skinning
 
             isDisposed = true;
 
-            rulesetTextures?.Dispose();
-            rulesetSamples?.Dispose();
+            textures?.Dispose();
+            samples?.Dispose();
         }
 
         #endregion
