@@ -19,7 +19,6 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.Centre;
             Size = new Vector2(2 * CatchHitObject.OBJECT_RADIUS);
-            // TODO: use skinned component?
             InternalChild = new BorderPiece();
         }
 
