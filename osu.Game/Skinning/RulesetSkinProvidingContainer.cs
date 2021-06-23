@@ -87,7 +87,11 @@ namespace osu.Game.Skinning
                 }
             }
 
-            SkinSources.Insert(SkinSources.IndexOf(skinManager.DefaultSkin), new RulesetResourcesSkin(Ruleset, host, audio));
+            var defaultSkinIndex = SkinSources.IndexOf(skinManager.DefaultSkin);
+            if (defaultSkinIndex >= 0)
+                SkinSources.Insert(defaultSkinIndex, new RulesetResourcesSkin(Ruleset, host, audio));
+            else
+                SkinSources.Add(new RulesetResourcesSkin(Ruleset, host, audio));
         }
 
         protected ISkin GetLegacyRulesetTransformedSkin(ISkin legacySkin)
