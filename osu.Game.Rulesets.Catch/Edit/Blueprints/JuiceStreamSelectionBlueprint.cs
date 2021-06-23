@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
     public class JuiceStreamSelectionBlueprint : CatchSelectionBlueprint<JuiceStream>
     {
-        public override Quad SelectionQuad => HitObjectContainer.ToScreenSpace(computeBoundingBox().Offset(new Vector2(0, HitObjectContainer.DrawHeight)));
+        public override Quad SelectionQuad => HitObjectContainer.ToScreenSpace(getBoundingBox().Offset(new Vector2(0, HitObjectContainer.DrawHeight)));
 
         private float minNestedX;
         private float maxNestedX;
@@ -26,18 +26,18 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         private void load()
         {
             HitObject.DefaultsApplied += onDefaultsApplied;
-            calculateObjectBounds();
+            computeObjectBounds();
         }
 
-        private void onDefaultsApplied(HitObject _) => calculateObjectBounds();
+        private void onDefaultsApplied(HitObject _) => computeObjectBounds();
 
-        private void calculateObjectBounds()
+        private void computeObjectBounds()
         {
             minNestedX = HitObject.NestedHitObjects.OfType<CatchHitObject>().Min(nested => nested.OriginalX) - HitObject.OriginalX;
             maxNestedX = HitObject.NestedHitObjects.OfType<CatchHitObject>().Max(nested => nested.OriginalX) - HitObject.OriginalX;
         }
 
-        private RectangleF computeBoundingBox()
+        private RectangleF getBoundingBox()
         {
             float left = HitObject.OriginalX + minNestedX;
             float right = HitObject.OriginalX + maxNestedX;
