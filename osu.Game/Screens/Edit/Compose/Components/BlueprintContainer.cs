@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -94,6 +95,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Creates a <see cref="SelectionBlueprint{T}"/> for a specific item.
         /// </summary>
         /// <param name="item">The item to create the overlay for.</param>
+        [CanBeNull]
         protected virtual SelectionBlueprint<T> CreateBlueprintFor(T item) => null;
 
         protected virtual DragBox CreateDragBox(Action<RectangleF> performSelect) => new DragBox(performSelect);
