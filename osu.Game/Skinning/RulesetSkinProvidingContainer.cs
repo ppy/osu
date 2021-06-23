@@ -51,6 +51,9 @@ namespace osu.Game.Skinning
         private AudioManager audio { get; set; }
 
         [Resolved]
+        private SkinManager skinManager { get; set; }
+
+        [Resolved]
         private ISkinSource skinSource { get; set; }
 
         [BackgroundDependencyLoader]
@@ -84,7 +87,7 @@ namespace osu.Game.Skinning
                 }
             }
 
-            SkinSources.Add(new RulesetResourcesSkin(Ruleset, host, audio));
+            SkinSources.Insert(SkinSources.IndexOf(skinManager.DefaultSkin), new RulesetResourcesSkin(Ruleset, host, audio));
         }
 
         protected ISkin GetLegacyRulesetTransformedSkin(ISkin legacySkin)
