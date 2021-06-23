@@ -51,8 +51,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public bool RestartOnFail => false;
 
-        public bool DisplayResultsOnFail => true;
-
         /// <summary>
         /// Jump distance for circles in the last combo
         /// </summary>
