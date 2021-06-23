@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
     {
         private const float border_width = 4;
 
+        private const float opacity_when_empty = 0.5f;
+
         private bool isEmpty = true;
 
         public TimeSpanOutline()
@@ -26,6 +28,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
             Masking = true;
             BorderThickness = border_width;
+            Alpha = opacity_when_empty;
 
             // A box is needed to make the border visible.
             InternalChild = new Box
@@ -52,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             bool wasEmpty = isEmpty;
             isEmpty = height == 0;
             if (wasEmpty != isEmpty)
-                this.FadeTo(isEmpty ? 0.5f : 1f, 150);
+                this.FadeTo(isEmpty ? opacity_when_empty : 1f, 150);
 
             Height = Math.Max(height, border_width);
         }
