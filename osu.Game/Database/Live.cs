@@ -18,7 +18,7 @@ namespace osu.Game.Database
     /// To consume this as a detached instance, assign to a variable of type <typeparam ref="T"/>. The implicit conversion will handle detaching an instance (and copy all content out).
     /// </remarks>
     /// <typeparam name="T">The underlying object type. Should be a <see cref="RealmObject"/> with a primary key provided via <see cref="IHasGuidPrimaryKey"/>.</typeparam>
-    public class Live<T> : IEquatable<Live<T>>, ILiveData
+    public class Live<T> : IEquatable<Live<T>>, IRealmBindableActions
         where T : RealmObject, IHasGuidPrimaryKey
     {
         /// <summary>
@@ -87,20 +87,6 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Re-run bind actions on the current context.
-        /// Should only be called after a context switch occurs.
-        /// </summary>
-        public void RunBindActions()
-        {
-            var previousContext = retrievalContext;
-            var fetched = Get();
-            Debug.Assert(!ReferenceEquals(previousContext, retrievalContext));
-
-            foreach (var action in bindActions)
-                action(fetched);
-        }
-
-        /// <summary>
         /// Initialise any property / value change bindings.
         /// </summary>
         /// <remarks>
@@ -135,5 +121,19 @@ namespace osu.Game.Database
         public bool Equals(Live<T>? other) => other != null && other.ID == ID;
 
         public override string ToString() => Get().ToString();
+
+        #region IRealmBindableActions Implementation
+
+        void IRealmBindableActions.RunBindActions()
+        {
+            var previousContext = retrievalContext;
+            var fetched = Get();
+            Debug.Assert(!ReferenceEquals(previousContext, retrievalContext));
+
+            foreach (var action in bindActions)
+                action(fetched);
+        }
+
+        #endregion
     }
 }

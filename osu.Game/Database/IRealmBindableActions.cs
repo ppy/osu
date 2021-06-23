@@ -3,8 +3,12 @@
 
 namespace osu.Game.Database
 {
-    public interface ILiveData
+    public interface IRealmBindableActions
     {
+        /// <summary>
+        /// Re-run bind actions on the current context.
+        /// Should only be called after a context switch occurs.
+        /// </summary>
         void RunBindActions();
     }
 }

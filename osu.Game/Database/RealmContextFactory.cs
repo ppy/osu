@@ -36,7 +36,7 @@ namespace osu.Game.Database
 
         private readonly ManualResetEventSlim blockingResetEvent = new ManualResetEventSlim(true);
 
-        private readonly WeakList<ILiveData> liveObjects = new WeakList<ILiveData>();
+        private readonly WeakList<IRealmBindableActions> liveObjects = new WeakList<IRealmBindableActions>();
 
         private Realm context;
 
@@ -89,7 +89,7 @@ namespace osu.Game.Database
             return new RealmWriteUsage(this);
         }
 
-        public void BindLive(ILiveData live) => liveObjects.Add(live);
+        public void BindLive(IRealmBindableActions live) => liveObjects.Add(live);
 
         protected override void Update()
         {
