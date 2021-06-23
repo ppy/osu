@@ -240,6 +240,9 @@ namespace osu.Game.Overlays.Chat
             {
                 get
                 {
+                    if (sender.Id == User.SYSTEM_USER.Id)
+                        return Array.Empty<MenuItem>();
+
                     List<MenuItem> items = new List<MenuItem>
                     {
                         new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action)
