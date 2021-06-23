@@ -21,14 +21,13 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         public TimeSpanOutline()
         {
-            Anchor = Anchor.BottomLeft;
-            Origin = Anchor.BottomLeft;
+            Anchor = Origin = Anchor.BottomLeft;
             RelativeSizeAxes = Axes.X;
 
             Masking = true;
             BorderThickness = border_width;
 
-            // a box is needed to make edge visible
+            // A box is needed to make the border visible.
             InternalChild = new Box
             {
                 RelativeSizeAxes = Axes.Both,
