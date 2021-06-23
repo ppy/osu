@@ -14,10 +14,10 @@ namespace osu.Game.Rulesets.Catch.Edit
 {
     public class CatchSelectionHandler : EditorSelectionHandler
     {
+        protected ScrollingHitObjectContainer HitObjectContainer => (ScrollingHitObjectContainer)playfield.HitObjectContainer;
+
         [Resolved]
         private Playfield playfield { get; set; }
-
-        protected ScrollingHitObjectContainer HitObjectContainer => (ScrollingHitObjectContainer)playfield.HitObjectContainer;
 
         public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent)
         {

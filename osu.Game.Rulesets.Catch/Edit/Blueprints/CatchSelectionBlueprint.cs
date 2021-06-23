@@ -13,11 +13,6 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
     public abstract class CatchSelectionBlueprint<THitObject> : HitObjectSelectionBlueprint<THitObject>
         where THitObject : CatchHitObject
     {
-        [Resolved]
-        private Playfield playfield { get; set; }
-
-        protected ScrollingHitObjectContainer HitObjectContainer => (ScrollingHitObjectContainer)playfield.HitObjectContainer;
-
         public override Vector2 ScreenSpaceSelectionPoint
         {
             get
@@ -29,6 +24,11 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => SelectionQuad.Contains(screenSpacePos);
+
+        protected ScrollingHitObjectContainer HitObjectContainer => (ScrollingHitObjectContainer)playfield.HitObjectContainer;
+
+        [Resolved]
+        private Playfield playfield { get; set; }
 
         protected CatchSelectionBlueprint(THitObject hitObject)
             : base(hitObject)
