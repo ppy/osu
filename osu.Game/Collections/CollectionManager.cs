@@ -55,6 +55,8 @@ namespace osu.Game.Collections
         [BackgroundDependencyLoader]
         private void load()
         {
+            Collections.CollectionChanged += collectionsChanged;
+
             if (storage.Exists(database_backup_name))
             {
                 // If a backup file exists, it means the previous write operation didn't run to completion.
@@ -65,10 +67,6 @@ namespace osu.Game.Collections
                     storage.Delete(database_name);
                 File.Copy(storage.GetFullPath(database_backup_name), storage.GetFullPath(database_name));
             }
-
-            // Only accept changes after/if the above succeeds to prevent simultaneously accessing either file.
-            // Todo: This really should not be delayed like this, but is unlikely to cause issues because CollectionManager loads very early in execution.
-            Collections.CollectionChanged += collectionsChanged;
 
             if (storage.Exists(database_name))
             {
@@ -82,7 +80,7 @@ namespace osu.Game.Collections
             }
         }
 
-        private void collectionsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void collectionsChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
         {
             switch (e.Action)
             {
@@ -106,7 +104,7 @@ namespace osu.Game.Collections
             }
 
             backgroundSave();
-        }
+        });
 
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
