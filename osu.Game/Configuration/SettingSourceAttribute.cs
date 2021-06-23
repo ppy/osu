@@ -192,6 +192,7 @@ namespace osu.Game.Configuration
 
             private class ModDropdownControl : DropdownControl
             {
+                // Set low enough to workaround nested scroll issues (see https://github.com/ppy/osu-framework/issues/4536).
                 protected override int MenuMaxHeight => 100;
             }
         }
