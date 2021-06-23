@@ -35,6 +35,7 @@ namespace osu.Game.Collections
         private const int database_version = 30000000;
 
         private const string database_name = "collection.db";
+        private const string database_backup_name = "collection.db.bak";
 
         public readonly BindableList<BeatmapCollection> Collections = new BindableList<BeatmapCollection>();
 
@@ -56,11 +57,14 @@ namespace osu.Game.Collections
         {
             Collections.CollectionChanged += collectionsChanged;
 
-            if (storage.Exists(database_name))
+            // If a backup file exists, it means the previous write operation didn't complete successfully. Always prefer the backup file in such a case.
+            string filename = storage.Exists(database_backup_name) ? database_backup_name : database_name;
+
+            if (storage.Exists(filename))
             {
                 List<BeatmapCollection> beatmapCollections;
 
-                using (var stream = storage.GetStream(database_name))
+                using (var stream = storage.GetStream(filename))
                     beatmapCollections = readCollections(stream);
 
                 // intentionally fire-and-forget async.
@@ -286,13 +290,21 @@ namespace osu.Game.Collections
                         using (var fs = File.OpenWrite(tempPath))
                             ms.WriteTo(fs);
 
-                        var storagePath = storage.GetFullPath(database_name);
-                        var storageBackupPath = storage.GetFullPath($"{database_name}.bak");
-                        if (File.Exists(storageBackupPath))
-                            File.Delete(storageBackupPath);
-                        if (File.Exists(storagePath))
-                            File.Move(storagePath, storageBackupPath);
-                        File.Move(tempPath, storagePath);
+                        var databasePath = storage.GetFullPath(database_name);
+                        var databaseBackupPath = storage.GetFullPath(database_backup_name);
+
+                        // Back up the existing database, clearing any existing backup.
+                        if (File.Exists(databaseBackupPath))
+                            File.Delete(databaseBackupPath);
+                        if (File.Exists(databasePath))
+                            File.Move(databasePath, databaseBackupPath);
+
+                        // Move the new database in-place of the existing one.
+                        File.Move(tempPath, databasePath);
+
+                        // If everything succeeded up to this point, remove the backup file.
+                        if (File.Exists(databaseBackupPath))
+                            File.Delete(databaseBackupPath);
                     }
 
                     if (saveFailures < 10)
