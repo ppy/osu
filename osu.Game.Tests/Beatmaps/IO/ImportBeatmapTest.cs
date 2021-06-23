@@ -945,7 +945,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             Assert.IsTrue(manager.QueryBeatmapSets(_ => true).First().DeletePending);
         }
 
-        private Task createScoreForBeatmap(OsuGameBase osu, BeatmapInfo beatmap)
+        private static Task createScoreForBeatmap(OsuGameBase osu, BeatmapInfo beatmap)
         {
             return ImportScoreTest.LoadScoreIntoOsu(osu, new ScoreInfo
             {
@@ -955,7 +955,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             }, new ImportScoreTest.TestArchiveReader());
         }
 
-        private void checkBeatmapSetCount(OsuGameBase osu, int expected, bool includeDeletePending = false)
+        private static void checkBeatmapSetCount(OsuGameBase osu, int expected, bool includeDeletePending = false)
         {
             var manager = osu.Dependencies.Get<BeatmapManager>();
 
@@ -964,18 +964,18 @@ namespace osu.Game.Tests.Beatmaps.IO
                 : manager.GetAllUsableBeatmapSets().Count);
         }
 
-        private string hashFile(string filename)
+        private static string hashFile(string filename)
         {
             using (var s = File.OpenRead(filename))
                 return s.ComputeMD5Hash();
         }
 
-        private void checkBeatmapCount(OsuGameBase osu, int expected)
+        private static void checkBeatmapCount(OsuGameBase osu, int expected)
         {
             Assert.AreEqual(expected, osu.Dependencies.Get<BeatmapManager>().QueryBeatmaps(_ => true).ToList().Count);
         }
 
-        private void checkSingleReferencedFileCount(OsuGameBase osu, int expected)
+        private static void checkSingleReferencedFileCount(OsuGameBase osu, int expected)
         {
             Assert.AreEqual(expected, osu.Dependencies.Get<FileStore>().QueryFiles(f => f.ReferenceCount == 1).Count());
         }
