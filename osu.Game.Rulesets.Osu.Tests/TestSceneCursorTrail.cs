@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
@@ -112,7 +113,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;
 
-            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(this) ? this : null;
+
+            public IEnumerable<ISkin> AllSources => new[] { this };
 
             public event Action SourceChanged
             {

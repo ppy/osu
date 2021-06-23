@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,45 +17,38 @@ namespace osu.Game.Skinning
     /// <summary>
     /// Transformer used to handle support of legacy features for individual rulesets.
     /// </summary>
-    public abstract class LegacySkinTransformer : ISkinSource
+    public abstract class LegacySkinTransformer : ISkin
     {
         /// <summary>
-        /// Source of the <see cref="ISkin"/> which is being transformed.
+        /// The <see cref="ISkin"/> which is being transformed.
         /// </summary>
-        protected ISkinSource Source { get; }
+        [NotNull]
+        protected ISkin Skin { get; }
 
-        protected LegacySkinTransformer(ISkinSource source)
+        protected LegacySkinTransformer([NotNull] ISkin skin)
         {
-            Source = source;
+            Skin = skin ?? throw new ArgumentNullException(nameof(skin));
         }
 
-        public abstract Drawable GetDrawableComponent(ISkinComponent component);
+        public virtual Drawable GetDrawableComponent(ISkinComponent component) => Skin.GetDrawableComponent(component);
 
         public Texture GetTexture(string componentName) => GetTexture(componentName, default, default);
 
         public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
-            => Source.GetTexture(componentName, wrapModeS, wrapModeT);
+            => Skin.GetTexture(componentName, wrapModeS, wrapModeT);
 
         public virtual ISample GetSample(ISampleInfo sampleInfo)
         {
             if (!(sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacySample))
-                return Source.GetSample(sampleInfo);
+                return Skin.GetSample(sampleInfo);
 
             var playLayeredHitSounds = GetConfig<LegacySetting, bool>(LegacySetting.LayeredHitSounds);
             if (legacySample.IsLayered && playLayeredHitSounds?.Value == false)
                 return new SampleVirtual();
 
-            return Source.GetSample(sampleInfo);
+            return Skin.GetSample(sampleInfo);
         }
 
-        public abstract IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
-
-        public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => Source.FindProvider(lookupFunction);
-
-        public event Action SourceChanged
-        {
-            add { throw new NotSupportedException(); }
-            remove { }
-        }
+        public virtual IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => Skin.GetConfig<TLookup, TValue>(lookup);
     }
 }

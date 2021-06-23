@@ -185,7 +185,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                                     {
                                                                                         Anchor = Anchor.CentreLeft,
                                                                                         Origin = Anchor.CentreLeft,
-                                                                                        DisplayUnrankedText = false,
                                                                                         Current = UserMods,
                                                                                         Scale = new Vector2(0.8f),
                                                                                     },
@@ -306,18 +305,34 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return true;
             }
 
+            return base.OnBackButton();
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            if (client.Room == null)
+            {
+                // room has not been created yet; exit immediately.
+                return base.OnExiting(next);
+            }
+
             if (!exitConfirmed && dialogOverlay != null)
             {
-                dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave this multiplayer match?", () =>
+                if (dialogOverlay.CurrentDialog is ConfirmDialog confirmDialog)
+                    confirmDialog.PerformOkAction();
+                else
                 {
-                    exitConfirmed = true;
-                    this.Exit();
-                }));
+                    dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave this multiplayer match?", () =>
+                    {
+                        exitConfirmed = true;
+                        this.Exit();
+                    }));
+                }
 
                 return true;
             }
 
-            return base.OnBackButton();
+            return base.OnExiting(next);
         }
 
         private ModSettingChangeTracker modSettingChangeTracker;

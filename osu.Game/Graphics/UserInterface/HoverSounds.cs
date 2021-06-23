@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -22,7 +21,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected readonly HoverSampleSet SampleSet;
 
-        public HoverSounds(HoverSampleSet sampleSet = HoverSampleSet.Normal)
+        public HoverSounds(HoverSampleSet sampleSet = HoverSampleSet.Default)
         {
             SampleSet = sampleSet;
             RelativeSizeAxes = Axes.Both;
@@ -31,7 +30,8 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, SessionStatics statics)
         {
-            sampleHover = audio.Samples.Get($@"UI/generic-hover{SampleSet.GetDescription()}");
+            sampleHover = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-hover")
+                          ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-hover");
         }
 
         public override void PlayHoverSample()
@@ -39,23 +39,5 @@ namespace osu.Game.Graphics.UserInterface
             sampleHover.Frequency.Value = 0.98 + RNG.NextDouble(0.04);
             sampleHover.Play();
         }
-    }
-
-    public enum HoverSampleSet
-    {
-        [Description("")]
-        Loud,
-
-        [Description("-soft")]
-        Normal,
-
-        [Description("-softer")]
-        Soft,
-
-        [Description("-toolbar")]
-        Toolbar,
-
-        [Description("-songselect")]
-        SongSelect
     }
 }
