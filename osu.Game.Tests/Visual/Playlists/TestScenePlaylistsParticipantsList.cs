@@ -8,16 +8,21 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsParticipantsList : RoomTestScene
+    public class TestScenePlaylistsParticipantsList : OsuTestScene
     {
+        private TestRoomContainer roomContainer;
+
         [SetUp]
-        public new void Setup() => Schedule(() =>
+        public void Setup() => Schedule(() =>
         {
-            Room.RoomID.Value = 7;
+            Child = roomContainer = new TestRoomContainer
+            {
+                Room = { RoomID = { Value = 7 } }
+            };
 
             for (int i = 0; i < 50; i++)
             {
-                Room.RecentParticipants.Add(new User
+                roomContainer.Room.RecentParticipants.Add(new User
                 {
                     Username = "peppy",
                     Statistics = new UserStatistics { GlobalRank = 1234 },
@@ -31,7 +36,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("create component", () =>
             {
-                Child = new ParticipantsDisplay(Direction.Horizontal)
+                roomContainer.Child = new ParticipantsDisplay(Direction.Horizontal)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -45,7 +50,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("create component", () =>
             {
-                Child = new ParticipantsDisplay(Direction.Vertical)
+                roomContainer.Child = new ParticipantsDisplay(Direction.Vertical)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
