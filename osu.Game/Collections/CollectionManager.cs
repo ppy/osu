@@ -257,27 +257,42 @@ namespace osu.Game.Collections
             {
                 Interlocked.Increment(ref lastSave);
 
+                // This is NOT thread-safe!!
                 try
                 {
-                    // This is NOT thread-safe!!
+                    var tempPath = Path.GetTempFileName();
 
-                    using (var sw = new SerializationWriter(storage.GetStream(database_name, FileAccess.Write)))
+                    using (var ms = new MemoryStream())
                     {
-                        sw.Write(database_version);
-
-                        var collectionsCopy = Collections.ToArray();
-                        sw.Write(collectionsCopy.Length);
-
-                        foreach (var c in collectionsCopy)
+                        using (var sw = new SerializationWriter(ms, true))
                         {
-                            sw.Write(c.Name.Value);
+                            sw.Write(database_version);
 
-                            var beatmapsCopy = c.Beatmaps.ToArray();
-                            sw.Write(beatmapsCopy.Length);
+                            var collectionsCopy = Collections.ToArray();
+                            sw.Write(collectionsCopy.Length);
 
-                            foreach (var b in beatmapsCopy)
-                                sw.Write(b.MD5Hash);
+                            foreach (var c in collectionsCopy)
+                            {
+                                sw.Write(c.Name.Value);
+
+                                var beatmapsCopy = c.Beatmaps.ToArray();
+                                sw.Write(beatmapsCopy.Length);
+
+                                foreach (var b in beatmapsCopy)
+                                    sw.Write(b.MD5Hash);
+                            }
                         }
+
+                        using (var fs = File.OpenWrite(tempPath))
+                            ms.WriteTo(fs);
+
+                        var storagePath = storage.GetFullPath(database_name);
+                        var storageBackupPath = storage.GetFullPath($"{database_name}.bak");
+                        if (File.Exists(storageBackupPath))
+                            File.Delete(storageBackupPath);
+                        if (File.Exists(storagePath))
+                            File.Move(storagePath, storageBackupPath);
+                        File.Move(tempPath, storagePath);
                     }
 
                     if (saveFailures < 10)
