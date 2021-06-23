@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -259,6 +260,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return CreateHitObjectBlueprintFor(item)?.With(b => b.DrawableObject = drawable);
         }
 
+        [CanBeNull]
         public virtual HitObjectSelectionBlueprint CreateHitObjectBlueprintFor(HitObject hitObject) => null;
 
         private void hitObjectAdded(HitObject obj)
