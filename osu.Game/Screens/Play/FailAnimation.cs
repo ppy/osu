@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Play
 
         private readonly DrawableRuleset drawableRuleset;
 
-        private BindableDouble trackFreq;
+        private readonly BindableDouble trackFreq = new BindableDouble(1);
 
         private Track track;
 
@@ -65,8 +65,6 @@ namespace osu.Game.Screens.Play
 
             if (adjustTrackFrequency)
             {
-                trackFreq = new BindableDouble(1);
-
                 this.TransformBindableTo(trackFreq, 0, duration).OnComplete(_ =>
                 {
                     OnComplete?.Invoke();
@@ -131,8 +129,7 @@ namespace osu.Game.Screens.Play
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            if (trackFreq != null)
-                track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+            track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
         }
     }
 }
