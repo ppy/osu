@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
@@ -47,5 +48,34 @@ namespace osu.Game.Skinning
         }
 
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;
+
+        #region Disposal
+
+        ~RulesetResourcesSkin()
+        {
+            // required to potentially clean up sample store from audio hierarchy.
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool isDisposed;
+
+        protected virtual void Dispose(bool isDisposing)
+        {
+            if (isDisposed)
+                return;
+
+            isDisposed = true;
+
+            rulesetTextures?.Dispose();
+            rulesetSamples?.Dispose();
+        }
+
+        #endregion
     }
 }
