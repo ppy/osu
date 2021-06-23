@@ -28,8 +28,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public bool RestartOnFail => false;
 
-        public bool DisplayResultsOnFail => false;
-
         private OsuInputManager inputManager;
 
         private IFrameStableClock gameplayClock;

@@ -41,7 +41,6 @@ namespace osu.Game.Rulesets.Mods
         }
 
         public bool RestartOnFail => false;
-        public bool DisplayResultsOnFail => false;
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {

@@ -640,7 +640,7 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
-            if (!ScoreProcessor.HasCompleted.Value && !HealthProcessor.HasFailed)
+            if (!ScoreProcessor.HasCompleted.Value)
             {
                 completionProgressDelegate?.Cancel();
                 completionProgressDelegate = null;
@@ -653,7 +653,7 @@ namespace osu.Game.Screens.Play
                 throw new InvalidOperationException($"{nameof(updateCompletionState)} was fired more than once");
 
             // Only show the completion screen if the player hasn't failed
-            if (HealthProcessor.HasFailed && !Mods.Value.OfType<IApplicableFailOverride>().Any(m => m.DisplayResultsOnFail))
+            if (HealthProcessor.HasFailed)
                 return;
 
             ValidForResume = false;
@@ -751,12 +751,6 @@ namespace osu.Game.Screens.Play
         // Called back when the transform finishes
         private void onFailComplete()
         {
-            if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => m.DisplayResultsOnFail))
-            {
-                updateCompletionState(true);
-                return;
-            }
-
             GameplayClockContainer.Stop();
 
             FailOverlay.Retries = RestartCount;
