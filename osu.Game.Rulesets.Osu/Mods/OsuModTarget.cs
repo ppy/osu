@@ -31,7 +31,8 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModTarget : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<OsuHitObject>,
-                                IApplicableToHealthProcessor, IApplicableToDifficulty, IApplicableFailOverride, IHasSeed
+                                IApplicableToHealthProcessor, IApplicableToDifficulty, IApplicableFailOverride,
+                                IHasSeed, IMutateApproachCircles
     {
         public override string Name => "Target";
         public override string Acronym => "TP";
@@ -40,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => @"Practice keeping up with the beat of the song.";
         public override double ScoreMultiplier => 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModTraceable) };
+        public override Type[] IncompatibleMods => new[] { typeof(IMutateApproachCircles) };
 
         [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(SeedSettingsControl))]
         public Bindable<int?> Seed { get; } = new Bindable<int?>
