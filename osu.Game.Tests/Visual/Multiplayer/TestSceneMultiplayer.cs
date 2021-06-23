@@ -6,15 +6,20 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Resources;
@@ -157,6 +162,50 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("play started", () => !multiplayerScreen.IsCurrentScreen());
+        }
+
+        [Test]
+        public void TestLeaveNavigation()
+        {
+            loadMultiplayer();
+
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                        AllowedMods = { new OsuModHidden() }
+                    }
+                }
+            });
+
+            AddStep("open mod overlay", () => this.ChildrenOfType<PurpleTriangleButton>().ElementAt(2).Click());
+
+            AddStep("invoke on back button", () => multiplayerScreen.OnBackButton());
+
+            AddAssert("mod overlay is hidden", () => this.ChildrenOfType<LocalPlayerModSelectOverlay>().Single().State.Value == Visibility.Hidden);
+
+            AddAssert("dialog overlay is hidden", () => DialogOverlay.State.Value == Visibility.Hidden);
+
+            testLeave("lounge tab item", () => this.ChildrenOfType<BreadcrumbControl<IScreen>.BreadcrumbTabItem>().First().Click());
+
+            testLeave("back button", () => multiplayerScreen.OnBackButton());
+
+            // mimics home button and OS window close
+            testLeave("forced exit", () => multiplayerScreen.Exit());
+
+            void testLeave(string actionName, Action action)
+            {
+                AddStep($"leave via {actionName}", action);
+
+                AddAssert("dialog overlay is visible", () => DialogOverlay.State.Value == Visibility.Visible);
+
+                AddStep("close dialog overlay", () => InputManager.Key(Key.Escape));
+            }
         }
 
         private void createRoom(Func<Room> room)
