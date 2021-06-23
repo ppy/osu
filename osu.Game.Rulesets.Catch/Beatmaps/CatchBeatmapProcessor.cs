@@ -8,7 +8,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
@@ -16,6 +15,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
     public class CatchBeatmapProcessor : BeatmapProcessor
     {
         public const int RNG_SEED = 1337;
+
+        public bool HardRockOffsets { get; set; }
 
         public CatchBeatmapProcessor(IBeatmap beatmap)
             : base(beatmap)
@@ -43,11 +44,10 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             }
         }
 
-        public static void ApplyPositionOffsets(IBeatmap beatmap, params Mod[] mods)
+        public void ApplyPositionOffsets(IBeatmap beatmap)
         {
             var rng = new FastRandom(RNG_SEED);
 
-            bool shouldApplyHardRockOffset = mods.Any(m => m is ModHardRock);
             float? lastPosition = null;
             double lastStartTime = 0;
 
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 switch (obj)
                 {
                     case Fruit fruit:
-                        if (shouldApplyHardRockOffset)
+                        if (HardRockOffsets)
                             applyHardRockOffset(fruit, ref lastPosition, ref lastStartTime, rng);
                         break;
 
