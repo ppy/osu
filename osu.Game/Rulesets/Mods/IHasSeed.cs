@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public interface IHasSeed
     {
-        public Bindable<int?> Seed { get; }
+        Bindable<int?> Seed { get; }
     }
 
     public class SeedSettingsControl : SettingsItem<int?>
