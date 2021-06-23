@@ -183,11 +183,7 @@ namespace osu.Game
 
             dependencies.Cache(realmFactory = new RealmContextFactory(Storage));
 
-            Host.UpdateThreadPausing += () =>
-            {
-                var blocking = realmFactory.BlockAllOperations();
-                Schedule(() => blocking.Dispose());
-            };
+            Host.UpdateThread.ThreadPausing += onUpdateThreadPausing;
 
             AddInternal(realmFactory);
 
@@ -363,6 +359,12 @@ namespace osu.Game
             Ruleset.BindValueChanged(onRulesetChanged);
         }
 
+        private void onUpdateThreadPausing()
+        {
+            var blocking = realmFactory.BlockAllOperations();
+            Schedule(() => blocking.Dispose());
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -496,6 +498,9 @@ namespace osu.Game
             LocalConfig?.Dispose();
 
             contextFactory.FlushConnections();
+
+            if (Host != null)
+                Host.UpdateThread.ThreadPausing -= onUpdateThreadPausing;
         }
     }
 }
