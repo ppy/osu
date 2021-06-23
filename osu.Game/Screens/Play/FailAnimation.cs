@@ -53,6 +53,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Start the fail animation playing.
         /// </summary>
+        /// <param name="adjustTrackFrequency">Whether to apply frequency adjustment to the track.</param>
         /// <exception cref="InvalidOperationException">Thrown if started more than once.</exception>
         public void Start(bool adjustTrackFrequency)
         {
