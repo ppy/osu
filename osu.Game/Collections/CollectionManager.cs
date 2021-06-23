@@ -55,16 +55,26 @@ namespace osu.Game.Collections
         [BackgroundDependencyLoader]
         private void load()
         {
+            if (storage.Exists(database_backup_name))
+            {
+                // If a backup file exists, it means the previous write operation didn't run to completion.
+                // Always prefer the backup file in such a case as it's the most recent copy that is guaranteed to not be malformed.
+                //
+                // The database is saved 100ms after any change, and again when the game is closed, so there shouldn't be a large diff between the two files in the worst case.
+                if (storage.Exists(database_name))
+                    storage.Delete(database_name);
+                File.Copy(storage.GetFullPath(database_backup_name), storage.GetFullPath(database_name));
+            }
+
+            // Only accept changes after/if the above succeeds to prevent simultaneously accessing either file.
+            // Todo: This really should not be delayed like this, but is unlikely to cause issues because CollectionManager loads very early in execution.
             Collections.CollectionChanged += collectionsChanged;
 
-            // If a backup file exists, it means the previous write operation didn't complete successfully. Always prefer the backup file in such a case.
-            string filename = storage.Exists(database_backup_name) ? database_backup_name : database_name;
-
-            if (storage.Exists(filename))
+            if (storage.Exists(database_name))
             {
                 List<BeatmapCollection> beatmapCollections;
 
-                using (var stream = storage.GetStream(filename))
+                using (var stream = storage.GetStream(database_name))
                     beatmapCollections = readCollections(stream);
 
                 // intentionally fire-and-forget async.
