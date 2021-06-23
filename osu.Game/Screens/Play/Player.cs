@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual bool CheckModsAllowFailure() => Mods.Value.OfType<IApplicableFailOverride>().All(m => m.PerformFail());
 
-        private bool displayResultsOnFail => Mods.Value.OfType<IApplicableFailOverride>().Any(m => m.DisplayResultsOnFail);
+        private bool displayResultsOnFail() => Mods.Value.OfType<IApplicableFailOverride>().Any(m => m.DisplayResultsOnFail);
 
         public readonly PlayerConfiguration Configuration;
 
@@ -668,7 +668,7 @@ namespace osu.Game.Screens.Play
             }
 
             // Only show the completion screen if the player hasn't failed
-            if (HealthProcessor.HasFailed && !displayResultsOnFail)
+            if (HealthProcessor.HasFailed && !displayResultsOnFail())
                 return;
 
             // Setting this early in the process means that even if something were to go wrong in the order of events following, there
@@ -685,7 +685,7 @@ namespace osu.Game.Screens.Play
 
             bool storyboardHasOutro = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
 
-            if (storyboardHasOutro && !displayResultsOnFail)
+            if (storyboardHasOutro && !displayResultsOnFail())
             {
                 // if the current beatmap has a storyboard, the progression to results will be handled by the storyboard ending
                 // or the user pressing the skip outro button.
@@ -786,12 +786,12 @@ namespace osu.Game.Screens.Play
             if (PauseOverlay.State.Value == Visibility.Visible)
                 PauseOverlay.Hide();
 
-            failAnimation.Start(!displayResultsOnFail);
+            failAnimation.Start(!displayResultsOnFail());
 
             if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
                 Restart();
 
-            if (displayResultsOnFail)
+            if (displayResultsOnFail())
             {
                 scoreCompletionChanged(new ValueChangedEvent<bool>(false, true));
             }
@@ -802,7 +802,7 @@ namespace osu.Game.Screens.Play
         // Called back when the transform finishes
         private void onFailComplete()
         {
-            if (displayResultsOnFail)
+            if (displayResultsOnFail())
                 return;
 
             GameplayClockContainer.Stop();
