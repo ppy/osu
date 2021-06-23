@@ -12,7 +12,7 @@ using osu.Game.Tests.Beatmaps;
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     [HeadlessTest]
-    public class TestSceneMultiplayerRoomManager : RoomTestScene
+    public class TestSceneMultiplayerRoomManager : OsuTestScene
     {
         private TestMultiplayerRoomContainer roomContainer;
         private TestMultiplayerRoomManager roomManager => roomContainer.RoomManager;

@@ -11,42 +11,51 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchHeader : RoomTestScene
+    public class TestSceneMatchHeader : OsuTestScene
     {
-        public TestSceneMatchHeader()
-        {
-            Child = new Header();
-        }
+        private TestRoomContainer roomContainer;
 
         [SetUp]
-        public new void Setup() => Schedule(() =>
+        public void Setup() => Schedule(() =>
         {
-            Room.Playlist.Add(new PlaylistItem
+            Child = roomContainer = new TestRoomContainer
             {
-                Beatmap =
-                {
-                    Value = new BeatmapInfo
-                    {
-                        Metadata = new BeatmapMetadata
-                        {
-                            Title = "Title",
-                            Artist = "Artist",
-                            AuthorString = "Author",
-                        },
-                        Version = "Version",
-                        Ruleset = new OsuRuleset().RulesetInfo
-                    }
-                },
-                RequiredMods =
-                {
-                    new OsuModDoubleTime(),
-                    new OsuModNoFail(),
-                    new OsuModRelax(),
-                }
-            });
-
-            Room.Name.Value = "A very awesome room";
-            Room.Host.Value = new User { Id = 2, Username = "peppy" };
+                Child = new Header()
+            };
         });
+
+        [Test]
+        public void TestBasicRoom()
+        {
+            AddStep("set basic room", () =>
+            {
+                roomContainer.Room.Playlist.Add(new PlaylistItem
+                {
+                    Beatmap =
+                    {
+                        Value = new BeatmapInfo
+                        {
+                            Metadata = new BeatmapMetadata
+                            {
+                                Title = "Title",
+                                Artist = "Artist",
+                                AuthorString = "Author",
+                            },
+                            Version = "Version",
+                            Ruleset = new OsuRuleset().RulesetInfo
+                        }
+                    },
+                    RequiredMods =
+                    {
+                        new OsuModDoubleTime(),
+                        new OsuModNoFail(),
+                        new OsuModRelax(),
+                    }
+                });
+
+                roomContainer.Room.Name.Value = "A very awesome room";
+                roomContainer.Room.Host.Value = new User { Id = 2, Username = "peppy" };
+            });
+        }
     }
 }

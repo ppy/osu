@@ -10,28 +10,28 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneLoungeRoomInfo : RoomTestScene
+    public class TestSceneLoungeRoomInfo : OsuTestScene
     {
+        private TestRoomContainer roomContainer;
+
         [SetUp]
-        public new void Setup() => Schedule(() =>
+        public void Setup() => Schedule(() =>
         {
-            Child = new RoomInfo
+            Child = roomContainer = new TestRoomContainer
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Width = 500
+                Child = new RoomInfo
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 500
+                }
             };
         });
-
-        public override void SetUpSteps()
-        {
-            // Todo: Temp
-        }
 
         [Test]
         public void TestNonSelectedRoom()
         {
-            AddStep("set null room", () => Room.RoomID.Value = null);
+            AddStep("set null room", () => roomContainer.Room.RoomID.Value = null);
         }
 
         [Test]
@@ -39,11 +39,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("set open room", () =>
             {
-                Room.RoomID.Value = 0;
-                Room.Name.Value = "Room 0";
-                Room.Host.Value = new User { Username = "peppy", Id = 2 };
-                Room.EndDate.Value = DateTimeOffset.Now.AddMonths(1);
-                Room.Status.Value = new RoomStatusOpen();
+                roomContainer.Room.RoomID.Value = 0;
+                roomContainer.Room.Name.Value = "Room 0";
+                roomContainer.Room.Host.Value = new User { Username = "peppy", Id = 2 };
+                roomContainer.Room.EndDate.Value = DateTimeOffset.Now.AddMonths(1);
+                roomContainer.Room.Status.Value = new RoomStatusOpen();
             });
         }
     }

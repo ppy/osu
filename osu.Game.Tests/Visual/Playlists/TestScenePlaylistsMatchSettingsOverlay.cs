@@ -15,23 +15,25 @@ using osu.Game.Screens.OnlinePlay.Playlists;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsMatchSettingsOverlay : RoomTestScene
+    public class TestScenePlaylistsMatchSettingsOverlay : OsuTestScene
     {
         [Cached(Type = typeof(IRoomManager))]
         private TestRoomManager roomManager = new TestRoomManager();
 
+        private TestRoomContainer roomContainer;
         private TestRoomSettings settings;
 
         [SetUp]
-        public new void Setup() => Schedule(() =>
+        public void Setup() => Schedule(() =>
         {
-            settings = new TestRoomSettings
+            Child = roomContainer = new TestRoomContainer
             {
-                RelativeSizeAxes = Axes.Both,
-                State = { Value = Visibility.Visible }
+                Child = settings = new TestRoomSettings
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    State = { Value = Visibility.Visible }
+                }
             };
-
-            Child = settings;
         });
 
         [Test]
@@ -39,19 +41,19 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("clear name and beatmap", () =>
             {
-                Room.Name.Value = "";
-                Room.Playlist.Clear();
+                roomContainer.Room.Name.Value = "";
+                roomContainer.Room.Playlist.Clear();
             });
 
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set name", () => Room.Name.Value = "Room name");
+            AddStep("set name", () => roomContainer.Room.Name.Value = "Room name");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set beatmap", () => Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } }));
+            AddStep("set beatmap", () => roomContainer.Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } }));
             AddAssert("button enabled", () => settings.ApplyButton.Enabled.Value);
 
-            AddStep("clear name", () => Room.Name.Value = "");
+            AddStep("clear name", () => roomContainer.Room.Name.Value = "");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
         }
 
@@ -67,7 +69,7 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 settings.NameField.Current.Value = expected_name;
                 settings.DurationField.Current.Value = expectedDuration;
-                Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
+                roomContainer.Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
 
                 roomManager.CreateRequested = r =>
                 {
@@ -88,8 +90,8 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("setup", () =>
             {
-                Room.Name.Value = "Test Room";
-                Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
+                roomContainer.Room.Name.Value = "Test Room";
+                roomContainer.Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
 
                 fail = true;
                 roomManager.CreateRequested = _ => !fail;
