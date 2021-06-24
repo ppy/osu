@@ -6,9 +6,9 @@ namespace osu.Game.Database
     public interface IRealmBindableActions
     {
         /// <summary>
-        /// Re-run bind actions on the current context.
+        /// Perform any required binding/setup actions.
         /// Should only be called after a context switch occurs.
         /// </summary>
-        void RunBindActions();
+        void RunSetupAction();
     }
 }

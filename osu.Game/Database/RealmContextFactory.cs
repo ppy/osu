@@ -66,7 +66,7 @@ namespace osu.Game.Database
         private void runBindActions()
         {
             foreach (var live in liveObjects)
-                live.RunBindActions();
+                live.RunSetupAction();
         }
 
         public RealmContextFactory(Storage storage)
@@ -91,13 +91,18 @@ namespace osu.Game.Database
             return new RealmWriteUsage(createContext(), writeComplete);
         }
 
+        public Live<T> CreateLive<T>(Func<Realm, T> func) where T : class
+        {
+            var live = new Live<T>(func, this);
+            liveObjects.Add(live);
+            return live;
+        }
+
         private void writeComplete()
         {
             Monitor.Exit(writeLock);
             pending_writes.Value--;
         }
-
-        public void BindLive(IRealmBindableActions live) => liveObjects.Add(live);
 
         protected override void Update()
         {

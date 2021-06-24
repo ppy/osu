@@ -24,7 +24,8 @@ namespace osu.Game.Input.Bindings
         private readonly int? variant;
 
         private IDisposable realmSubscription;
-        private IRealmCollection<RealmKeyBinding> realmKeyBindings;
+
+        private Live<IRealmCollection<RealmKeyBinding>> realmKeyBindings;
 
         [Resolved]
         private IRealmFactory realm { get; set; }
@@ -54,19 +55,39 @@ namespace osu.Game.Input.Bindings
             {
                 var rulesetId = ruleset?.ID;
 
-                realmKeyBindings = realm.Context.All<RealmKeyBinding>()
-                                        .Where(b => b.RulesetID == rulesetId && b.Variant == variant)
-                                        .AsRealmCollection();
+                realmKeyBindings = realm.CreateLive(context =>
+                {
+                    var bindings = context.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).AsRealmCollection();
 
-                realmSubscription = realmKeyBindings
-                    .SubscribeForNotifications((sender, changes, error) =>
-                    {
-                        // first subscription ignored as we are handling this in LoadComplete.
-                        if (changes == null)
-                            return;
+                    realmSubscription = bindings
+                        .SubscribeForNotifications((sender, changes, error) =>
+                        {
+                            // first subscription ignored as we are handling this in LoadComplete.
+                            if (changes == null)
+                                return;
 
-                        ReloadMappings();
-                    });
+                            ReloadMappings();
+                        });
+
+                    return bindings;
+                });
+
+                realmKeyBindings = new Live<IRealmCollection<RealmKeyBinding>>(context =>
+                {
+                    var bindings = realm.Context.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).AsRealmCollection();
+
+                    realmSubscription = bindings
+                        .SubscribeForNotifications((sender, changes, error) =>
+                        {
+                            // first subscription ignored as we are handling this in LoadComplete.
+                            if (changes == null)
+                                return;
+
+                            ReloadMappings();
+                        });
+
+                    return bindings;
+                }, realm);
             }
 
             base.LoadComplete();
@@ -90,7 +111,7 @@ namespace osu.Game.Input.Bindings
                 KeyBindings = defaults;
             else
             {
-                KeyBindings = realmKeyBindings.Detach()
+                KeyBindings = realmKeyBindings.Get().ToList().Detach()
                                               // this ordering is important to ensure that we read entries from the database in the order
                                               // enforced by DefaultKeyBindings. allow for song select to handle actions that may otherwise
                                               // have been eaten by the music controller due to query order.

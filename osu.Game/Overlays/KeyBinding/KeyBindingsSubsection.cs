@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.KeyBinding
             List<RealmKeyBinding> bindings;
 
             using (var usage = realm.GetForRead())
-                bindings = usage.Realm.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).Detach();
+                bindings = usage.Realm.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList().Detach();
 
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {

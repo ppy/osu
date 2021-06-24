@@ -57,12 +57,12 @@ namespace osu.Game.Database
         /// <returns>A wrapped instance of the provided item.</returns>
         /// <exception cref="ArgumentException">Throws if the provided item is managed.</exception>
         public static Live<T> WrapAsUnmanaged<T>(this T item)
-            where T : RealmObject, IHasGuidPrimaryKey
+            where T : class
         {
-            if (item.IsManaged)
+            if (item is RealmObject realmObject && realmObject.IsManaged)
                 throw new ArgumentException("Provided item must not be managed", nameof(item));
 
-            return new Live<T>(item, null);
+            return new Live<T>(_ => item, null);
         }
     }
 }

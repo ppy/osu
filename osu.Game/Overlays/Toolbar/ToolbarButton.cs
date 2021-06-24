@@ -167,17 +167,20 @@ namespace osu.Game.Overlays.Toolbar
 
             if (Hotkey == null) return;
 
-            var b = realm.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.ActionInt == (int)Hotkey.Value);
-            if (b != null)
-                realmKeyBinding = realm.ConvertToLive(b);
-
-            realmKeyBinding?.Bind(binding =>
+            realmKeyBinding = realm.CreateLive(context =>
             {
-                binding.PropertyChanged += (sender, args) =>
+                RealmKeyBinding binding = realm.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.ActionInt == (int)Hotkey.Value);
+
+                if (binding != null)
                 {
-                    if (args.PropertyName == nameof(binding.KeyCombinationString))
-                        updateKeyBindingTooltip();
-                };
+                    binding.PropertyChanged += (sender, args) =>
+                    {
+                        if (args.PropertyName == nameof(binding.KeyCombinationString))
+                            updateKeyBindingTooltip();
+                    };
+                }
+
+                return binding;
             });
 
             updateKeyBindingTooltip();
