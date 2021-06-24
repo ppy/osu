@@ -84,6 +84,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// </summary>
         private const double undim_duration = 96;
 
+        /// <summary>
+        /// Acceptable difference for timing comparisons
+        /// </summary>
+        private const double timing_precision = 1;
+
         #endregion
 
         #region Private Fields
@@ -198,11 +203,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var beats = beatmap.ControlPointInfo.TimingPoints
                                // Ignore timing points after endTime
-                               .Where(timingPoint => Precision.AlmostBigger(endTime, timingPoint.Time))
+                               .Where(timingPoint => almostBigger(endTime, timingPoint.Time))
                                // Generate the beats
                                .SelectMany(timingPoint => getBeatsForTimingPoint(timingPoint, endTime))
                                // Remove beats before startTime
-                               .Where(beat => Precision.AlmostBigger(beat, startTime))
+                               .Where(beat => almostBigger(beat, startTime))
                                // Remove beats during breaks
                                .Where(beat => !isInsideBreakPeriod(beatmap.Breaks, beat))
                                .ToList();
@@ -212,7 +217,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 var beat = beats[i];
 
-                if (Precision.AlmostBigger(beatmap.ControlPointInfo.TimingPointAt(beat).BeatLength / 2, beats[i + 1] - beat))
+                if (almostBigger(beatmap.ControlPointInfo.TimingPointAt(beat).BeatLength / 2, beats[i + 1] - beat))
                     beats.RemoveAt(i);
             }
 
@@ -257,7 +262,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             // Copy combo indices from the closest preceding object
             hitObjects.ForEach(obj =>
             {
-                var closestOrigObj = origHitObjects.FindLast(y => Precision.AlmostBigger(obj.StartTime, y.StartTime));
+                var closestOrigObj = origHitObjects.FindLast(y => almostBigger(obj.StartTime, y.StartTime));
 
                 // It shouldn't be possible for closestOrigObj to be null
                 // But if it is, obj should be in the first combo
@@ -397,10 +402,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             return breaks.Any(breakPeriod =>
             {
-                var firstObjAfterBreak = origHitObjects.First(obj => Precision.AlmostBigger(obj.StartTime, breakPeriod.EndTime));
+                var firstObjAfterBreak = origHitObjects.First(obj => almostBigger(obj.StartTime, breakPeriod.EndTime));
 
-                return Precision.AlmostBigger(time, breakPeriod.StartTime)
-                       && Precision.AlmostBigger(firstObjAfterBreak.StartTime, time);
+                return almostBigger(time, breakPeriod.StartTime)
+                       && almostBigger(firstObjAfterBreak.StartTime, time);
             });
         }
 
@@ -410,7 +415,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             int i = 0;
             var currentTime = timingPoint.Time;
 
-            while (Precision.AlmostBigger(mapEndTime, currentTime) && controlPointInfo.TimingPointAt(currentTime) == timingPoint)
+            while (almostBigger(mapEndTime, currentTime) && controlPointInfo.TimingPointAt(currentTime) == timingPoint)
             {
                 beats.Add(Math.Floor(currentTime));
                 i++;
@@ -436,13 +441,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             //   or has a repeat node at the target time
             var sampleObj = hitObjects.FirstOrDefault(hitObject =>
             {
-                if (Precision.AlmostEquals(time, hitObject.StartTime))
+                if (almostEquals(time, hitObject.StartTime))
                     return true;
 
                 if (!(hitObject is IHasPathWithRepeats s))
                     return false;
-                if (!Precision.AlmostBigger(time, hitObject.StartTime)
-                    || !Precision.AlmostBigger(s.EndTime, time))
+                if (!almostBigger(time, hitObject.StartTime)
+                    || !almostBigger(s.EndTime, time))
                     return false;
 
                 return nodeIndexFromTime(s, time - hitObject.StartTime) != -1;
@@ -470,7 +475,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             double spanDuration = curve.Duration / curve.SpanCount();
             double nodeIndex = timeSinceStart / spanDuration;
 
-            if (Precision.AlmostEquals(nodeIndex - Math.Round(nodeIndex), 0))
+            if (almostEquals(nodeIndex - Math.Round(nodeIndex), 0))
                 return (int)Math.Round(nodeIndex);
 
             return -1;
@@ -581,6 +586,16 @@ namespace osu.Game.Rulesets.Osu.Mods
         private static float map(float value, float fromLow, float fromHigh, float toLow, float toHigh)
         {
             return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
+        }
+
+        private static bool almostBigger(double value1, double value2)
+        {
+            return Precision.AlmostBigger(value1, value2, timing_precision);
+        }
+
+        private static bool almostEquals(double value1, double value2)
+        {
+            return Precision.AlmostEquals(value1, value2, timing_precision);
         }
 
         #endregion
