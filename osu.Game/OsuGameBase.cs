@@ -499,7 +499,7 @@ namespace osu.Game
 
             contextFactory.FlushConnections();
 
-            if (Host != null)
+            if (Host?.UpdateThread != null)
                 Host.UpdateThread.ThreadPausing -= onUpdateThreadPausing;
         }
     }
