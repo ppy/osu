@@ -19,19 +19,18 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// </summary>
         public readonly Room Room = new Room();
 
-        [Cached]
-        private readonly Bindable<Room> roomBindable;
-
         public TestRoomContainer()
         {
             RelativeSizeAxes = Axes.Both;
-            roomBindable = new Bindable<Room>(Room);
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            var dependencies = new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
-            dependencies.Model.Value = Room;
+            var dependencies = new DependencyContainer(
+                new CachedModelDependencyContainer<Room>(parent) { Model = { Value = Room } });
+
+            dependencies.Cache(new Bindable<Room>(Room));
+
             return dependencies;
         }
     }
