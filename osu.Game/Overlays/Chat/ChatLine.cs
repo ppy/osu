@@ -240,7 +240,7 @@ namespace osu.Game.Overlays.Chat
             {
                 get
                 {
-                    if (sender == User.SYSTEM_USER)
+                    if (sender.Equals(User.SYSTEM_USER))
                         return Array.Empty<MenuItem>();
 
                     List<MenuItem> items = new List<MenuItem>
@@ -248,7 +248,7 @@ namespace osu.Game.Overlays.Chat
                         new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action)
                     };
 
-                    if (sender.Id != api.LocalUser.Value.Id)
+                    if (!sender.Equals(api.LocalUser.Value))
                         items.Add(new OsuMenuItem("Start Chat", MenuItemType.Standard, startChatAction));
 
                     return items.ToArray();
