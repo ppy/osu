@@ -331,7 +331,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     tryCount++;
                     if (tryCount % 10 == 0) distance *= 0.9f;
-                } while (distance >= obj.Radius * 2 && isOverlappingWithRecent(hitObjects, i));
+                } while (distance >= obj.Radius * 2 && checkForOverlap(hitObjects.SkipLast(hitObjects.Count - i).TakeLast(overlap_check_count), obj));
 
                 if (obj.LastInCombo)
                     direction = two_pi * nextSingle();
@@ -470,11 +470,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             return -1;
         }
 
-        private bool isOverlappingWithRecent(IReadOnlyList<OsuHitObject> hitObjects, int idx)
+        private bool checkForOverlap(IEnumerable<OsuHitObject> objectsToCheck, OsuHitObject target)
         {
-            var target = hitObjects[idx];
-            return hitObjects.SkipLast(hitObjects.Count - idx).TakeLast(overlap_check_count)
-                             .Any(h => Vector2.Distance(h.Position, target.Position) < target.Radius * 2);
+            return objectsToCheck.Any(h => Vector2.Distance(h.Position, target.Position) < target.Radius * 2);
         }
 
         /// <summary>
