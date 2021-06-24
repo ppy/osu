@@ -25,8 +25,9 @@ namespace osu.Game.Overlays.BeatmapListing
     public class BeatmapListingFilterControl : CompositeDrawable
     {
         /// <summary>
-        /// Fired when a search finishes. Contains only new items in the case of pagination.
-        /// Fired with BeatmapListingSearchControl when non-supporter user used supporter-only filters.
+        /// Fired when a search finishes.
+        /// SearchFinished.Type = ResultsReturned when results returned. Contains only new items in the case of pagination.
+        /// SearchFinished.Type = SupporterOnlyFilter when a non-supporter user applied supporter-only filters.
         /// </summary>
         public Action<SearchResult> SearchFinished;
 
@@ -216,7 +217,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 getSetsRequest = null;
 
                 // check if an non-supporter user used supporter-only filters
-                if (!api.LocalUser.Value.IsSupporter && (searchControl.Ranks.Any() || searchControl.Played.Value != SearchPlayed.Any))
+                if (!api.LocalUser.Value.IsSupporter)
                 {
                     List<LocalisableString> filters = new List<LocalisableString>();
 
@@ -226,12 +227,14 @@ namespace osu.Game.Overlays.BeatmapListing
                     if (searchControl.Ranks.Any())
                         filters.Add(BeatmapsStrings.ListingSearchFiltersRank);
 
-                    SearchFinished?.Invoke(SearchResult.SupporterOnlyFilter(filters));
+                    if (filters.Any())
+                    {
+                        SearchFinished?.Invoke(SearchResult.SupporterOnlyFilter(filters));
+                        return;
+                    }
                 }
-                else
-                {
-                    SearchFinished?.Invoke(SearchResult.ResultsReturned(sets));
-                }
+
+                SearchFinished?.Invoke(SearchResult.ResultsReturned(sets));
             };
 
             api.Queue(getSetsRequest);
@@ -259,10 +262,14 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public enum SearchResultType
         {
+            // returned with Results
             ResultsReturned,
+            // non-supporter user applied supporter-only filters
             SupporterOnlyFilter
         }
 
+        // Results only valid when Type == ResultsReturned
+        // Filters only valid when Type == SupporterOnlyFilter
         public struct SearchResult
         {
             public SearchResultType Type { get; private set; }

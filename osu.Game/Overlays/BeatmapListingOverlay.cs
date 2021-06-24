@@ -256,7 +256,7 @@ namespace osu.Game.Overlays
         // using string literals as there's no proper processing for LocalizeStrings yet
         public class SupporterRequiredDrawable : CompositeDrawable
         {
-            private OsuSpriteText filtersText;
+            private LinkFlowContainer supporterRequiredText;
 
             public SupporterRequiredDrawable()
             {
@@ -275,7 +275,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Direction = FillDirection.Horizontal,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         new Sprite
                         {
@@ -285,39 +285,31 @@ namespace osu.Game.Overlays
                             FillMode = FillMode.Fit,
                             Texture = textures.Get(@"Online/supporter-required"),
                         },
-                        createSupporterText(),
+                        supporterRequiredText = new LinkFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            AutoSizeAxes = Axes.Both,
+                            Margin = new MarginPadding { Bottom = 10 },
+                        },
                     }
                 });
             }
 
             public void UpdateText(List<LocalisableString> filters)
             {
-                // use string literals for now
-                filtersText.Text = BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(string.Join(" and ", filters), "").ToString();
-            }
+                supporterRequiredText.Clear();
 
-            private Drawable createSupporterText()
-            {
-                LinkFlowContainer supporterRequiredText = new LinkFlowContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both,
-                    Margin = new MarginPadding { Bottom = 10 },
-                };
-
-                filtersText = (OsuSpriteText)supporterRequiredText.AddText(
-                    "_",
+                supporterRequiredText.AddText(
+                    BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(string.Join(" and ", filters), "").ToString(),
                     t =>
                     {
                         t.Font = OsuFont.GetFont(size: 16);
                         t.Colour = Colour4.White;
                     }
-                ).First();
+                );
 
                 supporterRequiredText.AddLink(BeatmapsStrings.ListingSearchSupporterFilterQuoteLinkText.ToString(), @"/store/products/supporter-tag");
-
-                return supporterRequiredText;
             }
         }
 
