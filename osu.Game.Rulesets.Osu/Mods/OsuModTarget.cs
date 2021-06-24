@@ -93,6 +93,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private List<OsuHitObject> origHitObjects;
 
+        private Random rng;
+
         #endregion
 
         #region Sudden Death (IApplicableFailOverride)
@@ -161,6 +163,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
             Seed.Value ??= RNG.Next();
+            rng = new Random(Seed.Value.GetValueOrDefault());
 
             var osuBeatmap = (OsuBeatmap)beatmap;
 
@@ -283,8 +286,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         private void randomizeCirclePos(IReadOnlyList<OsuHitObject> hitObjects)
         {
             if (hitObjects.Count == 0) return;
-
-            var rng = new Random(Seed.Value.GetValueOrDefault());
 
             float nextSingle(float max = 1f) => (float)(rng.NextDouble() * max);
 
