@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                                .Where(timingPoint => Precision.AlmostBigger(endTime, timingPoint.Time))
                                .SelectMany(timingPoint => getBeatsForTimingPoint(timingPoint, endTime))
                                .Where(beat => Precision.AlmostBigger(beat, startTime))
-                               .Where(beat => isInsideBreakPeriod(beatmap.Breaks, beat))
+                               .Where(beat => !isInsideBreakPeriod(beatmap.Breaks, beat))
                                .ToList();
 
             // Remove beats that are too close to the next one (e.g. due to timing point changes)
@@ -207,7 +207,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 var beat = beats[i];
 
-                if (Precision.AlmostBigger(beatmap.ControlPointInfo.TimingPointAt(beat).BeatLength / 2, beats[i + 1] - beat)) beats.RemoveAt(i);
+                if (Precision.AlmostBigger(beatmap.ControlPointInfo.TimingPointAt(beat).BeatLength / 2, beats[i + 1] - beat))
+                    beats.RemoveAt(i);
             }
 
             return beats;
@@ -381,7 +382,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <param name="time">The time to be checked.</param>=
         private bool isInsideBreakPeriod(IEnumerable<BreakPeriod> breaks, double time)
         {
-            return !breaks.Any(breakPeriod =>
+            return breaks.Any(breakPeriod =>
             {
                 var firstObjAfterBreak = origHitObjects.First(obj => Precision.AlmostBigger(obj.StartTime, breakPeriod.EndTime));
 
