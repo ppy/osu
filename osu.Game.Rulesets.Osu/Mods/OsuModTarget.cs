@@ -249,13 +249,20 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void fixComboInfo(List<OsuHitObject> hitObjects)
         {
-            // First follow the combo indices in the original beatmap
-            hitObjects.ForEach(x =>
+            // Copy combo indices from the closest preceding object
+            hitObjects.ForEach(obj =>
             {
-                var origObj = origHitObjects.FindLast(y => Precision.AlmostBigger(x.StartTime, y.StartTime));
-                x.ComboIndex = origObj?.ComboIndex ?? 0;
+                var closestOrigObj = origHitObjects.FindLast(y => Precision.AlmostBigger(obj.StartTime, y.StartTime));
+
+                // It shouldn't be possible for origObj to be null
+                // But if it is, obj should be in the first combo
+                obj.ComboIndex = closestOrigObj?.ComboIndex ?? 0;
             });
-            // Then reprocess them to ensure continuity in the combo indices and add indices in current combo
+
+            // The copied combo indices may not be continuous if the original map starts and ends a combo in between beats
+            // e.g. A stream with each object starting a new combo
+            // So combo indices need to be reprocessed to ensure continuity
+            // Other kinds of combo info are also added in the process
             var combos = hitObjects.GroupBy(x => x.ComboIndex).ToList();
 
             for (var i = 0; i < combos.Count; i++)
