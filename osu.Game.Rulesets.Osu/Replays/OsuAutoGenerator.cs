@@ -279,8 +279,8 @@ namespace osu.Game.Rulesets.Osu.Replays
                 {
                     Vector2 currentPosition = Interpolation.ValueAt(time, lastPosition, targetPos, lastFrame.Time, h.StartTime, easing);
 
-                    //Search in framesPendingAdjust to see if any frame has time == current time
-                    //If there is, it means the cursor should be at currentPosition if it's still moving during the KEY_UP_DELAY.
+                    //Search in framesPendingAdjust for frames with .Time == current time
+                    //If found, it means the cursor should be at currentPosition assume it's still moving during the KEY_UP_DELAY.
                     var adjustingFrame = framesPendingAdjust.FirstOrDefault(frame => Precision.AlmostEquals(frame.Time, time, GetFrameDelay(time)));
 
                     if (adjustingFrame != null)
@@ -324,11 +324,14 @@ namespace osu.Game.Rulesets.Osu.Replays
 
             var timeDifference = ApplyModsToTimeDelta(endFrame.Time, next.StartTime);
 
-            //We don't know the exact position the cursor will be at end time, so add it to pending adjust
-            if (timeDifference > GetFrameDelay(endFrame.Time)) framesPendingAdjust.Add(endFrame);
+            //We don't know where the cursor should be at end time, so add it to pending adjust
+            if (timeDifference > GetFrameDelay(endFrame.Time))
+                framesPendingAdjust.Add(endFrame);
 
-            //In 2B maps we cant order hitobjects by their start time, so just move on to the next one
-            else if (next != h /* is not the last hitobject */) endFrame.Position = next.StackedPosition;
+            //For 2B maps which we can't order hitobjects by their start time, so just move to the next one
+            //Moving to StackedEndPosition because timeDifference < FrameDelay < KEY_UP_DELAY
+            else
+                endFrame.Position = next.StackedEndPosition;
 
             // Decrement because we want the previous frame, not the next one
             int index = FindInsertionIndex(startFrame) - 1;
