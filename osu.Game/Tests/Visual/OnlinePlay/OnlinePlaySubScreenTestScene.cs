@@ -2,16 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Beatmaps;
 using osu.Game.Online.Rooms;
-using osu.Game.Rulesets;
 using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
@@ -28,7 +24,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// <summary>
         /// The cached <see cref="IRoomManager"/>
         /// </summary>
-        protected TestRoomManager RoomManager { get; private set; }
+        protected IRoomManager RoomManager { get; private set; }
 
         protected Bindable<FilterCriteria> Filter { get; private set; }
 
@@ -53,78 +49,20 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         protected virtual IReadOnlyDependencyContainer CreateScreenDependencies(IReadOnlyDependencyContainer parent)
         {
             SelectedRoom = new Bindable<Room>();
-            RoomManager = new TestRoomManager();
+            RoomManager = CreateRoomManager();
             Filter = new Bindable<FilterCriteria>(new FilterCriteria());
             OngoingOperationTracker = new OngoingOperationTracker();
 
             var dependencies = new DependencyContainer(new CachedModelDependencyContainer<Room>(parent) { Model = { BindTarget = SelectedRoom } });
             dependencies.CacheAs(SelectedRoom);
-            dependencies.CacheAs<IRoomManager>(RoomManager);
+            dependencies.CacheAs(RoomManager);
             dependencies.CacheAs(Filter);
             dependencies.CacheAs(OngoingOperationTracker);
 
             return dependencies;
         }
 
-        protected class TestRoomManager : IRoomManager
-        {
-            public event Action RoomsUpdated
-            {
-                add { }
-                remove { }
-            }
-
-            public readonly BindableList<Room> Rooms = new BindableList<Room>();
-
-            public IBindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>(true);
-
-            IBindableList<Room> IRoomManager.Rooms => Rooms;
-
-            public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
-            {
-                room.RoomID.Value ??= Rooms.Select(r => r.RoomID.Value).Where(id => id != null).Select(id => id.Value).DefaultIfEmpty().Max() + 1;
-                Rooms.Add(room);
-                onSuccess?.Invoke(room);
-            }
-
-            public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => onSuccess?.Invoke(room);
-
-            public void PartRoom()
-            {
-            }
-
-            public void AddRooms(int count, RulesetInfo ruleset = null)
-            {
-                for (int i = 0; i < count; i++)
-                {
-                    var room = new Room
-                    {
-                        RoomID = { Value = i },
-                        Name = { Value = $"Room {i}" },
-                        Host = { Value = new User { Username = "Host" } },
-                        EndDate = { Value = DateTimeOffset.Now + TimeSpan.FromSeconds(10) },
-                        Category = { Value = i % 2 == 0 ? RoomCategory.Spotlight : RoomCategory.Normal }
-                    };
-
-                    if (ruleset != null)
-                    {
-                        room.Playlist.Add(new PlaylistItem
-                        {
-                            Ruleset = { Value = ruleset },
-                            Beatmap =
-                            {
-                                Value = new BeatmapInfo
-                                {
-                                    Metadata = new BeatmapMetadata()
-                                }
-                            }
-                        });
-                    }
-
-                    CreateRoom(room);
-                }
-            }
-        }
+        protected virtual IRoomManager CreateRoomManager() => new TestBasicRoomManager();
 
         /// <summary>
         /// A dummy screen used for injecting new dependencies into the hierarchy before any screen is pushed via <see cref="ScreenTestScene.LoadScreen"/>.
