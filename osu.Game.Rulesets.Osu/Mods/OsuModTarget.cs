@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         .Then().Delay(h.TimePreempt - controlPointInfo.TimingPointAt(h.StartTime).BeatLength - undim_duration)
                         .FadeColour(colour, undim_duration);
 
-                // remove approach circles
+                // Remove approach circles
                 circle.ApproachCircle.Hide();
             }
         }
@@ -239,7 +239,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     if (lastSampleIdx > 0)
                     {
-                        // get samples from the previous hit object if it is closer in time
+                        // Get samples from the previous hit object if it is closer in time
                         if (obj.StartTime - origHitObjects[lastSampleIdx - 1].StartTime < origHitObjects[lastSampleIdx].StartTime - obj.StartTime)
                             lastSampleIdx--;
                     }
@@ -259,7 +259,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 var closestOrigObj = origHitObjects.FindLast(y => Precision.AlmostBigger(obj.StartTime, y.StartTime));
 
-                // It shouldn't be possible for origObj to be null
+                // It shouldn't be possible for closestOrigObj to be null
                 // But if it is, obj should be in the first combo
                 obj.ComboIndex = closestOrigObj?.ComboIndex ?? 0;
             });
