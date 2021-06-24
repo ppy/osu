@@ -217,29 +217,32 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var lastSampleIdx = 0;
 
-            foreach (var x in hitObjects)
+            foreach (var obj in hitObjects)
             {
-                var samples = getSamplesAtTime(origHitObjects, x.StartTime);
+                var samples = getSamplesAtTime(origHitObjects, obj.StartTime);
 
                 if (samples == null)
                 {
-                    while (lastSampleIdx < origHitObjects.Count && origHitObjects[lastSampleIdx].StartTime <= x.StartTime)
+                    // If samples aren't available at the exact start time of the object,
+                    // use samples (without additions) in the closest original hit object instead
+
+                    while (lastSampleIdx < origHitObjects.Count && origHitObjects[lastSampleIdx].StartTime <= obj.StartTime)
                         lastSampleIdx++;
-                    lastSampleIdx--;
 
-                    if (lastSampleIdx < 0 && lastSampleIdx >= origHitObjects.Count) continue;
+                    if (lastSampleIdx >= origHitObjects.Count) continue;
 
-                    if (lastSampleIdx < origHitObjects.Count - 1)
+                    if (lastSampleIdx > 0)
                     {
-                        // get samples from the next hit object if it is closer in time
-                        if (origHitObjects[lastSampleIdx + 1].StartTime - x.StartTime < x.StartTime - origHitObjects[lastSampleIdx].StartTime)
-                            lastSampleIdx++;
+                        // get samples from the previous hit object if it is closer in time
+                        if (obj.StartTime - origHitObjects[lastSampleIdx - 1].StartTime < origHitObjects[lastSampleIdx].StartTime - obj.StartTime)
+                            lastSampleIdx--;
                     }
 
-                    x.Samples = origHitObjects[lastSampleIdx].Samples.Where(s => !HitSampleInfo.AllAdditions.Contains(s.Name)).ToList();
+                    // Remove additions
+                    obj.Samples = origHitObjects[lastSampleIdx].Samples.Where(s => !HitSampleInfo.AllAdditions.Contains(s.Name)).ToList();
                 }
                 else
-                    x.Samples = samples;
+                    obj.Samples = samples;
             }
         }
 
