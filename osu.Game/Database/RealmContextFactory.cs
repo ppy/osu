@@ -103,8 +103,6 @@ namespace osu.Game.Database
         {
             base.Update();
 
-            if (!blockingResetEvent.IsSet) return;
-
             if (Context.Refresh())
                 refreshes.Value++;
         }
@@ -154,6 +152,8 @@ namespace osu.Game.Database
 
         public IDisposable BlockAllOperations()
         {
+            // TODO: this should only ever be called from the update thread. probably want to assert as such.
+
             blockingLock.Wait();
             flushContexts();
 
