@@ -20,6 +20,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -413,28 +414,46 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <returns>Hit samples</returns>
         private IList<HitSampleInfo> getSamplesAtTime(IEnumerable<OsuHitObject> hitObjects, double time)
         {
-            var sampleObj = hitObjects.FirstOrDefault(x =>
+            var sampleObj = hitObjects.FirstOrDefault(hitObject =>
             {
-                if (Precision.AlmostEquals(time, x.StartTime)) return true;
+                if (Precision.AlmostEquals(time, hitObject.StartTime))
+                    return true;
 
-                if (!(x is Slider s))
+                if (!(hitObject is IHasPathWithRepeats s))
                     return false;
-                if (!Precision.AlmostBigger(time, s.StartTime)
+                if (!Precision.AlmostBigger(time, hitObject.StartTime)
                     || !Precision.AlmostBigger(s.EndTime, time))
                     return false;
 
-                return Precision.AlmostEquals((time - s.StartTime) % s.SpanDuration, 0);
+                return nodeIndexFromTime(s, time - hitObject.StartTime) != -1;
             });
             if (sampleObj == null) return null;
 
             IList<HitSampleInfo> samples;
 
             if (sampleObj is Slider slider)
-                samples = slider.NodeSamples[(int)Math.Round((time - slider.StartTime) % slider.SpanDuration)];
+                samples = slider.NodeSamples[nodeIndexFromTime(slider, time - slider.StartTime)];
             else
                 samples = sampleObj.Samples;
 
             return samples;
+        }
+
+        /// <summary>
+        /// Get the repeat node at a point in time.
+        /// </summary>
+        /// <param name="curve">The slider.</param>
+        /// <param name="timeSinceStart">The time since the start time of the slider.</param>
+        /// <returns>Index of the node. -1 if there isn't a node at the specific time.</returns>
+        private int nodeIndexFromTime(IHasPathWithRepeats curve, double timeSinceStart)
+        {
+            double spanDuration = curve.Duration / curve.SpanCount();
+            double nodeIndex = timeSinceStart / spanDuration;
+
+            if (Precision.AlmostEquals(nodeIndex - Math.Round(nodeIndex), 0))
+                return (int)Math.Round(nodeIndex);
+
+            return -1;
         }
 
         private bool isOverlappingWithRecent(IReadOnlyList<OsuHitObject> hitObjects, int idx)
