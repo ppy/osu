@@ -10,11 +10,11 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
-using osu.Game.Tests.Visual.Multiplayer;
+using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsLoungeSubScreen : RoomManagerTestScene
+    public class TestScenePlaylistsLoungeSubScreen : OnlinePlaySubScreenTestScene
     {
         private LoungeSubScreen loungeScreen;
 
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestScrollSelectedIntoView()
         {
-            AddRooms(30);
+            AddStep("add rooms", () => RoomManager.AddRooms(30));
 
             AddUntilStep("first room is not masked", () => checkRoomVisible(roomsContainer.Rooms.First()));
 

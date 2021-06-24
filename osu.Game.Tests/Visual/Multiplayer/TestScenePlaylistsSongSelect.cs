@@ -14,6 +14,7 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -86,6 +87,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("reset", () =>
             {
+                SelectedRoom.Value = new Room();
                 Ruleset.Value = new OsuRuleset().RulesetInfo;
                 Beatmap.SetDefault();
                 SelectedMods.Value = Array.Empty<Mod>();
@@ -99,14 +101,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestItemAddedIfEmptyOnStart()
         {
             AddStep("finalise selection", () => songSelect.FinaliseSelection());
-            AddAssert("playlist has 1 item", () => Room.Playlist.Count == 1);
+            AddAssert("playlist has 1 item", () => SelectedRoom.Value.Playlist.Count == 1);
         }
 
         [Test]
         public void TestItemAddedWhenCreateNewItemClicked()
         {
             AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
-            AddAssert("playlist has 1 item", () => Room.Playlist.Count == 1);
+            AddAssert("playlist has 1 item", () => SelectedRoom.Value.Playlist.Count == 1);
         }
 
         [Test]
@@ -114,7 +116,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
             AddStep("finalise selection", () => songSelect.FinaliseSelection());
-            AddAssert("playlist has 1 item", () => Room.Playlist.Count == 1);
+            AddAssert("playlist has 1 item", () => SelectedRoom.Value.Playlist.Count == 1);
         }
 
         [Test]
@@ -122,7 +124,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
             AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
-            AddAssert("playlist has 2 items", () => Room.Playlist.Count == 2);
+            AddAssert("playlist has 2 items", () => SelectedRoom.Value.Playlist.Count == 2);
         }
 
         [Test]
@@ -132,13 +134,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
             AddStep("rearrange", () =>
             {
-                var item = Room.Playlist[0];
-                Room.Playlist.RemoveAt(0);
-                Room.Playlist.Add(item);
+                var item = SelectedRoom.Value.Playlist[0];
+                SelectedRoom.Value.Playlist.RemoveAt(0);
+                SelectedRoom.Value.Playlist.Add(item);
             });
 
             AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
-            AddAssert("new item has id 2", () => Room.Playlist.Last().ID == 2);
+            AddAssert("new item has id 2", () => SelectedRoom.Value.Playlist.Last().ID == 2);
         }
 
         /// <summary>
@@ -152,8 +154,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("change mod rate", () => ((OsuModDoubleTime)SelectedMods.Value[0]).SpeedChange.Value = 2);
             AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem());
 
-            AddAssert("item 1 has rate 1.5", () => Precision.AlmostEquals(1.5, ((OsuModDoubleTime)Room.Playlist.First().RequiredMods[0]).SpeedChange.Value));
-            AddAssert("item 2 has rate 2", () => Precision.AlmostEquals(2, ((OsuModDoubleTime)Room.Playlist.Last().RequiredMods[0]).SpeedChange.Value));
+            AddAssert("item 1 has rate 1.5", () => Precision.AlmostEquals(1.5, ((OsuModDoubleTime)SelectedRoom.Value.Playlist.First().RequiredMods[0]).SpeedChange.Value));
+            AddAssert("item 2 has rate 2", () => Precision.AlmostEquals(2, ((OsuModDoubleTime)SelectedRoom.Value.Playlist.Last().RequiredMods[0]).SpeedChange.Value));
         }
 
         /// <summary>
@@ -175,7 +177,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem());
 
             AddStep("change stored mod rate", () => mod.SpeedChange.Value = 2);
-            AddAssert("item has rate 1.5", () => Precision.AlmostEquals(1.5, ((OsuModDoubleTime)Room.Playlist.First().RequiredMods[0]).SpeedChange.Value));
+            AddAssert("item has rate 1.5", () => Precision.AlmostEquals(1.5, ((OsuModDoubleTime)SelectedRoom.Value.Playlist.First().RequiredMods[0]).SpeedChange.Value));
         }
 
         private class TestPlaylistsSongSelect : PlaylistsSongSelect
