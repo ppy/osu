@@ -79,7 +79,8 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Contains objects dropped from the plate.
         /// </summary>
-        private readonly DroppedObjectContainer droppedObjectTarget;
+        [Resolved]
+        private DroppedObjectContainer droppedObjectTarget { get; set; }
 
         public CatcherAnimationState CurrentState
         {
@@ -134,10 +135,9 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly DrawablePool<CaughtBanana> caughtBananaPool;
         private readonly DrawablePool<CaughtDroplet> caughtDropletPool;
 
-        public Catcher([NotNull] Container trailsTarget, [NotNull] DroppedObjectContainer droppedObjectTarget, BeatmapDifficulty difficulty = null)
+        public Catcher([NotNull] Container trailsTarget, BeatmapDifficulty difficulty = null)
         {
             this.trailsTarget = trailsTarget;
-            this.droppedObjectTarget = droppedObjectTarget;
 
             Origin = Anchor.TopCentre;
 

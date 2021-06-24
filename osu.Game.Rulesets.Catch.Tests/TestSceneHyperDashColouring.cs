@@ -118,11 +118,10 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             AddStep("create hyper-dashing catcher", () =>
             {
-                Child = setupSkinHierarchy(catcherArea = new CatcherArea(new DroppedObjectContainer())
+                Child = setupSkinHierarchy(catcherArea = new TestCatcherArea
                 {
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(4f),
+                    Origin = Anchor.Centre
                 }, skin);
             });
 
@@ -204,6 +203,19 @@ namespace osu.Game.Rulesets.Catch.Tests
             public TestSkin()
                 : base(new SkinInfo(), null, null, string.Empty)
             {
+            }
+        }
+
+        private class TestCatcherArea : CatcherArea
+        {
+            [Cached]
+            private readonly DroppedObjectContainer droppedObjectContainer;
+
+            public TestCatcherArea()
+            {
+                Scale = new Vector2(4f);
+
+                AddInternal(droppedObjectContainer = new DroppedObjectContainer());
             }
         }
     }
