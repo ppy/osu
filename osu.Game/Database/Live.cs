@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
+using osu.Framework.Development;
 using Realms;
 
 #nullable enable
@@ -64,21 +66,20 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Retrieve a detached copy of the data.
-        /// </summary>
-        public T Detach() => Get().Detach(); // TODO: this doesn't work on collections unfortunately..
-
-        /// <summary>
         /// Perform a write operation on this live object.
         /// </summary>
         /// <param name="perform">The action to perform.</param>
         public void PerformUpdate(Action<T> perform)
         {
-            using (realm?.GetForWrite())
-                perform(Get());
-        }
+            Debug.Assert(ThreadSafety.IsUpdateThread);
 
-        public static implicit operator T?(Live<T>? wrapper) => wrapper?.Detach() ?? null;
+            using (var usage = realm?.GetForWrite())
+            {
+                Debug.Assert(usage == null || ReferenceEquals(usage.Realm, retrievalContext));
+                perform(data);
+                usage?.Commit();
+            }
+        }
 
         public override string ToString() => Get().ToString();
 

@@ -4,6 +4,7 @@
 using System;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
@@ -76,10 +77,11 @@ namespace osu.Game.Database
 
         public RealmUsage GetForRead()
         {
-            // todo: can potentially use the main context when on update thread.
-
             reads.Value++;
-            return new RealmUsage(createContext());
+
+            return ThreadSafety.IsUpdateThread
+                ? new RealmUsage(Context, false)
+                : new RealmUsage(createContext(), true);
         }
 
         public RealmWriteUsage GetForWrite()
@@ -88,7 +90,10 @@ namespace osu.Game.Database
             pending_writes.Value++;
 
             Monitor.Enter(writeLock);
-            return new RealmWriteUsage(createContext(), writeComplete);
+
+            return ThreadSafety.IsUpdateThread
+                ? new RealmWriteUsage(Context, false, writeComplete)
+                : new RealmWriteUsage(createContext(), true, writeComplete);
         }
 
         public Live<T> CreateLive<T>(Func<Realm, T> func) where T : class
@@ -185,11 +190,13 @@ namespace osu.Game.Database
         public class RealmUsage : IDisposable
         {
             public readonly Realm Realm;
+            private readonly bool shouldDispose;
 
-            internal RealmUsage(Realm context)
+            internal RealmUsage(Realm context, bool shouldDispose)
             {
                 active_usages.Value++;
                 Realm = context;
+                this.shouldDispose = shouldDispose;
             }
 
             /// <summary>
@@ -197,7 +204,8 @@ namespace osu.Game.Database
             /// </summary>
             public virtual void Dispose()
             {
-                Realm?.Dispose();
+                if (shouldDispose)
+                    Realm?.Dispose();
                 active_usages.Value--;
             }
         }
@@ -210,8 +218,8 @@ namespace osu.Game.Database
             private readonly Action onWriteComplete;
             private readonly Transaction transaction;
 
-            internal RealmWriteUsage(Realm context, Action onWriteComplete)
-                : base(context)
+            internal RealmWriteUsage(Realm context, bool shouldDispose, Action onWriteComplete)
+                : base(context, shouldDispose)
             {
                 this.onWriteComplete = onWriteComplete;
                 transaction = Realm.BeginWrite();
