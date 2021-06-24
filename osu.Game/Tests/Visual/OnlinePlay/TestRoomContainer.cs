@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(
-                new CachedModelDependencyContainer<Room>(parent) { Model = { Value = Room } });
+                new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent)) { Model = { Value = Room } });
 
             dependencies.Cache(new Bindable<Room>(Room));
 
