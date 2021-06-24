@@ -13,6 +13,7 @@ using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -89,6 +90,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private ControlPointInfo controlPointInfo;
 
+        private List<OsuHitObject> origHitObjects;
+
         #endregion
 
         #region Sudden Death (IApplicableFailOverride)
@@ -163,9 +166,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (osuBeatmap.HitObjects.Count == 0) return;
 
             controlPointInfo = osuBeatmap.ControlPointInfo;
-            var origHitObjects = osuBeatmap.HitObjects.OrderBy(x => x.StartTime).ToList();
+            origHitObjects = osuBeatmap.HitObjects.OrderBy(x => x.StartTime).ToList();
 
-            var hitObjects = generateBeats(osuBeatmap, origHitObjects)
+            var hitObjects = generateBeats(osuBeatmap)
                              .Select(x =>
                              {
                                  var newCircle = new HitCircle();
@@ -174,9 +177,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                                  return (OsuHitObject)newCircle;
                              }).ToList();
 
-            addHitSamples(hitObjects, origHitObjects);
+            addHitSamples(hitObjects);
 
-            fixComboInfo(hitObjects, origHitObjects);
+            fixComboInfo(hitObjects);
 
             randomizeCirclePos(hitObjects);
 
@@ -185,21 +188,17 @@ namespace osu.Game.Rulesets.Osu.Mods
             base.ApplyToBeatmap(beatmap);
         }
 
-        private IEnumerable<double> generateBeats(IBeatmap beatmap, IReadOnlyCollection<OsuHitObject> origHitObjects)
+        private IEnumerable<double> generateBeats(IBeatmap beatmap)
         {
             var startTime = origHitObjects.First().StartTime;
             var endObj = origHitObjects.Last();
             var endTime = endObj.GetEndTime();
 
             var beats = beatmap.ControlPointInfo.TimingPoints
-                               .Where(x => Precision.AlmostBigger(endTime, x.Time))
+                               .Where(timingPoint => Precision.AlmostBigger(endTime, timingPoint.Time))
                                .SelectMany(timingPoint => getBeatsForTimingPoint(timingPoint, endTime))
-                               .Where(x => Precision.AlmostBigger(x, startTime))
-                               // Remove beats during breaks
-                               .Where(x => !beatmap.Breaks.Any(b =>
-                                   Precision.AlmostBigger(x, b.StartTime)
-                                   && Precision.AlmostBigger(origHitObjects.First(y => Precision.AlmostBigger(y.StartTime, b.EndTime)).StartTime, x)
-                               ))
+                               .Where(beat => Precision.AlmostBigger(beat, startTime))
+                               .Where(beat => isInsideBreakPeriod(beatmap.Breaks, beat))
                                .ToList();
 
             // Remove beats that are too close to the next one (e.g. due to timing point changes)
@@ -213,7 +212,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             return beats;
         }
 
-        private void addHitSamples(IEnumerable<OsuHitObject> hitObjects, IReadOnlyList<OsuHitObject> origHitObjects)
+        private void addHitSamples(IEnumerable<OsuHitObject> hitObjects)
         {
             var lastSampleIdx = 0;
 
@@ -243,7 +242,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        private void fixComboInfo(List<OsuHitObject> hitObjects, List<OsuHitObject> origHitObjects)
+        private void fixComboInfo(List<OsuHitObject> hitObjects)
         {
             // First follow the combo indices in the original beatmap
             hitObjects.ForEach(x =>
@@ -366,6 +365,26 @@ namespace osu.Game.Rulesets.Osu.Mods
         #endregion
 
         #region Helper Subroutines
+
+        /// <summary>
+        /// Check if a given time is inside a <see cref="BreakPeriod"/>.
+        /// </summary>
+        /// <remarks>
+        /// The given time is also considered to be inside a break if it is earlier than the
+        /// start time of the first original hit object after the break.
+        /// </remarks>
+        /// <param name="breaks">The breaks of the beatmap.</param>
+        /// <param name="time">The time to be checked.</param>=
+        private bool isInsideBreakPeriod(IEnumerable<BreakPeriod> breaks, double time)
+        {
+            return !breaks.Any(breakPeriod =>
+            {
+                var firstObjAfterBreak = origHitObjects.First(obj => Precision.AlmostBigger(obj.StartTime, breakPeriod.EndTime));
+
+                return Precision.AlmostBigger(time, breakPeriod.StartTime)
+                       && Precision.AlmostBigger(firstObjAfterBreak.StartTime, time);
+            });
+        }
 
         private IEnumerable<double> getBeatsForTimingPoint(TimingControlPoint timingPoint, double mapEndTime)
         {
