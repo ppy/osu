@@ -20,10 +20,11 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
+using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestScenePlaylistsSongSelect : RoomTestScene
+    public class TestScenePlaylistsSongSelect : OnlinePlaySubScreenTestScene
     {
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
