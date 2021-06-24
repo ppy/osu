@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 distanceToPrev * (float)Math.Sin(current.AngleRad)
             );
 
-            posRelativeToPrev = VectorHelper.RotateAwayFromEdge(previous.EndPositionRandomised, posRelativeToPrev);
+            posRelativeToPrev = VectorUtils.RotateAwayFromEdge(previous.EndPositionRandomised, posRelativeToPrev);
 
             current.AngleRad = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
 
