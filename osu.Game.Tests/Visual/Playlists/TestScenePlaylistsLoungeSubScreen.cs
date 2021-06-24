@@ -3,10 +3,10 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
@@ -16,12 +16,11 @@ namespace osu.Game.Tests.Visual.Playlists
 {
     public class TestScenePlaylistsLoungeSubScreen : OnlinePlaySubScreenTestScene
     {
+        protected new TestBasicRoomManager RoomManager => (TestBasicRoomManager)base.RoomManager;
+
         private LoungeSubScreen loungeScreen;
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-        }
+        protected override IRoomManager CreateRoomManager() => new TestBasicRoomManager();
 
         public override void SetUpSteps()
         {
