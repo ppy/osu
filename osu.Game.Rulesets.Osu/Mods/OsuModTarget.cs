@@ -17,6 +17,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
@@ -188,12 +189,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var startTime = origHitObjects.First().StartTime;
             var endObj = origHitObjects.Last();
-            var endTime = endObj switch
-            {
-                Slider slider => slider.EndTime,
-                Spinner spinner => spinner.EndTime,
-                _ => endObj.StartTime
-            };
+            var endTime = endObj.GetEndTime();
 
             var beats = beatmap.ControlPointInfo.TimingPoints
                                .Where(x => Precision.AlmostBigger(endTime, x.Time))
