@@ -193,19 +193,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var beats = beatmap.ControlPointInfo.TimingPoints
                                .Where(x => Precision.AlmostBigger(endTime, x.Time))
-                               .SelectMany(tp =>
-                               {
-                                   var tpBeats = new List<double>();
-                                   var currentTime = tp.Time;
-
-                                   while (Precision.AlmostBigger(endTime, currentTime) && beatmap.ControlPointInfo.TimingPointAt(currentTime) == tp)
-                                   {
-                                       tpBeats.Add(Math.Floor(currentTime));
-                                       currentTime += tp.BeatLength;
-                                   }
-
-                                   return tpBeats;
-                               })
+                               .SelectMany(timingPoint => getBeatsForTimingPoint(timingPoint, endTime))
                                .Where(x => Precision.AlmostBigger(x, startTime))
                                // Remove beats during breaks
                                .Where(x => !beatmap.Breaks.Any(b =>
@@ -378,6 +366,22 @@ namespace osu.Game.Rulesets.Osu.Mods
         #endregion
 
         #region Helper Subroutines
+
+        private IEnumerable<double> getBeatsForTimingPoint(TimingControlPoint timingPoint, double mapEndTime)
+        {
+            var beats = new List<double>();
+            int i = 0;
+            var currentTime = timingPoint.Time;
+
+            while (Precision.AlmostBigger(mapEndTime, currentTime) && controlPointInfo.TimingPointAt(currentTime) == timingPoint)
+            {
+                beats.Add(Math.Floor(currentTime));
+                i++;
+                currentTime = timingPoint.Time + i * timingPoint.BeatLength;
+            }
+
+            return beats;
+        }
 
         /// <summary>
         /// Get samples (if any) for a specific point in time.
