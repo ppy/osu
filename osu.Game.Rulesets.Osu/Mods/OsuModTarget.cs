@@ -173,11 +173,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             origHitObjects = osuBeatmap.HitObjects.OrderBy(x => x.StartTime).ToList();
 
             var hitObjects = generateBeats(osuBeatmap)
-                             .Select(x =>
+                             .Select(beat =>
                              {
                                  var newCircle = new HitCircle();
                                  newCircle.ApplyDefaults(controlPointInfo, osuBeatmap.BeatmapInfo.BaseDifficulty);
-                                 newCircle.StartTime = x;
+                                 newCircle.StartTime = beat;
                                  return (OsuHitObject)newCircle;
                              }).ToList();
 
@@ -199,9 +199,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             var endTime = endObj.GetEndTime();
 
             var beats = beatmap.ControlPointInfo.TimingPoints
+                               // Ignore timing points after endTime
                                .Where(timingPoint => Precision.AlmostBigger(endTime, timingPoint.Time))
+                               // Generate the beats
                                .SelectMany(timingPoint => getBeatsForTimingPoint(timingPoint, endTime))
+                               // Remove beats before startTime
                                .Where(beat => Precision.AlmostBigger(beat, startTime))
+                               // Remove beats during breaks
                                .Where(beat => !isInsideBreakPeriod(beatmap.Breaks, beat))
                                .ToList();
 
@@ -320,6 +324,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         distance * MathF.Cos(direction),
                         distance * MathF.Sin(direction)
                     );
+                    // Rotate the new circle away from playfield border
                     relativePos = getRotatedVector(lastPos, relativePos);
                     direction = MathF.Atan2(relativePos.Y, relativePos.X);
 
@@ -428,6 +433,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <returns>Hit samples</returns>
         private IList<HitSampleInfo> getSamplesAtTime(IEnumerable<OsuHitObject> hitObjects, double time)
         {
+            // Get a hit object that
+            //   either has StartTime equal to the target time
+            //   or has a repeat node at the target time
             var sampleObj = hitObjects.FirstOrDefault(hitObject =>
             {
                 if (Precision.AlmostEquals(time, hitObject.StartTime))
@@ -550,6 +558,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             );
         }
 
+        /// <summary>
+        /// Move the hit object into playfield, taking its radius into account.
+        /// </summary>
+        /// <param name="obj">The hit object to be clamped.</param>
         private void clampToPlayfield(OsuHitObject obj)
         {
             var position = obj.Position;
