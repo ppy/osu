@@ -330,22 +330,12 @@ namespace osu.Game.Overlays.Mods
                                                 Spacing = new Vector2(footer_button_spacing / 2, 0),
                                                 Origin = Anchor.CentreLeft,
                                                 Anchor = Anchor.CentreLeft,
-                                                Children = new Drawable[]
+                                                Child = MultiplierLabel = new OsuSpriteText
                                                 {
-                                                    new OsuSpriteText
-                                                    {
-                                                        Text = @"Score Multiplier:",
-                                                        Font = OsuFont.GetFont(size: 30),
-                                                        Origin = Anchor.CentreLeft,
-                                                        Anchor = Anchor.CentreLeft,
-                                                    },
-                                                    MultiplierLabel = new OsuSpriteText
-                                                    {
-                                                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
-                                                        Origin = Anchor.CentreLeft,
-                                                        Anchor = Anchor.CentreLeft,
-                                                        Width = 70, // make width fixed so reflow doesn't occur when multiplier number changes.
-                                                    },
+                                                    Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
+                                                    Origin = Anchor.CentreLeft,
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Width = 70, // make width fixed so reflow doesn't occur when multiplier number changes.
                                                 },
                                             },
                                         }
