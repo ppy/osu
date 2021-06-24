@@ -289,7 +289,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             float nextSingle(float max = 1f) => (float)(rng.NextDouble() * max);
 
-            var direction = MathHelper.TwoPi * nextSingle();
+            const float two_pi = MathF.PI * 2;
+
+            var direction = two_pi * nextSingle();
             var maxComboIndex = hitObjects.Last().ComboIndex;
 
             for (var i = 0; i < hitObjects.Count; i++)
@@ -312,14 +314,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 do
                 {
-                    if (tryCount > 0) direction = MathHelper.TwoPi * nextSingle();
+                    if (tryCount > 0) direction = two_pi * nextSingle();
 
                     var relativePos = new Vector2(
-                        distance * (float)Math.Cos(direction),
-                        distance * (float)Math.Sin(direction)
+                        distance * MathF.Cos(direction),
+                        distance * MathF.Sin(direction)
                     );
                     relativePos = getRotatedVector(lastPos, relativePos);
-                    direction = (float)Math.Atan2(relativePos.Y, relativePos.X);
+                    direction = MathF.Atan2(relativePos.Y, relativePos.X);
 
                     var newPosition = Vector2.Add(lastPos, relativePos);
 
@@ -332,9 +334,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 } while (distance >= obj.Radius * 2 && isOverlappingWithRecent(hitObjects, i));
 
                 if (obj.LastInCombo)
-                    direction = MathHelper.TwoPi * nextSingle();
+                    direction = two_pi * nextSingle();
                 else
-                    direction += distance / distance_cap * (nextSingle() * MathHelper.TwoPi - MathHelper.Pi);
+                    direction += distance / distance_cap * (nextSingle() * two_pi - MathF.PI);
             }
         }
 
