@@ -68,7 +68,11 @@ namespace osu.Game.Rulesets.Osu.Utils
                 );
             }
 
-            return RotateVectorTowardsVector(posRelativeToPrev, playfield_middle - prevObjectPos, relativeRotationDistance * rotationRatio);
+            return RotateVectorTowardsVector(
+                posRelativeToPrev,
+                playfield_middle - prevObjectPos,
+                Math.Min(1, relativeRotationDistance * rotationRatio)
+            );
         }
 
         /// <summary>
