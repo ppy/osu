@@ -32,13 +32,13 @@ namespace osu.Game.Overlays.KeyBinding
         }
 
         [BackgroundDependencyLoader]
-        private void load(RealmContextFactory realmFactory)
+        private void load(IRealmFactory realm)
         {
             var rulesetId = Ruleset?.ID;
 
             List<RealmKeyBinding> bindings;
 
-            using (var usage = realmFactory.GetForRead())
+            using (var usage = realm.GetForRead())
                 bindings = usage.Realm.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).Detach();
 
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))

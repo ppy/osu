@@ -14,9 +14,9 @@ namespace osu.Game.Input
 {
     public class RealmKeyBindingStore
     {
-        private readonly RealmContextFactory realmFactory;
+        private readonly IRealmFactory realmFactory;
 
-        public RealmKeyBindingStore(RealmContextFactory realmFactory)
+        public RealmKeyBindingStore(IRealmFactory realmFactory)
         {
             this.realmFactory = realmFactory;
         }

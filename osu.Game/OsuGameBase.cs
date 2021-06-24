@@ -181,7 +181,7 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
-            dependencies.Cache(realmFactory = new RealmContextFactory(Storage));
+            dependencies.CacheAs<IRealmFactory>(realmFactory = new RealmContextFactory(Storage));
 
             Host.UpdateThread.ThreadPausing += onUpdateThreadPausing;
 

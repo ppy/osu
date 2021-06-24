@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Database
 
         private RealmKeyBindingStore keyBindingStore;
 
-        private RealmContextFactory realmContextFactory;
+        private RealmContextFactory realm;
 
         [SetUp]
         public void SetUp()
@@ -31,8 +31,8 @@ namespace osu.Game.Tests.Database
 
             storage = new NativeStorage(directory.FullName);
 
-            realmContextFactory = new RealmContextFactory(storage);
-            keyBindingStore = new RealmKeyBindingStore(realmContextFactory);
+            realm = new RealmContextFactory(storage);
+            keyBindingStore = new RealmKeyBindingStore(realm);
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Database
             Assert.That(query().Where(k => k.ActionInt == (int)GlobalAction.Select).Count, Is.EqualTo(2));
         }
 
-        private IQueryable<RealmKeyBinding> query() => realmContextFactory.Context.All<RealmKeyBinding>();
+        private IQueryable<RealmKeyBinding> query() => realm.Context.All<RealmKeyBinding>();
 
         [Test]
         public void TestUpdateViaQueriedReference()
@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Database
 
             var tsr = ThreadSafeReference.Create(backBinding);
 
-            using (var usage = realmContextFactory.GetForWrite())
+            using (var usage = realm.GetForWrite())
             {
                 var binding = usage.Realm.ResolveReference(tsr);
                 binding.KeyCombination = new KeyCombination(InputKey.BackSpace);
@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Database
         [TearDown]
         public void TearDown()
         {
-            realmContextFactory.Dispose();
+            realm.Dispose();
             storage.DeleteDirectory(string.Empty);
         }
 

@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.KeyBinding
         }
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private IRealmFactory realm { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -366,7 +366,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         private void updateStoreFromButton(KeyButton button)
         {
-            using (var usage = realmFactory.GetForWrite())
+            using (var usage = realm.GetForWrite())
             {
                 var binding = usage.Realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
                 binding.KeyCombinationString = button.KeyBinding.KeyCombinationString;

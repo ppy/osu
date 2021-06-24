@@ -24,10 +24,10 @@ namespace osu.Game.Input.Bindings
         private readonly int? variant;
 
         private IDisposable realmSubscription;
-        private IQueryable<RealmKeyBinding> realmKeyBindings;
+        private IRealmCollection<RealmKeyBinding> realmKeyBindings;
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private IRealmFactory realm { get; set; }
 
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => ruleset.CreateInstance().GetDefaultKeyBindings(variant ?? 0);
 
@@ -54,8 +54,9 @@ namespace osu.Game.Input.Bindings
             {
                 var rulesetId = ruleset?.ID;
 
-                realmKeyBindings = realmFactory.Context.All<RealmKeyBinding>()
-                                               .Where(b => b.RulesetID == rulesetId && b.Variant == variant);
+                realmKeyBindings = realm.Context.All<RealmKeyBinding>()
+                                        .Where(b => b.RulesetID == rulesetId && b.Variant == variant)
+                                        .AsRealmCollection();
 
                 realmSubscription = realmKeyBindings
                     .SubscribeForNotifications((sender, changes, error) =>

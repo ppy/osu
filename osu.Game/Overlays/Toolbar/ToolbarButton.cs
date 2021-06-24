@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Toolbar
         protected FillFlowContainer Flow;
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private IRealmFactory realm { get; set; }
 
         protected ToolbarButton()
             : base(HoverSampleSet.Toolbar)
@@ -167,7 +167,9 @@ namespace osu.Game.Overlays.Toolbar
 
             if (Hotkey == null) return;
 
-            realmKeyBinding = realmFactory.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.ActionInt == (int)Hotkey.Value)?.Wrap(realmFactory);
+            var b = realm.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.ActionInt == (int)Hotkey.Value);
+            if (b != null)
+                realmKeyBinding = realm.ConvertToLive(b);
 
             realmKeyBinding?.Bind(binding =>
             {
