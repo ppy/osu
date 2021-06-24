@@ -80,6 +80,7 @@ namespace osu.Game.Database
             reads.Value++;
 
             return ThreadSafety.IsUpdateThread
+                // todo: in the case of the update thread a single instance could be returned to reduce allocs.
                 ? new RealmUsage(Context, false)
                 : new RealmUsage(createContext(), true);
         }
@@ -96,9 +97,9 @@ namespace osu.Game.Database
                 : new RealmWriteUsage(createContext(), true, writeComplete);
         }
 
-        public Live<T> CreateLive<T>(Func<Realm, T> func) where T : class
+        public Live<T> CreateLive<T>(Func<Realm, T> query) where T : class
         {
-            var live = new Live<T>(func, this);
+            var live = new Live<T>(query, this);
             liveObjects.Add(live);
             return live;
         }

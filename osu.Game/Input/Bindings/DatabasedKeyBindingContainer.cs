@@ -71,23 +71,6 @@ namespace osu.Game.Input.Bindings
 
                     return bindings;
                 });
-
-                realmKeyBindings = new Live<IRealmCollection<RealmKeyBinding>>(context =>
-                {
-                    var bindings = realm.Context.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).AsRealmCollection();
-
-                    realmSubscription = bindings
-                        .SubscribeForNotifications((sender, changes, error) =>
-                        {
-                            // first subscription ignored as we are handling this in LoadComplete.
-                            if (changes == null)
-                                return;
-
-                            ReloadMappings();
-                        });
-
-                    return bindings;
-                }, realm);
             }
 
             base.LoadComplete();
@@ -111,7 +94,7 @@ namespace osu.Game.Input.Bindings
                 KeyBindings = defaults;
             else
             {
-                KeyBindings = realmKeyBindings.Get().ToList().Detach()
+                KeyBindings = realmKeyBindings.Value.ToList().Detach()
                                               // this ordering is important to ensure that we read entries from the database in the order
                                               // enforced by DefaultKeyBindings. allow for song select to handle actions that may otherwise
                                               // have been eaten by the music controller due to query order.

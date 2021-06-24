@@ -13,57 +13,38 @@ namespace osu.Game.Database
     /// <summary>
     /// Provides a method of working with realm objects over longer application lifetimes.
     /// </summary>
-    /// <remarks>
-    /// To consume this as a live instance, the live object should be stored and accessed via <see cref="Get"/> each time.
-    /// To consume this as a detached instance, assign to a variable of type <typeparam ref="T"/>. The implicit conversion will handle detaching an instance (and copy all content out).
-    /// </remarks>
-    /// <typeparam name="T">The underlying object type. Should be a <see cref="RealmObject"/> with a primary key provided via <see cref="IHasGuidPrimaryKey"/>.</typeparam>
+    /// <typeparam name="T">The underlying object type.</typeparam>
     public class Live<T> : IRealmBindableActions
         where T : class
     {
+        private readonly Func<Realm, T> query;
+
+        private readonly IRealmFactory realm;
+
         /// <summary>
-        /// The currently retrieved instance of the realm data, sourced from <see cref="retrievalContext"/>.
+        /// The currently retrieved instance of the realm data, sourced from the <see cref="retrievedContext"/>.
         /// </summary>
-        private T data;
+        private T retrievedValue;
 
-        private readonly Func<Realm, T> setup;
-
-        private readonly IRealmFactory? realm;
-
-        private Realm? retrievalContext;
+        private Realm? retrievedContext;
 
         /// <summary>
         /// Construct a new instance of live realm data.
         /// </summary>
-        /// <param name="setup">The data to be consumed.</param>
-        /// <param name="realm">A context factory to allow transfer and re-retrieval over thread contexts. May be null if the provided item is not managed.</param>
-        public Live(Func<Realm, T> setup, IRealmFactory? realm)
+        /// <param name="query">A function which initialises and returns the value.</param>
+        /// <param name="realm">A context factory to allow transfer and re-retrieval over thread contexts.</param>
+        public Live(Func<Realm, T> query, IRealmFactory realm)
         {
-            this.setup = setup;
+            this.query = query;
             this.realm = realm;
 
-            data = Get();
+            retrievedValue = fetchThreadLocalValue();
         }
 
         /// <summary>
-        /// Access the underlying data directly from realm.
+        /// Access the underlying value directly from realm.
         /// </summary>
-        public T Get()
-        {
-            var previousContext = retrievalContext;
-
-            retrievalContext = realm?.Context;
-
-            // unmanaged data.
-            if (retrievalContext == null)
-                return data;
-
-            // if the retrieved context is still valid, no re-retrieval is required.
-            if (previousContext?.IsClosed == false && previousContext.IsSameInstance(retrievalContext))
-                return data;
-
-            return data = setup(retrievalContext);
-        }
+        public T Value => fetchThreadLocalValue();
 
         /// <summary>
         /// Perform a write operation on this live object.
@@ -73,16 +54,38 @@ namespace osu.Game.Database
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            using (var usage = realm?.GetForWrite())
+            using (var usage = realm.GetForWrite())
             {
-                Debug.Assert(usage == null || ReferenceEquals(usage.Realm, retrievalContext));
-                perform(data);
-                usage?.Commit();
+                // we are on the update thread so the context should always match our retrieved context.
+                // if this isn't the case things are going to fall over when making changes.
+                Debug.Assert(ReferenceEquals(usage.Realm, retrievedContext));
+
+                perform(retrievedValue);
+
+                usage.Commit();
             }
         }
 
-        public override string ToString() => Get().ToString();
+        /// <summary>
+        /// Fetches the value represented by this instance on the current update thread context.
+        /// </summary>
+        /// <returns></returns>
+        private T fetchThreadLocalValue()
+        {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
 
-        void IRealmBindableActions.RunSetupAction() => Get();
+            var localThreadContext = realm.Context;
+
+            // if the retrieved context is still valid, no re-retrieval is required.
+            if (retrievedContext?.IsClosed == false && retrievedContext.IsSameInstance(localThreadContext))
+                return retrievedValue;
+
+            retrievedContext = localThreadContext;
+            return retrievedValue = query(retrievedContext);
+        }
+
+        public override string ToString() => Value.ToString();
+
+        void IRealmBindableActions.RunSetupAction() => fetchThreadLocalValue();
     }
 }

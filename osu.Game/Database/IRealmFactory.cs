@@ -4,6 +4,8 @@
 using System;
 using Realms;
 
+#nullable enable
+
 namespace osu.Game.Database
 {
     public interface IRealmFactory
@@ -25,6 +27,13 @@ namespace osu.Game.Database
         /// <returns>A usage containing a usable context.</returns>
         RealmContextFactory.RealmWriteUsage GetForWrite();
 
-        Live<T> CreateLive<T>(Func<Realm, T> func) where T : class;
+        /// <summary>
+        /// Create an instance of live realm data, allowing bindings and subscriptions.
+        /// Must be run from the update thread.
+        /// </summary>
+        /// <param name="query">The query to construct (and on context loss, reconstruct) the value.</param>
+        /// <typeparam name="T">The type of the value.</typeparam>
+        /// <returns>A live instance.</returns>
+        Live<T> CreateLive<T>(Func<Realm, T> query) where T : class;
     }
 }

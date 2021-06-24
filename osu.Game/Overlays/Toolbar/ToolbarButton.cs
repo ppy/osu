@@ -227,7 +227,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             if (realmKeyBinding == null) return;
 
-            var keyBindingString = realmKeyBinding.Get().KeyCombination.ReadableString();
+            var keyBindingString = realmKeyBinding.Value.KeyCombination.ReadableString();
 
             if (!string.IsNullOrEmpty(keyBindingString))
                 keyBindingTooltip.Text = $" ({keyBindingString})";

@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using AutoMapper;
 using osu.Game.Input.Bindings;
@@ -47,22 +46,6 @@ namespace osu.Game.Database
                 return item;
 
             return mapper.Map<T>(item);
-        }
-
-        /// <summary>
-        /// Wrap an unmanaged instance of a realm object in a <see cref="Live{T}"/>.
-        /// </summary>
-        /// <param name="item">The item to wrap.</param>
-        /// <typeparam name="T">The type of object.</typeparam>
-        /// <returns>A wrapped instance of the provided item.</returns>
-        /// <exception cref="ArgumentException">Throws if the provided item is managed.</exception>
-        public static Live<T> WrapAsUnmanaged<T>(this T item)
-            where T : class
-        {
-            if (item is RealmObject realmObject && realmObject.IsManaged)
-                throw new ArgumentException("Provided item must not be managed", nameof(item));
-
-            return new Live<T>(_ => item, null);
         }
     }
 }
