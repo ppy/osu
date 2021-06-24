@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Rooms;
 
-namespace osu.Game.Tests.Visual
+namespace osu.Game.Tests.Visual.OnlinePlay
 {
     /// <summary>
     /// Contains a <see cref="Room"/> that is resolvable by components in test scenes.

@@ -9,6 +9,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Match.Components;
+using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Users;
 using osuTK;
 

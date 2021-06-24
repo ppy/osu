@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Playlists
