@@ -81,37 +81,44 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             directoryFlow.Clear();
 
-            try
-            {
-                if (directory.NewValue == null)
-                {
-                    var drives = DriveInfo.GetDrives();
+            var newDirectory = directory.NewValue;
 
-                    foreach (var drive in drives)
-                        directoryFlow.Add(new DirectoryPiece(drive.RootDirectory));
-
-                    return;
-                }
-
-                directory.NewValue.Refresh();
-
-                var newDirectory = directory.NewValue;
-
-                while (newDirectory != null && !newDirectory.Exists)
-                    newDirectory = newDirectory.Parent;
-
-                CurrentPath.Value = newDirectory;
-
-                if (newDirectory == null)
-                    return;
-
-                directoryFlow.Add(new ParentDirectoryPiece(newDirectory.Parent));
-                directoryFlow.AddRange(GetEntriesForPath(newDirectory));
-            }
-            catch (Exception)
-            {
-                CurrentPath.Value = directory.OldValue;
+            if (!newDirectoryIsAccessible())
                 this.FlashColour(Color4.Red, 300);
+
+            while (!newDirectoryIsAccessible())
+                newDirectory = newDirectory?.Parent;
+
+            if (newDirectory == null)
+            {
+                var drives = DriveInfo.GetDrives();
+
+                foreach (var drive in drives)
+                    directoryFlow.Add(new DirectoryPiece(drive.RootDirectory));
+
+                return;
+            }
+
+            directoryFlow.Add(new ParentDirectoryPiece(newDirectory.Parent));
+            directoryFlow.AddRange(GetEntriesForPath(newDirectory));
+            directoryFlow.Children.OfType<ParentDirectoryPiece>().First().CurrentDirectory.Value = newDirectory;
+
+            bool newDirectoryIsAccessible()
+            {
+                if (newDirectory == null)
+                    return true;
+
+                newDirectory.Refresh();
+
+                try
+                {
+                    newDirectory.GetDirectories();
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
             }
         }
 
@@ -219,7 +226,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             protected readonly DirectoryInfo Directory;
 
             [Resolved]
-            private Bindable<DirectoryInfo> currentDirectory { get; set; }
+            public Bindable<DirectoryInfo> CurrentDirectory { get; private set; }
 
             public DirectoryPiece(DirectoryInfo directory, string displayName = null)
                 : base(displayName)
@@ -229,7 +236,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected override bool OnClick(ClickEvent e)
             {
-                currentDirectory.Value = Directory;
+                CurrentDirectory.Value = Directory;
                 return true;
             }
 
