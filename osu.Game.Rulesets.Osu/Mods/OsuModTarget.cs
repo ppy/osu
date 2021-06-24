@@ -29,7 +29,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -146,8 +145,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 var colour = drawable.Colour;
 
-                var avgColour = colour.AverageColour.Linear;
-                drawable.FadeColour(new Color4(avgColour.R * 0.45f, avgColour.G * 0.45f, avgColour.B * 0.45f, avgColour.A))
+                drawable.FadeColour(OsuColour.Gray(0.45f))
                         .Then().Delay(h.TimePreempt - controlPointInfo.TimingPointAt(h.StartTime).BeatLength - undim_duration)
                         .FadeColour(colour, undim_duration);
 
