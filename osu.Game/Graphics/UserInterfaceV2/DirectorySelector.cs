@@ -99,9 +99,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 return;
             }
 
+            CurrentPath.Value = newDirectory;
+
             directoryFlow.Add(new ParentDirectoryPiece(newDirectory.Parent));
-            directoryFlow.AddRange(GetEntriesForPath(newDirectory));
-            directoryFlow.Children.OfType<ParentDirectoryPiece>().First().CurrentDirectory.Value = newDirectory;
+            if (TryGetEntriesForPath(newDirectory, out var displayPieces))
+                directoryFlow.AddRange(displayPieces);
 
             bool newDirectoryIsAccessible()
             {
@@ -110,31 +112,34 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                 newDirectory.Refresh();
 
-                try
-                {
-                    newDirectory.GetDirectories();
-                    return true;
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
+                return TryGetEntriesForPath(newDirectory, out displayPieces);
             }
         }
 
-        protected virtual IEnumerable<DisplayPiece> GetEntriesForPath(DirectoryInfo path)
+        protected virtual bool TryGetEntriesForPath(DirectoryInfo path, out IEnumerable<DisplayPiece> displayPieces)
         {
-            foreach (var dir in path.GetDirectories().OrderBy(d => d.Name))
+            displayPieces = new List<DisplayPiece>();
+
+            try
             {
-                if ((dir.Attributes & FileAttributes.Hidden) == 0)
-                    yield return new DirectoryPiece(dir);
+                foreach (var dir in path.GetDirectories().OrderBy(d => d.Name))
+                {
+                    if ((dir.Attributes & FileAttributes.Hidden) == 0)
+                        displayPieces = displayPieces.Append(new DirectoryPiece(dir));
+                }
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 
         private class CurrentDirectoryDisplay : CompositeDrawable
         {
             [Resolved]
-            private Bindable<DirectoryInfo> currentDirectory { get; set; }
+            public Bindable<DirectoryInfo> CurrentDirectory { get; private set; }
 
             private FillFlowContainer flow;
 
@@ -154,7 +159,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     },
                 };
 
-                currentDirectory.BindValueChanged(updateDisplay, true);
+                CurrentDirectory.BindValueChanged(updateDisplay, true);
             }
 
             private void updateDisplay(ValueChangedEvent<DirectoryInfo> dir)
@@ -226,7 +231,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             protected readonly DirectoryInfo Directory;
 
             [Resolved]
-            public Bindable<DirectoryInfo> CurrentDirectory { get; private set; }
+            private Bindable<DirectoryInfo> currentDirectory { get; set; }
 
             public DirectoryPiece(DirectoryInfo directory, string displayName = null)
                 : base(displayName)
@@ -236,7 +241,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             protected override bool OnClick(ClickEvent e)
             {
-                CurrentDirectory.Value = Directory;
+                currentDirectory.Value = Directory;
                 return true;
             }
 

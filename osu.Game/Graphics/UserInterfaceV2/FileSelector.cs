@@ -25,10 +25,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
             this.validFileExtensions = validFileExtensions ?? Array.Empty<string>();
         }
 
-        protected override IEnumerable<DisplayPiece> GetEntriesForPath(DirectoryInfo path)
+        protected override bool TryGetEntriesForPath(DirectoryInfo path, out IEnumerable<DisplayPiece> displayPieces)
         {
-            foreach (var dir in base.GetEntriesForPath(path))
-                yield return dir;
+            displayPieces = new List<DisplayPiece>();
+
+            if (!base.TryGetEntriesForPath(path, out var directories))
+                return false;
+
+            displayPieces = directories;
 
             IEnumerable<FileInfo> files = path.GetFiles();
 
@@ -38,8 +42,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
             foreach (var file in files.OrderBy(d => d.Name))
             {
                 if ((file.Attributes & FileAttributes.Hidden) == 0)
-                    yield return new FilePiece(file);
+                    displayPieces = displayPieces.Append(new FilePiece(file));
             }
+
+            return true;
         }
 
         protected class FilePiece : DisplayPiece
