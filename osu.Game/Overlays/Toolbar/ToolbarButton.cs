@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Toolbar
 
             realmKeyBinding = realm.CreateLive(context =>
             {
-                RealmKeyBinding binding = realm.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.ActionInt == (int)Hotkey.Value);
+                RealmKeyBinding binding = context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.ActionInt == (int)Hotkey.Value);
 
                 if (binding != null)
                 {
