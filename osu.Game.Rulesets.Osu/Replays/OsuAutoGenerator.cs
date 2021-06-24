@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                 addHitObjectReplay(h, i);
             }
 
-            //Apply key up frame adjustments
+            //Apply key up frame adjustments at the end to ensure frame order
             framesPendingAdjust.ForEach(f => Frames.Remove(f));
             framesAfterAdjust.ForEach(AddFrameToReplay);
 
@@ -172,15 +172,6 @@ namespace osu.Game.Rulesets.Osu.Replays
                 }
             }
 
-            //Gets the actual next hitobject we should move to
-            var next = Beatmap.HitObjects[index == Beatmap.HitObjects.Count - 1 ? index : index + 1];
-
-            while (next is Spinner { SpinsRequired: 0 } && index < Beatmap.HitObjects.Count - 1)
-            {
-                index++;
-                next = Beatmap.HitObjects[index == Beatmap.HitObjects.Count - 1 ? index : index + 1];
-            }
-
             // Do some nice easing for cursor movements
             if (Frames.Count > 0)
             {
@@ -188,7 +179,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
 
             // Add frames to click the hitobject
-            addHitObjectClickFrames(h, next, startPosition, spinnerDirection);
+            addHitObjectClickFrames(h, (OsuHitObject)GetNextObject(index), startPosition, spinnerDirection);
         }
 
         #endregion
@@ -240,6 +231,22 @@ namespace osu.Game.Rulesets.Osu.Replays
                 startPosition = SPINNER_CENTRE + new Vector2(0, -SPIN_RADIUS);
                 spinnerDirection = 1;
             }
+        }
+
+        /// <summary>
+        /// Gets the next hitobect that requires an action
+        /// Returns the same object if currentIndex is the index of the last hitobject
+        /// </summary>
+        protected override HitObject GetNextObject(int currentIndex)
+        {
+            var next = Beatmap.HitObjects[currentIndex == Beatmap.HitObjects.Count - 1 ? currentIndex : currentIndex + 1];
+
+            while (next is Spinner { SpinsRequired: 0 } && currentIndex < Beatmap.HitObjects.Count - 1)
+            {
+                next = Beatmap.HitObjects[++currentIndex];
+            }
+
+            return next;
         }
 
         private void moveToHitObject(OsuHitObject h, Vector2 targetPos, Easing easing)
