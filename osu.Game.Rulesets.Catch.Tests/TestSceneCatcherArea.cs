@@ -96,15 +96,12 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             SetContents(_ =>
             {
-                var droppedObjectContainer = new DroppedObjectContainer();
-
                 return new CatchInputManager(catchRuleset)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        droppedObjectContainer,
-                        new TestCatcherArea(droppedObjectContainer, beatmapDifficulty)
+                        new TestCatcherArea(beatmapDifficulty)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.TopCentre,
@@ -122,9 +119,13 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class TestCatcherArea : CatcherArea
         {
-            public TestCatcherArea(DroppedObjectContainer droppedObjectContainer, BeatmapDifficulty beatmapDifficulty)
-                : base(droppedObjectContainer, beatmapDifficulty)
+            [Cached]
+            private readonly DroppedObjectContainer droppedObjectContainer;
+
+            public TestCatcherArea(BeatmapDifficulty beatmapDifficulty)
+                : base(beatmapDifficulty)
             {
+                AddInternal(droppedObjectContainer = new DroppedObjectContainer());
             }
 
             public void ToggleHyperDash(bool status) => MovableCatcher.SetHyperDashState(status ? 2 : 1);
