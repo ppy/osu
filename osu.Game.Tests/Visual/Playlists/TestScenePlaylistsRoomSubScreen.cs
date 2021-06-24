@@ -40,8 +40,6 @@ namespace osu.Game.Tests.Visual.Playlists
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
 
-            manager.Import(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Wait();
-
             ((DummyAPIAccess)API).HandleRequest = req =>
             {
                 switch (req)
@@ -58,6 +56,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [SetUpSteps]
         public void SetupSteps()
         {
+            AddStep("ensure has beatmap", () => manager.Import(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Wait());
             AddStep("load match", () => LoadScreen(match = new TestPlaylistsRoomSubScreen(Room)));
             AddUntilStep("wait for load", () => match.IsCurrentScreen());
         }
