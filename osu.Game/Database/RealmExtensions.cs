@@ -50,16 +50,6 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Wrap a managed instance of a realm object in a <see cref="Live{T}"/>.
-        /// </summary>
-        /// <param name="item">The item to wrap.</param>
-        /// <param name="contextFactory">A factory to retrieve realm contexts from.</param>
-        /// <typeparam name="T">The type of object.</typeparam>
-        /// <returns>A wrapped instance of the provided item.</returns>
-        public static Live<T> Wrap<T>(this T item, IRealmFactory contextFactory)
-            where T : RealmObject, IHasGuidPrimaryKey => new Live<T>(item, contextFactory);
-
-        /// <summary>
         /// Wrap an unmanaged instance of a realm object in a <see cref="Live{T}"/>.
         /// </summary>
         /// <param name="item">The item to wrap.</param>
