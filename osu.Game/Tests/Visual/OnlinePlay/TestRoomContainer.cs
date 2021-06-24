@@ -10,7 +10,7 @@ using osu.Game.Online.Rooms;
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
     /// <summary>
-    /// Contains a <see cref="Room"/> that is resolvable by components in test scenes.
+    /// Contains a single <see cref="Room"/> that is resolvable by components in test scenes.
     /// </summary>
     public class TestRoomContainer : Container
     {

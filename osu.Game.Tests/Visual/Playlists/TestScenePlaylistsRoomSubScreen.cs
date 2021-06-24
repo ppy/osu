@@ -15,7 +15,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps;
@@ -27,9 +26,6 @@ namespace osu.Game.Tests.Visual.Playlists
 {
     public class TestScenePlaylistsRoomSubScreen : OnlinePlaySubScreenTestScene
     {
-        [Cached(typeof(IRoomManager))]
-        private readonly TestRoomManager roomManager = new TestRoomManager();
-
         private BeatmapManager manager;
         private RulesetStore rulesets;
 
@@ -59,7 +55,8 @@ namespace osu.Game.Tests.Visual.Playlists
         [SetUpSteps]
         public void SetupSteps()
         {
-            AddStep("load match", () => LoadScreen(match = new TestPlaylistsRoomSubScreen(Room)));
+            AddStep("set room", () => SelectedRoom.Value = new Room());
+            AddStep("load match", () => LoadScreen(match = new TestPlaylistsRoomSubScreen(SelectedRoom.Value)));
             AddUntilStep("wait for load", () => match.IsCurrentScreen());
         }
 
@@ -68,12 +65,12 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("set room properties", () =>
             {
-                Room.RoomID.Value = 1;
-                Room.Name.Value = "my awesome room";
-                Room.Host.Value = new User { Id = 2, Username = "peppy" };
-                Room.RecentParticipants.Add(Room.Host.Value);
-                Room.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
-                Room.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.RoomID.Value = 1;
+                SelectedRoom.Value.Name.Value = "my awesome room";
+                SelectedRoom.Value.Host.Value = new User { Id = 2, Username = "peppy" };
+                SelectedRoom.Value.RecentParticipants.Add(SelectedRoom.Value.Host.Value);
+                SelectedRoom.Value.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                     Ruleset = { Value = new OsuRuleset().RulesetInfo }
@@ -89,9 +86,9 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("set room properties", () =>
             {
-                Room.Name.Value = "my awesome room";
-                Room.Host.Value = new User { Id = 2, Username = "peppy" };
-                Room.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.Name.Value = "my awesome room";
+                SelectedRoom.Value.Host.Value = new User { Id = 2, Username = "peppy" };
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                     Ruleset = { Value = new OsuRuleset().RulesetInfo }
@@ -105,7 +102,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
 
-            AddAssert("first playlist item selected", () => match.SelectedItem.Value == Room.Playlist[0]);
+            AddAssert("first playlist item selected", () => match.SelectedItem.Value == SelectedRoom.Value.Playlist[0]);
         }
 
         [Test]
@@ -123,9 +120,9 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("load room", () =>
             {
-                Room.Name.Value = "my awesome room";
-                Room.Host.Value = new User { Id = 2, Username = "peppy" };
-                Room.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.Name.Value = "my awesome room";
+                SelectedRoom.Value.Host.Value = new User { Id = 2, Username = "peppy" };
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = importedSet.Beatmaps[0] },
                     Ruleset = { Value = new OsuRuleset().RulesetInfo }
@@ -153,31 +150,6 @@ namespace osu.Game.Tests.Visual.Playlists
 
             public TestPlaylistsRoomSubScreen(Room room)
                 : base(room)
-            {
-            }
-        }
-
-        private class TestRoomManager : IRoomManager
-        {
-            public event Action RoomsUpdated
-            {
-                add => throw new NotImplementedException();
-                remove => throw new NotImplementedException();
-            }
-
-            public IBindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>(true);
-
-            public IBindableList<Room> Rooms { get; } = new BindableList<Room>();
-
-            public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
-            {
-                room.RoomID.Value = 1;
-                onSuccess?.Invoke(room);
-            }
-
-            public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => onSuccess?.Invoke(room);
-
-            public void PartRoom()
             {
             }
         }
