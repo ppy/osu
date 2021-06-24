@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
@@ -35,10 +34,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatchPlayfield(BeatmapDifficulty difficulty)
         {
-            var droppedObjectContainer = new Container<CaughtObject>
-            {
-                RelativeSizeAxes = Axes.Both,
-            };
+            var droppedObjectContainer = new DroppedObjectContainer();
 
             CatcherArea = new CatcherArea(droppedObjectContainer, difficulty)
             {

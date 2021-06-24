@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         private int currentDirection;
 
-        public CatcherArea(Container<CaughtObject> droppedObjectContainer, BeatmapDifficulty difficulty = null)
+        public CatcherArea(DroppedObjectContainer droppedObjectContainer, BeatmapDifficulty difficulty = null)
         {
             Size = new Vector2(CatchPlayfield.WIDTH, CATCHER_SIZE);
             Children = new Drawable[]

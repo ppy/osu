@@ -6,7 +6,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -97,10 +96,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             SetContents(_ =>
             {
-                var droppedObjectContainer = new Container<CaughtObject>
-                {
-                    RelativeSizeAxes = Axes.Both
-                };
+                var droppedObjectContainer = new DroppedObjectContainer();
 
                 return new CatchInputManager(catchRuleset)
                 {
@@ -126,7 +122,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class TestCatcherArea : CatcherArea
         {
-            public TestCatcherArea(Container<CaughtObject> droppedObjectContainer, BeatmapDifficulty beatmapDifficulty)
+            public TestCatcherArea(DroppedObjectContainer droppedObjectContainer, BeatmapDifficulty beatmapDifficulty)
                 : base(droppedObjectContainer, beatmapDifficulty)
             {
             }
