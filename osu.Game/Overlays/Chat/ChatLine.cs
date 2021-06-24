@@ -240,7 +240,7 @@ namespace osu.Game.Overlays.Chat
             {
                 get
                 {
-                    if (sender.Id == User.SYSTEM_USER.Id)
+                    if (sender == User.SYSTEM_USER)
                         return Array.Empty<MenuItem>();
 
                     List<MenuItem> items = new List<MenuItem>
