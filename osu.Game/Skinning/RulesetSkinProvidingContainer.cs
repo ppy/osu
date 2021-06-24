@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
@@ -87,11 +88,18 @@ namespace osu.Game.Skinning
                 }
             }
 
-            var defaultSkinIndex = SkinSources.IndexOf(skinManager.DefaultSkin);
-            if (defaultSkinIndex >= 0)
-                SkinSources.Insert(defaultSkinIndex, new RulesetResourcesSkin(Ruleset, host, audio));
-            else
-                SkinSources.Add(new RulesetResourcesSkin(Ruleset, host, audio));
+            if (Ruleset.CreateResourceStore() is IResourceStore<byte[]> resources)
+            {
+                int defaultSkinIndex = SkinSources.IndexOf(skinManager.DefaultSkin);
+
+                if (defaultSkinIndex >= 0)
+                    SkinSources.Insert(defaultSkinIndex, new ResourcesSkin(resources, host, audio));
+                else
+                {
+                    // Tests may potentially override the SkinManager with another source that doesn't include it in AllSources.
+                    SkinSources.Add(new ResourcesSkin(resources, host, audio));
+                }
+            }
         }
 
         protected ISkin GetLegacyRulesetTransformedSkin(ISkin legacySkin)

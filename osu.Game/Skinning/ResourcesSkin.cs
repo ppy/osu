@@ -13,38 +13,32 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Audio;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// An <see cref="ISkin"/> providing the resources of the ruleset for accessibility during lookups.
+    /// An <see cref="ISkin"/> that uses an underlying <see cref="IResourceStore{T}"/> with namespaces for resources retrieval.
     /// </summary>
-    public class RulesetResourcesSkin : ISkin
+    public class ResourcesSkin : ISkin
     {
-        private readonly TextureStore? textures;
-        private readonly ISampleStore? samples;
+        private readonly TextureStore textures;
+        private readonly ISampleStore samples;
 
-        public RulesetResourcesSkin(Ruleset ruleset, GameHost host, AudioManager audio)
+        public ResourcesSkin(IResourceStore<byte[]> resources, GameHost host, AudioManager audio)
         {
-            IResourceStore<byte[]>? resources = ruleset.CreateResourceStore();
-
-            if (resources != null)
-            {
-                textures = new TextureStore(host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, @"Textures")));
-                samples = audio.GetSampleStore(new NamespacedResourceStore<byte[]>(resources, @"Samples"));
-            }
+            textures = new TextureStore(host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, @"Textures")));
+            samples = audio.GetSampleStore(new NamespacedResourceStore<byte[]>(resources, @"Samples"));
         }
 
         public Drawable? GetDrawableComponent(ISkinComponent component) => null;
 
-        public Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => textures?.Get(componentName, wrapModeS, wrapModeT);
+        public Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => textures.Get(componentName, wrapModeS, wrapModeT);
 
         public ISample? GetSample(ISampleInfo sampleInfo)
         {
             foreach (var lookup in sampleInfo.LookupNames)
             {
-                ISample? sample = samples?.Get(lookup);
+                ISample? sample = samples.Get(lookup);
                 if (sample != null)
                     return sample;
             }
@@ -56,7 +50,7 @@ namespace osu.Game.Skinning
 
         #region Disposal
 
-        ~RulesetResourcesSkin()
+        ~ResourcesSkin()
         {
             // required to potentially clean up sample store from audio hierarchy.
             Dispose(false);
@@ -77,8 +71,8 @@ namespace osu.Game.Skinning
 
             isDisposed = true;
 
-            textures?.Dispose();
-            samples?.Dispose();
+            textures.Dispose();
+            samples.Dispose();
         }
 
         #endregion
