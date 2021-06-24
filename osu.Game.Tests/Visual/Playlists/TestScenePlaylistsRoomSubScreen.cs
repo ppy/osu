@@ -19,12 +19,13 @@ using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Users;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsRoomSubScreen : RoomTestScene
+    public class TestScenePlaylistsRoomSubScreen : OnlinePlaySubScreenTestScene
     {
         [Cached(typeof(IRoomManager))]
         private readonly TestRoomManager roomManager = new TestRoomManager();
