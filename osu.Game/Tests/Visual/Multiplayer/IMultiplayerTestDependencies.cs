@@ -5,6 +5,7 @@ using osu.Game.Database;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Tests.Visual.OnlinePlay;
+using osu.Game.Tests.Visual.Spectator;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -24,5 +25,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         /// The cached <see cref="UserLookupCache"/>.
         /// </summary>
         TestUserLookupCache LookupCache { get; }
+
+        /// <summary>
+        /// The cached <see cref="osu.Game.Online.Spectator.SpectatorClient"/>.
+        /// </summary>
+        TestSpectatorClient SpectatorClient { get; }
     }
 }

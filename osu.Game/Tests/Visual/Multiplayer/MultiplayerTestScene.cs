@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Game.Online.Rooms;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual.OnlinePlay;
+using osu.Game.Tests.Visual.Spectator;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -16,6 +17,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public TestMultiplayerClient Client => RoomDependencies.Client;
         public new TestMultiplayerRoomManager RoomManager => RoomDependencies.RoomManager;
         public TestUserLookupCache LookupCache => RoomDependencies?.LookupCache;
+        public TestSpectatorClient SpectatorClient => RoomDependencies?.SpectatorClient;
 
         protected new MultiplayerRoomTestDependencies RoomDependencies => (MultiplayerRoomTestDependencies)base.RoomDependencies;
 

@@ -6,21 +6,14 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
-using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Tests.Visual.OnlinePlay;
-using osu.Game.Tests.Visual.Spectator;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiSpectatorLeaderboard : MultiplayerTestScene
     {
-        public TestSpectatorClient SpectatorClient => RoomDependencies?.SpectatorClient;
-
-        protected new TestDependencies RoomDependencies => (TestDependencies)base.RoomDependencies;
-
         private Dictionary<int, ManualClock> clocks;
         private MultiSpectatorLeaderboard leaderboard;
 
@@ -118,17 +111,5 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void assertCombo(int userId, int expectedCombo)
             => AddUntilStep($"player {userId} has {expectedCombo} combo", () => this.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.Id == userId).Combo.Value == expectedCombo);
-
-        protected override RoomTestDependencies CreateRoomDependencies() => new TestDependencies();
-
-        protected class TestDependencies : MultiplayerRoomTestDependencies
-        {
-            public readonly TestSpectatorClient SpectatorClient = new TestSpectatorClient();
-
-            public TestDependencies()
-            {
-                CacheAs<SpectatorClient>(SpectatorClient);
-            }
-        }
     }
 }
