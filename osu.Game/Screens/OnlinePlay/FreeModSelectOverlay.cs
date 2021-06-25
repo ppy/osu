@@ -32,7 +32,6 @@ namespace osu.Game.Screens.OnlinePlay
         {
             IsValidMod = m => true;
 
-            MultiplierSection.Alpha = 0;
             DeselectAllButton.Alpha = 0;
 
             Drawable selectAllButton;
