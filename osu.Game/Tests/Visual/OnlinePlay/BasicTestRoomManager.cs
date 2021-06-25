@@ -8,10 +8,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay;
+using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
+    /// <summary>
+    /// A very simple <see cref="RoomManager"/> for use in online-play test scenes.
+    /// </summary>
     public class BasicTestRoomManager : IRoomManager
     {
         public event Action RoomsUpdated

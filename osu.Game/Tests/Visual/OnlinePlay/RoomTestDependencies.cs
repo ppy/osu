@@ -13,7 +13,7 @@ using osu.Game.Screens.OnlinePlay.Lounge.Components;
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
     /// <summary>
-    /// Contains dependencies for testing online-play rooms.
+    /// Contains the basic dependencies of online-play test scenes.
     /// </summary>
     public class RoomTestDependencies : IReadOnlyDependencyContainer, IOnlinePlayTestDependencies
     {

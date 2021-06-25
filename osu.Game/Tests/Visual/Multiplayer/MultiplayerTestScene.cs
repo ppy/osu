@@ -9,6 +9,9 @@ using osu.Game.Tests.Visual.Spectator;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
+    /// <summary>
+    /// The base test scene for all multiplayer components and screens.
+    /// </summary>
     public abstract class MultiplayerTestScene : OnlinePlayTestScene, IMultiplayerTestDependencies
     {
         public const int PLAYER_1_ID = 55;
@@ -20,8 +23,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public TestSpectatorClient SpectatorClient => RoomDependencies?.SpectatorClient;
 
         protected new MultiplayerRoomTestDependencies RoomDependencies => (MultiplayerRoomTestDependencies)base.RoomDependencies;
-
-        protected override RoomTestDependencies CreateRoomDependencies() => new MultiplayerRoomTestDependencies();
 
         private readonly bool joinRoom;
 
@@ -58,9 +59,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             base.SetUpSteps();
 
             if (joinRoom)
-            {
                 AddUntilStep("wait for room join", () => Client.Room != null);
-            }
         }
+
+        protected override RoomTestDependencies CreateRoomDependencies() => new MultiplayerRoomTestDependencies();
     }
 }
