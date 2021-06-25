@@ -8,21 +8,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Online.Spectator;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
-using osu.Game.Tests.Visual.OnlinePlay;
-using osu.Game.Tests.Visual.Spectator;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiSpectatorScreen : MultiplayerTestScene
     {
-        public TestSpectatorClient SpectatorClient => RoomDependencies?.SpectatorClient;
-
-        protected new TestDependencies RoomDependencies => (TestDependencies)base.RoomDependencies;
-
         [Resolved]
         private OsuGameBase game { get; set; }
 
@@ -279,17 +272,5 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private Player getPlayer(int userId) => getInstance(userId).ChildrenOfType<Player>().Single();
 
         private PlayerArea getInstance(int userId) => spectatorScreen.ChildrenOfType<PlayerArea>().Single(p => p.UserId == userId);
-
-        protected override RoomTestDependencies CreateRoomDependencies() => new TestDependencies();
-
-        protected class TestDependencies : MultiplayerRoomTestDependencies
-        {
-            public readonly TestSpectatorClient SpectatorClient = new TestSpectatorClient();
-
-            public TestDependencies()
-            {
-                CacheAs<SpectatorClient>(SpectatorClient);
-            }
-        }
     }
 }

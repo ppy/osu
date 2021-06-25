@@ -3,8 +3,10 @@
 
 using osu.Game.Database;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Spectator;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Tests.Visual.OnlinePlay;
+using osu.Game.Tests.Visual.Spectator;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -12,17 +14,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         public TestMultiplayerClient Client { get; }
         public TestUserLookupCache LookupCache { get; }
+        public TestSpectatorClient SpectatorClient { get; }
+
         public new TestMultiplayerRoomManager RoomManager => (TestMultiplayerRoomManager)base.RoomManager;
 
         public MultiplayerRoomTestDependencies()
         {
             Client = new TestMultiplayerClient(RoomManager);
             LookupCache = new TestUserLookupCache();
+            SpectatorClient = CreateSpectatorClient();
 
             CacheAs<MultiplayerClient>(Client);
             CacheAs<UserLookupCache>(LookupCache);
+            CacheAs<SpectatorClient>(SpectatorClient);
         }
 
         protected override IRoomManager CreateRoomManager() => new TestMultiplayerRoomManager();
+
+        protected virtual TestSpectatorClient CreateSpectatorClient() => new TestSpectatorClient();
     }
 }

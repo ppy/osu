@@ -148,6 +148,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             public TestDependencies()
             {
+                // Need to set these values as early as possible.
                 RoomManager.TimeBetweenListingPolls.Value = 1;
                 RoomManager.TimeBetweenSelectionPolls.Value = 1;
             }

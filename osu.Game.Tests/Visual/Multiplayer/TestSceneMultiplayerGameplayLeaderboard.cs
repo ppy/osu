@@ -27,9 +27,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private static IEnumerable<int> users => Enumerable.Range(0, 16);
 
-        public TestMultiplayerSpectatorClient SpectatorClient => RoomDependencies?.SpectatorClient;
-
-        protected new TestDependencies RoomDependencies => (TestDependencies)base.RoomDependencies;
+        public new TestMultiplayerSpectatorClient SpectatorClient => (TestMultiplayerSpectatorClient)RoomDependencies?.SpectatorClient;
 
         private MultiplayerGameplayLeaderboard leaderboard;
         private OsuConfigManager config;
@@ -104,12 +102,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected class TestDependencies : MultiplayerRoomTestDependencies
         {
-            public readonly TestMultiplayerSpectatorClient SpectatorClient = new TestMultiplayerSpectatorClient();
-
-            public TestDependencies()
-            {
-                CacheAs<SpectatorClient>(SpectatorClient);
-            }
+            protected override TestSpectatorClient CreateSpectatorClient() => new TestMultiplayerSpectatorClient();
         }
 
         public class TestMultiplayerSpectatorClient : TestSpectatorClient
