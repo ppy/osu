@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchLeaderboard : OsuTestScene
+    public class TestSceneMatchLeaderboard : OnlinePlayTestScene
     {
         [BackgroundDependencyLoader]
         private void load()
@@ -59,18 +59,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
-            Child = new TestRoomContainer
+            SelectedRoom.Value = new Room { RoomID = { Value = 3 } };
+
+            Child = new MatchLeaderboard
             {
-                Room = { RoomID = { Value = 3 } },
-                Child = new MatchLeaderboard
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    Size = new Vector2(550f, 450f),
-                    Scope = MatchLeaderboardScope.Overall,
-                }
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+                Size = new Vector2(550f, 450f),
+                Scope = MatchLeaderboardScope.Overall,
             };
         });
     }

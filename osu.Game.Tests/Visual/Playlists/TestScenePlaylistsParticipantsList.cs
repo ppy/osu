@@ -3,27 +3,23 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsParticipantsList : OsuTestScene
+    public class TestScenePlaylistsParticipantsList : OnlinePlayTestScene
     {
-        private TestRoomContainer roomContainer;
-
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
-            Child = roomContainer = new TestRoomContainer
-            {
-                Room = { RoomID = { Value = 7 } }
-            };
+            SelectedRoom.Value = new Room { RoomID = { Value = 7 } };
 
             for (int i = 0; i < 50; i++)
             {
-                roomContainer.Room.RecentParticipants.Add(new User
+                SelectedRoom.Value.RecentParticipants.Add(new User
                 {
                     Username = "peppy",
                     Statistics = new UserStatistics { GlobalRank = 1234 },
@@ -37,7 +33,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("create component", () =>
             {
-                roomContainer.Child = new ParticipantsDisplay(Direction.Horizontal)
+                Child = new ParticipantsDisplay(Direction.Horizontal)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -51,7 +47,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("create component", () =>
             {
-                roomContainer.Child = new ParticipantsDisplay(Direction.Vertical)
+                Child = new ParticipantsDisplay(Direction.Vertical)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchBeatmapDetailArea : OsuTestScene
+    public class TestSceneMatchBeatmapDetailArea : OnlinePlayTestScene
     {
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -24,28 +24,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Resolved]
         private RulesetStore rulesetStore { get; set; }
 
-        private TestRoomContainer roomContainer;
-
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
-            Child = roomContainer = new TestRoomContainer
+            SelectedRoom.Value = new Room();
+
+            Child = new MatchBeatmapDetailArea
             {
-                Child = new MatchBeatmapDetailArea
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(500),
-                    CreateNewItem = createNewItem
-                }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Size = new Vector2(500),
+                CreateNewItem = createNewItem
             };
         });
 
         private void createNewItem()
         {
-            roomContainer.Room.Playlist.Add(new PlaylistItem
+            SelectedRoom.Value.Playlist.Add(new PlaylistItem
             {
-                ID = roomContainer.Room.Playlist.Count,
+                ID = SelectedRoom.Value.Playlist.Count,
                 Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                 Ruleset = { Value = new OsuRuleset().RulesetInfo },
                 RequiredMods =

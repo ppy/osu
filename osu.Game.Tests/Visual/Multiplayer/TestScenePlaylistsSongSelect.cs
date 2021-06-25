@@ -25,7 +25,7 @@ using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestScenePlaylistsSongSelect : OnlinePlaySubScreenTestScene
+    public class TestScenePlaylistsSongSelect : OnlinePlayTestScene
     {
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }

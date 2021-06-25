@@ -8,11 +8,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
-using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestMultiplayerRoomContainer : TestRoomContainer
+    public class TestMultiplayerRoomContainer : Container
     {
         protected override Container<Drawable> Content => content;
         private readonly Container content;

@@ -9,7 +9,6 @@ using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osuTK.Graphics;
@@ -17,9 +16,9 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneLoungeRoomsContainer : OnlinePlaySubScreenTestScene
+    public class TestSceneLoungeRoomsContainer : OnlinePlayTestScene
     {
-        protected new TestBasicRoomManager RoomManager => (TestBasicRoomManager)base.RoomManager;
+        protected new BasicTestRoomManager RoomManager => (BasicTestRoomManager)base.RoomManager;
 
         private RoomsContainer container;
 
@@ -34,8 +33,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 JoinRequested = joinRequested
             };
         }
-
-        protected override IRoomManager CreateRoomManager() => new TestBasicRoomManager();
 
         [Test]
         public void TestBasicListChanges()
