@@ -15,6 +15,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
+using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Tests.Visual.Spectator;
 using osu.Game.Users;
 
@@ -22,11 +23,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiSpectatorScreen : MultiplayerTestScene
     {
-        [Cached(typeof(SpectatorClient))]
-        private TestSpectatorClient spectatorClient = new TestSpectatorClient();
+        public TestSpectatorClient SpectatorClient => RoomDependencies?.SpectatorClient;
 
-        [Cached(typeof(UserLookupCache))]
-        private UserLookupCache lookupCache = new TestUserLookupCache();
+        protected new TestDependencies RoomDependencies => (TestDependencies)base.RoomDependencies;
 
         [Resolved]
         private OsuGameBase game { get; set; }
@@ -51,25 +50,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             importedBeatmapId = importedBeatmap.OnlineBeatmapID ?? -1;
         }
 
-        public override void SetUpSteps()
+        [SetUp]
+        public new void Setup() => Schedule(() =>
         {
-            base.SetUpSteps();
-
-            AddStep("reset sent frames", () => nextFrame.Clear());
-
-            AddStep("add streaming client", () =>
-            {
-                Remove(spectatorClient);
-                Add(spectatorClient);
-            });
-
-            AddStep("finish previous gameplay", () =>
-            {
-                foreach (var id in playingUserIds)
-                    spectatorClient.EndPlay(id);
-                playingUserIds.Clear();
-            });
-        }
+            nextFrame.Clear();
+            playingUserIds.Clear();
+        });
 
         [Test]
         public void TestDelayedStart()
@@ -87,11 +73,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             loadSpectateScreen(false);
 
             AddWaitStep("wait a bit", 10);
-            AddStep("load player first_player_id", () => spectatorClient.StartPlay(PLAYER_1_ID, importedBeatmapId));
+            AddStep("load player first_player_id", () => SpectatorClient.StartPlay(PLAYER_1_ID, importedBeatmapId));
             AddUntilStep("one player added", () => spectatorScreen.ChildrenOfType<Player>().Count() == 1);
 
             AddWaitStep("wait a bit", 10);
-            AddStep("load player second_player_id", () => spectatorClient.StartPlay(PLAYER_2_ID, importedBeatmapId));
+            AddStep("load player second_player_id", () => SpectatorClient.StartPlay(PLAYER_2_ID, importedBeatmapId));
             AddUntilStep("two players added", () => spectatorScreen.ChildrenOfType<Player>().Count() == 2);
         }
 
@@ -251,7 +237,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 foreach (int id in userIds)
                 {
                     Client.CurrentMatchPlayingUserIds.Add(id);
-                    spectatorClient.StartPlay(id, beatmapId ?? importedBeatmapId);
+                    SpectatorClient.StartPlay(id, beatmapId ?? importedBeatmapId);
                     playingUserIds.Add(id);
                     nextFrame[id] = 0;
                 }
@@ -262,7 +248,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("end play", () =>
             {
-                spectatorClient.EndPlay(userId);
+                SpectatorClient.EndPlay(userId);
                 playingUserIds.Remove(userId);
                 nextFrame.Remove(userId);
             });
@@ -276,7 +262,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 foreach (int id in userIds)
                 {
-                    spectatorClient.SendFrames(id, nextFrame[id], count);
+                    SpectatorClient.SendFrames(id, nextFrame[id], count);
                     nextFrame[id] += count;
                 }
             });
@@ -297,6 +283,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private Player getPlayer(int userId) => getInstance(userId).ChildrenOfType<Player>().Single();
 
         private PlayerArea getInstance(int userId) => spectatorScreen.ChildrenOfType<PlayerArea>().Single(p => p.UserId == userId);
+
+        protected override RoomTestDependencies CreateRoomDependencies() => new TestDependencies();
+
+        protected class TestDependencies : MultiplayerRoomTestDependencies
+        {
+            public readonly TestSpectatorClient SpectatorClient = new TestSpectatorClient();
+            public readonly UserLookupCache LookupCache = new TestUserLookupCache();
+
+            public TestDependencies()
+            {
+                CacheAs<SpectatorClient>(SpectatorClient);
+                CacheAs(LookupCache);
+            }
+        }
 
         internal class TestUserLookupCache : UserLookupCache
         {
