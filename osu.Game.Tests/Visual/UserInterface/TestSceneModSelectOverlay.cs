@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
@@ -107,7 +106,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             var conversionMods = osu.GetModsFor(ModType.Conversion);
 
             var noFailMod = osu.GetModsFor(ModType.DifficultyReduction).FirstOrDefault(m => m is OsuModNoFail);
-            var hiddenMod = harderMods.FirstOrDefault(m => m is OsuModHidden);
 
             var doubleTimeMod = harderMods.OfType<MultiMod>().FirstOrDefault(m => m.Mods.Any(a => a is OsuModDoubleTime));
 
@@ -120,8 +118,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             testMultiMod(doubleTimeMod);
             testIncompatibleMods(easy, hardRock);
             testDeselectAll(easierMods.Where(m => !(m is MultiMod)));
-            testMultiplierTextColour(noFailMod, () => modSelect.LowMultiplierColour);
-            testMultiplierTextColour(hiddenMod, () => modSelect.HighMultiplierColour);
 
             testUnimplementedMod(targetMod);
         }
@@ -149,7 +145,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             changeRuleset(0);
 
-            AddAssert("ensure mods still selected", () => modDisplay.Current.Value.Single(m => m is OsuModNoFail) != null);
+            AddAssert("ensure mods still selected", () => modDisplay.Current.Value.SingleOrDefault(m => m is OsuModNoFail) != null);
 
             changeRuleset(3);
 
@@ -316,17 +312,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("check for no selection", () => !modSelect.SelectedMods.Value.Any());
         }
 
-        private void testMultiplierTextColour(Mod mod, Func<Color4> getCorrectColour)
-        {
-            checkLabelColor(() => Color4.White);
-            selectNext(mod);
-            AddWaitStep("wait for changing colour", 1);
-            checkLabelColor(getCorrectColour);
-            selectPrevious(mod);
-            AddWaitStep("wait for changing colour", 1);
-            checkLabelColor(() => Color4.White);
-        }
-
         private void testModsWithSameBaseType(Mod modA, Mod modB)
         {
             selectNext(modA);
@@ -348,7 +333,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert($"check {mod.Name} is selected", () =>
             {
                 var button = modSelect.GetModButton(mod);
-                return modSelect.SelectedMods.Value.Single(m => m.Name == mod.Name) != null && button.SelectedMod.GetType() == mod.GetType() && button.Selected;
+                return modSelect.SelectedMods.Value.SingleOrDefault(m => m.Name == mod.Name) != null && button.SelectedMod.GetType() == mod.GetType() && button.Selected;
             });
         }
 
@@ -369,8 +354,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 return modSelect.SelectedMods.Value.All(m => m.GetType() != mod.GetType()) && button.SelectedMod?.GetType() != mod.GetType();
             });
         }
-
-        private void checkLabelColor(Func<Color4> getColour) => AddAssert("check label has expected colour", () => modSelect.MultiplierLabel.Colour.AverageColour == getColour());
 
         private void createDisplay(Func<TestModSelectOverlay> createOverlayFunc)
         {
@@ -408,7 +391,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 return section.ButtonsContainer.OfType<ModButton>().Single(b => b.Mods.Any(m => m.GetType() == mod.GetType()));
             }
 
-            public new OsuSpriteText MultiplierLabel => base.MultiplierLabel;
             public new TriangleButton DeselectAllButton => base.DeselectAllButton;
 
             public new Color4 LowMultiplierColour => base.LowMultiplierColour;
