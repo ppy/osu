@@ -42,27 +42,30 @@ namespace osu.Game.Skinning
             };
         }
 
-        [Resolved]
-        private ISkinSource skinSource { get; set; }
+        private ISkinSource parentSource;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            UpdateSkins();
-            skinSource.SourceChanged += OnSourceChanged;
+            parentSource = parent.Get<ISkinSource>();
+
+            UpdateSkinSources();
+
+            parentSource.SourceChanged += OnSourceChanged;
+
+            return base.CreateChildDependencies(parent);
         }
 
         protected override void OnSourceChanged()
         {
-            UpdateSkins();
+            UpdateSkinSources();
             base.OnSourceChanged();
         }
 
-        protected virtual void UpdateSkins()
+        protected virtual void UpdateSkinSources()
         {
             SkinSources.Clear();
 
-            foreach (var skin in skinSource.AllSources)
+            foreach (var skin in parentSource.AllSources)
             {
                 switch (skin)
                 {
@@ -93,8 +96,8 @@ namespace osu.Game.Skinning
         {
             base.Dispose(isDisposing);
 
-            if (skinSource != null)
-                skinSource.SourceChanged -= OnSourceChanged;
+            if (parentSource != null)
+                parentSource.SourceChanged -= OnSourceChanged;
         }
     }
 }
