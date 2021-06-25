@@ -13,14 +13,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
     /// <summary>
     /// Contains the basic dependencies of multiplayer test scenes.
     /// </summary>
-    public class MultiplayerRoomTestDependencies : OnlinePlayTestDependencies, IMultiplayerTestDependencies
+    public class MultiplayerTestSceneDependencies : OnlinePlayTestSceneDependencies, IMultiplayerTestDependencies
     {
         public TestMultiplayerClient Client { get; }
         public TestUserLookupCache LookupCache { get; }
         public TestSpectatorClient SpectatorClient { get; }
         public new TestMultiplayerRoomManager RoomManager => (TestMultiplayerRoomManager)base.RoomManager;
 
-        public MultiplayerRoomTestDependencies()
+        public MultiplayerTestSceneDependencies()
         {
             Client = new TestMultiplayerClient(RoomManager);
             LookupCache = new TestUserLookupCache();

@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public TestUserLookupCache LookupCache => OnlinePlayDependencies?.LookupCache;
         public TestSpectatorClient SpectatorClient => OnlinePlayDependencies?.SpectatorClient;
 
-        protected new MultiplayerRoomTestDependencies OnlinePlayDependencies => (MultiplayerRoomTestDependencies)base.OnlinePlayDependencies;
+        protected new MultiplayerTestSceneDependencies OnlinePlayDependencies => (MultiplayerTestSceneDependencies)base.OnlinePlayDependencies;
 
         private readonly bool joinRoom;
 
@@ -62,6 +62,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 AddUntilStep("wait for room join", () => Client.Room != null);
         }
 
-        protected override OnlinePlayTestDependencies CreateOnlinePlayDependencies() => new MultiplayerRoomTestDependencies();
+        protected override OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new MultiplayerTestSceneDependencies();
     }
 }
