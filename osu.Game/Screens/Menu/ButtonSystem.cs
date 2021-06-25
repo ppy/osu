@@ -261,7 +261,7 @@ namespace osu.Game.Screens.Menu
             switch (state)
             {
                 default:
-                    return true;
+                    return false;
 
                 case ButtonSystemState.Initial:
                     State = ButtonSystemState.TopLevel;
@@ -273,10 +273,6 @@ namespace osu.Game.Screens.Menu
 
                 case ButtonSystemState.Play:
                     buttonsPlay.First().Click();
-                    return false;
-
-                // no sound should be played if the logo is clicked on while transitioning to song select
-                case ButtonSystemState.EnteringMode:
                     return false;
             }
         }
