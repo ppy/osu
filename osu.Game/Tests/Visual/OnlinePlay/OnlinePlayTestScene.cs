@@ -14,18 +14,22 @@ using osu.Game.Screens.OnlinePlay.Lounge.Components;
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
     /// <summary>
-    /// A base test scene for all online-play components and screens.
+    /// A base test scene for all online play components and screens.
     /// </summary>
     public abstract class OnlinePlayTestScene : ScreenTestScene, IOnlinePlayTestDependencies
     {
-        public Bindable<Room> SelectedRoom => RoomDependencies?.SelectedRoom;
-        public IRoomManager RoomManager => RoomDependencies?.RoomManager;
-        public Bindable<FilterCriteria> Filter => RoomDependencies?.Filter;
-        public OngoingOperationTracker OngoingOperationTracker => RoomDependencies?.OngoingOperationTracker;
-        public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker => RoomDependencies?.AvailabilityTracker;
+        public Bindable<Room> SelectedRoom => OnlinePlayDependencies?.SelectedRoom;
+        public IRoomManager RoomManager => OnlinePlayDependencies?.RoomManager;
+        public Bindable<FilterCriteria> Filter => OnlinePlayDependencies?.Filter;
+        public OngoingOperationTracker OngoingOperationTracker => OnlinePlayDependencies?.OngoingOperationTracker;
+        public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker => OnlinePlayDependencies?.AvailabilityTracker;
 
-        protected RoomTestDependencies RoomDependencies => delegatedDependencies?.RoomDependencies;
-        private DelegatedRoomDependencyContainer delegatedDependencies;
+        /// <summary>
+        /// All dependencies required for online play components and screens.
+        /// </summary>
+        protected OnlinePlayTestDependencies OnlinePlayDependencies => dependencies?.OnlinePlayDependencies;
+
+        private DelegatedDependencyContainer dependencies;
 
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -42,8 +46,8 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            delegatedDependencies = new DelegatedRoomDependencyContainer(base.CreateChildDependencies(parent));
-            return delegatedDependencies;
+            dependencies = new DelegatedDependencyContainer(base.CreateChildDependencies(parent));
+            return dependencies;
         }
 
         [SetUp]
@@ -51,46 +55,46 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         {
             // Reset the room dependencies to a fresh state.
             drawableDependenciesContainer.Clear();
-            delegatedDependencies.RoomDependencies = CreateRoomDependencies();
-            drawableDependenciesContainer.AddRange(RoomDependencies.DrawableComponents);
+            dependencies.OnlinePlayDependencies = CreateOnlinePlayDependencies();
+            drawableDependenciesContainer.AddRange(OnlinePlayDependencies.DrawableComponents);
         });
 
         /// <summary>
         /// Creates the room dependencies. Called every <see cref="Setup"/>.
         /// </summary>
         /// <remarks>
-        /// Any custom dependencies required for online-play sub-classes should be added here.
+        /// Any custom dependencies required for online play sub-classes should be added here.
         /// </remarks>
-        protected virtual RoomTestDependencies CreateRoomDependencies() => new RoomTestDependencies();
+        protected virtual OnlinePlayTestDependencies CreateOnlinePlayDependencies() => new OnlinePlayTestDependencies();
 
         /// <summary>
-        /// A <see cref="IReadOnlyDependencyContainer"/> providing a mutable lookup source for room dependencies.
+        /// A <see cref="IReadOnlyDependencyContainer"/> providing a mutable lookup source for online play dependencies.
         /// </summary>
-        private class DelegatedRoomDependencyContainer : IReadOnlyDependencyContainer
+        private class DelegatedDependencyContainer : IReadOnlyDependencyContainer
         {
             /// <summary>
-            /// The room's dependencies.
+            /// The online play dependencies.
             /// </summary>
-            public RoomTestDependencies RoomDependencies { get; set; }
+            public OnlinePlayTestDependencies OnlinePlayDependencies { get; set; }
 
             private readonly IReadOnlyDependencyContainer parent;
             private readonly DependencyContainer injectableDependencies;
 
             /// <summary>
-            /// Creates a new <see cref="DelegatedRoomDependencyContainer"/>.
+            /// Creates a new <see cref="DelegatedDependencyContainer"/>.
             /// </summary>
-            /// <param name="parent">The fallback <see cref="IReadOnlyDependencyContainer"/> to use when <see cref="RoomDependencies"/> cannot satisfy a dependency.</param>
-            public DelegatedRoomDependencyContainer(IReadOnlyDependencyContainer parent)
+            /// <param name="parent">The fallback <see cref="IReadOnlyDependencyContainer"/> to use when <see cref="OnlinePlayDependencies"/> cannot satisfy a dependency.</param>
+            public DelegatedDependencyContainer(IReadOnlyDependencyContainer parent)
             {
                 this.parent = parent;
                 injectableDependencies = new DependencyContainer(this);
             }
 
             public object Get(Type type)
-                => RoomDependencies?.Get(type) ?? parent.Get(type);
+                => OnlinePlayDependencies?.Get(type) ?? parent.Get(type);
 
             public object Get(Type type, CacheInfo info)
-                => RoomDependencies?.Get(type, info) ?? parent.Get(type, info);
+                => OnlinePlayDependencies?.Get(type, info) ?? parent.Get(type, info);
 
             public void Inject<T>(T instance)
                 where T : class

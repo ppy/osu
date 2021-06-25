@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private static IEnumerable<int> users => Enumerable.Range(0, 16);
 
-        public new TestMultiplayerSpectatorClient SpectatorClient => (TestMultiplayerSpectatorClient)RoomDependencies?.SpectatorClient;
+        public new TestMultiplayerSpectatorClient SpectatorClient => (TestMultiplayerSpectatorClient)OnlinePlayDependencies?.SpectatorClient;
 
         private MultiplayerGameplayLeaderboard leaderboard;
         private OsuConfigManager config;
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("change to standardised", () => config.SetValue(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised));
         }
 
-        protected override RoomTestDependencies CreateRoomDependencies() => new TestDependencies();
+        protected override OnlinePlayTestDependencies CreateOnlinePlayDependencies() => new TestDependencies();
 
         protected class TestDependencies : MultiplayerRoomTestDependencies
         {
