@@ -31,7 +31,7 @@ namespace osu.Game.Configuration
     {
         public LocalisableString Label { get; }
 
-        public string Description { get; }
+        public LocalisableString Description { get; }
 
         public int? OrderPosition { get; }
 

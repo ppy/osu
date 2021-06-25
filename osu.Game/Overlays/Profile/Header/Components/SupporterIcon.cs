@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
@@ -18,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private readonly FillFlowContainer iconContainer;
         private readonly CircularContainer content;
 
-        public string TooltipText => "osu!supporter";
+        public LocalisableString TooltipText => "osu!supporter";
 
         public int SupportLevel
         {

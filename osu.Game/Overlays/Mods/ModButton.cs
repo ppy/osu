@@ -14,6 +14,7 @@ using System;
 using System.Linq;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
@@ -34,7 +35,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         public Action<Mod> SelectionChanged;
 
-        public string TooltipText => (SelectedMod?.Description ?? Mods.FirstOrDefault()?.Description) ?? string.Empty;
+        public LocalisableString TooltipText => (SelectedMod?.Description ?? Mods.FirstOrDefault()?.Description) ?? string.Empty;
 
         private const Easing mod_switch_easing = Easing.InOutSine;
         private const double mod_switch_duration = 120;
