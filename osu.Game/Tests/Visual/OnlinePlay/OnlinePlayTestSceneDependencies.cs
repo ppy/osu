@@ -15,7 +15,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// <summary>
     /// Contains the basic dependencies of online play test scenes.
     /// </summary>
-    public class OnlinePlayTestDependencies : IReadOnlyDependencyContainer, IOnlinePlayTestDependencies
+    public class OnlinePlayTestSceneDependencies : IReadOnlyDependencyContainer, IOnlinePlayTestDependencies
     {
         public Bindable<Room> SelectedRoom { get; }
         public IRoomManager RoomManager { get; }
@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         private readonly List<Drawable> drawableComponents = new List<Drawable>();
         private readonly DependencyContainer dependencies;
 
-        public OnlinePlayTestDependencies()
+        public OnlinePlayTestSceneDependencies()
         {
             SelectedRoom = new Bindable<Room>();
             RoomManager = CreateRoomManager();

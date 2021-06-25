@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// <summary>
         /// All dependencies required for online play components and screens.
         /// </summary>
-        protected OnlinePlayTestDependencies OnlinePlayDependencies => dependencies?.OnlinePlayDependencies;
+        protected OnlinePlayTestSceneDependencies OnlinePlayDependencies => dependencies?.OnlinePlayDependencies;
 
         private DelegatedDependencyContainer dependencies;
 
@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// <remarks>
         /// Any custom dependencies required for online play sub-classes should be added here.
         /// </remarks>
-        protected virtual OnlinePlayTestDependencies CreateOnlinePlayDependencies() => new OnlinePlayTestDependencies();
+        protected virtual OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new OnlinePlayTestSceneDependencies();
 
         /// <summary>
         /// A <see cref="IReadOnlyDependencyContainer"/> providing a mutable lookup source for online play dependencies.
@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             /// <summary>
             /// The online play dependencies.
             /// </summary>
-            public OnlinePlayTestDependencies OnlinePlayDependencies { get; set; }
+            public OnlinePlayTestSceneDependencies OnlinePlayDependencies { get; set; }
 
             private readonly IReadOnlyDependencyContainer parent;
             private readonly DependencyContainer injectableDependencies;

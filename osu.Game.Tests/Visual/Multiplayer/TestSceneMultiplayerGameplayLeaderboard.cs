@@ -98,9 +98,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("change to standardised", () => config.SetValue(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised));
         }
 
-        protected override OnlinePlayTestDependencies CreateOnlinePlayDependencies() => new TestDependencies();
+        protected override OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new TestDependencies();
 
-        protected class TestDependencies : MultiplayerRoomTestDependencies
+        protected class TestDependencies : MultiplayerTestSceneDependencies
         {
             protected override TestSpectatorClient CreateSpectatorClient() => new TestMultiplayerSpectatorClient();
         }

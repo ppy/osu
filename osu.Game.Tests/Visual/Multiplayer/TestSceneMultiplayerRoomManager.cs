@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     [HeadlessTest]
     public class TestSceneMultiplayerRoomManager : MultiplayerTestScene
     {
-        protected override OnlinePlayTestDependencies CreateOnlinePlayDependencies() => new TestDependencies();
+        protected override OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new TestDependencies();
 
         public TestSceneMultiplayerRoomManager()
             : base(false)
@@ -144,7 +144,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return room;
         }
 
-        private class TestDependencies : MultiplayerRoomTestDependencies
+        private class TestDependencies : MultiplayerTestSceneDependencies
         {
             public TestDependencies()
             {
