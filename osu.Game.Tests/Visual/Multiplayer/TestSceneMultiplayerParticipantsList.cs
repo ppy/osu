@@ -22,6 +22,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerParticipantsList : MultiplayerTestScene
     {
+        public TestSceneMultiplayerParticipantsList()
+            : base(false)
+        {
+        }
+
         [SetUp]
         public new void Setup() => Schedule(createNewParticipantsList);
 
