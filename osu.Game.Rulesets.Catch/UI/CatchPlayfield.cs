@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
@@ -27,6 +26,9 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         public const float CENTER_X = WIDTH / 2;
 
+        [Cached]
+        private readonly DroppedObjectContainer droppedObjectContainer;
+
         internal readonly CatcherArea CatcherArea;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
@@ -35,12 +37,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatchPlayfield(BeatmapDifficulty difficulty)
         {
-            var droppedObjectContainer = new Container<CaughtObject>
-            {
-                RelativeSizeAxes = Axes.Both,
-            };
-
-            CatcherArea = new CatcherArea(droppedObjectContainer, difficulty)
+            CatcherArea = new CatcherArea(difficulty)
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.TopLeft,
@@ -48,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             InternalChildren = new[]
             {
-                droppedObjectContainer,
+                droppedObjectContainer = new DroppedObjectContainer(),
                 CatcherArea.MovableCatcher.CreateProxiedContent(),
                 HitObjectContainer.CreateProxy(),
                 // This ordering (`CatcherArea` before `HitObjectContainer`) is important to
