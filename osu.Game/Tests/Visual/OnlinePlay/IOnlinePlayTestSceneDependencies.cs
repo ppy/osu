@@ -11,7 +11,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// <summary>
     /// Interface that defines the dependencies required for online play test scenes.
     /// </summary>
-    public interface IOnlinePlayTestDependencies
+    public interface IOnlinePlayTestSceneDependencies
     {
         /// <summary>
         /// The cached <see cref="Room"/>.

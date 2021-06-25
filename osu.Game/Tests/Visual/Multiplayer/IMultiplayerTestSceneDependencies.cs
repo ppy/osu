@@ -12,7 +12,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     /// <summary>
     /// Interface that defines the dependencies required for multiplayer test scenes.
     /// </summary>
-    public interface IMultiplayerTestDependencies : IOnlinePlayTestDependencies
+    public interface IMultiplayerTestSceneDependencies : IOnlinePlayTestSceneDependencies
     {
         /// <summary>
         /// The cached <see cref="MultiplayerClient"/>.
