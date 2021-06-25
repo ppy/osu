@@ -4,6 +4,7 @@
 using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Tests.Visual.OnlinePlay;
@@ -11,28 +12,25 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneLoungeRoomInfo : OsuTestScene
+    public class TestSceneLoungeRoomInfo : OnlinePlayTestScene
     {
-        private TestRoomContainer roomContainer;
-
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
-            Child = roomContainer = new TestRoomContainer
+            SelectedRoom.Value = new Room();
+
+            Child = new RoomInfo
             {
-                Child = new RoomInfo
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Width = 500
-                }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Width = 500
             };
         });
 
         [Test]
         public void TestNonSelectedRoom()
         {
-            AddStep("set null room", () => roomContainer.Room.RoomID.Value = null);
+            AddStep("set null room", () => SelectedRoom.Value.RoomID.Value = null);
         }
 
         [Test]
@@ -40,11 +38,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("set open room", () =>
             {
-                roomContainer.Room.RoomID.Value = 0;
-                roomContainer.Room.Name.Value = "Room 0";
-                roomContainer.Room.Host.Value = new User { Username = "peppy", Id = 2 };
-                roomContainer.Room.EndDate.Value = DateTimeOffset.Now.AddMonths(1);
-                roomContainer.Room.Status.Value = new RoomStatusOpen();
+                SelectedRoom.Value.RoomID.Value = 0;
+                SelectedRoom.Value.Name.Value = "Room 0";
+                SelectedRoom.Value.Host.Value = new User { Username = "peppy", Id = 2 };
+                SelectedRoom.Value.EndDate.Value = DateTimeOffset.Now.AddMonths(1);
+                SelectedRoom.Value.Status.Value = new RoomStatusOpen();
             });
         }
     }

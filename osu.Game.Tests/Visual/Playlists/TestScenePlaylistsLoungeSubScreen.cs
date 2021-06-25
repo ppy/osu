@@ -6,7 +6,6 @@ using NUnit.Framework;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
-using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
@@ -14,13 +13,11 @@ using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsLoungeSubScreen : OnlinePlaySubScreenTestScene
+    public class TestScenePlaylistsLoungeSubScreen : OnlinePlayTestScene
     {
-        protected new TestBasicRoomManager RoomManager => (TestBasicRoomManager)base.RoomManager;
+        protected new BasicTestRoomManager RoomManager => (BasicTestRoomManager)base.RoomManager;
 
         private LoungeSubScreen loungeScreen;
-
-        protected override IRoomManager CreateRoomManager() => new TestBasicRoomManager();
 
         public override void SetUpSteps()
         {

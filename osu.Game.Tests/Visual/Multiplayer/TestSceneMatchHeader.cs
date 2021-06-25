@@ -12,17 +12,14 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchHeader : OsuTestScene
+    public class TestSceneMatchHeader : OnlinePlayTestScene
     {
-        private TestRoomContainer roomContainer;
-
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
-            Child = roomContainer = new TestRoomContainer
-            {
-                Child = new Header()
-            };
+            SelectedRoom.Value = new Room();
+
+            Child = new Header();
         });
 
         [Test]
@@ -30,7 +27,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("set basic room", () =>
             {
-                roomContainer.Room.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem
                 {
                     Beatmap =
                     {
@@ -54,8 +51,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     }
                 });
 
-                roomContainer.Room.Name.Value = "A very awesome room";
-                roomContainer.Room.Host.Value = new User { Id = 2, Username = "peppy" };
+                SelectedRoom.Value.Name.Value = "A very awesome room";
+                SelectedRoom.Value.Host.Value = new User { Id = 2, Username = "peppy" };
             });
         }
     }

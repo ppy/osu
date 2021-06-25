@@ -12,7 +12,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
-    public class TestBasicRoomManager : IRoomManager
+    public class BasicTestRoomManager : IRoomManager
     {
         public event Action RoomsUpdated
         {
