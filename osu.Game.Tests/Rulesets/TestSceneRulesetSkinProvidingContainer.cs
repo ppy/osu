@@ -19,10 +19,10 @@ namespace osu.Game.Tests.Rulesets
 {
     public class TestSceneRulesetSkinProvidingContainer : OsuTestScene
     {
-        [Resolved]
-        private SkinManager skins { get; set; }
-
         private SkinRequester requester;
+
+        [Cached(typeof(ISkin))]
+        private readonly TestSkinProvider testSkin = new TestSkinProvider();
 
         protected override Ruleset CreateRuleset() => new TestSceneRulesetDependencies.TestRuleset();
 
@@ -31,15 +31,13 @@ namespace osu.Game.Tests.Rulesets
         {
             Texture textureOnLoad = null;
 
-            AddStep("set skin", () => skins.CurrentSkinInfo.Value = DefaultLegacySkin.Info);
-
             AddStep("setup provider", () =>
             {
                 var rulesetSkinProvider = new RulesetSkinProvidingContainer(Ruleset.Value.CreateInstance(), Beatmap.Value.Beatmap, Beatmap.Value.Skin);
 
                 rulesetSkinProvider.Add(requester = new SkinRequester());
 
-                requester.OnLoadAsync += () => textureOnLoad = requester.GetTexture("hitcircle");
+                requester.OnLoadAsync += () => textureOnLoad = requester.GetTexture(TestSkinProvider.TEXTURE_NAME);
 
                 Child = rulesetSkinProvider;
             });
@@ -68,6 +66,19 @@ namespace osu.Game.Tests.Rulesets
             public ISample GetSample(ISampleInfo sampleInfo) => skin.GetSample(sampleInfo);
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => skin.GetConfig<TLookup, TValue>(lookup);
+        }
+
+        private class TestSkinProvider : ISkin
+        {
+            public const string TEXTURE_NAME = "some-texture";
+
+            public Drawable GetDrawableComponent(ISkinComponent component) => throw new NotImplementedException();
+
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => componentName == TEXTURE_NAME ? Texture.WhitePixel : null;
+
+            public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
+
+            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
         }
     }
 }
