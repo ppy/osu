@@ -14,7 +14,7 @@ using osu.Game.Users;
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
     /// <summary>
-    /// A very simple <see cref="RoomManager"/> for use in online-play test scenes.
+    /// A very simple <see cref="RoomManager"/> for use in online play test scenes.
     /// </summary>
     public class BasicTestRoomManager : IRoomManager
     {

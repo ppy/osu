@@ -17,12 +17,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public const int PLAYER_1_ID = 55;
         public const int PLAYER_2_ID = 56;
 
-        public TestMultiplayerClient Client => RoomDependencies.Client;
-        public new TestMultiplayerRoomManager RoomManager => RoomDependencies.RoomManager;
-        public TestUserLookupCache LookupCache => RoomDependencies?.LookupCache;
-        public TestSpectatorClient SpectatorClient => RoomDependencies?.SpectatorClient;
+        public TestMultiplayerClient Client => OnlinePlayDependencies.Client;
+        public new TestMultiplayerRoomManager RoomManager => OnlinePlayDependencies.RoomManager;
+        public TestUserLookupCache LookupCache => OnlinePlayDependencies?.LookupCache;
+        public TestSpectatorClient SpectatorClient => OnlinePlayDependencies?.SpectatorClient;
 
-        protected new MultiplayerRoomTestDependencies RoomDependencies => (MultiplayerRoomTestDependencies)base.RoomDependencies;
+        protected new MultiplayerRoomTestDependencies OnlinePlayDependencies => (MultiplayerRoomTestDependencies)base.OnlinePlayDependencies;
 
         private readonly bool joinRoom;
 
@@ -62,6 +62,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 AddUntilStep("wait for room join", () => Client.Room != null);
         }
 
-        protected override RoomTestDependencies CreateRoomDependencies() => new MultiplayerRoomTestDependencies();
+        protected override OnlinePlayTestDependencies CreateOnlinePlayDependencies() => new MultiplayerRoomTestDependencies();
     }
 }

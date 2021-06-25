@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
         private TestRoomSettings settings;
 
-        protected override RoomTestDependencies CreateRoomDependencies() => new TestDependencies();
+        protected override OnlinePlayTestDependencies CreateOnlinePlayDependencies() => new TestDependencies();
 
         [SetUp]
         public new void Setup() => Schedule(() =>
@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.Playlists
             public OsuSpriteText ErrorText => ((MatchSettings)Settings).ErrorText;
         }
 
-        private class TestDependencies : RoomTestDependencies
+        private class TestDependencies : OnlinePlayTestDependencies
         {
             protected override IRoomManager CreateRoomManager() => new TestRoomManager();
         }

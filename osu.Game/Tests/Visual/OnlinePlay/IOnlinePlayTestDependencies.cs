@@ -9,7 +9,7 @@ using osu.Game.Screens.OnlinePlay.Lounge.Components;
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
     /// <summary>
-    /// Interface that defines the dependencies required for online-play test scenes.
+    /// Interface that defines the dependencies required for online play test scenes.
     /// </summary>
     public interface IOnlinePlayTestDependencies
     {
