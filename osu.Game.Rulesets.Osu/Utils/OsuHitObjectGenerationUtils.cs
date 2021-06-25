@@ -84,20 +84,20 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <returns>The rotated vector.</returns>
         public static Vector2 RotateVectorTowardsVector(Vector2 initial, Vector2 destination, float rotationRatio)
         {
-            var initialAngleRad = Math.Atan2(initial.Y, initial.X);
-            var destAngleRad = Math.Atan2(destination.Y, destination.X);
+            var initialAngleRad = MathF.Atan2(initial.Y, initial.X);
+            var destAngleRad = MathF.Atan2(destination.Y, destination.X);
 
             var diff = destAngleRad - initialAngleRad;
 
-            while (diff < -Math.PI) diff += 2 * Math.PI;
+            while (diff < -MathF.PI) diff += 2 * MathF.PI;
 
-            while (diff > Math.PI) diff -= 2 * Math.PI;
+            while (diff > MathF.PI) diff -= 2 * MathF.PI;
 
             var finalAngleRad = initialAngleRad + rotationRatio * diff;
 
             return new Vector2(
-                initial.Length * (float)Math.Cos(finalAngleRad),
-                initial.Length * (float)Math.Sin(finalAngleRad)
+                initial.Length * MathF.Cos(finalAngleRad),
+                initial.Length * MathF.Sin(finalAngleRad)
             );
         }
     }
