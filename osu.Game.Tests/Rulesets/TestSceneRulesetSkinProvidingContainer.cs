@@ -2,8 +2,6 @@
  // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
-using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
@@ -12,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using osu.Game.Tests.Testing;
@@ -27,15 +24,14 @@ namespace osu.Game.Tests.Rulesets
 
         private SkinRequester requester;
 
-        protected override Ruleset CreateRuleset() => new TestRuleset();
+        protected override Ruleset CreateRuleset() => new TestSceneRulesetDependencies.TestRuleset();
 
         [Test]
         public void TestEarlyAddedSkinRequester()
         {
-            ISample transformerSampleOnLoad = null;
+            Texture textureOnLoad = null;
 
-            // need a legacy skin to plug the TestRuleset's legacy transformer, which is required for testing this.
-            AddStep("set legacy skin", () => skins.CurrentSkinInfo.Value = DefaultLegacySkin.Info);
+            AddStep("set skin", () => skins.CurrentSkinInfo.Value = DefaultLegacySkin.Info);
 
             AddStep("setup provider", () =>
             {
@@ -43,12 +39,12 @@ namespace osu.Game.Tests.Rulesets
 
                 rulesetSkinProvider.Add(requester = new SkinRequester());
 
-                requester.OnLoadAsync += () => transformerSampleOnLoad = requester.GetSample(new SampleInfo(TestLegacySkinTransformer.VIRTUAL_SAMPLE_NAME));
+                requester.OnLoadAsync += () => textureOnLoad = requester.GetTexture("hitcircle");
 
                 Child = rulesetSkinProvider;
             });
 
-            AddAssert("requester got correct initial sample", () => transformerSampleOnLoad != null);
+            AddAssert("requester got correct initial texture", () => textureOnLoad != null);
         }
 
         private class SkinRequester : Drawable, ISkin
@@ -72,29 +68,6 @@ namespace osu.Game.Tests.Rulesets
             public ISample GetSample(ISampleInfo sampleInfo) => skin.GetSample(sampleInfo);
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => skin.GetConfig<TLookup, TValue>(lookup);
-        }
-
-        private class TestRuleset : TestSceneRulesetDependencies.TestRuleset
-        {
-            public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new TestLegacySkinTransformer(skin);
-        }
-
-        private class TestLegacySkinTransformer : LegacySkinTransformer
-        {
-            public const string VIRTUAL_SAMPLE_NAME = "virtual-test-sample";
-
-            public TestLegacySkinTransformer([NotNull] ISkin skin)
-                : base(skin)
-            {
-            }
-
-            public override ISample GetSample(ISampleInfo sampleInfo)
-            {
-                if (sampleInfo.LookupNames.Single() == VIRTUAL_SAMPLE_NAME)
-                    return new SampleVirtual();
-
-                return base.GetSample(sampleInfo);
-            }
         }
     }
 }
