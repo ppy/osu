@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
@@ -21,10 +22,14 @@ namespace osu.Game.Tests.Rulesets
     {
         private SkinRequester requester;
 
-        [Cached(typeof(ISkin))]
-        private readonly TestSkinProvider testSkin = new TestSkinProvider();
-
         protected override Ruleset CreateRuleset() => new TestSceneRulesetDependencies.TestRuleset();
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies.CacheAs<ISkinSource>(new TestSkinProvider());
+            return dependencies;
+        }
 
         [Test]
         public void TestEarlyAddedSkinRequester()
@@ -68,7 +73,7 @@ namespace osu.Game.Tests.Rulesets
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => skin.GetConfig<TLookup, TValue>(lookup);
         }
 
-        private class TestSkinProvider : ISkin
+        private class TestSkinProvider : ISkinSource
         {
             public const string TEXTURE_NAME = "some-texture";
 
@@ -79,6 +84,16 @@ namespace osu.Game.Tests.Rulesets
             public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
+
+            public event Action SourceChanged
+            {
+                add { }
+                remove { }
+            }
+
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(this) ? this : null;
+
+            public IEnumerable<ISkin> AllSources => new[] { this };
         }
     }
 }
