@@ -3,7 +3,6 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
@@ -22,8 +21,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private RoomsContainer container;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [SetUp]
+        public new void Setup() => Schedule(() =>
         {
             Child = container = new RoomsContainer
             {
@@ -32,7 +31,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Width = 0.5f,
                 JoinRequested = joinRequested
             };
-        }
+        });
 
         [Test]
         public void TestBasicListChanges()
@@ -113,14 +112,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("add rooms", () => RoomManager.AddRooms(2, new OsuRuleset().RulesetInfo));
             AddStep("add rooms", () => RoomManager.AddRooms(3, new CatchRuleset().RulesetInfo));
 
+            // Todo: What even is this case...?
+            AddStep("set empty filter criteria", () => container.Filter(null));
             AddUntilStep("5 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 5);
 
             AddStep("filter osu! rooms", () => container.Filter(new FilterCriteria { Ruleset = new OsuRuleset().RulesetInfo }));
-
             AddUntilStep("2 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 2);
 
             AddStep("filter catch rooms", () => container.Filter(new FilterCriteria { Ruleset = new CatchRuleset().RulesetInfo }));
-
             AddUntilStep("3 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 3);
         }
 

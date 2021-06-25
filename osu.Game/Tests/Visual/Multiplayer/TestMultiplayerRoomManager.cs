@@ -29,10 +29,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public new readonly List<Room> Rooms = new List<Room>();
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.LoadComplete();
-
             int currentScoreId = 0;
             int currentRoomId = 0;
             int currentPlaylistItemId = 0;

@@ -7,17 +7,14 @@ using osu.Game.Screens.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneFreeModSelectOverlay : OsuTestScene
+    public class TestSceneFreeModSelectOverlay : MultiplayerTestScene
     {
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
-            Child = new TestMultiplayerRoomContainer
+            Child = new FreeModSelectOverlay
             {
-                Child = new FreeModSelectOverlay
-                {
-                    State = { Value = Visibility.Visible }
-                }
+                State = { Value = Visibility.Visible }
             };
         });
     }
