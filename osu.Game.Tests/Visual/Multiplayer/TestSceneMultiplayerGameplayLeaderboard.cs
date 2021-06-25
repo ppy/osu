@@ -7,7 +7,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
@@ -20,6 +19,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Visual.Online;
+using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Tests.Visual.Spectator;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -28,27 +28,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private const int users = 16;
 
-        [Cached(typeof(SpectatorClient))]
-        private TestMultiplayerSpectatorClient spectatorClient = new TestMultiplayerSpectatorClient();
+        public TestMultiplayerSpectatorClient SpectatorClient => RoomDependencies?.SpectatorClient;
 
-        [Cached(typeof(UserLookupCache))]
-        private UserLookupCache lookupCache = new TestSceneCurrentlyPlayingDisplay.TestUserLookupCache();
+        public UserLookupCache LookupCache => RoomDependencies?.LookupCache;
+
+        protected new TestDependencies RoomDependencies => (TestDependencies)base.RoomDependencies;
 
         private MultiplayerGameplayLeaderboard leaderboard;
-
-        protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
-
         private OsuConfigManager config;
-
-        public TestSceneMultiplayerGameplayLeaderboard()
-        {
-            base.Content.Children = new Drawable[]
-            {
-                spectatorClient,
-                lookupCache,
-                Content
-            };
-        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -59,7 +46,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUpSteps]
         public override void SetUpSteps()
         {
-            AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = lookupCache.GetUserAsync(1).Result);
+            AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = LookupCache.GetUserAsync(1).Result);
 
             AddStep("create leaderboard", () =>
             {
@@ -71,12 +58,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var playable = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
 
                 for (int i = 0; i < users; i++)
-                    spectatorClient.StartPlay(i, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
+                    SpectatorClient.StartPlay(i, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
 
-                spectatorClient.Schedule(() =>
+                SpectatorClient.Schedule(() =>
                 {
                     Client.CurrentMatchPlayingUserIds.Clear();
-                    Client.CurrentMatchPlayingUserIds.AddRange(spectatorClient.PlayingUsers);
+                    Client.CurrentMatchPlayingUserIds.AddRange(SpectatorClient.PlayingUsers);
                 });
 
                 Children = new Drawable[]
@@ -86,7 +73,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 scoreProcessor.ApplyBeatmap(playable);
 
-                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, spectatorClient.PlayingUsers.ToArray())
+                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, SpectatorClient.PlayingUsers.ToArray())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -100,7 +87,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestScoreUpdates()
         {
-            AddRepeatStep("update state", () => spectatorClient.RandomlyUpdateState(), 100);
+            AddRepeatStep("update state", () => SpectatorClient.RandomlyUpdateState(), 100);
             AddToggleStep("switch compact mode", expanded => leaderboard.Expanded.Value = expanded);
         }
 
@@ -113,9 +100,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestChangeScoringMode()
         {
-            AddRepeatStep("update state", () => spectatorClient.RandomlyUpdateState(), 5);
+            AddRepeatStep("update state", () => SpectatorClient.RandomlyUpdateState(), 5);
             AddStep("change to classic", () => config.SetValue(OsuSetting.ScoreDisplayMode, ScoringMode.Classic));
             AddStep("change to standardised", () => config.SetValue(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised));
+        }
+
+        protected override RoomTestDependencies CreateRoomDependencies() => new TestDependencies();
+
+        protected class TestDependencies : MultiplayerRoomTestDependencies
+        {
+            public readonly TestMultiplayerSpectatorClient SpectatorClient = new TestMultiplayerSpectatorClient();
+            public readonly UserLookupCache LookupCache = new TestSceneCurrentlyPlayingDisplay.TestUserLookupCache();
+
+            public TestDependencies()
+            {
+                CacheAs<SpectatorClient>(SpectatorClient);
+                CacheAs(LookupCache);
+            }
         }
 
         public class TestMultiplayerSpectatorClient : TestSpectatorClient
