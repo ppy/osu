@@ -5,11 +5,10 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
-using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerMatchFooter : OnlinePlayTestScene
+    public class TestSceneMultiplayerMatchFooter : MultiplayerTestScene
     {
         [SetUp]
         public new void Setup() => Schedule(() =>
