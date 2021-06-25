@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Rulesets
         [Test]
         public void TestEarlyAddedSkinRequester()
         {
-            ISample transformerSampleOnBdl = null;
+            ISample transformerSampleOnLoad = null;
 
             // need a legacy skin to plug the TestRuleset's legacy transformer, which is required for testing this.
             AddStep("set legacy skin", () => skins.CurrentSkinInfo.Value = DefaultLegacySkin.Info);
@@ -43,26 +43,26 @@ namespace osu.Game.Tests.Rulesets
 
                 rulesetSkinProvider.Add(requester = new SkinRequester());
 
-                requester.OnBdl += () => transformerSampleOnBdl = requester.GetSample(new SampleInfo(TestLegacySkinTransformer.VIRTUAL_SAMPLE_NAME));
+                requester.OnLoadAsync += () => transformerSampleOnLoad = requester.GetSample(new SampleInfo(TestLegacySkinTransformer.VIRTUAL_SAMPLE_NAME));
 
                 Child = rulesetSkinProvider;
             });
 
-            AddAssert("requester got correct initial sample", () => transformerSampleOnBdl != null);
+            AddAssert("requester got correct initial sample", () => transformerSampleOnLoad != null);
         }
 
         private class SkinRequester : Drawable, ISkin
         {
             private ISkinSource skin;
 
-            public event Action OnBdl;
+            public event Action OnLoadAsync;
 
             [BackgroundDependencyLoader]
             private void load(ISkinSource skin)
             {
                 this.skin = skin;
 
-                OnBdl?.Invoke();
+                OnLoadAsync?.Invoke();
             }
 
             public Drawable GetDrawableComponent(ISkinComponent component) => skin.GetDrawableComponent(component);
