@@ -57,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override Room CreateNewRoom() =>
             new Room
             {
-                Name = { Value = $"{API.LocalUser}'s awesome room" },
+                Name = { Value = $"{API.LocalUser}{(API.LocalUser.ToString().ToLower().EndsWith("s") ? "'" : "'s")} awesome room" },
                 Category = { Value = RoomCategory.Realtime }
             };
 
