@@ -24,6 +24,7 @@ using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Logging;
+using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.Input;
@@ -156,6 +157,8 @@ namespace osu.Game
 
         private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(GLOBAL_TRACK_VOLUME_ADJUST);
 
+        private IBindable<GameThreadState> updateThreadState;
+
         public OsuGameBase()
         {
             UseDevelopmentServer = DebugUtils.IsDebugBuild;
@@ -183,7 +186,8 @@ namespace osu.Game
 
             dependencies.Cache(realmFactory = new RealmContextFactory(Storage));
 
-            Host.UpdateThread.ThreadPausing += onUpdateThreadPausing;
+            updateThreadState = Host.UpdateThread.State.GetBoundCopy();
+            updateThreadState.BindValueChanged(updateThreadStateChanged);
 
             AddInternal(realmFactory);
 
@@ -359,10 +363,21 @@ namespace osu.Game
             Ruleset.BindValueChanged(onRulesetChanged);
         }
 
-        private void onUpdateThreadPausing()
+        private IDisposable blocking;
+
+        private void updateThreadStateChanged(ValueChangedEvent<GameThreadState> state)
         {
-            var blocking = realmFactory.BlockAllOperations();
-            Schedule(() => blocking.Dispose());
+            switch (state.NewValue)
+            {
+                case GameThreadState.Running:
+                    blocking.Dispose();
+                    blocking = null;
+                    break;
+
+                case GameThreadState.Paused:
+                    blocking = realmFactory.BlockAllOperations();
+                    break;
+            }
         }
 
         protected override void LoadComplete()
@@ -498,9 +513,6 @@ namespace osu.Game
             LocalConfig?.Dispose();
 
             contextFactory.FlushConnections();
-
-            if (Host?.UpdateThread != null)
-                Host.UpdateThread.ThreadPausing -= onUpdateThreadPausing;
         }
     }
 }
