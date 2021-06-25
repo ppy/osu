@@ -8,13 +8,14 @@ using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public abstract class MultiplayerTestScene : OnlinePlayTestScene
+    public abstract class MultiplayerTestScene : OnlinePlayTestScene, IMultiplayerTestDependencies
     {
         public const int PLAYER_1_ID = 55;
         public const int PLAYER_2_ID = 56;
 
         public TestMultiplayerClient Client => RoomDependencies.Client;
         public new TestMultiplayerRoomManager RoomManager => RoomDependencies.RoomManager;
+        public TestUserLookupCache LookupCache => RoomDependencies?.LookupCache;
 
         protected new MultiplayerRoomTestDependencies RoomDependencies => (MultiplayerRoomTestDependencies)base.RoomDependencies;
 

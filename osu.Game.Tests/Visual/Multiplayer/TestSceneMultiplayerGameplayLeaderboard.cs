@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
-using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Tests.Visual.Online;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Tests.Visual.Spectator;
 
@@ -26,11 +25,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerGameplayLeaderboard : MultiplayerTestScene
     {
-        private const int users = 16;
+        private static IEnumerable<int> users => Enumerable.Range(0, 16);
 
         public TestMultiplayerSpectatorClient SpectatorClient => RoomDependencies?.SpectatorClient;
-
-        public UserLookupCache LookupCache => RoomDependencies?.LookupCache;
 
         protected new TestDependencies RoomDependencies => (TestDependencies)base.RoomDependencies;
 
@@ -57,14 +54,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 var playable = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
 
-                for (int i = 0; i < users; i++)
-                    SpectatorClient.StartPlay(i, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
+                foreach (var user in users)
+                    SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
 
-                SpectatorClient.Schedule(() =>
-                {
-                    Client.CurrentMatchPlayingUserIds.Clear();
-                    Client.CurrentMatchPlayingUserIds.AddRange(SpectatorClient.PlayingUsers);
-                });
+                // Todo: This is REALLY bad.
+                Client.CurrentMatchPlayingUserIds.AddRange(users);
 
                 Children = new Drawable[]
                 {
@@ -73,7 +67,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 scoreProcessor.ApplyBeatmap(playable);
 
-                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, SpectatorClient.PlayingUsers.ToArray())
+                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, users.ToArray())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -94,7 +88,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestUserQuit()
         {
-            AddRepeatStep("mark user quit", () => Client.CurrentMatchPlayingUserIds.RemoveAt(0), users);
+            foreach (var user in users)
+                AddStep($"mark user {user} quit", () => Client.RemoveUser(LookupCache.GetUserAsync(user).Result.AsNonNull()));
         }
 
         [Test]
@@ -110,12 +105,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected class TestDependencies : MultiplayerRoomTestDependencies
         {
             public readonly TestMultiplayerSpectatorClient SpectatorClient = new TestMultiplayerSpectatorClient();
-            public readonly UserLookupCache LookupCache = new TestSceneCurrentlyPlayingDisplay.TestUserLookupCache();
 
             public TestDependencies()
             {
                 CacheAs<SpectatorClient>(SpectatorClient);
-                CacheAs(LookupCache);
             }
         }
 

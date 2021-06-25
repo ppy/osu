@@ -15,7 +15,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// <summary>
     /// Contains dependencies for testing online-play rooms.
     /// </summary>
-    public class RoomTestDependencies : IReadOnlyDependencyContainer, IRoomTestDependencies
+    public class RoomTestDependencies : IReadOnlyDependencyContainer, IOnlinePlayTestDependencies
     {
         public Bindable<Room> SelectedRoom { get; }
         public IRoomManager RoomManager { get; }
