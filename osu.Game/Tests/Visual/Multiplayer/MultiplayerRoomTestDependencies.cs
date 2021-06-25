@@ -10,12 +10,14 @@ using osu.Game.Tests.Visual.Spectator;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
+    /// <summary>
+    /// Contains the basic dependencies of multiplayer test scenes.
+    /// </summary>
     public class MultiplayerRoomTestDependencies : RoomTestDependencies, IMultiplayerTestDependencies
     {
         public TestMultiplayerClient Client { get; }
         public TestUserLookupCache LookupCache { get; }
         public TestSpectatorClient SpectatorClient { get; }
-
         public new TestMultiplayerRoomManager RoomManager => (TestMultiplayerRoomManager)base.RoomManager;
 
         public MultiplayerRoomTestDependencies()

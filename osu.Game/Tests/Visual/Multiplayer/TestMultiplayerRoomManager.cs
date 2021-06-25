@@ -11,11 +11,15 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
+    /// <summary>
+    /// A <see cref="RoomManager"/> for use in multiplayer test scenes. Should generally not be used by itself outside of a <see cref="MultiplayerTestScene"/>.
+    /// </summary>
     public class TestMultiplayerRoomManager : MultiplayerRoomManager
     {
         [Resolved]

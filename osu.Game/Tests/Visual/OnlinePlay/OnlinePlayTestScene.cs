@@ -14,7 +14,7 @@ using osu.Game.Screens.OnlinePlay.Lounge.Components;
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
     /// <summary>
-    /// A <see cref="ScreenTestScene"/> providing all the dependencies cached by <see cref="OnlinePlayScreen"/> for testing <see cref="OnlinePlaySubScreen"/>s.
+    /// A base test scene for all online-play components and screens.
     /// </summary>
     public abstract class OnlinePlayTestScene : ScreenTestScene, IOnlinePlayTestDependencies
     {
