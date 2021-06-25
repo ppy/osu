@@ -11,6 +11,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Framework.Allocation;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays
 {
@@ -56,7 +57,7 @@ namespace osu.Game.Overlays
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; }
 
-            public string TooltipText => $@"{Value} view";
+            public LocalisableString TooltipText => $@"{Value} view";
 
             private readonly SpriteIcon icon;
 
