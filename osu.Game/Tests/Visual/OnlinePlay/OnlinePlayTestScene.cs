@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// <summary>
     /// A base test scene for all online play components and screens.
     /// </summary>
-    public abstract class OnlinePlayTestScene : ScreenTestScene, IOnlinePlayTestDependencies
+    public abstract class OnlinePlayTestScene : ScreenTestScene, IOnlinePlayTestSceneDependencies
     {
         public Bindable<Room> SelectedRoom => OnlinePlayDependencies?.SelectedRoom;
         public IRoomManager RoomManager => OnlinePlayDependencies?.RoomManager;
