@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// <summary>
     /// A <see cref="ScreenTestScene"/> providing all the dependencies cached by <see cref="OnlinePlayScreen"/> for testing <see cref="OnlinePlaySubScreen"/>s.
     /// </summary>
-    public abstract class OnlinePlayTestScene : ScreenTestScene, IRoomTestDependencies
+    public abstract class OnlinePlayTestScene : ScreenTestScene, IOnlinePlayTestDependencies
     {
         public Bindable<Room> SelectedRoom => RoomDependencies?.SelectedRoom;
         public IRoomManager RoomManager => RoomDependencies?.RoomManager;

@@ -8,7 +8,7 @@ using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
-    public interface IRoomTestDependencies
+    public interface IOnlinePlayTestDependencies
     {
         /// <summary>
         /// The cached <see cref="Room"/>.

@@ -3,19 +3,15 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
-using osu.Game.Database;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Tests.Visual.Spectator;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -128,24 +124,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected class TestDependencies : MultiplayerRoomTestDependencies
         {
             public readonly TestSpectatorClient SpectatorClient = new TestSpectatorClient();
-            public readonly UserLookupCache LookupCache = new TestUserLookupCache();
 
             public TestDependencies()
             {
                 CacheAs<SpectatorClient>(SpectatorClient);
-                CacheAs(LookupCache);
-            }
-        }
-
-        private class TestUserLookupCache : UserLookupCache
-        {
-            protected override Task<User> ComputeValueAsync(int lookup, CancellationToken token = default)
-            {
-                return Task.FromResult(new User
-                {
-                    Id = lookup,
-                    Username = $"User {lookup}"
-                });
             }
         }
     }
