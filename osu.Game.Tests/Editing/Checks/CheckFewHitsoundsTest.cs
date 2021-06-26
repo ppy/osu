@@ -48,6 +48,31 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
+        public void TestHitsoundedWithBreak()
+        {
+            var hitObjects = new List<HitObject>();
+
+            for (int i = 0; i < 32; ++i)
+            {
+                var samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) };
+
+                if ((i + 1) % 2 == 0)
+                    samples.Add(new HitSampleInfo(HitSampleInfo.HIT_CLAP));
+                if ((i + 1) % 3 == 0)
+                    samples.Add(new HitSampleInfo(HitSampleInfo.HIT_WHISTLE));
+                if ((i + 1) % 4 == 0)
+                    samples.Add(new HitSampleInfo(HitSampleInfo.HIT_FINISH));
+                // Leaves a gap in which no hitsounds exist or can be added, and so shouldn't be an issue.
+                if (i > 8 && i < 24)
+                    continue;
+
+                hitObjects.Add(new HitCircle { StartTime = 1000 * i, Samples = samples });
+            }
+
+            assertOk(hitObjects);
+        }
+
+        [Test]
         public void TestLightlyHitsounded()
         {
             var hitObjects = new List<HitObject>();
