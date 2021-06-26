@@ -82,8 +82,8 @@ namespace osu.Game.Beatmaps
         [CanBeNull]
         private readonly BeatmapOnlineLookupQueue onlineLookupQueue;
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null,
-                              WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources,
+                              GameHost host = null, WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
             : base(storage, contextFactory, api, new BeatmapStore(contextFactory), host)
         {
             this.rulesets = rulesets;
@@ -400,6 +400,32 @@ namespace osu.Game.Beatmaps
             if (string.IsNullOrEmpty(mapName))
             {
                 Logger.Log($"No beatmap files found in the beatmap archive ({reader.Name}).", LoggingTarget.Database);
+                return null;
+            }
+
+            // pre-check to make sure that the archive hasn't already been imported.
+            bool anyToImport = false;
+
+            foreach (var file in reader.Filenames.Where(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase)))
+            {
+                using (var raw = reader.GetStream(file))
+                using (var ms = new MemoryStream()) // we need a memory stream so we can seek
+                {
+                    raw.CopyTo(ms);
+                    ms.Position = 0;
+
+                    string hash = ms.ComputeSHA2Hash();
+                    if (Files.QueryFiles(f => f.Hash == hash).Any())
+                        continue;
+
+                    anyToImport = true;
+                    break;
+                }
+            }
+
+            if (!anyToImport)
+            {
+                Logger.Log($"Archive ({reader.Name}) has already been imported, skipping.");
                 return null;
             }
 
