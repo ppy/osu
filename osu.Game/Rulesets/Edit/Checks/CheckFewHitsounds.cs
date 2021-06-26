@@ -55,18 +55,23 @@ namespace osu.Game.Rulesets.Edit.Checks
             objectsWithoutHitsounds = 0;
             lastHitsoundTime = context.Beatmap.HitObjects.First().StartTime;
 
-            var hitObjectCount = context.Beatmap.HitObjects.Count;
+            var hitObjectsIncludingNested = new List<HitObject>();
+
+            foreach (var hitObject in context.Beatmap.HitObjects)
+            {
+                // Samples play on the end of objects. Some objects have nested objects to accomplish playing them elsewhere (e.g. slider head/repeat).
+                foreach (var nestedHitObject in hitObject.NestedHitObjects)
+                    hitObjectsIncludingNested.Add(nestedHitObject);
+
+                hitObjectsIncludingNested.Add(hitObject);
+            }
+
+            var hitObjectsByEndTime = hitObjectsIncludingNested.OrderBy(o => o.GetEndTime()).ToList();
+            var hitObjectCount = hitObjectsByEndTime.Count;
 
             for (int i = 0; i < hitObjectCount; ++i)
             {
-                var hitObject = context.Beatmap.HitObjects[i];
-
-                // Samples play on the end of objects. Some objects have nested objects to accomplish playing them elsewhere (e.g. slider head/repeat).
-                foreach (var nestedHitObject in hitObject.NestedHitObjects)
-                {
-                    foreach (var issue in applyHitsoundUpdate(nestedHitObject))
-                        yield return issue;
-                }
+                var hitObject = hitObjectsByEndTime[i];
 
                 // This is used to perform an update at the end so that the period after the last hitsounded object can be an issue.
                 bool isLastObject = i == hitObjectCount - 1;
