@@ -123,9 +123,9 @@ namespace osu.Game.Overlays
         private void onSearchFinished(BeatmapListingFilterControl.SearchResult searchResult)
         {
             // non-supporter user used supporter-only filters
-            if (searchResult.Type == BeatmapListingFilterControl.SearchResultType.SupporterOnlyFilter)
+            if (searchResult.Type == BeatmapListingFilterControl.SearchResultType.SupporterOnlyFilters)
             {
-                supporterRequiredContent.UpdateText(searchResult.Filters);
+                supporterRequiredContent.UpdateText(searchResult.SupporterOnlyFiltersUsed);
                 addContentToPlaceholder(supporterRequiredContent);
                 return;
             }
