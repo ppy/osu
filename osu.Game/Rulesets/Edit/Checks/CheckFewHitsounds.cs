@@ -38,6 +38,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         {
             new IssueTemplateLongPeriodProblem(this),
             new IssueTemplateLongPeriodWarning(this),
+            new IssueTemplateLongPeriodNegligible(this),
             new IssueTemplateNoHitsounds(this)
         };
 
