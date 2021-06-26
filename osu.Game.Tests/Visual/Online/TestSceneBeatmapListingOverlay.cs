@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestNonSupportUseSupporterOnlyFiltersPlaceholderNoBeatmaps()
+        public void TestUserWithoutSupporterUsesSupporterOnlyFiltersWithoutResults()
         {
             AddStep("fetch for 0 beatmaps", () => fetchFor());
             AddStep("set dummy as non-supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = false);
@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestSupportUseSupporterOnlyFiltersPlaceholderNoBeatmaps()
+        public void TestUserWithSupporterUsesSupporterOnlyFiltersWithoutResults()
         {
             AddStep("fetch for 0 beatmaps", () => fetchFor());
             AddStep("set dummy as supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = true);
@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestNonSupporterUseSupporterOnlyFiltersPlaceholderOneBeatmap()
+        public void TestUserWithoutSupporterUsesSupporterOnlyFiltersWithResults()
         {
             AddStep("fetch for 1 beatmap", () => fetchFor(CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet));
             AddStep("set dummy as non-supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = false);
@@ -162,7 +162,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestSupporterUseSupporterOnlyFiltersPlaceholderOneBeatmap()
+        public void TestUserWithSupporterUsesSupporterOnlyFiltersWithResults()
         {
             AddStep("fetch for 1 beatmap", () => fetchFor(CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet));
             AddStep("set dummy as supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = true);
