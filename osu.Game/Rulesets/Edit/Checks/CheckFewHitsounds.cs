@@ -82,10 +82,12 @@ namespace osu.Game.Rulesets.Edit.Checks
         private IEnumerable<Issue> applyHitsoundUpdate(HitObject hitObject, bool isLastObject = false)
         {
             var time = hitObject.GetEndTime();
+            bool hasHitsound = hitObject.Samples.Any(isHitsound);
+            bool couldHaveHitsound = hitObject.Samples.Any(isHitnormal);
 
             // Only generating issues on hitsounded or last objects ensures we get one issue per long period.
             // If there are no hitsounds we let the "No hitsounds" template take precedence.
-            if (hasHitsound(hitObject) || (isLastObject && mapHasHitsounds))
+            if (hasHitsound || (isLastObject && mapHasHitsounds))
             {
                 var timeWithoutHitsounds = time - lastHitsoundTime;
 
@@ -97,18 +99,15 @@ namespace osu.Game.Rulesets.Edit.Checks
                     yield return new IssueTemplateLongPeriodNegligible(this).Create(lastHitsoundTime, timeWithoutHitsounds);
             }
 
-            if (hasHitsound(hitObject))
+            if (hasHitsound)
             {
                 mapHasHitsounds = true;
                 objectsWithoutHitsounds = 0;
                 lastHitsoundTime = time;
             }
-            else if (couldHaveHitsound(hitObject))
+            else if (couldHaveHitsound)
                 ++objectsWithoutHitsounds;
         }
-
-        private bool hasHitsound(HitObject hitObject) => hitObject.Samples.Any(isHitsound);
-        private bool couldHaveHitsound(HitObject hitObject) => hitObject.Samples.Any(isHitnormal);
 
         private bool isHitsound(HitSampleInfo sample) => HitSampleInfo.AllAdditions.Any(sample.Name.Contains);
         private bool isHitnormal(HitSampleInfo sample) => sample.Name.Contains(HitSampleInfo.HIT_NORMAL);
