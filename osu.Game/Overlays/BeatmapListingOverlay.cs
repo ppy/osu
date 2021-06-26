@@ -122,7 +122,6 @@ namespace osu.Game.Overlays
 
         private void onSearchFinished(BeatmapListingFilterControl.SearchResult searchResult)
         {
-            // non-supporter user used supporter-only filters
             if (searchResult.Type == BeatmapListingFilterControl.SearchResultType.SupporterOnlyFilters)
             {
                 supporterRequiredContent.UpdateText(searchResult.SupporterOnlyFiltersUsed);
@@ -185,7 +184,7 @@ namespace osu.Game.Overlays
 
                 if (lastContent == notFoundContent || lastContent == supporterRequiredContent)
                 {
-                    // the placeholder may be used multiple times, so don't expire/dispose it.
+                    // the placeholders may be used multiple times, so don't expire/dispose them.
                     transform.Schedule(() => panelTarget.Remove(lastContent));
                 }
                 else
@@ -253,7 +252,8 @@ namespace osu.Game.Overlays
             }
         }
 
-        // using string literals as there's no proper processing for LocalizeStrings yet
+        // TODO: localisation requires Text/LinkFlowContainer support for localising strings with links inside
+        // (https://github.com/ppy/osu-framework/issues/4530)
         public class SupporterRequiredDrawable : CompositeDrawable
         {
             private LinkFlowContainer supporterRequiredText;
