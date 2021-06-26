@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Edit
             new CheckAudioPresence(),
             new CheckAudioQuality(),
             new CheckMutedObjects(),
+            new CheckFewHitsounds(),
 
             // Compose
             new CheckUnsnappedObjects(),
