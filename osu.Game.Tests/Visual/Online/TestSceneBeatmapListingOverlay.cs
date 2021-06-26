@@ -218,17 +218,19 @@ namespace osu.Game.Tests.Visual.Online
 
         private void supporterRequiredPlaceholderShown()
         {
-            AddUntilStep("supporter-placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().SingleOrDefault()?.IsPresent == true);
+            AddUntilStep("\"supporter required\" placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().SingleOrDefault()?.IsPresent == true);
         }
 
         private void notFoundPlaceholderShown()
         {
-            AddUntilStep("not-found-placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
+            AddUntilStep("\"no maps found\" placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
         }
 
         private void noPlaceholderShown()
         {
-            AddUntilStep("no placeholder shown", () => !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any() && !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
+            AddUntilStep("no placeholder shown", () =>
+                !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any()
+                && !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any());
         }
 
         private class TestAPIBeatmapSet : APIBeatmapSet
