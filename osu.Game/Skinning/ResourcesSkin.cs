@@ -19,7 +19,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// An <see cref="ISkin"/> that uses an underlying <see cref="IResourceStore{T}"/> with namespaces for resources retrieval.
     /// </summary>
-    public class ResourcesSkin : ISkin
+    public class ResourcesSkin : ISkin, IDisposable
     {
         private readonly TextureStore textures;
         private readonly ISampleStore samples;
@@ -48,33 +48,10 @@ namespace osu.Game.Skinning
 
         public IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup) => null;
 
-        #region Disposal
-
-        ~ResourcesSkin()
-        {
-            // required to potentially clean up sample store from audio hierarchy.
-            Dispose(false);
-        }
-
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private bool isDisposed;
-
-        protected virtual void Dispose(bool isDisposing)
-        {
-            if (isDisposed)
-                return;
-
-            isDisposed = true;
-
             textures.Dispose();
             samples.Dispose();
         }
-
-        #endregion
     }
 }
