@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Editing.Checks
                 hitObjects.Add(new HitCircle { StartTime = 1000 * i, Samples = samples });
             }
 
-            // Should prompt one warning between 1st and 11th, and another between 11th and 20th.
+            // Should prompt one warning between 1st and 16th, and another between 16th and 31st.
             assertLongPeriodWarning(hitObjects, count: 2);
         }
 
@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Editing.Checks
                 hitObjects.Add(new HitCircle { StartTime = 1000 * i, Samples = samples });
             }
 
-            // Should prompt one problem between 1st and 40th, and another between 40th and 80th.
+            // Should prompt one problem between 1st and 41st, and another between 41st and 81st.
             assertLongPeriodProblem(hitObjects, count: 2);
         }
 
@@ -140,7 +140,6 @@ namespace osu.Game.Tests.Editing.Checks
                 hitObjects.Add(new HitCircle { StartTime = 1000 * i, Samples = samples });
             }
 
-            // Should prompt one problem between 1st and 40th, and another between 40th and 80th.
             assertNoHitsounds(hitObjects);
         }
 
