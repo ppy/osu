@@ -22,6 +22,14 @@ namespace osu.Game.Rulesets.Edit.Checks
         /// </summary>
         private const int low_volume_threshold = 20;
 
+        private enum EdgeType
+        {
+            Head,
+            Repeat,
+            Tail,
+            None
+        }
+
         public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Audio, "Low volume hitobjects");
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
@@ -58,35 +66,41 @@ namespace osu.Game.Rulesets.Edit.Checks
             int maxVolume = sampledHitObject.Samples.Max(sample => sample.Volume > 0 ? sample.Volume : sampledHitObject.SampleControlPoint.SampleVolume);
             double samplePlayTime = sampledHitObject.GetEndTime();
 
-            bool head = Precision.AlmostEquals(samplePlayTime, hitObject.StartTime, 1f);
-            bool tail = Precision.AlmostEquals(samplePlayTime, hitObject.GetEndTime(), 1f);
-            bool repeat = false;
-
-            if (hitObject is IHasRepeats hasRepeats && !head && !tail)
-            {
-                double spanDuration = hasRepeats.Duration / hasRepeats.SpanCount();
-                repeat = Precision.AlmostEquals((samplePlayTime - hitObject.StartTime) % spanDuration, 0f, 1f);
-            }
-
+            EdgeType edgeType = getEdgeAtTime(hitObject, samplePlayTime);
             // We only care about samples played on the edges of objects, not ones like spinnerspin or slidertick.
-            if (!head && !tail && !repeat)
+            if (edgeType == EdgeType.None)
                 yield break;
 
-            string postfix = null;
-            if (hitObject is IHasDuration)
-                postfix = head ? "head" : tail ? "tail" : "repeat";
+            string postfix = hitObject is IHasDuration ? edgeType.ToString().ToLower() : null;
 
             if (maxVolume <= muted_threshold)
             {
-                if (head)
+                if (edgeType == EdgeType.Head)
                     yield return new IssueTemplateMutedActive(this).Create(hitObject, maxVolume / 100f, sampledHitObject.GetEndTime(), postfix);
                 else
                     yield return new IssueTemplateMutedPassive(this).Create(hitObject, maxVolume / 100f, sampledHitObject.GetEndTime(), postfix);
             }
-            else if (maxVolume <= low_volume_threshold && head)
+            else if (maxVolume <= low_volume_threshold && edgeType == EdgeType.Head)
             {
                 yield return new IssueTemplateLowVolumeActive(this).Create(hitObject, maxVolume / 100f, sampledHitObject.GetEndTime(), postfix);
             }
+        }
+
+        private EdgeType getEdgeAtTime(HitObject hitObject, double time)
+        {
+            if (Precision.AlmostEquals(time, hitObject.StartTime, 1f))
+                return EdgeType.Head;
+            if (Precision.AlmostEquals(time, hitObject.GetEndTime(), 1f))
+                return EdgeType.Tail;
+
+            if (hitObject is IHasRepeats hasRepeats)
+            {
+                double spanDuration = hasRepeats.Duration / hasRepeats.SpanCount();
+                if (Precision.AlmostEquals((time - hitObject.StartTime) % spanDuration, 0f, 1f))
+                    return EdgeType.Repeat;
+            }
+
+            return EdgeType.None;
         }
 
         public abstract class IssueTemplateMuted : IssueTemplate
