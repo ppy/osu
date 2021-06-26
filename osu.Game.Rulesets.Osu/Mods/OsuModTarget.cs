@@ -25,6 +25,7 @@ using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Osu.Utils;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
@@ -328,7 +329,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         distance * MathF.Sin(direction)
                     );
                     // Rotate the new circle away from playfield border
-                    relativePos = getRotatedVector(lastPos, relativePos);
+                    relativePos = OsuHitObjectGenerationUtils.RotateAwayFromEdge(lastPos, relativePos, edge_rotation_multiplier);
                     direction = MathF.Atan2(relativePos.Y, relativePos.X);
 
                     var newPosition = Vector2.Add(lastPos, relativePos);
@@ -484,81 +485,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         private bool checkForOverlap(IEnumerable<OsuHitObject> objectsToCheck, OsuHitObject target)
         {
             return objectsToCheck.Any(h => Vector2.Distance(h.Position, target.Position) < target.Radius * 2);
-        }
-
-        /// <summary>
-        /// Determines the position of the current hit object relative to the previous one.
-        /// </summary>
-        /// <returns>The position of the current hit object relative to the previous one</returns>
-        private Vector2 getRotatedVector(Vector2 prevPosChanged, Vector2 posRelativeToPrev)
-        {
-            var relativeRotationDistance = 0f;
-            var playfieldMiddle = Vector2.Divide(OsuPlayfield.BASE_SIZE, 2);
-
-            if (prevPosChanged.X < playfieldMiddle.X)
-            {
-                relativeRotationDistance = Math.Max(
-                    (border_distance_x - prevPosChanged.X) / border_distance_x,
-                    relativeRotationDistance
-                );
-            }
-            else
-            {
-                relativeRotationDistance = Math.Max(
-                    (prevPosChanged.X - (OsuPlayfield.BASE_SIZE.X - border_distance_x)) / border_distance_x,
-                    relativeRotationDistance
-                );
-            }
-
-            if (prevPosChanged.Y < playfieldMiddle.Y)
-            {
-                relativeRotationDistance = Math.Max(
-                    (border_distance_y - prevPosChanged.Y) / border_distance_y,
-                    relativeRotationDistance
-                );
-            }
-            else
-            {
-                relativeRotationDistance = Math.Max(
-                    (prevPosChanged.Y - (OsuPlayfield.BASE_SIZE.Y - border_distance_y)) / border_distance_y,
-                    relativeRotationDistance
-                );
-            }
-
-            return rotateVectorTowardsVector(
-                posRelativeToPrev,
-                Vector2.Subtract(playfieldMiddle, prevPosChanged),
-                Math.Min(1, relativeRotationDistance * edge_rotation_multiplier)
-            );
-        }
-
-        /// <summary>
-        /// Rotates vector "initial" towards vector "destination"
-        /// </summary>
-        /// <param name="initial">Vector to rotate to "destination"</param>
-        /// <param name="destination">Vector "initial" should be rotated to</param>
-        /// <param name="relativeDistance">
-        /// The angle the vector should be rotated relative to the difference between the angles of
-        /// the the two vectors.
-        /// </param>
-        /// <returns>Resulting vector</returns>
-        private Vector2 rotateVectorTowardsVector(Vector2 initial, Vector2 destination, float relativeDistance)
-        {
-            var initialAngleRad = Math.Atan2(initial.Y, initial.X);
-            var destAngleRad = Math.Atan2(destination.Y, destination.X);
-
-            var diff = destAngleRad - initialAngleRad;
-
-            while (diff < -Math.PI) diff += 2 * Math.PI;
-
-            while (diff > Math.PI) diff -= 2 * Math.PI;
-
-            var finalAngleRad = initialAngleRad + relativeDistance * diff;
-
-            return new Vector2(
-                initial.Length * (float)Math.Cos(finalAngleRad),
-                initial.Length * (float)Math.Sin(finalAngleRad)
-            );
         }
 
         /// <summary>
