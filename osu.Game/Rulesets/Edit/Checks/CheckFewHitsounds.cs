@@ -32,8 +32,6 @@ namespace osu.Game.Rulesets.Edit.Checks
         private const int warning_threshold_objects = 4;
         private const int problem_threshold_objects = 16;
 
-        private static readonly string[] hitsound_types = { HitSampleInfo.HIT_CLAP, HitSampleInfo.HIT_WHISTLE, HitSampleInfo.HIT_FINISH };
-
         public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Audio, "Few or no hitsounds");
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
@@ -111,7 +109,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         private bool hasHitsound(HitObject hitObject) => hitObject.Samples.Any(isHitsound);
         private bool couldHaveHitsound(HitObject hitObject) => hitObject.Samples.Any(isHitnormal);
 
-        private bool isHitsound(HitSampleInfo sample) => hitsound_types.Any(sample.Name.Contains);
+        private bool isHitsound(HitSampleInfo sample) => HitSampleInfo.AllAdditions.Any(sample.Name.Contains);
         private bool isHitnormal(HitSampleInfo sample) => sample.Name.Contains(HitSampleInfo.HIT_NORMAL);
 
         public abstract class IssueTemplateLongPeriod : IssueTemplate
