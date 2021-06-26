@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -14,6 +15,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -77,27 +79,27 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("fetch for 0 beatmaps", () => fetchFor());
             AddStep("set dummy as non-supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = false);
 
-            // test non-supporter on Rank Achieved filter
-            toggleRankFilter(Scoring.ScoreRank.XH);
+            // only Rank Achieved filter
+            setRankAchievedFilter(new[] { ScoreRank.XH });
             supporterRequiredPlaceholderShown();
 
-            AddStep("Clear Rank Achieved filter", () => searchControl.Ranks.Clear());
+            setRankAchievedFilter(Array.Empty<ScoreRank>());
             notFoundPlaceholderShown();
 
-            // test non-supporter on Played filter
-            toggleSupporterOnlyPlayedFilter(SearchPlayed.Played);
+            // only Played filter
+            setPlayedFilter(SearchPlayed.Played);
             supporterRequiredPlaceholderShown();
 
-            AddStep("Set Played filter to Any", () => searchControl.Played.Value = SearchPlayed.Any);
+            setPlayedFilter(SearchPlayed.Any);
             notFoundPlaceholderShown();
 
-            // test non-supporter on both Rank Achieved and Played filter
-            toggleRankFilter(Scoring.ScoreRank.XH);
-            toggleSupporterOnlyPlayedFilter(SearchPlayed.Played);
+            // both RankAchieved and Played filters
+            setRankAchievedFilter(new[] { ScoreRank.XH });
+            setPlayedFilter(SearchPlayed.Played);
             supporterRequiredPlaceholderShown();
 
-            AddStep("Clear Rank Achieved filter", () => searchControl.Ranks.Clear());
-            AddStep("Set Played filter to Any", () => searchControl.Played.Value = SearchPlayed.Any);
+            setRankAchievedFilter(Array.Empty<ScoreRank>());
+            setPlayedFilter(SearchPlayed.Any);
             notFoundPlaceholderShown();
         }
 
@@ -107,27 +109,27 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("fetch for 0 beatmaps", () => fetchFor());
             AddStep("set dummy as supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = true);
 
-            // test supporter on Rank Achieved filter
-            toggleRankFilter(Scoring.ScoreRank.XH);
+            // only Rank Achieved filter
+            setRankAchievedFilter(new[] { ScoreRank.XH });
             notFoundPlaceholderShown();
 
-            AddStep("Clear Rank Achieved filter", () => searchControl.Ranks.Clear());
+            setRankAchievedFilter(Array.Empty<ScoreRank>());
             notFoundPlaceholderShown();
 
-            // test supporter on Played filter
-            toggleSupporterOnlyPlayedFilter(SearchPlayed.Played);
+            // only Played filter
+            setPlayedFilter(SearchPlayed.Played);
             notFoundPlaceholderShown();
 
-            AddStep("Set Played filter to Any", () => searchControl.Played.Value = SearchPlayed.Any);
+            setPlayedFilter(SearchPlayed.Any);
             notFoundPlaceholderShown();
 
-            // test supporter on both Rank Achieved and Played filter
-            toggleRankFilter(Scoring.ScoreRank.XH);
-            toggleSupporterOnlyPlayedFilter(SearchPlayed.Played);
+            // both Rank Achieved and Played filters
+            setRankAchievedFilter(new[] { ScoreRank.XH });
+            setPlayedFilter(SearchPlayed.Played);
             notFoundPlaceholderShown();
 
-            AddStep("Clear Rank Achieved filter", () => searchControl.Ranks.Clear());
-            AddStep("Set Played filter to Any", () => searchControl.Played.Value = SearchPlayed.Any);
+            setRankAchievedFilter(Array.Empty<ScoreRank>());
+            setPlayedFilter(SearchPlayed.Any);
             notFoundPlaceholderShown();
         }
 
@@ -137,27 +139,27 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("fetch for 1 beatmap", () => fetchFor(CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet));
             AddStep("set dummy as non-supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = false);
 
-            // test non-supporter on Rank Achieved filter
-            toggleRankFilter(Scoring.ScoreRank.XH);
+            // only Rank Achieved filter
+            setRankAchievedFilter(new[] { ScoreRank.XH });
             supporterRequiredPlaceholderShown();
 
-            AddStep("Clear Rank Achieved filter", () => searchControl.Ranks.Clear());
+            setRankAchievedFilter(Array.Empty<ScoreRank>());
             noPlaceholderShown();
 
-            // test non-supporter on Played filter
-            toggleSupporterOnlyPlayedFilter(SearchPlayed.Played);
+            // only Played filter
+            setPlayedFilter(SearchPlayed.Played);
             supporterRequiredPlaceholderShown();
 
-            AddStep("Set Played filter to Any", () => searchControl.Played.Value = SearchPlayed.Any);
+            setPlayedFilter(SearchPlayed.Any);
             noPlaceholderShown();
 
-            // test non-supporter on both Rank Achieved and Played filter
-            toggleRankFilter(Scoring.ScoreRank.XH);
-            toggleSupporterOnlyPlayedFilter(SearchPlayed.Played);
+            // both Rank Achieved and Played filters
+            setRankAchievedFilter(new[] { ScoreRank.XH });
+            setPlayedFilter(SearchPlayed.Played);
             supporterRequiredPlaceholderShown();
 
-            AddStep("Clear Rank Achieved filter", () => searchControl.Ranks.Clear());
-            AddStep("Set Played filter to Any", () => searchControl.Played.Value = SearchPlayed.Any);
+            setRankAchievedFilter(Array.Empty<ScoreRank>());
+            setPlayedFilter(SearchPlayed.Any);
             noPlaceholderShown();
         }
 
@@ -167,27 +169,27 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("fetch for 1 beatmap", () => fetchFor(CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet));
             AddStep("set dummy as supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = true);
 
-            // test supporter on Rank Achieved filter
-            toggleRankFilter(Scoring.ScoreRank.XH);
+            // only Rank Achieved filter
+            setRankAchievedFilter(new[] { ScoreRank.XH });
             noPlaceholderShown();
 
-            AddStep("Clear Rank Achieved filter", () => searchControl.Ranks.Clear());
+            setRankAchievedFilter(Array.Empty<ScoreRank>());
             noPlaceholderShown();
 
-            // test supporter on Played filter
-            toggleSupporterOnlyPlayedFilter(SearchPlayed.Played);
+            // only Played filter
+            setPlayedFilter(SearchPlayed.Played);
             noPlaceholderShown();
 
-            AddStep("Set Played filter to Any", () => searchControl.Played.Value = SearchPlayed.Any);
+            setPlayedFilter(SearchPlayed.Any);
             noPlaceholderShown();
 
-            // test supporter on both Rank Achieved and Played filter
-            toggleRankFilter(Scoring.ScoreRank.XH);
-            toggleSupporterOnlyPlayedFilter(SearchPlayed.Played);
+            // both Rank Achieved and Played filters
+            setRankAchievedFilter(new[] { ScoreRank.XH });
+            setPlayedFilter(SearchPlayed.Played);
             noPlaceholderShown();
 
-            AddStep("Set Played filter to Any", () => searchControl.Played.Value = SearchPlayed.Any);
-            AddStep("Clear Rank Achieved filter", () => searchControl.Ranks.Clear());
+            setRankAchievedFilter(Array.Empty<ScoreRank>());
+            setPlayedFilter(SearchPlayed.Any);
             noPlaceholderShown();
         }
 
@@ -200,18 +202,18 @@ namespace osu.Game.Tests.Visual.Online
             searchControl.Query.TriggerChange();
         }
 
-        private void toggleRankFilter(Scoring.ScoreRank rank)
+        private void setRankAchievedFilter(ScoreRank[] ranks)
         {
-            AddStep("toggle Rank Achieved filter", () =>
+            AddStep($"set Rank Achieved filter to [{string.Join(',', ranks)}]", () =>
             {
                 searchControl.Ranks.Clear();
-                searchControl.Ranks.Add(rank);
+                searchControl.Ranks.AddRange(ranks);
             });
         }
 
-        private void toggleSupporterOnlyPlayedFilter(SearchPlayed played)
+        private void setPlayedFilter(SearchPlayed played)
         {
-            AddStep("toggle Played filter", () => searchControl.Played.Value = played);
+            AddStep($"set Played filter to {played}", () => searchControl.Played.Value = played);
         }
 
         private void supporterRequiredPlaceholderShown()
