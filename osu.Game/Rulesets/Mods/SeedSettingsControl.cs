@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mods
                 }
             }
 
-            private readonly SettingsNumberBox.NumberBox seedNumberBox;
+            private readonly OutlinedNumberBox seedNumberBox;
 
             public SeedControl()
             {
@@ -42,31 +42,11 @@ namespace osu.Game.Rulesets.Mods
 
                 InternalChildren = new[]
                 {
-                    new GridContainer
+                    seedNumberBox = new OutlinedNumberBox
                     {
+                        Margin = new MarginPadding { Top = 5 },
                         RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        ColumnDimensions = new[]
-                        {
-                            new Dimension(),
-                            new Dimension(GridSizeMode.Absolute, 2),
-                            new Dimension(GridSizeMode.Relative, 0.25f)
-                        },
-                        RowDimensions = new[]
-                        {
-                            new Dimension(GridSizeMode.AutoSize)
-                        },
-                        Content = new[]
-                        {
-                            new Drawable[]
-                            {
-                                seedNumberBox = new SettingsNumberBox.NumberBox
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    CommitOnFocusLost = true
-                                }
-                            }
-                        }
+                        CommitOnFocusLost = true
                     }
                 };
 
@@ -83,8 +63,9 @@ namespace osu.Game.Rulesets.Mods
 
             protected override void Update()
             {
-                if (current.Value == null)
-                    seedNumberBox.Text = current.Current.Value.ToString();
+                base.Update();
+                if (Current.Value == null)
+                    seedNumberBox.Current.Value = "";
             }
         }
     }
