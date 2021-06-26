@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateNoHitsounds(this)
         };
 
-        private bool hasHitsounds;
+        private bool mapHasHitsounds;
         private int objectsWithoutHitsounds;
         private double lastHitsoundTime;
 
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             if (!context.Beatmap.HitObjects.Any())
                 yield break;
 
-            hasHitsounds = false;
+            mapHasHitsounds = false;
             objectsWithoutHitsounds = 0;
             lastHitsoundTime = context.Beatmap.HitObjects.First().StartTime;
 
@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                     yield return issue;
             }
 
-            if (!hasHitsounds)
+            if (!mapHasHitsounds)
                 yield return new IssueTemplateNoHitsounds(this).Create();
         }
 
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             // Only generating issues on hitsounded or last objects ensures we get one issue per long period.
             // If there are no hitsounds we let the "No hitsounds" template take precedence.
-            if (hasHitsound(hitObject) || (isLastObject && hasHitsounds))
+            if (hasHitsound(hitObject) || (isLastObject && mapHasHitsounds))
             {
                 var timeWithoutHitsounds = time - lastHitsoundTime;
 
@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             if (hasHitsound(hitObject))
             {
-                hasHitsounds = true;
+                mapHasHitsounds = true;
                 objectsWithoutHitsounds = 0;
                 lastHitsoundTime = time;
             }
