@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             // Only generating issues on hitsounded or last objects ensures we get one issue per long period.
             // If there are no hitsounds we let the "No hitsounds" template take precedence.
-            if (hasHitsound(hitObject) || isLastObject && hasHitsounds)
+            if (hasHitsound(hitObject) || (isLastObject && hasHitsounds))
             {
                 var timeWithoutHitsounds = time - lastHitsoundTime;
 
