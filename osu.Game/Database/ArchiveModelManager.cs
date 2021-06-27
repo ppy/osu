@@ -374,6 +374,7 @@ namespace osu.Game.Database
                     // or alternatively doing a faster hash check. either of these require database changes and reprocessing of existing files.
                     if (getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)))
                     {
+                        LogForModel(item, $"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
                         Undelete(existing);
                         return existing;
                     }
