@@ -319,18 +319,6 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.ConsumableItems.AsNoTracking().FirstOrDefault(query);
 
-        protected override bool CanReuseExisting(BeatmapSetInfo existing, BeatmapSetInfo import)
-        {
-            if (!base.CanReuseExisting(existing, import))
-                return false;
-
-            var existingIds = existing.Beatmaps.Select(b => b.OnlineBeatmapID).OrderBy(i => i);
-            var importIds = import.Beatmaps.Select(b => b.OnlineBeatmapID).OrderBy(i => i);
-
-            // force re-import if we are not in a sane state.
-            return existing.OnlineBeatmapSetID == import.OnlineBeatmapSetID && existingIds.SequenceEqual(importIds);
-        }
-
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
         /// </summary>
