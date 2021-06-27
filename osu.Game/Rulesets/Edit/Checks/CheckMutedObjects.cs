@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Utils;
@@ -96,7 +97,9 @@ namespace osu.Game.Rulesets.Edit.Checks
             if (hitObject is IHasRepeats hasRepeats)
             {
                 double spanDuration = hasRepeats.Duration / hasRepeats.SpanCount();
-                if (Precision.AlmostEquals((time - hitObject.StartTime) % spanDuration, 0f, 1f))
+                double spans = (time - hitObject.StartTime) / spanDuration;
+
+                if (Precision.AlmostEquals(spans, Math.Ceiling(spans)) || Precision.AlmostEquals(spans, Math.Floor(spans)))
                     return EdgeType.Repeat;
             }
 
