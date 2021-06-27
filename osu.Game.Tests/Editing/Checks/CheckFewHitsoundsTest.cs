@@ -141,6 +141,38 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
+        public void TestNestedObjectsHitsounded()
+        {
+            var ticks = new List<HitObject>();
+            for (int i = 1; i < 16; ++i)
+                ticks.Add(new SliderTick { StartTime = 1000 * i, Samples = hitsounded });
+
+            var nested = new MockNestableHitObject(ticks.ToList(), 0, 16000)
+            {
+                Samples = hitsounded
+            };
+            nested.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+            assertOk(new List<HitObject> { nested });
+        }
+
+        [Test]
+        public void TestNestedObjectsRarelyHitsounded()
+        {
+            var ticks = new List<HitObject>();
+            for (int i = 1; i < 16; ++i)
+                ticks.Add(new SliderTick { StartTime = 1000 * i, Samples = i == 0 ? hitsounded : notHitsounded });
+
+            var nested = new MockNestableHitObject(ticks.ToList(), 0, 16000)
+            {
+                Samples = hitsounded
+            };
+            nested.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+            assertLongPeriodWarning(new List<HitObject> { nested });
+        }
+
+        [Test]
         public void TestConcurrentObjects()
         {
             var hitObjects = new List<HitObject>();
