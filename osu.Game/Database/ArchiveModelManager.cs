@@ -371,18 +371,25 @@ namespace osu.Game.Database
 
             delayEvents();
 
+            bool checkedExisting = false;
+            TModel existing = null;
+
             if (archive != null && !HasCustomHashFunction)
             {
-                // fast bail to improve large import performance.
+                // this is a fast bail condition to improve large import performance.
                 item.Hash = computeHashFast(archive);
 
-                var fastExisting = CheckForExisting(item);
+                checkedExisting = true;
+                existing = CheckForExisting(item);
 
-                if (fastExisting != null)
+                if (existing != null)
                 {
                     // bare minimum comparisons
-                    if (getFilenames(fastExisting.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened)))
-                        return fastExisting;
+                    //
+                    // note that this should really be checking filesizes on disk (of existing files) for some degree of sanity.
+                    // or alternatively doing a faster hash check. either of these require database changes and reprocessing of existing files.
+                    if (getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)))
+                        return existing;
                 }
             }
 
@@ -411,7 +418,8 @@ namespace osu.Game.Database
                     {
                         if (!write.IsTransactionLeader) throw new InvalidOperationException($"Ensure there is no parent transaction so errors can correctly be handled by {this}");
 
-                        var existing = CheckForExisting(item);
+                        if (!checkedExisting)
+                            existing = CheckForExisting(item);
 
                         if (existing != null)
                         {
