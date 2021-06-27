@@ -389,7 +389,10 @@ namespace osu.Game.Database
                     // note that this should really be checking filesizes on disk (of existing files) for some degree of sanity.
                     // or alternatively doing a faster hash check. either of these require database changes and reprocessing of existing files.
                     if (getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)))
+                    {
+                        Undelete(existing);
                         return existing;
+                    }
                 }
             }
 
