@@ -377,7 +377,7 @@ namespace osu.Game.Database
 
                         if (existing != null)
                         {
-                            if (CanReuseExisting(existing, item))
+                            if (canReuseExisting(existing, item))
                             {
                                 Undelete(existing);
                                 LogForModel(item, $"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
@@ -751,7 +751,7 @@ namespace osu.Game.Database
         /// <param name="existing">The existing model.</param>
         /// <param name="import">The newly imported model.</param>
         /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing and force a re-import.</returns>
-        protected virtual bool CanReuseExisting(TModel existing, TModel import) =>
+        private bool canReuseExisting(TModel existing, TModel import) =>
             // for the best or worst, we copy and import files of a new import before checking whether
             // it is a duplicate. so to check if anything has changed, we can just compare all FileInfo IDs.
             getIDs(existing.Files).SequenceEqual(getIDs(import.Files)) &&
