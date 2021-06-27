@@ -13,12 +13,12 @@ namespace osu.Game.Rulesets.Edit.Checks
     public class CheckMutedObjects : ICheck
     {
         /// <summary>
-        /// Volume percentages lower than this are typically inaudible.
+        /// Volume percentages lower than or equal to this are typically inaudible.
         /// </summary>
         private const int muted_threshold = 5;
 
         /// <summary>
-        /// Volume percentages lower than this can sometimes be inaudible depending on sample used and music volume.
+        /// Volume percentages lower than or equal to this can sometimes be inaudible depending on sample used and music volume.
         /// </summary>
         private const int low_volume_threshold = 20;
 
