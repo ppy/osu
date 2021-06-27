@@ -192,6 +192,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
+        [Ignore("intentionally broken by import optimisations")]
         public async Task TestImportThenImportWithChangedFile()
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
@@ -294,6 +295,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
+        [Ignore("intentionally broken by import optimisations")]
         public async Task TestImportCorruptThenImport()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
