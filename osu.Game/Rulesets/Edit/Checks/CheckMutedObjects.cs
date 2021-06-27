@@ -98,9 +98,13 @@ namespace osu.Game.Rulesets.Edit.Checks
             {
                 double spanDuration = hasRepeats.Duration / hasRepeats.SpanCount();
                 double spans = (time - hitObject.StartTime) / spanDuration;
+                double acceptableDifference = 1 / spanDuration; // 1 ms of acceptable difference, as with head/tail above.
 
-                if (Precision.AlmostEquals(spans, Math.Ceiling(spans)) || Precision.AlmostEquals(spans, Math.Floor(spans)))
+                if (Precision.AlmostEquals(spans, Math.Ceiling(spans), acceptableDifference) ||
+                    Precision.AlmostEquals(spans, Math.Floor(spans), acceptableDifference))
+                {
                     return EdgeType.Repeat;
+                }
             }
 
             return EdgeType.None;
