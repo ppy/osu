@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using NUnit.Framework;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -11,7 +10,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Beatmaps;
 
@@ -26,32 +24,6 @@ namespace osu.Game.Tests.Editing.Checks
         private const int volume_regular = 50;
         private const int volume_low = 15;
         private const int volume_muted = 5;
-
-        private sealed class MockNestableHitObject : HitObject, IHasDuration
-        {
-            private readonly IEnumerable<HitObject> toBeNested;
-
-            public MockNestableHitObject(IEnumerable<HitObject> toBeNested, double startTime, double endTime)
-            {
-                this.toBeNested = toBeNested;
-                StartTime = startTime;
-                EndTime = endTime;
-            }
-
-            protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
-            {
-                foreach (var hitObject in toBeNested)
-                    AddNested(hitObject);
-            }
-
-            public double EndTime { get; }
-
-            public double Duration
-            {
-                get => EndTime - StartTime;
-                set => throw new System.NotImplementedException();
-            }
-        }
 
         [SetUp]
         public void Setup()
