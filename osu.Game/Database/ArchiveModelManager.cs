@@ -317,7 +317,11 @@ namespace osu.Game.Database
         /// </remarks>
         protected virtual string ComputeHash(TModel item, ArchiveReader reader = null)
         {
-            // for now, concatenate all .osu files in the set to create a unique hash.
+            if (reader != null)
+                // fast hashing for cases where the item's files may not be populated.
+                return computeHashFast(reader);
+
+            // for now, concatenate all hashable files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
 
             foreach (TFileModel file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
@@ -329,10 +333,23 @@ namespace osu.Game.Database
             if (hashable.Length > 0)
                 return hashable.ComputeSHA2Hash();
 
-            if (reader != null)
-                return reader.Name.ComputeSHA2Hash();
-
             return item.Hash;
+        }
+
+        private string computeHashFast(ArchiveReader reader)
+        {
+            MemoryStream hashable = new MemoryStream();
+
+            foreach (var file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
+            {
+                using (Stream s = reader.GetStream(file))
+                    s.CopyTo(hashable);
+            }
+
+            if (hashable.Length > 0)
+                return hashable.ComputeSHA2Hash();
+
+            return reader.Name.ComputeSHA2Hash();
         }
 
         /// <summary>
@@ -347,6 +364,21 @@ namespace osu.Game.Database
             cancellationToken.ThrowIfCancellationRequested();
 
             delayEvents();
+
+            if (archive != null)
+            {
+                // fast bail to improve large import performance.
+                item.Hash = computeHashFast(archive);
+
+                var fastExisting = CheckForExisting(item);
+
+                if (fastExisting != null)
+                {
+                    // bare minimum comparisons
+                    if (getFilenames(fastExisting.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened)))
+                        return fastExisting;
+                }
+            }
 
             void rollback()
             {
@@ -644,24 +676,31 @@ namespace osu.Game.Database
         {
             var fileInfos = new List<TFileModel>();
 
-            string prefix = reader.Filenames.GetCommonPrefix();
-            if (!(prefix.EndsWith('/') || prefix.EndsWith('\\')))
-                prefix = string.Empty;
-
             // import files to manager
-            foreach (string file in reader.Filenames)
+            foreach (var filenames in getShortenedFilenames(reader))
             {
-                using (Stream s = reader.GetStream(file))
+                using (Stream s = reader.GetStream(filenames.original))
                 {
                     fileInfos.Add(new TFileModel
                     {
-                        Filename = file.Substring(prefix.Length).ToStandardisedPath(),
+                        Filename = filenames.shortened,
                         FileInfo = files.Add(s)
                     });
                 }
             }
 
             return fileInfos;
+        }
+
+        private IEnumerable<(string original, string shortened)> getShortenedFilenames(ArchiveReader reader)
+        {
+            string prefix = reader.Filenames.GetCommonPrefix();
+            if (!(prefix.EndsWith('/') || prefix.EndsWith('\\')))
+                prefix = string.Empty;
+
+            // import files to manager
+            foreach (string file in reader.Filenames)
+                yield return (file, file.Substring(prefix.Length).ToStandardisedPath());
         }
 
         #region osu-stable import
