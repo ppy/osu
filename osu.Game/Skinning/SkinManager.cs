@@ -125,6 +125,8 @@ namespace osu.Game.Skinning
 
         private const string unknown_creator_string = "Unknown";
 
+        protected override bool HasCustomHashFunction => true;
+
         protected override string ComputeHash(SkinInfo item, ArchiveReader reader = null)
         {
             // we need to populate early to create a hash based off skin.ini contents

@@ -310,6 +310,12 @@ namespace osu.Game.Database
         }
 
         /// <summary>
+        /// Whether the implementation overrides <see cref="ComputeHash"/> with a custom implementation.
+        /// Custom has implementations must bypass the early exit in the import flow (see <see cref="computeHashFast"/> usage).
+        /// </summary>
+        protected virtual bool HasCustomHashFunction => false;
+
+        /// <summary>
         /// Create a SHA-2 hash from the provided archive based on file content of all files matching <see cref="HashableFileTypes"/>.
         /// </summary>
         /// <remarks>
@@ -365,7 +371,7 @@ namespace osu.Game.Database
 
             delayEvents();
 
-            if (archive != null)
+            if (archive != null && !HasCustomHashFunction)
             {
                 // fast bail to improve large import performance.
                 item.Hash = computeHashFast(archive);
