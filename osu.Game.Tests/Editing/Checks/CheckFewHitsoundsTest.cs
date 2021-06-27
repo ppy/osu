@@ -20,10 +20,19 @@ namespace osu.Game.Tests.Editing.Checks
     {
         private CheckFewHitsounds check;
 
+        private List<HitSampleInfo> notHitsounded;
+        private List<HitSampleInfo> hitsounded;
+
         [SetUp]
         public void Setup()
         {
             check = new CheckFewHitsounds();
+            notHitsounded = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) };
+            hitsounded = new List<HitSampleInfo>
+            {
+                new HitSampleInfo(HitSampleInfo.HIT_NORMAL),
+                new HitSampleInfo(HitSampleInfo.HIT_FINISH)
+            };
         }
 
         [Test]
@@ -80,10 +89,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             for (int i = 0; i < 30; ++i)
             {
-                var samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) };
-
-                if (i % 8 == 0)
-                    samples.Add(new HitSampleInfo(HitSampleInfo.HIT_WHISTLE));
+                var samples = i % 8 == 0 ? hitsounded : notHitsounded;
 
                 hitObjects.Add(new HitCircle { StartTime = 1000 * i, Samples = samples });
             }
@@ -98,10 +104,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             for (int i = 0; i < 30; ++i)
             {
-                var samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) };
-
-                if (i == 0 || i == 15)
-                    samples.Add(new HitSampleInfo(HitSampleInfo.HIT_WHISTLE));
+                var samples = (i == 0 || i == 15) ? hitsounded : notHitsounded;
 
                 hitObjects.Add(new HitCircle { StartTime = 1000 * i, Samples = samples });
             }
@@ -117,10 +120,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             for (int i = 0; i < 80; ++i)
             {
-                var samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) };
-
-                if (i == 40)
-                    samples.Add(new HitSampleInfo(HitSampleInfo.HIT_WHISTLE));
+                var samples = i == 40 ? hitsounded : notHitsounded;
 
                 hitObjects.Add(new HitCircle { StartTime = 1000 * i, Samples = samples });
             }
@@ -135,11 +135,7 @@ namespace osu.Game.Tests.Editing.Checks
             var hitObjects = new List<HitObject>();
 
             for (int i = 0; i < 20; ++i)
-            {
-                var samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) };
-
-                hitObjects.Add(new HitCircle { StartTime = 1000 * i, Samples = samples });
-            }
+                hitObjects.Add(new HitCircle { StartTime = 1000 * i, Samples = notHitsounded });
 
             assertNoHitsounds(hitObjects);
         }
@@ -148,13 +144,6 @@ namespace osu.Game.Tests.Editing.Checks
         public void TestConcurrentObjects()
         {
             var hitObjects = new List<HitObject>();
-
-            var notHitsounded = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) };
-            var hitsounded = new List<HitSampleInfo>
-            {
-                new HitSampleInfo(HitSampleInfo.HIT_NORMAL),
-                new HitSampleInfo(HitSampleInfo.HIT_FINISH)
-            };
 
             var ticks = new List<HitObject>();
             for (int i = 1; i < 10; ++i)
