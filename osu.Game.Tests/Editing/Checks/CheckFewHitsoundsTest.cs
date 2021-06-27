@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
@@ -141,6 +142,35 @@ namespace osu.Game.Tests.Editing.Checks
             }
 
             assertNoHitsounds(hitObjects);
+        }
+
+        [Test]
+        public void TestConcurrentObjects()
+        {
+            var hitObjects = new List<HitObject>();
+
+            var notHitsounded = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) };
+            var hitsounded = new List<HitSampleInfo>
+            {
+                new HitSampleInfo(HitSampleInfo.HIT_NORMAL),
+                new HitSampleInfo(HitSampleInfo.HIT_FINISH)
+            };
+
+            var ticks = new List<HitObject>();
+            for (int i = 1; i < 10; ++i)
+                ticks.Add(new SliderTick { StartTime = 5000 * i, Samples = hitsounded });
+
+            var nested = new MockNestableHitObject(ticks.ToList(), 0, 50000)
+            {
+                Samples = notHitsounded
+            };
+            nested.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            hitObjects.Add(nested);
+
+            for (int i = 1; i <= 6; ++i)
+                hitObjects.Add(new HitCircle { StartTime = 10000 * i, Samples = notHitsounded });
+
+            assertOk(hitObjects);
         }
 
         private void assertOk(List<HitObject> hitObjects)
