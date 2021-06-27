@@ -342,22 +342,6 @@ namespace osu.Game.Database
             return item.Hash;
         }
 
-        private string computeHashFast(ArchiveReader reader)
-        {
-            MemoryStream hashable = new MemoryStream();
-
-            foreach (var file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
-            {
-                using (Stream s = reader.GetStream(file))
-                    s.CopyTo(hashable);
-            }
-
-            if (hashable.Length > 0)
-                return hashable.ComputeSHA2Hash();
-
-            return reader.Name.ComputeSHA2Hash();
-        }
-
         /// <summary>
         /// Silently import an item from a <typeparamref name="TModel"/>.
         /// </summary>
@@ -684,6 +668,22 @@ namespace osu.Game.Database
 
                 usage.Context.ChangeTracker.AutoDetectChangesEnabled = true;
             }
+        }
+
+        private string computeHashFast(ArchiveReader reader)
+        {
+            MemoryStream hashable = new MemoryStream();
+
+            foreach (var file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
+            {
+                using (Stream s = reader.GetStream(file))
+                    s.CopyTo(hashable);
+            }
+
+            if (hashable.Length > 0)
+                return hashable.ComputeSHA2Hash();
+
+            return reader.Name.ComputeSHA2Hash();
         }
 
         /// <summary>
