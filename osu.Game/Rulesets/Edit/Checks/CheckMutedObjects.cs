@@ -97,6 +97,10 @@ namespace osu.Game.Rulesets.Edit.Checks
             if (hitObject is IHasRepeats hasRepeats)
             {
                 double spanDuration = hasRepeats.Duration / hasRepeats.SpanCount();
+                if (spanDuration <= 0)
+                    // Prevents undefined behaviour in cases like where zero/negative-length sliders/hold notes exist.
+                    return EdgeType.None;
+
                 double spans = (time - hitObject.StartTime) / spanDuration;
                 double acceptableDifference = 1 / spanDuration; // 1 ms of acceptable difference, as with head/tail above.
 
