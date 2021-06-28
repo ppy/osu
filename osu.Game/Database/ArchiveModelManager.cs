@@ -311,7 +311,7 @@ namespace osu.Game.Database
 
         /// <summary>
         /// Whether the implementation overrides <see cref="ComputeHash"/> with a custom implementation.
-        /// Custom has implementations must bypass the early exit in the import flow (see <see cref="computeHashFast"/> usage).
+        /// Custom hash implementations must bypass the early exit in the import flow (see <see cref="computeHashFast"/> usage).
         /// </summary>
         protected virtual bool HasCustomHashFunction => false;
 
