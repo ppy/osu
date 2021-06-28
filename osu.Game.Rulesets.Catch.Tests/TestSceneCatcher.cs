@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Catch.UI;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -31,9 +31,22 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        private Container<CaughtObject> droppedObjectContainer;
+        [Cached]
+        private readonly DroppedObjectContainer droppedObjectContainer;
+
+        private readonly Container trailContainer;
 
         private TestCatcher catcher;
+
+        public TestSceneCatcher()
+        {
+            Add(trailContainer = new Container
+            {
+                Anchor = Anchor.Centre,
+                Depth = -1
+            });
+            Add(droppedObjectContainer = new DroppedObjectContainer());
+        }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -43,20 +56,13 @@ namespace osu.Game.Rulesets.Catch.Tests
                 CircleSize = 0,
             };
 
-            var trailContainer = new Container();
-            droppedObjectContainer = new Container<CaughtObject>();
-            catcher = new TestCatcher(trailContainer, droppedObjectContainer, difficulty);
+            if (catcher != null)
+                Remove(catcher);
 
-            Child = new Container
+            Add(catcher = new TestCatcher(trailContainer, difficulty)
             {
-                Anchor = Anchor.Centre,
-                Children = new Drawable[]
-                {
-                    trailContainer,
-                    droppedObjectContainer,
-                    catcher
-                }
-            };
+                Anchor = Anchor.Centre
+            });
         });
 
         [Test]
@@ -293,8 +299,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             public IEnumerable<CaughtObject> CaughtObjects => this.ChildrenOfType<CaughtObject>();
 
-            public TestCatcher(Container trailsTarget, Container<CaughtObject> droppedObjectTarget, BeatmapDifficulty difficulty)
-                : base(trailsTarget, droppedObjectTarget, difficulty)
+            public TestCatcher(Container trailsTarget, BeatmapDifficulty difficulty)
+                : base(trailsTarget, difficulty)
             {
             }
         }
