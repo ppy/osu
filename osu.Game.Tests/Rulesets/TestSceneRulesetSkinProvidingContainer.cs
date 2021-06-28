@@ -24,12 +24,8 @@ namespace osu.Game.Tests.Rulesets
 
         protected override Ruleset CreateRuleset() => new TestSceneRulesetDependencies.TestRuleset();
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs<ISkinSource>(new TestSkinProvider());
-            return dependencies;
-        }
+        [Cached(typeof(ISkinSource))]
+        private readonly ISkinSource testSource = new TestSkinProvider();
 
         [Test]
         public void TestEarlyAddedSkinRequester()
