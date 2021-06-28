@@ -47,10 +47,10 @@ namespace osu.Game.Skinning
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             parentSource = parent.Get<ISkinSource>();
-
-            UpdateSkinSources();
-
             parentSource.SourceChanged += OnSourceChanged;
+
+            // ensure sources are populated and ready for use before childrens' asynchronous load flow.
+            UpdateSkinSources();
 
             return base.CreateChildDependencies(parent);
         }
