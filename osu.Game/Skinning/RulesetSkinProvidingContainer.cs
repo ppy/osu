@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -52,13 +51,13 @@ namespace osu.Game.Skinning
         [Resolved]
         private ISkinSource skinSource { get; set; }
 
-        private ResourcesSkin rulesetResourcesSkin;
+        private ResourceStoreBackedSkin rulesetResourcesSkin;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
             if (Ruleset.CreateResourceStore() is IResourceStore<byte[]> resources)
-                rulesetResourcesSkin = new ResourcesSkin(resources, host, audio);
+                rulesetResourcesSkin = new ResourceStoreBackedSkin(resources, host, audio);
 
             UpdateSkins();
             skinSource.SourceChanged += OnSourceChanged;
