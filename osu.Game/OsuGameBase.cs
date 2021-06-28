@@ -370,7 +370,7 @@ namespace osu.Game
             switch (state.NewValue)
             {
                 case GameThreadState.Running:
-                    blocking.Dispose();
+                    blocking?.Dispose();
                     blocking = null;
                     break;
 
