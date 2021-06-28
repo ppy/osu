@@ -47,20 +47,19 @@ namespace osu.Game.Skinning
         }
 
         [Resolved]
-        private GameHost host { get; set; }
-
-        [Resolved]
-        private AudioManager audio { get; set; }
-
-        [Resolved]
         private SkinManager skinManager { get; set; }
 
         [Resolved]
         private ISkinSource skinSource { get; set; }
 
+        private ResourcesSkin rulesetResourcesSkin;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(GameHost host, AudioManager audio)
         {
+            if (Ruleset.CreateResourceStore() is IResourceStore<byte[]> resources)
+                rulesetResourcesSkin = new ResourcesSkin(resources, host, audio);
+
             UpdateSkins();
             skinSource.SourceChanged += OnSourceChanged;
         }
@@ -73,9 +72,6 @@ namespace osu.Game.Skinning
 
         protected virtual void UpdateSkins()
         {
-            foreach (var resourcesSkin in SkinSources.OfType<ResourcesSkin>())
-                resourcesSkin.Dispose();
-
             SkinSources.Clear();
 
             foreach (var skin in skinSource.AllSources)
@@ -92,20 +88,12 @@ namespace osu.Game.Skinning
                 }
             }
 
-            if (Ruleset.CreateResourceStore() is IResourceStore<byte[]> resources)
-            {
-                int defaultSkinIndex = SkinSources.IndexOf(skinManager.DefaultSkin);
+            int defaultSkinIndex = SkinSources.IndexOf(skinManager.DefaultSkin);
 
-                var rulesetResources = new ResourcesSkin(resources, host, audio);
-
-                if (defaultSkinIndex >= 0)
-                    SkinSources.Insert(defaultSkinIndex, rulesetResources);
-                else
-                {
-                    // Tests may potentially override the SkinManager with another source that doesn't include it in AllSources.
-                    SkinSources.Add(rulesetResources);
-                }
-            }
+            if (defaultSkinIndex >= 0)
+                SkinSources.Insert(defaultSkinIndex, rulesetResourcesSkin);
+            else
+                SkinSources.Add(rulesetResourcesSkin);
         }
 
         protected ISkin GetLegacyRulesetTransformedSkin(ISkin legacySkin)
@@ -126,6 +114,8 @@ namespace osu.Game.Skinning
 
             if (skinSource != null)
                 skinSource.SourceChanged -= OnSourceChanged;
+
+            rulesetResourcesSkin?.Dispose();
         }
     }
 }
