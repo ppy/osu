@@ -102,7 +102,7 @@ needs_cleanup: true
         {
             AddStep("Add absolute image", () =>
             {
-                markdownContainer.DocumentUrl = "https://dev.ppy.sh";
+                markdownContainer.CurrentPath = "https://dev.ppy.sh";
                 markdownContainer.Text = "![intro](/wiki/Interface/img/intro-screen.jpg)";
             });
         }
@@ -112,8 +112,7 @@ needs_cleanup: true
         {
             AddStep("Add relative image", () =>
             {
-                markdownContainer.DocumentUrl = "https://dev.ppy.sh";
-                markdownContainer.CurrentPath = $"{API.WebsiteRootUrl}/wiki/Interface/";
+                markdownContainer.CurrentPath = "https://dev.ppy.sh/wiki/Interface/";
                 markdownContainer.Text = "![intro](img/intro-screen.jpg)";
             });
         }
@@ -123,8 +122,7 @@ needs_cleanup: true
         {
             AddStep("Add paragraph with block image", () =>
             {
-                markdownContainer.DocumentUrl = "https://dev.ppy.sh";
-                markdownContainer.CurrentPath = $"{API.WebsiteRootUrl}/wiki/Interface/";
+                markdownContainer.CurrentPath = "https://dev.ppy.sh/wiki/Interface/";
                 markdownContainer.Text = @"Line before image
 
 ![play menu](img/play-menu.jpg ""Main Menu in osu!"")
@@ -138,7 +136,7 @@ Line after image";
         {
             AddStep("Add inline image", () =>
             {
-                markdownContainer.DocumentUrl = "https://dev.ppy.sh";
+                markdownContainer.CurrentPath = "https://dev.ppy.sh";
                 markdownContainer.Text = "![osu! mode icon](/wiki/shared/mode/osu.png) osu!";
             });
         }
@@ -148,7 +146,7 @@ Line after image";
         {
             AddStep("Add Table", () =>
             {
-                markdownContainer.DocumentUrl = "https://dev.ppy.sh";
+                markdownContainer.CurrentPath = "https://dev.ppy.sh";
                 markdownContainer.Text = @"
 | Image | Name | Effect |
 | :-: | :-: | :-- |
@@ -165,11 +163,6 @@ Line after image";
         private class TestMarkdownContainer : WikiMarkdownContainer
         {
             public LinkInline Link;
-
-            public new string DocumentUrl
-            {
-                set => base.DocumentUrl = value;
-            }
 
             public override MarkdownTextFlowContainer CreateTextFlow() => new TestMarkdownTextFlowContainer
             {
