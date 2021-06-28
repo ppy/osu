@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -45,15 +46,12 @@ namespace osu.Game.Skinning
             };
         }
 
-        private SkinManager skinManager;
         private ISkinSource parentSource;
 
         private ResourceStoreBackedSkin rulesetResourcesSkin;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            skinManager = parent.Get<SkinManager>();
-
             parentSource = parent.Get<ISkinSource>();
             parentSource.SourceChanged += OnSourceChanged;
 
@@ -90,13 +88,13 @@ namespace osu.Game.Skinning
                 }
             }
 
-            int defaultSkinIndex = SkinSources.IndexOf(skinManager.DefaultSkin);
+            int lastDefaultSkinIndex = SkinSources.IndexOf(SkinSources.OfType<DefaultSkin>().Last());
 
             // Ruleset resources should be given the ability to override game-wide defaults
-            // This is achieved by placing them before an instance of DefaultSkin.
+            // This is achieved by placing them before the last instance of DefaultSkin.
             // Note that DefaultSkin may not be present in some test scenes.
-            if (defaultSkinIndex >= 0)
-                SkinSources.Insert(defaultSkinIndex, rulesetResourcesSkin);
+            if (lastDefaultSkinIndex >= 0)
+                SkinSources.Insert(lastDefaultSkinIndex, rulesetResourcesSkin);
             else
                 SkinSources.Add(rulesetResourcesSkin);
         }
