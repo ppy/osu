@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -193,7 +194,7 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
             this.Delay(200).Expire();
         }
 
-        public string TooltipText { get; set; }
+        public LocalisableString TooltipText { get; set; }
 
         protected override bool OnClick(ClickEvent e)
         {

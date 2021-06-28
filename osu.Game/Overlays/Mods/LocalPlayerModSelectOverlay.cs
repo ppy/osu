@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
@@ -57,7 +58,7 @@ namespace osu.Game.Overlays.Mods
 
         private class SelectAllButton : TriangleButton, IHasTooltip
         {
-            public string TooltipText { get; set; }
+            public LocalisableString TooltipText { get; set; }
         }
     }
 }

@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
@@ -14,7 +15,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         public readonly BindableBool DetailsVisible = new BindableBool();
 
-        public override string TooltipText => DetailsVisible.Value ? "收起" : "展开";
+        public override LocalisableString TooltipText => DetailsVisible.Value ? "收起" : "展开";
 
         private SpriteIcon icon;
 

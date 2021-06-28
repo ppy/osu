@@ -191,8 +191,6 @@ namespace osu.Game.Beatmaps
         {
             var beatmapIds = beatmapSet.Beatmaps.Where(b => b.OnlineBeatmapID.HasValue).Select(b => b.OnlineBeatmapID).ToList();
 
-            LogForModel(beatmapSet, $"Validating online IDs for {beatmapSet.Beatmaps.Count} beatmaps...");
-
             // ensure all IDs are unique
             if (beatmapIds.GroupBy(b => b).Any(g => g.Count() > 1))
             {
@@ -318,6 +316,14 @@ namespace osu.Game.Beatmaps
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.ConsumableItems.AsNoTracking().FirstOrDefault(query);
+
+        protected override bool CanSkipImport(BeatmapSetInfo existing, BeatmapSetInfo import)
+        {
+            if (!base.CanReuseExisting(existing, import))
+                return false;
+
+            return existing.Beatmaps.Any(b => b.OnlineBeatmapID != null);
+        }
 
         protected override bool CanReuseExisting(BeatmapSetInfo existing, BeatmapSetInfo import)
         {

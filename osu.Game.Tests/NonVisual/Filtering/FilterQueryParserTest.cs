@@ -91,6 +91,20 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        public void TestApplyOverallDifficultyQueries()
+        {
+            const string query = "od>4 easy od<8";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("easy", filterCriteria.SearchText.Trim());
+            Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
+            Assert.Greater(filterCriteria.OverallDifficulty.Min, 4.0);
+            Assert.Less(filterCriteria.OverallDifficulty.Min, 4.1);
+            Assert.Greater(filterCriteria.OverallDifficulty.Max, 7.9);
+            Assert.Less(filterCriteria.OverallDifficulty.Max, 8.0);
+        }
+
+        [Test]
         public void TestApplyBPMQueries()
         {
             const string query = "bpm>:200 gotta go fast";

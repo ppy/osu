@@ -20,6 +20,7 @@ using System;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
+using osu.Framework.Localisation;
 using osu.Game.Overlays.Comments.Buttons;
 
 namespace osu.Game.Overlays.Comments
@@ -395,7 +396,7 @@ namespace osu.Game.Overlays.Comments
 
         private class ParentUsername : FillFlowContainer, IHasTooltip
         {
-            public string TooltipText => getParentMessage();
+            public LocalisableString TooltipText => getParentMessage();
 
             private readonly Comment parentComment;
 
@@ -427,7 +428,7 @@ namespace osu.Game.Overlays.Comments
                 if (parentComment == null)
                     return string.Empty;
 
-                return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? @"已删除" : string.Empty;
+                return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? "已删除" : string.Empty;
             }
         }
     }

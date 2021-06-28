@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -17,7 +18,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 {
     public class LyricPiece : DrawableLyric, IHasTooltip
     {
-        public string TooltipText { get; private set; }
+        public LocalisableString TooltipText { get; private set; }
 
         private Box hoverBox;
         private OsuSpriteText contentText;

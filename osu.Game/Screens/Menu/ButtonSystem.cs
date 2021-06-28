@@ -311,7 +311,7 @@ namespace osu.Game.Screens.Menu
             switch (state)
             {
                 default:
-                    return true;
+                    return false;
 
                 case ButtonSystemState.Initial:
                     State = ButtonSystemState.TopLevel;

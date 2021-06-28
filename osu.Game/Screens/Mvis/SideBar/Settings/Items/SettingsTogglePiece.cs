@@ -2,6 +2,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
@@ -10,7 +11,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
     {
         public Bindable<bool> Bindable { get; set; }
 
-        public string TooltipText { get; set; }
+        public LocalisableString TooltipText { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()

@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
@@ -159,7 +160,7 @@ namespace osu.Game.Overlays.News
                 };
             }
 
-            public string TooltipText => date.ToString("dddd dd MMMM yyyy hh:mm:ss UTCz").ToUpper();
+            public LocalisableString TooltipText => date.ToString("dddd dd MMMM yyyy hh:mm:ss UTCz").ToUpper();
         }
 
         // fake API data struct to use for now as a skeleton for data, as there is no API struct for news article info for now

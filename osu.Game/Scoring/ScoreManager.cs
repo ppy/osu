@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Bindables;
@@ -73,6 +74,9 @@ namespace osu.Game.Scoring
                 }
             }
         }
+
+        protected override Task Populate(ScoreInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
 
         protected override void ExportModelTo(ScoreInfo model, Stream outputStream)
         {

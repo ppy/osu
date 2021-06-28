@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         private class PlayCountText : CompositeDrawable, IHasTooltip
         {
-            public string TooltipText => "游玩次数";
+            public LocalisableString TooltipText => "游玩次数";
 
             public PlayCountText(int playCount)
             {

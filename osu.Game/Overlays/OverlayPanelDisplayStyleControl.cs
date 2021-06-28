@@ -13,6 +13,7 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Cursor;
 using System.ComponentModel;
 using osu.Framework.Extensions;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays
 {
@@ -58,7 +59,7 @@ namespace osu.Game.Overlays
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; }
 
-            public string TooltipText => $@"{Value.GetDescription().ToString()}视图";
+            public LocalisableString TooltipText => $@"{Value.GetDescription()}视图";
 
             private readonly SpriteIcon icon;
 

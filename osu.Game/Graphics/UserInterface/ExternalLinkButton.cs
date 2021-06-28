@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osuTK;
 using osuTK.Graphics;
@@ -58,6 +59,6 @@ namespace osu.Game.Graphics.UserInterface
             return true;
         }
 
-        public string TooltipText => "在浏览器中打开";
+        public LocalisableString TooltipText => "在浏览器中打开";
     }
 }

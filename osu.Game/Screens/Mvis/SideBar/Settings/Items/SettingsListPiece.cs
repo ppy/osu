@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
     {
         public Bindable<T> Bindable { get; set; }
 
-        public string TooltipText { get; set; }
+        public LocalisableString TooltipText { get; set; }
 
         private readonly CurrentValueText valueText = new CurrentValueText
         {
