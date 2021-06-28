@@ -19,12 +19,12 @@ namespace osu.Game.Skinning
     /// <summary>
     /// An <see cref="ISkin"/> that uses an underlying <see cref="IResourceStore{T}"/> with namespaces for resources retrieval.
     /// </summary>
-    public class ResourcesSkin : ISkin, IDisposable
+    public class ResourceStoreBackedSkin : ISkin, IDisposable
     {
         private readonly TextureStore textures;
         private readonly ISampleStore samples;
 
-        public ResourcesSkin(IResourceStore<byte[]> resources, GameHost host, AudioManager audio)
+        public ResourceStoreBackedSkin(IResourceStore<byte[]> resources, GameHost host, AudioManager audio)
         {
             textures = new TextureStore(host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, @"Textures")));
             samples = audio.GetSampleStore(new NamespacedResourceStore<byte[]>(resources, @"Samples"));
