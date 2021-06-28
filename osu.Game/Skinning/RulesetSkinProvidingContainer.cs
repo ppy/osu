@@ -89,6 +89,9 @@ namespace osu.Game.Skinning
 
             int defaultSkinIndex = SkinSources.IndexOf(skinManager.DefaultSkin);
 
+            // Ruleset resources should be given the ability to override game-wide defaults
+            // This is achieved by placing them before an instance of DefaultSkin.
+            // Note that DefaultSkin may not be present in some test scenes.
             if (defaultSkinIndex >= 0)
                 SkinSources.Insert(defaultSkinIndex, rulesetResourcesSkin);
             else
