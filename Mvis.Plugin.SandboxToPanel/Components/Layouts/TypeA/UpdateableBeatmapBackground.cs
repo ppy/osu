@@ -6,6 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
@@ -148,14 +149,14 @@ namespace Mvis.Plugin.Sandbox.Components.Layouts.TypeA
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 26, weight: FontWeight.SemiBold),
-                            Text = beatmap.Metadata.Artist
+                            Text = new RomanisableString(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)
                         },
                         new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold),
-                            Text = getShortTitle(beatmap.Metadata.Title)
+                            Text = new RomanisableString(getShortTitle(beatmap.Metadata.TitleUnicode ?? string.Empty), getShortTitle(beatmap.Metadata.Title))
                         }
                     }
                 }.WithEffect(new BlurEffect
