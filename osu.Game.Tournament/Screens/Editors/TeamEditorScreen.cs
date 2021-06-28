@@ -279,11 +279,11 @@ namespace osu.Game.Tournament.Screens.Editors
                     private void load()
                     {
                         userId.Value = user.Id;
-                        userId.BindValueChanged(idInt =>
+                        userId.BindValueChanged(id =>
                         {
-                            user.Id = idInt.NewValue ?? 0;
+                            user.Id = id.NewValue ?? 0;
 
-                            if (idInt.NewValue != idInt.OldValue)
+                            if (id.NewValue != id.OldValue)
                                 user.Username = string.Empty;
 
                             if (!string.IsNullOrEmpty(user.Username))

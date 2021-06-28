@@ -221,11 +221,11 @@ namespace osu.Game.Tournament.Screens.Editors
                     private void load(RulesetStore rulesets)
                     {
                         beatmapId.Value = Model.ID;
-                        beatmapId.BindValueChanged(idInt =>
+                        beatmapId.BindValueChanged(id =>
                         {
-                            Model.ID = idInt.NewValue ?? 0;
+                            Model.ID = id.NewValue ?? 0;
 
-                            if (idInt.NewValue != idInt.OldValue)
+                            if (id.NewValue != id.OldValue)
                                 Model.BeatmapInfo = null;
 
                             if (Model.BeatmapInfo != null)
