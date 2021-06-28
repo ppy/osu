@@ -372,7 +372,8 @@ namespace osu.Game.Database
                     //
                     // note that this should really be checking filesizes on disk (of existing files) for some degree of sanity.
                     // or alternatively doing a faster hash check. either of these require database changes and reprocessing of existing files.
-                    if (getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)))
+                    if (CanSkipImport(existing, item) &&
+                        getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)))
                     {
                         LogForModel(item, $"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
                         Undelete(existing);
@@ -800,6 +801,15 @@ namespace osu.Game.Database
         /// <param name="model">The new model proposed for import.</param>
         /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
         protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
+
+        /// <summary>
+        /// Whether inport can be skipped after finding an existing import early in the process.
+        /// Only valid when <see cref="ComputeHash"/> is not overridden.
+        /// </summary>
+        /// <param name="existing">The existing model.</param>
+        /// <param name="import">The newly imported model.</param>
+        /// <returns>Whether to skip this import completely.</returns>
+        protected virtual bool CanSkipImport(TModel existing, TModel import) => true;
 
         /// <summary>
         /// After an existing <typeparamref name="TModel"/> is found during an import process, the default behaviour is to use/restore the existing
