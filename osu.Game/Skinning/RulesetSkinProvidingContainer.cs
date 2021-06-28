@@ -45,35 +45,38 @@ namespace osu.Game.Skinning
             };
         }
 
-        [Resolved]
-        private SkinManager skinManager { get; set; }
-
-        [Resolved]
-        private ISkinSource skinSource { get; set; }
+        private SkinManager skinManager;
+        private ISkinSource parentSource;
 
         private ResourceStoreBackedSkin rulesetResourcesSkin;
 
-        [BackgroundDependencyLoader]
-        private void load(GameHost host, AudioManager audio)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            if (Ruleset.CreateResourceStore() is IResourceStore<byte[]> resources)
-                rulesetResourcesSkin = new ResourceStoreBackedSkin(resources, host, audio);
+            skinManager = parent.Get<SkinManager>();
 
-            UpdateSkins();
-            skinSource.SourceChanged += OnSourceChanged;
+            parentSource = parent.Get<ISkinSource>();
+            parentSource.SourceChanged += OnSourceChanged;
+
+            if (Ruleset.CreateResourceStore() is IResourceStore<byte[]> resources)
+                rulesetResourcesSkin = new ResourceStoreBackedSkin(resources, parent.Get<GameHost>(), parent.Get<AudioManager>());
+
+            // ensure sources are populated and ready for use before childrens' asynchronous load flow.
+            UpdateSkinSources();
+
+            return base.CreateChildDependencies(parent);
         }
 
         protected override void OnSourceChanged()
         {
-            UpdateSkins();
+            UpdateSkinSources();
             base.OnSourceChanged();
         }
 
-        protected virtual void UpdateSkins()
+        protected virtual void UpdateSkinSources()
         {
             SkinSources.Clear();
 
-            foreach (var skin in skinSource.AllSources)
+            foreach (var skin in parentSource.AllSources)
             {
                 switch (skin)
                 {
@@ -114,8 +117,8 @@ namespace osu.Game.Skinning
         {
             base.Dispose(isDisposing);
 
-            if (skinSource != null)
-                skinSource.SourceChanged -= OnSourceChanged;
+            if (parentSource != null)
+                parentSource.SourceChanged -= OnSourceChanged;
 
             rulesetResourcesSkin?.Dispose();
         }
