@@ -97,6 +97,9 @@ namespace osu.Game.Database
         {
             try
             {
+                if (IsDisposed)
+                    throw new InvalidOperationException(@"Attempted to retrieve a context after the factor has already been disposed.");
+
                 blockingLock.Wait();
 
                 contexts_created.Value++;
@@ -128,11 +131,8 @@ namespace osu.Game.Database
         {
             base.Dispose(isDisposing);
 
-            // In the standard case, operations will already be blocked by the Update thread "pausing" from GameHost exit.
-            // This avoids waiting (forever) on an already entered semaphore.
-            if (context != null || active_usages.Value > 0)
-                BlockAllOperations();
-
+            // intentionally block all operations indefinitely. this ensures that nothing can start consuming a new context after disposal.
+            BlockAllOperations();
             blockingLock?.Dispose();
         }
 
