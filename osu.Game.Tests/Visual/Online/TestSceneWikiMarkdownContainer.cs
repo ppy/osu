@@ -160,6 +160,20 @@ Line after image";
             });
         }
 
+        [Test]
+        public void TestWideImageNotExceedContainer()
+        {
+            AddStep("Add image", () =>
+            {
+                markdownContainer.CurrentPath = "https://dev.ppy.sh/wiki/osu!_Program_Files/";
+                markdownContainer.Text = "![](img/file_structure.jpg \"The file structure of osu!'s installation folder, on Windows and macOS\")";
+            });
+            AddStep("Change container width", () =>
+            {
+                markdownContainer.Width = 0.5f;
+            });
+        }
+
         private class TestMarkdownContainer : WikiMarkdownContainer
         {
             public LinkInline Link;
