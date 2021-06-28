@@ -14,13 +14,13 @@ using osuTK;
 namespace Mvis.Plugin.Sandbox
 {
     [Cached]
-    public class RulesetPanel : BindableControlledPlugin
+    public class SandboxPanel : BindableControlledPlugin
     {
         public override TargetLayer Target => TargetLayer.Foreground;
         public override int Version => 5;
         public Bindable<WorkingBeatmap> CurrentBeatmap = new Bindable<WorkingBeatmap>();
 
-        public RulesetPanel()
+        public SandboxPanel()
         {
             Name = "Sandbox";
             Description = "可能是最好的osu!音乐可视化";
@@ -46,7 +46,9 @@ namespace Mvis.Plugin.Sandbox
             idleAlpha.BindValueChanged(onIdleAlphaChanged);
 
             var config = (SandboxConfigManager)Dependencies.Get<MvisPluginManager>().GetConfigManager(this);
+
             config.BindWith(SandboxSetting.EnableRulesetPanel, Value);
+            config.BindWith(SandboxSetting.IdleAlpha, idleAlpha);
 
             if (MvisScreen != null)
             {

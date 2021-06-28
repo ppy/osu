@@ -25,7 +25,7 @@
     <ProjectReference Include="..\Mvis.Plugin.StoryboardSupport\Mvis.Plugin.StoryboardSupport.csproj" />
     <ProjectReference Include="..\Mvis.Plugin.CollectionSupport\Mvis.Plugin.CollectionSupport.csproj" />
     <ProjectReference Include="..\Mvis.Plugin.CloudMusicSupport\Mvis.Plugin.CloudMusicSupport.csproj" />
-    <!-- <ProjectReference Include="..\Mvis.Plugin.SandboxToPanel\Mvis.Plugin.SandboxToPanel.csproj" /> -->
+    <ProjectReference Include="..\Mvis.Plugin.SandboxToPanel\Mvis.Plugin.SandboxToPanel.csproj" />
     <ProjectReference Include="..\Mvis.Plugin.FakeEditor\Mvis.Plugin.FakeEditor.csproj" />
     <ProjectReference Include="..\Mvis.Plugin.Yasp\Mvis.Plugin.Yasp.csproj" />
   </ItemGroup>

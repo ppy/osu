@@ -4,7 +4,7 @@
     <OutputType>Library</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>RulesetPanel</Description>
-    <AssemblyName>Mvis.Plugin.SandboxToPanel</AssemblyName>
+    <AssemblyName>Mvis.Plugin.Sandbox</AssemblyName>
     <RootNamespace>Mvis.Plugin.Sandbox</RootNamespace>
   </PropertyGroup>
 
