@@ -214,7 +214,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     [Resolved]
                     private TournamentGameBase game { get; set; }
 
-                    private readonly Bindable<string> userId = new Bindable<string>();
+                    private readonly Bindable<int?> userId = new Bindable<int?>();
 
                     private readonly Container drawableContainer;
 
@@ -278,14 +278,12 @@ namespace osu.Game.Tournament.Screens.Editors
                     [BackgroundDependencyLoader]
                     private void load()
                     {
-                        userId.Value = user.Id.ToString();
-                        userId.BindValueChanged(idString =>
+                        userId.Value = user.Id;
+                        userId.BindValueChanged(idInt =>
                         {
-                            int.TryParse(idString.NewValue, out var parsed);
+                            user.Id = idInt.NewValue ?? 0;
 
-                            user.Id = parsed;
-
-                            if (idString.NewValue != idString.OldValue)
+                            if (idInt.NewValue != idInt.OldValue)
                                 user.Username = string.Empty;
 
                             if (!string.IsNullOrEmpty(user.Username))
