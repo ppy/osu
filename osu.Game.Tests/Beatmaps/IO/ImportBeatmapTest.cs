@@ -441,6 +441,41 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task TestImportThenDeleteThenImportWithOnlineIDMismatch(bool set)
+        {
+            // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost($"{nameof(ImportBeatmapTest)}-{set}"))
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+
+                    var imported = await LoadOszIntoOsu(osu);
+
+                    if (set)
+                        imported.OnlineBeatmapSetID = 1234;
+                    else
+                        imported.Beatmaps.First().OnlineBeatmapID = 1234;
+
+                    osu.Dependencies.Get<BeatmapManager>().Update(imported);
+
+                    deleteBeatmapSet(imported, osu);
+
+                    var importedSecondTime = await LoadOszIntoOsu(osu);
+
+                    // check the newly "imported" beatmap has been reimported due to mismatch (even though hashes matched)
+                    Assert.IsTrue(imported.ID != importedSecondTime.ID);
+                    Assert.IsTrue(imported.Beatmaps.First().ID != importedSecondTime.Beatmaps.First().ID);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
         [Test]
         public async Task TestImportWithDuplicateBeatmapIDs()
         {
