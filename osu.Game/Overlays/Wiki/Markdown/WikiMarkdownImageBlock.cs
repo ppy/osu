@@ -32,11 +32,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
         {
             Children = new Drawable[]
             {
-                new WikiMarkdownImage(linkInline)
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                },
+                new BlockMarkdownImage(linkInline),
                 parentTextComponent.CreateSpriteText().With(t =>
                 {
                     t.Text = linkInline.Title;
@@ -44,6 +40,16 @@ namespace osu.Game.Overlays.Wiki.Markdown
                     t.Origin = Anchor.TopCentre;
                 }),
             };
+        }
+
+        private class BlockMarkdownImage : WikiMarkdownImage
+        {
+            public BlockMarkdownImage(LinkInline linkInline)
+                : base(linkInline)
+            {
+                AutoSizeAxes = Axes.Y;
+                RelativeSizeAxes = Axes.X;
+            }
         }
     }
 }
