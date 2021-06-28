@@ -58,5 +58,10 @@ namespace osu.Game.Overlays.Settings
                 });
             }
         }
+
+        private class OutlinedNumberBox : OutlinedTextBox
+        {
+            protected override bool CanAddCharacter(char character) => char.IsNumber(character);
+        }
     }
 }
