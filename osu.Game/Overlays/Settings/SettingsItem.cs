@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Settings
 
         public bool ShowsDefaultIndicator = true;
 
-        public string TooltipText { get; set; }
+        public LocalisableString TooltipText { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }

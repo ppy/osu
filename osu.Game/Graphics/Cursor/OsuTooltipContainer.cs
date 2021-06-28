@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Cursor
@@ -32,7 +33,7 @@ namespace osu.Game.Graphics.Cursor
 
             public override bool SetContent(object content)
             {
-                if (!(content is string contentString))
+                if (!(content is LocalisableString contentString))
                     return false;
 
                 if (contentString == text.Text) return true;
