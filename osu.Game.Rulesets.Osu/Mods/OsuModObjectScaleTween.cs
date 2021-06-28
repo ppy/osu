@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     /// <summary>
     /// Adjusts the size of hit objects during their fade in animation.
     /// </summary>
-    public abstract class OsuModObjectScaleTween : ModWithVisibilityAdjustment, IMutateApproachCircles
+    public abstract class OsuModObjectScaleTween : ModWithVisibilityAdjustment, IHidesApproachCircles
     {
         public override ModType Type => ModType.Fun;
 
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected virtual float EndScale => 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(IMutateApproachCircles) };
+        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles) };
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
