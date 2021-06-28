@@ -50,6 +50,18 @@ namespace osu.Game.Overlays.Wiki.Markdown
                 AutoSizeAxes = Axes.Y;
                 RelativeSizeAxes = Axes.X;
             }
+
+            protected override ImageContainer CreateImageContainer(string url) => new BlockImageContainer(url);
+
+            private class BlockImageContainer : ImageContainer
+            {
+                public BlockImageContainer(string url)
+                    : base(url)
+                {
+                    AutoSizeAxes = Axes.Y;
+                    RelativeSizeAxes = Axes.X;
+                }
+            }
         }
     }
 }
