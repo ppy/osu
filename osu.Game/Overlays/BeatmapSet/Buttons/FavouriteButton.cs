@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -28,7 +29,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private readonly IBindable<User> localUser = new Bindable<User>();
 
-        public string TooltipText
+        public LocalisableString TooltipText
         {
             get
             {
