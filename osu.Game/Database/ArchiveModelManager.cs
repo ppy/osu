@@ -78,7 +78,7 @@ namespace osu.Game.Database
 
         private readonly Bindable<WeakReference<TModel>> itemRemoved = new Bindable<WeakReference<TModel>>();
 
-        public virtual IEnumerable<string> HandledExtensions => new[] { ".zip" };
+        public virtual IEnumerable<string> HandledExtensions => new[] { @".zip" };
 
         protected readonly FileStore Files;
 
@@ -99,7 +99,7 @@ namespace osu.Game.Database
             ModelStore.ItemUpdated += item => handleEvent(() => itemUpdated.Value = new WeakReference<TModel>(item));
             ModelStore.ItemRemoved += item => handleEvent(() => itemRemoved.Value = new WeakReference<TModel>(item));
 
-            exportStorage = storage.GetStorageForDirectory("exports");
+            exportStorage = storage.GetStorageForDirectory(@"exports");
 
             Files = new FileStore(contextFactory, storage);
 
@@ -282,7 +282,7 @@ namespace osu.Game.Database
             }
             catch (Exception e)
             {
-                LogForModel(model, $"Model creation of {archive.Name} failed.", e);
+                LogForModel(model, @$"Model creation of {archive.Name} failed.", e);
                 return null;
             }
 
@@ -375,12 +375,12 @@ namespace osu.Game.Database
                     if (CanSkipImport(existing, item) &&
                         getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)))
                     {
-                        LogForModel(item, $"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
+                        LogForModel(item, @$"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
                         Undelete(existing);
                         return existing;
                     }
 
-                    LogForModel(item, $"Found existing (optimised) but failed pre-check.");
+                    LogForModel(item, @"Found existing (optimised) but failed pre-check.");
                 }
             }
 
@@ -389,14 +389,14 @@ namespace osu.Game.Database
                 if (!Delete(item))
                 {
                     // We may have not yet added the model to the underlying table, but should still clean up files.
-                    LogForModel(item, "Dereferencing files for incomplete import.");
+                    LogForModel(item, @"Dereferencing files for incomplete import.");
                     Files.Dereference(item.Files.Select(f => f.FileInfo).ToArray());
                 }
             }
 
             try
             {
-                LogForModel(item, "Beginning import...");
+                LogForModel(item, @"Beginning import...");
 
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
                 item.Hash = ComputeHash(item, archive);
@@ -407,7 +407,7 @@ namespace osu.Game.Database
                 {
                     try
                     {
-                        if (!write.IsTransactionLeader) throw new InvalidOperationException($"Ensure there is no parent transaction so errors can correctly be handled by {this}");
+                        if (!write.IsTransactionLeader) throw new InvalidOperationException(@$"Ensure there is no parent transaction so errors can correctly be handled by {this}");
 
                         if (!checkedExisting)
                             existing = CheckForExisting(item);
@@ -417,14 +417,14 @@ namespace osu.Game.Database
                             if (CanReuseExisting(existing, item))
                             {
                                 Undelete(existing);
-                                LogForModel(item, $"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
+                                LogForModel(item, @$"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
                                 // existing item will be used; rollback new import and exit early.
                                 rollback();
                                 flushEvents(true);
                                 return existing;
                             }
 
-                            LogForModel(item, $"Found existing but failed re-use check.");
+                            LogForModel(item, @"Found existing but failed re-use check.");
                             Delete(existing);
                             ModelStore.PurgeDeletable(s => s.ID == existing.ID);
                         }
@@ -441,12 +441,12 @@ namespace osu.Game.Database
                     }
                 }
 
-                LogForModel(item, "Import successfully completed!");
+                LogForModel(item, @"Import successfully completed!");
             }
             catch (Exception e)
             {
                 if (!(e is TaskCanceledException))
-                    LogForModel(item, "Database import or population failed and has been rolled back.", e);
+                    LogForModel(item, @"Database import or population failed and has been rolled back.", e);
 
                 rollback();
                 flushEvents(false);
@@ -466,7 +466,7 @@ namespace osu.Game.Database
             var retrievedItem = ModelStore.ConsumableItems.FirstOrDefault(s => s.ID == item.ID);
 
             if (retrievedItem == null)
-                throw new ArgumentException("Specified model could not be found", nameof(item));
+                throw new ArgumentException(@"Specified model could not be found", nameof(item));
 
             using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
                 ExportModelTo(retrievedItem, outputStream);
@@ -757,7 +757,7 @@ namespace osu.Game.Database
             {
                 string fullPath = storage.GetFullPath(ImportFromStablePath);
 
-                Logger.Log($"Folder \"{fullPath}\" not available in the target osu!stable installation to import {HumanisedModelName}s.", LoggingTarget.Information, LogLevel.Error);
+                Logger.Log(@$"Folder ""{fullPath}"" not available in the target osu!stable installation to import {HumanisedModelName}s.", LoggingTarget.Information, LogLevel.Error);
                 return Task.CompletedTask;
             }
 
@@ -841,7 +841,7 @@ namespace osu.Game.Database
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
-        protected virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace("Info", "").ToLower()}";
+        protected virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLower()}";
 
         #region Event handling / delaying
 
