@@ -96,12 +96,14 @@ namespace osu.Game.Skinning
             {
                 int defaultSkinIndex = SkinSources.IndexOf(skinManager.DefaultSkin);
 
+                var rulesetResources = new ResourcesSkin(resources, host, audio);
+
                 if (defaultSkinIndex >= 0)
-                    SkinSources.Insert(defaultSkinIndex, new ResourcesSkin(resources, host, audio));
+                    SkinSources.Insert(defaultSkinIndex, rulesetResources);
                 else
                 {
                     // Tests may potentially override the SkinManager with another source that doesn't include it in AllSources.
-                    SkinSources.Add(new ResourcesSkin(resources, host, audio));
+                    SkinSources.Add(rulesetResources);
                 }
             }
         }
