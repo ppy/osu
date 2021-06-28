@@ -3,7 +3,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osuTK;
 
-namespace Mvis.Plugin.RulesetPanel.Components.Visualizers.Circular
+namespace Mvis.Plugin.Sandbox.Components.Visualizers.Circular
 {
     public class BasicMusicVisualizerDrawable : CircularMusicVisualizerDrawable
     {

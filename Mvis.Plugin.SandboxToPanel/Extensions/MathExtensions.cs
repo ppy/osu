@@ -1,7 +1,7 @@
 ﻿using System;
 using osuTK;
 
-namespace Mvis.Plugin.RulesetPanel.Extensions
+namespace Mvis.Plugin.Sandbox.Extensions
 {
     public static class MathExtensions
     {

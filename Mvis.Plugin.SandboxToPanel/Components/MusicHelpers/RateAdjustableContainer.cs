@@ -1,7 +1,7 @@
 ﻿using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 
-namespace Mvis.Plugin.RulesetPanel.Components.MusicHelpers
+namespace Mvis.Plugin.Sandbox.Components.MusicHelpers
 {
     public class RateAdjustableContainer : Container
     {

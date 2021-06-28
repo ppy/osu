@@ -1,4 +1,4 @@
-﻿using Mvis.Plugin.RulesetPanel.Components.MusicHelpers;
+﻿using Mvis.Plugin.Sandbox.Components.MusicHelpers;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -8,7 +8,7 @@ using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osuTK;
 using osuTK.Graphics;
 
-namespace Mvis.Plugin.RulesetPanel.Components.Layouts.TypeA
+namespace Mvis.Plugin.Sandbox.Components.Layouts.TypeA
 {
     public class CircularBeatmapLogo : CurrentBeatmapProvider
     {

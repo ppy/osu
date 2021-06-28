@@ -1,4 +1,4 @@
-﻿namespace Mvis.Plugin.RulesetPanel.Components.Layouts
+﻿namespace Mvis.Plugin.Sandbox.Components.Layouts
 {
     public class EmptyLayout : DrawableVisualizerLayout
     {

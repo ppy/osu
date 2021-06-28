@@ -1,6 +1,6 @@
-﻿using Mvis.Plugin.RulesetPanel.Components.Layouts.TypeB;
+﻿using Mvis.Plugin.Sandbox.Components.Layouts.TypeB;
 
-namespace Mvis.Plugin.RulesetPanel.Components.Layouts
+namespace Mvis.Plugin.Sandbox.Components.Layouts
 {
     public class TypeBLayout : DrawableVisualizerLayout
     {

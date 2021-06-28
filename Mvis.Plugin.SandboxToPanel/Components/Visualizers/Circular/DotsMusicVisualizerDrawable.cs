@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Textures;
 using osuTK;
 
-namespace Mvis.Plugin.RulesetPanel.Components.Visualizers.Circular
+namespace Mvis.Plugin.Sandbox.Components.Visualizers.Circular
 {
     public class DotsMusicVisualizerDrawable : CircularMusicVisualizerDrawable
     {

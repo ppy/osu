@@ -1,4 +1,4 @@
-using Mvis.Plugin.RulesetPanel.Components;
+using Mvis.Plugin.Sandbox.Components;
 using Mvis.Plugin.Sandbox.Config;
 using Mvis.Plugin.Sandbox.UI;
 using osu.Framework.Allocation;

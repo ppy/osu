@@ -1,7 +1,7 @@
 ﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
-namespace Mvis.Plugin.RulesetPanel.Components.Layouts
+namespace Mvis.Plugin.Sandbox.Components.Layouts
 {
     public abstract class DrawableVisualizerLayout : CompositeDrawable
     {

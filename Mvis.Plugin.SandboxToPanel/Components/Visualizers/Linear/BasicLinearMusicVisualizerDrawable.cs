@@ -2,7 +2,7 @@
 using osu.Framework.Graphics.Primitives;
 using osuTK;
 
-namespace Mvis.Plugin.RulesetPanel.Components.Visualizers.Linear
+namespace Mvis.Plugin.Sandbox.Components.Visualizers.Linear
 {
     public class BasicLinearMusicVisualizerDrawable : LinearMusicVisualizerDrawable
     {

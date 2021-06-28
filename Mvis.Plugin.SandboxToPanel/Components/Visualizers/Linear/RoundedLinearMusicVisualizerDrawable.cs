@@ -4,7 +4,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Textures;
 using osuTK;
 
-namespace Mvis.Plugin.RulesetPanel.Components.Visualizers.Linear
+namespace Mvis.Plugin.Sandbox.Components.Visualizers.Linear
 {
     public class RoundedLinearMusicVisualizerDrawable : LinearMusicVisualizerDrawable
     {

@@ -1,7 +1,7 @@
-﻿using Mvis.Plugin.RulesetPanel.Components.MusicHelpers;
+﻿using Mvis.Plugin.Sandbox.Components.MusicHelpers;
 using osu.Framework.Graphics;
 
-namespace Mvis.Plugin.RulesetPanel.Components
+namespace Mvis.Plugin.Sandbox.Components
 {
     public class Particles : CurrentRateContainer
     {

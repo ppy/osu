@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Mvis.Plugin.RulesetPanel.Extensions;
 using Mvis.Plugin.Sandbox.Config;
+using Mvis.Plugin.Sandbox.Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osuTK;
 
-namespace Mvis.Plugin.RulesetPanel.Components
+namespace Mvis.Plugin.Sandbox.Components
 {
     public class ParticlesDrawable : Sprite
     {

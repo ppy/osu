@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Mvis.Plugin.RulesetPanel.Extensions;
+using Mvis.Plugin.Sandbox.Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osuTK;
 
-namespace Mvis.Plugin.RulesetPanel.Components.Visualizers
+namespace Mvis.Plugin.Sandbox.Components.Visualizers
 {
     public abstract class MusicVisualizerDrawable : Drawable
     {

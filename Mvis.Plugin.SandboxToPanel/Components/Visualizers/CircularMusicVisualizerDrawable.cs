@@ -1,7 +1,7 @@
 ﻿using osu.Framework.Bindables;
 using osuTK;
 
-namespace Mvis.Plugin.RulesetPanel.Components.Visualizers
+namespace Mvis.Plugin.Sandbox.Components.Visualizers
 {
     public abstract class CircularMusicVisualizerDrawable : MusicVisualizerDrawable
     {

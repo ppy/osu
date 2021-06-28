@@ -1,11 +1,11 @@
-﻿using Mvis.Plugin.RulesetPanel.Components.Layouts.TypeA;
+﻿using Mvis.Plugin.Sandbox.Components.Layouts.TypeA;
 using Mvis.Plugin.Sandbox.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osuTK;
 
-namespace Mvis.Plugin.RulesetPanel.Components.Layouts
+namespace Mvis.Plugin.Sandbox.Components.Layouts
 {
     public class TypeALayout : DrawableVisualizerLayout
     {

@@ -2,7 +2,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
-namespace Mvis.Plugin.RulesetPanel.Components.MusicHelpers
+namespace Mvis.Plugin.Sandbox.Components.MusicHelpers
 {
     public class CurrentRateContainer : RateAdjustableContainer
     {

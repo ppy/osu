@@ -1,14 +1,14 @@
 ﻿using System;
-using Mvis.Plugin.RulesetPanel.Components.MusicHelpers;
-using Mvis.Plugin.RulesetPanel.Components.Visualizers;
-using Mvis.Plugin.RulesetPanel.Components.Visualizers.Circular;
+using Mvis.Plugin.Sandbox.Components.MusicHelpers;
+using Mvis.Plugin.Sandbox.Components.Visualizers;
+using Mvis.Plugin.Sandbox.Components.Visualizers.Circular;
 using Mvis.Plugin.Sandbox.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osuTK;
 
-namespace Mvis.Plugin.RulesetPanel.Components.Layouts.TypeA
+namespace Mvis.Plugin.Sandbox.Components.Layouts.TypeA
 {
     public class TypeAVisualizerController : MusicAmplitudesProvider
     {

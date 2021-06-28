@@ -1,4 +1,4 @@
-﻿using Mvis.Plugin.RulesetPanel.Components.MusicHelpers;
+﻿using Mvis.Plugin.Sandbox.Components.MusicHelpers;
 using Mvis.Plugin.Sandbox.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -13,7 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
-namespace Mvis.Plugin.RulesetPanel.Components.Layouts.TypeA
+namespace Mvis.Plugin.Sandbox.Components.Layouts.TypeA
 {
     public class UpdateableBeatmapBackground : CurrentBeatmapProvider
     {

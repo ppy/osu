@@ -2,7 +2,7 @@
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 
-namespace Mvis.Plugin.RulesetPanel.Components.MusicHelpers
+namespace Mvis.Plugin.Sandbox.Components.MusicHelpers
 {
     public abstract class MusicAmplitudesProvider : CurrentBeatmapProvider
     {

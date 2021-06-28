@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Mvis.Plugin.RulesetPanel.Extensions;
+using Mvis.Plugin.Sandbox.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osuTK;
 
-namespace Mvis.Plugin.RulesetPanel.Components.Visualizers.Circular
+namespace Mvis.Plugin.Sandbox.Components.Visualizers.Circular
 {
     public class FallMusicVisualizerDrawable : CircularMusicVisualizerDrawable
     {

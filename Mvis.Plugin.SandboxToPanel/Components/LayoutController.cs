@@ -1,11 +1,11 @@
-﻿using Mvis.Plugin.RulesetPanel.Components.Layouts;
+﻿using Mvis.Plugin.Sandbox.Components.Layouts;
 using Mvis.Plugin.Sandbox.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
-namespace Mvis.Plugin.RulesetPanel.Components
+namespace Mvis.Plugin.Sandbox.Components
 {
     public class LayoutController : CompositeDrawable
     {
