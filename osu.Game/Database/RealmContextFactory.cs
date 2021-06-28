@@ -44,9 +44,6 @@ namespace osu.Game.Database
         {
             get
             {
-                if (IsDisposed)
-                    throw new InvalidOperationException($"Attempted to access {nameof(Context)} on a disposed context factory");
-
                 if (context == null)
                 {
                     context = createContext();
