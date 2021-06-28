@@ -445,7 +445,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (almostEquals(time, hitObject.StartTime))
                     return true;
 
-                if (!(hitObject is IHasPathWithRepeats s))
+                if (!(hitObject is IHasRepeats s))
                     return false;
                 if (!almostBigger(time, hitObject.StartTime)
                     || !almostBigger(s.EndTime, time))
@@ -457,7 +457,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             IList<HitSampleInfo> samples;
 
-            if (sampleObj is IHasPathWithRepeats slider)
+            if (sampleObj is IHasRepeats slider)
                 samples = slider.NodeSamples[nodeIndexFromTime(slider, time - sampleObj.StartTime)];
             else
                 samples = sampleObj.Samples;
@@ -471,7 +471,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <param name="curve">The slider.</param>
         /// <param name="timeSinceStart">The time since the start time of the slider.</param>
         /// <returns>Index of the node. -1 if there isn't a node at the specific time.</returns>
-        private int nodeIndexFromTime(IHasPathWithRepeats curve, double timeSinceStart)
+        private int nodeIndexFromTime(IHasRepeats curve, double timeSinceStart)
         {
             double spanDuration = curve.Duration / curve.SpanCount();
             double nodeIndex = timeSinceStart / spanDuration;
