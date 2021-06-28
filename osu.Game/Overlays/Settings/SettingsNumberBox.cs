@@ -20,21 +20,17 @@ namespace osu.Game.Overlays.Settings
         {
             private readonly BindableWithCurrent<int?> current = new BindableWithCurrent<int?>();
 
-            private readonly OutlinedNumberBox numberBox;
-
             public Bindable<int?> Current
             {
-                get => current;
-                set
-                {
-                    current.Current = value;
-                    numberBox.Text = value.Value.ToString();
-                }
+                get => current.Current;
+                set => current.Current = value;
             }
 
             public NumberControl()
             {
                 AutoSizeAxes = Axes.Y;
+
+                OutlinedNumberBox numberBox;
 
                 InternalChildren = new[]
                 {
@@ -55,13 +51,11 @@ namespace osu.Game.Overlays.Settings
 
                     current.Value = value;
                 });
-            }
 
-            protected override void Update()
-            {
-                base.Update();
-                if (Current.Value == null)
-                    numberBox.Current.Value = "";
+                Current.BindValueChanged(e =>
+                {
+                    numberBox.Current.Value = e.NewValue?.ToString();
+                });
             }
         }
     }
