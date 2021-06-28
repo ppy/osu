@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
@@ -23,28 +24,55 @@ namespace osu.Game.Tests.Rulesets
 
         protected override Ruleset CreateRuleset() => new TestSceneRulesetDependencies.TestRuleset();
 
-        [SetUp]
-        public void SetUp() => Schedule(() =>
-        {
-            Child = new RulesetSkinProvidingContainer(Ruleset.Value.CreateInstance(), Beatmap.Value.Beatmap, Beatmap.Value.Skin)
-                .WithChild(requester = new SkinRequester());
-        });
-
         [Test]
         public void TestRulesetResources()
         {
+            setupProviderStep();
+
             AddAssert("ruleset texture retrieved via skin", () => requester.GetTexture("test-image") != null);
             AddAssert("ruleset sample retrieved via skin", () => requester.GetSample(new SampleInfo("test-sample")) != null);
+        }
+
+        [Test]
+        public void TestEarlyAddedSkinRequester()
+        {
+            Texture textureOnLoad = null;
+
+            AddStep("setup provider", () =>
+            {
+                var rulesetSkinProvider = new RulesetSkinProvidingContainer(Ruleset.Value.CreateInstance(), Beatmap.Value.Beatmap, Beatmap.Value.Skin);
+
+                rulesetSkinProvider.Add(requester = new SkinRequester());
+
+                requester.OnLoadAsync += () => textureOnLoad = requester.GetTexture("test-image");
+
+                Child = rulesetSkinProvider;
+            });
+
+            AddAssert("requester got correct initial texture", () => textureOnLoad != null);
+        }
+
+        private void setupProviderStep()
+        {
+            AddStep("setup provider", () =>
+            {
+                Child = new RulesetSkinProvidingContainer(Ruleset.Value.CreateInstance(), Beatmap.Value.Beatmap, Beatmap.Value.Skin)
+                    .WithChild(requester = new SkinRequester());
+            });
         }
 
         private class SkinRequester : Drawable, ISkin
         {
             private ISkinSource skin;
 
+            public event Action OnLoadAsync;
+
             [BackgroundDependencyLoader]
             private void load(ISkinSource skin)
             {
                 this.skin = skin;
+
+                OnLoadAsync?.Invoke();
             }
 
             public Drawable GetDrawableComponent(ISkinComponent component) => skin.GetDrawableComponent(component);
