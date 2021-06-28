@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 
 namespace osu.Game.Graphics.UserInterface
@@ -105,7 +106,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private class CapsWarning : SpriteIcon, IHasTooltip
         {
-            public string TooltipText => @"caps lock is active";
+            public LocalisableString TooltipText => "caps lock is active";
 
             public CapsWarning()
             {

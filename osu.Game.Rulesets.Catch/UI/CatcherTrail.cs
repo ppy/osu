@@ -37,6 +37,7 @@ namespace osu.Game.Rulesets.Catch.UI
         protected override void FreeAfterUse()
         {
             ClearTransforms();
+            Alpha = 1;
             base.FreeAfterUse();
         }
     }
