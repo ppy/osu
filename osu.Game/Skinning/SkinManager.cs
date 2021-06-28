@@ -142,16 +142,16 @@ namespace osu.Game.Skinning
             return base.ComputeHash(item, reader);
         }
 
-        protected override async Task Populate(SkinInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
+        protected override Task Populate(SkinInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
-            await base.Populate(model, archive, cancellationToken).ConfigureAwait(false);
-
             var instance = GetSkin(model);
 
             model.InstantiationInfo ??= instance.GetType().GetInvariantInstantiationInfo();
 
             if (model.Name?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true)
                 populateMetadata(model, instance);
+
+            return Task.CompletedTask;
         }
 
         private void populateMetadata(SkinInfo item, Skin instance)
