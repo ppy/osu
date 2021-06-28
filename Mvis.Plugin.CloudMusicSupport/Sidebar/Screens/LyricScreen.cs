@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Screens.Mvis;
 using osuTK;
 
@@ -37,12 +38,17 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
                 LyricScroll = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = LyricFlow = new FillFlowContainer<DrawableLyric>
+                    Child = new OsuContextMenuContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(5),
-                        Padding = new MarginPadding(5)
+                        Child = LyricFlow = new FillFlowContainer<DrawableLyric>
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(5),
+                            Padding = new MarginPadding(5)
+                        }
                     }
                 }
             };
