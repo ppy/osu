@@ -84,11 +84,10 @@ namespace osu.Game.Database
         /// ie. to move the realm backing file to a new location.
         /// </remarks>
         /// <returns>An <see cref="IDisposable"/> which should be disposed to end the blocking section.</returns>
-        /// <exception cref="InvalidOperationException">Thrown if this context is already disposed.</exception>
         public IDisposable BlockAllOperations()
         {
             if (IsDisposed)
-                throw new InvalidOperationException(@"Attempted to block operations after already disposed.");
+                throw new ObjectDisposedException(nameof(RealmContextFactory));
 
             blockingLock.Wait();
             flushContexts();
@@ -111,7 +110,7 @@ namespace osu.Game.Database
             try
             {
                 if (IsDisposed)
-                    throw new InvalidOperationException(@"Attempted to retrieve a context after the factor has already been disposed.");
+                    throw new ObjectDisposedException(nameof(RealmContextFactory));
 
                 blockingLock.Wait();
 
