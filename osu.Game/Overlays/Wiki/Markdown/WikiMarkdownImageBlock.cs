@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Framework.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Overlays.Wiki.Markdown
@@ -61,6 +62,12 @@ namespace osu.Game.Overlays.Wiki.Markdown
                     AutoSizeAxes = Axes.Y;
                     RelativeSizeAxes = Axes.X;
                 }
+
+                protected override Sprite CreateSpriteImage() => base.CreateSpriteImage().With(s =>
+                {
+                    s.Anchor = Anchor.TopCentre;
+                    s.Origin = Anchor.TopCentre;
+                });
             }
         }
     }
