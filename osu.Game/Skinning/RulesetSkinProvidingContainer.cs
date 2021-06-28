@@ -88,7 +88,7 @@ namespace osu.Game.Skinning
                 }
             }
 
-            int lastDefaultSkinIndex = SkinSources.IndexOf(SkinSources.OfType<DefaultSkin>().Last());
+            int lastDefaultSkinIndex = SkinSources.IndexOf(SkinSources.OfType<DefaultSkin>().LastOrDefault());
 
             // Ruleset resources should be given the ability to override game-wide defaults
             // This is achieved by placing them before the last instance of DefaultSkin.
