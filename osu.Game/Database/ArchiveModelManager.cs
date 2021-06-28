@@ -379,6 +379,8 @@ namespace osu.Game.Database
                         Undelete(existing);
                         return existing;
                     }
+
+                    LogForModel(item, $"Found existing (optimised) but failed pre-check.");
                 }
             }
 
@@ -422,6 +424,7 @@ namespace osu.Game.Database
                                 return existing;
                             }
 
+                            LogForModel(item, $"Found existing but failed re-use check.");
                             Delete(existing);
                             ModelStore.PurgeDeletable(s => s.ID == existing.ID);
                         }
