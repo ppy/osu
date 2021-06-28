@@ -441,10 +441,11 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
+        [Test]
         public async Task TestImportThenDeleteThenImportWithOnlineIDsMissing()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost($"{nameof(ImportBeatmapTest)}-{set}"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost($"{nameof(ImportBeatmapTest)}"))
             {
                 try
                 {
