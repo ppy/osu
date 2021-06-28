@@ -4,9 +4,9 @@
 namespace osu.Game.Rulesets.Osu.Mods
 {
     /// <summary>
-    /// Any mod which affects the animation or visibility of approach circles. Should be used for incompatibility purposes.
+    /// Any mod which completely hides the approach circles. Used for incompatibility with <see cref="IRequiresApproachCircles"/>.
     /// </summary>
-    public interface IMutateApproachCircles
+    public interface IHidesApproachCircles
     {
     }
 }
