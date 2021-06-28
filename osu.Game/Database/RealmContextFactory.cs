@@ -76,10 +76,26 @@ namespace osu.Game.Database
             return new RealmWriteUsage(createContext(), writeComplete);
         }
 
-        private void writeComplete()
+        /// <summary>
+        /// Flush any active contexts and block any further writes.
+        /// </summary>
+        /// <remarks>
+        /// This should be used in places we need to ensure no ongoing reads/writes are occurring with realm.
+        /// ie. to move the realm backing file to a new location.
+        /// </remarks>
+        /// <returns>An <see cref="IDisposable"/> which should be disposed to end the blocking section.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if this context is already disposed.</exception>
+        public IDisposable BlockAllOperations()
         {
-            Monitor.Exit(writeLock);
-            pending_writes.Value--;
+            if (IsDisposed)
+                throw new InvalidOperationException(@"Attempted to block operations after already disposed.");
+
+            blockingLock.Wait();
+            flushContexts();
+
+            return new InvokeOnDisposal<RealmContextFactory>(this, endBlockingSection);
+
+            static void endBlockingSection(RealmContextFactory factory) => factory.blockingLock.Release();
         }
 
         protected override void Update()
@@ -113,6 +129,12 @@ namespace osu.Game.Database
             }
         }
 
+        private void writeComplete()
+        {
+            Monitor.Exit(writeLock);
+            pending_writes.Value--;
+        }
+
         private void onMigration(Migration migration, ulong lastSchemaVersion)
         {
             switch (lastSchemaVersion)
@@ -122,31 +144,6 @@ namespace osu.Game.Database
                     migration.NewRealm.RemoveAll<RealmKeyBinding>();
                     break;
             }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            if (!IsDisposed)
-            {
-                // intentionally block all operations indefinitely. this ensures that nothing can start consuming a new context after disposal.
-                BlockAllOperations();
-                blockingLock?.Dispose();
-            }
-
-            base.Dispose(isDisposing);
-        }
-
-        public IDisposable BlockAllOperations()
-        {
-            if (IsDisposed)
-                throw new InvalidOperationException(@"Attempted to block operations after already disposed.");
-
-            blockingLock.Wait();
-            flushContexts();
-
-            return new InvokeOnDisposal<RealmContextFactory>(this, endBlockingSection);
-
-            static void endBlockingSection(RealmContextFactory factory) => factory.blockingLock.Release();
         }
 
         private void flushContexts()
@@ -159,6 +156,18 @@ namespace osu.Game.Database
                 Thread.Sleep(50);
 
             previousContext?.Dispose();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (!IsDisposed)
+            {
+                // intentionally block all operations indefinitely. this ensures that nothing can start consuming a new context after disposal.
+                BlockAllOperations();
+                blockingLock?.Dispose();
+            }
+
+            base.Dispose(isDisposing);
         }
 
         /// <summary>
