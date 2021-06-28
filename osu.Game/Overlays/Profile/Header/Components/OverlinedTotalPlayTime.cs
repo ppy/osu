@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Header.Components
@@ -14,7 +15,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         public readonly Bindable<User> User = new Bindable<User>();
 
-        public string TooltipText { get; set; }
+        public LocalisableString TooltipText { get; set; }
 
         private OverlinedInfoContainer info;
 
