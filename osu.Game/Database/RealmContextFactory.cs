@@ -126,22 +126,28 @@ namespace osu.Game.Database
 
         protected override void Dispose(bool isDisposing)
         {
-            base.Dispose(isDisposing);
+            if (!IsDisposed)
+            {
+                // intentionally block all operations indefinitely. this ensures that nothing can start consuming a new context after disposal.
+                BlockAllOperations();
+                blockingLock?.Dispose();
+            }
 
-            // intentionally block all operations indefinitely. this ensures that nothing can start consuming a new context after disposal.
-            BlockAllOperations();
-            blockingLock?.Dispose();
+            base.Dispose(isDisposing);
         }
 
         public IDisposable BlockAllOperations()
         {
+            if (IsDisposed)
+                throw new InvalidOperationException(@"Attempted to block operations after already disposed.");
+
             blockingLock.Wait();
             flushContexts();
 
             return new InvokeOnDisposal<RealmContextFactory>(this, endBlockingSection);
-        }
 
-        private static void endBlockingSection(RealmContextFactory factory) => factory.blockingLock.Release();
+            static void endBlockingSection(RealmContextFactory factory) => factory.blockingLock.Release();
+        }
 
         private void flushContexts()
         {
