@@ -317,6 +317,14 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.ConsumableItems.AsNoTracking().FirstOrDefault(query);
 
+        protected override bool CanSkipImport(BeatmapSetInfo existing, BeatmapSetInfo import)
+        {
+            if (!base.CanReuseExisting(existing, import))
+                return false;
+
+            return existing.Beatmaps.Any(b => b.OnlineBeatmapID != null);
+        }
+
         protected override bool CanReuseExisting(BeatmapSetInfo existing, BeatmapSetInfo import)
         {
             if (!base.CanReuseExisting(existing, import))
