@@ -197,8 +197,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             sendFrames(PLAYER_1_ID, 10);
             sendFrames(PLAYER_2_ID, 20);
             checkPaused(PLAYER_1_ID, false);
-            assertMuted(PLAYER_1_ID, false);
-            assertMuted(PLAYER_2_ID, true);
+            assertOneNotMuted();
 
             checkPaused(PLAYER_1_ID, true);
             assertMuted(PLAYER_1_ID, true);
@@ -304,6 +303,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             // Todo: The following should work, but is broken because SpectatorScreen retrieves the WorkingBeatmap via the BeatmapManager, bypassing the test scene clock and running real-time.
             // AddAssert($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().GameplayClock.IsRunning != state);
         }
+
+        private void assertOneNotMuted() => AddAssert("one player not muted", () => spectatorScreen.ChildrenOfType<PlayerArea>().Count(p => !p.Mute) == 1);
 
         private void assertMuted(int userId, bool muted)
             => AddAssert($"{userId} {(muted ? "is" : "is not")} muted", () => getInstance(userId).Mute == muted);
