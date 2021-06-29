@@ -227,34 +227,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void addHitSamples(IEnumerable<OsuHitObject> hitObjects)
         {
-            var lastSampleIdx = 0;
-
             foreach (var obj in hitObjects)
             {
                 var samples = getSamplesAtTime(origHitObjects, obj.StartTime);
 
-                if (samples == null)
-                {
-                    // If samples aren't available at the exact start time of the object,
-                    // use samples (without additions) in the closest original hit object instead
-
-                    while (lastSampleIdx < origHitObjects.Count && origHitObjects[lastSampleIdx].StartTime <= obj.StartTime)
-                        lastSampleIdx++;
-
-                    if (lastSampleIdx >= origHitObjects.Count) continue;
-
-                    if (lastSampleIdx > 0)
-                    {
-                        // Get samples from the previous hit object if it is closer in time
-                        if (obj.StartTime - origHitObjects[lastSampleIdx - 1].StartTime < origHitObjects[lastSampleIdx].StartTime - obj.StartTime)
-                            lastSampleIdx--;
-                    }
-
-                    // Remove additions
-                    obj.Samples = origHitObjects[lastSampleIdx].Samples.Where(s => !HitSampleInfo.AllAdditions.Contains(s.Name)).ToList();
-                }
-                else
-                    obj.Samples = samples;
+                // If samples aren't available at the exact start time of the object,
+                // use samples (without additions) in the closest original hit object instead
+                obj.Samples = samples ?? getClosestHitObject(origHitObjects, obj.StartTime).Samples.Where(s => !HitSampleInfo.AllAdditions.Contains(s.Name)).ToList();
             }
         }
 
@@ -424,6 +403,18 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             return beats;
+        }
+
+        private OsuHitObject getClosestHitObject(List<OsuHitObject> hitObjects, double time)
+        {
+            var closestIdx = hitObjects.FindLastIndex(h => h.StartTime < time);
+
+            if (closestIdx == hitObjects.Count - 1) return hitObjects[closestIdx];
+
+            // return the closest preceding/succeeding hit object, whoever is closer in time
+            return hitObjects[closestIdx + 1].StartTime - time < time - hitObjects[closestIdx].StartTime
+                ? hitObjects[closestIdx + 1]
+                : hitObjects[closestIdx];
         }
 
         /// <summary>
