@@ -149,7 +149,8 @@ namespace osu.Game.Tournament.Tests.NonVisual
         private TournamentGameBase loadOsu(GameHost host)
         {
             var osu = new TournamentGameBase();
-            Task.Run(() => host.Run(osu));
+            Task.Run(() => host.Run(osu))
+                .ContinueWith(t => Assert.Fail($"Host threw exception {t.Exception}"), TaskContinuationOptions.OnlyOnFaulted);
             waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
             return osu;
         }
