@@ -7,46 +7,49 @@ using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.Match.Components;
+using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchHeader : RoomTestScene
+    public class TestSceneMatchHeader : OnlinePlayTestScene
     {
-        public TestSceneMatchHeader()
-        {
-            Child = new Header();
-        }
-
         [SetUp]
         public new void Setup() => Schedule(() =>
         {
-            Room.Playlist.Add(new PlaylistItem
+            SelectedRoom.Value = new Room
             {
-                Beatmap =
+                Name = { Value = "A very awesome room" },
+                Host = { Value = new User { Id = 2, Username = "peppy" } },
+                Playlist =
                 {
-                    Value = new BeatmapInfo
+                    new PlaylistItem
                     {
-                        Metadata = new BeatmapMetadata
+                        Beatmap =
                         {
-                            Title = "Title",
-                            Artist = "Artist",
-                            AuthorString = "Author",
+                            Value = new BeatmapInfo
+                            {
+                                Metadata = new BeatmapMetadata
+                                {
+                                    Title = "Title",
+                                    Artist = "Artist",
+                                    AuthorString = "Author",
+                                },
+                                Version = "Version",
+                                Ruleset = new OsuRuleset().RulesetInfo
+                            }
                         },
-                        Version = "Version",
-                        Ruleset = new OsuRuleset().RulesetInfo
+                        RequiredMods =
+                        {
+                            new OsuModDoubleTime(),
+                            new OsuModNoFail(),
+                            new OsuModRelax(),
+                        }
                     }
-                },
-                RequiredMods =
-                {
-                    new OsuModDoubleTime(),
-                    new OsuModNoFail(),
-                    new OsuModRelax(),
                 }
-            });
+            };
 
-            Room.Name.Value = "A very awesome room";
-            Room.Host.Value = new User { Id = 2, Username = "peppy" };
+            Child = new Header();
         });
     }
 }
