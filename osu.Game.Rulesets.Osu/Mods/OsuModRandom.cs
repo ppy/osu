@@ -26,6 +26,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
 
+        /// <summary>
+        /// Number of previous hit circles to be shifted together when a slider needs to be moved.
+        /// </summary>
+        private const int shift_object_count = 10;
+
         private Random rng;
 
         public void ApplyToBeatmap(IBeatmap beatmap)
@@ -43,14 +48,22 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             float rateOfChangeMultiplier = 0;
 
+            int cntSinceNewCombo = 0;
+
             for (int i = 0; i < hitObjects.Count; i++)
             {
                 var hitObject = hitObjects[i];
 
                 var current = new RandomObjectInfo(hitObject);
 
-                // rateOfChangeMultiplier only changes every i iterations to prevent shaky-line-shaped streams
-                if (i % 3 == 0)
+                // rateOfChangeMultiplier only changes every 5 iterations in a combo
+                // to prevent shaky-line-shaped streams
+                if (hitObject.NewCombo)
+                    cntSinceNewCombo = 0;
+                else
+                    cntSinceNewCombo++;
+
+                if (cntSinceNewCombo % 5 == 0)
                     rateOfChangeMultiplier = (float)rng.NextDouble() * 2 - 1;
 
                 if (hitObject is Spinner)
@@ -67,7 +80,24 @@ namespace osu.Game.Rulesets.Osu.Mods
                 current.EndPositionRandomised = current.PositionRandomised;
 
                 if (hitObject is Slider slider)
-                    moveSliderIntoPlayfield(slider, current);
+                {
+                    Vector2 shift = moveSliderIntoPlayfield(slider, current);
+
+                    if (shift != Vector2.Zero)
+                    {
+                        var toBeShifted = new List<OsuHitObject>();
+
+                        for (int j = i - 1; j >= i - shift_object_count && j >= 0; j--)
+                        {
+                            if (!(hitObjects[j] is HitCircle)) break;
+
+                            toBeShifted.Add(hitObjects[j]);
+                        }
+
+                        if (toBeShifted.Count > 0)
+                            applyDecreasingShift(toBeShifted, shift);
+                    }
+                }
 
                 previous = current;
             }
@@ -94,7 +124,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             // The max. angle (relative to the angle of the vector pointing from the 2nd last to the last hit object)
             // is proportional to the distance between the last and the current hit object
             // to allow jumps and prevent too sharp turns during streams.
-            var randomAngleRad = rateOfChangeMultiplier * 2 * Math.PI * distanceToPrev / playfield_diagonal;
+
+            // Allow maximum jump angle when jump distance is more than half of playfield diagonal length
+            var randomAngleRad = rateOfChangeMultiplier * 2 * Math.PI * Math.Min(1f, distanceToPrev / (playfield_diagonal * 0.5f));
 
             current.AngleRad = (float)randomAngleRad + previous.AngleRad;
             if (current.AngleRad < 0)
@@ -122,9 +154,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <summary>
         /// Moves the <see cref="Slider"/> and all necessary nested <see cref="OsuHitObject"/>s into the <see cref="OsuPlayfield"/> if they aren't already.
         /// </summary>
-        private void moveSliderIntoPlayfield(Slider slider, RandomObjectInfo currentObjectInfo)
+        /// <returns>The <see cref="Vector2"/> that this slider has been shifted by.</returns>
+        private Vector2 moveSliderIntoPlayfield(Slider slider, RandomObjectInfo currentObjectInfo)
         {
             var minMargin = getMinSliderMargin(slider);
+
+            var prevPosition = slider.Position;
 
             slider.Position = new Vector2(
                 Math.Clamp(slider.Position.X, minMargin.Left, OsuPlayfield.BASE_SIZE.X - minMargin.Right),
@@ -135,6 +170,27 @@ namespace osu.Game.Rulesets.Osu.Mods
             currentObjectInfo.EndPositionRandomised = slider.EndPosition;
 
             shiftNestedObjects(slider, currentObjectInfo.PositionRandomised - currentObjectInfo.PositionOriginal);
+
+            return slider.Position - prevPosition;
+        }
+
+        /// <summary>
+        /// Decreasingly shift a list of <see cref="OsuHitObject"/>s by a specified amount.
+        /// The first item in the list is shifted by the largest amount, while the last item is shifted by the smallest amount.
+        /// </summary>
+        /// <param name="hitObjects">The list of hit objects to be shifted.</param>
+        /// <param name="shift">The amount to be shifted.</param>
+        private void applyDecreasingShift(IList<OsuHitObject> hitObjects, Vector2 shift)
+        {
+            for (int i = 0; i < hitObjects.Count; i++)
+            {
+                Vector2 position = hitObjects[i].Position + shift * ((hitObjects.Count - i) / (float)(hitObjects.Count + 1));
+
+                position.X = MathHelper.Clamp(position.X, 0, OsuPlayfield.BASE_SIZE.X);
+                position.Y = MathHelper.Clamp(position.Y, 0, OsuPlayfield.BASE_SIZE.Y);
+
+                hitObjects[i].Position = position;
+            }
         }
 
         /// <summary>
