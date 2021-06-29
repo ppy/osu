@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using Markdig.Syntax.Inlines;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -9,6 +10,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Containers.Markdown;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Wiki.Markdown;
@@ -168,9 +172,18 @@ Line after image";
                 markdownContainer.CurrentPath = "https://dev.ppy.sh/wiki/osu!_Program_Files/";
                 markdownContainer.Text = "![](img/file_structure.jpg \"The file structure of osu!'s installation folder, on Windows and macOS\")";
             });
+
+            AddUntilStep("Wait image to load", () => markdownContainer.ChildrenOfType<DelayedLoadWrapper>().First().DelayedLoadCompleted);
+
             AddStep("Change container width", () =>
             {
                 markdownContainer.Width = 0.5f;
+            });
+
+            AddAssert("Image not exceed container width", () =>
+            {
+                var spriteImage = markdownContainer.ChildrenOfType<Sprite>().First();
+                return Precision.DefinitelyBigger(markdownContainer.DrawWidth, spriteImage.DrawWidth);
             });
         }
 
