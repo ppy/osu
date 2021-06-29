@@ -21,6 +21,13 @@ namespace osu.Game.Online.Chat
         [Resolved]
         private Bindable<WorkingBeatmap> currentBeatmap { get; set; }
 
+        private readonly Channel target;
+
+        public NowPlayingCommand(Channel target)
+        {
+            this.target = target;
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -48,7 +55,7 @@ namespace osu.Game.Online.Chat
 
             var beatmapString = beatmap.OnlineBeatmapID.HasValue ? $"[{api.WebsiteRootUrl}/b/{beatmap.OnlineBeatmapID} {beatmap}]" : beatmap.ToString();
 
-            channelManager.PostMessage($"is {verb} {beatmapString}", true);
+            channelManager.PostMessage($"is {verb} {beatmapString}", true, target);
             Expire();
         }
     }
