@@ -40,8 +40,6 @@ namespace osu.Game.Tests.Visual.Playlists
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
 
-            manager.Import(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Wait();
-
             ((DummyAPIAccess)API).HandleRequest = req =>
             {
                 switch (req)
@@ -58,6 +56,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [SetUpSteps]
         public void SetupSteps()
         {
+            AddStep("ensure has beatmap", () => manager.Import(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Wait());
             AddStep("load match", () => LoadScreen(match = new TestPlaylistsRoomSubScreen(Room)));
             AddUntilStep("wait for load", () => match.IsCurrentScreen());
         }
@@ -111,10 +110,27 @@ namespace osu.Game.Tests.Visual.Playlists
         public void TestBeatmapUpdatedOnReImport()
         {
             BeatmapSetInfo importedSet = null;
+            TestBeatmap beatmap = null;
+
+            // this step is required to make sure the further imports actually get online IDs.
+            // all the playlist logic relies on online ID matching.
+            AddStep("remove all matching online IDs", () =>
+            {
+                beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo);
+
+                var existing = manager.QueryBeatmapSets(s => s.OnlineBeatmapSetID == beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID).ToList();
+
+                foreach (var s in existing)
+                {
+                    s.OnlineBeatmapSetID = null;
+                    foreach (var b in s.Beatmaps)
+                        b.OnlineBeatmapID = null;
+                    manager.Update(s);
+                }
+            });
 
             AddStep("import altered beatmap", () =>
             {
-                var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo);
                 beatmap.BeatmapInfo.BaseDifficulty.CircleSize = 1;
 
                 importedSet = manager.Import(beatmap.BeatmapInfo.BeatmapSet).Result;
