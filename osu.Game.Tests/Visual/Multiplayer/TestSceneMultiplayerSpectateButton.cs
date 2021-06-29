@@ -37,40 +37,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private IDisposable readyClickOperation;
 
-        protected override Container<Drawable> Content => content;
-        private readonly Container content;
-
-        public TestSceneMultiplayerSpectateButton()
-        {
-            base.Content.Add(content = new Container
-            {
-                RelativeSizeAxes = Axes.Both
-            });
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
-            return dependencies;
-        }
-
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
-
-            var beatmapTracker = new OnlinePlayBeatmapAvailabilityTracker { SelectedItem = { BindTarget = selectedItem } };
-            base.Content.Add(beatmapTracker);
-            Dependencies.Cache(beatmapTracker);
-
             beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
         }
 
         [SetUp]
         public new void Setup() => Schedule(() =>
         {
+            AvailabilityTracker.SelectedItem.BindTo(selectedItem);
+
             importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
             Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
             selectedItem.Value = new PlaylistItem

@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -224,15 +222,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("load screen", () => LoadScreen(spectatorScreen = new SoloSpectator(streamingUser)));
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded);
-        }
-
-        internal class TestUserLookupCache : UserLookupCache
-        {
-            protected override Task<User> ComputeValueAsync(int lookup, CancellationToken token = default) => Task.FromResult(new User
-            {
-                Id = lookup,
-                Username = $"User {lookup}"
-            });
         }
     }
 }
