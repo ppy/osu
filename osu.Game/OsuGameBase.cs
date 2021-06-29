@@ -24,6 +24,7 @@ using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Logging;
+using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.Input;
@@ -95,7 +96,7 @@ namespace osu.Game
 
         protected RulesetStore RulesetStore { get; private set; }
 
-        protected KeyBindingStore KeyBindingStore { get; private set; }
+        protected RealmKeyBindingStore KeyBindingStore { get; private set; }
 
         protected MenuCursorContainer MenuCursorContainer { get; private set; }
 
@@ -144,6 +145,8 @@ namespace osu.Game
 
         private DatabaseContextFactory contextFactory;
 
+        private RealmContextFactory realmFactory;
+
         protected override Container<Drawable> Content => content;
 
         private Container content;
@@ -153,6 +156,8 @@ namespace osu.Game
         private Bindable<bool> fpsDisplayVisible;
 
         private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(GLOBAL_TRACK_VOLUME_ADJUST);
+
+        private IBindable<GameThreadState> updateThreadState;
 
         public OsuGameBase()
         {
@@ -179,6 +184,13 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
+            dependencies.Cache(realmFactory = new RealmContextFactory(Storage));
+
+            updateThreadState = Host.UpdateThread.State.GetBoundCopy();
+            updateThreadState.BindValueChanged(updateThreadStateChanged);
+
+            AddInternal(realmFactory);
+
             dependencies.CacheAs(Storage);
 
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
@@ -190,20 +202,29 @@ namespace osu.Game
 
             AddFont(Resources, @"Fonts/osuFont");
 
-            AddFont(Resources, @"Fonts/Torus-Regular");
-            AddFont(Resources, @"Fonts/Torus-Light");
-            AddFont(Resources, @"Fonts/Torus-SemiBold");
-            AddFont(Resources, @"Fonts/Torus-Bold");
+            AddFont(Resources, @"Fonts/Torus/Torus-Regular");
+            AddFont(Resources, @"Fonts/Torus/Torus-Light");
+            AddFont(Resources, @"Fonts/Torus/Torus-SemiBold");
+            AddFont(Resources, @"Fonts/Torus/Torus-Bold");
 
-            AddFont(Resources, @"Fonts/Noto-Basic");
-            AddFont(Resources, @"Fonts/Noto-Hangul");
-            AddFont(Resources, @"Fonts/Noto-CJK-Basic");
-            AddFont(Resources, @"Fonts/Noto-CJK-Compatibility");
-            AddFont(Resources, @"Fonts/Noto-Thai");
+            AddFont(Resources, @"Fonts/Inter/Inter-Regular");
+            AddFont(Resources, @"Fonts/Inter/Inter-RegularItalic");
+            AddFont(Resources, @"Fonts/Inter/Inter-Light");
+            AddFont(Resources, @"Fonts/Inter/Inter-LightItalic");
+            AddFont(Resources, @"Fonts/Inter/Inter-SemiBold");
+            AddFont(Resources, @"Fonts/Inter/Inter-SemiBoldItalic");
+            AddFont(Resources, @"Fonts/Inter/Inter-Bold");
+            AddFont(Resources, @"Fonts/Inter/Inter-BoldItalic");
 
-            AddFont(Resources, @"Fonts/Venera-Light");
-            AddFont(Resources, @"Fonts/Venera-Bold");
-            AddFont(Resources, @"Fonts/Venera-Black");
+            AddFont(Resources, @"Fonts/Noto/Noto-Basic");
+            AddFont(Resources, @"Fonts/Noto/Noto-Hangul");
+            AddFont(Resources, @"Fonts/Noto/Noto-CJK-Basic");
+            AddFont(Resources, @"Fonts/Noto/Noto-CJK-Compatibility");
+            AddFont(Resources, @"Fonts/Noto/Noto-Thai");
+
+            AddFont(Resources, @"Fonts/Venera/Venera-Light");
+            AddFont(Resources, @"Fonts/Venera/Venera-Bold");
+            AddFont(Resources, @"Fonts/Venera/Venera-Black");
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
@@ -244,7 +265,7 @@ namespace osu.Game
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Host, () => difficultyCache, LocalConfig));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, true));
 
-            // this should likely be moved to ArchiveModelManager when another case appers where it is necessary
+            // this should likely be moved to ArchiveModelManager when another case appears where it is necessary
             // to have inter-dependent model managers. this could be obtained with an IHasForeign<T> interface to
             // allow lookups to be done on the child (ScoreManager in this case) to perform the cascading delete.
             List<ScoreInfo> getBeatmapScores(BeatmapSetInfo set)
@@ -275,7 +296,8 @@ namespace osu.Game
             dependencies.Cache(scorePerformanceManager);
             AddInternal(scorePerformanceManager);
 
-            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
+            migrateDataToRealm();
+
             dependencies.Cache(settingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(rulesetConfigCache = new RulesetConfigCache(settingsStore));
 
@@ -323,7 +345,12 @@ namespace osu.Game
 
             base.Content.Add(CreateScalingContainer().WithChildren(mainContent));
 
+            KeyBindingStore = new RealmKeyBindingStore(realmFactory);
             KeyBindingStore.Register(globalBindings);
+
+            foreach (var r in RulesetStore.AvailableRulesets)
+                KeyBindingStore.Register(r);
+
             dependencies.Cache(globalBindings);
 
             PreviewTrackManager previewTrackManager;
@@ -334,6 +361,23 @@ namespace osu.Game
             dependencies.CacheAs(MusicController);
 
             Ruleset.BindValueChanged(onRulesetChanged);
+        }
+
+        private IDisposable blocking;
+
+        private void updateThreadStateChanged(ValueChangedEvent<GameThreadState> state)
+        {
+            switch (state.NewValue)
+            {
+                case GameThreadState.Running:
+                    blocking?.Dispose();
+                    blocking = null;
+                    break;
+
+                case GameThreadState.Paused:
+                    blocking = realmFactory.BlockAllOperations();
+                    break;
+            }
         }
 
         protected override void LoadComplete()
@@ -378,8 +422,11 @@ namespace osu.Game
 
         public void Migrate(string path)
         {
-            contextFactory.FlushConnections();
-            (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
+            using (realmFactory.BlockAllOperations())
+            {
+                contextFactory.FlushConnections();
+                (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
+            }
         }
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
@@ -389,6 +436,34 @@ namespace osu.Game
         protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
+
+        private void migrateDataToRealm()
+        {
+            using (var db = contextFactory.GetForWrite())
+            using (var usage = realmFactory.GetForWrite())
+            {
+                var existingBindings = db.Context.DatabasedKeyBinding;
+
+                // only migrate data if the realm database is empty.
+                if (!usage.Realm.All<RealmKeyBinding>().Any())
+                {
+                    foreach (var dkb in existingBindings)
+                    {
+                        usage.Realm.Add(new RealmKeyBinding
+                        {
+                            KeyCombinationString = dkb.KeyCombination.ToString(),
+                            ActionInt = (int)dkb.Action,
+                            RulesetID = dkb.RulesetID,
+                            Variant = dkb.Variant
+                        });
+                    }
+                }
+
+                db.Context.RemoveRange(existingBindings);
+
+                usage.Commit();
+            }
+        }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {

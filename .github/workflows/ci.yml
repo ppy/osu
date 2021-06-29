@@ -1,0 +1,94 @@
+on: [push, pull_request]
+name: Continuous Integration
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{matrix.os.fullname}}
+    env:
+      OSU_EXECUTION_MODE: ${{matrix.threadingMode}}
+    strategy:
+       fail-fast: false
+       matrix:
+          os:
+            - { prettyname: Windows, fullname: windows-latest }
+            - { prettyname: macOS, fullname: macos-latest }
+            - { prettyname: Linux, fullname: ubuntu-latest }
+          threadingMode: ['SingleThread', 'MultiThreaded']
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install .NET 5.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
+
+      # FIXME: libavformat is not included in Ubuntu. Let's fix that.
+      # https://github.com/ppy/osu-framework/issues/4349
+      # Remove this once https://github.com/actions/virtual-environments/issues/3306 has been resolved.
+      - name: Install libavformat-dev
+        if: ${{matrix.os.fullname == 'ubuntu-latest'}}
+        run: |
+         sudo apt-get update && \
+         sudo apt-get -y install libavformat-dev
+
+      - name: Compile
+        run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
+
+      - name: Test
+        run: dotnet test $pwd/*.Tests/bin/Debug/*/*.Tests.dll --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
+        shell: pwsh
+
+      # Attempt to upload results even if test fails.
+      # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#always
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
+          path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx
+
+  inspect-code:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # FIXME: Tools won't run in .NET 5.0 unless you install 3.1.x LTS side by side.
+      # https://itnext.io/how-to-support-multiple-net-sdks-in-github-actions-workflows-b988daa884e
+      - name: Install .NET 3.1.x LTS
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "3.1.x"
+
+      - name: Install .NET 5.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
+
+      - name: Restore Tools
+        run: dotnet tool restore
+
+      - name: Restore Packages
+        run: dotnet restore
+
+      - name: CodeFileSanity
+        run: |
+          # TODO: Add ignore filters and GitHub Workflow Command Reporting in CFS. That way we don't have to do this workaround.
+          # FIXME: Suppress warnings from templates project
+          dotnet codefilesanity | while read -r line; do
+            echo "::warning::$line"
+          done
+
+      # Temporarily disabled due to test failures, but it won't work anyway until the tool is upgraded.
+      # - name: .NET Format (Dry Run)
+      #   run: dotnet format --dry-run --check
+
+      - name: InspectCode
+        run: dotnet jb inspectcode $(pwd)/osu.Desktop.slnf --output=$(pwd)/inspectcodereport.xml --cachesDir=$(pwd)/inspectcode --verbosity=WARN
+
+      - name: NVika
+        run: dotnet nvika parsereport "${{github.workspace}}/inspectcodereport.xml" --treatwarningsaserrors

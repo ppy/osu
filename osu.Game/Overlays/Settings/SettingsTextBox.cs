@@ -2,17 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
     public class SettingsTextBox : SettingsItem<string>
     {
-        protected override Drawable CreateControl() => new OsuTextBox
+        protected override Drawable CreateControl() => new OutlinedTextBox
         {
             Margin = new MarginPadding { Top = 5 },
             RelativeSizeAxes = Axes.X,
-            CommitOnFocusLost = true,
+            CommitOnFocusLost = true
         };
     }
 }

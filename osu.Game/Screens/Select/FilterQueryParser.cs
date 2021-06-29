@@ -37,6 +37,7 @@ namespace osu.Game.Screens.Select
         {
             switch (key)
             {
+                case "star":
                 case "stars":
                     return TryUpdateCriteriaRange(ref criteria.StarDifficulty, op, value, 0.01d / 2);
 
@@ -49,6 +50,9 @@ namespace osu.Game.Screens.Select
 
                 case "cs":
                     return TryUpdateCriteriaRange(ref criteria.CircleSize, op, value);
+
+                case "od":
+                    return TryUpdateCriteriaRange(ref criteria.OverallDifficulty, op, value);
 
                 case "bpm":
                     return TryUpdateCriteriaRange(ref criteria.BPM, op, value, 0.01d / 2);

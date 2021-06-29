@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
@@ -167,7 +168,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public void Disable()
             {
                 allow = false;
-                TriggerSourceChanged();
+                OnSourceChanged();
             }
 
             public SwitchableSkinProvidingContainer(ISkin skin)
@@ -329,6 +330,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
 
             public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => throw new NotImplementedException();
+
+            public IEnumerable<ISkin> AllSources => throw new NotImplementedException();
 
             public event Action SourceChanged
             {

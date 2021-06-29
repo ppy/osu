@@ -9,8 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -18,7 +16,6 @@ using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Skinning;
-using osu.Game.Rulesets.Catch.Skinning.Default;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Skinning;
 using osuTK;
@@ -26,7 +23,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class Catcher : SkinReloadableDrawable, IKeyBindingHandler<CatchAction>
+    public class Catcher : SkinReloadableDrawable
     {
         /// <summary>
         /// The default colour used to tint hyper-dash fruit, along with the moving catcher, its trail
@@ -55,6 +52,11 @@ namespace osu.Game.Rulesets.Catch.UI
         public const double BASE_SPEED = 1.0;
 
         /// <summary>
+        /// The current speed of the catcher.
+        /// </summary>
+        public double Speed => (Dashing ? 1 : 0.5) * BASE_SPEED * hyperDashModifier;
+
+        /// <summary>
         /// The amount by which caught fruit should be offset from the plate surface to make them look visually "caught".
         /// </summary>
         public const float CAUGHT_FRUIT_VERTICAL_OFFSET = -5;
@@ -77,26 +79,26 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Contains objects dropped from the plate.
         /// </summary>
-        private readonly Container<CaughtObject> droppedObjectTarget;
+        [Resolved]
+        private DroppedObjectContainer droppedObjectTarget { get; set; }
 
-        [Cached]
-        protected readonly Bindable<CatcherAnimationState> CurrentStateBindable = new Bindable<CatcherAnimationState>();
-
-        public CatcherAnimationState CurrentState => CurrentStateBindable.Value;
+        public CatcherAnimationState CurrentState
+        {
+            get => body.AnimationState.Value;
+            private set => body.AnimationState.Value = value;
+        }
 
         /// <summary>
         /// The width of the catcher which can receive fruit. Equivalent to "catchMargin" in osu-stable.
         /// </summary>
         public const float ALLOWED_CATCH_RANGE = 0.8f;
 
-        internal Texture CurrentTexture => ((ICatcherSprite)currentCatcher.Drawable).CurrentTexture;
-
         private bool dashing;
 
         public bool Dashing
         {
             get => dashing;
-            protected set
+            set
             {
                 if (value == dashing) return;
 
@@ -106,17 +108,21 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
+        public Direction VisualDirection
+        {
+            get => Scale.X > 0 ? Direction.Right : Direction.Left;
+            set => Scale = new Vector2((value == Direction.Right ? 1 : -1) * Math.Abs(Scale.X), Scale.Y);
+        }
+
         /// <summary>
         /// Width of the area that can be used to attempt catches during gameplay.
         /// </summary>
         private readonly float catchWidth;
 
-        private readonly SkinnableDrawable currentCatcher;
+        private readonly SkinnableCatcher body;
 
         private Color4 hyperDashColour = DEFAULT_HYPER_DASH_COLOUR;
         private Color4 hyperDashEndGlowColour = DEFAULT_HYPER_DASH_COLOUR;
-
-        private int currentDirection;
 
         private double hyperDashModifier = 1;
         private int hyperDashDirection;
@@ -129,10 +135,9 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly DrawablePool<CaughtBanana> caughtBananaPool;
         private readonly DrawablePool<CaughtDroplet> caughtDropletPool;
 
-        public Catcher([NotNull] Container trailsTarget, [NotNull] Container<CaughtObject> droppedObjectTarget, BeatmapDifficulty difficulty = null)
+        public Catcher([NotNull] Container trailsTarget, BeatmapDifficulty difficulty = null)
         {
             this.trailsTarget = trailsTarget;
-            this.droppedObjectTarget = droppedObjectTarget;
 
             Origin = Anchor.TopCentre;
 
@@ -153,13 +158,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.BottomCentre,
                 },
-                currentCatcher = new SkinnableDrawable(
-                    new CatchSkinComponent(CatchSkinComponents.Catcher),
-                    _ => new DefaultCatcher())
-                {
-                    Anchor = Anchor.TopCentre,
-                    OriginPosition = new Vector2(0.5f, 0.06f) * CatcherArea.CATCHER_SIZE
-                },
+                body = new SkinnableCatcher(),
                 hitExplosionContainer = new HitExplosionContainer
                 {
                     Anchor = Anchor.TopCentre,
@@ -260,17 +259,16 @@ namespace osu.Game.Rulesets.Catch.UI
                 SetHyperDashState();
 
             if (result.IsHit)
-                updateState(hitObject.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle);
+                CurrentState = hitObject.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle;
             else if (!(hitObject is Banana))
-                updateState(CatcherAnimationState.Fail);
+                CurrentState = CatcherAnimationState.Fail;
         }
 
         public void OnRevertResult(DrawableCatchHitObject drawableObject, JudgementResult result)
         {
             var catchResult = (CatchJudgementResult)result;
 
-            if (CurrentState != catchResult.CatcherAnimationState)
-                updateState(catchResult.CatcherAnimationState);
+            CurrentState = catchResult.CatcherAnimationState;
 
             if (HyperDashing != catchResult.CatcherHyperDash)
             {
@@ -315,55 +313,6 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        public void UpdatePosition(float position)
-        {
-            position = Math.Clamp(position, 0, CatchPlayfield.WIDTH);
-
-            if (position == X)
-                return;
-
-            Scale = new Vector2(Math.Abs(Scale.X) * (position > X ? 1 : -1), Scale.Y);
-            X = position;
-        }
-
-        public bool OnPressed(CatchAction action)
-        {
-            switch (action)
-            {
-                case CatchAction.MoveLeft:
-                    currentDirection--;
-                    return true;
-
-                case CatchAction.MoveRight:
-                    currentDirection++;
-                    return true;
-
-                case CatchAction.Dash:
-                    Dashing = true;
-                    return true;
-            }
-
-            return false;
-        }
-
-        public void OnReleased(CatchAction action)
-        {
-            switch (action)
-            {
-                case CatchAction.MoveLeft:
-                    currentDirection++;
-                    break;
-
-                case CatchAction.MoveRight:
-                    currentDirection--;
-                    break;
-
-                case CatchAction.Dash:
-                    Dashing = false;
-                    break;
-            }
-        }
-
         /// <summary>
         /// Drop any fruit off the plate.
         /// </summary>
@@ -405,15 +354,6 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             base.Update();
 
-            if (currentDirection == 0) return;
-
-            var direction = Math.Sign(currentDirection);
-
-            var dashModifier = Dashing ? 1 : 0.5;
-            var speed = BASE_SPEED * dashModifier * hyperDashModifier;
-
-            UpdatePosition((float)(X + direction * Clock.ElapsedFrameTime * speed));
-
             // Correct overshooting.
             if ((hyperDashDirection > 0 && hyperDashTargetPosition < X) ||
                 (hyperDashDirection < 0 && hyperDashTargetPosition > X))
@@ -421,14 +361,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 X = hyperDashTargetPosition;
                 SetHyperDashState();
             }
-        }
-
-        private void updateState(CatcherAnimationState state)
-        {
-            if (CurrentState == state)
-                return;
-
-            CurrentStateBindable.Value = state;
         }
 
         private void placeCaughtObject(DrawablePalpableCatchHitObject drawableObject, Vector2 position)

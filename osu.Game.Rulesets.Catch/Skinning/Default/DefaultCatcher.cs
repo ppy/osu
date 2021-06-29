@@ -12,11 +12,9 @@ using osu.Game.Rulesets.Catch.UI;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
-    public class DefaultCatcher : CompositeDrawable, ICatcherSprite
+    public class DefaultCatcher : CompositeDrawable
     {
         public Bindable<CatcherAnimationState> CurrentState { get; } = new Bindable<CatcherAnimationState>();
-
-        public Texture CurrentTexture => sprite.Texture;
 
         private readonly Sprite sprite;
 
