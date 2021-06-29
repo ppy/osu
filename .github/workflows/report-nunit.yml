@@ -21,6 +21,7 @@ jobs:
             - { prettyname: macOS }
             - { prettyname: Linux }
           threadingMode: ['SingleThread', 'MultiThreaded']
+    timeout-minutes: 5
     steps:
       - name: Annotate CI run with test results
         uses: dorny/test-reporter@v1.4.2

@@ -26,6 +26,11 @@ namespace osu.Game.Database
         /// </summary>
         private readonly object writeLock = new object();
 
+        /// <summary>
+        /// Lock object which is held during <see cref="BlockAllOperations"/> sections.
+        /// </summary>
+        private readonly SemaphoreSlim blockingLock = new SemaphoreSlim(1);
+
         private static readonly GlobalStatistic<int> reads = GlobalStatistics.Get<int>("Realm", "Get (Read)");
         private static readonly GlobalStatistic<int> writes = GlobalStatistics.Get<int>("Realm", "Get (Write)");
         private static readonly GlobalStatistic<int> refreshes = GlobalStatistics.Get<int>("Realm", "Dirty Refreshes");
@@ -33,17 +38,12 @@ namespace osu.Game.Database
         private static readonly GlobalStatistic<int> pending_writes = GlobalStatistics.Get<int>("Realm", "Pending writes");
         private static readonly GlobalStatistic<int> active_usages = GlobalStatistics.Get<int>("Realm", "Active usages");
 
-        private readonly ManualResetEventSlim blockingResetEvent = new ManualResetEventSlim(true);
-
         private Realm context;
 
         public Realm Context
         {
             get
             {
-                if (IsDisposed)
-                    throw new InvalidOperationException($"Attempted to access {nameof(Context)} on a disposed context factory");
-
                 if (context == null)
                 {
                     context = createContext();
@@ -64,7 +64,7 @@ namespace osu.Game.Database
         public RealmUsage GetForRead()
         {
             reads.Value++;
-            return new RealmUsage(this);
+            return new RealmUsage(createContext());
         }
 
         public RealmWriteUsage GetForWrite()
@@ -73,8 +73,28 @@ namespace osu.Game.Database
             pending_writes.Value++;
 
             Monitor.Enter(writeLock);
+            return new RealmWriteUsage(createContext(), writeComplete);
+        }
 
-            return new RealmWriteUsage(this);
+        /// <summary>
+        /// Flush any active contexts and block any further writes.
+        /// </summary>
+        /// <remarks>
+        /// This should be used in places we need to ensure no ongoing reads/writes are occurring with realm.
+        /// ie. to move the realm backing file to a new location.
+        /// </remarks>
+        /// <returns>An <see cref="IDisposable"/> which should be disposed to end the blocking section.</returns>
+        public IDisposable BlockAllOperations()
+        {
+            if (IsDisposed)
+                throw new ObjectDisposedException(nameof(RealmContextFactory));
+
+            blockingLock.Wait();
+            flushContexts();
+
+            return new InvokeOnDisposal<RealmContextFactory>(this, endBlockingSection);
+
+            static void endBlockingSection(RealmContextFactory factory) => factory.blockingLock.Release();
         }
 
         protected override void Update()
@@ -87,15 +107,31 @@ namespace osu.Game.Database
 
         private Realm createContext()
         {
-            blockingResetEvent.Wait();
-
-            contexts_created.Value++;
-
-            return Realm.GetInstance(new RealmConfiguration(storage.GetFullPath($"{database_name}.realm", true))
+            try
             {
-                SchemaVersion = schema_version,
-                MigrationCallback = onMigration,
-            });
+                if (IsDisposed)
+                    throw new ObjectDisposedException(nameof(RealmContextFactory));
+
+                blockingLock.Wait();
+
+                contexts_created.Value++;
+
+                return Realm.GetInstance(new RealmConfiguration(storage.GetFullPath($"{database_name}.realm", true))
+                {
+                    SchemaVersion = schema_version,
+                    MigrationCallback = onMigration,
+                });
+            }
+            finally
+            {
+                blockingLock.Release();
+            }
+        }
+
+        private void writeComplete()
+        {
+            Monitor.Exit(writeLock);
+            pending_writes.Value--;
         }
 
         private void onMigration(Migration migration, ulong lastSchemaVersion)
@@ -107,26 +143,6 @@ namespace osu.Game.Database
                     migration.NewRealm.RemoveAll<RealmKeyBinding>();
                     break;
             }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            BlockAllOperations();
-        }
-
-        public IDisposable BlockAllOperations()
-        {
-            blockingResetEvent.Reset();
-            flushContexts();
-
-            return new InvokeOnDisposal<RealmContextFactory>(this, r => endBlockingSection());
-        }
-
-        private void endBlockingSection()
-        {
-            blockingResetEvent.Set();
         }
 
         private void flushContexts()
@@ -141,6 +157,18 @@ namespace osu.Game.Database
             previousContext?.Dispose();
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            if (!IsDisposed)
+            {
+                // intentionally block all operations indefinitely. this ensures that nothing can start consuming a new context after disposal.
+                BlockAllOperations();
+                blockingLock?.Dispose();
+            }
+
+            base.Dispose(isDisposing);
+        }
+
         /// <summary>
         /// A usage of realm from an arbitrary thread.
         /// </summary>
@@ -148,13 +176,10 @@ namespace osu.Game.Database
         {
             public readonly Realm Realm;
 
-            protected readonly RealmContextFactory Factory;
-
-            internal RealmUsage(RealmContextFactory factory)
+            internal RealmUsage(Realm context)
             {
                 active_usages.Value++;
-                Factory = factory;
-                Realm = factory.createContext();
+                Realm = context;
             }
 
             /// <summary>
@@ -172,11 +197,13 @@ namespace osu.Game.Database
         /// </summary>
         public class RealmWriteUsage : RealmUsage
         {
+            private readonly Action onWriteComplete;
             private readonly Transaction transaction;
 
-            internal RealmWriteUsage(RealmContextFactory factory)
-                : base(factory)
+            internal RealmWriteUsage(Realm context, Action onWriteComplete)
+                : base(context)
             {
+                this.onWriteComplete = onWriteComplete;
                 transaction = Realm.BeginWrite();
             }
 
@@ -200,8 +227,7 @@ namespace osu.Game.Database
 
                 base.Dispose();
 
-                Monitor.Exit(Factory.writeLock);
-                pending_writes.Value--;
+                onWriteComplete();
             }
         }
     }
