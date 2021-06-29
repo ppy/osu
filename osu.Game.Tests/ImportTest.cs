@@ -17,7 +17,8 @@ namespace osu.Game.Tests
         protected virtual TestOsuGameBase LoadOsuIntoHost(GameHost host, bool withBeatmap = false)
         {
             var osu = new TestOsuGameBase(withBeatmap);
-            Task.Run(() => host.Run(osu));
+            Task.Run(() => host.Run(osu))
+                .ContinueWith(t => Assert.Fail($"Host threw exception {t.Exception}"), TaskContinuationOptions.OnlyOnFaulted);
 
             waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
 
