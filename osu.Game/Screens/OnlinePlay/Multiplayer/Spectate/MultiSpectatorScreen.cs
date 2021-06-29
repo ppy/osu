@@ -101,7 +101,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 Expanded = { Value = true },
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-            }, leaderboardContainer.Add);
+            }, l =>
+            {
+                foreach (var instance in instances)
+                    leaderboard.AddClock(instance.UserId, instance.GameplayClock);
+
+                leaderboardContainer.Add(leaderboard);
+            });
 
             syncManager.ReadyToStart += onReadyToStart;
             syncManager.MasterState.BindValueChanged(onMasterStateChanged, true);
@@ -166,14 +172,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         protected override void StartGameplay(int userId, GameplayState gameplayState)
-        {
-            var instance = instances.Single(i => i.UserId == userId);
-
-            instance.LoadScore(gameplayState.Score);
-
-            syncManager.AddPlayerClock(instance.GameplayClock);
-            leaderboard.AddClock(instance.UserId, instance.GameplayClock);
-        }
+            => instances.Single(i => i.UserId == userId).LoadScore(gameplayState.Score);
 
         protected override void EndGameplay(int userId)
         {

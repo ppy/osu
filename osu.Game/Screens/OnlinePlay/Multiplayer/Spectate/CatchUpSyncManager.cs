@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -54,7 +55,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             MasterClock = master;
         }
 
-        public void AddPlayerClock(ISpectatorPlayerClock clock) => playerClocks.Add(clock);
+        public void AddPlayerClock(ISpectatorPlayerClock clock)
+        {
+            Debug.Assert(!playerClocks.Contains(clock));
+            playerClocks.Add(clock);
+        }
 
         public void RemovePlayerClock(ISpectatorPlayerClock clock) => playerClocks.Remove(clock);
 
