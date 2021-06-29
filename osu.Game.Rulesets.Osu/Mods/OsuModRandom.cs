@@ -48,8 +48,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             float rateOfChangeMultiplier = 0;
 
-            int cntSinceNewCombo = 0;
-
             for (int i = 0; i < hitObjects.Count; i++)
             {
                 var hitObject = hitObjects[i];
@@ -58,12 +56,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 // rateOfChangeMultiplier only changes every 5 iterations in a combo
                 // to prevent shaky-line-shaped streams
-                if (hitObject.NewCombo)
-                    cntSinceNewCombo = 0;
-                else
-                    cntSinceNewCombo++;
-
-                if (cntSinceNewCombo % 5 == 0)
+                if (hitObject.IndexInCurrentCombo % 5 == 0)
                     rateOfChangeMultiplier = (float)rng.NextDouble() * 2 - 1;
 
                 if (hitObject is Spinner)
