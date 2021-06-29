@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Testing
                 Dependencies.Get<TestRulesetConfigManager>() != null);
         }
 
-        private class TestRuleset : Ruleset
+        public class TestRuleset : Ruleset
         {
             public override string Description => string.Empty;
             public override string ShortName => string.Empty;

@@ -4,12 +4,13 @@
 using Markdig.Syntax.Inlines;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
     public class OsuMarkdownImage : MarkdownImage, IHasTooltip
     {
-        public string TooltipText { get; }
+        public LocalisableString TooltipText { get; }
 
         public OsuMarkdownImage(LinkInline linkInline)
             : base(linkInline.Url)

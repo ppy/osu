@@ -242,6 +242,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
+        [Ignore("intentionally broken by import optimisations")]
         public async Task TestImportThenImportWithChangedFile()
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
@@ -344,6 +345,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
+        [Ignore("intentionally broken by import optimisations")]
         public async Task TestImportCorruptThenImport()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
@@ -489,12 +491,11 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public async Task TestImportThenDeleteThenImportWithOnlineIDMismatch(bool set)
+        [Test]
+        public async Task TestImportThenDeleteThenImportWithOnlineIDsMissing()
         {
             // unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost($"{nameof(ImportBeatmapTest)}-{set}"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost($"{nameof(ImportBeatmapTest)}"))
             {
                 try
                 {
@@ -502,10 +503,8 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     var imported = await LoadOszIntoOsu(osu);
 
-                    if (set)
-                        imported.OnlineBeatmapSetID = 1234;
-                    else
-                        imported.Beatmaps.First().OnlineBeatmapID = 1234;
+                    foreach (var b in imported.Beatmaps)
+                        b.OnlineBeatmapID = null;
 
                     osu.Dependencies.Get<BeatmapManager>().Update(imported);
 
