@@ -4,7 +4,7 @@
 namespace osu.Game.Rulesets.Osu.Mods
 {
     /// <summary>
-    /// Any mod which requires the approach circles to be visible. Used for incompatibility with <see cref="IHidesApproachCircles"/>.
+    /// Marker interface for any mod which requires the approach circles to be visible. Used for incompatibility with <see cref="IHidesApproachCircles"/>.
     /// </summary>
     public interface IRequiresApproachCircles
     {
