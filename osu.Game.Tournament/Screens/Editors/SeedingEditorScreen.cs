@@ -147,7 +147,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     [Resolved]
                     protected IAPIProvider API { get; private set; }
 
-                    private readonly Bindable<string> beatmapId = new Bindable<string>();
+                    private readonly Bindable<int?> beatmapId = new Bindable<int?>();
 
                     private readonly Bindable<string> score = new Bindable<string>();
 
@@ -228,16 +228,12 @@ namespace osu.Game.Tournament.Screens.Editors
                     [BackgroundDependencyLoader]
                     private void load(RulesetStore rulesets)
                     {
-                        beatmapId.Value = Model.ID.ToString();
-                        beatmapId.BindValueChanged(idString =>
+                        beatmapId.Value = Model.ID;
+                        beatmapId.BindValueChanged(id =>
                         {
-                            int parsed;
+                            Model.ID = id.NewValue ?? 0;
 
-                            int.TryParse(idString.NewValue, out parsed);
-
-                            Model.ID = parsed;
-
-                            if (idString.NewValue != idString.OldValue)
+                            if (id.NewValue != id.OldValue)
                                 Model.BeatmapInfo = null;
 
                             if (Model.BeatmapInfo != null)
