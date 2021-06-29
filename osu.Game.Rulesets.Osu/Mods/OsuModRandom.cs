@@ -89,6 +89,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                         for (int j = i - 1; j >= i - shift_object_count && j >= 0; j--)
                         {
+                            // only shift hit circles
                             if (!(hitObjects[j] is HitCircle)) break;
 
                             toBeShifted.Add(hitObjects[j]);
@@ -184,6 +185,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             for (int i = 0; i < hitObjects.Count; i++)
             {
+                // The first object is shifted by a vector slightly smaller than shift
+                // The last object is shifted by a vector slightly larger than zero
                 Vector2 position = hitObjects[i].Position + shift * ((hitObjects.Count - i) / (float)(hitObjects.Count + 1));
 
                 position.X = MathHelper.Clamp(position.X, 0, OsuPlayfield.BASE_SIZE.X);
