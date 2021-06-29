@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
                     RelativeSizeAxes = Axes.X;
                 }
 
-                protected override Sprite CreateSpriteImage() => new ImageSprite();
+                protected override Sprite CreateImageSprite() => new ImageSprite();
 
                 private class ImageSprite : Sprite
                 {
