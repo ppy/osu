@@ -4,7 +4,7 @@
 namespace osu.Game.Rulesets.Osu.Mods
 {
     /// <summary>
-    /// Any mod which completely hides the approach circles. Used for incompatibility with <see cref="IRequiresApproachCircles"/>.
+    /// Marker interface for any mod which completely hides the approach circles. Used for incompatibility with <see cref="IRequiresApproachCircles"/>.
     /// </summary>
     public interface IHidesApproachCircles
     {
