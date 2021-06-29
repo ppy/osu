@@ -39,7 +39,8 @@ namespace osu.Game.Tests.Chat
                 {
                     switch (req)
                     {
-                        case JoinChannelRequest _:
+                        case JoinChannelRequest joinChannel:
+                            joinChannel.TriggerSuccess();
                             return true;
 
                         case PostMessageRequest postMessage:
