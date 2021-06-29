@@ -89,12 +89,18 @@ namespace osu.Game.Database
             if (IsDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
+            Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
+
             blockingLock.Wait();
             flushContexts();
 
             return new InvokeOnDisposal<RealmContextFactory>(this, endBlockingSection);
 
-            static void endBlockingSection(RealmContextFactory factory) => factory.blockingLock.Release();
+            static void endBlockingSection(RealmContextFactory factory)
+            {
+                factory.blockingLock.Release();
+                Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
+            }
         }
 
         protected override void Update()
@@ -147,6 +153,8 @@ namespace osu.Game.Database
 
         private void flushContexts()
         {
+            Logger.Log(@"Flushing realm contexts...", LoggingTarget.Database);
+
             var previousContext = context;
             context = null;
 
@@ -155,6 +163,8 @@ namespace osu.Game.Database
                 Thread.Sleep(50);
 
             previousContext?.Dispose();
+
+            Logger.Log(@"Realm contexts flushed.", LoggingTarget.Database);
         }
 
         protected override void Dispose(bool isDisposing)
