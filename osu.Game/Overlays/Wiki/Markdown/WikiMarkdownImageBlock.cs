@@ -63,11 +63,28 @@ namespace osu.Game.Overlays.Wiki.Markdown
                     RelativeSizeAxes = Axes.X;
                 }
 
-                protected override Sprite CreateSpriteImage() => base.CreateSpriteImage().With(s =>
+                protected override Sprite CreateSpriteImage() => new ImageSprite();
+
+                private class ImageSprite : Sprite
                 {
-                    s.Anchor = Anchor.TopCentre;
-                    s.Origin = Anchor.TopCentre;
-                });
+                    public ImageSprite()
+                    {
+                        Anchor = Anchor.TopCentre;
+                        Origin = Anchor.TopCentre;
+                    }
+
+                    protected override void Update()
+                    {
+                        base.Update();
+
+                        if (Width > Parent.DrawWidth)
+                        {
+                            float ratio = Height / Width;
+                            Width = Parent.DrawWidth;
+                            Height = ratio * Width;
+                        }
+                    }
+                }
             }
         }
     }
