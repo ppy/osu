@@ -74,6 +74,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 applyRandomisation(rateOfChangeMultiplier, previous, current);
 
+                // Move hit objects back into the playfield if they are outside of it,
+                // which would sometimes happen during big jumps otherwise.
+                current.PositionRandomised = clampToPlayfield(current.PositionRandomised, (float)hitObject.Radius);
+
                 hitObject.Position = current.PositionRandomised;
 
                 // update end position as it may have changed as a result of the position update.
@@ -142,14 +146,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             current.AngleRad = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
 
-            var position = previous.EndPositionRandomised + posRelativeToPrev;
-
-            // Move hit objects back into the playfield if they are outside of it,
-            // which would sometimes happen during big jumps otherwise.
-            position.X = MathHelper.Clamp(position.X, 0, OsuPlayfield.BASE_SIZE.X);
-            position.Y = MathHelper.Clamp(position.Y, 0, OsuPlayfield.BASE_SIZE.Y);
-
-            current.PositionRandomised = position;
+            current.PositionRandomised = previous.EndPositionRandomised + posRelativeToPrev;
         }
 
         /// <summary>
@@ -185,14 +182,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             for (int i = 0; i < hitObjects.Count; i++)
             {
+                var hitObject = hitObjects[i];
                 // The first object is shifted by a vector slightly smaller than shift
                 // The last object is shifted by a vector slightly larger than zero
-                Vector2 position = hitObjects[i].Position + shift * ((hitObjects.Count - i) / (float)(hitObjects.Count + 1));
+                Vector2 position = hitObject.Position + shift * ((hitObjects.Count - i) / (float)(hitObjects.Count + 1));
 
-                position.X = MathHelper.Clamp(position.X, 0, OsuPlayfield.BASE_SIZE.X);
-                position.Y = MathHelper.Clamp(position.Y, 0, OsuPlayfield.BASE_SIZE.Y);
-
-                hitObjects[i].Position = position;
+                hitObject.Position = clampToPlayfield(position, (float)hitObject.Radius);
             }
         }
 
@@ -217,6 +212,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             minMargin.Left = Math.Min(minMargin.Left, OsuPlayfield.BASE_SIZE.X - minMargin.Right);
             minMargin.Top = Math.Min(minMargin.Top, OsuPlayfield.BASE_SIZE.Y - minMargin.Bottom);
 
+            var radius = (float)slider.Radius;
+
+            minMargin.Left += radius;
+            minMargin.Right += radius;
+            minMargin.Top += radius;
+            minMargin.Bottom += radius;
+
             return minMargin;
         }
 
@@ -234,6 +236,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 osuHitObject.Position += shift;
             }
+        }
+
+        private Vector2 clampToPlayfield(Vector2 position, float radius)
+        {
+            position.X = MathHelper.Clamp(position.X, radius, OsuPlayfield.BASE_SIZE.X - radius);
+            position.Y = MathHelper.Clamp(position.Y, radius, OsuPlayfield.BASE_SIZE.Y - radius);
+
+            return position;
         }
 
         private class RandomObjectInfo
