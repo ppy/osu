@@ -43,6 +43,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private PlayerGrid grid;
         private MultiSpectatorLeaderboard leaderboard;
         private PlayerArea currentAudioSource;
+        private bool canStartMasterClock;
 
         /// <summary>
         /// Creates a new <see cref="MultiSpectatorScreen"/>.
@@ -108,17 +109,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
                 leaderboardContainer.Add(leaderboard);
             });
-
-            syncManager.ReadyToStart += onReadyToStart;
-            syncManager.MasterState.BindValueChanged(onMasterStateChanged, true);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            masterClockContainer.Stop();
             masterClockContainer.Reset();
+            masterClockContainer.Stop();
+
+            syncManager.ReadyToStart += onReadyToStart;
+            syncManager.MasterState.BindValueChanged(onMasterStateChanged, true);
         }
 
         protected override void Update()
@@ -151,6 +152,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             masterClockContainer.Seek(startTime);
             masterClockContainer.Start();
+
+            // Although the clock has been started, this flag is set to allow for later synchronisation state changes to also be able to start it.
+            canStartMasterClock = true;
         }
 
         private void onMasterStateChanged(ValueChangedEvent<MasterClockState> state)
@@ -158,7 +162,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             switch (state.NewValue)
             {
                 case MasterClockState.Synchronised:
-                    masterClockContainer.Start();
+                    if (canStartMasterClock)
+                        masterClockContainer.Start();
+
                     break;
 
                 case MasterClockState.TooFarAhead:
