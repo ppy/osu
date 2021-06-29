@@ -59,6 +59,8 @@ namespace osu.Game.Screens.Play.HUD
             set => counterContainer.Alpha = value ? 1 : 0;
         }
 
+        public bool UsesFixedAnchor { get; set; }
+
         public LegacyComboCounter()
         {
             AutoSizeAxes = Axes.Both;

@@ -39,9 +39,9 @@ namespace osu.Game.Overlays
         protected OverlayStreamItem(T value)
             : base(value)
         {
-            Height = 60;
-            Width = 100;
-            Padding = new MarginPadding(5);
+            Height = 50;
+            Width = 90;
+            Margin = new MarginPadding(5);
         }
 
         [BackgroundDependencyLoader]

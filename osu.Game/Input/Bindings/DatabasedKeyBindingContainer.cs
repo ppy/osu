@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
+using osu.Game.Database;
 using osu.Game.Rulesets;
-using System.Linq;
+using Realms;
 
 namespace osu.Game.Input.Bindings
 {
@@ -21,7 +23,11 @@ namespace osu.Game.Input.Bindings
 
         private readonly int? variant;
 
-        private KeyBindingStore store;
+        private IDisposable realmSubscription;
+        private IQueryable<RealmKeyBinding> realmKeyBindings;
+
+        [Resolved]
+        private RealmContextFactory realmFactory { get; set; }
 
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => ruleset.CreateInstance().GetDefaultKeyBindings(variant ?? 0);
 
@@ -42,24 +48,34 @@ namespace osu.Game.Input.Bindings
                 throw new InvalidOperationException($"{nameof(variant)} can not be null when a non-null {nameof(ruleset)} is provided.");
         }
 
-        [BackgroundDependencyLoader]
-        private void load(KeyBindingStore keyBindings)
-        {
-            store = keyBindings;
-        }
-
         protected override void LoadComplete()
         {
+            if (ruleset == null || ruleset.ID.HasValue)
+            {
+                var rulesetId = ruleset?.ID;
+
+                realmKeyBindings = realmFactory.Context.All<RealmKeyBinding>()
+                                               .Where(b => b.RulesetID == rulesetId && b.Variant == variant);
+
+                realmSubscription = realmKeyBindings
+                    .SubscribeForNotifications((sender, changes, error) =>
+                    {
+                        // first subscription ignored as we are handling this in LoadComplete.
+                        if (changes == null)
+                            return;
+
+                        ReloadMappings();
+                    });
+            }
+
             base.LoadComplete();
-            store.KeyBindingChanged += ReloadMappings;
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            if (store != null)
-                store.KeyBindingChanged -= ReloadMappings;
+            realmSubscription?.Dispose();
         }
 
         protected override void ReloadMappings()
@@ -67,17 +83,17 @@ namespace osu.Game.Input.Bindings
             var defaults = DefaultKeyBindings.ToList();
 
             if (ruleset != null && !ruleset.ID.HasValue)
-                // if the provided ruleset is not stored to the database, we have no way to retrieve custom bindings.
-                // fallback to defaults instead.
+                // some tests instantiate a ruleset which is not present in the database.
+                // in these cases we still want key bindings to work, but matching to database instances would result in none being present,
+                // so let's populate the defaults directly.
                 KeyBindings = defaults;
             else
             {
-                KeyBindings = store.Query(ruleset?.ID, variant)
-                                   .OrderBy(b => defaults.FindIndex(d => (int)d.Action == b.IntAction))
-                                   // this ordering is important to ensure that we read entries from the database in the order
-                                   // enforced by DefaultKeyBindings. allow for song select to handle actions that may otherwise
-                                   // have been eaten by the music controller due to query order.
-                                   .ToList();
+                KeyBindings = realmKeyBindings.Detach()
+                                              // this ordering is important to ensure that we read entries from the database in the order
+                                              // enforced by DefaultKeyBindings. allow for song select to handle actions that may otherwise
+                                              // have been eaten by the music controller due to query order.
+                                              .OrderBy(b => defaults.FindIndex(d => (int)d.Action == b.ActionInt)).ToList();
             }
         }
     }

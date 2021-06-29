@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
     /// A <see cref="Mod"/> which applies visibility adjustments to <see cref="DrawableHitObject"/>s
     /// with an optional increased visibility adjustment depending on the user's "increase first object visibility" setting.
     /// </summary>
-    public abstract class ModWithVisibilityAdjustment : Mod, IReadFromConfig, IApplicableToBeatmap, IApplicableToDrawableHitObjects
+    public abstract class ModWithVisibilityAdjustment : Mod, IReadFromConfig, IApplicableToBeatmap, IApplicableToDrawableHitObject
     {
         /// <summary>
         /// The first adjustable object.
@@ -73,19 +73,16 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        public virtual void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        public virtual void ApplyToDrawableHitObject(DrawableHitObject dho)
         {
-            foreach (var dho in drawables)
+            dho.ApplyCustomUpdateState += (o, state) =>
             {
-                dho.ApplyCustomUpdateState += (o, state) =>
-                {
-                    // Increased visibility is applied to the entire first object, including all of its nested hitobjects.
-                    if (IncreaseFirstObjectVisibility.Value && isObjectEqualToOrNestedIn(o.HitObject, FirstObject))
-                        ApplyIncreasedVisibilityState(o, state);
-                    else
-                        ApplyNormalVisibilityState(o, state);
-                };
-            }
+                // Increased visibility is applied to the entire first object, including all of its nested hitobjects.
+                if (IncreaseFirstObjectVisibility.Value && isObjectEqualToOrNestedIn(o.HitObject, FirstObject))
+                    ApplyIncreasedVisibilityState(o, state);
+                else
+                    ApplyNormalVisibilityState(o, state);
+            };
         }
 
         /// <summary>

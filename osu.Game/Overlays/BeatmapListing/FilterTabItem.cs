@@ -7,6 +7,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -66,7 +67,7 @@ namespace osu.Game.Overlays.BeatmapListing
         /// <summary>
         /// Returns the label text to be used for the supplied <paramref name="value"/>.
         /// </summary>
-        protected virtual string LabelFor(T value) => (value as Enum)?.GetDescription() ?? value.ToString();
+        protected virtual LocalisableString LabelFor(T value) => (value as Enum)?.GetLocalisableDescription() ?? value.ToString();
 
         private void updateState()
         {
