@@ -102,6 +102,11 @@ namespace osu.Game.Screens.Play
         /// <returns>Whether gameplay should be immediately exited as a result. Returning false allows the gameplay session to continue. Defaults to true.</returns>
         protected virtual bool HandleTokenRetrievalFailure(Exception exception) => true;
 
+        public override bool OnExiting(IScreen next)
+        {
+            return base.OnExiting(next);
+        }
+
         protected override async Task PrepareScoreForResultsAsync(Score score)
         {
             await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
