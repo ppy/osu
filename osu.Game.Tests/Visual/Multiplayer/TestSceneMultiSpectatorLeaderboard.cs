@@ -62,10 +62,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 // For player 2, send frames in sets of 10.
                 for (int i = 0; i < 100; i++)
                 {
-                    SpectatorClient.SendFrames(PLAYER_1_ID, i, 1);
+                    SpectatorClient.SendFrames(PLAYER_1_ID, 1);
 
                     if (i % 10 == 0)
-                        SpectatorClient.SendFrames(PLAYER_2_ID, i, 10);
+                        SpectatorClient.SendFrames(PLAYER_2_ID, 10);
                 }
             });
 

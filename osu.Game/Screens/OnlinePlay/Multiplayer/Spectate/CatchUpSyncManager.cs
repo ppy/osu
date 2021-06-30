@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 
@@ -28,15 +31,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public const double MAXIMUM_START_DELAY = 15000;
 
+        public event Action ReadyToStart;
+
         /// <summary>
         /// The master clock which is used to control the timing of all player clocks clocks.
         /// </summary>
         public IAdjustableClock MasterClock { get; }
 
+        public IBindable<MasterClockState> MasterState => masterState;
+
         /// <summary>
         /// The player clocks.
         /// </summary>
         private readonly List<ISpectatorPlayerClock> playerClocks = new List<ISpectatorPlayerClock>();
+
+        private readonly Bindable<MasterClockState> masterState = new Bindable<MasterClockState>();
 
         private bool hasStarted;
         private double? firstStartAttemptTime;
@@ -46,7 +55,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             MasterClock = master;
         }
 
-        public void AddPlayerClock(ISpectatorPlayerClock clock) => playerClocks.Add(clock);
+        public void AddPlayerClock(ISpectatorPlayerClock clock)
+        {
+            Debug.Assert(!playerClocks.Contains(clock));
+            playerClocks.Add(clock);
+        }
 
         public void RemovePlayerClock(ISpectatorPlayerClock clock) => playerClocks.Remove(clock);
 
@@ -62,8 +75,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 return;
             }
 
-            updateCatchup();
-            updateMasterClock();
+            updatePlayerCatchup();
+            updateMasterState();
         }
 
         /// <summary>
@@ -81,14 +94,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             int readyCount = playerClocks.Count(s => !s.WaitingOnFrames.Value);
 
             if (readyCount == playerClocks.Count)
-                return hasStarted = true;
+                return performStart();
 
             if (readyCount > 0)
             {
                 firstStartAttemptTime ??= Time.Current;
 
                 if (Time.Current - firstStartAttemptTime > MAXIMUM_START_DELAY)
-                    return hasStarted = true;
+                    return performStart();
+            }
+
+            bool performStart()
+            {
+                ReadyToStart?.Invoke();
+                return hasStarted = true;
             }
 
             return false;
@@ -97,7 +116,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// Updates the catchup states of all player clocks clocks.
         /// </summary>
-        private void updateCatchup()
+        private void updatePlayerCatchup()
         {
             for (int i = 0; i < playerClocks.Count; i++)
             {
@@ -135,19 +154,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         /// <summary>
-        /// Updates the master clock's running state.
+        /// Updates the state of the master clock.
         /// </summary>
-        private void updateMasterClock()
+        private void updateMasterState()
         {
             bool anyInSync = playerClocks.Any(s => !s.IsCatchingUp);
-
-            if (MasterClock.IsRunning != anyInSync)
-            {
-                if (anyInSync)
-                    MasterClock.Start();
-                else
-                    MasterClock.Stop();
-            }
+            masterState.Value = anyInSync ? MasterClockState.Synchronised : MasterClockState.TooFarAhead;
         }
     }
 }

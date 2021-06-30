@@ -39,8 +39,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private OsuGameBase game { get; set; }
 
-        private int nextFrame;
-
         private BeatmapSetInfo importedBeatmap;
 
         private int importedBeatmapId;
@@ -48,8 +46,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         public override void SetUpSteps()
         {
             base.SetUpSteps();
-
-            AddStep("reset sent frames", () => nextFrame = 0);
 
             AddStep("import beatmap", () =>
             {
@@ -103,7 +99,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             waitForPlayer();
             checkPaused(true);
 
-            sendFrames(1000); // send enough frames to ensure play won't be paused
+            // send enough frames to ensure play won't be paused
+            sendFrames(100);
 
             checkPaused(false);
         }
@@ -112,12 +109,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestSpectatingDuringGameplay()
         {
             start();
+            sendFrames(300);
 
             loadSpectatingScreen();
             waitForPlayer();
 
-            AddStep("advance frame count", () => nextFrame = 300);
-            sendFrames();
+            sendFrames(300);
 
             AddUntilStep("playing from correct point in time", () => player.ChildrenOfType<DrawableRuleset>().First().FrameStableClock.CurrentTime > 30000);
         }
@@ -218,11 +215,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void sendFrames(int count = 10)
         {
-            AddStep("send frames", () =>
-            {
-                testSpectatorClient.SendFrames(streamingUser.Id, nextFrame, count);
-                nextFrame += count;
-            });
+            AddStep("send frames", () => testSpectatorClient.SendFrames(streamingUser.Id, count));
         }
 
         private void loadSpectatingScreen()
