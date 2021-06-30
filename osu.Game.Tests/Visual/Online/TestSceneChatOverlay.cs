@@ -82,7 +82,8 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     switch (req)
                     {
-                        case JoinChannelRequest _:
+                        case JoinChannelRequest joinChannel:
+                            joinChannel.TriggerSuccess();
                             return true;
                     }
 
