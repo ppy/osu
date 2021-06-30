@@ -17,6 +17,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -46,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(IMutateApproachCircles) };
 
-        [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(SeedSettingsControl))]
+        [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(SettingsNumberBox))]
         public Bindable<int?> Seed { get; } = new Bindable<int?>
         {
             Default = null,
