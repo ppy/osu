@@ -21,8 +21,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Circles spin in. No approach circles.";
         public override double ScoreMultiplier => 1;
 
-        // todo: this mod should be able to be compatible with hidden with a bit of further implementation.
-        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(IHidesApproachCircles) };
+        // todo: this mod needs to be incompatible with "hidden" due to forcing the circle to remain opaque,
+        // further implementation will be required for supporting that.
+        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModObjectScaleTween), typeof(OsuModHidden) };
 
         private const int rotate_offset = 360;
         private const float rotate_starting_width = 2;
@@ -49,10 +50,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                         circle.RotateTo(rotate_offset).Then().RotateTo(0, h.TimePreempt, Easing.InOutSine);
                         circle.ScaleTo(new Vector2(rotate_starting_width, 0)).Then().ScaleTo(1, h.TimePreempt, Easing.InOutSine);
-
-                        // bypass fade in.
-                        if (state == ArmedState.Idle)
-                            circle.FadeIn();
                     }
 
                     break;
