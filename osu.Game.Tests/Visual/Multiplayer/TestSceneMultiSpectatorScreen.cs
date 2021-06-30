@@ -168,7 +168,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // Send initial frames for both players. A few more for player 1.
             sendFrames(PLAYER_1_ID, 1000);
-            sendFrames(PLAYER_2_ID, 10);
+            sendFrames(PLAYER_2_ID, 30);
             checkPausedInstant(PLAYER_1_ID, false);
             checkPausedInstant(PLAYER_2_ID, false);
 
