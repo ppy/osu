@@ -258,8 +258,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectatorScreen.AllPlayersLoaded));
         }
 
-        private void start(int userId, int? beatmapId = null) => start(new[] { userId }, beatmapId);
-
         private void start(int[] userIds, int? beatmapId = null)
         {
             AddStep("start play", () =>
@@ -270,15 +268,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     SpectatorClient.StartPlay(id, beatmapId ?? importedBeatmapId);
                     playingUserIds.Add(id);
                 }
-            });
-        }
-
-        private void finish(int userId)
-        {
-            AddStep("end play", () =>
-            {
-                SpectatorClient.EndPlay(userId);
-                playingUserIds.Remove(userId);
             });
         }
 
