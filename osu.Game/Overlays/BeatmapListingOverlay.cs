@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Localisation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -15,7 +16,9 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Resources.Localisation.Web;
@@ -33,6 +36,7 @@ namespace osu.Game.Overlays
         private Container panelTarget;
         private FillFlowContainer<BeatmapPanel> foundContent;
         private NotFoundDrawable notFoundContent;
+        private SupporterRequiredDrawable supporterRequiredContent;
         private BeatmapListingFilterControl filterControl;
 
         public BeatmapListingOverlay()
@@ -76,6 +80,7 @@ namespace osu.Game.Overlays
                                 {
                                     foundContent = new FillFlowContainer<BeatmapPanel>(),
                                     notFoundContent = new NotFoundDrawable(),
+                                    supporterRequiredContent = new SupporterRequiredDrawable(),
                                 }
                             }
                         },
@@ -115,9 +120,16 @@ namespace osu.Game.Overlays
 
         private Task panelLoadDelegate;
 
-        private void onSearchFinished(List<BeatmapSetInfo> beatmaps)
+        private void onSearchFinished(BeatmapListingFilterControl.SearchResult searchResult)
         {
-            var newPanels = beatmaps.Select<BeatmapSetInfo, BeatmapPanel>(b => new GridBeatmapPanel(b)
+            if (searchResult.Type == BeatmapListingFilterControl.SearchResultType.SupporterOnlyFilters)
+            {
+                supporterRequiredContent.UpdateText(searchResult.SupporterOnlyFiltersUsed);
+                addContentToPlaceholder(supporterRequiredContent);
+                return;
+            }
+
+            var newPanels = searchResult.Results.Select<BeatmapSetInfo, BeatmapPanel>(b => new GridBeatmapPanel(b)
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
@@ -128,7 +140,7 @@ namespace osu.Game.Overlays
                 //No matches case
                 if (!newPanels.Any())
                 {
-                    LoadComponentAsync(notFoundContent, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+                    addContentToPlaceholder(notFoundContent);
                     return;
                 }
 
@@ -170,9 +182,9 @@ namespace osu.Game.Overlays
             {
                 var transform = lastContent.FadeOut(100, Easing.OutQuint);
 
-                if (lastContent == notFoundContent)
+                if (lastContent == notFoundContent || lastContent == supporterRequiredContent)
                 {
-                    // not found display may be used multiple times, so don't expire/dispose it.
+                    // the placeholders may be used multiple times, so don't expire/dispose them.
                     transform.Schedule(() => panelTarget.Remove(lastContent));
                 }
                 else
@@ -237,6 +249,67 @@ namespace osu.Game.Overlays
                         }
                     }
                 });
+            }
+        }
+
+        // TODO: localisation requires Text/LinkFlowContainer support for localising strings with links inside
+        // (https://github.com/ppy/osu-framework/issues/4530)
+        public class SupporterRequiredDrawable : CompositeDrawable
+        {
+            private LinkFlowContainer supporterRequiredText;
+
+            public SupporterRequiredDrawable()
+            {
+                RelativeSizeAxes = Axes.X;
+                Height = 225;
+                Alpha = 0;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                AddInternal(new FillFlowContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Direction = FillDirection.Horizontal,
+                    Children = new Drawable[]
+                    {
+                        new Sprite
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            FillMode = FillMode.Fit,
+                            Texture = textures.Get(@"Online/supporter-required"),
+                        },
+                        supporterRequiredText = new LinkFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            AutoSizeAxes = Axes.Both,
+                            Margin = new MarginPadding { Bottom = 10 },
+                        },
+                    }
+                });
+            }
+
+            public void UpdateText(List<LocalisableString> filters)
+            {
+                supporterRequiredText.Clear();
+
+                supporterRequiredText.AddText(
+                    BeatmapsStrings.ListingSearchSupporterFilterQuoteDefault(string.Join(" and ", filters), "").ToString(),
+                    t =>
+                    {
+                        t.Font = OsuFont.GetFont(size: 16);
+                        t.Colour = Colour4.White;
+                    }
+                );
+
+                supporterRequiredText.AddLink(BeatmapsStrings.ListingSearchSupporterFilterQuoteLinkText.ToString(), @"/store/products/supporter-tag");
             }
         }
 
