@@ -29,7 +29,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerMatchSongSelect : RoomTestScene
+    public class TestSceneMultiplayerMatchSongSelect : MultiplayerTestScene
     {
         private BeatmapManager manager;
         private RulesetStore rulesets;

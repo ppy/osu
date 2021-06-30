@@ -225,7 +225,7 @@ namespace osu.Game.Online.Chat
             switch (command)
             {
                 case "np":
-                    AddInternal(new NowPlayingCommand());
+                    AddInternal(new NowPlayingCommand(target));
                     break;
 
                 case "me":
@@ -235,7 +235,7 @@ namespace osu.Game.Online.Chat
                         break;
                     }
 
-                    PostMessage(content, true);
+                    PostMessage(content, true, target);
                     break;
 
                 case "join":
