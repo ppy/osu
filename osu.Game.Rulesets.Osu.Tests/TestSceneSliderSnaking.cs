@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap { HitObjects = createHitObjects() };
 
-        private List<HitObject> createHitObjects() => new List<HitObject>
+        private static List<HitObject> createHitObjects() => new List<HitObject>
         {
             new Slider
             {
