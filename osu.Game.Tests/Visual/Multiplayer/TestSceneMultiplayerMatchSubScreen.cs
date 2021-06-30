@@ -49,13 +49,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUp]
         public new void Setup() => Schedule(() =>
         {
-            Room.Name.Value = "Test Room";
+            SelectedRoom.Value = new Room { Name = { Value = "Test Room" } };
         });
 
         [SetUpSteps]
         public void SetupSteps()
         {
-            AddStep("load match", () => LoadScreen(screen = new MultiplayerMatchSubScreen(Room)));
+            AddStep("load match", () => LoadScreen(screen = new MultiplayerMatchSubScreen(SelectedRoom.Value)));
             AddUntilStep("wait for load", () => screen.IsCurrentScreen());
         }
 
@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("set playlist", () =>
             {
-                Room.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                     Ruleset = { Value = new OsuRuleset().RulesetInfo },
@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("set playlist", () =>
             {
-                Room.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                     Ruleset = { Value = new OsuRuleset().RulesetInfo },
@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("set playlist", () =>
             {
-                Room.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo },
                     Ruleset = { Value = new OsuRuleset().RulesetInfo },
