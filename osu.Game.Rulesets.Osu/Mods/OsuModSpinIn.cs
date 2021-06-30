@@ -50,6 +50,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                         circle.RotateTo(rotate_offset).Then().RotateTo(0, h.TimePreempt, Easing.InOutSine);
                         circle.ScaleTo(new Vector2(rotate_starting_width, 0)).Then().ScaleTo(1, h.TimePreempt, Easing.InOutSine);
+
+                        // bypass fade in.
+                        if (state == ArmedState.Idle)
+                            circle.FadeIn();
                     }
 
                     break;
