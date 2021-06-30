@@ -152,10 +152,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var prevPosition = slider.Position;
 
-            slider.Position = new Vector2(
-                Math.Clamp(slider.Position.X, minMargin.Left, OsuPlayfield.BASE_SIZE.X - minMargin.Right),
-                Math.Clamp(slider.Position.Y, minMargin.Top, OsuPlayfield.BASE_SIZE.Y - minMargin.Bottom)
-            );
+            var newX = minMargin.Left + minMargin.Right > OsuPlayfield.BASE_SIZE.X
+                ? currentObjectInfo.PositionOriginal.X
+                : Math.Clamp(slider.Position.X, minMargin.Left, OsuPlayfield.BASE_SIZE.X - minMargin.Right);
+
+            var newY = minMargin.Top + minMargin.Bottom > OsuPlayfield.BASE_SIZE.Y
+                ? currentObjectInfo.PositionOriginal.Y
+                : Math.Clamp(slider.Position.Y, minMargin.Top, OsuPlayfield.BASE_SIZE.Y - minMargin.Bottom);
+
+            slider.Position = new Vector2(newX, newY);
 
             currentObjectInfo.PositionRandomised = slider.Position;
             currentObjectInfo.EndPositionRandomised = slider.EndPosition;
