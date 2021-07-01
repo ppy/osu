@@ -223,7 +223,20 @@ namespace osu.Game
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
-            Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
+
+            var preferredRuleset = RulesetStore.GetRuleset(configRuleset.Value);
+
+            try
+            {
+                Ruleset.Value = preferredRuleset ?? RulesetStore.AvailableRulesets.First();
+            }
+            catch (Exception e)
+            {
+                // on startup, a ruleset may be selected which has compatibility issues.
+                Logger.Error(e, $@"Failed to switch to preferred ruleset {preferredRuleset}.");
+                Ruleset.Value = RulesetStore.AvailableRulesets.First();
+            }
+
             Ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ID ?? 0;
 
             // bind config int to database SkinInfo
