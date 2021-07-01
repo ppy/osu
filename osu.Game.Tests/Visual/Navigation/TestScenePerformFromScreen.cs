@@ -11,6 +11,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
+using osu.Game.Tests.Beatmaps.IO;
 using osuTK.Input;
 using static osu.Game.Tests.Visual.Navigation.TestSceneScreenNavigation;
 
@@ -57,8 +58,11 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestPerformAtSongSelectFromPlayerLoader()
         {
+            AddStep("import beatmap", () => ImportBeatmapTest.LoadQuickOszIntoOsu(Game).Wait());
             PushAndConfirm(() => new TestPlaySongSelect());
-            PushAndConfirm(() => new PlayerLoader(() => new SoloPlayer()));
+
+            AddStep("Press enter", () => InputManager.Key(Key.Enter));
+            AddUntilStep("Wait for new screen", () => Game.ScreenStack.CurrentScreen is PlayerLoader);
 
             AddStep("try to perform", () => Game.PerformFromScreen(_ => actionPerformed = true, new[] { typeof(TestPlaySongSelect) }));
             AddUntilStep("returned to song select", () => Game.ScreenStack.CurrentScreen is TestPlaySongSelect);
@@ -68,8 +72,11 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestPerformAtMenuFromPlayerLoader()
         {
+            AddStep("import beatmap", () => ImportBeatmapTest.LoadQuickOszIntoOsu(Game).Wait());
             PushAndConfirm(() => new TestPlaySongSelect());
-            PushAndConfirm(() => new PlayerLoader(() => new SoloPlayer()));
+
+            AddStep("Press enter", () => InputManager.Key(Key.Enter));
+            AddUntilStep("Wait for new screen", () => Game.ScreenStack.CurrentScreen is PlayerLoader);
 
             AddStep("try to perform", () => Game.PerformFromScreen(_ => actionPerformed = true));
             AddUntilStep("returned to song select", () => Game.ScreenStack.CurrentScreen is MainMenu);
