@@ -202,8 +202,16 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             foreach (var pos in pathPositions)
             {
+                // Reduce Width and Height accordingly after increasing X and Y
+                // to keep the right and bottom edge of the rectangle in place
+                var right = box.Right;
                 box.X = Math.Max(box.X, -pos.X);
+                box.Width = right - box.X;
+
+                var bottom = box.Bottom;
                 box.Y = Math.Max(box.Y, -pos.Y);
+                box.Height = bottom - box.Y;
+
                 box.Width = Math.Min(box.Width, OsuPlayfield.BASE_SIZE.X - pos.X - box.X);
                 box.Height = Math.Min(box.Height, OsuPlayfield.BASE_SIZE.Y - pos.Y - box.Y);
             }
