@@ -40,7 +40,8 @@ namespace osu.Game.Tests.Visual
         public new HealthProcessor HealthProcessor => base.HealthProcessor;
 
         public bool TokenCreationRequested { get; private set; }
-        public bool SubmissionRequested { get; private set; }
+
+        public Score SubmittedScore { get; private set; }
 
         public new bool PauseCooldownActive => base.PauseCooldownActive;
 
@@ -66,7 +67,7 @@ namespace osu.Game.Tests.Visual
 
         protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token)
         {
-            SubmissionRequested = true;
+            SubmittedScore = score;
             return base.CreateSubmissionRequest(score, token);
         }
 

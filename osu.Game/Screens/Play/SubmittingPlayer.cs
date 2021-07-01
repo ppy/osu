@@ -113,9 +113,11 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(IScreen next)
         {
+            var exiting = base.OnExiting(next);
+
             submitScore(Score);
 
-            return base.OnExiting(next);
+            return exiting;
         }
 
         /// <summary>

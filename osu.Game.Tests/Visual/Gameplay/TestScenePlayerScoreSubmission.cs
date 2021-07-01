@@ -23,9 +23,14 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override bool HasCustomSteps => true;
 
+        private bool allowFail;
+
         protected override TestPlayer CreatePlayer(Ruleset ruleset)
         {
-            SelectedMods.Value = new[] { ruleset.GetAllMods().OfType<ModNoFail>().First() };
+            SelectedMods.Value = !allowFail
+                ? new[] { ruleset.GetAllMods().OfType<ModNoFail>().First() }
+                : Array.Empty<Mod>();
+
             return new TestPlayer(false);
         }
 
@@ -34,7 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             prepareTokenResponse(false);
 
-            CreateTest(() => { });
+            CreateTest(() => allowFail = false);
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
 
@@ -43,7 +48,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
 
-            AddAssert("ensure no submission", () => !Player.SubmissionRequested);
+            AddAssert("ensure no submission", () => Player.SubmittedScore == null);
         }
 
         [Test]
@@ -51,7 +56,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             prepareTokenResponse(true);
 
-            CreateTest(() => { });
+            CreateTest(() => allowFail = false);
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
 
@@ -59,8 +64,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("seek to completion", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
-
-            AddAssert("ensure submission", () => Player.SubmissionRequested);
+            AddAssert("ensure passing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == true);
         }
 
         [Test]
@@ -68,12 +72,26 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             prepareTokenResponse(false);
 
-            CreateTest(() => { });
+            CreateTest(() => allowFail = false);
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            AddStep("exit", () => Player.Exit());
+            AddAssert("ensure no submission", () => Player.SubmittedScore == null);
+        }
+
+        [Test]
+        public void TestSubmissionOnFail()
+        {
+            prepareTokenResponse(true);
+
+            CreateTest(() => allowFail = true);
+
+            AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+            AddUntilStep("wait for fail", () => Player.HasFailed);
             AddStep("exit", () => Player.Exit());
 
-            AddAssert("ensure no submission", () => !Player.SubmissionRequested);
+            AddAssert("ensure failing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == false);
         }
 
         [Test]
@@ -81,11 +99,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             prepareTokenResponse(true);
 
-            CreateTest(() => { });
+            CreateTest(() => allowFail = false);
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
             AddStep("exit", () => Player.Exit());
-            AddUntilStep("wait for submission", () => Player.SubmissionRequested);
+            AddAssert("ensure failing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == false);
         }
 
         private void prepareTokenResponse(bool validToken)
