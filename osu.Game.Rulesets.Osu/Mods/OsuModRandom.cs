@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -148,19 +148,14 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <returns>The <see cref="Vector2"/> that this slider has been shifted by.</returns>
         private Vector2 moveSliderIntoPlayfield(Slider slider, RandomObjectInfo currentObjectInfo)
         {
-            var minMargin = getMinSliderMargin(slider);
+            var minMargin = getSliderBoundingBox(slider);
 
             var prevPosition = slider.Position;
 
-            var newX = minMargin.Left + minMargin.Right > OsuPlayfield.BASE_SIZE.X
-                ? currentObjectInfo.PositionOriginal.X
-                : Math.Clamp(slider.Position.X, minMargin.Left, OsuPlayfield.BASE_SIZE.X - minMargin.Right);
-
-            var newY = minMargin.Top + minMargin.Bottom > OsuPlayfield.BASE_SIZE.Y
-                ? currentObjectInfo.PositionOriginal.Y
-                : Math.Clamp(slider.Position.Y, minMargin.Top, OsuPlayfield.BASE_SIZE.Y - minMargin.Bottom);
-
-            slider.Position = new Vector2(newX, newY);
+            slider.Position = new Vector2(
+                Math.Clamp(slider.Position.X, minMargin.Left, minMargin.Right),
+                Math.Clamp(slider.Position.Y, minMargin.Top, minMargin.Bottom)
+            );
 
             currentObjectInfo.PositionRandomised = slider.Position;
             currentObjectInfo.EndPositionRandomised = slider.EndPosition;
@@ -190,34 +185,44 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
 
         /// <summary>
-        /// Calculates the min. distances from the <see cref="Slider"/>'s position to the playfield border for the slider to be fully inside of the playfield.
+        /// Calculates the bounding box of a <see cref="Slider"/>'s position for the slider to be fully inside of the playfield.
         /// </summary>
-        private MarginPadding getMinSliderMargin(Slider slider)
+        private RectangleF getSliderBoundingBox(Slider slider)
         {
             var pathPositions = new List<Vector2>();
             slider.Path.GetPathToProgress(pathPositions, 0, 1);
 
-            var minMargin = new MarginPadding();
+            var box = new RectangleF();
 
             foreach (var pos in pathPositions)
             {
-                minMargin.Left = Math.Max(minMargin.Left, -pos.X);
-                minMargin.Right = Math.Max(minMargin.Right, pos.X);
-                minMargin.Top = Math.Max(minMargin.Top, -pos.Y);
-                minMargin.Bottom = Math.Max(minMargin.Bottom, pos.Y);
+                box.X = Math.Max(box.X, -pos.X);
+                box.Y = Math.Max(box.Y, -pos.Y);
+                box.Width = Math.Min(box.Width, OsuPlayfield.BASE_SIZE.X - pos.X - box.X);
+                box.Height = Math.Min(box.Height, OsuPlayfield.BASE_SIZE.Y - pos.Y - box.Y);
             }
-
-            minMargin.Left = Math.Min(minMargin.Left, OsuPlayfield.BASE_SIZE.X - minMargin.Right);
-            minMargin.Top = Math.Min(minMargin.Top, OsuPlayfield.BASE_SIZE.Y - minMargin.Bottom);
 
             var radius = (float)slider.Radius;
 
-            minMargin.Left += radius;
-            minMargin.Right += radius;
-            minMargin.Top += radius;
-            minMargin.Bottom += radius;
+            box.X += radius;
+            box.Y += radius;
+            box.Width -= radius * 2;
+            box.Height -= radius * 2;
 
-            return minMargin;
+            // If the slider is larger than the playfield, force the slider to stay at its original position
+            if (box.Width < 0)
+            {
+                box.Width = 0;
+                box.X = slider.Position.X;
+            }
+
+            if (box.Height < 0)
+            {
+                box.Height = 0;
+                box.Y = slider.Position.Y;
+            }
+
+            return box;
         }
 
         /// <summary>
