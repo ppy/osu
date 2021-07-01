@@ -2,22 +2,26 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
+using Microsoft.Win32;
+using osu.Desktop.Security;
 using osu.Desktop.Overlays;
 using osu.Framework.Platform;
 using osu.Game;
-using osuTK.Input;
-using Microsoft.Win32;
 using osu.Desktop.Updater;
 using osu.Framework;
 using osu.Framework.Logging;
-using osu.Framework.Platform.Windows;
 using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Updater;
+using osu.Desktop.Windows;
+using osu.Framework.Threading;
+using osu.Game.IO;
 
 namespace osu.Desktop
 {
@@ -32,12 +36,16 @@ namespace osu.Desktop
             noVersionOverlay = args?.Any(a => a == "--no-version-overlay") ?? false;
         }
 
-        public override Storage GetStorageForStableInstall()
+        public override StableStorage GetStorageForStableInstall()
         {
             try
             {
                 if (Host is DesktopGameHost desktopHost)
-                    return new StableStorage(desktopHost);
+                {
+                    string stablePath = getStableInstallPath();
+                    if (!string.IsNullOrEmpty(stablePath))
+                        return new StableStorage(stablePath, desktopHost);
+                }
             }
             catch (Exception)
             {
@@ -45,6 +53,42 @@ namespace osu.Desktop
             }
 
             return null;
+        }
+
+        private string getStableInstallPath()
+        {
+            static bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs")) || File.Exists(Path.Combine(p, "osu!.cfg"));
+
+            string stableInstallPath;
+
+            if (OperatingSystem.IsWindows())
+            {
+                try
+                {
+                    stableInstallPath = getStableInstallPathFromRegistry();
+
+                    if (!string.IsNullOrEmpty(stableInstallPath) && checkExists(stableInstallPath))
+                        return stableInstallPath;
+                }
+                catch { }
+            }
+
+            stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
+            if (checkExists(stableInstallPath))
+                return stableInstallPath;
+
+            stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu");
+            if (checkExists(stableInstallPath))
+                return stableInstallPath;
+
+            return null;
+        }
+
+        [SupportedOSPlatform("windows")]
+        private string getStableInstallPathFromRegistry()
+        {
+            using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
+                return key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
         }
 
         protected override UpdateManager CreateUpdateManager()
@@ -67,6 +111,11 @@ namespace osu.Desktop
                 LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, Add);
 
             LoadComponentAsync(new DiscordRichPresence(), Add);
+
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+                LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
+
+            LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
         }
 
         protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)
@@ -90,65 +139,48 @@ namespace osu.Desktop
         {
             base.SetHost(host);
 
-            if (host.Window is DesktopGameWindow desktopWindow)
+            var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
+
+            var desktopWindow = (SDL2DesktopWindow)host.Window;
+
+            desktopWindow.CursorState |= CursorState.Hidden;
+            desktopWindow.SetIconFromStream(iconStream);
+            desktopWindow.Title = Name;
+            desktopWindow.DragDrop += f => fileDrop(new[] { f });
+        }
+
+        private readonly List<string> importableFiles = new List<string>();
+        private ScheduledDelegate importSchedule;
+
+        private void fileDrop(string[] filePaths)
+        {
+            lock (importableFiles)
             {
-                desktopWindow.CursorState |= CursorState.Hidden;
+                var firstExtension = Path.GetExtension(filePaths.First());
 
-                desktopWindow.SetIconFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
-                desktopWindow.Title = Name;
+                if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
 
-                desktopWindow.FileDrop += fileDrop;
+                importableFiles.AddRange(filePaths);
+
+                Logger.Log($"Adding {filePaths.Length} files for import");
+
+                // File drag drop operations can potentially trigger hundreds or thousands of these calls on some platforms.
+                // In order to avoid spawning multiple import tasks for a single drop operation, debounce a touch.
+                importSchedule?.Cancel();
+                importSchedule = Scheduler.AddDelayed(handlePendingImports, 100);
             }
         }
 
-        private void fileDrop(object sender, FileDropEventArgs e)
+        private void handlePendingImports()
         {
-            var filePaths = e.FileNames;
-
-            var firstExtension = Path.GetExtension(filePaths.First());
-
-            if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
-
-            Task.Factory.StartNew(() => Import(filePaths), TaskCreationOptions.LongRunning);
-        }
-
-        /// <summary>
-        /// A method of accessing an osu-stable install in a controlled fashion.
-        /// </summary>
-        private class StableStorage : WindowsStorage
-        {
-            protected override string LocateBasePath()
+            lock (importableFiles)
             {
-                static bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs"));
+                Logger.Log($"Handling batch import of {importableFiles.Count} files");
 
-                string stableInstallPath;
+                var paths = importableFiles.ToArray();
+                importableFiles.Clear();
 
-                try
-                {
-                    using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
-                        stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
-
-                    if (checkExists(stableInstallPath))
-                        return stableInstallPath;
-                }
-                catch
-                {
-                }
-
-                stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
-                if (checkExists(stableInstallPath))
-                    return stableInstallPath;
-
-                stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu");
-                if (checkExists(stableInstallPath))
-                    return stableInstallPath;
-
-                return null;
-            }
-
-            public StableStorage(DesktopGameHost host)
-                : base(string.Empty, host)
-            {
+                Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
             }
         }
     }

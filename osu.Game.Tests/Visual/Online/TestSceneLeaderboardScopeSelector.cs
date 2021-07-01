@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Overlays.BeatmapSet;
-using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Game.Screens.Select.Leaderboards;
@@ -16,11 +14,6 @@ namespace osu.Game.Tests.Visual.Online
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
-
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(LeaderboardScopeSelector),
-        };
 
         public TestSceneLeaderboardScopeSelector()
         {

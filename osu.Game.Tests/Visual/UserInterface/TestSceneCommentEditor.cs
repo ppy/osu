@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -15,14 +13,8 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneCommentEditor : ManualInputManagerTestScene
+    public class TestSceneCommentEditor : OsuManualInputManagerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(CommentEditor),
-            typeof(CancellableCommentEditor),
-        };
-
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
@@ -56,7 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
             AddStep("enter text", () => commentEditor.Current.Value = "text");
 
-            AddStep("press Enter", () => press(Key.Enter));
+            AddStep("press Enter", () => InputManager.Key(Key.Enter));
 
             AddAssert("text committed", () => commentEditor.CommittedText == "text");
             AddAssert("button is loading", () => commentEditor.IsLoading);
@@ -71,7 +63,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddStep("press Enter", () => press(Key.Enter));
+            AddStep("press Enter", () => InputManager.Key(Key.Enter));
 
             AddAssert("no text committed", () => commentEditor.CommittedText == null);
             AddAssert("button is not loading", () => !commentEditor.IsLoading);
@@ -107,12 +99,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddAssert("cancel action fired", () => cancellableCommentEditor.Cancelled);
-        }
-
-        private void press(Key key)
-        {
-            InputManager.PressKey(key);
-            InputManager.ReleaseKey(key);
         }
 
         private class TestCommentEditor : CommentEditor

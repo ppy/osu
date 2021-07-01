@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mania.Configuration;
@@ -29,19 +30,25 @@ namespace osu.Game.Rulesets.Mania
                 new SettingsEnumDropdown<ManiaScrollingDirection>
                 {
                     LabelText = "Scrolling direction",
-                    Bindable = config.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection)
+                    Current = config.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection)
                 },
                 new SettingsSlider<double, TimeSlider>
                 {
                     LabelText = "Scroll speed",
-                    Bindable = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime)
+                    Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime),
+                    KeyboardStep = 5
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Timing-based note colouring",
+                    Current = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring),
+                }
             };
         }
 
         private class TimeSlider : OsuSliderBar<double>
         {
-            public override string TooltipText => Current.Value.ToString("N0") + "ms";
+            public override LocalisableString TooltipText => Current.Value.ToString(@"N0") + "ms";
         }
     }
 }

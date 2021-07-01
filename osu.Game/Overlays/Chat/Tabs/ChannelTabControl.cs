@@ -68,8 +68,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             if (!Items.Contains(channel))
                 AddItem(channel);
 
-            if (Current.Value == null)
-                Current.Value = channel;
+            Current.Value ??= channel;
         }
 
         /// <summary>
@@ -79,20 +78,13 @@ namespace osu.Game.Overlays.Chat.Tabs
         /// <param name="channel">The channel that is going to be removed.</param>
         public void RemoveChannel(Channel channel)
         {
-            if (Current.Value == channel)
-            {
-                var allChannels = TabContainer.AllTabItems.Select(tab => tab.Value).ToList();
-                var isNextTabSelector = allChannels[allChannels.IndexOf(channel) + 1] == selectorTab.Value;
-
-                // selectorTab is not switchable, so we have to explicitly select it if it's the only tab left
-                if (isNextTabSelector && allChannels.Count == 2)
-                    SelectTab(selectorTab);
-                else
-                    SwitchTab(isNextTabSelector ? -1 : 1);
-            }
-
             RemoveItem(channel);
+
+            if (SelectedTab == null)
+                SelectChannelSelectorTab();
         }
+
+        public void SelectChannelSelectorTab() => SelectTab(selectorTab);
 
         protected override void SelectTab(TabItem<Channel> tab)
         {

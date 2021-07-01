@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,18 +16,11 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneUserPanel : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(UserPanel),
-            typeof(UserListPanel),
-            typeof(UserGridPanel),
-        };
-
         private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
         private readonly Bindable<UserStatus> status = new Bindable<UserStatus>();
 
         private UserGridPanel peppy;
-        private UserListPanel evast;
+        private TestUserListPanel evast;
 
         [Resolved]
         private RulesetStore rulesetStore { get; set; }
@@ -37,6 +29,9 @@ namespace osu.Game.Tests.Visual.Online
         public void SetUp() => Schedule(() =>
         {
             UserGridPanel flyte;
+
+            activity.Value = null;
+            status.Value = null;
 
             Child = new FillFlowContainer
             {
@@ -47,6 +42,19 @@ namespace osu.Game.Tests.Visual.Online
                 Spacing = new Vector2(10f),
                 Children = new Drawable[]
                 {
+                    new UserBrickPanel(new User
+                    {
+                        Username = @"flyte",
+                        Id = 3103765,
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
+                    }),
+                    new UserBrickPanel(new User
+                    {
+                        Username = @"peppy",
+                        Id = 2,
+                        Colour = "99EB47",
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                    }),
                     flyte = new UserGridPanel(new User
                     {
                         Username = @"flyte",
@@ -63,7 +71,7 @@ namespace osu.Game.Tests.Visual.Online
                         IsSupporter = true,
                         SupportLevel = 3,
                     }) { Width = 300 },
-                    evast = new UserListPanel(new User
+                    evast = new TestUserListPanel(new User
                     {
                         Username = @"Evast",
                         Id = 8195163,
@@ -96,7 +104,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestUserActivity()
         {
-            AddStep("set online status", () => peppy.Status.Value = evast.Status.Value = new UserStatusOnline());
+            AddStep("set online status", () => status.Value = new UserStatusOnline());
 
             AddStep("idle", () => activity.Value = null);
             AddStep("spectating", () => activity.Value = new UserActivity.Spectating());
@@ -109,6 +117,29 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("modding", () => activity.Value = new UserActivity.Modding());
         }
 
+        [Test]
+        public void TestUserActivityChange()
+        {
+            AddAssert("visit message is visible", () => evast.LastVisitMessage.IsPresent);
+            AddStep("set online status", () => status.Value = new UserStatusOnline());
+            AddAssert("visit message is not visible", () => !evast.LastVisitMessage.IsPresent);
+            AddStep("set choosing activity", () => activity.Value = new UserActivity.ChoosingBeatmap());
+            AddStep("set offline status", () => status.Value = new UserStatusOffline());
+            AddAssert("visit message is visible", () => evast.LastVisitMessage.IsPresent);
+            AddStep("set online status", () => status.Value = new UserStatusOnline());
+            AddAssert("visit message is not visible", () => !evast.LastVisitMessage.IsPresent);
+        }
+
         private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.SoloGame(null, rulesetStore.GetRuleset(rulesetId));
+
+        private class TestUserListPanel : UserListPanel
+        {
+            public TestUserListPanel(User user)
+                : base(user)
+            {
+            }
+
+            public new TextFlowContainer LastVisitMessage => base.LastVisitMessage;
+        }
     }
 }

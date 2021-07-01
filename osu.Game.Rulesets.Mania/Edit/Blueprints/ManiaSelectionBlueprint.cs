@@ -3,76 +3,42 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Input.Events;
-using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class ManiaSelectionBlueprint : OverlaySelectionBlueprint
+    public abstract class ManiaSelectionBlueprint<T> : HitObjectSelectionBlueprint<T>
+        where T : ManiaHitObject
     {
-        public Vector2 ScreenSpaceDragPosition { get; private set; }
-        public Vector2 DragPosition { get; private set; }
-
-        public new DrawableManiaHitObject DrawableObject => (DrawableManiaHitObject)base.DrawableObject;
-
-        protected IClock EditorClock { get; private set; }
+        [Resolved]
+        private Playfield playfield { get; set; }
 
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
-        [Resolved]
-        private IManiaHitObjectComposer composer { get; set; }
+        protected ScrollingHitObjectContainer HitObjectContainer => ((ManiaPlayfield)playfield).GetColumn(HitObject.Column).HitObjectContainer;
 
-        public ManiaSelectionBlueprint(DrawableHitObject drawableObject)
-            : base(drawableObject)
+        protected ManiaSelectionBlueprint(T hitObject)
+            : base(hitObject)
         {
             RelativeSizeAxes = Axes.None;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(IAdjustableClock clock)
-        {
-            EditorClock = clock;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            Position = Parent.ToLocalSpace(DrawableObject.ToScreenSpace(Vector2.Zero));
-        }
+            var anchor = scrollingInfo.Direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+            Anchor = Origin = anchor;
+            foreach (var child in InternalChildren)
+                child.Anchor = child.Origin = anchor;
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            ScreenSpaceDragPosition = e.ScreenSpaceMousePosition;
-            DragPosition = DrawableObject.ToLocalSpace(e.ScreenSpaceMousePosition);
-
-            return base.OnMouseDown(e);
-        }
-
-        protected override void OnDrag(DragEvent e)
-        {
-            base.OnDrag(e);
-
-            ScreenSpaceDragPosition = e.ScreenSpaceMousePosition;
-            DragPosition = DrawableObject.ToLocalSpace(e.ScreenSpaceMousePosition);
-        }
-
-        public override void Show()
-        {
-            DrawableObject.AlwaysAlive = true;
-            base.Show();
-        }
-
-        public override void Hide()
-        {
-            DrawableObject.AlwaysAlive = false;
-            base.Hide();
+            Position = Parent.ToLocalSpace(HitObjectContainer.ScreenSpacePositionAtTime(HitObject.StartTime)) - AnchorPosition;
+            Width = HitObjectContainer.DrawWidth;
         }
     }
 }

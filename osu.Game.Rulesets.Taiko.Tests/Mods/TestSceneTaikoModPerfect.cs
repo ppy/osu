@@ -12,14 +12,16 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
 {
     public class TestSceneTaikoModPerfect : ModPerfectTestScene
     {
+        protected override Ruleset CreatePlayerRuleset() => new TestTaikoRuleset();
+
         public TestSceneTaikoModPerfect()
-            : base(new TestTaikoRuleset(), new TaikoModPerfect())
+            : base(new TaikoModPerfect())
         {
         }
 
         [TestCase(false)]
         [TestCase(true)]
-        public void TestHit(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new CentreHit { StartTime = 1000 }), shouldMiss);
+        public void TestHit(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new Hit { StartTime = 1000, Type = HitType.Centre }), shouldMiss);
 
         [TestCase(false)]
         [TestCase(true)]

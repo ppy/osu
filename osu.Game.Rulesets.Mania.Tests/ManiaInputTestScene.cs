@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             {
             }
 
-            protected override RulesetKeyBindingContainer CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
+            protected override KeyBindingContainer<ManiaAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 => new LocalKeyBindingContainer(ruleset, variant, unique);
 
             private class LocalKeyBindingContainer : RulesetKeyBindingContainer

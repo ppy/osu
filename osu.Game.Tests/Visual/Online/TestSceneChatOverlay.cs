@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -10,11 +9,14 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
 using osu.Game.Users;
@@ -22,19 +24,8 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneChatOverlay : ManualInputManagerTestScene
+    public class TestSceneChatOverlay : OsuManualInputManagerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ChatLine),
-            typeof(DrawableChannel),
-            typeof(ChannelSelectorTabItem),
-            typeof(ChannelTabControl),
-            typeof(ChannelTabItem),
-            typeof(PrivateChannelTabItem),
-            typeof(TabCloseButton)
-        };
-
         private TestChatOverlay chatOverlay;
         private ChannelManager channelManager;
 
@@ -47,6 +38,10 @@ namespace osu.Game.Tests.Visual.Online
         private Channel previousChannel => joinedChannels.ElementAt(joinedChannels.ToList().IndexOf(currentChannel) - 1);
         private Channel channel1 => channels[0];
         private Channel channel2 => channels[1];
+        private Channel channel3 => channels[2];
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         public TestSceneChatOverlay()
         {
@@ -55,7 +50,8 @@ namespace osu.Game.Tests.Visual.Online
                                  {
                                      Name = $"Channel no. {index}",
                                      Topic = index == 3 ? null : $"We talk about the number {index} here",
-                                     Type = index % 2 == 0 ? ChannelType.PM : ChannelType.Temporary
+                                     Type = index % 2 == 0 ? ChannelType.PM : ChannelType.Temporary,
+                                     Id = index
                                  })
                                  .ToList();
         }
@@ -74,6 +70,25 @@ namespace osu.Game.Tests.Visual.Online
 
                 chatOverlay = container.ChatOverlay;
                 channelManager = container.ChannelManager;
+            });
+        }
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("register request handling", () =>
+            {
+                ((DummyAPIAccess)API).HandleRequest = req =>
+                {
+                    switch (req)
+                    {
+                        case JoinChannelRequest joinChannel:
+                            joinChannel.TriggerSuccess();
+                            return true;
+                    }
+
+                    return false;
+                };
             });
         }
 
@@ -116,11 +131,7 @@ namespace osu.Game.Tests.Visual.Online
         public void TestChannelShortcutKeys()
         {
             AddStep("Join channels", () => channels.ForEach(channel => channelManager.JoinChannel(channel)));
-            AddStep("Close channel selector", () =>
-            {
-                InputManager.PressKey(Key.Escape);
-                InputManager.ReleaseKey(Key.Escape);
-            });
+            AddStep("Close channel selector", () => InputManager.Key(Key.Escape));
             AddUntilStep("Wait for close", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
 
             for (int zeroBasedIndex = 0; zeroBasedIndex < 10; ++zeroBasedIndex)
@@ -225,13 +236,115 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
         }
 
+        [Test]
+        public void TestCloseTabShortcut()
+        {
+            AddStep("Join 2 channels", () =>
+            {
+                channelManager.JoinChannel(channel1);
+                channelManager.JoinChannel(channel2);
+            });
+
+            // Want to close channel 2
+            AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
+            AddStep("Close tab via shortcut", pressCloseDocumentKeys);
+
+            // Channel 2 should be closed
+            AddAssert("Channel 1 open", () => channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("Channel 2 closed", () => !channelManager.JoinedChannels.Contains(channel2));
+
+            // Want to close channel 1
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+
+            AddStep("Close tab via shortcut", pressCloseDocumentKeys);
+            // Channel 1 and channel 2 should be closed
+            AddAssert("All channels closed", () => !channelManager.JoinedChannels.Any());
+        }
+
+        [Test]
+        public void TestNewTabShortcut()
+        {
+            AddStep("Join 2 channels", () =>
+            {
+                channelManager.JoinChannel(channel1);
+                channelManager.JoinChannel(channel2);
+            });
+
+            // Want to join another channel
+            AddStep("Press new tab shortcut", pressNewTabKeys);
+
+            // Selector should be visible
+            AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
+        }
+
+        [Test]
+        public void TestRestoreTabShortcut()
+        {
+            AddStep("Join 3 channels", () =>
+            {
+                channelManager.JoinChannel(channel1);
+                channelManager.JoinChannel(channel2);
+                channelManager.JoinChannel(channel3);
+            });
+
+            // Should do nothing
+            AddStep("Restore tab via shortcut", pressRestoreTabKeys);
+            AddAssert("All channels still open", () => channelManager.JoinedChannels.Count == 3);
+
+            // Close channel 1
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+            AddStep("Click normal close button", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
+            AddAssert("Channel 1 closed", () => !channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("Other channels still open", () => channelManager.JoinedChannels.Count == 2);
+
+            // Reopen channel 1
+            AddStep("Restore tab via shortcut", pressRestoreTabKeys);
+            AddAssert("All channels now open", () => channelManager.JoinedChannels.Count == 3);
+            AddAssert("Current channel is channel 1", () => currentChannel == channel1);
+
+            // Close two channels
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+            AddStep("Close channel 1", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
+            AddStep("Select channel 2", () => clickDrawable(chatOverlay.TabMap[channel2]));
+            AddStep("Close channel 2", () => clickDrawable(((TestPrivateChannelTabItem)chatOverlay.TabMap[channel2]).CloseButton.Child));
+            AddAssert("Only one channel open", () => channelManager.JoinedChannels.Count == 1);
+            AddAssert("Current channel is channel 3", () => currentChannel == channel3);
+
+            // Should first re-open channel 2
+            AddStep("Restore tab via shortcut", pressRestoreTabKeys);
+            AddAssert("Channel 1 still closed", () => !channelManager.JoinedChannels.Contains(channel1));
+            AddAssert("Channel 2 now open", () => channelManager.JoinedChannels.Contains(channel2));
+            AddAssert("Current channel is channel 2", () => currentChannel == channel2);
+
+            // Should then re-open channel 1
+            AddStep("Restore tab via shortcut", pressRestoreTabKeys);
+            AddAssert("All channels now open", () => channelManager.JoinedChannels.Count == 3);
+            AddAssert("Current channel is channel 1", () => currentChannel == channel1);
+        }
+
         private void pressChannelHotkey(int number)
         {
             var channelKey = Key.Number0 + number;
             InputManager.PressKey(Key.AltLeft);
-            InputManager.PressKey(channelKey);
+            InputManager.Key(channelKey);
             InputManager.ReleaseKey(Key.AltLeft);
-            InputManager.ReleaseKey(channelKey);
+        }
+
+        private void pressCloseDocumentKeys() => pressKeysFor(PlatformActionType.DocumentClose);
+
+        private void pressNewTabKeys() => pressKeysFor(PlatformActionType.TabNew);
+
+        private void pressRestoreTabKeys() => pressKeysFor(PlatformActionType.TabRestore);
+
+        private void pressKeysFor(PlatformActionType type)
+        {
+            var binding = host.PlatformKeyBindings.First(b => ((PlatformAction)b.Action).ActionType == type);
+
+            foreach (var k in binding.KeyCombination.Keys)
+                InputManager.PressKey((Key)k);
+
+            foreach (var k in binding.KeyCombination.Keys)
+                InputManager.ReleaseKey((Key)k);
         }
 
         private void clickDrawable(Drawable d)
@@ -259,7 +372,12 @@ namespace osu.Game.Tests.Visual.Online
             {
                 ((BindableList<Channel>)ChannelManager.AvailableChannels).AddRange(channels);
 
-                Child = ChatOverlay = new TestChatOverlay { RelativeSizeAxes = Axes.Both, };
+                InternalChildren = new Drawable[]
+                {
+                    ChannelManager,
+                    ChatOverlay = new TestChatOverlay { RelativeSizeAxes = Axes.Both, },
+                };
+
                 ChatOverlay.Show();
             }
         }

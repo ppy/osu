@@ -14,7 +14,6 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModHardRock : ModHardRock, IApplicableToHitObject
     {
         public override double ScoreMultiplier => 1.06;
-        public override bool Ranked => true;
 
         public void ApplyToHitObject(HitObject hitObject)
         {
@@ -26,10 +25,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
 
             slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
-            slider.NestedHitObjects.OfType<RepeatPoint>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
+            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
 
-            foreach (var point in slider.Path.ControlPoints)
+            var controlPoints = slider.Path.ControlPoints.Select(p => new PathControlPoint(p.Position.Value, p.Type.Value)).ToArray();
+            foreach (var point in controlPoints)
                 point.Position.Value = new Vector2(point.Position.Value.X, -point.Position.Value.Y);
+
+            slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
         }
     }
 }

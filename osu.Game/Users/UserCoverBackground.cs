@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -22,6 +23,16 @@ namespace osu.Game.Users
         }
 
         protected override Drawable CreateDrawable(User user) => new Cover(user);
+
+        protected override double LoadDelay => 300;
+
+        /// <summary>
+        /// Delay before the background is unloaded while off-screen.
+        /// </summary>
+        protected virtual double UnloadDelay => 5000;
+
+        protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
+            => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad, UnloadDelay);
 
         [LongRunningLoad]
         private class Cover : CompositeDrawable

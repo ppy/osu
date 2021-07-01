@@ -20,8 +20,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
     {
         private const int padding = 10;
 
-        protected override string Title => @"ladder";
-
         private SettingsDropdown<TournamentRound> roundDropdown;
         private PlayerCheckbox losersCheckbox;
         private DateTextBox dateTimeBox;
@@ -33,6 +31,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         [Resolved]
         private LadderInfo ladderInfo { get; set; }
+
+        public LadderEditorSettings()
+            : base("ladder")
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -48,15 +51,15 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             editorInfo.Selected.ValueChanged += selection =>
             {
-                roundDropdown.Bindable = selection.NewValue?.Round;
+                roundDropdown.Current = selection.NewValue?.Round;
                 losersCheckbox.Current = selection.NewValue?.Losers;
-                dateTimeBox.Bindable = selection.NewValue?.Date;
+                dateTimeBox.Current = selection.NewValue?.Date;
 
-                team1Dropdown.Bindable = selection.NewValue?.Team1;
-                team2Dropdown.Bindable = selection.NewValue?.Team2;
+                team1Dropdown.Current = selection.NewValue?.Team1;
+                team2Dropdown.Current = selection.NewValue?.Team2;
             };
 
-            roundDropdown.Bindable.ValueChanged += round =>
+            roundDropdown.Current.ValueChanged += round =>
             {
                 if (editorInfo.Selected.Value?.Date.Value < round.NewValue?.StartDate.Value)
                 {
@@ -81,11 +84,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
         }
 
-        private class SettingsRoundDropdown : LadderSettingsDropdown<TournamentRound>
+        private class SettingsRoundDropdown : SettingsDropdown<TournamentRound>
         {
             public SettingsRoundDropdown(BindableList<TournamentRound> rounds)
             {
-                Bindable = new Bindable<TournamentRound>();
+                Current = new Bindable<TournamentRound>();
 
                 foreach (var r in rounds.Prepend(new TournamentRound()))
                     add(r);

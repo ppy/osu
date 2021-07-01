@@ -63,7 +63,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             this.losers = losers;
             Size = new Vector2(150, 40);
 
-            Flag.Scale = new Vector2(0.9f);
+            Flag.Scale = new Vector2(0.54f);
             Flag.Anchor = Flag.Origin = Anchor.CentreLeft;
 
             AcronymText.Anchor = AcronymText.Origin = Anchor.CentreLeft;

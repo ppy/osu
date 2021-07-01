@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -94,9 +95,9 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             private readonly OsuSpriteText value;
 
-            public string TooltipText { get; }
+            public LocalisableString TooltipText { get; }
 
-            public string Value
+            public LocalisableString Value
             {
                 get => value.Text;
                 set => this.value.Text = value;

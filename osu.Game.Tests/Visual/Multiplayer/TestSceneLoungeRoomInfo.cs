@@ -2,27 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Multiplayer.RoomStatuses;
-using osu.Game.Screens.Multi.Lounge.Components;
+using osu.Game.Online.Rooms;
+using osu.Game.Online.Rooms.RoomStatuses;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
+using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneLoungeRoomInfo : MultiplayerTestScene
+    public class TestSceneLoungeRoomInfo : OnlinePlayTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(RoomInfo)
-        };
-
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
-            Room.CopyFrom(new Room());
+            SelectedRoom.Value = new Room();
 
             Child = new RoomInfo
             {
@@ -32,15 +27,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             };
         });
 
-        public override void SetUpSteps()
-        {
-            // Todo: Temp
-        }
-
         [Test]
         public void TestNonSelectedRoom()
         {
-            AddStep("set null room", () => Room.RoomID.Value = null);
+            AddStep("set null room", () => SelectedRoom.Value.RoomID.Value = null);
         }
 
         [Test]
@@ -48,11 +38,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("set open room", () =>
             {
-                Room.RoomID.Value = 0;
-                Room.Name.Value = "Room 0";
-                Room.Host.Value = new User { Username = "peppy", Id = 2 };
-                Room.EndDate.Value = DateTimeOffset.Now.AddMonths(1);
-                Room.Status.Value = new RoomStatusOpen();
+                SelectedRoom.Value.RoomID.Value = 0;
+                SelectedRoom.Value.Name.Value = "Room 0";
+                SelectedRoom.Value.Host.Value = new User { Username = "peppy", Id = 2 };
+                SelectedRoom.Value.EndDate.Value = DateTimeOffset.Now.AddMonths(1);
+                SelectedRoom.Value.Status.Value = new RoomStatusOpen();
             });
         }
     }

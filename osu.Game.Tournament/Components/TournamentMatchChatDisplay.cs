@@ -70,6 +70,17 @@ namespace osu.Game.Tournament.Components
 
         protected override ChatLine CreateMessage(Message message) => new MatchMessage(message);
 
+        protected override StandAloneDrawableChannel CreateDrawableChannel(Channel channel) => new MatchChannel(channel);
+
+        public class MatchChannel : StandAloneDrawableChannel
+        {
+            public MatchChannel(Channel channel)
+                : base(channel)
+            {
+                ScrollbarVisible = false;
+            }
+        }
+
         protected class MatchMessage : StandAloneMessage
         {
             public MatchMessage(Message message)

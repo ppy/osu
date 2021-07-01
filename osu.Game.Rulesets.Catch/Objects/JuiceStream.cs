@@ -1,19 +1,20 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public class JuiceStream : CatchHitObject, IHasCurve
+    public class JuiceStream : CatchHitObject, IHasPathWithRepeats
     {
         /// <summary>
         /// Positional distance that results in a duration of one second, before any speed adjustments.
@@ -45,20 +46,16 @@ namespace osu.Game.Rulesets.Catch.Objects
             TickDistance = scoringDistance / difficulty.SliderTickRate;
         }
 
-        protected override void CreateNestedHitObjects()
+        protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
-            base.CreateNestedHitObjects();
+            base.CreateNestedHitObjects(cancellationToken);
 
-            var dropletSamples = Samples.Select(s => new HitSampleInfo
-            {
-                Bank = s.Bank,
-                Name = @"slidertick",
-                Volume = s.Volume
-            }).ToList();
+            var dropletSamples = Samples.Select(s => s.With(@"slidertick")).ToList();
 
+            int nodeIndex = 0;
             SliderEventDescriptor? lastEvent = null;
 
-            foreach (var e in SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))
+            foreach (var e in SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken))
             {
                 // generate tiny droplets since the last point
                 if (lastEvent != null)
@@ -73,11 +70,13 @@ namespace osu.Game.Rulesets.Catch.Objects
 
                         for (double t = timeBetweenTiny; t < sinceLastTick; t += timeBetweenTiny)
                         {
+                            cancellationToken.ThrowIfCancellationRequested();
+
                             AddNested(new TinyDroplet
                             {
                                 StartTime = t + lastEvent.Value.Time,
-                                X = X + Path.PositionAt(
-                                    lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X / CatchPlayfield.BASE_WIDTH,
+                                X = OriginalX + Path.PositionAt(
+                                    lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X,
                             });
                         }
                     }
@@ -94,7 +93,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         {
                             Samples = dropletSamples,
                             StartTime = e.Time,
-                            X = X + Path.PositionAt(e.PathProgress).X / CatchPlayfield.BASE_WIDTH,
+                            X = OriginalX + Path.PositionAt(e.PathProgress).X,
                         });
                         break;
 
@@ -103,24 +102,24 @@ namespace osu.Game.Rulesets.Catch.Objects
                     case SliderEventType.Repeat:
                         AddNested(new Fruit
                         {
-                            Samples = Samples,
+                            Samples = this.GetNodeSamples(nodeIndex++),
                             StartTime = e.Time,
-                            X = X + Path.PositionAt(e.PathProgress).X / CatchPlayfield.BASE_WIDTH,
+                            X = OriginalX + Path.PositionAt(e.PathProgress).X,
                         });
                         break;
                 }
             }
         }
 
-        public double EndTime
+        public float EndX => OriginalX + this.CurvePositionAt(1).X;
+
+        public double Duration
         {
-            get => StartTime + this.SpanCount() * Path.Distance / Velocity;
-            set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
+            get => this.SpanCount() * Path.Distance / Velocity;
+            set => throw new NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
         }
 
-        public float EndX => X + this.CurvePositionAt(1).X / CatchPlayfield.BASE_WIDTH;
-
-        public double Duration => EndTime - StartTime;
+        public double EndTime => StartTime + Duration;
 
         private readonly SliderPath path = new SliderPath();
 

@@ -1,34 +1,46 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.Multi;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneDrawableRoomPlaylist : ManualInputManagerTestScene
+    public class TestSceneDrawableRoomPlaylist : OsuManualInputManagerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(DrawableRoomPlaylist),
-            typeof(DrawableRoomPlaylistItem)
-        };
-
         private TestPlaylist playlist;
+
+        private BeatmapManager manager;
+        private RulesetStore rulesets;
+
+        [BackgroundDependencyLoader]
+        private void load(GameHost host, AudioManager audio)
+        {
+            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+
+            manager.Import(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Wait();
+        }
 
         [Test]
         public void TestNonEditableNonSelectable()
@@ -189,8 +201,48 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("click delete button", () => InputManager.Click(MouseButton.Left));
         }
 
+        [Test]
+        public void TestDownloadButtonHiddenWhenBeatmapExists()
+        {
+            createPlaylist(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo);
+
+            assertDownloadButtonVisible(false);
+
+            AddStep("delete beatmap set", () => manager.Delete(manager.QueryBeatmapSets(_ => true).Single()));
+            assertDownloadButtonVisible(true);
+
+            AddStep("undelete beatmap set", () => manager.Undelete(manager.QueryBeatmapSets(_ => true).Single()));
+            assertDownloadButtonVisible(false);
+
+            void assertDownloadButtonVisible(bool visible) => AddUntilStep($"download button {(visible ? "shown" : "hidden")}",
+                () => playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().Single().Alpha == (visible ? 1 : 0));
+        }
+
+        [Test]
+        public void TestDownloadButtonVisibleInitiallyWhenBeatmapDoesNotExist()
+        {
+            var byOnlineId = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
+            byOnlineId.BeatmapSet.OnlineBeatmapSetID = 1337; // Some random ID that does not exist locally.
+
+            var byChecksum = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
+            byChecksum.MD5Hash = "1337"; // Some random checksum that does not exist locally.
+
+            createPlaylist(byOnlineId, byChecksum);
+
+            AddAssert("download buttons shown", () => playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().All(d => d.IsPresent));
+        }
+
+        [Test]
+        public void TestExplicitBeatmapItem()
+        {
+            var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
+            beatmap.BeatmapSet.OnlineInfo.HasExplicitContent = true;
+
+            createPlaylist(beatmap);
+        }
+
         private void moveToItem(int index, Vector2? offset = null)
-            => AddStep($"move mouse to item {index}", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<OsuRearrangeableListItem<PlaylistItem>>().ElementAt(index), offset));
+            => AddStep($"move mouse to item {index}", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<DifficultyIcon>().ElementAt(index), offset));
 
         private void moveToDragger(int index, Vector2? offset = null) => AddStep($"move mouse to dragger {index}", () =>
         {
@@ -201,7 +253,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void moveToDeleteButton(int index, Vector2? offset = null) => AddStep($"move mouse to delete button {index}", () =>
         {
             var item = playlist.ChildrenOfType<OsuRearrangeableListItem<PlaylistItem>>().ElementAt(index);
-            InputManager.MoveMouseTo(item.ChildrenOfType<IconButton>().ElementAt(0), offset);
+            InputManager.MoveMouseTo(item.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(0), offset);
         });
 
         private void assertHandleVisibility(int index, bool visible)
@@ -209,7 +261,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 () => (playlist.ChildrenOfType<OsuRearrangeableListItem<PlaylistItem>.PlaylistItemHandle>().ElementAt(index).Alpha > 0) == visible);
 
         private void assertDeleteButtonVisibility(int index, bool visible)
-            => AddAssert($"delete button {index} {(visible ? "is" : "is not")} visible", () => (playlist.ChildrenOfType<IconButton>().ElementAt(2 + index * 2).Alpha > 0) == visible);
+            => AddAssert($"delete button {index} {(visible ? "is" : "is not")} visible", () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(2 + index * 2).Alpha > 0) == visible);
 
         private void createPlaylist(bool allowEdit, bool allowSelection)
         {
@@ -227,7 +279,54 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     playlist.Items.Add(new PlaylistItem
                     {
                         ID = i,
-                        Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                        Beatmap =
+                        {
+                            Value = i % 2 == 1
+                                ? new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo
+                                : new BeatmapInfo
+                                {
+                                    Metadata = new BeatmapMetadata
+                                    {
+                                        Artist = "Artist",
+                                        Author = new User { Username = "Creator name here" },
+                                        Title = "Long title used to check background colour",
+                                    },
+                                    BeatmapSet = new BeatmapSetInfo()
+                                }
+                        },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                        RequiredMods =
+                        {
+                            new OsuModHardRock(),
+                            new OsuModDoubleTime(),
+                            new OsuModAutoplay()
+                        }
+                    });
+                }
+            });
+
+            AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
+        }
+
+        private void createPlaylist(params BeatmapInfo[] beatmaps)
+        {
+            AddStep("create playlist", () =>
+            {
+                Child = playlist = new TestPlaylist(false, false)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(500, 300)
+                };
+
+                int index = 0;
+
+                foreach (var b in beatmaps)
+                {
+                    playlist.Items.Add(new PlaylistItem
+                    {
+                        ID = index++,
+                        Beatmap = { Value = b },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
                         RequiredMods =
                         {
