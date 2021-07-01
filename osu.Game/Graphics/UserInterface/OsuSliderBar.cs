@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -99,7 +100,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
         {
-            sample = audio.Samples.Get(@"UI/sliderbar-notch");
+            sample = audio.Samples.Get(@"UI/notch-tick");
             AccentColour = colours.Pink;
         }
 
@@ -149,7 +150,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private void playSample(T value)
         {
-            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 50)
+            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 30)
                 return;
 
             if (value.Equals(lastSampleValue))
@@ -160,11 +161,11 @@ namespace osu.Game.Graphics.UserInterface
 
             var channel = sample.Play();
 
-            channel.Frequency.Value = 1 + NormalizedValue * 0.2f;
+            channel.Frequency.Value = 1 + NormalizedValue * 0.2f + RNG.NextDouble(0.02f);
             if (NormalizedValue == 0)
-                channel.Frequency.Value -= 0.4f;
+                channel.Frequency.Value -= 0.5f;
             else if (NormalizedValue == 1)
-                channel.Frequency.Value += 0.4f;
+                channel.Frequency.Value -= 0.5f;
         }
 
         private void updateTooltipText(T value)
