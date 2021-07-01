@@ -300,6 +300,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 var tryCount = 0;
 
+                // for checking overlap
+                var precedingObjects = hitObjects.SkipLast(hitObjects.Count - i).TakeLast(overlap_check_count).ToList();
+
                 do
                 {
                     if (tryCount > 0) direction = two_pi * nextSingle();
@@ -320,7 +323,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     tryCount++;
                     if (tryCount % 10 == 0) distance *= 0.9f;
-                } while (distance >= obj.Radius * 2 && checkForOverlap(hitObjects.SkipLast(hitObjects.Count - i).TakeLast(overlap_check_count), obj));
+                } while (distance >= obj.Radius * 2 && checkForOverlap(precedingObjects, obj));
 
                 if (obj.LastInCombo)
                     direction = two_pi * nextSingle();
