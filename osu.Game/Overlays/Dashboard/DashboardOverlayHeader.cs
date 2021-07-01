@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Dashboard
             switch (value)
             {
                 case DashboardOverlayTabs.Friends:
-                    return FriendsStrings.TitleCompact;                  
+                    return FriendsStrings.TitleCompact;
 
                 case DashboardOverlayTabs.CurrentlyPlaying:
                     return @"Currently Playing";
