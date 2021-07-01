@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <summary>
         /// Number of previous hit circles to be shifted together when a slider needs to be moved.
         /// </summary>
-        private const int shift_object_count = 10;
+        private const int objects_to_shift_before_slider = 10;
 
         private Random rng;
 
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     {
                         var toBeShifted = new List<OsuHitObject>();
 
-                        for (int j = i - 1; j >= i - shift_object_count && j >= 0; j--)
+                        for (int j = i - 1; j >= i - objects_to_shift_before_slider && j >= 0; j--)
                         {
                             // only shift hit circles
                             if (!(hitObjects[j] is HitCircle)) break;
