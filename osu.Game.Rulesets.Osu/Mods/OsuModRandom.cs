@@ -148,14 +148,20 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <returns>The <see cref="Vector2"/> that this slider has been shifted by.</returns>
         private Vector2 moveSliderIntoPlayfield(Slider slider, RandomObjectInfo currentObjectInfo)
         {
-            var minMargin = getSliderBoundingBox(slider);
+            var boundingBox = getSliderBoundingBox(slider);
 
             var prevPosition = slider.Position;
 
-            slider.Position = new Vector2(
-                Math.Clamp(slider.Position.X, minMargin.Left, minMargin.Right),
-                Math.Clamp(slider.Position.Y, minMargin.Top, minMargin.Bottom)
-            );
+            // If the slider is larger than the playfield, force it to stay at the original position
+            var newX = boundingBox.Width < 0
+                ? currentObjectInfo.PositionOriginal.X
+                : Math.Clamp(slider.Position.X, boundingBox.Left, boundingBox.Right);
+
+            var newY = boundingBox.Height < 0
+                ? currentObjectInfo.PositionOriginal.Y
+                : Math.Clamp(slider.Position.Y, boundingBox.Top, boundingBox.Bottom);
+
+            slider.Position = new Vector2(newX, newY);
 
             currentObjectInfo.PositionRandomised = slider.Position;
             currentObjectInfo.EndPositionRandomised = slider.EndPosition;
@@ -192,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             var pathPositions = new List<Vector2>();
             slider.Path.GetPathToProgress(pathPositions, 0, 1);
 
-            var box = new RectangleF();
+            var box = new RectangleF(Vector2.Zero, OsuPlayfield.BASE_SIZE);
 
             foreach (var pos in pathPositions)
             {
@@ -208,19 +214,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             box.Y += radius;
             box.Width -= radius * 2;
             box.Height -= radius * 2;
-
-            // If the slider is larger than the playfield, force the slider to stay at its original position
-            if (box.Width < 0)
-            {
-                box.Width = 0;
-                box.X = slider.Position.X;
-            }
-
-            if (box.Height < 0)
-            {
-                box.Height = 0;
-                box.Y = slider.Position.Y;
-            }
 
             return box;
         }
