@@ -4,6 +4,8 @@
 using System;
 using System.Globalization;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -36,6 +38,10 @@ namespace osu.Game.Overlays.Volume
         private OsuSpriteText text;
         private BufferedContainer maxGlow;
 
+        private bool firstUpdate = true;
+        private Sample sample;
+        private double sampleLastPlaybackTime;
+
         public VolumeMeter(string name, float circleSize, Color4 meterColour)
         {
             this.circleSize = circleSize;
@@ -46,8 +52,11 @@ namespace osu.Game.Overlays.Volume
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
+            sample = audio.Samples.Get(@"UI/notch-tick");
+            sampleLastPlaybackTime = Time.Current;
+
             Color4 backgroundColour = colours.Gray1;
 
             CircularProgress bgProgress;
@@ -202,6 +211,7 @@ namespace osu.Game.Overlays.Volume
             get => displayVolume;
             set
             {
+                bool displayVolumeChanged = Math.Round(displayVolume * 100) != Math.Round(value * 100);
                 displayVolume = value;
 
                 if (displayVolume >= 0.995f)
@@ -217,6 +227,29 @@ namespace osu.Game.Overlays.Volume
 
                 volumeCircle.Current.Value = displayVolume * 0.75f;
                 volumeCircleGlow.Current.Value = displayVolume * 0.75f;
+
+                Schedule(() =>
+                {
+                    const int sfx_debounce_time = 30;
+
+                    if (firstUpdate ||
+                        !displayVolumeChanged ||
+                        Time.Current - sampleLastPlaybackTime <= sfx_debounce_time)
+                    {
+                        firstUpdate = false;
+                        return;
+                    }
+
+                    var channel = sample.Play();
+
+                    channel.Frequency.Value = 1 + displayVolume * 0.1f + RNG.NextDouble(0.02f);
+                    if (displayVolume < 0.005f)
+                        channel.Frequency.Value -= 0.5f;
+                    else if (displayVolume > 0.995f)
+                        channel.Frequency.Value -= 0.5f;
+
+                    sampleLastPlaybackTime = Time.Current;
+                });
             }
         }
 
