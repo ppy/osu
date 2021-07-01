@@ -12,6 +12,16 @@ namespace osu.Game.Screens.Play
 {
     public class SoloPlayer : SubmittingPlayer
     {
+        public SoloPlayer()
+            : this(null)
+        {
+        }
+
+        protected SoloPlayer(PlayerConfiguration configuration = null)
+            : base(configuration)
+        {
+        }
+
         protected override APIRequest<APIScoreToken> CreateTokenRequest()
         {
             if (!(Beatmap.Value.BeatmapInfo.OnlineBeatmapID is int beatmapId))
