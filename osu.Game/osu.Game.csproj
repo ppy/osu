@@ -20,7 +20,7 @@
   <ItemGroup Label="Package References">
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="DiffPlex" Version="1.7.0" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.33" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.34" />
     <PackageReference Include="Humanizer" Version="2.10.1" />
     <PackageReference Include="MessagePack" Version="2.2.85" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.6" />
