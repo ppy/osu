@@ -7,6 +7,5 @@ namespace osu.Game.Rulesets.Catch.Scoring
 {
     public class CatchScoreProcessor : ScoreProcessor
     {
-        public override HitWindows CreateHitWindows() => new CatchHitWindows();
     }
 }

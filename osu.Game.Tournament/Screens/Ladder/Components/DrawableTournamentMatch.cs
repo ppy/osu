@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,7 +14,6 @@ using osu.Game.Tournament.Models;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
-using SixLabors.Primitives;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
@@ -144,9 +144,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 if (selected)
                 {
                     selectionBox.Show();
-                    if (editor)
+                    if (editor && editorInfo != null)
                         editorInfo.Selected.Value = Match;
-                    else
+                    else if (ladderInfo != null)
                         ladderInfo.CurrentMatch.Value = Match;
                 }
                 else

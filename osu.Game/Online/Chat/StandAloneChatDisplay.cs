@@ -26,7 +26,7 @@ namespace osu.Game.Online.Chat
 
         protected ChannelManager ChannelManager;
 
-        private DrawableChannel drawableChannel;
+        private StandAloneDrawableChannel drawableChannel;
 
         private readonly bool postingTextbox;
 
@@ -59,12 +59,13 @@ namespace osu.Game.Online.Chat
                     RelativeSizeAxes = Axes.X,
                     Height = textbox_height,
                     PlaceholderText = "type your message",
-                    OnCommit = postMessage,
                     ReleaseFocusOnCommit = false,
                     HoldFocus = true,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                 });
+
+                textbox.OnCommit += postMessage;
             }
 
             Channel.BindValueChanged(channelChanged);
@@ -73,9 +74,11 @@ namespace osu.Game.Online.Chat
         [BackgroundDependencyLoader(true)]
         private void load(ChannelManager manager)
         {
-            if (ChannelManager == null)
-                ChannelManager = manager;
+            ChannelManager ??= manager;
         }
+
+        protected virtual StandAloneDrawableChannel CreateDrawableChannel(Channel channel) =>
+            new StandAloneDrawableChannel(channel);
 
         private void postMessage(TextBox sender, bool newtext)
         {
@@ -100,14 +103,14 @@ namespace osu.Game.Online.Chat
 
             if (e.NewValue == null) return;
 
-            AddInternal(drawableChannel = new StandAloneDrawableChannel(e.NewValue)
-            {
-                CreateChatLineAction = CreateMessage,
-                Padding = new MarginPadding { Bottom = postingTextbox ? textbox_height : 0 }
-            });
+            drawableChannel = CreateDrawableChannel(e.NewValue);
+            drawableChannel.CreateChatLineAction = CreateMessage;
+            drawableChannel.Padding = new MarginPadding { Bottom = postingTextbox ? textbox_height : 0 };
+
+            AddInternal(drawableChannel);
         }
 
-        protected class StandAloneDrawableChannel : DrawableChannel
+        public class StandAloneDrawableChannel : DrawableChannel
         {
             public Func<Message, ChatLine> CreateChatLineAction;
 

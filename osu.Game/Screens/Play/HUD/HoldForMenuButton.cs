@@ -88,11 +88,6 @@ namespace osu.Game.Screens.Play.HUD
             return base.OnMouseMove(e);
         }
 
-        public bool PauseOnFocusLost
-        {
-            set => button.PauseOnFocusLost = value;
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -119,8 +114,6 @@ namespace osu.Game.Screens.Play.HUD
 
             public Action HoverGained;
             public Action HoverLost;
-
-            private readonly IBindable<bool> gameActive = new Bindable<bool>(true);
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, Framework.Game game)
@@ -164,14 +157,6 @@ namespace osu.Game.Screens.Play.HUD
                 };
 
                 bind();
-
-                gameActive.BindTo(game.IsActive);
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                gameActive.BindValueChanged(_ => updateActive(), true);
             }
 
             private void bind()
@@ -221,36 +206,12 @@ namespace osu.Game.Screens.Play.HUD
                 base.OnHoverLost(e);
             }
 
-            private bool pauseOnFocusLost = true;
-
-            public bool PauseOnFocusLost
-            {
-                set
-                {
-                    if (pauseOnFocusLost == value)
-                        return;
-
-                    pauseOnFocusLost = value;
-                    if (IsLoaded)
-                        updateActive();
-                }
-            }
-
-            private void updateActive()
-            {
-                if (!pauseOnFocusLost || IsPaused.Value) return;
-
-                if (gameActive.Value)
-                    AbortConfirm();
-                else
-                    BeginConfirm();
-            }
-
             public bool OnPressed(GlobalAction action)
             {
                 switch (action)
                 {
                     case GlobalAction.Back:
+                    case GlobalAction.PauseGameplay: // in the future this behaviour will differ for replays etc.
                         if (!pendingAnimation)
                             BeginConfirm();
                         return true;
@@ -264,6 +225,7 @@ namespace osu.Game.Screens.Play.HUD
                 switch (action)
                 {
                     case GlobalAction.Back:
+                    case GlobalAction.PauseGameplay:
                         AbortConfirm();
                         break;
                 }

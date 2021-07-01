@@ -1,15 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Users;
@@ -20,12 +17,6 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneRankGraph : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(RankGraph),
-            typeof(LineGraph)
-        };
-
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
@@ -79,7 +70,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 graph.Statistics.Value = new UserStatistics
                 {
-                    Ranks = new UserStatistics.UserRanks { Global = 123456 },
+                    GlobalRank = 123456,
                     PP = 12345,
                 };
             });
@@ -88,7 +79,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 graph.Statistics.Value = new UserStatistics
                 {
-                    Ranks = new UserStatistics.UserRanks { Global = 89000 },
+                    GlobalRank = 89000,
                     PP = 12345,
                     RankHistory = new User.RankHistoryData
                     {
@@ -101,7 +92,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 graph.Statistics.Value = new UserStatistics
                 {
-                    Ranks = new UserStatistics.UserRanks { Global = 89000 },
+                    GlobalRank = 89000,
                     PP = 12345,
                     RankHistory = new User.RankHistoryData
                     {
@@ -114,7 +105,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 graph.Statistics.Value = new UserStatistics
                 {
-                    Ranks = new UserStatistics.UserRanks { Global = 12000 },
+                    GlobalRank = 12000,
                     PP = 12345,
                     RankHistory = new User.RankHistoryData
                     {
@@ -127,7 +118,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 graph.Statistics.Value = new UserStatistics
                 {
-                    Ranks = new UserStatistics.UserRanks { Global = 12000 },
+                    GlobalRank = 12000,
                     PP = 12345,
                     RankHistory = new User.RankHistoryData
                     {

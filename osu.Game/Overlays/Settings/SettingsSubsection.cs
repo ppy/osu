@@ -8,10 +8,12 @@ using osu.Game.Graphics.Sprites;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Testing;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Settings
 {
+    [ExcludeFromDynamicCompile]
     public abstract class SettingsSubsection : FillFlowContainer, IHasFilterableChildren
     {
         protected override Container<Drawable> Content => FlowContent;
@@ -39,7 +41,7 @@ namespace osu.Game.Overlays.Settings
             FlowContent = new FillFlowContainer
             {
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 5),
+                Spacing = new Vector2(0, 8),
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
             };
@@ -53,7 +55,7 @@ namespace osu.Game.Overlays.Settings
                 new OsuSpriteText
                 {
                     Text = Header.ToUpperInvariant(),
-                    Margin = new MarginPadding { Bottom = 10, Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS },
+                    Margin = new MarginPadding { Vertical = 30, Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS },
                     Font = OsuFont.GetFont(weight: FontWeight.Bold),
                 },
                 FlowContent

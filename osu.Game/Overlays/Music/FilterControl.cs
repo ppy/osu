@@ -8,13 +8,15 @@ using osu.Game.Graphics.UserInterface;
 using osuTK;
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Music
 {
     public class FilterControl : Container
     {
+        public Action<FilterCriteria> FilterChanged;
+
         public readonly FilterTextBox Search;
+        private readonly CollectionDropdown collectionDropdown;
 
         public FilterControl()
         {
@@ -32,21 +34,27 @@ namespace osu.Game.Overlays.Music
                             RelativeSizeAxes = Axes.X,
                             Height = 40,
                         },
-                        new CollectionsDropdown<PlaylistCollection>
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Items = new[] { PlaylistCollection.All },
-                        }
+                        collectionDropdown = new CollectionDropdown { RelativeSizeAxes = Axes.X }
                     },
                 },
             };
-
-            Search.Current.ValueChanged += current_ValueChanged;
         }
 
-        private void current_ValueChanged(ValueChangedEvent<string> e) => FilterChanged?.Invoke(e.NewValue);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
-        public Action<string> FilterChanged;
+            Search.Current.BindValueChanged(_ => updateCriteria());
+            collectionDropdown.Current.BindValueChanged(_ => updateCriteria(), true);
+        }
+
+        private void updateCriteria() => FilterChanged?.Invoke(createCriteria());
+
+        private FilterCriteria createCriteria() => new FilterCriteria
+        {
+            SearchText = Search.Current.Value,
+            Collection = collectionDropdown.Current.Value?.Collection
+        };
 
         public class FilterTextBox : SearchTextBox
         {

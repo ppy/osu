@@ -17,11 +17,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public abstract class PlayerSettingsGroup : Container
     {
-        /// <summary>
-        /// The title to be displayed in the header of this group.
-        /// </summary>
-        protected abstract string Title { get; }
-
         private const float transition_duration = 250;
         private const int container_width = 270;
         private const int border_thickness = 2;
@@ -58,7 +53,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private Color4 expandedColour;
 
-        protected PlayerSettingsGroup()
+        /// <summary>
+        /// Create a new instance.
+        /// </summary>
+        /// <param name="title">The title to be displayed in the header of this group.</param>
+        protected PlayerSettingsGroup(string title)
         {
             AutoSizeAxes = Axes.Y;
             Width = container_width;
@@ -95,7 +94,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
-                                    Text = Title.ToUpperInvariant(),
+                                    Text = title.ToUpperInvariant(),
                                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                                     Margin = new MarginPadding { Left = 10 },
                                 },

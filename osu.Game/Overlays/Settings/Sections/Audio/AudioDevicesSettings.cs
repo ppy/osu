@@ -6,6 +6,7 @@ using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
@@ -64,7 +65,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             updateItems();
 
-            dropdown.Bindable = audio.AudioDevice;
+            dropdown.Current = audio.AudioDevice;
 
             audio.OnNewDevice += onDeviceChanged;
             audio.OnLostDevice += onDeviceChanged;
@@ -76,7 +77,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             private class AudioDeviceDropdownControl : DropdownControl
             {
-                protected override string GenerateItemText(string item)
+                protected override LocalisableString GenerateItemText(string item)
                     => string.IsNullOrEmpty(item) ? "Default" : base.GenerateItemText(item);
             }
         }

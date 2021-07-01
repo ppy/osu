@@ -1,38 +1,29 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Overlays.AccountCreation;
+using osu.Game.Overlays.Settings;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneAccountCreationOverlay : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ErrorTextFlowContainer),
-            typeof(AccountCreationBackground),
-            typeof(ScreenEntry),
-            typeof(ScreenWarning),
-            typeof(ScreenWelcome),
-            typeof(AccountCreationScreen),
-        };
-
         private readonly Container userPanelArea;
+        private readonly AccountCreationOverlay accountCreation;
 
-        private Bindable<User> localUser;
+        private IBindable<User> localUser;
 
         public TestSceneAccountCreationOverlay()
         {
-            AccountCreationOverlay accountCreation;
-
             Children = new Drawable[]
             {
                 accountCreation = new AccountCreationOverlay(),
@@ -44,19 +35,29 @@ namespace osu.Game.Tests.Visual.Online
                     Origin = Anchor.TopRight,
                 },
             };
-
-            AddStep("show", () => accountCreation.Show());
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            API.Logout();
-
             localUser = API.LocalUser.GetBoundCopy();
             localUser.BindValueChanged(user => { userPanelArea.Child = new UserGridPanel(user.NewValue) { Width = 200 }; }, true);
+        }
 
-            AddStep("logout", API.Logout);
+        [Test]
+        public void TestOverlayVisibility()
+        {
+            AddStep("start hidden", () => accountCreation.Hide());
+            AddStep("log out", () => API.Logout());
+
+            AddStep("show manually", () => accountCreation.Show());
+            AddUntilStep("overlay is visible", () => accountCreation.State.Value == Visibility.Visible);
+
+            AddStep("click button", () => accountCreation.ChildrenOfType<SettingsButton>().Single().Click());
+            AddUntilStep("warning screen is present", () => accountCreation.ChildrenOfType<ScreenWarning>().SingleOrDefault()?.IsPresent == true);
+
+            AddStep("log back in", () => API.Login("dummy", "password"));
+            AddUntilStep("overlay is hidden", () => accountCreation.State.Value == Visibility.Hidden);
         }
     }
 }

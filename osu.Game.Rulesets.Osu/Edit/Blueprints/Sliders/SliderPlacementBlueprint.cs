@@ -1,6 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
+using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -23,10 +26,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private SliderBodyPiece bodyPiece;
         private HitCirclePiece headCirclePiece;
         private HitCirclePiece tailCirclePiece;
+        private PathControlPointVisualiser controlPointVisualiser;
 
         private InputManager inputManager;
 
-        private PlacementState state;
+        private SliderPlacementState state;
         private PathControlPoint segmentStart;
         private PathControlPoint cursor;
         private int currentSegmentLength;
@@ -51,10 +55,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 bodyPiece = new SliderBodyPiece(),
                 headCirclePiece = new HitCirclePiece(),
                 tailCirclePiece = new HitCirclePiece(),
-                new PathControlPointVisualiser(HitObject, false)
+                controlPointVisualiser = new PathControlPointVisualiser(HitObject, false)
             };
 
-            setState(PlacementState.Initial);
+            setState(SliderPlacementState.Initial);
         }
 
         protected override void LoadComplete()
@@ -63,42 +67,50 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             inputManager = GetContainingInputManager();
         }
 
-        public override void UpdatePosition(Vector2 screenSpacePosition)
+        public override void UpdateTimeAndPosition(SnapResult result)
         {
+            base.UpdateTimeAndPosition(result);
+
             switch (state)
             {
-                case PlacementState.Initial:
+                case SliderPlacementState.Initial:
                     BeginPlacement();
-                    HitObject.Position = ToLocalSpace(screenSpacePosition);
+                    HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
                     break;
 
-                case PlacementState.Body:
-                    ensureCursor();
-
-                    // The given screen-space position may have been externally snapped, but the unsnapped position from the input manager
-                    // is used instead since snapping control points doesn't make much sense
-                    cursor.Position.Value = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
+                case SliderPlacementState.Body:
+                    updateCursor();
                     break;
             }
         }
 
-        protected override bool OnClick(ClickEvent e)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
+            if (e.Button != MouseButton.Left)
+                return base.OnMouseDown(e);
+
             switch (state)
             {
-                case PlacementState.Initial:
+                case SliderPlacementState.Initial:
                     beginCurve();
                     break;
 
-                case PlacementState.Body:
-                    switch (e.Button)
+                case SliderPlacementState.Body:
+                    if (canPlaceNewControlPoint(out var lastPoint))
                     {
-                        case MouseButton.Left:
-                            ensureCursor();
+                        // Place a new point by detatching the current cursor.
+                        updateCursor();
+                        cursor = null;
+                    }
+                    else
+                    {
+                        // Transform the last point into a new segment.
+                        Debug.Assert(lastPoint != null);
 
-                            // Detatch the cursor
-                            cursor = null;
-                            break;
+                        segmentStart = lastPoint;
+                        segmentStart.Type.Value = PathType.Linear;
+
+                        currentSegmentLength = 1;
                     }
 
                     break;
@@ -109,37 +121,30 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (state == PlacementState.Body && e.Button == MouseButton.Right)
+            if (state == SliderPlacementState.Body && e.Button == MouseButton.Right)
                 endCurve();
             base.OnMouseUp(e);
-        }
-
-        protected override bool OnDoubleClick(DoubleClickEvent e)
-        {
-            // Todo: This should all not occur on double click, but rather if the previous control point is hovered.
-            segmentStart = HitObject.Path.ControlPoints[^1];
-            segmentStart.Type.Value = PathType.Linear;
-
-            currentSegmentLength = 1;
-            return true;
         }
 
         private void beginCurve()
         {
             BeginPlacement(commitStart: true);
-            setState(PlacementState.Body);
+            setState(SliderPlacementState.Body);
         }
 
         private void endCurve()
         {
             updateSlider();
-            EndPlacement(true);
+            EndPlacement(HitObject.Path.HasValidLength);
         }
 
         protected override void Update()
         {
             base.Update();
             updateSlider();
+
+            // Maintain the path type in case it got defaulted to bezier at some point during the drag.
+            updatePathType();
         }
 
         private void updatePathType()
@@ -161,15 +166,48 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
         }
 
-        private void ensureCursor()
+        private void updateCursor()
         {
-            if (cursor == null)
+            if (canPlaceNewControlPoint(out _))
             {
-                HitObject.Path.ControlPoints.Add(cursor = new PathControlPoint { Position = { Value = Vector2.Zero } });
-                currentSegmentLength++;
+                // The cursor does not overlap a previous control point, so it can be added if not already existing.
+                if (cursor == null)
+                {
+                    HitObject.Path.ControlPoints.Add(cursor = new PathControlPoint { Position = { Value = Vector2.Zero } });
 
+                    // The path type should be adjusted in the progression of updatePathType() (Linear -> PC -> Bezier).
+                    currentSegmentLength++;
+                    updatePathType();
+                }
+
+                // Update the cursor position.
+                cursor.Position.Value = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
+            }
+            else if (cursor != null)
+            {
+                // The cursor overlaps a previous control point, so it's removed.
+                HitObject.Path.ControlPoints.Remove(cursor);
+                cursor = null;
+
+                // The path type should be adjusted in the reverse progression of updatePathType() (Bezier -> PC -> Linear).
+                currentSegmentLength--;
                 updatePathType();
             }
+        }
+
+        /// <summary>
+        /// Whether a new control point can be placed at the current mouse position.
+        /// </summary>
+        /// <param name="lastPoint">The last-placed control point. May be null, but is not null if <c>false</c> is returned.</param>
+        /// <returns>Whether a new control point can be placed at the current position.</returns>
+        private bool canPlaceNewControlPoint([CanBeNull] out PathControlPoint lastPoint)
+        {
+            // We cannot rely on the ordering of drawable pieces, so find the respective drawable piece by searching for the last non-cursor control point.
+            var last = HitObject.Path.ControlPoints.LastOrDefault(p => p != cursor);
+            var lastPiece = controlPointVisualiser.Pieces.Single(p => p.ControlPoint == last);
+
+            lastPoint = last;
+            return lastPiece.IsHovered != true;
         }
 
         private void updateSlider()
@@ -181,12 +219,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             tailCirclePiece.UpdateFrom(HitObject.TailCircle);
         }
 
-        private void setState(PlacementState newState)
+        private void setState(SliderPlacementState newState)
         {
             state = newState;
         }
 
-        private enum PlacementState
+        private enum SliderPlacementState
         {
             Initial,
             Body,

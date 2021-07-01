@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Select.Details;
 using osuTK.Graphics;
 
@@ -141,16 +142,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select changed Difficulty Adjust mod", () =>
             {
                 var ruleset = advancedStats.Beatmap.Ruleset.CreateInstance();
-                var difficultyAdjustMod = ruleset.GetAllMods().OfType<ModDifficultyAdjust>().Single();
+                var difficultyAdjustMod = ruleset.GetAllMods().OfType<OsuModDifficultyAdjust>().Single();
                 var originalDifficulty = advancedStats.Beatmap.BaseDifficulty;
-                var adjustedDifficulty = new BeatmapDifficulty
-                {
-                    CircleSize = originalDifficulty.CircleSize,
-                    DrainRate = originalDifficulty.DrainRate - 0.5f,
-                    OverallDifficulty = originalDifficulty.OverallDifficulty,
-                    ApproachRate = originalDifficulty.ApproachRate + 2.2f,
-                };
-                difficultyAdjustMod.ReadFromDifficulty(adjustedDifficulty);
+
+                difficultyAdjustMod.ReadFromDifficulty(originalDifficulty);
+                difficultyAdjustMod.DrainRate.Value = originalDifficulty.DrainRate - 0.5f;
+                difficultyAdjustMod.ApproachRate.Value = originalDifficulty.ApproachRate + 2.2f;
                 SelectedMods.Value = new[] { difficultyAdjustMod };
             });
 

@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 
@@ -20,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 new SettingsSlider<double, OffsetSlider>
                 {
                     LabelText = "Audio offset",
-                    Bindable = config.GetBindable<double>(OsuSetting.AudioOffset),
+                    Current = config.GetBindable<double>(OsuSetting.AudioOffset),
                     KeyboardStep = 1f
                 },
                 new SettingsButton
@@ -32,7 +33,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
         private class OffsetSlider : OsuSliderBar<double>
         {
-            public override string TooltipText => Current.Value.ToString(@"0ms");
+            public override LocalisableString TooltipText => Current.Value.ToString(@"0ms");
         }
     }
 }

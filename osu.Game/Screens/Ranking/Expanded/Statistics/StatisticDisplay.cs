@@ -6,6 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
@@ -16,8 +17,9 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
     /// </summary>
     public abstract class StatisticDisplay : CompositeDrawable
     {
-        private readonly string header;
+        protected SpriteText HeaderText { get; private set; }
 
+        private readonly string header;
         private Drawable content;
 
         /// <summary>
@@ -53,7 +55,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = Color4Extensions.FromHex("#222")
                             },
-                            new OsuSpriteText
+                            HeaderText = new OsuSpriteText
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,

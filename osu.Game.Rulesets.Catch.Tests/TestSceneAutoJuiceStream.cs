@@ -1,7 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
@@ -12,13 +14,8 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
-    public class TestSceneAutoJuiceStream : PlayerTestScene
+    public class TestSceneAutoJuiceStream : TestSceneCatchPlayer
     {
-        public TestSceneAutoJuiceStream()
-            : base(new CatchRuleset())
-        {
-        }
-
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
             var beatmap = new Beatmap
@@ -32,18 +29,22 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             for (int i = 0; i < 100; i++)
             {
-                float width = (i % 10 + 1) / 20f;
+                float width = (i % 10 + 1) / 20f * CatchPlayfield.WIDTH;
 
                 beatmap.HitObjects.Add(new JuiceStream
                 {
-                    X = 0.5f - width / 2,
+                    X = CatchPlayfield.CENTER_X - width / 2,
                     Path = new SliderPath(PathType.Linear, new[]
                     {
                         Vector2.Zero,
-                        new Vector2(width * CatchPlayfield.BASE_WIDTH, 0)
+                        new Vector2(width, 0)
                     }),
                     StartTime = i * 2000,
-                    NewCombo = i % 8 == 0
+                    NewCombo = i % 8 == 0,
+                    Samples = new List<HitSampleInfo>(new[]
+                    {
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "normal", volume: 100)
+                    })
                 });
             }
 

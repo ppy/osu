@@ -13,6 +13,11 @@ namespace osu.Game.Screens.Menu
 
         public void Abort() => AbortConfirm();
 
+        public ExitConfirmOverlay()
+            : base(0.7f)
+        {
+        }
+
         public bool OnPressed(GlobalAction action)
         {
             if (action == GlobalAction.Back)

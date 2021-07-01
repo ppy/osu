@@ -7,6 +7,11 @@ namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogUpdateStreamControl : OverlayStreamControl<APIUpdateStream>
     {
+        public ChangelogUpdateStreamControl()
+        {
+            SelectFirstTabByDefault = false;
+        }
+
         protected override OverlayStreamItem<APIUpdateStream> CreateStreamItem(APIUpdateStream value) => new ChangelogUpdateStreamItem(value);
     }
 }

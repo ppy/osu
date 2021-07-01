@@ -42,7 +42,7 @@ namespace osu.Game.Tournament.Screens.MapPool
         {
             InternalChildren = new Drawable[]
             {
-                new TourneyVideo("gameplay")
+                new TourneyVideo("mappool")
                 {
                     Loop = true,
                     RelativeSizeAxes = Axes.Both,
@@ -50,11 +50,11 @@ namespace osu.Game.Tournament.Screens.MapPool
                 new MatchHeader(),
                 mapFlows = new FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>>
                 {
-                    Y = 140,
+                    Y = 160,
                     Spacing = new Vector2(10, 10),
-                    Padding = new MarginPadding(25),
                     Direction = FillDirection.Vertical,
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                 },
                 new ControlPanel
                 {
@@ -95,6 +95,7 @@ namespace osu.Game.Tournament.Screens.MapPool
                             Text = "Reset",
                             Action = reset
                         },
+                        new ControlPanel.Spacer(),
                     }
                 }
             };
@@ -211,10 +212,14 @@ namespace osu.Game.Tournament.Screens.MapPool
         {
             mapFlows.Clear();
 
+            int totalRows = 0;
+
             if (match.NewValue.Round.Value != null)
             {
                 FillFlowContainer<TournamentBeatmapPanel> currentFlow = null;
                 string currentMod = null;
+
+                int flowCount = 0;
 
                 foreach (var b in match.NewValue.Round.Value.Beatmaps)
                 {
@@ -229,6 +234,15 @@ namespace osu.Game.Tournament.Screens.MapPool
                         });
 
                         currentMod = b.Mods;
+
+                        totalRows++;
+                        flowCount = 0;
+                    }
+
+                    if (++flowCount > 2)
+                    {
+                        totalRows++;
+                        flowCount = 1;
                     }
 
                     currentFlow.Add(new TournamentBeatmapPanel(b.BeatmapInfo, b.Mods)
@@ -239,6 +253,12 @@ namespace osu.Game.Tournament.Screens.MapPool
                     });
                 }
             }
+
+            mapFlows.Padding = new MarginPadding(5)
+            {
+                // remove horizontal padding to increase flow width to 3 panels
+                Horizontal = totalRows > 9 ? 0 : 100
+            };
         }
     }
 }

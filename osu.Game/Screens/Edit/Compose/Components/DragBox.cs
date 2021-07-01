@@ -45,13 +45,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             Masking = true,
             BorderColour = Color4.White,
-            BorderThickness = SelectionHandler.BORDER_RADIUS,
+            BorderThickness = SelectionBox.BORDER_RADIUS,
             Child = new Box
             {
                 RelativeSizeAxes = Axes.Both,
                 Alpha = 0.1f
             }
         };
+
+        private RectangleF? dragRectangle;
 
         /// <summary>
         /// Handle a forwarded mouse event.
@@ -66,15 +68,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var dragQuad = new Quad(dragStartPosition.X, dragStartPosition.Y, dragPosition.X - dragStartPosition.X, dragPosition.Y - dragStartPosition.Y);
 
             // We use AABBFloat instead of RectangleF since it handles negative sizes for us
-            var dragRectangle = dragQuad.AABBFloat;
+            var rec = dragQuad.AABBFloat;
+            dragRectangle = rec;
 
-            var topLeft = ToLocalSpace(dragRectangle.TopLeft);
-            var bottomRight = ToLocalSpace(dragRectangle.BottomRight);
+            var topLeft = ToLocalSpace(rec.TopLeft);
+            var bottomRight = ToLocalSpace(rec.BottomRight);
 
             Box.Position = topLeft;
             Box.Size = bottomRight - topLeft;
-
-            PerformSelection?.Invoke(dragRectangle);
             return true;
         }
 
@@ -93,7 +94,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        public override void Hide() => State = Visibility.Hidden;
+        protected override void Update()
+        {
+            base.Update();
+
+            if (dragRectangle != null)
+                PerformSelection?.Invoke(dragRectangle.Value);
+        }
+
+        public override void Hide()
+        {
+            State = Visibility.Hidden;
+            dragRectangle = null;
+        }
 
         public override void Show() => State = Visibility.Visible;
 

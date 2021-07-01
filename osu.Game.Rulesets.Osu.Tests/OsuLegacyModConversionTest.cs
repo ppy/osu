@@ -12,18 +12,36 @@ namespace osu.Game.Rulesets.Osu.Tests
     [TestFixture]
     public class OsuLegacyModConversionTest : LegacyModConversionTest
     {
-        [TestCase(LegacyMods.Easy, new[] { typeof(OsuModEasy) })]
-        [TestCase(LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(OsuModHardRock), typeof(OsuModDoubleTime) })]
-        [TestCase(LegacyMods.DoubleTime, new[] { typeof(OsuModDoubleTime) })]
-        [TestCase(LegacyMods.Nightcore, new[] { typeof(OsuModNightcore) })]
+        private static readonly object[][] osu_mod_mapping =
+        {
+            new object[] { LegacyMods.NoFail, new[] { typeof(OsuModNoFail) } },
+            new object[] { LegacyMods.Easy, new[] { typeof(OsuModEasy) } },
+            new object[] { LegacyMods.TouchDevice, new[] { typeof(OsuModTouchDevice) } },
+            new object[] { LegacyMods.Hidden, new[] { typeof(OsuModHidden) } },
+            new object[] { LegacyMods.HardRock, new[] { typeof(OsuModHardRock) } },
+            new object[] { LegacyMods.SuddenDeath, new[] { typeof(OsuModSuddenDeath) } },
+            new object[] { LegacyMods.DoubleTime, new[] { typeof(OsuModDoubleTime) } },
+            new object[] { LegacyMods.Relax, new[] { typeof(OsuModRelax) } },
+            new object[] { LegacyMods.HalfTime, new[] { typeof(OsuModHalfTime) } },
+            new object[] { LegacyMods.Nightcore, new[] { typeof(OsuModNightcore) } },
+            new object[] { LegacyMods.Flashlight, new[] { typeof(OsuModFlashlight) } },
+            new object[] { LegacyMods.Autoplay, new[] { typeof(OsuModAutoplay) } },
+            new object[] { LegacyMods.SpunOut, new[] { typeof(OsuModSpunOut) } },
+            new object[] { LegacyMods.Autopilot, new[] { typeof(OsuModAutopilot) } },
+            new object[] { LegacyMods.Perfect, new[] { typeof(OsuModPerfect) } },
+            new object[] { LegacyMods.Cinema, new[] { typeof(OsuModCinema) } },
+            new object[] { LegacyMods.Target, new[] { typeof(OsuModTarget) } },
+            new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(OsuModHardRock), typeof(OsuModDoubleTime) } }
+        };
+
+        [TestCaseSource(nameof(osu_mod_mapping))]
+        [TestCase(LegacyMods.Cinema | LegacyMods.Autoplay, new[] { typeof(OsuModCinema) })]
         [TestCase(LegacyMods.Nightcore | LegacyMods.DoubleTime, new[] { typeof(OsuModNightcore) })]
-        [TestCase(LegacyMods.Flashlight | LegacyMods.Nightcore | LegacyMods.DoubleTime, new[] { typeof(OsuModFlashlight), typeof(OsuModFlashlight) })]
-        [TestCase(LegacyMods.Perfect, new[] { typeof(OsuModPerfect) })]
-        [TestCase(LegacyMods.SuddenDeath, new[] { typeof(OsuModSuddenDeath) })]
         [TestCase(LegacyMods.Perfect | LegacyMods.SuddenDeath, new[] { typeof(OsuModPerfect) })]
-        [TestCase(LegacyMods.Perfect | LegacyMods.SuddenDeath | LegacyMods.DoubleTime, new[] { typeof(OsuModDoubleTime), typeof(OsuModPerfect) })]
-        [TestCase(LegacyMods.SpunOut | LegacyMods.Easy, new[] { typeof(OsuModSpunOut), typeof(OsuModEasy) })]
-        public new void Test(LegacyMods legacyMods, Type[] expectedMods) => base.Test(legacyMods, expectedMods);
+        public new void TestFromLegacy(LegacyMods legacyMods, Type[] expectedMods) => base.TestFromLegacy(legacyMods, expectedMods);
+
+        [TestCaseSource(nameof(osu_mod_mapping))]
+        public new void TestToLegacy(LegacyMods legacyMods, Type[] givenMods) => base.TestToLegacy(legacyMods, givenMods);
 
         protected override Ruleset CreateRuleset() => new OsuRuleset();
     }

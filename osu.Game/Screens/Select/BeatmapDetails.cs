@@ -1,25 +1,25 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
-using osuTK.Graphics;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
-using System.Linq;
-using osu.Game.Online.API;
-using osu.Framework.Threading;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Game.Screens.Select.Details;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Rulesets;
 using osu.Game.Online.Chat;
+using osu.Game.Rulesets;
+using osu.Game.Screens.Select.Details;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
@@ -28,11 +28,8 @@ namespace osu.Game.Screens.Select
         private const float spacing = 10;
         private const float transition_duration = 250;
 
-        private readonly FillFlowContainer top, statsFlow;
         private readonly AdvancedStats advanced;
-        private readonly DetailBox ratingsContainer;
         private readonly UserRatings ratings;
-        private readonly OsuScrollContainer metadataScroll;
         private readonly MetadataSection description, source, tags;
         private readonly Container failRetryContainer;
         private readonly FailRetryGraph failRetryGraph;
@@ -40,8 +37,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private IAPIProvider api { get; set; }
-
-        private ScheduledDelegate pendingBeatmapSwitch;
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
@@ -57,15 +52,12 @@ namespace osu.Game.Screens.Select
 
                 beatmap = value;
 
-                pendingBeatmapSwitch?.Cancel();
-                pendingBeatmapSwitch = Schedule(updateStatistics);
+                Scheduler.AddOnce(updateStatistics);
             }
         }
 
         public BeatmapDetails()
         {
-            Container content;
-
             Children = new Drawable[]
             {
                 new Box
@@ -73,103 +65,112 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black.Opacity(0.5f),
                 },
-                content = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Horizontal = spacing },
                     Children = new Drawable[]
                     {
-                        top = new FillFlowContainer
+                        new GridContainer
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Horizontal,
-                            Children = new Drawable[]
+                            RelativeSizeAxes = Axes.Both,
+                            RowDimensions = new[]
                             {
-                                statsFlow = new FillFlowContainer
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension()
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Width = 0.5f,
-                                    Spacing = new Vector2(spacing),
-                                    Padding = new MarginPadding { Right = spacing / 2 },
-                                    Children = new[]
+                                    new FillFlowContainer
                                     {
-                                        new DetailBox
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Direction = FillDirection.Horizontal,
+                                        Children = new Drawable[]
                                         {
-                                            Child = advanced = new AdvancedStats
+                                            new FillFlowContainer
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
-                                                Padding = new MarginPadding { Horizontal = spacing, Top = spacing * 2, Bottom = spacing },
+                                                Width = 0.5f,
+                                                Spacing = new Vector2(spacing),
+                                                Padding = new MarginPadding { Right = spacing / 2 },
+                                                Children = new[]
+                                                {
+                                                    new DetailBox().WithChild(advanced = new AdvancedStats
+                                                    {
+                                                        RelativeSizeAxes = Axes.X,
+                                                        AutoSizeAxes = Axes.Y,
+                                                        Padding = new MarginPadding { Horizontal = spacing, Top = spacing * 2, Bottom = spacing },
+                                                    }),
+                                                    new DetailBox().WithChild(new OnlineViewContainer(string.Empty)
+                                                    {
+                                                        RelativeSizeAxes = Axes.X,
+                                                        Height = 134,
+                                                        Padding = new MarginPadding { Horizontal = spacing, Top = spacing },
+                                                        Child = ratings = new UserRatings
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                        },
+                                                    }),
+                                                },
                                             },
-                                        },
-                                        ratingsContainer = new DetailBox
-                                        {
-                                            Child = ratings = new UserRatings
+                                            new OsuScrollContainer
                                             {
-                                                RelativeSizeAxes = Axes.X,
-                                                Height = 134,
-                                                Padding = new MarginPadding { Horizontal = spacing, Top = spacing },
+                                                RelativeSizeAxes = Axes.Both,
+                                                Width = 0.5f,
+                                                ScrollbarVisible = false,
+                                                Padding = new MarginPadding { Left = spacing / 2 },
+                                                Child = new FillFlowContainer
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    LayoutDuration = transition_duration,
+                                                    LayoutEasing = Easing.OutQuad,
+                                                    Spacing = new Vector2(spacing * 2),
+                                                    Margin = new MarginPadding { Top = spacing * 2 },
+                                                    Children = new[]
+                                                    {
+                                                        description = new MetadataSection(MetadataType.Description),
+                                                        source = new MetadataSection(MetadataType.Source),
+                                                        tags = new MetadataSection(MetadataType.Tags),
+                                                    },
+                                                },
                                             },
                                         },
                                     },
                                 },
-                                metadataScroll = new OsuScrollContainer
+                                new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    Width = 0.5f,
-                                    ScrollbarVisible = false,
-                                    Padding = new MarginPadding { Left = spacing / 2 },
-                                    Child = new FillFlowContainer
+                                    failRetryContainer = new OnlineViewContainer("Sign in to view more details")
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        LayoutDuration = transition_duration,
-                                        LayoutEasing = Easing.OutQuad,
-                                        Spacing = new Vector2(spacing * 2),
-                                        Margin = new MarginPadding { Top = spacing * 2 },
-                                        Children = new[]
+                                        RelativeSizeAxes = Axes.Both,
+                                        Children = new Drawable[]
                                         {
                                             description = new MetadataSection(MetadataType.Description),
                                             source = new MetadataSection(MetadataType.Source),
                                             tags = new MetadataSection(MetadataType.Tags),
+                                            new OsuSpriteText
+                                            {
+                                                Text = "Points of Failure",
+                                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
+                                            },
+                                            failRetryGraph = new FailRetryGraph
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding { Top = 14 + spacing / 2 },
+                                            },
                                         },
                                     },
-                                },
-                            },
-                        },
-                        failRetryContainer = new Container
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
-                            Children = new Drawable[]
-                            {
-                                new OsuSpriteText
-                                {
-                                    Text = "Points of Failure",
-                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
-                                },
-                                failRetryGraph = new FailRetryGraph
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding { Top = 14 + spacing / 2 },
-                                },
-                            },
+                                }
+                            }
                         },
                     },
                 },
-                loading = new LoadingLayer(content),
+                loading = new LoadingLayer(true)
             };
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            metadataScroll.Height = statsFlow.DrawHeight;
-            failRetryContainer.Height = DrawHeight - Padding.TotalVertical - (top.DrawHeight + spacing / 2);
         }
 
         private void updateStatistics()
@@ -187,7 +188,7 @@ namespace osu.Game.Screens.Select
             }
 
             // for now, let's early abort if an OnlineBeatmapID is not present (should have been populated at import time).
-            if (Beatmap?.OnlineBeatmapID == null)
+            if (Beatmap?.OnlineBeatmapID == null || api.State.Value == APIState.Offline)
             {
                 updateMetrics();
                 return;
@@ -202,7 +203,7 @@ namespace osu.Game.Screens.Select
                 Schedule(() =>
                 {
                     if (beatmap != requestedBeatmap)
-                        //the beatmap has been changed since we started the lookup.
+                        // the beatmap has been changed since we started the lookup.
                         return;
 
                     var b = res.ToBeatmap(rulesets);
@@ -223,7 +224,7 @@ namespace osu.Game.Screens.Select
                 Schedule(() =>
                 {
                     if (beatmap != requestedBeatmap)
-                        //the beatmap has been changed since we started the lookup.
+                        // the beatmap has been changed since we started the lookup.
                         return;
 
                     updateMetrics();
@@ -237,17 +238,18 @@ namespace osu.Game.Screens.Select
         private void updateMetrics()
         {
             var hasRatings = beatmap?.BeatmapSet?.Metrics?.Ratings?.Any() ?? false;
-            var hasRetriesFails = (beatmap?.Metrics?.Retries?.Any() ?? false) && (beatmap?.Metrics.Fails?.Any() ?? false);
+            var hasRetriesFails = (beatmap?.Metrics?.Retries?.Any() ?? false) || (beatmap?.Metrics?.Fails?.Any() ?? false);
 
             if (hasRatings)
             {
                 ratings.Metrics = beatmap.BeatmapSet.Metrics;
-                ratingsContainer.FadeIn(transition_duration);
+                ratings.FadeIn(transition_duration);
             }
             else
             {
+                // loading or just has no data server-side.
                 ratings.Metrics = new BeatmapSetMetrics { Ratings = new int[10] };
-                ratingsContainer.FadeTo(0.25f, transition_duration);
+                ratings.FadeTo(0.25f, transition_duration);
             }
 
             if (hasRetriesFails)
@@ -262,7 +264,6 @@ namespace osu.Game.Screens.Select
                     Fails = new int[100],
                     Retries = new int[100],
                 };
-                failRetryContainer.FadeOut(transition_duration);
             }
 
             loading.Hide();
@@ -299,9 +300,13 @@ namespace osu.Game.Screens.Select
             private readonly FillFlowContainer textContainer;
             private readonly MetadataType type;
             private TextFlowContainer textFlow;
+
             public MetadataSection(MetadataType type)
             {
                 this.type = type;
+
+                Alpha = 0;
+
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
 
@@ -358,6 +363,7 @@ namespace osu.Game.Screens.Select
                     {
                         case MetadataType.Tags:
                             string[] tags = text.Split(" ");
+
                             for (int i = 0; i <= tags.Length - 1; i++)
                             {
                                 loaded.AddLink(tags[i], LinkAction.SearchBeatmapSet, tags[i]);
@@ -365,10 +371,13 @@ namespace osu.Game.Screens.Select
                                 if (i != tags.Length - 1)
                                     loaded.AddText(" ");
                             }
+
                             break;
+
                         case MetadataType.Source:
                             loaded.AddLink(text, LinkAction.SearchBeatmapSet, text);
                             break;
+
                         default:
                             loaded.AddText(text);
                             break;

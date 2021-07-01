@@ -12,10 +12,10 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
 using System.Linq;
-using osu.Game.Overlays.Direct;
 using System.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.BeatmapListing.Panels;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -24,6 +24,7 @@ namespace osu.Game.Overlays.Rankings
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private readonly Bindable<APISpotlight> selectedSpotlight = new Bindable<APISpotlight>();
+        private readonly Bindable<RankingsSortCriteria> sort = new Bindable<RankingsSortCriteria>();
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -44,6 +45,7 @@ namespace osu.Game.Overlays.Rankings
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
             InternalChild = new ReverseChildIDFillFlowContainer<Drawable>
             {
                 RelativeSizeAxes = Axes.X,
@@ -67,20 +69,21 @@ namespace osu.Game.Overlays.Rankings
                                 AutoSizeAxes = Axes.Y,
                                 Margin = new MarginPadding { Vertical = 10 }
                             },
-                            loading = new LoadingLayer(content)
+                            loading = new LoadingLayer(true)
                         }
                     }
                 }
             };
+
+            sort.BindTo(selector.Sort);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            selector.Show();
-
-            selectedSpotlight.BindValueChanged(onSpotlightChanged);
+            selectedSpotlight.BindValueChanged(_ => onSpotlightChanged());
+            sort.BindValueChanged(_ => onSpotlightChanged());
             Ruleset.BindValueChanged(onRulesetChanged);
 
             getSpotlights();
@@ -101,14 +104,14 @@ namespace osu.Game.Overlays.Rankings
             selectedSpotlight.TriggerChange();
         }
 
-        private void onSpotlightChanged(ValueChangedEvent<APISpotlight> spotlight)
+        private void onSpotlightChanged()
         {
             loading.Show();
 
             cancellationToken?.Cancel();
             getRankingsRequest?.Cancel();
 
-            getRankingsRequest = new GetSpotlightRankingsRequest(Ruleset.Value, spotlight.NewValue.Id);
+            getRankingsRequest = new GetSpotlightRankingsRequest(Ruleset.Value, selectedSpotlight.Value.Id, sort.Value);
             getRankingsRequest.Success += onSuccess;
             api.Queue(getRankingsRequest);
         }
@@ -140,7 +143,7 @@ namespace osu.Game.Overlays.Rankings
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Spacing = new Vector2(10),
-                    Children = response.BeatmapSets.Select(b => new DirectGridPanel(b.ToBeatmapSet(rulesets))
+                    Children = response.BeatmapSets.Select(b => new GridBeatmapPanel(b.ToBeatmapSet(rulesets))
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,

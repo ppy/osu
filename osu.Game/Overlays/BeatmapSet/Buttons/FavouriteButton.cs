@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -26,9 +27,9 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private PostBeatmapFavouriteRequest request;
         private LoadingLayer loading;
 
-        private readonly Bindable<User> localUser = new Bindable<User>();
+        private readonly IBindable<User> localUser = new Bindable<User>();
 
-        public string TooltipText
+        public LocalisableString TooltipText
         {
             get
             {
@@ -53,7 +54,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     Size = new Vector2(18),
                     Shadow = false,
                 },
-                loading = new LoadingLayer(icon, false),
+                loading = new LoadingLayer(true, false),
             });
 
             Action = () =>

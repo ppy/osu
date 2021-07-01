@@ -1,31 +1,44 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModDifficultyAdjust : ModTestScene
+    public class TestSceneOsuModDifficultyAdjust : OsuModTestScene
     {
-        public TestSceneOsuModDifficultyAdjust()
-            : base(new OsuRuleset())
-        {
-        }
-
         [Test]
         public void TestNoAdjustment() => CreateModTest(new ModTestData
         {
             Mod = new OsuModDifficultyAdjust(),
+            Beatmap = new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    BaseDifficulty = new BeatmapDifficulty
+                    {
+                        CircleSize = 8
+                    }
+                },
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle { StartTime = 1000 },
+                    new HitCircle { StartTime = 2000 }
+                }
+            },
             Autoplay = true,
-            PassCondition = checkSomeHit
+            PassCondition = () => checkSomeHit() && checkObjectsScale(0.29f)
         });
 
         [Test]

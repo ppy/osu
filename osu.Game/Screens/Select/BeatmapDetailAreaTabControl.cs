@@ -26,7 +26,13 @@ namespace osu.Game.Screens.Select
             set => tabs.Current = value;
         }
 
-        public Action<BeatmapDetailAreaTabItem, bool> OnFilter; //passed the selected tab and if mods is checked
+        public Bindable<bool> CurrentModsFilter
+        {
+            get => modsCheckbox.Current;
+            set => modsCheckbox.Current = value;
+        }
+
+        public Action<BeatmapDetailAreaTabItem, bool> OnFilter; // passed the selected tab and if mods is checked
 
         public IReadOnlyList<BeatmapDetailAreaTabItem> TabItems
         {

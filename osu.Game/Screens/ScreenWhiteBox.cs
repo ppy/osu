@@ -87,9 +87,9 @@ namespace osu.Game.Screens
         private static Color4 getColourFor(object type)
         {
             int hash = type.GetHashCode();
-            byte r = (byte)Math.Clamp(((hash & 0xFF0000) >> 16) * 0.8f, 20, 255);
-            byte g = (byte)Math.Clamp(((hash & 0x00FF00) >> 8) * 0.8f, 20, 255);
-            byte b = (byte)Math.Clamp((hash & 0x0000FF) * 0.8f, 20, 255);
+            byte r = (byte)Math.Clamp(((hash & 0xFF0000) >> 16) * 2, 128, 255);
+            byte g = (byte)Math.Clamp(((hash & 0x00FF00) >> 8) * 2, 128, 255);
+            byte b = (byte)Math.Clamp((hash & 0x0000FF) * 2, 128, 255);
             return new Color4(r, g, b, 255);
         }
 
@@ -109,10 +109,10 @@ namespace osu.Game.Screens
 
             private readonly Container boxContainer;
 
-            public UnderConstructionMessage(string name)
+            public UnderConstructionMessage(string name, string description = "is not yet ready for use!")
             {
-                RelativeSizeAxes = Axes.Both;
-                Size = new Vector2(0.3f);
+                AutoSizeAxes = Axes.Both;
+
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
 
@@ -124,7 +124,7 @@ namespace osu.Game.Screens
                     {
                         CornerRadius = 20,
                         Masking = true,
-                        RelativeSizeAxes = Axes.Both,
+                        AutoSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Children = new Drawable[]
@@ -133,15 +133,15 @@ namespace osu.Game.Screens
                             {
                                 RelativeSizeAxes = Axes.Both,
 
-                                Colour = colour,
-                                Alpha = 0.2f,
-                                Blending = BlendingParameters.Additive,
+                                Colour = colour.Darken(0.8f),
+                                Alpha = 0.8f,
                             },
                             TextContainer = new FillFlowContainer
                             {
                                 AutoSizeAxes = Axes.Both,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
+                                Padding = new MarginPadding(20),
                                 Direction = FillDirection.Vertical,
                                 Children = new Drawable[]
                                 {
@@ -157,14 +157,14 @@ namespace osu.Game.Screens
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
                                         Text = name,
-                                        Colour = colour.Lighten(0.8f),
+                                        Colour = colour,
                                         Font = OsuFont.GetFont(size: 36),
                                     },
                                     new OsuSpriteText
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
-                                        Text = "is not yet ready for use!",
+                                        Text = description,
                                         Font = OsuFont.GetFont(size: 20),
                                     },
                                     new OsuSpriteText

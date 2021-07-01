@@ -4,48 +4,43 @@
 using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
+using osu.Game.Tests.Visual;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneHitCircleArea : ManualInputManagerTestScene
+    public class TestSceneHitCircleArea : OsuManualInputManagerTestScene
     {
         private HitCircle hitCircle;
         private DrawableHitCircle drawableHitCircle;
         private DrawableHitCircle.HitReceptor hitAreaReceptor => drawableHitCircle.HitArea;
 
         [SetUp]
-        public new void SetUp()
+        public void SetUp() => Schedule(() =>
         {
-            base.SetUp();
-
-            Schedule(() =>
+            hitCircle = new HitCircle
             {
-                hitCircle = new HitCircle
-                {
-                    Position = new Vector2(100, 100),
-                    StartTime = Time.Current + 500
-                };
+                Position = new Vector2(100, 100),
+                StartTime = Time.Current + 500
+            };
 
-                hitCircle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            hitCircle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-                Child = new SkinProvidingContainer(new DefaultSkin())
+            Child = new SkinProvidingContainer(new DefaultSkin(null))
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = drawableHitCircle = new DrawableHitCircle(hitCircle)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = drawableHitCircle = new DrawableHitCircle(hitCircle)
-                    {
-                        Size = new Vector2(100)
-                    }
-                };
-            });
-        }
+                    Size = new Vector2(100)
+                }
+            };
+        });
 
         [Test]
         public void TestCircleHitCentre()

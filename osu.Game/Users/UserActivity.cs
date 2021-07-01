@@ -3,6 +3,7 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
 
@@ -61,9 +62,21 @@ namespace osu.Game.Users
             public override string Status => @"Spectating a game";
         }
 
+        public class SearchingForLobby : UserActivity
+        {
+            public override string Status => @"Looking for a lobby";
+        }
+
         public class InLobby : UserActivity
         {
             public override string Status => @"In a multiplayer lobby";
+
+            public readonly Room Room;
+
+            public InLobby(Room room)
+            {
+                Room = room;
+            }
         }
     }
 }

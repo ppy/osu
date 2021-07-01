@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
@@ -13,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModWiggle : Mod, IApplicableToDrawableHitObjects
+    internal class OsuModWiggle : ModWithVisibilityAdjustment
     {
         public override string Name => "Wiggle";
         public override string Acronym => "WG";
@@ -26,20 +25,18 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const int wiggle_duration = 90; // (ms) Higher = fewer wiggles
         private const int wiggle_strength = 10; // Higher = stronger wiggles
 
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
-        {
-            foreach (var drawable in drawables)
-                drawable.ApplyCustomUpdateState += drawableOnApplyCustomUpdateState;
-        }
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) => drawableOnApplyCustomUpdateState(hitObject, state);
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => drawableOnApplyCustomUpdateState(hitObject, state);
 
         private void drawableOnApplyCustomUpdateState(DrawableHitObject drawable, ArmedState state)
         {
             var osuObject = (OsuHitObject)drawable.HitObject;
             Vector2 origin = drawable.Position;
 
-            // Wiggle the repeat points with the slider instead of independently.
+            // Wiggle the repeat points and the tail with the slider instead of independently.
             // Also fixes an issue with repeat points being positioned incorrectly.
-            if (osuObject is RepeatPoint)
+            if (osuObject is SliderRepeat || osuObject is SliderTailCircle)
                 return;
 
             Random objRand = new Random((int)osuObject.StartTime);
@@ -61,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             // Keep wiggling sliders and spinners for their duration
-            if (!(osuObject is IHasEndTime endTime))
+            if (!(osuObject is IHasDuration endTime))
                 return;
 
             amountWiggles = (int)(endTime.Duration / wiggle_duration);

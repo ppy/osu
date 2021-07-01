@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Overlays.BeatmapSet;
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -15,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -23,11 +22,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneLeaderboardModSelector : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(LeaderboardModSelector),
-        };
-
         public TestSceneLeaderboardModSelector()
         {
             LeaderboardModSelector modSelector;
@@ -52,14 +46,14 @@ namespace osu.Game.Tests.Visual.Online
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
-                        args.NewItems.Cast<Mod>().ForEach(mod => selectedMods.Add(new OsuSpriteText
+                        args.NewItems.AsNonNull().Cast<Mod>().ForEach(mod => selectedMods.Add(new OsuSpriteText
                         {
                             Text = mod.Acronym,
                         }));
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
-                        args.OldItems.Cast<Mod>().ForEach(mod =>
+                        args.OldItems.AsNonNull().Cast<Mod>().ForEach(mod =>
                         {
                             foreach (var selected in selectedMods)
                             {

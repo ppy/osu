@@ -4,17 +4,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osuTK;
@@ -37,6 +35,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private readonly FillFlowContainer<InfoColumn> statisticsColumns;
         private readonly ModsInfoColumn modsColumn;
+
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
 
         public TopScoreStatisticsSection()
         {
@@ -87,6 +88,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            if (score != null)
+                totalScoreColumn.Current = scoreManager.GetBindableTotalScoreString(score);
+        }
+
+        private ScoreInfo score;
+
         /// <summary>
         /// Sets the score to be displayed.
         /// </summary>
@@ -94,20 +104,28 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             set
             {
-                totalScoreColumn.Text = $@"{value.TotalScore:N0}";
+                if (score == value)
+                    return;
+
+                score = value;
+
                 accuracyColumn.Text = value.DisplayAccuracy;
                 maxComboColumn.Text = $@"{value.MaxCombo:N0}x";
-                ppColumn.Alpha = value.Beatmap?.Status == BeatmapSetOnlineStatus.Ranked ? 1 : 0;
+
+                ppColumn.Alpha = value.Beatmap?.Status.GrantsPerformancePoints() == true ? 1 : 0;
                 ppColumn.Text = $@"{value.PP:N0}";
 
-                statisticsColumns.ChildrenEnumerable = value.SortedStatistics.Select(kvp => createStatisticsColumn(kvp.Key, kvp.Value));
+                statisticsColumns.ChildrenEnumerable = value.GetStatisticsForDisplay().Select(createStatisticsColumn);
                 modsColumn.Mods = value.Mods;
+
+                if (scoreManager != null)
+                    totalScoreColumn.Current = scoreManager.GetBindableTotalScoreString(value);
             }
         }
 
-        private TextColumn createStatisticsColumn(HitResult hitResult, int count) => new TextColumn(hitResult.GetDescription(), smallFont, bottom_columns_min_width)
+        private TextColumn createStatisticsColumn(HitResultDisplayStatistic stat) => new TextColumn(stat.DisplayName, smallFont, bottom_columns_min_width)
         {
-            Text = count.ToString()
+            Text = stat.MaxCount == null ? $"{stat.Count}" : $"{stat.Count}/{stat.MaxCount}"
         };
 
         private class InfoColumn : CompositeDrawable
@@ -186,9 +204,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 this.text = text;
             }
 
-            public LocalisedString Text
+            public string Text
             {
                 set => text.Text = value;
+            }
+
+            public Bindable<string> Current
+            {
+                get => text.Current;
+                set => text.Current = value;
             }
         }
 

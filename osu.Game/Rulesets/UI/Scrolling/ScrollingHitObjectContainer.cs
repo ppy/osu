@@ -2,13 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osuTK;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
@@ -17,16 +19,36 @@ namespace osu.Game.Rulesets.UI.Scrolling
         private readonly IBindable<double> timeRange = new BindableDouble();
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
+        /// <summary>
+        /// Whether the scrolling direction is horizontal or vertical.
+        /// </summary>
+        private Direction scrollingAxis => direction.Value == ScrollingDirection.Left || direction.Value == ScrollingDirection.Right ? Direction.Horizontal : Direction.Vertical;
+
+        /// <summary>
+        /// The scrolling axis is inverted if objects temporally farther in the future have a smaller position value across the scrolling axis.
+        /// </summary>
+        /// <example>
+        /// <see cref="ScrollingDirection.Down"/> is inverted, because given two objects, one of which is at the current time and one of which is 1000ms in the future,
+        /// in the current time instant the future object is spatially above the current object, and therefore has a smaller value of the Y coordinate of its position.
+        /// </example>
+        private bool axisInverted => direction.Value == ScrollingDirection.Down || direction.Value == ScrollingDirection.Right;
+
+        /// <summary>
+        /// A set of top-level <see cref="DrawableHitObject"/>s which have an up-to-date layout.
+        /// </summary>
+        private readonly HashSet<DrawableHitObject> layoutComputed = new HashSet<DrawableHitObject>();
+
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
-        private readonly LayoutValue initialStateCache = new LayoutValue(Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo);
+        // Responds to changes in the layout. When the layout changes, all hit object states must be recomputed.
+        private readonly LayoutValue layoutCache = new LayoutValue(Invalidation.RequiredParentSizeToFit | Invalidation.DrawInfo);
 
         public ScrollingHitObjectContainer()
         {
             RelativeSizeAxes = Axes.Both;
 
-            AddLayout(initialStateCache);
+            AddLayout(layoutCache);
         }
 
         [BackgroundDependencyLoader]
@@ -35,76 +57,138 @@ namespace osu.Game.Rulesets.UI.Scrolling
             direction.BindTo(scrollingInfo.Direction);
             timeRange.BindTo(scrollingInfo.TimeRange);
 
-            direction.ValueChanged += _ => initialStateCache.Invalidate();
-            timeRange.ValueChanged += _ => initialStateCache.Invalidate();
+            direction.ValueChanged += _ => layoutCache.Invalidate();
+            timeRange.ValueChanged += _ => layoutCache.Invalidate();
         }
 
-        public override void Add(DrawableHitObject hitObject)
+        /// <summary>
+        /// Given a position at <paramref name="currentTime"/>, return the time of the object corresponding to the position.
+        /// </summary>
+        /// <remarks>
+        /// If there are multiple valid time values, one arbitrary time is returned.
+        /// </remarks>
+        public double TimeAtPosition(float localPosition, double currentTime)
         {
-            initialStateCache.Invalidate();
-            base.Add(hitObject);
+            float scrollPosition = axisInverted ? -localPosition : localPosition;
+            return scrollingInfo.Algorithm.TimeAt(scrollPosition, currentTime, timeRange.Value, scrollLength);
         }
 
-        public override bool Remove(DrawableHitObject hitObject)
+        /// <summary>
+        /// Given a position at the current time in screen space, return the time of the object corresponding the position.
+        /// </summary>
+        /// <remarks>
+        /// If there are multiple valid time values, one arbitrary time is returned.
+        /// </remarks>
+        public double TimeAtScreenSpacePosition(Vector2 screenSpacePosition)
         {
-            var result = base.Remove(hitObject);
-
-            if (result)
-            {
-                initialStateCache.Invalidate();
-                hitObjectInitialStateCache.Remove(hitObject);
-            }
-
-            return result;
+            Vector2 pos = ToLocalSpace(screenSpacePosition);
+            float localPosition = scrollingAxis == Direction.Horizontal ? pos.X : pos.Y;
+            localPosition -= axisInverted ? scrollLength : 0;
+            return TimeAtPosition(localPosition, Time.Current);
         }
 
-        private float scrollLength;
+        /// <summary>
+        /// Given a time, return the position along the scrolling axis within this <see cref="HitObjectContainer"/> at time <paramref name="currentTime"/>.
+        /// </summary>
+        public float PositionAtTime(double time, double currentTime)
+        {
+            float scrollPosition = scrollingInfo.Algorithm.PositionAt(time, currentTime, timeRange.Value, scrollLength);
+            return axisInverted ? -scrollPosition : scrollPosition;
+        }
+
+        /// <summary>
+        /// Given a time, return the position along the scrolling axis within this <see cref="HitObjectContainer"/> at the current time.
+        /// </summary>
+        public float PositionAtTime(double time) => PositionAtTime(time, Time.Current);
+
+        /// <summary>
+        /// Given a time, return the screen space position within this <see cref="HitObjectContainer"/>.
+        /// In the non-scrolling axis, the center of this <see cref="HitObjectContainer"/> is returned.
+        /// </summary>
+        public Vector2 ScreenSpacePositionAtTime(double time)
+        {
+            float localPosition = PositionAtTime(time, Time.Current);
+            localPosition += axisInverted ? scrollLength : 0;
+            return scrollingAxis == Direction.Horizontal
+                ? ToScreenSpace(new Vector2(localPosition, DrawHeight / 2))
+                : ToScreenSpace(new Vector2(DrawWidth / 2, localPosition));
+        }
+
+        /// <summary>
+        /// Given a start time and end time of a scrolling object, return the length of the object along the scrolling axis.
+        /// </summary>
+        public float LengthAtTime(double startTime, double endTime)
+        {
+            return scrollingInfo.Algorithm.GetLength(startTime, endTime, timeRange.Value, scrollLength);
+        }
+
+        private float scrollLength => scrollingAxis == Direction.Horizontal ? DrawWidth : DrawHeight;
+
+        protected override void AddDrawable(HitObjectLifetimeEntry entry, DrawableHitObject drawable)
+        {
+            base.AddDrawable(entry, drawable);
+
+            invalidateHitObject(drawable);
+            drawable.DefaultsApplied += invalidateHitObject;
+        }
+
+        protected override void RemoveDrawable(HitObjectLifetimeEntry entry, DrawableHitObject drawable)
+        {
+            base.RemoveDrawable(entry, drawable);
+
+            drawable.DefaultsApplied -= invalidateHitObject;
+            layoutComputed.Remove(drawable);
+        }
+
+        private void invalidateHitObject(DrawableHitObject hitObject)
+        {
+            hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
+            layoutComputed.Remove(hitObject);
+        }
 
         protected override void Update()
         {
             base.Update();
 
-            if (!initialStateCache.IsValid)
+            if (layoutCache.IsValid) return;
+
+            layoutComputed.Clear();
+
+            // Reset lifetime to the conservative estimation.
+            // If a drawable becomes alive by this lifetime, its lifetime will be updated to a more precise lifetime in the next update.
+            foreach (var entry in Entries)
+                entry.SetInitialLifetime();
+
+            scrollingInfo.Algorithm.Reset();
+
+            layoutCache.Validate();
+        }
+
+        protected override void UpdateAfterChildrenLife()
+        {
+            base.UpdateAfterChildrenLife();
+
+            // We need to calculate hit object positions (including nested hit objects) as soon as possible after lifetimes
+            // to prevent hit objects displayed in a wrong position for one frame.
+            // Only AliveObjects need to be considered for layout (reduces overhead in the case of scroll speed changes).
+            foreach (var obj in AliveObjects)
             {
-                foreach (var cached in hitObjectInitialStateCache.Values)
-                    cached.Invalidate();
+                updatePosition(obj, Time.Current);
 
-                switch (direction.Value)
-                {
-                    case ScrollingDirection.Up:
-                    case ScrollingDirection.Down:
-                        scrollLength = DrawSize.Y;
-                        break;
+                if (layoutComputed.Contains(obj))
+                    continue;
 
-                    default:
-                        scrollLength = DrawSize.X;
-                        break;
-                }
+                updateLayoutRecursive(obj);
 
-                scrollingInfo.Algorithm.Reset();
-
-                foreach (var obj in Objects)
-                {
-                    computeLifetimeStartRecursive(obj);
-                    computeInitialStateRecursive(obj);
-                }
-
-                initialStateCache.Validate();
+                layoutComputed.Add(obj);
             }
         }
 
-        private void computeLifetimeStartRecursive(DrawableHitObject hitObject)
-        {
-            hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
-
-            foreach (var obj in hitObject.NestedHitObjects)
-                computeLifetimeStartRecursive(obj);
-        }
-
-        private readonly Dictionary<DrawableHitObject, Cached> hitObjectInitialStateCache = new Dictionary<DrawableHitObject, Cached>();
-
         private double computeOriginAdjustedLifetimeStart(DrawableHitObject hitObject)
         {
+            // Origin position may be relative to the parent size
+            Debug.Assert(hitObject.Parent != null);
+
             float originAdjustment = 0.0f;
 
             // calculate the dimension of the part of the hitobject that should already be visible
@@ -131,71 +215,34 @@ namespace osu.Game.Rulesets.UI.Scrolling
             return scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, originAdjustment, timeRange.Value, scrollLength);
         }
 
-        // Cant use AddOnce() since the delegate is re-constructed every invocation
-        private void computeInitialStateRecursive(DrawableHitObject hitObject) => hitObject.Schedule(() =>
+        private void updateLayoutRecursive(DrawableHitObject hitObject)
         {
-            if (!hitObjectInitialStateCache.TryGetValue(hitObject, out var cached))
-                cached = hitObjectInitialStateCache[hitObject] = new Cached();
-
-            if (cached.IsValid)
-                return;
-
-            if (hitObject.HitObject is IHasEndTime e)
+            if (hitObject.HitObject is IHasDuration e)
             {
-                switch (direction.Value)
-                {
-                    case ScrollingDirection.Up:
-                    case ScrollingDirection.Down:
-                        hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, e.EndTime, timeRange.Value, scrollLength);
-                        break;
-
-                    case ScrollingDirection.Left:
-                    case ScrollingDirection.Right:
-                        hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, e.EndTime, timeRange.Value, scrollLength);
-                        break;
-                }
+                float length = LengthAtTime(hitObject.HitObject.StartTime, e.EndTime);
+                if (scrollingAxis == Direction.Horizontal)
+                    hitObject.Width = length;
+                else
+                    hitObject.Height = length;
             }
 
             foreach (var obj in hitObject.NestedHitObjects)
             {
-                computeInitialStateRecursive(obj);
+                updateLayoutRecursive(obj);
 
                 // Nested hitobjects don't need to scroll, but they do need accurate positions
                 updatePosition(obj, hitObject.HitObject.StartTime);
             }
-
-            cached.Validate();
-        });
-
-        protected override void UpdateAfterChildrenLife()
-        {
-            base.UpdateAfterChildrenLife();
-
-            // We need to calculate hitobject positions as soon as possible after lifetimes so that hitobjects get the final say in their positions
-            foreach (var obj in AliveObjects)
-                updatePosition(obj, Time.Current);
         }
 
         private void updatePosition(DrawableHitObject hitObject, double currentTime)
         {
-            switch (direction.Value)
-            {
-                case ScrollingDirection.Up:
-                    hitObject.Y = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
-                    break;
+            float position = PositionAtTime(hitObject.HitObject.StartTime, currentTime);
 
-                case ScrollingDirection.Down:
-                    hitObject.Y = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
-                    break;
-
-                case ScrollingDirection.Left:
-                    hitObject.X = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
-                    break;
-
-                case ScrollingDirection.Right:
-                    hitObject.X = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
-                    break;
-            }
+            if (scrollingAxis == Direction.Horizontal)
+                hitObject.X = position;
+            else
+                hitObject.Y = position;
         }
     }
 }
