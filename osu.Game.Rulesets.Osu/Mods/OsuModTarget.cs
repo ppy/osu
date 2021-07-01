@@ -204,7 +204,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var beats = beatmap.ControlPointInfo.TimingPoints
                                // Ignore timing points after endTime
-                               .Where(timingPoint => almostBigger(endTime, timingPoint.Time))
+                               .Where(timingPoint => !definitelyBigger(timingPoint.Time, endTime))
                                // Generate the beats
                                .SelectMany(timingPoint => getBeatsForTimingPoint(timingPoint, endTime))
                                // Remove beats before startTime
@@ -218,7 +218,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 var beat = beats[i];
 
-                if (almostBigger(beatmap.ControlPointInfo.TimingPointAt(beat).BeatLength / 2, beats[i + 1] - beat))
+                if (!definitelyBigger(beats[i + 1] - beat, beatmap.ControlPointInfo.TimingPointAt(beat).BeatLength / 2))
                     beats.RemoveAt(i);
             }
 
@@ -386,7 +386,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 var firstObjAfterBreak = originalHitObjects.First(obj => almostBigger(obj.StartTime, breakPeriod.EndTime));
 
                 return almostBigger(time, breakPeriod.StartTime)
-                       && almostBigger(firstObjAfterBreak.StartTime, time);
+                       && definitelyBigger(firstObjAfterBreak.StartTime, time);
             });
         }
 
@@ -396,7 +396,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             int i = 0;
             var currentTime = timingPoint.Time;
 
-            while (almostBigger(mapEndTime, currentTime) && controlPointInfo.TimingPointAt(currentTime) == timingPoint)
+            while (!definitelyBigger(currentTime, mapEndTime) && controlPointInfo.TimingPointAt(currentTime) == timingPoint)
             {
                 beats.Add(Math.Floor(currentTime));
                 i++;
@@ -439,6 +439,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 if (!(hitObject is IHasRepeats s))
                     return false;
+                // If time is outside the duration of the IHasRepeats,
+                // then this hitObject isn't the one we want
                 if (!almostBigger(time, hitObject.StartTime)
                     || !almostBigger(s.EndTime, time))
                     return false;
@@ -518,6 +520,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         private static bool almostBigger(double value1, double value2)
         {
             return Precision.AlmostBigger(value1, value2, timing_precision);
+        }
+
+        private static bool definitelyBigger(double value1, double value2)
+        {
+            return Precision.DefinitelyBigger(value1, value2, timing_precision);
         }
 
         private static bool almostEquals(double value1, double value2)
