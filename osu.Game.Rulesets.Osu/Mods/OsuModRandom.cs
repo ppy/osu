@@ -243,8 +243,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private Vector2 clampToPlayfield(Vector2 position, float radius)
         {
-            position.X = MathHelper.Clamp(position.X, radius, OsuPlayfield.BASE_SIZE.X - radius);
-            position.Y = MathHelper.Clamp(position.Y, radius, OsuPlayfield.BASE_SIZE.Y - radius);
+            position.X = Math.Clamp(position.X, radius, OsuPlayfield.BASE_SIZE.X - radius);
+            position.Y = Math.Clamp(position.Y, radius, OsuPlayfield.BASE_SIZE.Y - radius);
 
             return position;
         }
