@@ -149,9 +149,6 @@ namespace osu.Game.Screens.Select
                                         RelativeSizeAxes = Axes.Both,
                                         Children = new Drawable[]
                                         {
-                                            description = new MetadataSection(MetadataType.Description),
-                                            source = new MetadataSection(MetadataType.Source),
-                                            tags = new MetadataSection(MetadataType.Tags),
                                             new OsuSpriteText
                                             {
                                                 Text = "Points of Failure",
