@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private ControlPointInfo controlPointInfo;
 
-        private List<OsuHitObject> origHitObjects;
+        private List<OsuHitObject> originalHitObjects;
 
         private Random rng;
 
@@ -168,14 +168,14 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override void ApplyToBeatmap(IBeatmap beatmap)
         {
             Seed.Value ??= RNG.Next();
-            rng = new Random(Seed.Value.GetValueOrDefault());
+            rng = new Random(Seed.Value.Value);
 
             var osuBeatmap = (OsuBeatmap)beatmap;
 
             if (osuBeatmap.HitObjects.Count == 0) return;
 
             controlPointInfo = osuBeatmap.ControlPointInfo;
-            origHitObjects = osuBeatmap.HitObjects.OrderBy(x => x.StartTime).ToList();
+            originalHitObjects = osuBeatmap.HitObjects.OrderBy(x => x.StartTime).ToList();
 
             var hitObjects = generateBeats(osuBeatmap)
                              .Select(beat =>
@@ -199,9 +199,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private IEnumerable<double> generateBeats(IBeatmap beatmap)
         {
-            var startTime = origHitObjects.First().StartTime;
-            var endObj = origHitObjects.Last();
-            var endTime = endObj.GetEndTime();
+            var startTime = originalHitObjects.First().StartTime;
+            var endTime = originalHitObjects.Last().GetEndTime();
 
             var beats = beatmap.ControlPointInfo.TimingPoints
                                // Ignore timing points after endTime
@@ -230,24 +229,25 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             foreach (var obj in hitObjects)
             {
-                var samples = getSamplesAtTime(origHitObjects, obj.StartTime);
+                var samples = getSamplesAtTime(originalHitObjects, obj.StartTime);
 
                 // If samples aren't available at the exact start time of the object,
                 // use samples (without additions) in the closest original hit object instead
-                obj.Samples = samples ?? getClosestHitObject(origHitObjects, obj.StartTime).Samples.Where(s => !HitSampleInfo.AllAdditions.Contains(s.Name)).ToList();
+                obj.Samples = samples ?? getClosestHitObject(originalHitObjects, obj.StartTime).Samples.Where(s => !HitSampleInfo.AllAdditions.Contains(s.Name)).ToList();
             }
         }
 
         private void fixComboInfo(List<OsuHitObject> hitObjects)
         {
-            // Copy combo indices from the closest preceding object
-            hitObjects.ForEach(obj =>
+            // Copy combo indices from an original object at the same time or from the closest preceding object
+            // (Objects lying between two combos are assumed to belong to the preceding combo)
+            hitObjects.ForEach(newObj =>
             {
-                var closestOrigObj = origHitObjects.FindLast(y => almostBigger(obj.StartTime, y.StartTime));
+                var closestOrigObj = originalHitObjects.FindLast(y => almostBigger(newObj.StartTime, y.StartTime));
 
                 // It shouldn't be possible for closestOrigObj to be null
                 // But if it is, obj should be in the first combo
-                obj.ComboIndex = closestOrigObj?.ComboIndex ?? 0;
+                newObj.ComboIndex = closestOrigObj?.ComboIndex ?? 0;
             });
 
             // The copied combo indices may not be continuous if the original map starts and ends a combo in between beats
@@ -383,7 +383,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             return breaks.Any(breakPeriod =>
             {
-                var firstObjAfterBreak = origHitObjects.First(obj => almostBigger(obj.StartTime, breakPeriod.EndTime));
+                var firstObjAfterBreak = originalHitObjects.First(obj => almostBigger(obj.StartTime, breakPeriod.EndTime));
 
                 return almostBigger(time, breakPeriod.StartTime)
                        && almostBigger(firstObjAfterBreak.StartTime, time);
@@ -408,14 +408,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private OsuHitObject getClosestHitObject(List<OsuHitObject> hitObjects, double time)
         {
-            var closestIdx = hitObjects.FindLastIndex(h => h.StartTime < time);
+            var precedingIndex = hitObjects.FindLastIndex(h => h.StartTime < time);
 
-            if (closestIdx == hitObjects.Count - 1) return hitObjects[closestIdx];
+            if (precedingIndex == hitObjects.Count - 1) return hitObjects[precedingIndex];
 
             // return the closest preceding/succeeding hit object, whoever is closer in time
-            return hitObjects[closestIdx + 1].StartTime - time < time - hitObjects[closestIdx].StartTime
-                ? hitObjects[closestIdx + 1]
-                : hitObjects[closestIdx];
+            return hitObjects[precedingIndex + 1].StartTime - time < time - hitObjects[precedingIndex].StartTime
+                ? hitObjects[precedingIndex + 1]
+                : hitObjects[precedingIndex];
         }
 
         /// <summary>
@@ -468,7 +468,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             double spanDuration = curve.Duration / curve.SpanCount();
             double nodeIndex = timeSinceStart / spanDuration;
 
-            if (almostEquals(nodeIndex - Math.Round(nodeIndex), 0))
+            if (almostEquals(nodeIndex, Math.Round(nodeIndex)))
                 return (int)Math.Round(nodeIndex);
 
             return -1;
@@ -501,6 +501,15 @@ namespace osu.Game.Rulesets.Osu.Mods
             obj.Position = position;
         }
 
+        /// <summary>
+        /// Re-maps a number from one range to another.
+        /// </summary>
+        /// <param name="value">The number to be re-mapped.</param>
+        /// <param name="fromLow">Beginning of the original range.</param>
+        /// <param name="fromHigh">End of the original range.</param>
+        /// <param name="toLow">Beginning of the new range.</param>
+        /// <param name="toHigh">End of the new range.</param>
+        /// <returns>The re-mapped number.</returns>
         private static float map(float value, float fromLow, float fromHigh, float toLow, float toHigh)
         {
             return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
