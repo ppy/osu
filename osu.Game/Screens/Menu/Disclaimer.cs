@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -36,6 +37,8 @@ namespace osu.Game.Screens.Menu
         private readonly Bindable<User> currentUser = new Bindable<User>();
         private FillFlowContainer fill;
 
+        private readonly List<Drawable> expendableText = new List<Drawable>();
+
         public Disclaimer(OsuScreen nextScreen = null)
         {
             this.nextScreen = nextScreen;
@@ -54,7 +57,7 @@ namespace osu.Game.Screens.Menu
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = FontAwesome.Solid.Flask,
+                    Icon = OsuIcon.Logo,
                     Size = new Vector2(icon_size),
                     Y = icon_y,
                 },
@@ -76,36 +79,52 @@ namespace osu.Game.Screens.Menu
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Spacing = new Vector2(0, 2),
-                            LayoutDuration = 2000,
-                            LayoutEasing = Easing.OutQuint
-                        },
-                        supportFlow = new LinkFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            TextAnchor = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Alpha = 0,
-                            Spacing = new Vector2(0, 2),
                         },
                     }
-                }
+                },
+                supportFlow = new LinkFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    TextAnchor = Anchor.BottomCentre,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Padding = new MarginPadding(20),
+                    Alpha = 0,
+                    Spacing = new Vector2(0, 2),
+                },
             };
 
-            textFlow.AddText("This project is an ongoing ", t => t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Light));
-            textFlow.AddText("work in progress", t => t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.SemiBold));
+            textFlow.AddText("This is osu!", t => t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Regular));
+
+            expendableText.AddRange(textFlow.AddText("(lazer)", t =>
+            {
+                t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Regular);
+                t.Colour = colours.PinkLight;
+            }));
 
             textFlow.NewParagraph();
 
-            static void format(SpriteText t) => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
+            textFlow.AddText("the next ", t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.Regular));
+            textFlow.AddText("major update", t =>
+            {
+                t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.SemiBold);
+                t.Colour = colours.Pink;
+            });
+            expendableText.AddRange(textFlow.AddText(" coming to osu!", t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.Regular)));
+            textFlow.AddText(".", t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.Regular));
 
-            textFlow.AddParagraph(getRandomTip(), t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.SemiBold));
+            textFlow.NewParagraph();
+
+            textFlow.AddParagraph("Today's Tip: ", t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.SemiBold));
+            textFlow.AddText(getRandomTip(), t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.Regular));
             textFlow.NewParagraph();
 
             textFlow.NewParagraph();
 
             iconColour = colours.Yellow;
+
+            static void format(SpriteText t) => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
 
             // manually transfer the user once, but only do the final bind in LoadComplete to avoid thread woes (API scheduler could run while this screen is still loading).
             // the manual transfer is here to ensure all text content is loaded ahead of time as this is very early in the game load process and we want to avoid stutters.
@@ -122,7 +141,7 @@ namespace osu.Game.Screens.Menu
                 {
                     supportFlow.AddText("Consider becoming an ", format);
                     supportFlow.AddLink("osu!supporter", "https://osu.ppy.sh/home/support", creationParameters: format);
-                    supportFlow.AddText(" to help support the game", format);
+                    supportFlow.AddText(" to help support osu!'s development", format);
                 }
 
                 heart = supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
@@ -169,7 +188,11 @@ namespace osu.Game.Screens.Menu
                     .MoveToY(icon_y, 160, Easing.InQuart)
                     .FadeColour(Color4.White, 160);
 
-                fill.Delay(520 + 160).MoveToOffset(new Vector2(0, 15), 160, Easing.OutQuart);
+                using (BeginDelayedSequence(520 + 160))
+                {
+                    fill.MoveToOffset(new Vector2(0, 15), 160, Easing.OutQuart);
+                    Schedule(() => expendableText.ForEach(t => t.Expire()));
+                }
             }
 
             supportFlow.FadeOut().Delay(2000).FadeIn(500);
