@@ -114,6 +114,16 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "游玩区域边框风格",
                     Current = config.GetBindable<PlayfieldBorderStyle>(OsuRulesetSetting.PlayfieldBorderStyle),
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "强制为转盘启用pippi移动方式",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.PippiSpinner)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "强制为note串启用pippi移动方式",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.PippiStream)
+                }
             };
         }
 

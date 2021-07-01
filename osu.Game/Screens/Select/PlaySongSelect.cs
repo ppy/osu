@@ -103,8 +103,7 @@ namespace osu.Game.Screens.Select
 
                 var mods = Mods.Value;
 
-                if (!mods.Any(m => m is ModAutoplay))
-                //if (mods.All(m => m.GetType() != autoInstance.GetType()))
+                if (!mods.Any(m => m is ModAutoplay) || !mods.Any(m => m is ModDance))
                 {
                     Mods.Value = mods.Append(autoInstance).ToArray();
                     removeAutoModOnResume = true;
