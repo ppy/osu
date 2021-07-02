@@ -103,6 +103,16 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
                     result.Value = LegacyColourCompatibility.DisallowZeroAlpha(result.Value);
                     return (IBindable<TValue>)result;
+
+                case CatchSkinConfiguration config:
+                    switch (config)
+                    {
+                        case CatchSkinConfiguration.FlipCatcherPlate:
+                            // Always return `false` (don't flip catcher plate contents) for a legacy skin.
+                            return (IBindable<TValue>)new Bindable<bool>();
+                    }
+
+                    break;
             }
 
             return base.GetConfig<TLookup, TValue>(lookup);
