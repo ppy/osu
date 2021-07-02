@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
@@ -14,6 +15,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneColourPicker : OsuTestScene
     {
+        private readonly Bindable<Colour4> colour = new Bindable<Colour4>(Colour4.Aquamarine);
+
         [SetUpSteps]
         public void SetUpSteps()
         {
@@ -42,7 +45,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 new OsuColourPicker
                                 {
                                     Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre
+                                    Origin = Anchor.Centre,
+                                    Current = { BindTarget = colour },
                                 }
                             }
                         },
@@ -59,13 +63,18 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 new OsuColourPicker
                                 {
                                     Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre
+                                    Origin = Anchor.Centre,
+                                    Current = { BindTarget = colour },
                                 }
                             }
                         }
                     }
                 }
             });
+
+            AddStep("set green", () => colour.Value = Colour4.LimeGreen);
+            AddStep("set white", () => colour.Value = Colour4.White);
+            AddStep("set red", () => colour.Value = Colour4.Red);
         }
 
         private class ColourProvidingContainer : Container
