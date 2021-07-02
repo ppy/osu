@@ -242,7 +242,9 @@ namespace osu.Game.Overlays.Volume
 
             if (displayVolumeInt == 0)
                 channel.Frequency.Value -= 0.5f;
-            else if (displayVolumeInt == 100) channel.Frequency.Value -= 0.5f;
+            else if (displayVolumeInt == 100)
+                // intentionally pitched down, even when hitting max.
+                channel.Frequency.Value -= 0.5f;
 
             channel.Play();
             sampleLastPlaybackTime = Time.Current;
