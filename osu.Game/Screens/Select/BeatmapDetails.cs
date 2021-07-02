@@ -15,7 +15,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Online.Chat;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Details;
 using osuTK;
@@ -129,8 +128,6 @@ namespace osu.Game.Screens.Select
                                                     AutoSizeAxes = Axes.Y,
                                                     LayoutDuration = transition_duration,
                                                     LayoutEasing = Easing.OutQuad,
-                                                    Spacing = new Vector2(spacing * 2),
-                                                    Margin = new MarginPadding { Top = spacing * 2 },
                                                     Children = new[]
                                                     {
                                                         description = new MetadataSection(MetadataType.Description),
@@ -291,110 +288,5 @@ namespace osu.Game.Screens.Select
                 };
             }
         }
-
-        private class MetadataSection : Container
-        {
-            private readonly FillFlowContainer textContainer;
-            private readonly MetadataType type;
-            private TextFlowContainer textFlow;
-
-            public MetadataSection(MetadataType type)
-            {
-                this.type = type;
-
-                Alpha = 0;
-
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-
-                InternalChild = textContainer = new FillFlowContainer
-                {
-                    Alpha = 0,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(spacing / 2),
-                    Children = new Drawable[]
-                    {
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Child = new OsuSpriteText
-                            {
-                                Text = this.type.ToString(),
-                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
-                            },
-                        },
-                    },
-                };
-            }
-
-            public string Text
-            {
-                set
-                {
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        this.FadeOut(transition_duration);
-                        return;
-                    }
-
-                    this.FadeIn(transition_duration);
-
-                    setTextAsync(value);
-                }
-            }
-
-            private void setTextAsync(string text)
-            {
-                LoadComponentAsync(new LinkFlowContainer(s => s.Font = s.Font.With(size: 14))
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Colour = Color4.White.Opacity(0.75f),
-                }, loaded =>
-                {
-                    textFlow?.Expire();
-
-                    switch (type)
-                    {
-                        case MetadataType.Tags:
-                            string[] tags = text.Split(" ");
-
-                            for (int i = 0; i <= tags.Length - 1; i++)
-                            {
-                                loaded.AddLink(tags[i], LinkAction.SearchBeatmapSet, tags[i]);
-
-                                if (i != tags.Length - 1)
-                                    loaded.AddText(" ");
-                            }
-
-                            break;
-
-                        case MetadataType.Source:
-                            loaded.AddLink(text, LinkAction.SearchBeatmapSet, text);
-                            break;
-
-                        default:
-                            loaded.AddText(text);
-                            break;
-                    }
-
-                    textContainer.Add(textFlow = loaded);
-
-                    // fade in if we haven't yet.
-                    textContainer.FadeIn(transition_duration);
-                });
-            }
-        }
-    }
-
-    public enum MetadataType
-    {
-        Tags,
-        Source,
-        Description,
-        Genre,
-        Language
     }
 }

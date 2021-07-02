@@ -6,14 +6,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Chat;
 using osu.Game.Screens.Select;
-using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -137,77 +133,6 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             successRateBackground.Colour = colourProvider.Background4;
             background.Colour = colourProvider.Background5;
-        }
-
-        private class MetadataSection : FillFlowContainer
-        {
-            private readonly MetadataType type;
-            private readonly LinkFlowContainer textFlow;
-
-            public string Text
-            {
-                set
-                {
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        Hide();
-                        return;
-                    }
-
-                    this.FadeIn(transition_duration);
-
-                    textFlow.Clear();
-                    static void format(SpriteText t) => t.Font = t.Font.With(size: 12);
-
-                    switch (type)
-                    {
-                        case MetadataType.Tags:
-                            string[] tags = value.Split(" ");
-
-                            for (int i = 0; i <= tags.Length - 1; i++)
-                            {
-                                textFlow.AddLink(tags[i], LinkAction.SearchBeatmapSet, tags[i], null, format);
-
-                                if (i != tags.Length - 1)
-                                    textFlow.AddText(" ", format);
-                            }
-
-                            break;
-
-                        case MetadataType.Source:
-                            textFlow.AddLink(value, LinkAction.SearchBeatmapSet, value, null, format);
-                            break;
-
-                        default:
-                            textFlow.AddText(value, format);
-                            break;
-                    }
-                }
-            }
-
-            public MetadataSection(MetadataType type)
-            {
-                this.type = type;
-
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-                Spacing = new Vector2(5f);
-
-                InternalChildren = new Drawable[]
-                {
-                    new OsuSpriteText
-                    {
-                        Text = this.type.ToString(),
-                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                        Margin = new MarginPadding { Top = 15 },
-                    },
-                    textFlow = new LinkFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                    },
-                };
-            }
         }
     }
 }
