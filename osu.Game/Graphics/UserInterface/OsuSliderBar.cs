@@ -161,10 +161,9 @@ namespace osu.Game.Graphics.UserInterface
 
             var channel = sample.Play();
 
-            channel.Frequency.Value = 1 + NormalizedValue * 0.2f + RNG.NextDouble(0.02f);
-            if (NormalizedValue == 0)
-                channel.Frequency.Value -= 0.5f;
-            else if (NormalizedValue == 1)
+            channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + NormalizedValue * 0.2f;
+
+            if (NormalizedValue == 0 || NormalizedValue == 1)
                 channel.Frequency.Value -= 0.5f;
         }
 

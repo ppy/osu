@@ -238,7 +238,7 @@ namespace osu.Game.Overlays.Volume
 
             var channel = sample.GetChannel();
 
-            channel.Frequency.Value = 1 + displayVolume * 0.1f + RNG.NextDouble(0.02f);
+            channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + displayVolume * 0.1f;
 
             if (displayVolumeInt == 0)
                 channel.Frequency.Value -= 0.5f;
