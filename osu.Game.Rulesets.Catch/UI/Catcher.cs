@@ -84,8 +84,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatcherAnimationState CurrentState
         {
-            get => body.AnimationState.Value;
-            private set => body.AnimationState.Value = value;
+            get => Body.AnimationState.Value;
+            private set => Body.AnimationState.Value = value;
         }
 
         /// <summary>
@@ -108,18 +108,14 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        public Direction VisualDirection
-        {
-            get => Scale.X > 0 ? Direction.Right : Direction.Left;
-            set => Scale = new Vector2((value == Direction.Right ? 1 : -1) * Math.Abs(Scale.X), Scale.Y);
-        }
+        public Direction VisualDirection { get; set; } = Direction.Right;
 
         /// <summary>
         /// Width of the area that can be used to attempt catches during gameplay.
         /// </summary>
         private readonly float catchWidth;
 
-        private readonly SkinnableCatcher body;
+        internal readonly SkinnableCatcher Body;
 
         private Color4 hyperDashColour = DEFAULT_HYPER_DASH_COLOUR;
         private Color4 hyperDashEndGlowColour = DEFAULT_HYPER_DASH_COLOUR;
@@ -158,7 +154,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.BottomCentre,
                 },
-                body = new SkinnableCatcher(),
+                Body = new SkinnableCatcher(),
                 hitExplosionContainer = new HitExplosionContainer
                 {
                     Anchor = Anchor.TopCentre,
@@ -354,6 +350,11 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             base.Update();
 
+            var scaleFromDirection = new Vector2((int)VisualDirection, 1);
+            Body.Scale = scaleFromDirection;
+            // TODO: don't flip plate contents on legacy skin.
+            caughtObjectContainer.Scale = hitExplosionContainer.Scale = scaleFromDirection;
+
             // Correct overshooting.
             if ((hyperDashDirection > 0 && hyperDashTargetPosition < X) ||
                 (hyperDashDirection < 0 && hyperDashTargetPosition > X))
@@ -465,7 +466,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     break;
 
                 case DroppedObjectAnimation.Explode:
-                    var originalX = droppedObjectTarget.ToSpaceOfOtherDrawable(d.DrawPosition, caughtObjectContainer).X * Scale.X;
+                    float originalX = droppedObjectTarget.ToSpaceOfOtherDrawable(d.DrawPosition, caughtObjectContainer).X * caughtObjectContainer.Scale.X;
                     d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then().MoveToY(d.Y + 50, 500, Easing.InSine);
                     d.MoveToX(d.X + originalX * 6, 1000);
                     d.FadeOut(750);
