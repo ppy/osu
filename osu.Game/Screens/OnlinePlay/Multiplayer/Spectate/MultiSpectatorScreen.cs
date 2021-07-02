@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
@@ -42,6 +43,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private PlayerGrid grid;
         private MultiSpectatorLeaderboard leaderboard;
         private PlayerArea currentAudioSource;
+        private bool canStartMasterClock;
 
         /// <summary>
         /// Creates a new <see cref="MultiSpectatorScreen"/>.
@@ -100,15 +102,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 Expanded = { Value = true },
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-            }, leaderboardContainer.Add);
+            }, l =>
+            {
+                foreach (var instance in instances)
+                    leaderboard.AddClock(instance.UserId, instance.GameplayClock);
+
+                leaderboardContainer.Add(leaderboard);
+            });
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            masterClockContainer.Stop();
             masterClockContainer.Reset();
+            masterClockContainer.Stop();
+
+            syncManager.ReadyToStart += onReadyToStart;
+            syncManager.MasterState.BindValueChanged(onMasterStateChanged, true);
         }
 
         protected override void Update()
@@ -129,19 +140,45 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private bool isCandidateAudioSource([CanBeNull] ISpectatorPlayerClock clock)
             => clock?.IsRunning == true && !clock.IsCatchingUp && !clock.WaitingOnFrames.Value;
 
+        private void onReadyToStart()
+        {
+            // Seek the master clock to the gameplay time.
+            // This is chosen as the first available frame in the players' replays, which matches the seek by each individual SpectatorPlayer.
+            var startTime = instances.Where(i => i.Score != null)
+                                     .SelectMany(i => i.Score.Replay.Frames)
+                                     .Select(f => f.Time)
+                                     .DefaultIfEmpty(0)
+                                     .Min();
+
+            masterClockContainer.Seek(startTime);
+            masterClockContainer.Start();
+
+            // Although the clock has been started, this flag is set to allow for later synchronisation state changes to also be able to start it.
+            canStartMasterClock = true;
+        }
+
+        private void onMasterStateChanged(ValueChangedEvent<MasterClockState> state)
+        {
+            switch (state.NewValue)
+            {
+                case MasterClockState.Synchronised:
+                    if (canStartMasterClock)
+                        masterClockContainer.Start();
+
+                    break;
+
+                case MasterClockState.TooFarAhead:
+                    masterClockContainer.Stop();
+                    break;
+            }
+        }
+
         protected override void OnUserStateChanged(int userId, SpectatorState spectatorState)
         {
         }
 
         protected override void StartGameplay(int userId, GameplayState gameplayState)
-        {
-            var instance = instances.Single(i => i.UserId == userId);
-
-            instance.LoadScore(gameplayState.Score);
-
-            syncManager.AddPlayerClock(instance.GameplayClock);
-            leaderboard.AddClock(instance.UserId, instance.GameplayClock);
-        }
+            => instances.Single(i => i.UserId == userId).LoadScore(gameplayState.Score);
 
         protected override void EndGameplay(int userId)
         {

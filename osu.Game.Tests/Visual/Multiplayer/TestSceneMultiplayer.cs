@@ -18,6 +18,7 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
@@ -30,14 +31,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayer : ScreenTestScene
     {
-        private TestMultiplayer multiplayerScreen;
-
         private BeatmapManager beatmaps;
         private RulesetStore rulesets;
         private BeatmapSetInfo importedSet;
 
-        private TestMultiplayerClient client => multiplayerScreen.Client;
-        private Room room => client.APIRoom;
+        private DependenciesScreen dependenciesScreen;
+        private TestMultiplayer multiplayerScreen;
+        private TestMultiplayerClient client;
 
         public TestSceneMultiplayer()
         {
@@ -229,30 +229,43 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void loadMultiplayer()
         {
-            AddStep("show", () =>
+            AddStep("create multiplayer screen", () => multiplayerScreen = new TestMultiplayer());
+
+            AddStep("load dependencies", () =>
             {
-                multiplayerScreen = new TestMultiplayer();
+                client = new TestMultiplayerClient(multiplayerScreen.RoomManager);
 
-                // Needs to be added at a higher level since the multiplayer screen becomes non-current.
-                Child = multiplayerScreen.Client;
+                // The screen gets suspended so it stops receiving updates.
+                Child = client;
 
-                LoadScreen(multiplayerScreen);
+                LoadScreen(dependenciesScreen = new DependenciesScreen(client));
             });
 
-            AddUntilStep("wait for loaded", () => multiplayerScreen.IsLoaded);
+            AddUntilStep("wait for dependencies to load", () => dependenciesScreen.IsLoaded);
+
+            AddStep("load multiplayer", () => LoadScreen(multiplayerScreen));
+            AddUntilStep("wait for multiplayer to load", () => multiplayerScreen.IsLoaded);
         }
 
-        private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
+        /// <summary>
+        /// Used for the sole purpose of adding <see cref="TestMultiplayerClient"/> as a resolvable dependency.
+        /// </summary>
+        private class DependenciesScreen : OsuScreen
         {
             [Cached(typeof(MultiplayerClient))]
             public readonly TestMultiplayerClient Client;
 
-            public TestMultiplayer()
+            public DependenciesScreen(TestMultiplayerClient client)
             {
-                Client = new TestMultiplayerClient((TestMultiplayerRoomManager)RoomManager);
+                Client = client;
             }
+        }
 
-            protected override RoomManager CreateRoomManager() => new TestMultiplayerRoomManager();
+        private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
+        {
+            public new TestMultiplayerRoomManager RoomManager { get; private set; }
+
+            protected override RoomManager CreateRoomManager() => RoomManager = new TestMultiplayerRoomManager();
         }
     }
 }
