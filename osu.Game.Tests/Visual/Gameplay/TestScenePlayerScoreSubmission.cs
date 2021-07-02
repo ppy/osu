@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
@@ -9,7 +8,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Ranking;
 
@@ -17,22 +15,15 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestScenePlayerScoreSubmission : OsuPlayerTestScene
     {
-        protected override bool AllowFail => false;
+        protected override bool AllowFail => allowFail;
+
+        private bool allowFail;
 
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         protected override bool HasCustomSteps => true;
 
-        private bool allowFail;
-
-        protected override TestPlayer CreatePlayer(Ruleset ruleset)
-        {
-            SelectedMods.Value = !allowFail
-                ? new[] { ruleset.GetAllMods().OfType<ModNoFail>().First() }
-                : Array.Empty<Mod>();
-
-            return new TestPlayer(false);
-        }
+        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false);
 
         [Test]
         public void TestNoSubmissionOnResultsWithNoToken()
