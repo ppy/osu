@@ -491,6 +491,10 @@ namespace osu.Game
         public override Task Import(params ImportTask[] imports)
         {
             // encapsulate task as we don't want to begin the import process until in a ready state.
+
+            // ReSharper disable once AsyncVoidLambda
+            // TODO: This is bad because `new Task` doesn't have a Func<Task?> override.
+            // Only used for android imports and a bit of a mess. Probably needs rethinking overall.
             var importTask = new Task(async () => await base.Import(imports).ConfigureAwait(false));
 
             waitForReady(() => this, _ => importTask.Start());
