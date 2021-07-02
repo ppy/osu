@@ -108,7 +108,15 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
+        /// <summary>
+        /// The currently facing direction.
+        /// </summary>
         public Direction VisualDirection { get; set; } = Direction.Right;
+
+        /// <summary>
+        /// Whether the contents of the catcher plate should be visually flipped when the catcher direction is changed.
+        /// </summary>
+        private bool flipCatcherPlate;
 
         /// <summary>
         /// Width of the area that can be used to attempt catches during gameplay.
@@ -343,6 +351,8 @@ namespace osu.Game.Rulesets.Catch.UI
             trails.HyperDashTrailsColour = hyperDashColour;
             trails.EndGlowSpritesColour = hyperDashEndGlowColour;
 
+            flipCatcherPlate = skin.GetConfig<CatchSkinConfiguration, bool>(CatchSkinConfiguration.FlipCatcherPlate)?.Value ?? true;
+
             runHyperDashStateTransition(HyperDashing);
         }
 
@@ -352,8 +362,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             var scaleFromDirection = new Vector2((int)VisualDirection, 1);
             Body.Scale = scaleFromDirection;
-            // TODO: don't flip plate contents on legacy skin.
-            caughtObjectContainer.Scale = hitExplosionContainer.Scale = scaleFromDirection;
+            caughtObjectContainer.Scale = hitExplosionContainer.Scale = flipCatcherPlate ? scaleFromDirection : Vector2.One;
 
             // Correct overshooting.
             if ((hyperDashDirection > 0 && hyperDashTargetPosition < X) ||
