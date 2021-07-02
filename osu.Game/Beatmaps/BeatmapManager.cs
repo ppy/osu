@@ -181,8 +181,13 @@ namespace osu.Game.Beatmaps
                 if (existingOnlineId != null)
                 {
                     Delete(existingOnlineId);
-                    beatmaps.PurgeDeletable(s => s.ID == existingOnlineId.ID);
-                    LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineBeatmapSetID ({beatmapSet.OnlineBeatmapSetID}). It has been purged.");
+
+                    // in order to avoid a unique key constraint, immediately remove the online ID from the previous set.
+                    existingOnlineId.OnlineBeatmapSetID = null;
+                    foreach (var b in existingOnlineId.Beatmaps)
+                        b.OnlineBeatmapID = null;
+
+                    LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineBeatmapSetID ({beatmapSet.OnlineBeatmapSetID}). It has been deleted.");
                 }
             }
         }

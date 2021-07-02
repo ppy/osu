@@ -422,11 +422,15 @@ namespace osu.Game
 
         public void Migrate(string path)
         {
+            Logger.Log($@"Migrating osu! data from ""{Storage.GetFullPath(string.Empty)}"" to ""{path}""...");
+
             using (realmFactory.BlockAllOperations())
             {
                 contextFactory.FlushConnections();
                 (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
             }
+
+            Logger.Log(@"Migration complete!");
         }
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();

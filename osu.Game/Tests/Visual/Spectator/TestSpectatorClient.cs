@@ -20,9 +20,15 @@ namespace osu.Game.Tests.Visual.Spectator
 {
     public class TestSpectatorClient : SpectatorClient
     {
+        /// <summary>
+        /// Maximum number of frames sent per bundle via <see cref="SendFrames"/>.
+        /// </summary>
+        public const int FRAME_BUNDLE_SIZE = 10;
+
         public override IBindable<bool> IsConnected { get; } = new Bindable<bool>(true);
 
         private readonly Dictionary<int, int> userBeatmapDictionary = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> userNextFrameDictionary = new Dictionary<int, int>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -35,6 +41,7 @@ namespace osu.Game.Tests.Visual.Spectator
         public void StartPlay(int userId, int beatmapId)
         {
             userBeatmapDictionary[userId] = beatmapId;
+            userNextFrameDictionary[userId] = 0;
             sendPlayingState(userId);
         }
 
@@ -57,24 +64,41 @@ namespace osu.Game.Tests.Visual.Spectator
         public new void Schedule(Action action) => base.Schedule(action);
 
         /// <summary>
-        /// Sends frames for an arbitrary user.
+        /// Sends frames for an arbitrary user, in bundles containing 10 frames each.
         /// </summary>
         /// <param name="userId">The user to send frames for.</param>
-        /// <param name="index">The frame index.</param>
-        /// <param name="count">The number of frames to send.</param>
-        public void SendFrames(int userId, int index, int count)
+        /// <param name="count">The total number of frames to send.</param>
+        public void SendFrames(int userId, int count)
         {
             var frames = new List<LegacyReplayFrame>();
 
-            for (int i = index; i < index + count; i++)
-            {
-                var buttonState = i == index + count - 1 ? ReplayButtonState.None : ReplayButtonState.Left1;
+            int currentFrameIndex = userNextFrameDictionary[userId];
+            int lastFrameIndex = currentFrameIndex + count - 1;
 
-                frames.Add(new LegacyReplayFrame(i * 100, RNG.Next(0, 512), RNG.Next(0, 512), buttonState));
+            for (; currentFrameIndex <= lastFrameIndex; currentFrameIndex++)
+            {
+                // This is done in the next frame so that currentFrameIndex is updated to the correct value.
+                if (frames.Count == FRAME_BUNDLE_SIZE)
+                    flush();
+
+                var buttonState = currentFrameIndex == lastFrameIndex ? ReplayButtonState.None : ReplayButtonState.Left1;
+                frames.Add(new LegacyReplayFrame(currentFrameIndex * 100, RNG.Next(0, 512), RNG.Next(0, 512), buttonState));
             }
 
-            var bundle = new FrameDataBundle(new ScoreInfo { Combo = index + count }, frames);
-            ((ISpectatorClient)this).UserSentFrames(userId, bundle);
+            flush();
+
+            userNextFrameDictionary[userId] = currentFrameIndex;
+
+            void flush()
+            {
+                if (frames.Count == 0)
+                    return;
+
+                var bundle = new FrameDataBundle(new ScoreInfo { Combo = currentFrameIndex }, frames.ToArray());
+                ((ISpectatorClient)this).UserSentFrames(userId, bundle);
+
+                frames.Clear();
+            }
         }
 
         protected override Task BeginPlayingInternal(SpectatorState state)

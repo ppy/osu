@@ -127,6 +127,7 @@ namespace osu.Game.Skinning.Editor
         public override bool HandleFlip(Direction direction)
         {
             var selectionQuad = getSelectionQuad();
+            Vector2 scaleFactor = direction == Direction.Horizontal ? new Vector2(-1, 1) : new Vector2(1, -1);
 
             foreach (var b in SelectedBlueprints)
             {
@@ -136,10 +137,8 @@ namespace osu.Game.Skinning.Editor
 
                 updateDrawablePosition(drawableItem, flippedPosition);
 
-                drawableItem.Scale *= new Vector2(
-                    direction == Direction.Horizontal ? -1 : 1,
-                    direction == Direction.Vertical ? -1 : 1
-                );
+                drawableItem.Scale *= scaleFactor;
+                drawableItem.Rotation -= drawableItem.Rotation % 180 * 2;
             }
 
             return true;
