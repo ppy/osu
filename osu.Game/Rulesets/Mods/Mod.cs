@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual bool UserPlayable => true;
 
-        [Obsolete("Going forward, the concept of \"ranked\" doesn't exist. The only exceptions are automation mods, which should now override and set UserPlayable to true.")] // Can be removed 20211009
+        [Obsolete("Going forward, the concept of \"ranked\" doesn't exist. The only exceptions are automation mods, which should now override and set UserPlayable to false.")] // Can be removed 20211009
         public virtual bool Ranked => false;
 
         /// <summary>
