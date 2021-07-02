@@ -103,28 +103,30 @@ namespace osu.Game.Screens.Menu
                 t.Colour = colours.PinkLight;
             }));
 
+            static void formatRegular(SpriteText t) => t.Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular);
+            static void formatSemiBold(SpriteText t) => t.Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold);
+
             textFlow.NewParagraph();
 
-            textFlow.AddText("the next ", t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.Regular));
+            textFlow.AddText("the next ", formatRegular);
             textFlow.AddText("major update", t =>
             {
                 t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.SemiBold);
                 t.Colour = colours.Pink;
             });
-            expendableText.AddRange(textFlow.AddText(" coming to osu!", t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.Regular)));
-            textFlow.AddText(".", t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.Regular));
+            expendableText.AddRange(textFlow.AddText(" coming to osu!", formatRegular));
+            textFlow.AddText(".", formatRegular);
 
             textFlow.NewParagraph();
+            textFlow.NewParagraph();
 
-            textFlow.AddParagraph("today's tip: ", t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.SemiBold));
-            textFlow.AddText(getRandomTip(), t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.Regular));
+            textFlow.AddParagraph("today's tip:", formatSemiBold);
+            textFlow.AddParagraph(getRandomTip(), formatRegular);
             textFlow.NewParagraph();
 
             textFlow.NewParagraph();
 
             iconColour = colours.Yellow;
-
-            static void format(SpriteText t) => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
 
             // manually transfer the user once, but only do the final bind in LoadComplete to avoid thread woes (API scheduler could run while this screen is still loading).
             // the manual transfer is here to ensure all text content is loaded ahead of time as this is very early in the game load process and we want to avoid stutters.
@@ -135,19 +137,19 @@ namespace osu.Game.Screens.Menu
 
                 if (e.NewValue.IsSupporter)
                 {
-                    supportFlow.AddText("Eternal thanks to you for supporting osu!", format);
+                    supportFlow.AddText("Eternal thanks to you for supporting osu!", formatSemiBold);
                 }
                 else
                 {
-                    supportFlow.AddText("Consider becoming an ", format);
-                    supportFlow.AddLink("osu!supporter", "https://osu.ppy.sh/home/support", creationParameters: format);
-                    supportFlow.AddText(" to help support osu!'s development", format);
+                    supportFlow.AddText("Consider becoming an ", formatSemiBold);
+                    supportFlow.AddLink("osu!supporter", "https://osu.ppy.sh/home/support", formatSemiBold);
+                    supportFlow.AddText(" to help support osu!'s development", formatSemiBold);
                 }
 
                 heart = supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
                 {
                     t.Padding = new MarginPadding { Left = 5, Top = 3 };
-                    t.Font = t.Font.With(size: 12);
+                    t.Font = t.Font.With(size: 20);
                     t.Origin = Anchor.Centre;
                     t.Colour = colours.Pink;
                 }).First();
