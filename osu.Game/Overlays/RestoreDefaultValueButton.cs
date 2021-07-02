@@ -30,14 +30,8 @@ namespace osu.Game.Overlays
             get => current;
             set
             {
-                if (current != null)
-                {
-                    current.ValueChanged -= onValueChanged;
-                    current.DefaultChanged -= onDefaultChanged;
-                    current.DisabledChanged -= onDisabledChanged;
-                }
-
-                current = value;
+                current?.UnbindAll();
+                current = value.GetBoundCopy();
 
                 current.ValueChanged += onValueChanged;
                 current.DefaultChanged += onDefaultChanged;
