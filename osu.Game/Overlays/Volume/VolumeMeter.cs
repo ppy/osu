@@ -187,13 +187,7 @@ namespace osu.Game.Overlays.Volume
                 }
             };
 
-            Bindable.ValueChanged += volume =>
-            {
-                this.TransformTo("DisplayVolume",
-                    volume.NewValue,
-                    400,
-                    Easing.OutQuint);
-            };
+            Bindable.ValueChanged += volume => { this.TransformTo(nameof(DisplayVolume), volume.NewValue, 400, Easing.OutQuint); };
 
             bgProgress.Current.Value = 0.75f;
         }
