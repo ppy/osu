@@ -159,12 +159,14 @@ namespace osu.Game.Graphics.UserInterface
             lastSampleValue = value;
             lastSampleTime = Clock.CurrentTime;
 
-            var channel = sample.Play();
+            var channel = sample.GetChannel();
 
             channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + NormalizedValue * 0.2f;
 
             if (NormalizedValue == 0 || NormalizedValue == 1)
                 channel.Frequency.Value -= 0.5f;
+
+            channel.Play();
         }
 
         private void updateTooltipText(T value)
