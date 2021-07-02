@@ -20,7 +20,7 @@ namespace osu.Game.Overlays
     {
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
-        private readonly IBindableWithCurrent<T> current = IBindableWithCurrent<T>.Create();
+        private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
 
         // this is done to ensure a click on this button doesn't trigger focus on a parent element which contains the button.
         public override bool AcceptsFocus => true;
@@ -62,8 +62,7 @@ namespace osu.Game.Overlays
 
             Action += () =>
             {
-                if (!Current.Disabled)
-                    Current.SetDefault();
+                if (!current.Disabled) current.SetDefault();
             };
         }
 
@@ -97,12 +96,12 @@ namespace osu.Game.Overlays
 
         private void updateState()
         {
-            if (Current == null)
+            if (current == null)
                 return;
 
-            this.FadeTo(Current.IsDefault ? 0f :
-                hovering && !Current.Disabled ? 1f : 0.65f, 200, Easing.OutQuint);
-            this.FadeColour(Current.Disabled ? Color4.Gray : buttonColour, 200, Easing.OutQuint);
+            this.FadeTo(current.IsDefault ? 0f :
+                hovering && !current.Disabled ? 1f : 0.65f, 200, Easing.OutQuint);
+            this.FadeColour(current.Disabled ? Color4.Gray : buttonColour, 200, Easing.OutQuint);
         }
     }
 }
