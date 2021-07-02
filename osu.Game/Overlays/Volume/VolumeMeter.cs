@@ -240,10 +240,8 @@ namespace osu.Game.Overlays.Volume
 
             channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + displayVolume * 0.1f;
 
-            if (displayVolumeInt == 0)
-                channel.Frequency.Value -= 0.5f;
-            else if (displayVolumeInt == 100)
-                // intentionally pitched down, even when hitting max.
+            // intentionally pitched down, even when hitting max.
+            if (displayVolumeInt == 0 || displayVolumeInt == 100)
                 channel.Frequency.Value -= 0.5f;
 
             channel.Play();
