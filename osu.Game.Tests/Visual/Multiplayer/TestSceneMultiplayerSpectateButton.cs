@@ -70,31 +70,39 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(200, 50),
-                        OnSpectateClick = () => Task.Run(async () =>
+                        OnSpectateClick = () =>
                         {
                             readyClickOperation = OngoingOperationTracker.BeginOperation();
-                            await Client.ToggleSpectate();
-                            readyClickOperation.Dispose();
-                        })
+
+                            Task.Run(async () =>
+                            {
+                                await Client.ToggleSpectate();
+                                readyClickOperation.Dispose();
+                            });
+                        }
                     },
                     readyButton = new MultiplayerReadyButton
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(200, 50),
-                        OnReadyClick = () => Task.Run(async () =>
+                        OnReadyClick = () =>
                         {
                             readyClickOperation = OngoingOperationTracker.BeginOperation();
 
-                            if (Client.IsHost && Client.LocalUser?.State == MultiplayerUserState.Ready)
+                            Task.Run(async () =>
                             {
-                                await Client.StartMatch();
-                                return;
-                            }
+                                if (Client.IsHost && Client.LocalUser?.State == MultiplayerUserState.Ready)
+                                {
+                                    await Client.StartMatch();
+                                    return;
+                                }
 
-                            await Client.ToggleReady();
-                            readyClickOperation.Dispose();
-                        })
+                                await Client.ToggleReady();
+
+                                readyClickOperation.Dispose();
+                            });
+                        }
                     }
                 }
             };
