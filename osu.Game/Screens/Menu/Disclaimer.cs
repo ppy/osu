@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Menu
                     {
                         textFlow = new LinkFlowContainer
                         {
-                            RelativeSizeAxes = Axes.X,
+                            Width = 680,
                             AutoSizeAxes = Axes.Y,
                             TextAnchor = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
