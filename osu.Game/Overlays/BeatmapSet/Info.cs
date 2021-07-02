@@ -163,6 +163,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         case MetadataType.Tags:
                             string[] tags = value.Split(" ");
+
                             for (int i = 0; i <= tags.Length - 1; i++)
                             {
                                 textFlow.AddLink(tags[i], LinkAction.SearchBeatmapSet, tags[i], null, format);
@@ -170,6 +171,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 if (i != tags.Length - 1)
                                     textFlow.AddText(" ", format);
                             }
+
                             break;
 
                         case MetadataType.Source:
