@@ -95,9 +95,9 @@ namespace osu.Game.Screens.Menu
                 },
             };
 
-            textFlow.AddText("This is osu!", t => t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Regular));
+            textFlow.AddText("this is osu!", t => t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Regular));
 
-            expendableText.AddRange(textFlow.AddText("(lazer)", t =>
+            expendableText.AddRange(textFlow.AddText("lazer", t =>
             {
                 t.Font = t.Font.With(Typeface.Torus, 30, FontWeight.Regular);
                 t.Colour = colours.PinkLight;
@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Menu
 
             textFlow.NewParagraph();
 
-            textFlow.AddParagraph("Today's Tip: ", t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.SemiBold));
+            textFlow.AddParagraph("today's tip: ", t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.SemiBold));
             textFlow.AddText(getRandomTip(), t => t.Font = t.Font.With(Typeface.Torus, 20, FontWeight.Regular));
             textFlow.NewParagraph();
 
@@ -191,7 +191,11 @@ namespace osu.Game.Screens.Menu
                 using (BeginDelayedSequence(520 + 160))
                 {
                     fill.MoveToOffset(new Vector2(0, 15), 160, Easing.OutQuart);
-                    Schedule(() => expendableText.ForEach(t => t.Expire()));
+                    Schedule(() => expendableText.ForEach(t =>
+                    {
+                        t.FadeOut(100);
+                        t.ScaleTo(new Vector2(0, 1), 100, Easing.OutQuart);
+                    }));
                 }
             }
 
