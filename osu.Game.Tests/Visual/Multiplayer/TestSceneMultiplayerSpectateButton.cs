@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -69,19 +70,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(200, 50),
-                        OnSpectateClick = async () =>
+                        OnSpectateClick = () => Task.Run(async () =>
                         {
                             readyClickOperation = OngoingOperationTracker.BeginOperation();
                             await Client.ToggleSpectate();
                             readyClickOperation.Dispose();
-                        }
+                        })
                     },
                     readyButton = new MultiplayerReadyButton
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(200, 50),
-                        OnReadyClick = async () =>
+                        OnReadyClick = () => Task.Run(async () =>
                         {
                             readyClickOperation = OngoingOperationTracker.BeginOperation();
 
@@ -93,7 +94,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                             await Client.ToggleReady();
                             readyClickOperation.Dispose();
-                        }
+                        })
                     }
                 }
             };
