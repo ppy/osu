@@ -163,6 +163,7 @@ namespace osu.Game.Graphics.UserInterface
 
             channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + NormalizedValue * 0.2f;
 
+            // intentionally pitched down, even when hitting max.
             if (NormalizedValue == 0 || NormalizedValue == 1)
                 channel.Frequency.Value -= 0.5f;
 
