@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -37,40 +38,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private IDisposable readyClickOperation;
 
-        protected override Container<Drawable> Content => content;
-        private readonly Container content;
-
-        public TestSceneMultiplayerSpectateButton()
-        {
-            base.Content.Add(content = new Container
-            {
-                RelativeSizeAxes = Axes.Both
-            });
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
-            return dependencies;
-        }
-
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
-
-            var beatmapTracker = new OnlinePlayBeatmapAvailabilityTracker { SelectedItem = { BindTarget = selectedItem } };
-            base.Content.Add(beatmapTracker);
-            Dependencies.Cache(beatmapTracker);
-
             beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
         }
 
         [SetUp]
         public new void Setup() => Schedule(() =>
         {
+            AvailabilityTracker.SelectedItem.BindTo(selectedItem);
+
             importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
             Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
             selectedItem.Value = new PlaylistItem
@@ -90,11 +70,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(200, 50),
-                        OnSpectateClick = async () =>
+                        OnSpectateClick = () =>
                         {
                             readyClickOperation = OngoingOperationTracker.BeginOperation();
-                            await Client.ToggleSpectate();
-                            readyClickOperation.Dispose();
+
+                            Task.Run(async () =>
+                            {
+                                await Client.ToggleSpectate();
+                                readyClickOperation.Dispose();
+                            });
                         }
                     },
                     readyButton = new MultiplayerReadyButton
@@ -102,18 +86,22 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(200, 50),
-                        OnReadyClick = async () =>
+                        OnReadyClick = () =>
                         {
                             readyClickOperation = OngoingOperationTracker.BeginOperation();
 
-                            if (Client.IsHost && Client.LocalUser?.State == MultiplayerUserState.Ready)
+                            Task.Run(async () =>
                             {
-                                await Client.StartMatch();
-                                return;
-                            }
+                                if (Client.IsHost && Client.LocalUser?.State == MultiplayerUserState.Ready)
+                                {
+                                    await Client.StartMatch();
+                                    return;
+                                }
 
-                            await Client.ToggleReady();
-                            readyClickOperation.Dispose();
+                                await Client.ToggleReady();
+
+                                readyClickOperation.Dispose();
+                            });
                         }
                     }
                 }

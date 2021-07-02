@@ -3,24 +3,26 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
+using osu.Game.Tests.Visual.OnlinePlay;
 using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneLoungeRoomsContainer : RoomManagerTestScene
+    public class TestSceneLoungeRoomsContainer : OnlinePlayTestScene
     {
+        protected new BasicTestRoomManager RoomManager => (BasicTestRoomManager)base.RoomManager;
+
         private RoomsContainer container;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [SetUp]
+        public new void Setup() => Schedule(() =>
         {
             Child = container = new RoomsContainer
             {
@@ -29,12 +31,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Width = 0.5f,
                 JoinRequested = joinRequested
             };
-        }
+        });
 
         [Test]
         public void TestBasicListChanges()
         {
-            AddRooms(3);
+            AddStep("add rooms", () => RoomManager.AddRooms(3));
 
             AddAssert("has 3 rooms", () => container.Rooms.Count == 3);
             AddStep("remove first room", () => RoomManager.Rooms.Remove(RoomManager.Rooms.FirstOrDefault()));
@@ -51,7 +53,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestKeyboardNavigation()
         {
-            AddRooms(3);
+            AddStep("add rooms", () => RoomManager.AddRooms(3));
 
             AddAssert("no selection", () => checkRoomSelected(null));
 
@@ -72,7 +74,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestClickDeselection()
         {
-            AddRooms(1);
+            AddStep("add room", () => RoomManager.AddRooms(1));
 
             AddAssert("no selection", () => checkRoomSelected(null));
 
@@ -91,7 +93,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestStringFiltering()
         {
-            AddRooms(4);
+            AddStep("add rooms", () => RoomManager.AddRooms(4));
 
             AddUntilStep("4 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 4);
 
@@ -107,21 +109,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestRulesetFiltering()
         {
-            AddRooms(2, new OsuRuleset().RulesetInfo);
-            AddRooms(3, new CatchRuleset().RulesetInfo);
+            AddStep("add rooms", () => RoomManager.AddRooms(2, new OsuRuleset().RulesetInfo));
+            AddStep("add rooms", () => RoomManager.AddRooms(3, new CatchRuleset().RulesetInfo));
 
+            // Todo: What even is this case...?
+            AddStep("set empty filter criteria", () => container.Filter(null));
             AddUntilStep("5 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 5);
 
             AddStep("filter osu! rooms", () => container.Filter(new FilterCriteria { Ruleset = new OsuRuleset().RulesetInfo }));
-
             AddUntilStep("2 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 2);
 
             AddStep("filter catch rooms", () => container.Filter(new FilterCriteria { Ruleset = new CatchRuleset().RulesetInfo }));
-
             AddUntilStep("3 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 3);
         }
 
-        private bool checkRoomSelected(Room room) => Room == room;
+        private bool checkRoomSelected(Room room) => SelectedRoom.Value == room;
 
         private void joinRequested(Room room) => room.Status.Value = new JoinedRoomStatus();
 

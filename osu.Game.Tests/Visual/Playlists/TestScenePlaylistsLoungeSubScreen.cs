@@ -3,25 +3,21 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
-using osu.Game.Tests.Visual.Multiplayer;
+using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsLoungeSubScreen : RoomManagerTestScene
+    public class TestScenePlaylistsLoungeSubScreen : OnlinePlayTestScene
     {
-        private LoungeSubScreen loungeScreen;
+        protected new BasicTestRoomManager RoomManager => (BasicTestRoomManager)base.RoomManager;
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-        }
+        private LoungeSubScreen loungeScreen;
 
         public override void SetUpSteps()
         {
@@ -37,7 +33,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestScrollSelectedIntoView()
         {
-            AddRooms(30);
+            AddStep("add rooms", () => RoomManager.AddRooms(30));
 
             AddUntilStep("first room is not masked", () => checkRoomVisible(roomsContainer.Rooms.First()));
 

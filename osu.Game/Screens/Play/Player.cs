@@ -768,6 +768,7 @@ namespace osu.Game.Screens.Play
                 return false;
 
             HasFailed = true;
+            Score.ScoreInfo.Passed = false;
 
             // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
             // could process an extra frame after the GameplayClock is stopped.
@@ -949,6 +950,10 @@ namespace osu.Game.Screens.Play
         public override bool OnExiting(IScreen next)
         {
             screenSuspension?.Expire();
+
+            // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
+            if (prepareScoreForDisplayTask == null)
+                Score.ScoreInfo.Passed = false;
 
             // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
             // To resolve test failures, forcefully end playing synchronously when this screen exits.
