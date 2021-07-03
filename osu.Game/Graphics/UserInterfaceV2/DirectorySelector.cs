@@ -138,7 +138,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         private class CurrentDirectoryDisplay : CompositeDrawable
         {
             [Resolved]
-            public Bindable<DirectoryInfo> CurrentDirectory { get; private set; }
+            private Bindable<DirectoryInfo> currentDirectory { get; set; }
 
             private FillFlowContainer flow;
 
@@ -158,7 +158,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     },
                 };
 
-                CurrentDirectory.BindValueChanged(updateDisplay, true);
+                currentDirectory.BindValueChanged(updateDisplay, true);
             }
 
             private void updateDisplay(ValueChangedEvent<DirectoryInfo> dir)
