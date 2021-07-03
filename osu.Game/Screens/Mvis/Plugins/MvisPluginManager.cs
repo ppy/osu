@@ -113,17 +113,12 @@ namespace osu.Game.Screens.Mvis.Plugins
 
                 if (providerAssembly != gameAssembly && blockFromFutureLoad)
                 {
-                    if (customStore.Contains(providerAssembly.Location))
-                        File.Move(providerAssembly.Location, $"{providerAssembly.Location.Replace(".dll", ".blocked")}");
-                    else
-                    {
-                        blockedProviders.Add(providerAssembly.ToString());
+                    blockedProviders.Add(providerAssembly.ToString());
 
-                        using (var writer = new StreamWriter(File.OpenWrite(blockedPluginFilePath)))
-                        {
-                            var serializedString = JsonConvert.SerializeObject(blockedProviders);
-                            writer.Write(serializedString);
-                        }
+                    using (var writer = new StreamWriter(File.OpenWrite(blockedPluginFilePath)))
+                    {
+                        var serializedString = JsonConvert.SerializeObject(blockedProviders);
+                        writer.Write(serializedString);
                     }
                 }
             }
