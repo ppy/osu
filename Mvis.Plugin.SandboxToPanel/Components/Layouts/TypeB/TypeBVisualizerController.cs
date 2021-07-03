@@ -90,7 +90,7 @@ namespace Mvis.Plugin.Sandbox.Components.Layouts.TypeB
             Beatmap.BindValueChanged(b =>
             {
                 text.Text = new RomanisableString(
-                    $"{b.NewValue.Metadata.ArtistUnicode} - {b.NewValue.Metadata.TitleUnicode}",
+                    $"{b.NewValue.Metadata.ArtistUnicode ?? b.NewValue.Metadata.Artist} - {b.NewValue.Metadata.TitleUnicode ?? b.NewValue.Metadata.Title}",
                     $"{b.NewValue.Metadata.Artist} - {b.NewValue.Metadata.Title}");
             }, true);
 
