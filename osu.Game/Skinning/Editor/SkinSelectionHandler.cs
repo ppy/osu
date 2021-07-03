@@ -95,8 +95,8 @@ namespace osu.Game.Skinning.Editor
 
             // scale adjust applied to each individual item should match that of the quad itself.
             var scaledDelta = new Vector2(
-                adjustedRect.Width / selectionRect.Width,
-                adjustedRect.Height / selectionRect.Height
+                MathF.Max(adjustedRect.Width / selectionRect.Width, 0),
+                MathF.Max(adjustedRect.Height / selectionRect.Height, 0)
             );
 
             foreach (var b in SelectedBlueprints)
