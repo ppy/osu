@@ -83,11 +83,17 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             var newDirectory = directory.NewValue;
             bool flashError = false;
+            IEnumerable<DisplayPiece> displayPieces = Array.Empty<DisplayPiece>();
 
-            while (!newDirectoryIsAccessible())
+            while (newDirectory != null)
             {
+                newDirectory.Refresh();
+
+                if (TryGetEntriesForPath(newDirectory, out displayPieces))
+                    break;
+
                 flashError = true;
-                newDirectory = newDirectory?.Parent;
+                newDirectory = newDirectory.Parent;
             }
 
             if (flashError)
@@ -106,18 +112,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             CurrentPath.Value = newDirectory;
 
             directoryFlow.Add(new ParentDirectoryPiece(newDirectory.Parent));
-            if (TryGetEntriesForPath(newDirectory, out var displayPieces))
-                directoryFlow.AddRange(displayPieces);
-
-            bool newDirectoryIsAccessible()
-            {
-                if (newDirectory == null)
-                    return true;
-
-                newDirectory.Refresh();
-
-                return TryGetEntriesForPath(newDirectory, out displayPieces);
-            }
+            directoryFlow.AddRange(displayPieces);
         }
 
         protected virtual bool TryGetEntriesForPath(DirectoryInfo path, out IEnumerable<DisplayPiece> displayPieces)
