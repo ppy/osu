@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 
@@ -43,7 +44,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                 foreach (var file in files.OrderBy(d => d.Name))
                 {
-                    if ((file.Attributes & FileAttributes.Hidden) == 0)
+                    if (!file.Attributes.HasFlagFast(FileAttributes.Hidden))
                         displayPieces.Add(new FilePiece(file));
                 }
 
