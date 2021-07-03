@@ -77,8 +77,20 @@ namespace osu.Game.Graphics.UserInterfaceV2
             CurrentPath.BindValueChanged(updateDisplay, true);
         }
 
+        /// <summary>
+        /// Because <see cref="CurrentPath"/> changes may not necessarily lead to directories that exist/are accessible,
+        /// <see cref="updateDisplay"/> may need to change <see cref="CurrentPath"/> again to lead to a directory that is actually accessible.
+        /// This flag intends to prevent recursive <see cref="updateDisplay"/> calls from taking place during the process of finding an accessible directory.
+        /// </summary>
+        private bool directoryChanging;
+
         private void updateDisplay(ValueChangedEvent<DirectoryInfo> directory)
         {
+            if (directoryChanging)
+                return;
+
+            directoryChanging = true;
+
             directoryFlow.Clear();
 
             var newDirectory = directory.NewValue;
@@ -113,6 +125,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             directoryFlow.Add(new ParentDirectoryPiece(newDirectory.Parent));
             directoryFlow.AddRange(displayPieces);
+
+            directoryChanging = false;
         }
 
         protected virtual bool TryGetEntriesForPath(DirectoryInfo path, out ICollection<DisplayPiece> displayPieces)
