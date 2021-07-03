@@ -43,6 +43,11 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     TooltipText = "这将影响所有谱面预览、封面、和下图的功能, 但不会影响已完成或正在进行中的请求",
                     Current = config.GetBindable<bool>(MSetting.UseSayobot)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "隐藏Disclaimer",
+                    Current = config.GetBindable<bool>(MSetting.DoNotShowDisclaimer)
+                },
                 new SettingsSlider<float>
                 {
                     LabelText = "立体音效增益",
