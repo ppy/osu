@@ -34,18 +34,25 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             displayPieces = directories;
 
-            IEnumerable<FileInfo> files = path.GetFiles();
-
-            if (validFileExtensions.Length > 0)
-                files = files.Where(f => validFileExtensions.Contains(f.Extension));
-
-            foreach (var file in files.OrderBy(d => d.Name))
+            try
             {
-                if ((file.Attributes & FileAttributes.Hidden) == 0)
-                    displayPieces.Add(new FilePiece(file));
-            }
+                IEnumerable<FileInfo> files = path.GetFiles();
 
-            return true;
+                if (validFileExtensions.Length > 0)
+                    files = files.Where(f => validFileExtensions.Contains(f.Extension));
+
+                foreach (var file in files.OrderBy(d => d.Name))
+                {
+                    if ((file.Attributes & FileAttributes.Hidden) == 0)
+                        displayPieces.Add(new FilePiece(file));
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         protected class FilePiece : DisplayPiece
