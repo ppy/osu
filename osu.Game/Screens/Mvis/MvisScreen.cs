@@ -129,6 +129,27 @@ namespace osu.Game.Screens.Mvis
             if (runOnce) action.Invoke(Beatmap.Value);
         }
 
+        private readonly Dictionary<PluginKeybind, MvisPlugin> pluginKeyBindings = new Dictionary<PluginKeybind, MvisPlugin>();
+
+        public void RegisterKeybind(MvisPlugin plugin, PluginKeybind keybind)
+        {
+            if (pluginKeyBindings.Any(b => (b.Value == plugin && b.Key.Key == keybind.Key)))
+                throw new InvalidOperationException($"{plugin}已经注册过一个相同的{keybind}了");
+
+            keybind.Id = pluginKeyBindings.Count + 1;
+
+            pluginKeyBindings[keybind] = plugin;
+        }
+
+        private void unBindFor(MvisPlugin pl)
+        {
+            //查找插件是pl的绑定
+            var bindings = pluginKeyBindings.Where(b => b.Value == pl);
+
+            foreach (var bind in bindings)
+                pluginKeyBindings.Remove(bind.Key);
+        }
+
         /// <summary>
         /// 拖动下方进度条时调用<br/><br/>
         /// 传递: 拖动的目标时间
@@ -255,7 +276,6 @@ namespace osu.Game.Screens.Mvis
         private List<Mod> timeRateMod;
 
         private readonly Dictionary<GlobalAction, Action> keyBindings = new Dictionary<GlobalAction, Action>();
-        private readonly Dictionary<Key, Action> pluginKeyBindings = new Dictionary<Key, Action>();
 
         public bool OverlaysHidden { get; private set; }
         private readonly BindableBool lockChanges = new BindableBool();
@@ -602,16 +622,16 @@ namespace osu.Game.Screens.Mvis
                         //如果插件的侧边栏页面有调用快捷键
                         if (pluginSidebarPage.ShortcutKey != Key.Unknown)
                         {
-                            pluginKeyBindings[pluginSidebarPage.ShortcutKey] = () =>
+                            RegisterKeybind(pl, new PluginKeybind(pluginSidebarPage.ShortcutKey, () =>
                             {
                                 if (!pl.Disabled.Value) btn?.Click();
-                            };
+                            }));
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, $"在添加 {pl.Name} 时出现问题, 请联系你的插件提供方");
+                    Logger.Error(e, $"在添加 {pl.Name} 时出现问题, 请联系你的插件提供方: {e.Message}");
                 }
             }
 
@@ -685,6 +705,8 @@ namespace osu.Game.Screens.Mvis
 
         private void onPluginUnLoad(MvisPlugin pl)
         {
+            unBindFor(pl); //移除快捷键
+
             //查找与pl对应的侧边栏页面
             foreach (var sc in sidebar.Components)
             {
@@ -692,7 +714,6 @@ namespace osu.Game.Screens.Mvis
                 if (sc is PluginSidebarPage plsp && plsp.Plugin == pl)
                 {
                     sidebar.Remove(plsp); //移除这个页面
-                    pluginKeyBindings.Remove(plsp.ShortcutKey); //移除快捷键
 
                     //查找与plsp对应的底栏入口
                     foreach (var d in bottomBar.PluginEntriesFillFlow)
@@ -893,8 +914,8 @@ namespace osu.Game.Screens.Mvis
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            //查找插件按键绑定
-            pluginKeyBindings.FirstOrDefault(b => b.Key == e.Key).Value?.Invoke();
+            //查找插件按键绑定并执行
+            pluginKeyBindings.FirstOrDefault(b => b.Key.Key == e.Key).Key?.Action?.Invoke();
 
             return base.OnKeyDown(e);
         }

@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Osu.Configuration
             SetDefault(OsuRulesetSetting.NextJumpMulti, 2f / 3f, 0f, 2f, float.Epsilon);
             SetDefault(OsuRulesetSetting.SkipStackAngles, true);
             SetDefault(OsuRulesetSetting.BorderBounce, true);
+            SetDefault(OsuRulesetSetting.PippiSpinner, false);
+            SetDefault(OsuRulesetSetting.PippiStream, false);
             SetDefault(OsuRulesetSetting.SpinnerDance, true);
             SetDefault(OsuRulesetSetting.SliderDance, true);
             SetDefault(OsuRulesetSetting.SpinnerRadiusStart, 235f, 10f, 350f, 1f);
@@ -44,7 +46,8 @@ namespace osu.Game.Rulesets.Osu.Configuration
     {
         HalfCircle,
         Flower,
-        Momentum
+        Momentum,
+        Pippi
     }
 
     public enum OsuRulesetSetting
@@ -59,6 +62,8 @@ namespace osu.Game.Rulesets.Osu.Configuration
         NextJumpMulti,
         BorderBounce,
         SkipStackAngles,
+        PippiSpinner,
+        PippiStream,
         PlayfieldBorderStyle,
         SpinnerRadiusStart,
         SpinnerRadiusEnd,

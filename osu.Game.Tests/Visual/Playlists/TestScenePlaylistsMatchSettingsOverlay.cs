@@ -3,7 +3,6 @@
 
 using System;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,26 +11,28 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Playlists;
+using osu.Game.Tests.Visual.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsMatchSettingsOverlay : RoomTestScene
+    public class TestScenePlaylistsMatchSettingsOverlay : OnlinePlayTestScene
     {
-        [Cached(Type = typeof(IRoomManager))]
-        private TestRoomManager roomManager = new TestRoomManager();
+        protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
 
         private TestRoomSettings settings;
+
+        protected override OnlinePlayTestSceneDependencies CreateOnlinePlayDependencies() => new TestDependencies();
 
         [SetUp]
         public new void Setup() => Schedule(() =>
         {
-            settings = new TestRoomSettings
+            SelectedRoom.Value = new Room();
+
+            Child = settings = new TestRoomSettings
             {
                 RelativeSizeAxes = Axes.Both,
                 State = { Value = Visibility.Visible }
             };
-
-            Child = settings;
         });
 
         [Test]
@@ -39,19 +40,19 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("clear name and beatmap", () =>
             {
-                Room.Name.Value = "";
-                Room.Playlist.Clear();
+                SelectedRoom.Value.Name.Value = "";
+                SelectedRoom.Value.Playlist.Clear();
             });
 
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set name", () => Room.Name.Value = "Room name");
+            AddStep("set name", () => SelectedRoom.Value.Name.Value = "Room name");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set beatmap", () => Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } }));
+            AddStep("set beatmap", () => SelectedRoom.Value.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } }));
             AddAssert("button enabled", () => settings.ApplyButton.Enabled.Value);
 
-            AddStep("clear name", () => Room.Name.Value = "");
+            AddStep("clear name", () => SelectedRoom.Value.Name.Value = "");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
         }
 
@@ -67,9 +68,9 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 settings.NameField.Current.Value = expected_name;
                 settings.DurationField.Current.Value = expectedDuration;
-                Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
 
-                roomManager.CreateRequested = r =>
+                RoomManager.CreateRequested = r =>
                 {
                     createdRoom = r;
                     return true;
@@ -88,11 +89,11 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("setup", () =>
             {
-                Room.Name.Value = "Test Room";
-                Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
+                SelectedRoom.Value.Name.Value = "Test Room";
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
 
                 fail = true;
-                roomManager.CreateRequested = _ => !fail;
+                RoomManager.CreateRequested = _ => !fail;
             });
             AddAssert("error not displayed", () => !settings.ErrorText.IsPresent);
 
@@ -119,7 +120,12 @@ namespace osu.Game.Tests.Visual.Playlists
             public OsuSpriteText ErrorText => ((MatchSettings)Settings).ErrorText;
         }
 
-        private class TestRoomManager : IRoomManager
+        private class TestDependencies : OnlinePlayTestSceneDependencies
+        {
+            protected override IRoomManager CreateRoomManager() => new TestRoomManager();
+        }
+
+        protected class TestRoomManager : IRoomManager
         {
             public const string FAILED_TEXT = "failed";
 

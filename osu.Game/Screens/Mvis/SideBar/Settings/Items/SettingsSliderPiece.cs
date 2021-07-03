@@ -2,6 +2,7 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
 {
@@ -10,7 +11,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Settings.Items
     {
         public Bindable<T> Bindable { get; set; }
 
-        public string TooltipText
+        public LocalisableString TooltipText
         {
             get => tooltip;
             set => tooltip = value + " (点击重置)";

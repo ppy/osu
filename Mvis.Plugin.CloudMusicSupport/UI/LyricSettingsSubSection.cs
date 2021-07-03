@@ -20,6 +20,7 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
             var config = (LyricConfigManager)ConfigManager;
 
             SettingsCheckbox useDrawablePoolCheckBox;
+            SettingsCheckbox autoScrollChechBox;
             Children = new Drawable[]
             {
                 new SettingsCheckbox
@@ -62,9 +63,15 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                     TooltipText = "调整歌词淡出动画要花多长时间",
                     Current = config.GetBindable<float>(LyricSettings.LyricFadeOutDuration)
                 },
+                autoScrollChechBox = new SettingsCheckbox
+                {
+                    LabelText = "自动滚动歌词",
+                    Current = config.GetBindable<bool>(LyricSettings.AutoScrollToCurrent)
+                },
             };
 
             useDrawablePoolCheckBox.WarningText = "试验性功能！";
+            autoScrollChechBox.WarningText = "与DrawablePool不兼容";
         }
     }
 }

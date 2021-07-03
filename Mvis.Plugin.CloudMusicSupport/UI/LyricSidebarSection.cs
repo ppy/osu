@@ -60,6 +60,12 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                     Description = "歌词淡出时间",
                     TooltipText = "调整歌词淡出动画要花多长时间",
                     Bindable = config.GetBindable<float>(LyricSettings.LyricFadeOutDuration)
+                },
+                new SettingsTogglePiece
+                {
+                    Description = "自动滚动歌词",
+                    TooltipText = "与DrawablePool不兼容",
+                    Bindable = config.GetBindable<bool>(LyricSettings.AutoScrollToCurrent)
                 }
             });
         }

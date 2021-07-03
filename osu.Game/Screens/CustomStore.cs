@@ -28,13 +28,10 @@ namespace osu.Game.Screens
         public List<MvisPluginProvider> LoadedPluginProviders = new List<MvisPluginProvider>();
         public static bool CustomFontLoaded;
 
-        private Storage storage;
-
         public CustomStore(Storage storage, OsuGameBase gameBase)
             : base(new StorageBackedResourceStore(storage), "custom")
         {
             this.gameBase = gameBase;
-            this.storage = storage;
 
             customStorage = storage.GetStorageForDirectory("custom");
 
@@ -82,32 +79,39 @@ namespace osu.Game.Screens
 
             var assemblies = fonts.Concat(plugins);
 
-            //加载自带的Mvis插件
-            //From RulesetStore
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            try
             {
-                string name = assembly.GetName().Name;
+                //加载自带的Mvis插件
+                //From RulesetStore
+                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    string name = assembly.GetName().Name;
 
-                if (!name.StartsWith("Mvis.Plugin", StringComparison.InvariantCultureIgnoreCase))
-                    continue;
+                    if (!name.StartsWith("Mvis.Plugin", StringComparison.InvariantCultureIgnoreCase))
+                        continue;
 
-                loadAssembly(assembly);
+                    loadAssembly(assembly);
+                }
+
+                //从程序根目录加载
+                if (RuntimeInfo.IsDesktop)
+                {
+                    foreach (var file in Directory.GetFiles(RuntimeInfo.StartupDirectory, "Mvis.Plugin.*.dll"))
+                        loadAssembly(Assembly.LoadFrom(file));
+                }
+
+                foreach (var assembly in assemblies)
+                {
+                    //获取完整路径
+                    var fullPath = customStorage.GetFullPath(assembly);
+
+                    //Logger.Log($"加载 {fullPath}");
+                    loadAssembly(Assembly.LoadFrom(fullPath));
+                }
             }
-
-            //从程序根目录加载
-            if (RuntimeInfo.IsDesktop)
+            catch (Exception e)
             {
-                foreach (var file in Directory.GetFiles(RuntimeInfo.StartupDirectory, "Mvis.Plugin.*.dll"))
-                    loadAssembly(Assembly.LoadFrom(file));
-            }
-
-            foreach (var assembly in assemblies)
-            {
-                //获取完整路径
-                var fullPath = customStorage.GetFullPath(assembly);
-
-                //Logger.Log($"加载 {fullPath}");
-                loadAssembly(Assembly.LoadFrom(fullPath));
+                Logger.Error(e, $"载入文件时出现问题: {e.Message}");
             }
         }
 
@@ -154,8 +158,7 @@ namespace osu.Game.Screens
             }
             catch (Exception e)
             {
-                Logger.Error(e, $"载入插件{assembly.FullName}时出现了问题, 请联系你的插件提供方。");
-                return;
+                Logger.Error(e, $"载入 {assembly.FullName} 时出现了问题, 请联系你的插件提供方。");
             }
         }
 

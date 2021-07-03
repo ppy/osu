@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -29,7 +30,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private readonly bool IsMini;
         private readonly bool NoSuffix;
 
-        public string TooltipText => button.Enabled.Value ? "下载该谱面" : "请先登录再进行下载";
+        public LocalisableString TooltipText => button.Enabled.Value ? "下载该谱面" : "请先登录再进行下载";
 
         private readonly IBindable<User> localUser = new Bindable<User>();
         private BindableBool UseSayobot = new BindableBool();

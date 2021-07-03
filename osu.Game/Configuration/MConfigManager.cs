@@ -23,6 +23,7 @@ namespace osu.Game.Configuration
 
             //Other Settings
             SetDefault(MSetting.UseSayobot, true);
+            SetDefault(MSetting.DoNotShowDisclaimer, false);
 
             //UI Settings
             SetDefault(MSetting.OptUI, true);
@@ -95,6 +96,7 @@ namespace osu.Game.Configuration
         AlwaysHideTextIndicator,
         MvisCurrentAudioProvider,
         Gamemode,
+        DoNotShowDisclaimer
     }
 
     public enum GamemodeActivateCondition

@@ -95,8 +95,8 @@ namespace osu.Game.Skinning.Editor
 
             // scale adjust applied to each individual item should match that of the quad itself.
             var scaledDelta = new Vector2(
-                adjustedRect.Width / selectionRect.Width,
-                adjustedRect.Height / selectionRect.Height
+                MathF.Max(adjustedRect.Width / selectionRect.Width, 0),
+                MathF.Max(adjustedRect.Height / selectionRect.Height, 0)
             );
 
             foreach (var b in SelectedBlueprints)
@@ -127,6 +127,7 @@ namespace osu.Game.Skinning.Editor
         public override bool HandleFlip(Direction direction)
         {
             var selectionQuad = getSelectionQuad();
+            Vector2 scaleFactor = direction == Direction.Horizontal ? new Vector2(-1, 1) : new Vector2(1, -1);
 
             foreach (var b in SelectedBlueprints)
             {
@@ -136,10 +137,8 @@ namespace osu.Game.Skinning.Editor
 
                 updateDrawablePosition(drawableItem, flippedPosition);
 
-                drawableItem.Scale *= new Vector2(
-                    direction == Direction.Horizontal ? -1 : 1,
-                    direction == Direction.Vertical ? -1 : 1
-                );
+                drawableItem.Scale *= scaleFactor;
+                drawableItem.Rotation -= drawableItem.Rotation % 180 * 2;
             }
 
             return true;
@@ -149,12 +148,20 @@ namespace osu.Game.Skinning.Editor
         {
             foreach (var c in SelectedBlueprints)
             {
-                Drawable drawable = (Drawable)c.Item;
+                var item = c.Item;
+                Drawable drawable = (Drawable)item;
+
                 drawable.Position += drawable.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
+
+                if (item.UsesFixedAnchor) continue;
+
+                applyClosestAnchor(drawable);
             }
 
             return true;
         }
+
+        private static void applyClosestAnchor(Drawable drawable) => applyAnchor(drawable, getClosestAnchor(drawable));
 
         protected override void OnSelectionChanged()
         {
@@ -171,20 +178,27 @@ namespace osu.Game.Skinning.Editor
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
         {
+            var closestItem = new TernaryStateRadioMenuItem("最近的锚点", MenuItemType.Standard, _ => applyClosestAnchors())
+            {
+                State = { Value = GetStateFromSelection(selection, c => !c.Item.UsesFixedAnchor) }
+            };
+
             yield return new OsuMenuItem("锚点(Anchor)")
             {
-                Items = createAnchorItems(d => d.Anchor, applyAnchor).ToArray()
+                Items = createAnchorItems((d, a) => d.UsesFixedAnchor && ((Drawable)d).Anchor == a, applyFixedAnchors)
+                        .Prepend(closestItem)
+                        .ToArray()
             };
 
             yield return new OsuMenuItem("原点(Origin)")
             {
-                Items = createAnchorItems(d => d.Origin, applyOrigin).ToArray()
+                Items = createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray()
             };
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            IEnumerable<TernaryStateMenuItem> createAnchorItems(Func<Drawable, Anchor> checkFunction, Action<Anchor> applyFunction)
+            IEnumerable<TernaryStateMenuItem> createAnchorItems(Func<ISkinnableDrawable, Anchor, bool> checkFunction, Action<Anchor> applyFunction)
             {
                 var displayableAnchors = new[]
                 {
@@ -198,12 +212,11 @@ namespace osu.Game.Skinning.Editor
                     Anchor.BottomCentre,
                     Anchor.BottomRight,
                 };
-
                 return displayableAnchors.Select(a =>
                 {
                     return new TernaryStateRadioMenuItem(a.ToString(), MenuItemType.Standard, _ => applyFunction(a))
                     {
-                        State = { Value = GetStateFromSelection(selection, c => checkFunction((Drawable)c.Item) == a) }
+                        State = { Value = GetStateFromSelection(selection, c => checkFunction(c.Item, a)) }
                     };
                 });
             }
@@ -215,15 +228,21 @@ namespace osu.Game.Skinning.Editor
                 drawable.Parent.ToLocalSpace(screenSpacePosition) - drawable.AnchorPosition;
         }
 
-        private void applyOrigin(Anchor anchor)
+        private void applyOrigins(Anchor origin)
         {
             foreach (var item in SelectedItems)
             {
                 var drawable = (Drawable)item;
 
+                if (origin == drawable.Origin) continue;
+
                 var previousOrigin = drawable.OriginPosition;
-                drawable.Origin = anchor;
+                drawable.Origin = origin;
                 drawable.Position += drawable.OriginPosition - previousOrigin;
+
+                if (item.UsesFixedAnchor) continue;
+
+                applyClosestAnchor(drawable);
             }
         }
 
@@ -234,16 +253,84 @@ namespace osu.Game.Skinning.Editor
         private Quad getSelectionQuad() =>
             GetSurroundingQuad(SelectedBlueprints.SelectMany(b => b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
 
-        private void applyAnchor(Anchor anchor)
+        private void applyFixedAnchors(Anchor anchor)
         {
             foreach (var item in SelectedItems)
             {
                 var drawable = (Drawable)item;
 
-                var previousAnchor = drawable.AnchorPosition;
-                drawable.Anchor = anchor;
-                drawable.Position -= drawable.AnchorPosition - previousAnchor;
+                item.UsesFixedAnchor = true;
+                applyAnchor(drawable, anchor);
             }
+        }
+
+        private void applyClosestAnchors()
+        {
+            foreach (var item in SelectedItems)
+            {
+                item.UsesFixedAnchor = false;
+                applyClosestAnchor((Drawable)item);
+            }
+        }
+
+        private static Anchor getClosestAnchor(Drawable drawable)
+        {
+            var parent = drawable.Parent;
+
+            if (parent == null)
+                return drawable.Anchor;
+
+            var screenPosition = getScreenPosition();
+
+            var absolutePosition = parent.ToLocalSpace(screenPosition);
+            var factor = parent.RelativeToAbsoluteFactor;
+
+            var result = default(Anchor);
+
+            static Anchor getAnchorFromPosition(float xOrY, Anchor anchor0, Anchor anchor1, Anchor anchor2)
+            {
+                if (xOrY >= 2 / 3f)
+                    return anchor2;
+
+                if (xOrY >= 1 / 3f)
+                    return anchor1;
+
+                return anchor0;
+            }
+
+            result |= getAnchorFromPosition(absolutePosition.X / factor.X, Anchor.x0, Anchor.x1, Anchor.x2);
+            result |= getAnchorFromPosition(absolutePosition.Y / factor.Y, Anchor.y0, Anchor.y1, Anchor.y2);
+
+            return result;
+
+            Vector2 getScreenPosition()
+            {
+                var quad = drawable.ScreenSpaceDrawQuad;
+                var origin = drawable.Origin;
+
+                var pos = quad.TopLeft;
+
+                if (origin.HasFlagFast(Anchor.x2))
+                    pos.X += quad.Width;
+                else if (origin.HasFlagFast(Anchor.x1))
+                    pos.X += quad.Width / 2f;
+
+                if (origin.HasFlagFast(Anchor.y2))
+                    pos.Y += quad.Height;
+                else if (origin.HasFlagFast(Anchor.y1))
+                    pos.Y += quad.Height / 2f;
+
+                return pos;
+            }
+        }
+
+        private static void applyAnchor(Drawable drawable, Anchor anchor)
+        {
+            if (anchor == drawable.Anchor) return;
+
+            var previousAnchor = drawable.AnchorPosition;
+            drawable.Anchor = anchor;
+            drawable.Position -= drawable.AnchorPosition - previousAnchor;
         }
 
         private static void adjustScaleFromAnchor(ref Vector2 scale, Anchor reference)

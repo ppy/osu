@@ -1,19 +1,20 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
-using osu.Framework.Input.Events;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Allocation;
-using osu.Game.Graphics.Sprites;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Dashboard.Friends
+namespace osu.Game.Overlays.Dashboard
 {
     public abstract class OverlayStreamItemCN<T> : TabItem<T>
     {
@@ -88,9 +89,9 @@ namespace osu.Game.Overlays.Dashboard.Friends
             SelectedItem.BindValueChanged(_ => updateState(), true);
         }
 
-        protected abstract string MainText { get; }
+        protected abstract LocalisableString MainText { get; }
 
-        protected abstract string AdditionalText { get; }
+        protected abstract LocalisableString AdditionalText { get; }
 
         protected virtual string InfoText => string.Empty;
 

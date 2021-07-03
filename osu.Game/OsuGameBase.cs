@@ -24,6 +24,7 @@ using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Logging;
+using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.Input;
@@ -159,6 +160,8 @@ namespace osu.Game
 
         private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(GLOBAL_TRACK_VOLUME_ADJUST);
 
+        private IBindable<GameThreadState> updateThreadState;
+
         public OsuGameBase()
         {
             UseDevelopmentServer = DebugUtils.IsDebugBuild;
@@ -186,6 +189,10 @@ namespace osu.Game
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
             dependencies.Cache(realmFactory = new RealmContextFactory(Storage));
+
+            updateThreadState = Host.UpdateThread.State.GetBoundCopy();
+            updateThreadState.BindValueChanged(updateThreadStateChanged);
+
             AddInternal(realmFactory);
 
             dependencies.CacheAs(Storage);
@@ -266,7 +273,7 @@ namespace osu.Game
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Host, () => difficultyCache, LocalConfig));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, true));
 
-            // this should likely be moved to ArchiveModelManager when another case appers where it is necessary
+            // this should likely be moved to ArchiveModelManager when another case appears where it is necessary
             // to have inter-dependent model managers. this could be obtained with an IHasForeign<T> interface to
             // allow lookups to be done on the child (ScoreManager in this case) to perform the cascading delete.
             List<ScoreInfo> getBeatmapScores(BeatmapSetInfo set)
@@ -368,6 +375,23 @@ namespace osu.Game
             Ruleset.BindValueChanged(onRulesetChanged);
         }
 
+        private IDisposable blocking;
+
+        private void updateThreadStateChanged(ValueChangedEvent<GameThreadState> state)
+        {
+            switch (state.NewValue)
+            {
+                case GameThreadState.Running:
+                    blocking?.Dispose();
+                    blocking = null;
+                    break;
+
+                case GameThreadState.Paused:
+                    blocking = realmFactory.BlockAllOperations();
+                    break;
+            }
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -412,11 +436,15 @@ namespace osu.Game
 
         public void Migrate(string path)
         {
+            Logger.Log($@"Migrating osu! data from ""{Storage.GetFullPath(string.Empty)}"" to ""{path}""...");
+
             using (realmFactory.BlockAllOperations())
             {
                 contextFactory.FlushConnections();
                 (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
             }
+
+            Logger.Log(@"Migration complete!");
         }
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();

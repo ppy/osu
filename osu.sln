@@ -100,7 +100,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Rulesets.Pippidon"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Rulesets.Pippidon.Tests", "Templates\Rulesets\ruleset-scrolling-example\osu.Game.Rulesets.Pippidon.Tests\osu.Game.Rulesets.Pippidon.Tests.csproj", "{1743BF7C-E6AE-4A06-BAD9-166D62894303}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvis.Plugin.RulesetPanel", "Mvis.Plugin.RulesetPanel\Mvis.Plugin.RulesetPanel.csproj", "{0DE09BF5-5630-424A-A98D-23A390299178}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvis.Plugin.SandboxToPanel", "Mvis.Plugin.SandboxToPanel\Mvis.Plugin.SandboxToPanel.csproj", "{0DE09BF5-5630-424A-A98D-23A390299178}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvis.Plugin.StoryboardSupport", "Mvis.Plugin.StoryboardSupport\Mvis.Plugin.StoryboardSupport.csproj", "{6B5AB791-DBF4-4E80-BD5E-4DFB5719B86E}"
 EndProject

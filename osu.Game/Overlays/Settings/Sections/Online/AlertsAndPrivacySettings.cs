@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
 {
     public class AlertsAndPrivacySettings : SettingsSubsection
     {
-        protected override string Header => "Alerts and Privacy";
+        protected override string Header => "提示和隐私";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -18,12 +18,12 @@ namespace osu.Game.Overlays.Settings.Sections.Online
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Show a notification when someone mentions your name",
+                    LabelText = "当有人在聊天中提到你时显示通知",
                     Current = config.GetBindable<bool>(OsuSetting.NotifyOnUsernameMentioned)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Show a notification when you receive a private message",
+                    LabelText = "当有人向你发送私聊信息时显示通知",
                     Current = config.GetBindable<bool>(OsuSetting.NotifyOnPrivateMessage)
                 },
             };

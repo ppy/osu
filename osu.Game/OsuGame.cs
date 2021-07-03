@@ -286,7 +286,20 @@ namespace osu.Game
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
-            Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
+
+            var preferredRuleset = RulesetStore.GetRuleset(configRuleset.Value);
+
+            try
+            {
+                Ruleset.Value = preferredRuleset ?? RulesetStore.AvailableRulesets.First();
+            }
+            catch (Exception e)
+            {
+                // on startup, a ruleset may be selected which has compatibility issues.
+                Logger.Error(e, $@"Failed to switch to preferred ruleset {preferredRuleset}.");
+                Ruleset.Value = RulesetStore.AvailableRulesets.First();
+            }
+
             Ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ID ?? 0;
 
             // bind config int to database SkinInfo
@@ -547,6 +560,10 @@ namespace osu.Game
         public override Task Import(params ImportTask[] imports)
         {
             // encapsulate task as we don't want to begin the import process until in a ready state.
+
+            // ReSharper disable once AsyncVoidLambda
+            // TODO: This is bad because `new Task` doesn't have a Func<Task?> override.
+            // Only used for android imports and a bit of a mess. Probably needs rethinking overall.
             var importTask = new Task(async () => await base.Import(imports).ConfigureAwait(false));
 
             waitForReady(() => this, _ => importTask.Start());
@@ -654,7 +671,15 @@ namespace osu.Game
             foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
             {
                 var cultureCode = language.ToCultureCode();
-                Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
+
+                try
+                {
+                    Localisation.AddLanguage(cultureCode, new ResourceManagerLocalisationStore(cultureCode));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, $"Could not load localisations for language \"{cultureCode}\"");
+                }
             }
 
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results

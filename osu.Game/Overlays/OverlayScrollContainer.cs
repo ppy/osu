@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -118,7 +119,7 @@ namespace osu.Game.Overlays
                     }
                 });
 
-                TooltipText = "滚动至顶部";
+                TooltipText = CommonStrings.ButtonsBackToTop;
             }
 
             [BackgroundDependencyLoader]

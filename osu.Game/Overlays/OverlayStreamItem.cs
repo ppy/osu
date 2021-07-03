@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
 using osuTK.Graphics;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays
 {
@@ -39,9 +40,9 @@ namespace osu.Game.Overlays
         protected OverlayStreamItem(T value)
             : base(value)
         {
-            Height = 60;
-            Width = 100;
-            Padding = new MarginPadding(5);
+            Height = 50;
+            Width = 90;
+            Margin = new MarginPadding(5);
         }
 
         [BackgroundDependencyLoader]
@@ -88,11 +89,11 @@ namespace osu.Game.Overlays
             SelectedItem.BindValueChanged(_ => updateState(), true);
         }
 
-        protected abstract string MainText { get; }
+        protected abstract LocalisableString MainText { get; }
 
-        protected abstract string AdditionalText { get; }
+        protected abstract LocalisableString AdditionalText { get; }
 
-        protected virtual string InfoText => string.Empty;
+        protected virtual LocalisableString InfoText => string.Empty;
 
         protected abstract Color4 GetBarColour(OsuColour colours);
 

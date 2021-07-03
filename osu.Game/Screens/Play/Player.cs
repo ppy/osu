@@ -228,29 +228,23 @@ namespace osu.Game.Screens.Play
 
             dependencies.CacheAs(GameplayBeatmap);
 
-            var beatmapSkinProvider = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
-
-            // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
-            // full access to all skin sources.
-            var rulesetSkinProvider = new SkinProvidingContainer(GameplayRuleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
+            var rulesetSkinProvider = new RulesetSkinProvidingContainer(GameplayRuleset, playableBeatmap, Beatmap.Value.Skin);
 
             // load the skinning hierarchy first.
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
-            GameplayClockContainer.Add(beatmapSkinProvider.WithChild(rulesetSkinProvider));
+            GameplayClockContainer.Add(rulesetSkinProvider);
 
             rulesetSkinProvider.AddRange(new[]
             {
-                // underlay and gameplay should have access the to skinning sources.
+                // underlay and gameplay should have access to the skinning sources.
                 createUnderlayComponents(),
                 createGameplayComponents(Beatmap.Value, playableBeatmap)
             });
 
-            // also give the HUD a ruleset container to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
-            // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
-            var hudRulesetContainer = new SkinProvidingContainer(GameplayRuleset.CreateLegacySkinProvider(beatmapSkinProvider, playableBeatmap));
-
             // add the overlay components as a separate step as they proxy some elements from the above underlay/gameplay components.
-            GameplayClockContainer.Add(hudRulesetContainer.WithChild(createOverlayComponents(Beatmap.Value)));
+            // also give the overlays the ruleset skin provider to allow rulesets to potentially override HUD elements (used to disable combo counters etc.)
+            // we may want to limit this in the future to disallow rulesets from outright replacing elements the user expects to be there.
+            rulesetSkinProvider.Add(createOverlayComponents(Beatmap.Value));
 
             if (!DrawableRuleset.AllowGameplayOverlays)
             {
@@ -776,6 +770,7 @@ namespace osu.Game.Screens.Play
                 return false;
 
             HasFailed = true;
+            Score.ScoreInfo.Passed = false;
 
             // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
             // could process an extra frame after the GameplayClock is stopped.
@@ -957,6 +952,10 @@ namespace osu.Game.Screens.Play
         public override bool OnExiting(IScreen next)
         {
             screenSuspension?.Expire();
+
+            // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
+            if (prepareScoreForDisplayTask == null)
+                Score.ScoreInfo.Passed = false;
 
             // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
             // To resolve test failures, forcefully end playing synchronously when this screen exits.

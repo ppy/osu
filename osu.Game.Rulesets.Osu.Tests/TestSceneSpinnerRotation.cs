@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void addSeekStep(double time)
         {
-            AddStep($"seek to {time}", () => MusicController.SeekTo(time));
+            AddStep($"seek to {time}", () => Player.GameplayClockContainer.Seek(time));
 
             AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(time, Player.DrawableRuleset.FrameStableClock.CurrentTime, 100));
         }

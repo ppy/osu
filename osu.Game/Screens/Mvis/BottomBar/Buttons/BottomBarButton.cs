@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         private IconUsage emptyIcon => new IconUsage();
 
         public Action Action;
-        public string TooltipText { get; set; }
+        public LocalisableString TooltipText { get; set; }
 
         public IconUsage ButtonIcon
         {

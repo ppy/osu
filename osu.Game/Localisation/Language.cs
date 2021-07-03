@@ -86,8 +86,10 @@ namespace osu.Game.Localisation
         [Description(@"ไทย")]
         th,
 
-        [Description(@"Tagalog")]
-        tl,
+        // Tagalog has no associated localisations yet, and is not supported on Xamarin platforms or Windows versions <10.
+        // Can be revisited if localisations ever arrive.
+        //[Description(@"Tagalog")]
+        //tl,
 
         [Description(@"Türkçe")]
         tr,
@@ -101,8 +103,11 @@ namespace osu.Game.Localisation
         [Description(@"简体中文")]
         zh,
 
-        [Description(@"繁體中文（香港）")]
-        zh_hk,
+        // Traditional Chinese (Hong Kong) is listed in web sources but has no associated localisations,
+        // and was wrongly falling back to Simplified Chinese.
+        // Can be revisited if localisations ever arrive.
+        // [Description(@"繁體中文（香港）")]
+        // zh_hk,
 
         [Description(@"繁體中文（台灣）")]
         zh_tw

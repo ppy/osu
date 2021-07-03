@@ -11,14 +11,15 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModHidden : ModHidden, IMutateApproachCircles
+    public class OsuModHidden : ModHidden, IHidesApproachCircles
     {
         public override double ScoreMultiplier => 1.06;
 
-        public override Type[] IncompatibleMods => new[] { typeof(IMutateApproachCircles) };
+        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModSpinIn) };
 
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
@@ -109,6 +110,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                     // hide elements we don't care about.
                     // todo: hide background
 
+                    spinner.Body.OnSkinChanged += () => hideSpinnerApproachCircle(spinner);
+                    hideSpinnerApproachCircle(spinner);
+
                     using (spinner.BeginAbsoluteSequence(fadeStartTime))
                         spinner.FadeOut(fadeDuration);
 
@@ -158,6 +162,16 @@ namespace osu.Game.Rulesets.Osu.Mods
                         return (fadeOutStartTime, fadeOutDuration);
                 }
             }
+        }
+
+        private static void hideSpinnerApproachCircle(DrawableSpinner spinner)
+        {
+            var approachCircle = (spinner.Body.Drawable as IHasApproachCircle)?.ApproachCircle;
+            if (approachCircle == null)
+                return;
+
+            using (spinner.BeginAbsoluteSequence(spinner.HitObject.StartTime - spinner.HitObject.TimePreempt))
+                approachCircle.Hide();
         }
     }
 }

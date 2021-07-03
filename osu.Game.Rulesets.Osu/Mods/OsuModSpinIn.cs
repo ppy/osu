@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModSpinIn : ModWithVisibilityAdjustment, IMutateApproachCircles
+    public class OsuModSpinIn : ModWithVisibilityAdjustment, IHidesApproachCircles
     {
         public override string Name => "螺旋";
         public override string Acronym => "SI";
@@ -21,8 +21,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "没有缩圈,圆圈会螺旋进入";
         public override double ScoreMultiplier => 1;
 
-        // todo: this mod should be able to be compatible with hidden with a bit of further implementation.
-        public override Type[] IncompatibleMods => new[] { typeof(IMutateApproachCircles) };
+        // todo: this mod needs to be incompatible with "hidden" due to forcing the circle to remain opaque,
+        // further implementation will be required for supporting that.
+        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModObjectScaleTween), typeof(OsuModHidden) };
 
         private const int rotate_offset = 360;
         private const float rotate_starting_width = 2;
