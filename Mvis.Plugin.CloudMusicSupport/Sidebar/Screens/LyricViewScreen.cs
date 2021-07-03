@@ -1,3 +1,4 @@
+using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic;
 using osu.Framework.Allocation;
@@ -65,6 +66,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
                 Size = new Vector2(45),
                 TooltipText = "编辑",
                 Action = pushEditScreen
+            },
+            new IconButton
+            {
+                Icon = FontAwesome.Solid.AngleDown,
+                Size = new Vector2(45),
+                TooltipText = "滚动到当前歌词",
+                Action = ScrollToCurrent
             }
         };
 
@@ -80,9 +88,16 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             TooltipText = "保存为lrc"
         };
 
+        [Resolved]
+        private LyricConfigManager configManager { get; set; }
+
+        private readonly BindableBool autoScroll = new BindableBool();
+
         protected override void LoadComplete()
         {
             saveButton.Action = plugin.WriteLyricToDisk;
+
+            configManager.BindWith(LyricSettings.AutoScrollToCurrent, autoScroll);
 
             plugin.CurrentStatus.BindValueChanged(v =>
             {
@@ -105,7 +120,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
         protected override void Update()
         {
-            if (followCooldown.Value == 0) ScrollToCurrent();
+            if (followCooldown.Value == 0 && autoScroll.Value) ScrollToCurrent();
             base.Update();
         }
 
