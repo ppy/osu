@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Select;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
