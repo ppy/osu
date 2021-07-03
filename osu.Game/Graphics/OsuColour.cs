@@ -32,10 +32,10 @@ namespace osu.Game.Graphics
                     return Pink;
 
                 case DifficultyRating.Expert:
-                    return useLighterColour ? PurpleLight : Purple;
+                    return PurpleLight;
 
                 case DifficultyRating.ExpertPlus:
-                    return useLighterColour ? Gray9 : Gray0;
+                    return useLighterColour ? Gray9 : Color4Extensions.FromHex("#121415");
             }
         }
 
