@@ -14,7 +14,6 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public class Info : Container
     {
-        private const float transition_duration = 250;
         private const float metadata_width = 175;
         private const float spacing = 20;
         private const float base_height = 220;
