@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModTarget : ModWithVisibilityAdjustment, IApplicableToDrawableRuleset<OsuHitObject>,
                                 IApplicableToHealthProcessor, IApplicableToDifficulty, IApplicableFailOverride,
-                                IHasSeed, IMutateApproachCircles
+                                IHasSeed, IHidesApproachCircles
     {
         public override string Name => "Target";
         public override string Acronym => "TP";
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => @"Practice keeping up with the beat of the song.";
         public override double ScoreMultiplier => 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(IMutateApproachCircles) };
+        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles) };
 
         [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(SettingsNumberBox))]
         public Bindable<int?> Seed { get; } = new Bindable<int?>
