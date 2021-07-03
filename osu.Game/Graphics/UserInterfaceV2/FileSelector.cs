@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             this.validFileExtensions = validFileExtensions ?? Array.Empty<string>();
         }
 
-        protected override bool TryGetEntriesForPath(DirectoryInfo path, out IEnumerable<DisplayPiece> displayPieces)
+        protected override bool TryGetEntriesForPath(DirectoryInfo path, out ICollection<DisplayPiece> displayPieces)
         {
             displayPieces = new List<DisplayPiece>();
 
@@ -42,7 +42,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             foreach (var file in files.OrderBy(d => d.Name))
             {
                 if ((file.Attributes & FileAttributes.Hidden) == 0)
-                    displayPieces = displayPieces.Append(new FilePiece(file));
+                    displayPieces.Add(new FilePiece(file));
             }
 
             return true;

@@ -83,7 +83,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             var newDirectory = directory.NewValue;
             bool flashError = false;
-            IEnumerable<DisplayPiece> displayPieces = Array.Empty<DisplayPiece>();
+            ICollection<DisplayPiece> displayPieces = Array.Empty<DisplayPiece>();
 
             while (newDirectory != null)
             {
@@ -115,7 +115,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             directoryFlow.AddRange(displayPieces);
         }
 
-        protected virtual bool TryGetEntriesForPath(DirectoryInfo path, out IEnumerable<DisplayPiece> displayPieces)
+        protected virtual bool TryGetEntriesForPath(DirectoryInfo path, out ICollection<DisplayPiece> displayPieces)
         {
             displayPieces = new List<DisplayPiece>();
 
@@ -124,7 +124,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 foreach (var dir in path.GetDirectories().OrderBy(d => d.Name))
                 {
                     if ((dir.Attributes & FileAttributes.Hidden) == 0)
-                        displayPieces = displayPieces.Append(new DirectoryPiece(dir));
+                        displayPieces.Add(new DirectoryPiece(dir));
                 }
 
                 return true;
