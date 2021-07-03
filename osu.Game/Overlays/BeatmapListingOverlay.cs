@@ -89,6 +89,12 @@ namespace osu.Game.Overlays
             };
         }
 
+        public void ShowWithSearch(string query)
+        {
+            filterControl.Search(query);
+            Show();
+        }
+
         protected override BeatmapListingHeader CreateHeader() => new BeatmapListingHeader();
 
         protected override Color4 BackgroundColour => ColourProvider.Background6;
