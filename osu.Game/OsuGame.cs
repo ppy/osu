@@ -367,7 +367,7 @@ namespace osu.Game
         public void ShowBeatmap(int beatmapId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId));
 
         /// <summary>
-        /// Show Direct with a query.
+        /// Shows the beatmap listing overlay, with the given <paramref name="query"/> in the search box.
         /// </summary>
         /// <param name="query">The query to search for.</param>
         public void SearchBeatmapSet(string query) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithSearch(query));
