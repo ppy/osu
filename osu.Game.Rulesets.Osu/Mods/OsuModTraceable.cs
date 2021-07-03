@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Osu.Skinning.Default;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModTraceable : ModWithVisibilityAdjustment, IMutateApproachCircles
+    public class OsuModTraceable : ModWithVisibilityAdjustment, IRequiresApproachCircles
     {
         public override string Name => "追溯";
         public override string Acronym => "TC";
@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "注意缩圈,意念打图";
         public override double ScoreMultiplier => 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(IMutateApproachCircles) };
+        public override Type[] IncompatibleMods => new[] { typeof(IHidesApproachCircles) };
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {

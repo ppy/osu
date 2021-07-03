@@ -19,7 +19,9 @@ using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Scoring;
 using osu.Game.Tests.Resources;
+using osu.Game.Tests.Scores.IO;
 using osu.Game.Users;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
@@ -185,10 +187,58 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
-        private string hashFile(string filename)
+        [Test]
+        public async Task TestImportThenImportWithChangedHashedFile()
         {
-            using (var s = File.OpenRead(filename))
-                return s.ComputeMD5Hash();
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+
+                    var temp = TestResources.GetTestBeatmapForImport();
+
+                    string extractedFolder = $"{temp}_extracted";
+                    Directory.CreateDirectory(extractedFolder);
+
+                    try
+                    {
+                        var imported = await LoadOszIntoOsu(osu);
+
+                        await createScoreForBeatmap(osu, imported.Beatmaps.First());
+
+                        using (var zip = ZipArchive.Open(temp))
+                            zip.WriteToDirectory(extractedFolder);
+
+                        // arbitrary write to hashed file
+                        // this triggers the special BeatmapManager.PreImport deletion/replacement flow.
+                        using (var sw = new FileInfo(Directory.GetFiles(extractedFolder, "*.osu").First()).AppendText())
+                            await sw.WriteLineAsync("// changed");
+
+                        using (var zip = ZipArchive.Create())
+                        {
+                            zip.AddAllFromDirectory(extractedFolder);
+                            zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
+                        }
+
+                        var importedSecondTime = await osu.Dependencies.Get<BeatmapManager>().Import(new ImportTask(temp));
+
+                        ensureLoaded(osu);
+
+                        // check the newly "imported" beatmap is not the original.
+                        Assert.IsTrue(imported.ID != importedSecondTime.ID);
+                        Assert.IsTrue(imported.Beatmaps.First().ID != importedSecondTime.Beatmaps.First().ID);
+                    }
+                    finally
+                    {
+                        Directory.Delete(extractedFolder, true);
+                    }
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
         }
 
         [Test]
@@ -894,7 +944,17 @@ namespace osu.Game.Tests.Beatmaps.IO
             Assert.IsTrue(manager.QueryBeatmapSets(_ => true).First().DeletePending);
         }
 
-        private void checkBeatmapSetCount(OsuGameBase osu, int expected, bool includeDeletePending = false)
+        private static Task createScoreForBeatmap(OsuGameBase osu, BeatmapInfo beatmap)
+        {
+            return ImportScoreTest.LoadScoreIntoOsu(osu, new ScoreInfo
+            {
+                OnlineScoreID = 2,
+                Beatmap = beatmap,
+                BeatmapInfoID = beatmap.ID
+            }, new ImportScoreTest.TestArchiveReader());
+        }
+
+        private static void checkBeatmapSetCount(OsuGameBase osu, int expected, bool includeDeletePending = false)
         {
             var manager = osu.Dependencies.Get<BeatmapManager>();
 
@@ -903,12 +963,18 @@ namespace osu.Game.Tests.Beatmaps.IO
                 : manager.GetAllUsableBeatmapSets().Count);
         }
 
-        private void checkBeatmapCount(OsuGameBase osu, int expected)
+        private static string hashFile(string filename)
+        {
+            using (var s = File.OpenRead(filename))
+                return s.ComputeMD5Hash();
+        }
+
+        private static void checkBeatmapCount(OsuGameBase osu, int expected)
         {
             Assert.AreEqual(expected, osu.Dependencies.Get<BeatmapManager>().QueryBeatmaps(_ => true).ToList().Count);
         }
 
-        private void checkSingleReferencedFileCount(OsuGameBase osu, int expected)
+        private static void checkSingleReferencedFileCount(OsuGameBase osu, int expected)
         {
             Assert.AreEqual(expected, osu.Dependencies.Get<FileStore>().QueryFiles(f => f.ReferenceCount == 1).Count());
         }

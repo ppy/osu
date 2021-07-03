@@ -11,11 +11,12 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Visual.OnlinePlay;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchBeatmapDetailArea : RoomTestScene
+    public class TestSceneMatchBeatmapDetailArea : OnlinePlayTestScene
     {
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -26,6 +27,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUp]
         public new void Setup() => Schedule(() =>
         {
+            SelectedRoom.Value = new Room();
+
             Child = new MatchBeatmapDetailArea
             {
                 Anchor = Anchor.Centre,
@@ -37,9 +40,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void createNewItem()
         {
-            Room.Playlist.Add(new PlaylistItem
+            SelectedRoom.Value.Playlist.Add(new PlaylistItem
             {
-                ID = Room.Playlist.Count,
+                ID = SelectedRoom.Value.Playlist.Count,
                 Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                 Ruleset = { Value = new OsuRuleset().RulesetInfo },
                 RequiredMods =

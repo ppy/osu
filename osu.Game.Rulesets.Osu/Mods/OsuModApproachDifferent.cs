@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModApproachDifferent : Mod, IApplicableToDrawableHitObject, IMutateApproachCircles
+    public class OsuModApproachDifferent : Mod, IApplicableToDrawableHitObject, IRequiresApproachCircles
     {
         public override string Name => "嗦圈";
         public override string Acronym => "AD";
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon { get; } = FontAwesome.Regular.Circle;
 
-        public override Type[] IncompatibleMods => new[] { typeof(IMutateApproachCircles) };
+        public override Type[] IncompatibleMods => new[] { typeof(IHidesApproachCircles) };
 
         [SettingSource("初始大小", "更改缩圈相较与圆圈的的初始大小。", 0)]
         public BindableFloat Scale { get; } = new BindableFloat(4)

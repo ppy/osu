@@ -51,12 +51,12 @@
     <Reference Include="Java.Interop" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2021.618.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2021.701.0" />
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
     <ProjectReference Include="..\osu-framework\osu.Framework.Android\osu.Framework.Android.csproj" />
   </ItemGroup>
   <ItemGroup Label="Transitive Dependencies">
     <!-- Realm needs to be directly referenced in all Xamarin projects, as it will not pull in its transitive dependencies otherwise. -->
-    <PackageReference Include="Realm" Version="10.2.0" />
+    <PackageReference Include="Realm" Version="10.2.1" />
   </ItemGroup>
 </Project>
