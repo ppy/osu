@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Dashboard
                     return FriendsStrings.TitleCompact;
 
                 case DashboardOverlayTabs.CurrentlyPlaying:
-                    return @"Currently Playing";
+                    return @"正在游玩";
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), value, null);
