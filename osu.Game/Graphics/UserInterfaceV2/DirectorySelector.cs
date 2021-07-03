@@ -82,12 +82,16 @@ namespace osu.Game.Graphics.UserInterfaceV2
             directoryFlow.Clear();
 
             var newDirectory = directory.NewValue;
-
-            if (!newDirectoryIsAccessible())
-                this.FlashColour(Color4.Red, 300);
+            bool flashError = false;
 
             while (!newDirectoryIsAccessible())
+            {
+                flashError = true;
                 newDirectory = newDirectory?.Parent;
+            }
+
+            if (flashError)
+                this.FlashColour(Color4.Red, 300);
 
             if (newDirectory == null)
             {
