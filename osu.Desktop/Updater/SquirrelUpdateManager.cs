@@ -116,7 +116,7 @@ namespace osu.Desktop.Updater
                 if (scheduleRecheck)
                 {
                     // check again in 30 minutes.
-                    Scheduler.AddDelayed(async () => await checkForUpdateAsync().ConfigureAwait(false), 60000 * 30);
+                    Scheduler.AddDelayed(() => Task.Run(async () => await checkForUpdateAsync().ConfigureAwait(false)), 60000 * 30);
                 }
             }
 
@@ -141,7 +141,7 @@ namespace osu.Desktop.Updater
                 Activated = () =>
                 {
                     updateManager.PrepareUpdateAsync()
-                                 .ContinueWith(_ => updateManager.Schedule(() => game.GracefullyExit()));
+                                 .ContinueWith(_ => updateManager.Schedule(() => game?.GracefullyExit()));
                     return true;
                 };
             }
