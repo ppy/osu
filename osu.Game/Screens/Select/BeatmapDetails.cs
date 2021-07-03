@@ -1,24 +1,25 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
-using osuTK.Graphics;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
-using System.Linq;
-using osu.Game.Online.API;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Game.Screens.Select.Details;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API.Requests;
-using osu.Game.Rulesets;
 using osu.Game.Online;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Overlays.BeatmapSet;
+using osu.Game.Rulesets;
+using osu.Game.Screens.Select.Details;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
@@ -128,13 +129,11 @@ namespace osu.Game.Screens.Select
                                                     AutoSizeAxes = Axes.Y,
                                                     LayoutDuration = transition_duration,
                                                     LayoutEasing = Easing.OutQuad,
-                                                    Spacing = new Vector2(spacing * 2),
-                                                    Margin = new MarginPadding { Top = spacing * 2 },
                                                     Children = new[]
                                                     {
-                                                        description = new MetadataSection("Description"),
-                                                        source = new MetadataSection("Source"),
-                                                        tags = new MetadataSection("Tags"),
+                                                        description = new MetadataSection(MetadataType.Description),
+                                                        source = new MetadataSection(MetadataType.Source),
+                                                        tags = new MetadataSection(MetadataType.Tags),
                                                     },
                                                 },
                                             },
@@ -288,74 +287,6 @@ namespace osu.Game.Screens.Select
                         AutoSizeAxes = Axes.Y,
                     },
                 };
-            }
-        }
-
-        private class MetadataSection : Container
-        {
-            private readonly FillFlowContainer textContainer;
-            private TextFlowContainer textFlow;
-
-            public MetadataSection(string title)
-            {
-                Alpha = 0;
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-
-                InternalChild = textContainer = new FillFlowContainer
-                {
-                    Alpha = 0,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(spacing / 2),
-                    Children = new Drawable[]
-                    {
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Child = new OsuSpriteText
-                            {
-                                Text = title,
-                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
-                            },
-                        },
-                    },
-                };
-            }
-
-            public string Text
-            {
-                set
-                {
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        this.FadeOut(transition_duration);
-                        return;
-                    }
-
-                    this.FadeIn(transition_duration);
-
-                    setTextAsync(value);
-                }
-            }
-
-            private void setTextAsync(string text)
-            {
-                LoadComponentAsync(new OsuTextFlowContainer(s => s.Font = s.Font.With(size: 14))
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Colour = Color4.White.Opacity(0.75f),
-                    Text = text
-                }, loaded =>
-                {
-                    textFlow?.Expire();
-                    textContainer.Add(textFlow = loaded);
-
-                    // fade in if we haven't yet.
-                    textContainer.FadeIn(transition_duration);
-                });
             }
         }
     }
