@@ -4,6 +4,7 @@
 using System;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -46,15 +47,21 @@ namespace osu.Game.Database
         {
             get
             {
-                if (context == null)
+                if (!ThreadSafety.IsUpdateThread)
+                    throw new InvalidOperationException($"Use {nameof(GetForRead)} when performing realm operations from a non-update thread");
+
+                lock (updateContextLock)
                 {
-                    context = createContext();
-                    Logger.Log($"Opened realm \"{context.Config.DatabasePath}\" at version {context.Config.SchemaVersion}");
+                    if (context == null)
+                    {
+                        context = createContext();
+                        Logger.Log($"Opened realm \"{context.Config.DatabasePath}\" at version {context.Config.SchemaVersion}");
+                    }
+
+                    // creating a context will ensure our schema is up-to-date and migrated.
+
+                    return context;
                 }
-
-                // creating a context will ensure our schema is up-to-date and migrated.
-
-                return context;
             }
         }
 
