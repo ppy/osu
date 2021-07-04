@@ -19,7 +19,6 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    [Cached]
     public class VolumeOverlay : VisibilityContainer
     {
         private const float offset = 10;
@@ -64,11 +63,20 @@ namespace osu.Game.Overlays
                     Origin = Anchor.CentreLeft,
                     Spacing = new Vector2(0, offset),
                     Margin = new MarginPadding { Left = offset },
-                    Children = new VolumeMeter[]
+                    Children = new []
                     {
-                        volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker),
-                        volumeMeterMaster = new VolumeMeter("MASTER", 150, colours.PinkDarker),
-                        volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.BlueDarker),
+                        volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker)
+                        {
+                            RequestFocus = v => focusedMeter.Value = v
+                        },
+                        volumeMeterMaster = new VolumeMeter("MASTER", 150, colours.PinkDarker)
+                        {
+                            RequestFocus = v => focusedMeter.Value = v
+                        },
+                        volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.BlueDarker)
+                        {
+                            RequestFocus = v => focusedMeter.Value = v
+                        },
                     }
                 }
             });
@@ -85,11 +93,14 @@ namespace osu.Game.Overlays
                     audio.RemoveAdjustment(AdjustableProperty.Volume, muteAdjustment);
             });
 
-            focusedMeter.BindValueChanged(meter => meter.OldValue?.Unfocus());
+            focusedMeter.BindValueChanged(meter =>
+            {
+                meter.OldValue?.Unfocus();
+                meter.NewValue?.Focus();
+            });
         }
 
-        [Cached]
-        private Bindable<VolumeMeter> focusedMeter = new Bindable<VolumeMeter>();
+        private readonly Bindable<VolumeMeter> focusedMeter = new Bindable<VolumeMeter>();
 
         protected override void LoadComplete()
         {
@@ -165,19 +176,21 @@ namespace osu.Game.Overlays
         private void focusShift(int direction = 1)
         {
             Show();
+
             var newIndex = volumeMeters.IndexOf(focusedMeter.Value) + direction;
             if (newIndex < 0)
                 newIndex += volumeMeters.Count;
 
-            volumeMeters.Children[newIndex % volumeMeters.Count].Focus();
+            focusedMeter.Value = volumeMeters.Children[newIndex % volumeMeters.Count];
         }
 
         private ScheduledDelegate popOutDelegate;
 
         public override void Show()
         {
+            // Focus on the master meter as a default if previously hidden
             if (State.Value == Visibility.Hidden)
-                volumeMeterMaster.Focus();
+                focusedMeter.Value = volumeMeterMaster;
 
             if (State.Value == Visibility.Visible)
                 schedulePopOut();
