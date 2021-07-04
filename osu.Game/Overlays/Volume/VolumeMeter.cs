@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -27,6 +28,11 @@ namespace osu.Game.Overlays.Volume
 {
     public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
     {
+        [Resolved(canBeNull: true)]
+        private Bindable<VolumeMeter> focusedMeter { get; set; }
+
+        private bool isFocused => focusedMeter == null || focusedMeter.Value == this;
+
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
 
@@ -40,6 +46,8 @@ namespace osu.Game.Overlays.Volume
 
         private Sample sample;
         private double sampleLastPlaybackTime;
+
+        public Action<VolumeMeter> RequestFocus;
 
         public VolumeMeter(string name, float circleSize, Color4 meterColour)
         {
@@ -310,20 +318,32 @@ namespace osu.Game.Overlays.Volume
 
         private const float transition_length = 500;
 
+        public void Focus()
+        {
+            if (focusedMeter != null)
+                focusedMeter.Value = this;
+
+            this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
+        }
+
+        public void Unfocus()
+        {
+            this.ScaleTo(1f, transition_length, Easing.OutExpo);
+        }
+
         protected override bool OnHover(HoverEvent e)
         {
-            this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
+            Focus();
             return false;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            this.ScaleTo(1f, transition_length, Easing.OutExpo);
         }
 
         public bool OnPressed(GlobalAction action)
         {
-            if (!IsHovered)
+            if (!IsHovered || !isFocused)
                 return false;
 
             switch (action)
