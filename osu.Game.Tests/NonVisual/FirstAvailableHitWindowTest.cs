@@ -23,51 +23,47 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestResultIfOnlyParentHitWindowIsEmpty()
         {
-            var testObject = new TestHitObject(hitWindows: HitWindows.Empty);
-            HitObject nested = new TestHitObject(hitWindows: new HitWindows());
+            var testObject = new TestHitObject(HitWindows.Empty);
+            HitObject nested = new TestHitObject(new HitWindows());
             testObject.AddNested(nested);
             testDrawableRuleset.HitObjects = new List<HitObject> { testObject };
 
-            // If the parent window is empty, but its nested object isn't, return the nested object
             Assert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, nested.HitWindows);
         }
 
         [Test]
         public void TestResultIfParentHitWindowsIsNotEmpty()
         {
-            var testObject = new TestHitObject(hitWindows: new HitWindows());
-            HitObject nested = new TestHitObject(hitWindows: new HitWindows());
+            var testObject = new TestHitObject(new HitWindows());
+            HitObject nested = new TestHitObject(new HitWindows());
             testObject.AddNested(nested);
             testDrawableRuleset.HitObjects = new List<HitObject> { testObject };
 
-            // If the parent window is not empty, return that immediately
             Assert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, testObject.HitWindows);
         }
 
         [Test]
         public void TestResultIfParentAndChildHitWindowsAreEmpty()
         {
-            var firstObject = new TestHitObject(hitWindows: HitWindows.Empty);
-            HitObject nested = new TestHitObject(hitWindows: HitWindows.Empty);
+            var firstObject = new TestHitObject(HitWindows.Empty);
+            HitObject nested = new TestHitObject(HitWindows.Empty);
             firstObject.AddNested(nested);
 
-            var secondObject = new TestHitObject(hitWindows: new HitWindows());
+            var secondObject = new TestHitObject(new HitWindows());
             testDrawableRuleset.HitObjects = new List<HitObject> { firstObject, secondObject };
 
-            // If the parent and child windows are empty, return the next object if window isn't empty
             Assert.AreSame(testDrawableRuleset.FirstAvailableHitWindows, secondObject.HitWindows);
         }
 
         [Test]
         public void TestResultIfAllHitWindowsAreEmpty()
         {
-            var firstObject = new TestHitObject(hitWindows: HitWindows.Empty);
-            HitObject nested = new TestHitObject(hitWindows: HitWindows.Empty);
+            var firstObject = new TestHitObject(HitWindows.Empty);
+            HitObject nested = new TestHitObject(HitWindows.Empty);
             firstObject.AddNested(nested);
 
             testDrawableRuleset.HitObjects = new List<HitObject> { firstObject };
 
-            // If all windows are empty, this should return null
             Assert.IsNull(testDrawableRuleset.FirstAvailableHitWindows);
         }
 
