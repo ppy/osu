@@ -63,7 +63,7 @@ namespace osu.Game.Overlays
                     Origin = Anchor.CentreLeft,
                     Spacing = new Vector2(0, offset),
                     Margin = new MarginPadding { Left = offset },
-                    Children = new []
+                    Children = new[]
                     {
                         volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker)
                         {
@@ -145,7 +145,6 @@ namespace osu.Game.Overlays
                     else
                         focusShift(-1);
                     return true;
-
 
                 case GlobalAction.ToggleMute:
                     Show();
