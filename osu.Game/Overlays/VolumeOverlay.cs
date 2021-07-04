@@ -112,23 +112,6 @@ namespace osu.Game.Overlays
             muteButton.Current.ValueChanged += _ => Show();
         }
 
-        public bool HandleAction(GlobalAction action)
-        {
-            if (!IsLoaded) return false;
-
-            switch (action)
-            {
-                case GlobalAction.DecreaseVolume:
-                case GlobalAction.IncreaseVolume:
-                    return Adjust(action);
-                case GlobalAction.NextVolumeMeter:
-                    return true;
-
-            }
-
-            return true;
-        }
-
         public bool Adjust(GlobalAction action, float amount = 1, bool isPrecise = false)
         {
             if (!IsLoaded) return false;
