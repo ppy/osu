@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup Label="Project References">
-    <ProjectReference Include="..\..\mfosu\osu.Game\osu.Game.csproj" />
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
     <ProjectReference Include="..\..\osu-framework\osu.Framework\osu.Framework.csproj" />
   </ItemGroup>
 
