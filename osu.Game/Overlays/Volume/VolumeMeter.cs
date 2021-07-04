@@ -193,7 +193,7 @@ namespace osu.Game.Overlays.Volume
             bgProgress.Current.Value = 0.75f;
         }
 
-        private int displayVolumeInt;
+        private int? displayVolumeInt;
 
         private double displayVolume;
 
@@ -202,9 +202,6 @@ namespace osu.Game.Overlays.Volume
             get => displayVolume;
             set
             {
-                if (value == displayVolume)
-                    return;
-
                 displayVolume = value;
 
                 int intValue = (int)Math.Round(displayVolume * 100);
@@ -220,7 +217,7 @@ namespace osu.Game.Overlays.Volume
                 else
                 {
                     maxGlow.EffectColour = Color4.Transparent;
-                    text.Text = displayVolumeInt.ToString(CultureInfo.CurrentCulture);
+                    text.Text = intValue.ToString(CultureInfo.CurrentCulture);
                 }
 
                 volumeCircle.Current.Value = displayVolume * 0.75f;
