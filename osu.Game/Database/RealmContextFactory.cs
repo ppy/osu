@@ -38,6 +38,8 @@ namespace osu.Game.Database
         private static readonly GlobalStatistic<int> pending_writes = GlobalStatistics.Get<int>("Realm", "Pending writes");
         private static readonly GlobalStatistic<int> active_usages = GlobalStatistics.Get<int>("Realm", "Active usages");
 
+        private readonly object updateContextLock = new object();
+
         private Realm context;
 
         public Realm Context
@@ -107,8 +109,11 @@ namespace osu.Game.Database
         {
             base.Update();
 
-            if (context?.Refresh() == true)
-                refreshes.Value++;
+            lock (updateContextLock)
+            {
+                if (context?.Refresh() == true)
+                    refreshes.Value++;
+            }
         }
 
         private Realm createContext()
@@ -156,7 +161,9 @@ namespace osu.Game.Database
             Logger.Log(@"Flushing realm contexts...", LoggingTarget.Database);
 
             var previousContext = context;
-            context = null;
+
+            lock (updateContextLock)
+                context = null;
 
             // wait for all threaded usages to finish
             while (active_usages.Value > 0)
