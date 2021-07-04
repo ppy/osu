@@ -37,6 +37,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
 
             AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
+
+            addFakeHit();
+
             AddStep("seek to completion", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.Objects.Last().GetEndTime()));
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
@@ -71,6 +74,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             CreateTest(() => allowFail = false);
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
+
+            addFakeHit();
 
             AddStep("exit", () => Player.Exit());
             AddAssert("ensure no submission", () => Player.SubmittedScore == null);
