@@ -27,8 +27,6 @@ namespace osu.Game.Overlays.Volume
 {
     public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
     {
-        private bool isFocused = true;
-
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
 
@@ -316,13 +314,11 @@ namespace osu.Game.Overlays.Volume
 
         public void Focus()
         {
-            isFocused = true;
             this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
         }
 
         public void Unfocus()
         {
-            isFocused = false;
             this.ScaleTo(1f, transition_length, Easing.OutExpo);
         }
 
@@ -341,17 +337,15 @@ namespace osu.Game.Overlays.Volume
             if (!IsHovered)
                 return false;
 
-            // Grab back focus is UP/DOWN input is directed at this meter
-            if (!isFocused)
-                RequestFocus?.Invoke(this);
-
             switch (action)
             {
                 case GlobalAction.SelectPrevious:
+                    RequestFocus?.Invoke(this);
                     adjust(1, false);
                     return true;
 
                 case GlobalAction.SelectNext:
+                    RequestFocus?.Invoke(this);
                     adjust(-1, false);
                     return true;
             }
