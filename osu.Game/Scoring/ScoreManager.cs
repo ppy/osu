@@ -208,7 +208,7 @@ namespace osu.Game.Scoring
                 }
                 else
                 {
-                    // This score is guaranteed to be an osu!lazer score.
+                    // This is guaranteed to be a non-legacy score.
                     // The combo must be determined through the score's statistics, as both the beatmap's max combo and the difficulty calculator will provide osu!stable combo values.
                     beatmapMaxCombo = Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r.AffectsCombo()).Select(r => score.Statistics.GetOrDefault(r)).Sum();
                 }
