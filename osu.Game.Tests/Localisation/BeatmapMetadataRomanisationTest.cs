@@ -10,20 +10,30 @@ namespace osu.Game.Tests.Localisation
     public class BeatmapMetadataRomanisationTest
     {
         [Test]
-        public void TestNoUnicode()
+        public void TestRomanisation()
         {
-            var beatmap = new Beatmap
+            var metadata = new BeatmapMetadata
             {
-                BeatmapInfo = new BeatmapInfo
-                {
-                    Metadata = new BeatmapMetadata
-                    {
-                        Artist = "Artist",
-                        Title = "Romanised title"
-                    }
-                }
+                Artist = "Romanised Artist",
+                ArtistUnicode = "Unicode Artist",
+                Title = "Romanised title",
+                TitleUnicode = "Unicode Title"
             };
-            var romanisableString = beatmap.Metadata.ToRomanisableString();
+            var romanisableString = metadata.ToRomanisableString();
+
+            Assert.AreEqual(metadata.ToString(), romanisableString.Romanised);
+            Assert.AreEqual($"{metadata.ArtistUnicode} - {metadata.TitleUnicode}", romanisableString.Original);
+        }
+
+        [Test]
+        public void TestRomanisationNoUnicode()
+        {
+            var metadata = new BeatmapMetadata
+            {
+                Artist = "Romanised Artist",
+                Title = "Romanised title"
+            };
+            var romanisableString = metadata.ToRomanisableString();
 
             Assert.AreEqual(romanisableString.Romanised, romanisableString.Original);
         }
