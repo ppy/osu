@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Play
                 return scoreSubmissionSource.Task;
 
             // if the user never hit anything, this score should not be counted in any way.
-            if (!score.ScoreInfo.Statistics.Any(s => s.Key.IsHit()))
+            if (!score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0))
                 return Task.CompletedTask;
 
             scoreSubmissionSource = new TaskCompletionSource<bool>();
