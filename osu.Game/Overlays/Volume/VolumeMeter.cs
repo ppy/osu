@@ -338,8 +338,12 @@ namespace osu.Game.Overlays.Volume
 
         public bool OnPressed(GlobalAction action)
         {
-            if (!IsHovered || !isFocused)
+            if (!IsHovered)
                 return false;
+
+            // Grab back focus is UP/DOWN input is directed at this meter
+            if (!isFocused)
+                RequestFocus?.Invoke(this);
 
             switch (action)
             {
