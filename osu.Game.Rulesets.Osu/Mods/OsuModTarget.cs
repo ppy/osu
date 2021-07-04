@@ -291,7 +291,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 var distance = maxComboIndex == 0
                     ? (float)obj.Radius
-                    : map(obj.ComboIndex, 0, maxComboIndex, (float)obj.Radius, max_base_distance);
+                    : mapRange(obj.ComboIndex, 0, maxComboIndex, (float)obj.Radius, max_base_distance);
                 if (obj.NewCombo) distance *= 1.5f;
                 if (obj.Kiai) distance *= 1.2f;
                 distance = Math.Min(distance_cap, distance);
@@ -515,7 +515,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <param name="toLow">Beginning of the new range.</param>
         /// <param name="toHigh">End of the new range.</param>
         /// <returns>The re-mapped number.</returns>
-        private static float map(float value, float fromLow, float fromHigh, float toLow, float toHigh)
+        private static float mapRange(float value, float fromLow, float fromHigh, float toLow, float toHigh)
         {
             return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
         }
