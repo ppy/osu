@@ -18,7 +18,13 @@ namespace osu.Game.Tests.NonVisual
 {
     public class FirstAvailableHitWindowsTest
     {
-        private TestDrawableRuleset testDrawableRuleset = new TestDrawableRuleset();
+        private TestDrawableRuleset testDrawableRuleset;
+
+        [SetUp]
+        public void Setup()
+        {
+            testDrawableRuleset = new TestDrawableRuleset();
+        }
 
         [Test]
         public void TestResultIfOnlyParentHitWindowIsEmpty()
