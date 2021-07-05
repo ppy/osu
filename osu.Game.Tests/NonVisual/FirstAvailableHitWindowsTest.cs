@@ -108,5 +108,16 @@ namespace osu.Game.Tests.NonVisual
 
             public override void CancelResume() => throw new NotImplementedException();
         }
+
+        public class TestHitObject : HitObject
+        {
+            public TestHitObject(HitWindows hitWindows)
+            {
+                HitWindows = hitWindows;
+                HitWindows.SetDifficulty(0.5f);
+            }
+
+            public new void AddNested(HitObject nested) => base.AddNested(nested);
+        }
     }
 }
