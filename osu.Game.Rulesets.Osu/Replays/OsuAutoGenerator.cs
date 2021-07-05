@@ -248,8 +248,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             if (timeDifference > 0)
             {
                 // If the last frame is a key-up frame and there has been no wait period, adjust the last frame's position such that it begins eased movement instantaneously.
-                if (lastLastFrame != null && lastFrame is OsuKeyUpReplayFrame && !hasWaited
-                    && lastFrame.Time > lastLastFrame.Time) //
+                if (lastLastFrame != null && lastFrame is OsuKeyUpReplayFrame && !hasWaited)
                 {
                     // [lastLastFrame] ... [lastFrame] ... [current frame]
                     // We want to find the cursor position at lastFrame, so interpolate between lastLastFrame and the new target position.
