@@ -86,7 +86,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         public override void ApplyTransformsAt(double time, bool propagateChildren = false)
         {
             // For the same reasons as above w.r.t rewinding, we shouldn't propagate to children here either.
-            base.ApplyTransformsAt(time);
+            // ReSharper disable once RedundantArgumentDefaultValue - removing the "redundant" default value triggers BaseMethodCallWithDefaultParameter
+            base.ApplyTransformsAt(time, false);
         }
 
         private bool tracking;
