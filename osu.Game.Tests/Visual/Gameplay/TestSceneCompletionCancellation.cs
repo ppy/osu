@@ -114,11 +114,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public bool ResultsCreated { get; private set; }
 
-            public FakeRankingPushPlayer()
-                : base(true, true)
-            {
-            }
-
             protected override ResultsScreen CreateResults(ScoreInfo score)
             {
                 var results = base.CreateResults(score);

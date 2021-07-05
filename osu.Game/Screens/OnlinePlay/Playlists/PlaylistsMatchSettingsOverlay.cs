@@ -75,7 +75,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                         RelativeSizeAxes = Axes.Both,
                         RowDimensions = new[]
                         {
-                            new Dimension(GridSizeMode.Distributed),
+                            new Dimension(),
                             new Dimension(GridSizeMode.AutoSize),
                         },
                         Content = new[]

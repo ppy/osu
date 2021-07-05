@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         Children = new[]
                         {
                             new ExposedSkinnableDrawable("default", _ => new DefaultBox()),
-                            new ExposedSkinnableDrawable("available", _ => new DefaultBox(), ConfineMode.ScaleToFit),
+                            new ExposedSkinnableDrawable("available", _ => new DefaultBox()),
                             new ExposedSkinnableDrawable("available", _ => new DefaultBox(), ConfineMode.NoScaling)
                         }
                     },

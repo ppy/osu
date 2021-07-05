@@ -181,7 +181,7 @@ namespace osu.Game.Screens.Menu
 
             icon.Delay(500).FadeIn(500).ScaleTo(1, 500, Easing.OutQuint);
 
-            using (BeginDelayedSequence(3000, true))
+            using (BeginDelayedSequence(3000))
             {
                 icon.FadeColour(iconColour, 200, Easing.OutQuint);
                 icon.MoveToY(icon_y * 1.3f, 500, Easing.OutCirc)
