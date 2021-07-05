@@ -266,8 +266,8 @@ namespace osu.Game.Rulesets.Osu.Replays
                 }
             }
 
-            // Start alternating once the time separation is too small (equivalent 120BPM @ 1/4 divisor).
-            if (timeDifference > 0 && timeDifference < 125)
+            // Start alternating once the time separation is too small (faster than ~225BPM).
+            if (timeDifference > 0 && timeDifference < 266)
                 buttonIndex++;
             else
                 buttonIndex = 0;
