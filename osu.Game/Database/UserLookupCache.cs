@@ -27,6 +27,30 @@ namespace osu.Game.Database
         [ItemCanBeNull]
         public Task<User> GetUserAsync(int userId, CancellationToken token = default) => GetAsync(userId, token);
 
+        /// <summary>
+        /// Perform an API lookup on the specified users, populating a <see cref="User"/> model.
+        /// </summary>
+        /// <param name="userIds">The users to lookup.</param>
+        /// <param name="token">An optional cancellation token.</param>
+        /// <returns>.</returns>
+        public Task<User[]> GetUsersAsync(int[] userIds, CancellationToken token = default)
+        {
+            var userLookupTasks = new List<Task<User>>();
+
+            foreach (var u in userIds)
+            {
+                userLookupTasks.Add(GetUserAsync(u, token).ContinueWith(task =>
+                {
+                    if (!task.IsCompletedSuccessfully)
+                        return null;
+
+                    return task.Result;
+                }, token));
+            }
+
+            return Task.WhenAll(userLookupTasks);
+        }
+
         protected override async Task<User> ComputeValueAsync(int lookup, CancellationToken token = default)
             => await queryUser(lookup).ConfigureAwait(false);
 
