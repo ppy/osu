@@ -107,21 +107,21 @@ namespace osu.Game.Rulesets.Mania.Edit
             if (selectionTimeRange == null)
                 return;
 
-            var range = selectionTimeRange.Value;
+            var (start, end) = selectionTimeRange.Value;
 
-            var timingPoint = beatmap.ControlPointInfo.TimingPointAt(range.start - visible_range);
+            var timingPoint = beatmap.ControlPointInfo.TimingPointAt(start - visible_range);
 
             double time = timingPoint.Time;
             int beat = 0;
 
             // progress time until in the visible range.
-            while (time < range.start - visible_range)
+            while (time < start - visible_range)
             {
                 time += timingPoint.BeatLength / beatDivisor.Value;
                 beat++;
             }
 
-            while (time < range.end + visible_range)
+            while (time < end + visible_range)
             {
                 var nextTimingPoint = beatmap.ControlPointInfo.TimingPointAt(time);
 
@@ -160,11 +160,11 @@ namespace osu.Game.Rulesets.Mania.Edit
                 {
                     time = line.HitObject.StartTime;
 
-                    if (time >= range.start && time <= range.end)
+                    if (time >= start && time <= end)
                         line.Alpha = 1;
                     else
                     {
-                        double timeSeparation = time < range.start ? range.start - time : time - range.end;
+                        double timeSeparation = time < start ? start - time : time - end;
                         line.Alpha = (float)Math.Max(0, 1 - timeSeparation / visible_range);
                     }
                 }

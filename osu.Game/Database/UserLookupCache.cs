@@ -61,17 +61,17 @@ namespace osu.Game.Database
             {
                 while (pendingUserTasks.Count > 0 && userTasks.Count < 50)
                 {
-                    (int id, TaskCompletionSource<User> task) next = pendingUserTasks.Dequeue();
+                    (int id, TaskCompletionSource<User> task) = pendingUserTasks.Dequeue();
 
                     // Perform a secondary check for existence, in case the user was queried in a previous batch.
-                    if (CheckExists(next.id, out var existing))
-                        next.task.SetResult(existing);
+                    if (CheckExists(id, out var existing))
+                        task.SetResult(existing);
                     else
                     {
-                        if (userTasks.TryGetValue(next.id, out var tasks))
-                            tasks.Add(next.task);
+                        if (userTasks.TryGetValue(id, out var tasks))
+                            tasks.Add(task);
                         else
-                            userTasks[next.id] = new List<TaskCompletionSource<User>> { next.task };
+                            userTasks[id] = new List<TaskCompletionSource<User>> { task };
                     }
                 }
             }

@@ -55,7 +55,7 @@ namespace osu.Game.Beatmaps
             // Note: This is more accurate and may present different results because osu-stable didn't have the ability to calculate slider durations in this context.
             double lastTime = HitObjects.LastOrDefault()?.GetEndTime() ?? ControlPointInfo.TimingPoints.LastOrDefault()?.Time ?? 0;
 
-            var mostCommon =
+            var (beatLength, duration) =
                 // Construct a set of (beatLength, duration) tuples for each individual timing point.
                 ControlPointInfo.TimingPoints.Select((t, i) =>
                                 {
@@ -71,7 +71,7 @@ namespace osu.Game.Beatmaps
                                 // Get the most common one, or 0 as a suitable default
                                 .OrderByDescending(i => i.duration).FirstOrDefault();
 
-            return mostCommon.beatLength;
+            return beatLength;
         }
 
         IBeatmap IBeatmap.Clone() => Clone();
