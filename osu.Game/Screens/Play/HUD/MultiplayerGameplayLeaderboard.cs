@@ -57,6 +57,9 @@ namespace osu.Game.Screens.Play.HUD
             {
                 foreach (var user in users.Result)
                 {
+                    if (user == null)
+                        continue;
+
                     var trackedUser = CreateUserData(user.Id, scoreProcessor);
                     trackedUser.ScoringMode.BindTo(scoringMode);
 

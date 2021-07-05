@@ -32,7 +32,7 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="userIds">The users to lookup.</param>
         /// <param name="token">An optional cancellation token.</param>
-        /// <returns>.</returns>
+        /// <returns>The populated users. May include null results for failed retrievals.</returns>
         public Task<User[]> GetUsersAsync(int[] userIds, CancellationToken token = default)
         {
             var userLookupTasks = new List<Task<User>>();
