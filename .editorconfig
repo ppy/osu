@@ -157,7 +157,7 @@ csharp_style_unused_value_assignment_preference = discard_variable:warning
 
 #Style - variable declaration
 csharp_style_inlined_variable_declaration = true:warning
-csharp_style_deconstructed_variable_declaration = true:warning
+csharp_style_deconstructed_variable_declaration = false:silent
 
 #Style - other C# 7.x features
 dotnet_style_prefer_inferred_tuple_names = true:warning
