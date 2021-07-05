@@ -63,7 +63,12 @@ namespace osu.Game.Screens.Spectate
             userLookupCache.GetUsersAsync(userIds.ToArray()).ContinueWith(users => Schedule(() =>
             {
                 foreach (var u in users.Result)
+                {
+                    if (u == null)
+                        continue;
+
                     userMap[u.Id] = u;
+                }
 
                 playingUserStates.BindTo(spectatorClient.PlayingUserStates);
                 playingUserStates.BindCollectionChanged(onPlayingUserStatesChanged, true);
