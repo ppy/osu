@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         /// <remarks>
         /// All constants are in osu!stable's gamefield space, which is shifted 16px downwards.
-        /// This offset is negated in both osu!stable and osu!lazer to bring all constants into window-space.
+        /// This offset is negated to bring all constants into window-space.
         /// Note: SPINNER_Y_CENTRE + SPINNER_TOP_OFFSET - Position.Y = 240 (=480/2, or half the window-space in osu!stable)
         /// </remarks>
         protected const float SPINNER_TOP_OFFSET = 45f - 16f;
