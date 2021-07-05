@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Difficulty
                         continue;
 
                     // If all's good, attach the next set to the current set and recurse further.
-                    foreach (var combo in createDifficultyAdjustmentModCombinations(remainingMods.Slice(i + 1), currentSet.Concat(nextSet), currentSetCount + nextCount))
+                    foreach (var combo in createDifficultyAdjustmentModCombinations(remainingMods[(i + 1)..], currentSet.Concat(nextSet), currentSetCount + nextCount))
                         yield return combo;
                 }
             }

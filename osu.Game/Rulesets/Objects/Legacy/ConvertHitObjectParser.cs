@@ -269,13 +269,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 // The start of the next segment is the index after the type descriptor.
                 string endPoint = endIndex < pointSplit.Length - 1 ? pointSplit[endIndex + 1] : null;
 
-                controlPoints.AddRange(convertPoints(pointSplit.AsMemory().Slice(startIndex, endIndex - startIndex), endPoint, first, offset));
+                controlPoints.AddRange(convertPoints(pointSplit.AsMemory()[startIndex..endIndex], endPoint, first, offset));
                 startIndex = endIndex;
                 first = false;
             }
 
             if (endIndex > startIndex)
-                controlPoints.AddRange(convertPoints(pointSplit.AsMemory().Slice(startIndex, endIndex - startIndex), null, first, offset));
+                controlPoints.AddRange(convertPoints(pointSplit.AsMemory()[startIndex..endIndex], null, first, offset));
 
             return mergePointsLists(controlPoints);
         }
@@ -346,14 +346,14 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                 // Force a type on the last point, and return the current control point set as a segment.
                 vertices[endIndex - 1].Type.Value = type;
-                yield return vertices.AsMemory().Slice(startIndex, endIndex - startIndex);
+                yield return vertices.AsMemory()[startIndex..endIndex];
 
                 // Skip the current control point - as it's the same as the one that's just been returned.
                 startIndex = endIndex + 1;
             }
 
             if (endIndex > startIndex)
-                yield return vertices.AsMemory().Slice(startIndex, endIndex - startIndex);
+                yield return vertices.AsMemory()[startIndex..endIndex];
 
             static void readPoint(string value, Vector2 startPos, out PathControlPoint point)
             {
@@ -380,7 +380,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             foreach (var arr in controlPointList)
             {
-                arr.CopyTo(mergedArrayMemory.Slice(copyIndex));
+                arr.CopyTo(mergedArrayMemory[copyIndex..]);
                 copyIndex += arr.Length;
             }
 

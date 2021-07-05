@@ -187,7 +187,7 @@ namespace osu.Game.Tests.Beatmaps
                 return new MemoryStream();
             }
 
-            private void markLookup(string name) => PerformedLookups.Add(name.Substring(name.LastIndexOf(Path.DirectorySeparatorChar) + 1));
+            private void markLookup(string name) => PerformedLookups.Add(name[(name.LastIndexOf(Path.DirectorySeparatorChar) + 1)..]);
 
             public IEnumerable<string> GetAvailableResources() => Enumerable.Empty<string>();
 

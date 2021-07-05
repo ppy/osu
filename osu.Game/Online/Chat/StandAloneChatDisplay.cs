@@ -88,7 +88,7 @@ namespace osu.Game.Online.Chat
                 return;
 
             if (text[0] == '/')
-                ChannelManager?.PostCommand(text.Substring(1), Channel.Value);
+                ChannelManager?.PostCommand(text[1..], Channel.Value);
             else
                 ChannelManager?.PostMessage(text, target: Channel.Value);
 
