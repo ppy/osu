@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             showOverlay();
 
             AddStep("Up arrow", () => InputManager.Key(Key.Up));
-            AddAssert("Last button selected", () => pauseOverlay.Buttons.Last().Selected.Value);
+            AddAssert("Last button selected", () => pauseOverlay.Buttons.Last().Selected);
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             showOverlay();
 
             AddStep("Down arrow", () => InputManager.Key(Key.Down));
-            AddAssert("First button selected", () => getButton(0).Selected.Value);
+            AddAssert("First button selected", () => getButton(0).Selected);
         }
 
         /// <summary>
@@ -111,11 +111,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Show overlay", () => failOverlay.Show());
 
             AddStep("Up arrow", () => InputManager.Key(Key.Up));
-            AddAssert("Last button selected", () => failOverlay.Buttons.Last().Selected.Value);
+            AddAssert("Last button selected", () => failOverlay.Buttons.Last().Selected);
             AddStep("Up arrow", () => InputManager.Key(Key.Up));
-            AddAssert("First button selected", () => failOverlay.Buttons.First().Selected.Value);
+            AddAssert("First button selected", () => failOverlay.Buttons.First().Selected);
             AddStep("Up arrow", () => InputManager.Key(Key.Up));
-            AddAssert("Last button selected", () => failOverlay.Buttons.Last().Selected.Value);
+            AddAssert("Last button selected", () => failOverlay.Buttons.Last().Selected);
         }
 
         /// <summary>
@@ -127,11 +127,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Show overlay", () => failOverlay.Show());
 
             AddStep("Down arrow", () => InputManager.Key(Key.Down));
-            AddAssert("First button selected", () => failOverlay.Buttons.First().Selected.Value);
+            AddAssert("First button selected", () => failOverlay.Buttons.First().Selected);
             AddStep("Down arrow", () => InputManager.Key(Key.Down));
-            AddAssert("Last button selected", () => failOverlay.Buttons.Last().Selected.Value);
+            AddAssert("Last button selected", () => failOverlay.Buttons.Last().Selected);
             AddStep("Down arrow", () => InputManager.Key(Key.Down));
-            AddAssert("First button selected", () => failOverlay.Buttons.First().Selected.Value);
+            AddAssert("First button selected", () => failOverlay.Buttons.First().Selected);
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Hover first button", () => InputManager.MoveMouseTo(failOverlay.Buttons.First()));
             AddStep("Hide overlay", () => failOverlay.Hide());
 
-            AddAssert("Overlay state is reset", () => !failOverlay.Buttons.Any(b => b.Selected.Value));
+            AddAssert("Overlay state is reset", () => !failOverlay.Buttons.Any(b => b.Selected));
         }
 
         /// <summary>
@@ -162,11 +162,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Hide overlay", () => pauseOverlay.Hide());
             showOverlay();
 
-            AddAssert("First button not selected", () => !getButton(0).Selected.Value);
+            AddAssert("First button not selected", () => !getButton(0).Selected);
 
             AddStep("Move slightly", () => InputManager.MoveMouseTo(InputManager.CurrentState.Mouse.Position + new Vector2(1)));
 
-            AddAssert("First button selected", () => getButton(0).Selected.Value);
+            AddAssert("First button selected", () => getButton(0).Selected);
         }
 
         /// <summary>
@@ -179,8 +179,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("Down arrow", () => InputManager.Key(Key.Down));
             AddStep("Hover second button", () => InputManager.MoveMouseTo(getButton(1)));
-            AddAssert("First button not selected", () => !getButton(0).Selected.Value);
-            AddAssert("Second button selected", () => getButton(1).Selected.Value);
+            AddAssert("First button not selected", () => !getButton(0).Selected);
+            AddAssert("Second button selected", () => getButton(1).Selected);
         }
 
         /// <summary>
@@ -196,8 +196,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("Hover second button", () => InputManager.MoveMouseTo(getButton(1)));
             AddStep("Up arrow", () => InputManager.Key(Key.Up));
-            AddAssert("Second button not selected", () => !getButton(1).Selected.Value);
-            AddAssert("First button selected", () => getButton(0).Selected.Value);
+            AddAssert("Second button not selected", () => !getButton(1).Selected);
+            AddAssert("First button selected", () => getButton(0).Selected);
         }
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Hover second button", () => InputManager.MoveMouseTo(getButton(1)));
             AddStep("Unhover second button", () => InputManager.MoveMouseTo(Vector2.Zero));
             AddStep("Down arrow", () => InputManager.Key(Key.Down));
-            AddAssert("First button selected", () => getButton(0).Selected.Value); // Initial state condition
+            AddAssert("First button selected", () => getButton(0).Selected); // Initial state condition
         }
 
         /// <summary>
@@ -282,7 +282,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             showOverlay();
 
             AddAssert("No button selected",
-                () => pauseOverlay.Buttons.All(button => !button.Selected.Value));
+                () => pauseOverlay.Buttons.All(button => !button.Selected));
         }
 
         private void showOverlay() => AddStep("Show overlay", () => pauseOverlay.Show());

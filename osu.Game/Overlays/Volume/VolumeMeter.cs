@@ -19,13 +19,14 @@ using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
+    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>, ISelectable
     {
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
@@ -43,7 +44,13 @@ namespace osu.Game.Overlays.Volume
         private Sample sample;
         private double sampleLastPlaybackTime;
 
-        public Action<VolumeMeter> RequestFocus;
+        public BindableBool SelectedBindable = new BindableBool();
+
+        public bool Selected
+        {
+            get => SelectedBindable.Value;
+            set => SelectedBindable.Value = value;
+        }
 
         public VolumeMeter(string name, float circleSize, Color4 meterColour)
         {
@@ -212,6 +219,8 @@ namespace osu.Game.Overlays.Volume
             Bindable.BindValueChanged(volume => { this.TransformTo(nameof(DisplayVolume), volume.NewValue, 400, Easing.OutQuint); }, true);
 
             bgProgress.Current.Value = 0.75f;
+
+            SelectedBindable.ValueChanged += selectionChanged;
         }
 
         private int? displayVolumeInt;
@@ -330,26 +339,28 @@ namespace osu.Game.Overlays.Volume
 
         private const float transition_length = 500;
 
-        public void Focus()
-        {
-            this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
-            focusGlowContainer.FadeIn(transition_length, Easing.OutExpo);
-        }
-
-        public void Unfocus()
-        {
-            this.ScaleTo(1f, transition_length, Easing.OutExpo);
-            focusGlowContainer.FadeOut(transition_length, Easing.OutExpo);
-        }
-
         protected override bool OnHover(HoverEvent e)
         {
-            RequestFocus?.Invoke(this);
+            Selected = true;
             return false;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
+        }
+
+        private void selectionChanged(ValueChangedEvent<bool> selected)
+        {
+            if (selected.NewValue)
+            {
+                this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
+                focusGlowContainer.FadeIn(transition_length, Easing.OutExpo);
+            }
+            else
+            {
+                this.ScaleTo(1f, transition_length, Easing.OutExpo);
+                focusGlowContainer.FadeOut(transition_length, Easing.OutExpo);
+            }
         }
 
         public bool OnPressed(GlobalAction action)
@@ -360,12 +371,12 @@ namespace osu.Game.Overlays.Volume
             switch (action)
             {
                 case GlobalAction.SelectPrevious:
-                    RequestFocus?.Invoke(this);
+                    Selected = true;
                     adjust(1, false);
                     return true;
 
                 case GlobalAction.SelectNext:
-                    RequestFocus?.Invoke(this);
+                    Selected = true;
                     adjust(-1, false);
                     return true;
             }
