@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         public override void ApplyTransformsAt(double time, bool propagateChildren = false)
         {
             // For the same reasons as above w.r.t rewinding, we shouldn't propagate to children here either.
-            base.ApplyTransformsAt(time, false);
+            base.ApplyTransformsAt(time);
         }
 
         private bool tracking;

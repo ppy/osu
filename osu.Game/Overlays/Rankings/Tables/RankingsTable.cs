@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Rankings.Tables
         private static TableColumn[] mainHeaders => new[]
         {
             new TableColumn(string.Empty, Anchor.Centre, new Dimension(GridSizeMode.Absolute, 40)), // place
-            new TableColumn(string.Empty, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed)), // flag and username (country name)
+            new TableColumn(string.Empty, Anchor.CentreLeft, new Dimension()), // flag and username (country name)
         };
 
         protected abstract TableColumn[] CreateAdditionalHeaders();
