@@ -2,24 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osuTK;
-using osuTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Backgrounds;
-using osu.Game.Graphics.Sprites;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics.Effects;
-using osu.Game.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DialogButton : OsuClickableContainer
+    public class DialogButton : OsuClickableContainer, ISelectable
     {
         private const float idle_width = 0.8f;
         private const float hover_width = 0.9f;
@@ -27,7 +27,13 @@ namespace osu.Game.Graphics.UserInterface
         private const float hover_duration = 500;
         private const float click_duration = 200;
 
-        public readonly BindableBool Selected = new BindableBool();
+        public readonly BindableBool SelectedBindable = new BindableBool();
+
+        public bool Selected
+        {
+            get => SelectedBindable.Value;
+            set => SelectedBindable.Value = value;
+        }
 
         private readonly Container backgroundContainer;
         private readonly Container colourContainer;
@@ -153,7 +159,7 @@ namespace osu.Game.Graphics.UserInterface
 
             updateGlow();
 
-            Selected.ValueChanged += selectionChanged;
+            SelectedBindable.ValueChanged += selectionChanged;
         }
 
         private Color4 buttonColour;
@@ -221,7 +227,7 @@ namespace osu.Game.Graphics.UserInterface
                            .OnComplete(_ =>
                            {
                                clickAnimating = false;
-                               Selected.TriggerChange();
+                               SelectedBindable.TriggerChange();
                            });
 
             return base.OnClick(e);
@@ -235,7 +241,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (Selected.Value)
+            if (Selected)
                 colourContainer.ResizeWidthTo(hover_width, click_duration, Easing.In);
             base.OnMouseUp(e);
         }
@@ -243,7 +249,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
-            Selected.Value = true;
+            Selected = true;
 
             return true;
         }
@@ -251,7 +257,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            Selected.Value = false;
+            Selected = false;
         }
 
         private void selectionChanged(ValueChangedEvent<bool> args)
