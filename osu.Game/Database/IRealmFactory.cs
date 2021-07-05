@@ -9,6 +9,7 @@ namespace osu.Game.Database
     {
         /// <summary>
         /// The main realm context, bound to the update thread.
+        /// If querying from a non-update thread is needed, use <see cref="GetForRead"/> or <see cref="GetForWrite"/> to receive a context instead.
         /// </summary>
         Realm Context { get; }
 
