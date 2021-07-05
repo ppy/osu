@@ -245,21 +245,25 @@ namespace osu.Game.Rulesets.Osu.Replays
             double timeDifference = ApplyModsToTimeDelta(lastFrame.Time, h.StartTime);
             OsuReplayFrame lastLastFrame = Frames.Count >= 2 ? (OsuReplayFrame)Frames[^2] : null;
 
-            // If the last frame is a key-up frame and there has been no wait period, adjust the last frame's position such that it begins eased movement instantaneously.
-            if (lastLastFrame != null && lastFrame is OsuKeyUpReplayFrame && !hasWaited)
+            if (timeDifference > 0)
             {
-                // [lastLastFrame] ... [lastFrame] ... [current frame]
-                // We want to find the cursor position at lastFrame, so interpolate between lastLastFrame and the new target position.
-                lastFrame.Position = Interpolation.ValueAt(lastFrame.Time, lastFrame.Position, targetPos, lastLastFrame.Time, h.StartTime, easing);
-            }
+                // If the last frame is a key-up frame and there has been no wait period, adjust the last frame's position such that it begins eased movement instantaneously.
+                if (lastLastFrame != null && lastFrame is OsuKeyUpReplayFrame && !hasWaited
+                    && lastFrame.Time > lastLastFrame.Time) //
+                {
+                    // [lastLastFrame] ... [lastFrame] ... [current frame]
+                    // We want to find the cursor position at lastFrame, so interpolate between lastLastFrame and the new target position.
+                    lastFrame.Position = Interpolation.ValueAt(lastFrame.Time, lastFrame.Position, targetPos, lastLastFrame.Time, h.StartTime, easing);
+                }
 
-            Vector2 lastPosition = lastFrame.Position;
+                Vector2 lastPosition = lastFrame.Position;
 
-            // Perform eased movement.
-            for (double time = lastFrame.Time + GetFrameDelay(lastFrame.Time); time < h.StartTime; time += GetFrameDelay(time))
-            {
-                Vector2 currentPosition = Interpolation.ValueAt(time, lastPosition, targetPos, lastFrame.Time, h.StartTime, easing);
-                AddFrameToReplay(new OsuReplayFrame((int)time, new Vector2(currentPosition.X, currentPosition.Y)) { Actions = lastFrame.Actions });
+                // Perform eased movement.
+                for (double time = lastFrame.Time + GetFrameDelay(lastFrame.Time); time < h.StartTime; time += GetFrameDelay(time))
+                {
+                    Vector2 currentPosition = Interpolation.ValueAt(time, lastPosition, targetPos, lastFrame.Time, h.StartTime, easing);
+                    AddFrameToReplay(new OsuReplayFrame((int)time, new Vector2(currentPosition.X, currentPosition.Y)) { Actions = lastFrame.Actions });
+                }
             }
 
             // Start alternating once the time separation is too small (equivalent 120BPM @ 1/4 divisor).
