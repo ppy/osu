@@ -39,11 +39,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private TestMultiplayer multiplayerScreen;
         private TestMultiplayerClient client;
 
-        public TestSceneMultiplayer()
-        {
-            loadMultiplayer();
-        }
-
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
@@ -51,18 +46,43 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
         }
 
-        [SetUp]
-        public void Setup() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
-            importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
-        });
+            base.SetUpSteps();
+
+            AddStep("import beatmap", () =>
+            {
+                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
+            });
+
+            AddStep("create multiplayer screen", () => multiplayerScreen = new TestMultiplayer());
+
+            AddStep("load dependencies", () =>
+            {
+                client = new TestMultiplayerClient(multiplayerScreen.RoomManager);
+
+                // The screen gets suspended so it stops receiving updates.
+                Child = client;
+
+                LoadScreen(dependenciesScreen = new DependenciesScreen(client));
+            });
+
+            AddUntilStep("wait for dependencies to load", () => dependenciesScreen.IsLoaded);
+
+            AddStep("load multiplayer", () => LoadScreen(multiplayerScreen));
+            AddUntilStep("wait for multiplayer to load", () => multiplayerScreen.IsLoaded);
+        }
+
+        [Test]
+        public void TestEmpty()
+        {
+            // used to test the flow of multiplayer from visual tests.
+        }
 
         [Test]
         public void TestUserSetToIdleWhenBeatmapDeleted()
         {
-            loadMultiplayer();
-
             createRoom(() => new Room
             {
                 Name = { Value = "Test Room" },
@@ -85,8 +105,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestLocalPlayDoesNotStartWhileSpectatingWithNoBeatmap()
         {
-            loadMultiplayer();
-
             createRoom(() => new Room
             {
                 Name = { Value = "Test Room" },
@@ -123,8 +141,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestLocalPlayStartsWhileSpectatingWhenBeatmapBecomesAvailable()
         {
-            loadMultiplayer();
-
             createRoom(() => new Room
             {
                 Name = { Value = "Test Room" },
@@ -167,8 +183,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestLeaveNavigation()
         {
-            loadMultiplayer();
-
             createRoom(() => new Room
             {
                 Name = { Value = "Test Room" },
@@ -225,26 +239,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for join", () => client.Room != null);
-        }
-
-        private void loadMultiplayer()
-        {
-            AddStep("create multiplayer screen", () => multiplayerScreen = new TestMultiplayer());
-
-            AddStep("load dependencies", () =>
-            {
-                client = new TestMultiplayerClient(multiplayerScreen.RoomManager);
-
-                // The screen gets suspended so it stops receiving updates.
-                Child = client;
-
-                LoadScreen(dependenciesScreen = new DependenciesScreen(client));
-            });
-
-            AddUntilStep("wait for dependencies to load", () => dependenciesScreen.IsLoaded);
-
-            AddStep("load multiplayer", () => LoadScreen(multiplayerScreen));
-            AddUntilStep("wait for multiplayer to load", () => multiplayerScreen.IsLoaded);
         }
 
         /// <summary>
