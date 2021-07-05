@@ -249,6 +249,18 @@ namespace osu.Game.Rulesets.Osu.Replays
                 ((lastPosition - targetPos).Length > h.Radius * (1.5 + 100.0 / timeDifference) || // Either the distance is big enough
                  timeDifference >= 266)) // ... or the beats are slow enough to tap anyway.
             {
+                OsuReplayFrame lastLastFrame = Frames.Count >= 2 ? (OsuReplayFrame)Frames[^2] : null;
+
+                // The last frame may be a key-up frame if it shares a position with the second-last frame.
+                // If it is a key-up frame and its time occurs after the "wait time" (i.e. there was no wait period), adjust its position to begin eased movement instantaneously.
+                if (lastLastFrame?.Position == lastFrame.Position && lastFrame.Time >= waitTime)
+                {
+                    // [lastLastFrame] ... [lastFrame] ... [current frame]
+                    // We want to find the cursor position at lastFrame, so interpolate between lastLastFrame and the new target position.
+                    lastFrame.Position = Interpolation.ValueAt(lastFrame.Time, lastFrame.Position, targetPos, lastLastFrame.Time, h.StartTime, easing);
+                    lastPosition = lastFrame.Position;
+                }
+
                 // Perform eased movement
                 for (double time = lastFrame.Time + GetFrameDelay(lastFrame.Time); time < h.StartTime; time += GetFrameDelay(time))
                 {
