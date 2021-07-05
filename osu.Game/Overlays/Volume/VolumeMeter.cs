@@ -38,6 +38,8 @@ namespace osu.Game.Overlays.Volume
         private OsuSpriteText text;
         private BufferedContainer maxGlow;
 
+        private Container focusGlowContainer;
+
         private Sample sample;
         private double sampleLastPlaybackTime;
 
@@ -75,6 +77,25 @@ namespace osu.Game.Overlays.Volume
                     Size = new Vector2(circleSize),
                     Children = new Drawable[]
                     {
+                        focusGlowContainer = new CircularContainer
+                        {
+                            Masking = true,
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            Child = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
+                                AlwaysPresent = true,
+                            },
+                            EdgeEffect = new EdgeEffectParameters
+                            {
+                                Type = EdgeEffectType.Glow,
+                                Colour = meterColour.Opacity(0.5f),
+                                Radius = 5,
+                                Hollow = true,
+                            }
+                        },
                         new BufferedContainer
                         {
                             Alpha = 0.9f,
@@ -312,11 +333,13 @@ namespace osu.Game.Overlays.Volume
         public void Focus()
         {
             this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
+            focusGlowContainer.FadeIn(transition_length, Easing.OutExpo);
         }
 
         public void Unfocus()
         {
             this.ScaleTo(1f, transition_length, Easing.OutExpo);
+            focusGlowContainer.FadeOut(transition_length, Easing.OutExpo);
         }
 
         protected override bool OnHover(HoverEvent e)
