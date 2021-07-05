@@ -257,7 +257,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
                 Vector2 lastPosition = lastFrame.Position;
 
-                // Perform eased movement.
+                // Perform the rest of the eased movement until the target position is reached.
                 for (double time = lastFrame.Time + GetFrameDelay(lastFrame.Time); time < h.StartTime; time += GetFrameDelay(time))
                 {
                     Vector2 currentPosition = Interpolation.ValueAt(time, lastPosition, targetPos, lastFrame.Time, h.StartTime, easing);
