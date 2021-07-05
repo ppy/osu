@@ -148,18 +148,19 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <returns>The <see cref="Vector2"/> that this slider has been shifted by.</returns>
         private Vector2 moveSliderIntoPlayfield(Slider slider, RandomObjectInfo currentObjectInfo)
         {
-            var boundingBox = getSliderBoundingBox(slider);
+            var area = getSliderPlacementArea(slider);
 
             var prevPosition = slider.Position;
 
+            // Clamp slider position to the placement area
             // If the slider is larger than the playfield, force it to stay at the original position
-            var newX = boundingBox.Width < 0
+            var newX = area.Width < 0
                 ? currentObjectInfo.PositionOriginal.X
-                : Math.Clamp(slider.Position.X, boundingBox.Left, boundingBox.Right);
+                : Math.Clamp(slider.Position.X, area.Left, area.Right);
 
-            var newY = boundingBox.Height < 0
+            var newY = area.Height < 0
                 ? currentObjectInfo.PositionOriginal.Y
-                : Math.Clamp(slider.Position.Y, boundingBox.Top, boundingBox.Bottom);
+                : Math.Clamp(slider.Position.Y, area.Top, area.Bottom);
 
             slider.Position = new Vector2(newX, newY);
 
@@ -191,15 +192,21 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
 
         /// <summary>
-        /// Calculates the bounding box of a <see cref="Slider"/>'s position for the slider to be fully inside of the playfield.
+        /// Calculates a <see cref="RectangleF"/> that includes all possible positions of the slider such that
+        /// the entire slider is inside the playfield.
         /// </summary>
-        private RectangleF getSliderBoundingBox(Slider slider)
+        /// <remarks>
+        /// If the slider is larger than the playfield, the returned <see cref="RectangleF"/> may have negative width/height.
+        /// </remarks>
+        private RectangleF getSliderPlacementArea(Slider slider)
         {
             var pathPositions = new List<Vector2>();
             slider.Path.GetPathToProgress(pathPositions, 0, 1);
 
+            // Initially, assume that the slider can be placed anywhere in the playfield
             var box = new RectangleF(Vector2.Zero, OsuPlayfield.BASE_SIZE);
 
+            // Then narrow down the area with each path position
             foreach (var pos in pathPositions)
             {
                 // Reduce Width and Height accordingly after increasing X and Y
@@ -216,6 +223,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 box.Height = Math.Min(box.Height, OsuPlayfield.BASE_SIZE.Y - pos.Y - box.Y);
             }
 
+            // Reduce the area by slider radius, so that the slider fits inside the playfield completely
             var radius = (float)slider.Radius;
 
             box.X += radius;
