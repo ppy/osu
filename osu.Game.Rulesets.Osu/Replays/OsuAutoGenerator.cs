@@ -233,20 +233,20 @@ namespace osu.Game.Rulesets.Osu.Replays
 
             // Wait until Auto could "see and react" to the next note.
             double waitTime = h.StartTime - Math.Max(0.0, h.TimePreempt - getReactionTime(h.StartTime - h.TimePreempt));
+            bool hasWaited = false;
 
             if (waitTime > lastFrame.Time)
             {
                 lastFrame = new OsuReplayFrame(waitTime, lastFrame.Position) { Actions = lastFrame.Actions };
+                hasWaited = true;
                 AddFrameToReplay(lastFrame);
             }
 
             double timeDifference = ApplyModsToTimeDelta(lastFrame.Time, h.StartTime);
-
             OsuReplayFrame lastLastFrame = Frames.Count >= 2 ? (OsuReplayFrame)Frames[^2] : null;
 
-            // The last frame may be a key-up frame if it shares a position with the second-last frame.
-            // If it is a key-up frame and its time occurs after the "wait time" (i.e. there was no wait period), adjust its position to begin eased movement instantaneously.
-            if (lastLastFrame?.Position == lastFrame.Position && lastFrame.Time >= waitTime)
+            // If the last frame is a key-up frame and there has been no wait period, adjust the last frame's position such that it begins eased movement instantaneously.
+            if (lastLastFrame != null && lastFrame is OsuKeyUpReplayFrame && !hasWaited)
             {
                 // [lastLastFrame] ... [lastFrame] ... [current frame]
                 // We want to find the cursor position at lastFrame, so interpolate between lastLastFrame and the new target position.
@@ -289,7 +289,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             // TODO: Why do we delay 1 ms if the object is a spinner? There already is KEY_UP_DELAY from hEndTime.
             double hEndTime = h.GetEndTime() + KEY_UP_DELAY;
             int endDelay = h is Spinner ? 1 : 0;
-            var endFrame = new OsuReplayFrame(hEndTime + endDelay, new Vector2(h.StackedEndPosition.X, h.StackedEndPosition.Y));
+            var endFrame = new OsuKeyUpReplayFrame(hEndTime + endDelay, new Vector2(h.StackedEndPosition.X, h.StackedEndPosition.Y));
 
             // Decrement because we want the previous frame, not the next one
             int index = FindInsertionIndex(startFrame) - 1;
@@ -386,5 +386,13 @@ namespace osu.Game.Rulesets.Osu.Replays
         }
 
         #endregion
+
+        private class OsuKeyUpReplayFrame : OsuReplayFrame
+        {
+            public OsuKeyUpReplayFrame(double time, Vector2 position)
+                : base(time, position)
+            {
+            }
+        }
     }
 }
