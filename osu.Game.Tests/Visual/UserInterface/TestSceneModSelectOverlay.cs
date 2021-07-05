@@ -103,7 +103,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             var easierMods = osu.GetModsFor(ModType.DifficultyReduction);
             var harderMods = osu.GetModsFor(ModType.DifficultyIncrease);
-            var conversionMods = osu.GetModsFor(ModType.Conversion);
 
             var noFailMod = osu.GetModsFor(ModType.DifficultyReduction).FirstOrDefault(m => m is OsuModNoFail);
 
