@@ -48,11 +48,9 @@ namespace osu.Game.Overlays.AccountCreation
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            FillFlowContainer mainContent;
-
             InternalChildren = new Drawable[]
             {
-                mainContent = new FillFlowContainer
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
@@ -124,7 +122,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                     },
                 },
-                loadingLayer = new LoadingLayer(mainContent)
+                loadingLayer = new LoadingLayer(true)
             };
 
             textboxes = new[] { usernameTextBox, emailTextBox, passwordTextBox };
@@ -132,7 +130,7 @@ namespace osu.Game.Overlays.AccountCreation
             usernameDescription.AddText("This will be your public presence. No profanity, no impersonation. Avoid exposing your own personal details, too!");
 
             emailAddressDescription.AddText("Will be used for notifications, account verification and in the case you forget your password. No spam, ever.");
-            emailAddressDescription.AddText(" Make sure to get it right!", cp => cp.Font = cp.Font.With(Typeface.Exo, weight: FontWeight.Bold));
+            emailAddressDescription.AddText(" Make sure to get it right!", cp => cp.Font = cp.Font.With(Typeface.Torus, weight: FontWeight.Bold));
 
             passwordDescription.AddText("At least ");
             characterCheckText = passwordDescription.AddText("8 characters long");

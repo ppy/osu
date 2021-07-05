@@ -1,20 +1,18 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
-using osuTK.Graphics;
+using osu.Framework.Extensions.EnumExtensions;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -28,8 +26,9 @@ namespace osu.Game.Overlays.BeatmapListing
             set => current.Current = value;
         }
 
-        public BeatmapSearchFilterRow(string headerName)
+        public BeatmapSearchFilterRow(LocalisableString header)
         {
+            Drawable filter;
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
             AddInternal(new GridContainer
@@ -47,26 +46,26 @@ namespace osu.Game.Overlays.BeatmapListing
                 },
                 Content = new[]
                 {
-                    new Drawable[]
+                    new[]
                     {
                         new OsuSpriteText
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Font = OsuFont.GetFont(size: 10),
-                            Text = headerName.ToUpper()
+                            Font = OsuFont.GetFont(size: 13),
+                            Text = header
                         },
-                        CreateFilter().With(f =>
-                        {
-                            f.Current = current;
-                        })
+                        filter = CreateFilter()
                     }
                 }
             });
+
+            if (filter is IHasCurrentValue<T> filterWithValue)
+                Current = filterWithValue.Current;
         }
 
         [NotNull]
-        protected virtual BeatmapSearchFilter CreateFilter() => new BeatmapSearchFilter();
+        protected virtual Drawable CreateFilter() => new BeatmapSearchFilter();
 
         protected class BeatmapSearchFilter : TabControl<T>
         {
@@ -81,7 +80,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
                 if (typeof(T).IsEnum)
                 {
-                    foreach (var val in (T[])Enum.GetValues(typeof(T)))
+                    foreach (var val in EnumExtensions.GetValuesInOrder<T>())
                         AddItem(val);
                 }
             }
@@ -89,68 +88,13 @@ namespace osu.Game.Overlays.BeatmapListing
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                ((FilterDropdown)Dropdown).AccentColour = colourProvider.Light2;
+                if (Dropdown is FilterDropdown fd)
+                    fd.AccentColour = colourProvider.Light2;
             }
 
             protected override Dropdown<T> CreateDropdown() => new FilterDropdown();
 
-            protected override TabItem<T> CreateTabItem(T value) => new FilterTabItem(value);
-
-            protected class FilterTabItem : TabItem<T>
-            {
-                protected virtual float TextSize => 13;
-
-                [Resolved]
-                private OverlayColourProvider colourProvider { get; set; }
-
-                private readonly OsuSpriteText text;
-
-                public FilterTabItem(T value)
-                    : base(value)
-                {
-                    AutoSizeAxes = Axes.Both;
-                    Anchor = Anchor.BottomLeft;
-                    Origin = Anchor.BottomLeft;
-                    AddRangeInternal(new Drawable[]
-                    {
-                        text = new OsuSpriteText
-                        {
-                            Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Regular),
-                            Text = (value as Enum)?.GetDescription() ?? value.ToString()
-                        },
-                        new HoverClickSounds()
-                    });
-
-                    Enabled.Value = true;
-                }
-
-                [BackgroundDependencyLoader]
-                private void load()
-                {
-                    updateState();
-                }
-
-                protected override bool OnHover(HoverEvent e)
-                {
-                    base.OnHover(e);
-                    updateState();
-                    return true;
-                }
-
-                protected override void OnHoverLost(HoverLostEvent e)
-                {
-                    base.OnHoverLost(e);
-                    updateState();
-                }
-
-                protected override void OnActivated() => updateState();
-
-                protected override void OnDeactivated() => updateState();
-
-                private void updateState() => text.FadeColour(Active.Value ? Color4.White : getStateColour(), 200, Easing.OutQuint);
-
-                private Color4 getStateColour() => IsHovered ? colourProvider.Light1 : colourProvider.Light3;
-            }
+            protected override TabItem<T> CreateTabItem(T value) => new FilterTabItem<T>(value);
 
             private class FilterDropdown : OsuTabDropdown<T>
             {

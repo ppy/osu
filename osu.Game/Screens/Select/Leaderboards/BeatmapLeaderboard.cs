@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -41,24 +40,11 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        public APILegacyUserTopScoreInfo TopScore
-        {
-            get => topScoreContainer.Score.Value;
-            set
-            {
-                if (value == null)
-                    topScoreContainer.Hide();
-                else
-                {
-                    topScoreContainer.Show();
-                    topScoreContainer.Score.Value = value;
-                }
-            }
-        }
-
         private bool filterMods;
 
-        private UserTopScoreContainer topScoreContainer;
+        private IBindable<WeakReference<ScoreInfo>> itemRemoved;
+
+        private IBindable<WeakReference<ScoreInfo>> itemAdded;
 
         /// <summary>
         /// Whether to apply the game's currently selected mods as a filter when retrieving scores.
@@ -99,12 +85,11 @@ namespace osu.Game.Screens.Select.Leaderboards
                     UpdateScores();
             };
 
-            Content.Add(topScoreContainer = new UserTopScoreContainer
-            {
-                ScoreSelected = s => ScoreSelected?.Invoke(s)
-            });
+            itemRemoved = scoreManager.ItemRemoved.GetBoundCopy();
+            itemRemoved.BindValueChanged(onScoreRemoved);
 
-            scoreManager.ItemRemoved += onScoreRemoved;
+            itemAdded = scoreManager.ItemUpdated.GetBoundCopy();
+            itemAdded.BindValueChanged(onScoreAdded);
         }
 
         protected override void Reset()
@@ -113,7 +98,25 @@ namespace osu.Game.Screens.Select.Leaderboards
             TopScore = null;
         }
 
-        private void onScoreRemoved(ScoreInfo score) => Schedule(RefreshScores);
+        private void onScoreRemoved(ValueChangedEvent<WeakReference<ScoreInfo>> score) =>
+            scoreStoreChanged(score);
+
+        private void onScoreAdded(ValueChangedEvent<WeakReference<ScoreInfo>> score) =>
+            scoreStoreChanged(score);
+
+        private void scoreStoreChanged(ValueChangedEvent<WeakReference<ScoreInfo>> score)
+        {
+            if (Scope != BeatmapLeaderboardScope.Local)
+                return;
+
+            if (score.NewValue.TryGetTarget(out var scoreInfo))
+            {
+                if (Beatmap?.ID != scoreInfo.BeatmapInfoID)
+                    return;
+            }
+
+            RefreshScores();
+        }
 
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
 
@@ -180,7 +183,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             req.Success += r =>
             {
                 scoresCallback?.Invoke(r.Scores.Select(s => s.CreateScoreInfo(rulesets)));
-                TopScore = r.UserScore;
+                TopScore = r.UserScore?.CreateScoreInfo(rulesets);
             };
 
             return req;
@@ -191,12 +194,9 @@ namespace osu.Game.Screens.Select.Leaderboards
             Action = () => ScoreSelected?.Invoke(model)
         };
 
-        protected override void Dispose(bool isDisposing)
+        protected override LeaderboardScore CreateDrawableTopScore(ScoreInfo model) => new LeaderboardScore(model, model.Position, false)
         {
-            base.Dispose(isDisposing);
-
-            if (scoreManager != null)
-                scoreManager.ItemRemoved -= onScoreRemoved;
-        }
+            Action = () => ScoreSelected?.Invoke(model)
+        };
     }
 }

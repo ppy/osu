@@ -14,6 +14,8 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
+using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -25,7 +27,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         private const int max_decimal_digits = 5;
 
-        private SampleChannel sample;
+        private Sample sample;
         private double lastSampleTime;
         private T lastSampleValue;
 
@@ -34,7 +36,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box rightBox;
         private readonly Container nubContainer;
 
-        public virtual string TooltipText { get; private set; }
+        public virtual LocalisableString TooltipText { get; private set; }
 
         /// <summary>
         /// Whether to format the tooltip as a percentage or the actual value.
@@ -98,7 +100,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
         {
-            sample = audio.Samples.Get(@"UI/sliderbar-notch");
+            sample = audio.Samples.Get(@"UI/notch-tick");
             AccentColour = colours.Pink;
         }
 
@@ -148,23 +150,24 @@ namespace osu.Game.Graphics.UserInterface
 
         private void playSample(T value)
         {
-            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 50)
+            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 30)
                 return;
 
             if (value.Equals(lastSampleValue))
                 return;
 
             lastSampleValue = value;
-
             lastSampleTime = Clock.CurrentTime;
-            sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
 
-            if (NormalizedValue == 0)
-                sample.Frequency.Value -= 0.4f;
-            else if (NormalizedValue == 1)
-                sample.Frequency.Value += 0.4f;
+            var channel = sample.GetChannel();
 
-            sample.Play();
+            channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + NormalizedValue * 0.2f;
+
+            // intentionally pitched down, even when hitting max.
+            if (NormalizedValue == 0 || NormalizedValue == 1)
+                channel.Frequency.Value -= 0.5f;
+
+            channel.Play();
         }
 
         private void updateTooltipText(T value)

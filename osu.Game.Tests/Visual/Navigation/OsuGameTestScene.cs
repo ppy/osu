@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Platform;
@@ -17,6 +16,8 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osuTK.Graphics;
@@ -27,11 +28,15 @@ namespace osu.Game.Tests.Visual.Navigation
     /// <summary>
     /// A scene which tests full game flow.
     /// </summary>
-    public abstract class OsuGameTestScene : ManualInputManagerTestScene
+    public abstract class OsuGameTestScene : OsuManualInputManagerTestScene
     {
         private GameHost host;
 
         protected TestOsuGame Game;
+
+        protected override bool UseFreshStoragePerRun => true;
+
+        protected override bool CreateNestedActionContainer => false;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host)
@@ -46,7 +51,7 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [SetUpSteps]
-        public void SetUpSteps()
+        public virtual void SetUpSteps()
         {
             AddStep("Create new game instance", () =>
             {
@@ -58,24 +63,25 @@ namespace osu.Game.Tests.Visual.Navigation
 
                 RecycleLocalStorage();
 
-                // see MouseSettings
-                var frameworkConfig = host.Dependencies.Get<FrameworkConfigManager>();
-                frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity).Disabled = false;
-
-                Game = new TestOsuGame(LocalStorage, API);
-                Game.SetHost(host);
-
-                // todo: this can be removed once we can run audio tracks without a device present
-                // see https://github.com/ppy/osu/issues/1302
-                Game.LocalConfig.Set(OsuSetting.IntroSequence, IntroSequence.Circles);
-
-                Add(Game);
+                CreateGame();
             });
 
             AddUntilStep("Wait for load", () => Game.IsLoaded);
             AddUntilStep("Wait for intro", () => Game.ScreenStack.CurrentScreen is IntroScreen);
 
             ConfirmAtMainMenu();
+        }
+
+        protected void CreateGame()
+        {
+            Game = new TestOsuGame(LocalStorage, API);
+            Game.SetHost(host);
+
+            // todo: this can be removed once we can run audio tracks without a device present
+            // see https://github.com/ppy/osu/issues/1302
+            Game.LocalConfig.SetValue(OsuSetting.IntroSequence, IntroSequence.Circles);
+
+            Add(Game);
         }
 
         protected void PushAndConfirm(Func<Screen> newScreen)
@@ -95,13 +101,22 @@ namespace osu.Game.Tests.Visual.Navigation
 
             public new BeatmapManager BeatmapManager => base.BeatmapManager;
 
+            public new ScoreManager ScoreManager => base.ScoreManager;
+
             public new SettingsPanel Settings => base.Settings;
+
+            public new MusicController MusicController => base.MusicController;
 
             public new OsuConfigManager LocalConfig => base.LocalConfig;
 
             public new Bindable<WorkingBeatmap> Beatmap => base.Beatmap;
 
             public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
+
+            public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
+
+            // if we don't do this, when running under nUnit the version that gets populated is that of nUnit.
+            public override string Version => "test game";
 
             protected override Loader CreateLoader() => new TestLoader();
 
@@ -118,7 +133,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 base.LoadComplete();
                 API.Login("Rhythm Champion", "osu!");
 
-                Dependencies.Get<SessionStatics>().Set(Static.MutedAudioNotificationShownOnce, true);
+                Dependencies.Get<SessionStatics>().SetValue(Static.MutedAudioNotificationShownOnce, true);
             }
         }
 

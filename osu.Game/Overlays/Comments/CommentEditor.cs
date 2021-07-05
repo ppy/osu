@@ -158,7 +158,11 @@ namespace osu.Game.Overlays.Comments
                 Font = OsuFont.GetFont(weight: FontWeight.Regular),
             };
 
-            protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) };
+            protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) },
+            };
         }
 
         private class CommitButton : LoadingButton

@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Profile
                             {
                                 Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
                                 Top = 15,
-                                Bottom = 10,
+                                Bottom = 20,
                             },
                             Children = new Drawable[]
                             {

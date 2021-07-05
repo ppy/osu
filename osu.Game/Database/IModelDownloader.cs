@@ -1,8 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Online.API;
 using System;
+using osu.Game.Online.API;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Database
 {
@@ -15,13 +16,15 @@ namespace osu.Game.Database
     {
         /// <summary>
         /// Fired when a <typeparamref name="TModel"/> download begins.
+        /// This is NOT run on the update thread and should be scheduled.
         /// </summary>
-        event Action<ArchiveDownloadRequest<TModel>> DownloadBegan;
+        IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> DownloadBegan { get; }
 
         /// <summary>
         /// Fired when a <typeparamref name="TModel"/> download is interrupted, either due to user cancellation or failure.
+        /// This is NOT run on the update thread and should be scheduled.
         /// </summary>
-        event Action<ArchiveDownloadRequest<TModel>> DownloadFailed;
+        IBindable<WeakReference<ArchiveDownloadRequest<TModel>>> DownloadFailed { get; }
 
         /// <summary>
         /// Checks whether a given <typeparamref name="TModel"/> is already available in the local store.

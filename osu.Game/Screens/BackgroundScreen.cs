@@ -13,6 +13,8 @@ namespace osu.Game.Screens
     {
         private readonly bool animateOnEnter;
 
+        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
         protected BackgroundScreen(bool animateOnEnter = true)
         {
             this.animateOnEnter = animateOnEnter;
@@ -30,9 +32,15 @@ namespace osu.Game.Screens
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            //we don't want to handle escape key.
+            // we don't want to handle escape key.
             return false;
         }
+
+        /// <summary>
+        /// Apply arbitrary changes to this background in a thread safe manner.
+        /// </summary>
+        /// <param name="action">The operation to perform.</param>
+        public void ApplyToBackground(Action<BackgroundScreen> action) => Schedule(() => action.Invoke(this));
 
         protected override void Update()
         {
@@ -62,15 +70,19 @@ namespace osu.Game.Screens
 
         public override bool OnExiting(IScreen next)
         {
-            this.FadeOut(transition_length, Easing.OutExpo);
-            this.MoveToX(x_movement_amount, transition_length, Easing.OutExpo);
+            if (IsLoaded)
+            {
+                this.FadeOut(transition_length, Easing.OutExpo);
+                this.MoveToX(x_movement_amount, transition_length, Easing.OutExpo);
+            }
 
             return base.OnExiting(next);
         }
 
         public override void OnResuming(IScreen last)
         {
-            this.MoveToX(0, transition_length, Easing.OutExpo);
+            if (IsLoaded)
+                this.MoveToX(0, transition_length, Easing.OutExpo);
             base.OnResuming(last);
         }
     }

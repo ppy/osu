@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -24,8 +25,8 @@ using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
-using Humanizer;
 using osu.Game.Online.API;
+using osu.Game.Utils;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -58,6 +59,12 @@ namespace osu.Game.Online.Leaderboards
         [Resolved(CanBeNull = true)]
         private DialogOverlay dialogOverlay { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private SongSelect songSelect { get; set; }
+
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
+
         public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true)
         {
             this.score = score;
@@ -69,30 +76,20 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuColour colour)
+        private void load(IAPIProvider api, OsuColour colour, ScoreManager scoreManager)
         {
             var user = score.User;
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
 
-            DrawableAvatar innerAvatar;
+            ClickableAvatar innerAvatar;
 
             Children = new Drawable[]
             {
-                new Container
+                new RankLabel(rank)
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = rank_width,
-                    Children = new[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 20, italics: true),
-                            Text = rank == null ? "-" : rank.Value.ToMetric(decimals: rank < 100000 ? 1 : 0),
-                        },
-                    },
                 },
                 content = new Container
                 {
@@ -122,7 +119,7 @@ namespace osu.Game.Online.Leaderboards
                             Children = new[]
                             {
                                 avatar = new DelayedLoadWrapper(
-                                    innerAvatar = new DrawableAvatar(user)
+                                    innerAvatar = new ClickableAvatar(user)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         CornerRadius = corner_radius,
@@ -200,8 +197,8 @@ namespace osu.Game.Online.Leaderboards
                                         scoreLabel = new GlowingSpriteText
                                         {
                                             TextColour = Color4.White,
-                                            GlowColour = OsuColour.FromHex(@"83ccfa"),
-                                            Text = score.TotalScore.ToString(@"N0"),
+                                            GlowColour = Color4Extensions.FromHex(@"83ccfa"),
+                                            Current = scoreManager.GetBindableTotalScoreString(score),
                                             Font = OsuFont.Numeric.With(size: 23),
                                         },
                                         RankContainer = new Container
@@ -299,7 +296,7 @@ namespace osu.Game.Online.Leaderboards
 
             public override bool Contains(Vector2 screenSpacePos) => content.Contains(screenSpacePos);
 
-            public string TooltipText { get; }
+            public LocalisableString TooltipText { get; }
 
             public ScoreComponentLabel(LeaderboardScoreStatistic statistic)
             {
@@ -325,7 +322,7 @@ namespace osu.Game.Online.Leaderboards
                                     Origin = Anchor.Centre,
                                     Size = new Vector2(icon_size),
                                     Rotation = 45,
-                                    Colour = OsuColour.FromHex(@"3087ac"),
+                                    Colour = Color4Extensions.FromHex(@"3087ac"),
                                     Icon = FontAwesome.Solid.Square,
                                     Shadow = true,
                                 },
@@ -334,7 +331,7 @@ namespace osu.Game.Online.Leaderboards
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Size = new Vector2(icon_size - 6),
-                                    Colour = OsuColour.FromHex(@"a4edff"),
+                                    Colour = Color4Extensions.FromHex(@"a4edff"),
                                     Icon = statistic.Icon,
                                 },
                             },
@@ -344,13 +341,32 @@ namespace osu.Game.Online.Leaderboards
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             TextColour = Color4.White,
-                            GlowColour = OsuColour.FromHex(@"83ccfa"),
+                            GlowColour = Color4Extensions.FromHex(@"83ccfa"),
                             Text = statistic.Value,
                             Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold),
                         },
                     },
                 };
             }
+        }
+
+        private class RankLabel : Container, IHasTooltip
+        {
+            public RankLabel(int? rank)
+            {
+                if (rank >= 1000)
+                    TooltipText = $"#{rank:N0}";
+
+                Child = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Font = OsuFont.GetFont(size: 20, italics: true),
+                    Text = rank == null ? "-" : rank.Value.FormatRank()
+                };
+            }
+
+            public LocalisableString TooltipText { get; }
         }
 
         public class LeaderboardScoreStatistic
@@ -372,6 +388,12 @@ namespace osu.Game.Online.Leaderboards
             get
             {
                 List<MenuItem> items = new List<MenuItem>();
+
+                if (score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
+                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = score.Mods));
+
+                if (score.Files?.Count > 0)
+                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => scoreManager.Export(score)));
 
                 if (score.ID != 0)
                     items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));

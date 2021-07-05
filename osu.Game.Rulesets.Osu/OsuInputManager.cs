@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu
         /// </summary>
         public bool AllowUserCursorMovement { get; set; } = true;
 
-        protected override RulesetKeyBindingContainer CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
+        protected override KeyBindingContainer<OsuAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new OsuKeyBindingContainer(ruleset, variant, unique);
 
         public OsuInputManager(RulesetInfo ruleset)
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu
 
         protected override bool Handle(UIEvent e)
         {
-            if (e is MouseMoveEvent && !AllowUserCursorMovement) return false;
+            if ((e is MouseMoveEvent || e is TouchMoveEvent) && !AllowUserCursorMovement) return false;
 
             return base.Handle(e);
         }

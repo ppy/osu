@@ -4,10 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Changelog
@@ -18,9 +19,11 @@ namespace osu.Game.Overlays.Changelog
 
         public Action ListingSelected;
 
-        public UpdateStreamBadgeArea Streams;
+        public ChangelogUpdateStreamControl Streams;
 
         private const string listing_string = "listing";
+
+        private Box streamsBackground;
 
         public ChangelogHeader()
         {
@@ -40,7 +43,11 @@ namespace osu.Game.Overlays.Changelog
             };
         }
 
-        private ChangelogHeaderTitle title;
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            streamsBackground.Colour = colourProvider.Background5;
+        }
 
         private void showBuild(ValueChangedEvent<APIChangelogBuild> e)
         {
@@ -53,14 +60,11 @@ namespace osu.Game.Overlays.Changelog
                 Current.Value = e.NewValue.ToString();
 
                 updateCurrentStream();
-
-                title.Version = e.NewValue.UpdateStream.DisplayName;
             }
             else
             {
                 Current.Value = listing_string;
                 Streams.Current.Value = null;
-                title.Version = null;
             }
         }
 
@@ -72,11 +76,25 @@ namespace osu.Game.Overlays.Changelog
             AutoSizeAxes = Axes.Y,
             Children = new Drawable[]
             {
-                Streams = new UpdateStreamBadgeArea(),
+                streamsBackground = new Box
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding
+                    {
+                        Horizontal = 65,
+                        Vertical = 20
+                    },
+                    Child = Streams = new ChangelogUpdateStreamControl()
+                }
             }
         };
 
-        protected override ScreenTitle CreateTitle() => title = new ChangelogHeaderTitle();
+        protected override OverlayTitle CreateTitle() => new ChangelogHeaderTitle();
 
         public void Populate(List<APIUpdateStream> streams)
         {
@@ -92,20 +110,14 @@ namespace osu.Game.Overlays.Changelog
             Streams.Current.Value = Streams.Items.FirstOrDefault(s => s.Name == Build.Value.UpdateStream.Name);
         }
 
-        private class ChangelogHeaderTitle : ScreenTitle
+        private class ChangelogHeaderTitle : OverlayTitle
         {
-            public string Version
-            {
-                set => Section = value ?? listing_string;
-            }
-
             public ChangelogHeaderTitle()
             {
                 Title = "changelog";
-                Version = null;
+                Description = "track recent dev updates in the osu! ecosystem";
+                IconTexture = "Icons/Hexacons/devtools";
             }
-
-            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/changelog");
         }
     }
 }

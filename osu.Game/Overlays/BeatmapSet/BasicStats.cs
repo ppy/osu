@@ -3,10 +3,12 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -93,9 +95,9 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             private readonly OsuSpriteText value;
 
-            public string TooltipText { get; }
+            public LocalisableString TooltipText { get; }
 
-            public string Value
+            public LocalisableString Value
             {
                 get => value.Text;
                 set => this.value.Text = value;
@@ -124,7 +126,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Icon = FontAwesome.Solid.Square,
                                 Size = new Vector2(12),
                                 Rotation = 45,
-                                Colour = OsuColour.FromHex(@"441288"),
+                                Colour = Color4Extensions.FromHex(@"441288"),
                             },
                             new SpriteIcon
                             {
@@ -132,7 +134,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Origin = Anchor.Centre,
                                 Icon = icon,
                                 Size = new Vector2(12),
-                                Colour = OsuColour.FromHex(@"f7dd55"),
+                                Colour = Color4Extensions.FromHex(@"f7dd55"),
                                 Scale = new Vector2(0.8f),
                             },
                             value = new OsuSpriteText

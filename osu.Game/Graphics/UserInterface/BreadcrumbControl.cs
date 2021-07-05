@@ -27,6 +27,8 @@ namespace osu.Game.Graphics.UserInterface
         {
             Height = 32;
             TabContainer.Spacing = new Vector2(padding, 0f);
+            SwitchTabOnRemove = false;
+
             Current.ValueChanged += index =>
             {
                 foreach (var t in TabContainer.Children.OfType<BreadcrumbTabItem>())

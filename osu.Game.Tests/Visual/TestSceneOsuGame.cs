@@ -34,11 +34,6 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestSceneOsuGame : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(OsuLogo),
-        };
-
         private IReadOnlyList<Type> requiredGameDependencies => new[]
         {
             typeof(OsuGame),
@@ -47,8 +42,9 @@ namespace osu.Game.Tests.Visual
             typeof(IdleTracker),
             typeof(OnScreenDisplay),
             typeof(NotificationOverlay),
-            typeof(DirectOverlay),
-            typeof(SocialOverlay),
+            typeof(BeatmapListingOverlay),
+            typeof(DashboardOverlay),
+            typeof(NewsOverlay),
             typeof(ChannelManager),
             typeof(ChatOverlay),
             typeof(SettingsOverlay),
@@ -78,7 +74,6 @@ namespace osu.Game.Tests.Visual
             typeof(FileStore),
             typeof(ScoreManager),
             typeof(BeatmapManager),
-            typeof(KeyBindingStore),
             typeof(SettingsStore),
             typeof(RulesetConfigCache),
             typeof(OsuColour),

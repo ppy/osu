@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
@@ -14,9 +15,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarUserButton : ToolbarOverlayToggleButton, IOnlineComponent
+    public class ToolbarUserButton : ToolbarOverlayToggleButton
     {
         private readonly UpdateableAvatar avatar;
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         public ToolbarUserButton()
         {
@@ -26,14 +32,13 @@ namespace osu.Game.Overlays.Toolbar
 
             Add(new OpaqueBackground { Depth = 1 });
 
-            Flow.Add(avatar = new UpdateableAvatar
+            Flow.Add(avatar = new UpdateableAvatar(openOnClick: false)
             {
                 Masking = true,
                 Size = new Vector2(32),
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 CornerRadius = 4,
-                OpenOnClick = { Value = false },
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
@@ -44,16 +49,17 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(IAPIProvider api, LoginOverlay login)
+        private void load(LoginOverlay login)
         {
-            api.Register(this);
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(onlineStateChanged, true);
 
             StateContainer = login;
         }
 
-        public void APIStateChanged(IAPIProvider api, APIState state)
+        private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
-            switch (state)
+            switch (state.NewValue)
             {
                 default:
                     Text = @"Guest";
@@ -65,6 +71,6 @@ namespace osu.Game.Overlays.Toolbar
                     avatar.User = api.LocalUser.Value;
                     break;
             }
-        }
+        });
     }
 }

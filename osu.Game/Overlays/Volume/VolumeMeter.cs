@@ -4,6 +4,8 @@
 using System;
 using System.Globalization;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -11,16 +13,19 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeMeter : Container
+    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
     {
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
@@ -33,6 +38,9 @@ namespace osu.Game.Overlays.Volume
         private OsuSpriteText text;
         private BufferedContainer maxGlow;
 
+        private Sample sample;
+        private double sampleLastPlaybackTime;
+
         public VolumeMeter(string name, float circleSize, Color4 meterColour)
         {
             this.circleSize = circleSize;
@@ -43,8 +51,11 @@ namespace osu.Game.Overlays.Volume
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
+            sample = audio.Samples.Get(@"UI/notch-tick");
+            sampleLastPlaybackTime = Time.Current;
+
             Color4 backgroundColour = colours.Gray1;
 
             CircularProgress bgProgress;
@@ -174,21 +185,13 @@ namespace osu.Game.Overlays.Volume
                     }
                 }
             };
-            Bindable.ValueChanged += volume =>
-            {
-                this.TransformTo("DisplayVolume",
-                    volume.NewValue,
-                    400,
-                    Easing.OutQuint);
-            };
+
+            Bindable.BindValueChanged(volume => { this.TransformTo(nameof(DisplayVolume), volume.NewValue, 400, Easing.OutQuint); }, true);
+
             bgProgress.Current.Value = 0.75f;
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            Bindable.TriggerChange();
-        }
+        private int displayVolumeInt;
 
         private double displayVolume;
 
@@ -197,9 +200,17 @@ namespace osu.Game.Overlays.Volume
             get => displayVolume;
             set
             {
+                if (value == displayVolume)
+                    return;
+
                 displayVolume = value;
 
-                if (displayVolume > 0.99f)
+                int intValue = (int)Math.Round(displayVolume * 100);
+                bool intVolumeChanged = intValue != displayVolumeInt;
+
+                displayVolumeInt = intValue;
+
+                if (displayVolume >= 0.995f)
                 {
                     text.Text = "MAX";
                     maxGlow.EffectColour = meterColour.Opacity(2f);
@@ -207,12 +218,34 @@ namespace osu.Game.Overlays.Volume
                 else
                 {
                     maxGlow.EffectColour = Color4.Transparent;
-                    text.Text = Math.Round(displayVolume * 100).ToString(CultureInfo.CurrentCulture);
+                    text.Text = displayVolumeInt.ToString(CultureInfo.CurrentCulture);
                 }
 
                 volumeCircle.Current.Value = displayVolume * 0.75f;
                 volumeCircleGlow.Current.Value = displayVolume * 0.75f;
+
+                if (intVolumeChanged && IsLoaded)
+                    Scheduler.AddOnce(playTickSound);
             }
+        }
+
+        private void playTickSound()
+        {
+            const int tick_debounce_time = 30;
+
+            if (Time.Current - sampleLastPlaybackTime <= tick_debounce_time)
+                return;
+
+            var channel = sample.GetChannel();
+
+            channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + displayVolume * 0.1f;
+
+            // intentionally pitched down, even when hitting max.
+            if (displayVolumeInt == 0 || displayVolumeInt == 100)
+                channel.Frequency.Value -= 0.5f;
+
+            channel.Play();
+            sampleLastPlaybackTime = Time.Current;
         }
 
         public double Volume
@@ -221,7 +254,7 @@ namespace osu.Game.Overlays.Volume
             private set => Bindable.Value = value;
         }
 
-        private const double adjust_step = 0.05;
+        private const double adjust_step = 0.01;
 
         public void Increase(double amount = 1, bool isPrecise = false) => adjust(amount, isPrecise);
         public void Decrease(double amount = 1, bool isPrecise = false) => adjust(-amount, isPrecise);
@@ -229,16 +262,43 @@ namespace osu.Game.Overlays.Volume
         // because volume precision is set to 0.01, this local is required to keep track of more precise adjustments and only apply when possible.
         private double scrollAccumulation;
 
+        private double accelerationModifier = 1;
+
+        private const double max_acceleration = 5;
+        private const double acceleration_multiplier = 1.8;
+
+        private ScheduledDelegate accelerationDebounce;
+
+        private void resetAcceleration() => accelerationModifier = 1;
+
         private void adjust(double delta, bool isPrecise)
         {
-            scrollAccumulation += delta * adjust_step * (isPrecise ? 0.1 : 1);
+            if (delta == 0)
+                return;
+
+            // every adjust increment increases the rate at which adjustments happen up to a cutoff.
+            // this debounce will reset on inactivity.
+            accelerationDebounce?.Cancel();
+            accelerationDebounce = Scheduler.AddDelayed(resetAcceleration, 150);
+
+            delta *= accelerationModifier;
+            accelerationModifier = Math.Min(max_acceleration, accelerationModifier * acceleration_multiplier);
 
             var precision = Bindable.Precision;
 
-            while (Precision.AlmostBigger(Math.Abs(scrollAccumulation), precision))
+            if (isPrecise)
             {
-                Volume += Math.Sign(scrollAccumulation) * precision;
-                scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
+                scrollAccumulation += delta * adjust_step * 0.1;
+
+                while (Precision.AlmostBigger(Math.Abs(scrollAccumulation), precision))
+                {
+                    Volume += Math.Sign(scrollAccumulation) * precision;
+                    scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
+                }
+            }
+            else
+            {
+                Volume += Math.Sign(delta) * Math.Max(precision, Math.Abs(delta * adjust_step));
             }
         }
 
@@ -259,6 +319,29 @@ namespace osu.Game.Overlays.Volume
         protected override void OnHoverLost(HoverLostEvent e)
         {
             this.ScaleTo(1f, transition_length, Easing.OutExpo);
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (!IsHovered)
+                return false;
+
+            switch (action)
+            {
+                case GlobalAction.SelectPrevious:
+                    adjust(1, false);
+                    return true;
+
+                case GlobalAction.SelectNext:
+                    adjust(-1, false);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
     }
 }

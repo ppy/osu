@@ -3,12 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
@@ -21,6 +23,9 @@ namespace osu.Game.Overlays.Profile.Header
         private const float avatar_size = 110;
 
         public readonly Bindable<User> User = new Bindable<User>();
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         private SupporterIcon supporterTag;
         private UpdateableAvatar avatar;
@@ -53,13 +58,11 @@ namespace osu.Game.Overlays.Profile.Header
                     Origin = Anchor.CentreLeft,
                     Children = new Drawable[]
                     {
-                        avatar = new UpdateableAvatar
+                        avatar = new UpdateableAvatar(openOnClick: false, showGuestOnNull: false)
                         {
                             Size = new Vector2(avatar_size),
                             Masking = true,
                             CornerRadius = avatar_size * 0.25f,
-                            OpenOnClick = { Value = false },
-                            ShowGuestOnNull = false,
                         },
                         new Container
                         {
@@ -165,12 +168,12 @@ namespace osu.Game.Overlays.Profile.Header
         {
             avatar.User = user;
             usernameText.Text = user?.Username ?? string.Empty;
-            openUserExternally.Link = $@"https://osu.ppy.sh/users/{user?.Id ?? 0}";
+            openUserExternally.Link = $@"{api.WebsiteRootUrl}/users/{user?.Id ?? 0}";
             userFlag.Country = user?.Country;
             userCountryText.Text = user?.Country?.FullName ?? "Alien";
             supporterTag.SupportLevel = user?.SupportLevel ?? 0;
             titleText.Text = user?.Title ?? string.Empty;
-            titleText.Colour = OsuColour.FromHex(user?.Colour ?? "fff");
+            titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
 
             userStats.Clear();
 

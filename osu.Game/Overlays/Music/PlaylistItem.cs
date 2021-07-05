@@ -48,8 +48,8 @@ namespace osu.Game.Overlays.Music
             artistColour = colours.Gray9;
             HandleColour = colours.Gray5;
 
-            title = localisation.GetLocalisedString(new LocalisedString((Model.Metadata.TitleUnicode, Model.Metadata.Title)));
-            artist = localisation.GetLocalisedString(new LocalisedString((Model.Metadata.ArtistUnicode, Model.Metadata.Artist)));
+            title = localisation.GetLocalisedString(new RomanisableString(Model.Metadata.TitleUnicode, Model.Metadata.Title));
+            artist = localisation.GetLocalisedString(new RomanisableString(Model.Metadata.ArtistUnicode, Model.Metadata.Artist));
         }
 
         protected override void LoadComplete()
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Music
         {
             text.Clear();
 
-            //space after the title to put a space between the title and artist
+            // space after the title to put a space between the title and artist
             titleSprites = text.AddText(title.Value + @"  ", sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular)).OfType<SpriteText>();
 
             text.AddText(artist.Value, sprite =>
@@ -95,22 +95,39 @@ namespace osu.Game.Overlays.Music
             return true;
         }
 
+        private bool inSelectedCollection = true;
+
+        public bool InSelectedCollection
+        {
+            get => inSelectedCollection;
+            set
+            {
+                if (inSelectedCollection == value)
+                    return;
+
+                inSelectedCollection = value;
+                updateFilter();
+            }
+        }
+
         public IEnumerable<string> FilterTerms { get; }
 
-        private bool matching = true;
+        private bool matchingFilter = true;
 
         public bool MatchingFilter
         {
-            get => matching;
+            get => matchingFilter && inSelectedCollection;
             set
             {
-                if (matching == value) return;
+                if (matchingFilter == value)
+                    return;
 
-                matching = value;
-
-                this.FadeTo(matching ? 1 : 0, 200);
+                matchingFilter = value;
+                updateFilter();
             }
         }
+
+        private void updateFilter() => this.FadeTo(MatchingFilter ? 1 : 0, 200);
 
         public bool FilteringActive { get; set; }
     }

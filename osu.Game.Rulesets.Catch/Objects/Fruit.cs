@@ -6,8 +6,10 @@ using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public class Fruit : CatchHitObject
+    public class Fruit : PalpableCatchHitObject
     {
         public override Judgement CreateJudgement() => new CatchJudgement();
+
+        public static FruitVisualRepresentation GetVisualRepresentation(int indexInBeatmap) => (FruitVisualRepresentation)(indexInBeatmap % 4);
     }
 }

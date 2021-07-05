@@ -2,12 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
@@ -16,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModSpinIn : Mod, IApplicableToDrawableHitObjects, IReadFromConfig
+    public class OsuModSpinIn : ModWithVisibilityAdjustment, IHidesApproachCircles
     {
         public override string Name => "Spin In";
         public override string Acronym => "SI";
@@ -25,37 +21,24 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Circles spin in. No approach circles.";
         public override double ScoreMultiplier => 1;
 
-        // todo: this mod should be able to be compatible with hidden with a bit of further implementation.
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModObjectScaleTween), typeof(OsuModHidden), typeof(OsuModTraceable) };
+        // todo: this mod needs to be incompatible with "hidden" due to forcing the circle to remain opaque,
+        // further implementation will be required for supporting that.
+        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModObjectScaleTween), typeof(OsuModHidden) };
 
         private const int rotate_offset = 360;
         private const float rotate_starting_width = 2;
 
-        private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>();
-
-        public void ReadFromConfig(OsuConfigManager config)
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            increaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
         }
 
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
-        {
-            foreach (var drawable in drawables.Skip(increaseFirstObjectVisibility.Value ? 1 : 0))
-            {
-                switch (drawable)
-                {
-                    case DrawableSpinner _:
-                        continue;
-
-                    default:
-                        drawable.ApplyCustomUpdateState += applyZoomState;
-                        break;
-                }
-            }
-        }
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyZoomState(hitObject, state);
 
         private void applyZoomState(DrawableHitObject drawable, ArmedState state)
         {
+            if (drawable is DrawableSpinner)
+                return;
+
             var h = (OsuHitObject)drawable.HitObject;
 
             switch (drawable)

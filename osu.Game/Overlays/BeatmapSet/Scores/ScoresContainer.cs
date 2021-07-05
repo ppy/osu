@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
         private readonly Bindable<BeatmapLeaderboardScope> scope = new Bindable<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Global);
-        private readonly Bindable<User> user = new Bindable<User>();
+        private readonly IBindable<User> user = new Bindable<User>();
 
         private readonly Box background;
         private readonly ScoreTable scoreTable;
@@ -52,17 +52,17 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 if (value?.Scores.Any() != true)
                 {
-                    scoreTable.Scores = null;
+                    scoreTable.ClearScores();
                     scoreTable.Hide();
                     return;
                 }
 
                 var scoreInfos = value.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToList();
+                var topScore = scoreInfos.First();
 
-                scoreTable.Scores = scoreInfos;
+                scoreTable.DisplayScores(scoreInfos, topScore.Beatmap?.Status.GrantsPerformancePoints() == true);
                 scoreTable.Show();
 
-                var topScore = scoreInfos.First();
                 var userScore = value.UserScore;
                 var userScoreInfo = userScore?.Score.CreateScoreInfo(rulesets);
 
@@ -157,11 +157,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         }
                                     }
                                 },
-                                loading = new LoadingLayer()
                             }
                         }
-                    }
-                }
+                    },
+                },
+                loading = new LoadingLayer()
             });
         }
 
@@ -228,7 +228,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 Scores = null;
                 notSupporterPlaceholder.Show();
+
                 loading.Hide();
+                loading.FinishTransforms();
                 return;
             }
 
@@ -241,6 +243,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             getScoresRequest.Success += scores =>
             {
                 loading.Hide();
+                loading.FinishTransforms();
+
                 Scores = scores;
 
                 if (!scores.Scores.Any())

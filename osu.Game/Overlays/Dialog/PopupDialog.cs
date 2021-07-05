@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -43,25 +42,34 @@ namespace osu.Game.Overlays.Dialog
             set => icon.Icon = value;
         }
 
-        private string text;
+        private string headerText;
 
         public string HeaderText
         {
-            get => text;
+            get => headerText;
             set
             {
-                if (text == value)
+                if (headerText == value)
                     return;
 
-                text = value;
-
+                headerText = value;
                 header.Text = value;
             }
         }
 
+        private string bodyText;
+
         public string BodyText
         {
-            set => body.Text = value;
+            get => bodyText;
+            set
+            {
+                if (bodyText == value)
+                    return;
+
+                bodyText = value;
+                body.Text = value;
+            }
         }
 
         public IEnumerable<PopupDialogButton> Buttons
@@ -86,6 +94,10 @@ namespace osu.Game.Overlays.Dialog
                 }
             }
         }
+
+        // We always want dialogs to show their appear animation, so we request they start hidden.
+        // Normally this would not be required, but is here due to the manual Show() call that occurs before LoadComplete().
+        protected override bool StartHidden => true;
 
         protected PopupDialog()
         {
@@ -114,13 +126,13 @@ namespace osu.Game.Overlays.Dialog
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.FromHex(@"221a21"),
+                                    Colour = Color4Extensions.FromHex(@"221a21"),
                                 },
                                 new Triangles
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    ColourLight = OsuColour.FromHex(@"271e26"),
-                                    ColourDark = OsuColour.FromHex(@"1e171e"),
+                                    ColourLight = Color4Extensions.FromHex(@"271e26"),
+                                    ColourDark = Color4Extensions.FromHex(@"1e171e"),
                                     TriangleScale = 4,
                                 },
                             },
@@ -197,7 +209,16 @@ namespace osu.Game.Overlays.Dialog
                     },
                 },
             };
+
+            // It's important we start in a visible state so our state fires on hide, even before load.
+            // This is used by the DialogOverlay to know when the dialog was dismissed.
+            Show();
         }
+
+        /// <summary>
+        /// Programmatically clicks the first <see cref="PopupDialogOkButton"/>.
+        /// </summary>
+        public void PerformOkAction() => Buttons.OfType<PopupDialogOkButton>().First().Click();
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
