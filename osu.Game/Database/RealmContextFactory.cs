@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
@@ -166,11 +167,15 @@ namespace osu.Game.Database
         private void flushContexts()
         {
             Logger.Log(@"Flushing realm contexts...", LoggingTarget.Database);
+            Debug.Assert(blockingLock.CurrentCount == 0);
 
-            var previousContext = context;
+            Realm previousContext;
 
             lock (updateContextLock)
+            {
+                previousContext = context;
                 context = null;
+            }
 
             // wait for all threaded usages to finish
             while (active_usages.Value > 0)
