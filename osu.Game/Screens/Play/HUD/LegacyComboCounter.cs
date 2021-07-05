@@ -23,8 +23,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private const double pop_out_duration = 150;
 
-        private const Easing pop_out_easing = Easing.None;
-
         private const double fade_out_duration = 100;
 
         /// <summary>
