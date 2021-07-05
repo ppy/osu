@@ -27,11 +27,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected override ScrollContainer<Drawable> CreateScrollContainer() => new OsuScrollContainer();
 
-        protected override DirectorySelectorBreadcrumbDisplay CreateBreadcrumb() => new OsuDirectorySelector.OsuDirectorySelectorBreadcrumbDisplay();
+        protected override DirectorySelectorBreadcrumbDisplay CreateBreadcrumb() => new OsuDirectorySelectorBreadcrumbDisplay();
 
-        protected override DirectorySelectorDirectory CreateParentDirectoryItem(DirectoryInfo directory) => new OsuDirectorySelector.OsuDirectorySelectorParentDirectory(directory);
+        protected override DirectorySelectorDirectory CreateParentDirectoryItem(DirectoryInfo directory) => new OsuDirectorySelectorParentDirectory(directory);
 
-        protected override DirectorySelectorDirectory CreateDirectoryItem(DirectoryInfo directory, string displayName = null) => new OsuDirectorySelector.OsuDirectorySelectorDirectory(directory, displayName);
+        protected override DirectorySelectorDirectory CreateDirectoryItem(DirectoryInfo directory, string displayName = null) => new OsuDirectorySelectorDirectory(directory, displayName);
 
         protected override DirectoryListingFile CreateFileItem(FileInfo file) => new OsuDirectoryListingFile(file);
 
@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Flow.AutoSizeAxes = Axes.X;
                 Flow.Height = OsuDirectorySelector.ITEM_HEIGHT;
 
-                AddInternal(new OsuDirectorySelector.OsuDirectorySelectorItemBackground
+                AddInternal(new OsuDirectorySelectorDirectory.Background
                 {
                     Depth = 1
                 });
