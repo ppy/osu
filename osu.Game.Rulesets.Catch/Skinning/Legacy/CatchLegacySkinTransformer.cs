@@ -108,8 +108,11 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     switch (config)
                     {
                         case CatchSkinConfiguration.FlipCatcherPlate:
-                            // Always return `false` (don't flip catcher plate contents) for a legacy skin.
-                            return (IBindable<TValue>)new Bindable<bool>();
+                            // Don't flip catcher plate contents if the catcher is provided by this legacy skin.
+                            if (GetDrawableComponent(new CatchSkinComponent(CatchSkinComponents.Catcher)) != null)
+                                return (IBindable<TValue>)new Bindable<bool>();
+
+                            break;
                     }
 
                     break;
