@@ -17,6 +17,8 @@ using osu.Game.Overlays.Comments;
 using JetBrains.Annotations;
 using System;
 using osu.Framework.Extensions;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays
 {
@@ -30,6 +32,14 @@ namespace osu.Game.Overlays
             set => current.Current = value;
         }
 
+        public LocalisableString Title
+        {
+            get => text.Text;
+            set => text.Text = value;
+        }
+
+        private readonly OsuSpriteText text;
+
         public OverlaySortTabControl()
         {
             AutoSizeAxes = Axes.Both;
@@ -40,12 +50,12 @@ namespace osu.Game.Overlays
                 Spacing = new Vector2(10, 0),
                 Children = new Drawable[]
                 {
-                    new OsuSpriteText
+                    text = new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Font = OsuFont.GetFont(size: 12),
-                        Text = @"Sort by"
+                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                        Text = SortStrings.Default
                     },
                     CreateControl().With(c =>
                     {
@@ -133,11 +143,13 @@ namespace osu.Game.Overlays
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 12),
-                            Text = (value as Enum)?.GetDescription() ?? value.ToString()
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                            Text = (value as Enum)?.GetLocalisableDescription() ?? value.ToString()
                         }
                     }
                 });
+
+                AddInternal(new HoverClickSounds());
             }
 
             protected override void LoadComplete()
@@ -163,7 +175,7 @@ namespace osu.Game.Overlays
 
                 ContentColour = Active.Value && !IsHovered ? colourProvider.Light1 : Color4.White;
 
-                text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
+                text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.SemiBold);
             }
         }
     }

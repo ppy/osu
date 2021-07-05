@@ -40,8 +40,19 @@ namespace osu.Game.Graphics.UserInterface
             set => CurrentNumber.Value = value;
         }
 
-        public ProgressBar()
+        private readonly bool allowSeek;
+
+        public override bool HandlePositionalInput => allowSeek;
+        public override bool HandleNonPositionalInput => allowSeek;
+
+        /// <summary>
+        /// Construct a new progress bar.
+        /// </summary>
+        /// <param name="allowSeek">Whether the user should be allowed to click/drag to adjust the value.</param>
+        public ProgressBar(bool allowSeek)
         {
+            this.allowSeek = allowSeek;
+
             CurrentNumber.MinValue = 0;
             CurrentNumber.MaxValue = 1;
             RelativeSizeAxes = Axes.X;

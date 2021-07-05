@@ -23,6 +23,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         private Color4 accentColour;
 
+        public const float HORIZONTAL_SPACING = 10;
+
         public virtual Color4 AccentColour
         {
             get => accentColour;
@@ -54,7 +56,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public OsuTabControl()
         {
-            TabContainer.Spacing = new Vector2(10f, 0f);
+            TabContainer.Spacing = new Vector2(HORIZONTAL_SPACING, 0f);
 
             AddInternal(strip = new Box
             {
@@ -113,29 +115,29 @@ namespace osu.Game.Graphics.UserInterface
 
             private const float transition_length = 500;
 
-            private void fadeActive()
+            protected void FadeHovered()
             {
                 Bar.FadeIn(transition_length, Easing.OutQuint);
                 Text.FadeColour(Color4.White, transition_length, Easing.OutQuint);
             }
 
-            private void fadeInactive()
+            protected void FadeUnhovered()
             {
-                Bar.FadeOut(transition_length, Easing.OutQuint);
-                Text.FadeColour(AccentColour, transition_length, Easing.OutQuint);
+                Bar.FadeTo(IsHovered ? 1 : 0, transition_length, Easing.OutQuint);
+                Text.FadeColour(IsHovered ? Color4.White : AccentColour, transition_length, Easing.OutQuint);
             }
 
             protected override bool OnHover(HoverEvent e)
             {
                 if (!Active.Value)
-                    fadeActive();
+                    FadeHovered();
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
                 if (!Active.Value)
-                    fadeInactive();
+                    FadeUnhovered();
             }
 
             [BackgroundDependencyLoader]
@@ -158,7 +160,7 @@ namespace osu.Game.Graphics.UserInterface
                         Margin = new MarginPadding { Top = 5, Bottom = 5 },
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
-                        Text = (value as IHasDescription)?.Description ?? (value as Enum)?.GetDescription() ?? value.ToString(),
+                        Text = (value as IHasDescription)?.Description ?? (value as Enum)?.GetLocalisableDescription() ?? value.ToString(),
                         Font = OsuFont.GetFont(size: 14)
                     },
                     Bar = new Box
@@ -170,15 +172,21 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                     },
-                    new HoverClickSounds()
+                    new HoverClickSounds(HoverSampleSet.TabSelect)
                 };
-
-                Active.BindValueChanged(active => Text.Font = Text.Font.With(Typeface.Exo, weight: active.NewValue ? FontWeight.Bold : FontWeight.Medium), true);
             }
 
-            protected override void OnActivated() => fadeActive();
+            protected override void OnActivated()
+            {
+                Text.Font = Text.Font.With(weight: FontWeight.Bold);
+                FadeHovered();
+            }
 
-            protected override void OnDeactivated() => fadeInactive();
+            protected override void OnDeactivated()
+            {
+                Text.Font = Text.Font.With(weight: FontWeight.Medium);
+                FadeUnhovered();
+            }
         }
     }
 }

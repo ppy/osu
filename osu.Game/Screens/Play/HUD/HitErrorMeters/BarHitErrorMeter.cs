@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -19,8 +20,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
     public class BarHitErrorMeter : HitErrorMeter
     {
-        private readonly Anchor alignment;
-
         private const int arrow_move_duration = 400;
 
         private const int judgement_line_width = 6;
@@ -42,11 +41,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private double maxHitWindow;
 
-        public BarHitErrorMeter(HitWindows hitWindows, bool rightAligned = false)
-            : base(hitWindows)
+        public BarHitErrorMeter()
         {
-            alignment = rightAligned ? Anchor.x0 : Anchor.x2;
-
             AutoSizeAxes = Axes.Both;
         }
 
@@ -62,33 +58,42 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 Margin = new MarginPadding(2),
                 Children = new Drawable[]
                 {
-                    judgementsContainer = new Container
+                    new Container
                     {
-                        Anchor = Anchor.y1 | alignment,
-                        Origin = Anchor.y1 | alignment,
-                        Width = judgement_line_width,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Width = chevron_size,
                         RelativeSizeAxes = Axes.Y,
+                        Child = arrow = new SpriteIcon
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.Centre,
+                            RelativePositionAxes = Axes.Y,
+                            Y = 0.5f,
+                            Icon = FontAwesome.Solid.ChevronRight,
+                            Size = new Vector2(chevron_size),
+                        }
                     },
                     colourBars = new Container
                     {
                         Width = bar_width,
                         RelativeSizeAxes = Axes.Y,
-                        Anchor = Anchor.y1 | alignment,
-                        Origin = Anchor.y1 | alignment,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
                         Children = new Drawable[]
                         {
                             colourBarsEarly = new Container
                             {
-                                Anchor = Anchor.y1 | alignment,
-                                Origin = alignment,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.TopRight,
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 0.5f,
                                 Scale = new Vector2(1, -1),
                             },
                             colourBarsLate = new Container
                             {
-                                Anchor = Anchor.y1 | alignment,
-                                Origin = alignment,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.TopRight,
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 0.5f,
                             },
@@ -98,7 +103,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Size = new Vector2(10),
                                 Icon = FontAwesome.Solid.ShippingFast,
                                 Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
+                                Origin = Anchor.Centre,
+                                // undo any layout rotation to display the icon the correct orientation
+                                Rotation = -Rotation,
                             },
                             new SpriteIcon
                             {
@@ -106,25 +113,18 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Size = new Vector2(10),
                                 Icon = FontAwesome.Solid.Bicycle,
                                 Anchor = Anchor.BottomCentre,
-                                Origin = Anchor.BottomCentre,
+                                Origin = Anchor.Centre,
+                                // undo any layout rotation to display the icon the correct orientation
+                                Rotation = -Rotation,
                             }
                         }
                     },
-                    new Container
+                    judgementsContainer = new Container
                     {
-                        Anchor = Anchor.y1 | alignment,
-                        Origin = Anchor.y1 | alignment,
-                        Width = chevron_size,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Width = judgement_line_width,
                         RelativeSizeAxes = Axes.Y,
-                        Child = arrow = new SpriteIcon
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.Centre,
-                            RelativePositionAxes = Axes.Y,
-                            Y = 0.5f,
-                            Icon = alignment == Anchor.x2 ? FontAwesome.Solid.ChevronRight : FontAwesome.Solid.ChevronLeft,
-                            Size = new Vector2(chevron_size),
-                        }
                     },
                 }
             };
@@ -147,19 +147,22 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             var windows = HitWindows.GetAllAvailableWindows().ToArray();
 
-            maxHitWindow = windows.First().length;
+            // max to avoid div-by-zero.
+            maxHitWindow = Math.Max(1, windows.First().length);
 
             for (var i = 0; i < windows.Length; i++)
             {
                 var (result, length) = windows[i];
 
-                colourBarsEarly.Add(createColourBar(result, (float)(length / maxHitWindow), i == 0));
-                colourBarsLate.Add(createColourBar(result, (float)(length / maxHitWindow), i == 0));
+                var hitWindow = (float)(length / maxHitWindow);
+
+                colourBarsEarly.Add(createColourBar(result, hitWindow, i == 0));
+                colourBarsLate.Add(createColourBar(result, hitWindow, i == 0));
             }
 
             // a little nub to mark the centre point.
             var centre = createColourBar(windows.Last().result, 0.01f);
-            centre.Anchor = centre.Origin = Anchor.y1 | (alignment == Anchor.x2 ? Anchor.x0 : Anchor.x2);
+            centre.Anchor = centre.Origin = Anchor.CentreLeft;
             centre.Width = 2.5f;
             colourBars.Add(centre);
 
@@ -209,9 +212,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private const int max_concurrent_judgements = 50;
 
-        public override void OnNewJudgement(JudgementResult judgement)
+        protected override void OnNewJudgement(JudgementResult judgement)
         {
-            if (!judgement.IsHit)
+            if (!judgement.IsHit || judgement.HitObject.HitWindows?.WindowFor(HitResult.Miss) == 0)
+                return;
+
+            if (!judgement.Type.IsScorable() || judgement.Type.IsBonus())
                 return;
 
             if (judgementsContainer.Count > max_concurrent_judgements)
@@ -231,8 +237,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             judgementsContainer.Add(new JudgementLine
             {
                 Y = getRelativeJudgementPosition(judgement.TimeOffset),
-                Anchor = alignment == Anchor.x2 ? Anchor.x0 : Anchor.x2,
-                Origin = Anchor.y1 | (alignment == Anchor.x2 ? Anchor.x0 : Anchor.x2),
+                Origin = Anchor.CentreLeft,
             });
 
             arrow.MoveToY(
@@ -240,9 +245,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 , arrow_move_duration, Easing.Out);
         }
 
-        private float getRelativeJudgementPosition(double value) => (float)((value / maxHitWindow) + 1) / 2;
+        private float getRelativeJudgementPosition(double value) => Math.Clamp((float)((value / maxHitWindow) + 1) / 2, 0, 1);
 
-        private class JudgementLine : CompositeDrawable
+        internal class JudgementLine : CompositeDrawable
         {
             private const int judgement_fade_duration = 5000;
 

@@ -41,11 +41,9 @@ namespace osu.Game.IO.Archives
                     return null;
 
                 byte[] buffer = new byte[input.Length];
-                await input.ReadAsync(buffer, 0, buffer.Length);
+                await input.ReadAsync(buffer).ConfigureAwait(false);
                 return buffer;
             }
         }
-
-        public abstract Stream GetUnderlyingStream();
     }
 }

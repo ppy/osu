@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 new PaginatedBeatmapContainer(BeatmapSetType.RankedAndApproved, User, "Ranked & Approved Beatmaps"),
                 new PaginatedBeatmapContainer(BeatmapSetType.Loved, User, "Loved Beatmaps"),
                 new PaginatedBeatmapContainer(BeatmapSetType.Unranked, User, "Pending Beatmaps"),
-                new PaginatedBeatmapContainer(BeatmapSetType.Graveyard, User, "Graveyarded Beatmaps"),
+                new PaginatedBeatmapContainer(BeatmapSetType.Graveyard, User, "Graveyarded Beatmaps")
             };
         }
     }

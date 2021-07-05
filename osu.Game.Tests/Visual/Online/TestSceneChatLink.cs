@@ -2,16 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
@@ -26,16 +24,6 @@ namespace osu.Game.Tests.Visual.Online
         private readonly TestChatLineContainer textContainer;
         private readonly DialogOverlay dialogOverlay;
         private Color4 linkColour;
-
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ChatLine),
-            typeof(Message),
-            typeof(LinkFlowContainer),
-            typeof(DummyEchoMessage),
-            typeof(LocalEchoMessage),
-            typeof(MessageFormatter)
-        };
 
         public TestSceneChatLink()
         {
@@ -77,7 +65,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddAssert($"msg #{index} has {linkAmount} link(s)", () => newLine.Message.Links.Count == linkAmount);
             AddAssert($"msg #{index} has the right action", hasExpectedActions);
-            AddAssert($"msg #{index} is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic());
+            //AddAssert($"msg #{index} is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic());
             AddAssert($"msg #{index} shows {linkAmount} link(s)", isShowingLinks);
 
             bool hasExpectedActions()
@@ -96,13 +84,13 @@ namespace osu.Game.Tests.Visual.Online
                 return true;
             }
 
-            bool isItalic() => newLine.ContentFlow.Where(d => d is OsuSpriteText).Cast<OsuSpriteText>().All(sprite => sprite.Font.Italics);
+            //bool isItalic() => newLine.ContentFlow.Where(d => d is OsuSpriteText).Cast<OsuSpriteText>().All(sprite => sprite.Font.Italics);
 
             bool isShowingLinks()
             {
                 bool hasBackground = !string.IsNullOrEmpty(newLine.Message.Sender.Colour);
 
-                Color4 textColour = isAction && hasBackground ? OsuColour.FromHex(newLine.Message.Sender.Colour) : Color4.White;
+                Color4 textColour = isAction && hasBackground ? Color4Extensions.FromHex(newLine.Message.Sender.Colour) : Color4.White;
 
                 var linkCompilers = newLine.ContentFlow.Where(d => d is DrawableLinkCompiler).ToList();
                 var linkSprites = linkCompilers.SelectMany(comp => ((DrawableLinkCompiler)comp).Parts);
@@ -115,26 +103,26 @@ namespace osu.Game.Tests.Visual.Online
         private void testLinksGeneral()
         {
             addMessageWithChecks("test!");
-            addMessageWithChecks("osu.ppy.sh!");
-            addMessageWithChecks("https://osu.ppy.sh!", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("dev.ppy.sh!");
+            addMessageWithChecks("https://dev.ppy.sh!", 1, expectedActions: LinkAction.External);
             addMessageWithChecks("00:12:345 (1,2) - Test?", 1, expectedActions: LinkAction.OpenEditorTimestamp);
             addMessageWithChecks("Wiki link for tasty [[Performance Points]]", 1, expectedActions: LinkAction.External);
-            addMessageWithChecks("(osu forums)[https://osu.ppy.sh/forum] (old link format)", 1, expectedActions: LinkAction.External);
-            addMessageWithChecks("[https://osu.ppy.sh/home New site] (new link format)", 1, expectedActions: LinkAction.External);
-            addMessageWithChecks("[osu forums](https://osu.ppy.sh/forum) (new link format 2)", 1, expectedActions: LinkAction.External);
-            addMessageWithChecks("[https://osu.ppy.sh/home This is only a link to the new osu webpage but this is supposed to test word wrap.]", 1, expectedActions: LinkAction.External);
-            addMessageWithChecks("is now listening to [https://osu.ppy.sh/s/93523 IMAGE -MATERIAL- <Version 0>]", 1, true, expectedActions: LinkAction.OpenBeatmapSet);
-            addMessageWithChecks("is now playing [https://osu.ppy.sh/b/252238 IMAGE -MATERIAL- <Version 0>]", 1, true, expectedActions: LinkAction.OpenBeatmap);
-            addMessageWithChecks("Let's (try)[https://osu.ppy.sh/home] [https://osu.ppy.sh/b/252238 multiple links] https://osu.ppy.sh/home", 3,
+            addMessageWithChecks("(osu forums)[https://dev.ppy.sh/forum] (old link format)", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("[https://dev.ppy.sh/home New site] (new link format)", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("[osu forums](https://dev.ppy.sh/forum) (new link format 2)", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("[https://dev.ppy.sh/home This is only a link to the new osu webpage but this is supposed to test word wrap.]", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("is now listening to [https://dev.ppy.sh/s/93523 IMAGE -MATERIAL- <Version 0>]", 1, true, expectedActions: LinkAction.OpenBeatmapSet);
+            addMessageWithChecks("is now playing [https://dev.ppy.sh/b/252238 IMAGE -MATERIAL- <Version 0>]", 1, true, expectedActions: LinkAction.OpenBeatmap);
+            addMessageWithChecks("Let's (try)[https://dev.ppy.sh/home] [https://dev.ppy.sh/b/252238 multiple links] https://dev.ppy.sh/home", 3,
                 expectedActions: new[] { LinkAction.External, LinkAction.OpenBeatmap, LinkAction.External });
-            addMessageWithChecks("[https://osu.ppy.sh/home New link format with escaped [and \\[ paired] braces]", 1, expectedActions: LinkAction.External);
-            addMessageWithChecks("[Markdown link format with escaped [and \\[ paired] braces](https://osu.ppy.sh/home)", 1, expectedActions: LinkAction.External);
-            addMessageWithChecks("(Old link format with escaped (and \\( paired) parentheses)[https://osu.ppy.sh/home] and [[also a rogue wiki link]]", 2, expectedActions: new[] { LinkAction.External, LinkAction.External });
+            addMessageWithChecks("[https://dev.ppy.sh/home New link format with escaped [and \\[ paired] braces]", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("[Markdown link format with escaped [and \\[ paired] braces](https://dev.ppy.sh/home)", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("(Old link format with escaped (and \\( paired) parentheses)[https://dev.ppy.sh/home] and [[also a rogue wiki link]]", 2, expectedActions: new[] { LinkAction.External, LinkAction.External });
             // note that there's 0 links here (they get removed if a channel is not found)
             addMessageWithChecks("#lobby or #osu would be blue (and work) in the ChatDisplay test (when a proper ChatOverlay is present).");
             addMessageWithChecks("I am important!", 0, false, true);
             addMessageWithChecks("feels important", 0, true, true);
-            addMessageWithChecks("likes to post this [https://osu.ppy.sh/home link].", 1, true, true, expectedActions: LinkAction.External);
+            addMessageWithChecks("likes to post this [https://dev.ppy.sh/home link].", 1, true, true, expectedActions: LinkAction.External);
             addMessageWithChecks("Join my multiplayer game osump://12346.", 1, expectedActions: LinkAction.JoinMultiplayerMatch);
             addMessageWithChecks("Join my [multiplayer game](osump://12346).", 1, expectedActions: LinkAction.JoinMultiplayerMatch);
             addMessageWithChecks("Join my [#english](osu://chan/#english).", 1, expectedActions: LinkAction.OpenChannel);
@@ -148,9 +136,9 @@ namespace osu.Game.Tests.Visual.Online
             int echoCounter = 0;
 
             addEchoWithWait("sent!", "received!");
-            addEchoWithWait("https://osu.ppy.sh/home", null, 500);
-            addEchoWithWait("[https://osu.ppy.sh/forum let's try multiple words too!]");
-            addEchoWithWait("(long loading times! clickable while loading?)[https://osu.ppy.sh/home]", null, 5000);
+            addEchoWithWait("https://dev.ppy.sh/home", null, 500);
+            addEchoWithWait("[https://dev.ppy.sh/forum let's try multiple words too!]");
+            addEchoWithWait("(long loading times! clickable while loading?)[https://dev.ppy.sh/home]", null, 5000);
 
             void addEchoWithWait(string text, string completeText = null, double delay = 250)
             {

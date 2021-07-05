@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -13,6 +12,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
@@ -37,16 +37,15 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
             AddRangeInternal(new Drawable[]
             {
-                new UpdateableBeatmapSetCover
+                new UpdateableBeatmapSetCover(BeatmapSetCoverType.List)
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = cover_width,
                     BeatmapSet = beatmap.BeatmapSet,
-                    CoverType = BeatmapSetCoverType.List,
                 },
                 new Container
                 {
@@ -61,7 +60,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                             CornerRadius = corner_radius,
                             Children = new Drawable[]
                             {
-                                new ProfileItemContainer
+                                new MostPlayedBeatmapContainer
                                 {
                                     Child = new Container
                                     {
@@ -78,11 +77,14 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                                 Children = new Drawable[]
                                                 {
                                                     new MostPlayedBeatmapMetadataContainer(beatmap),
-                                                    new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular))
+                                                    new LinkFlowContainer(t =>
+                                                    {
+                                                        t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular);
+                                                        t.Colour = colourProvider.Foreground1;
+                                                    })
                                                     {
                                                         AutoSizeAxes = Axes.Both,
                                                         Direction = FillDirection.Horizontal,
-                                                        Colour = colours.GreySeafoamLighter
                                                     }.With(d =>
                                                     {
                                                         d.AddText("mapped by ");
@@ -105,6 +107,16 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             });
         }
 
+        private class MostPlayedBeatmapContainer : ProfileItemContainer
+        {
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                IdleColour = colourProvider.Background4;
+                HoverColour = colourProvider.Background3;
+            }
+        }
+
         private class MostPlayedBeatmapMetadataContainer : BeatmapMetadataContainer
         {
             public MostPlayedBeatmapMetadataContainer(BeatmapInfo beatmap)
@@ -116,14 +128,14 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             {
                 new OsuSpriteText
                 {
-                    Text = new LocalisedString((
+                    Text = new RomanisableString(
                         $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
-                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ")),
+                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] "),
                     Font = OsuFont.GetFont(weight: FontWeight.Bold)
                 },
                 new OsuSpriteText
                 {
-                    Text = "by " + new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
+                    Text = "by " + new RomanisableString(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist),
                     Font = OsuFont.GetFont(weight: FontWeight.Regular)
                 },
             };
@@ -131,7 +143,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         private class PlayCountText : CompositeDrawable, IHasTooltip
         {
-            public string TooltipText => "times played";
+            public LocalisableString TooltipText => "times played";
 
             public PlayCountText(int playCount)
             {

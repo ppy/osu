@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mods
         public override BindableNumber<double> InitialRate { get; } = new BindableDouble
         {
             MinValue = 0.5,
-            MaxValue = 1,
+            MaxValue = 1.99,
             Default = 1,
             Value = 1,
             Precision = 0.01,
@@ -30,13 +30,35 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Final rate", "The speed increase to ramp towards")]
         public override BindableNumber<double> FinalRate { get; } = new BindableDouble
         {
-            MinValue = 1.01,
+            MinValue = 0.51,
             MaxValue = 2,
             Default = 1.5,
             Value = 1.5,
             Precision = 0.01,
         };
 
+        [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
+        public override BindableBool AdjustPitch { get; } = new BindableBool
+        {
+            Default = true,
+            Value = true
+        };
+
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModWindDown)).ToArray();
+
+        public ModWindUp()
+        {
+            InitialRate.BindValueChanged(val =>
+            {
+                if (val.NewValue >= FinalRate.Value)
+                    FinalRate.Value = val.NewValue + FinalRate.Precision;
+            });
+
+            FinalRate.BindValueChanged(val =>
+            {
+                if (val.NewValue <= InitialRate.Value)
+                    InitialRate.Value = val.NewValue - InitialRate.Precision;
+            });
+        }
     }
 }

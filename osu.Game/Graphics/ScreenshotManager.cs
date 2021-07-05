@@ -19,6 +19,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace osu.Game.Graphics
 {
@@ -43,7 +44,7 @@ namespace osu.Game.Graphics
         [Resolved]
         private NotificationOverlay notificationOverlay { get; set; }
 
-        private SampleChannel shutter;
+        private Sample shutter;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, Storage storage, AudioManager audio)
@@ -102,7 +103,7 @@ namespace osu.Game.Graphics
                 }
             }
 
-            using (var image = await host.TakeScreenshotAsync())
+            using (var image = await host.TakeScreenshotAsync().ConfigureAwait(false))
             {
                 if (Interlocked.Decrement(ref screenShotTasks) == 0 && cursorVisibility.Value == false)
                     cursorVisibility.Value = true;
@@ -115,11 +116,13 @@ namespace osu.Game.Graphics
                 switch (screenshotFormat.Value)
                 {
                     case ScreenshotFormat.Png:
-                        image.SaveAsPng(stream);
+                        await image.SaveAsPngAsync(stream).ConfigureAwait(false);
                         break;
 
                     case ScreenshotFormat.Jpg:
-                        image.SaveAsJpeg(stream);
+                        const int jpeg_quality = 92;
+
+                        await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality }).ConfigureAwait(false);
                         break;
 
                     default:

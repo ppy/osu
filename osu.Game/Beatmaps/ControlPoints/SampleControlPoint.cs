@@ -3,12 +3,22 @@
 
 using osu.Framework.Bindables;
 using osu.Game.Audio;
+using osu.Game.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
     public class SampleControlPoint : ControlPoint
     {
         public const string DEFAULT_BANK = "normal";
+
+        public static readonly SampleControlPoint DEFAULT = new SampleControlPoint
+        {
+            SampleBankBindable = { Disabled = true },
+            SampleVolumeBindable = { Disabled = true }
+        };
+
+        public override Color4 GetRepresentingColour(OsuColour colours) => colours.Pink;
 
         /// <summary>
         /// The default sample bank at this control point.
@@ -48,12 +58,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="sampleName">The name of the same.</param>
         /// <returns>A populated <see cref="HitSampleInfo"/>.</returns>
-        public HitSampleInfo GetSampleInfo(string sampleName = HitSampleInfo.HIT_NORMAL) => new HitSampleInfo
-        {
-            Bank = SampleBank,
-            Name = sampleName,
-            Volume = SampleVolume,
-        };
+        public HitSampleInfo GetSampleInfo(string sampleName = HitSampleInfo.HIT_NORMAL) => new HitSampleInfo(sampleName, SampleBank, volume: SampleVolume);
 
         /// <summary>
         /// Applies <see cref="SampleBank"/> and <see cref="SampleVolume"/> to a <see cref="HitSampleInfo"/> if necessary, returning the modified <see cref="HitSampleInfo"/>.
@@ -61,15 +66,19 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="hitSampleInfo">The <see cref="HitSampleInfo"/>. This will not be modified.</param>
         /// <returns>The modified <see cref="HitSampleInfo"/>. This does not share a reference with <paramref name="hitSampleInfo"/>.</returns>
         public virtual HitSampleInfo ApplyTo(HitSampleInfo hitSampleInfo)
-        {
-            var newSampleInfo = hitSampleInfo.Clone();
-            newSampleInfo.Bank = hitSampleInfo.Bank ?? SampleBank;
-            newSampleInfo.Volume = hitSampleInfo.Volume > 0 ? hitSampleInfo.Volume : SampleVolume;
-            return newSampleInfo;
-        }
+            => hitSampleInfo.With(newBank: hitSampleInfo.Bank ?? SampleBank, newVolume: hitSampleInfo.Volume > 0 ? hitSampleInfo.Volume : SampleVolume);
 
-        public override bool EquivalentTo(ControlPoint other) =>
-            other is SampleControlPoint otherTyped &&
-            SampleBank == otherTyped.SampleBank && SampleVolume == otherTyped.SampleVolume;
+        public override bool IsRedundant(ControlPoint existing)
+            => existing is SampleControlPoint existingSample
+               && SampleBank == existingSample.SampleBank
+               && SampleVolume == existingSample.SampleVolume;
+
+        public override void CopyFrom(ControlPoint other)
+        {
+            SampleVolume = ((SampleControlPoint)other).SampleVolume;
+            SampleBank = ((SampleControlPoint)other).SampleBank;
+
+            base.CopyFrom(other);
+        }
     }
 }

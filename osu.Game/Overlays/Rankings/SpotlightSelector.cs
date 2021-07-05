@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -19,14 +19,10 @@ using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class SpotlightSelector : VisibilityContainer, IHasCurrentValue<APISpotlight>
+    public class SpotlightSelector : CompositeDrawable, IHasCurrentValue<APISpotlight>
     {
-        private const int duration = 300;
-
-        private readonly Box background;
-        private readonly SpotlightsDropdown dropdown;
-
         private readonly BindableWithCurrent<APISpotlight> current = new BindableWithCurrent<APISpotlight>();
+        public readonly Bindable<RankingsSortCriteria> Sort = new Bindable<RankingsSortCriteria>();
 
         public Bindable<APISpotlight> Current
         {
@@ -40,60 +36,80 @@ namespace osu.Game.Overlays.Rankings
             set => dropdown.Items = value;
         }
 
-        protected override bool StartHidden => true;
-
+        private readonly Box background;
+        private readonly SpotlightsDropdown dropdown;
         private readonly InfoColumn startDateColumn;
         private readonly InfoColumn endDateColumn;
         private readonly InfoColumn mapCountColumn;
         private readonly InfoColumn participantsColumn;
-        private readonly Container content;
 
         public SpotlightSelector()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 155;
-            Add(content = new Container
+            AutoSizeAxes = Axes.Y;
+
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                background = new Box
                 {
-                    background = new Box
+                    RelativeSizeAxes = Axes.Both,
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN },
+                    Child = new FillFlowContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN },
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            dropdown = new SpotlightsDropdown
+                            new Container
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
+                                Margin = new MarginPadding { Vertical = 20 },
                                 RelativeSizeAxes = Axes.X,
-                                Current = Current,
-                                Depth = -float.MaxValue
+                                Height = 40,
+                                Depth = -float.MaxValue,
+                                Child = dropdown = new SpotlightsDropdown
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Current = Current
+                                }
                             },
-                            new FillFlowContainer
+                            new Container
                             {
-                                Anchor = Anchor.BottomLeft,
-                                Origin = Anchor.BottomLeft,
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(20, 0),
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
                                 Children = new Drawable[]
                                 {
-                                    startDateColumn = new InfoColumn(@"Start Date"),
-                                    endDateColumn = new InfoColumn(@"End Date"),
-                                    mapCountColumn = new InfoColumn(@"Map Count"),
-                                    participantsColumn = new InfoColumn(@"Participants")
+                                    new FillFlowContainer
+                                    {
+                                        AutoSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(10, 0),
+                                        Margin = new MarginPadding { Bottom = 5 },
+                                        Children = new Drawable[]
+                                        {
+                                            startDateColumn = new InfoColumn(@"Start Date"),
+                                            endDateColumn = new InfoColumn(@"End Date"),
+                                            mapCountColumn = new InfoColumn(@"Map Count"),
+                                            participantsColumn = new InfoColumn(@"Participants")
+                                        }
+                                    },
+                                    new RankingsSortTabControl
+                                    {
+                                        Anchor = Anchor.CentreRight,
+                                        Origin = Anchor.CentreRight,
+                                        Current = Sort
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            });
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -109,10 +125,6 @@ namespace osu.Game.Overlays.Rankings
             mapCountColumn.Value = response.BeatmapSets.Count.ToString();
             participantsColumn.Value = response.Spotlight.Participants?.ToString("N0");
         }
-
-        protected override void PopIn() => content.FadeIn(duration, Easing.OutQuint);
-
-        protected override void PopOut() => content.FadeOut(duration, Easing.OutQuint);
 
         private string dateToString(DateTimeOffset date) => date.ToString("yyyy-MM-dd");
 
@@ -135,7 +147,7 @@ namespace osu.Game.Overlays.Rankings
                     new OsuSpriteText
                     {
                         Text = name,
-                        Font = OsuFont.GetFont(size: 10),
+                        Font = OsuFont.GetFont(size: 10, weight: FontWeight.Regular),
                     },
                     new Container
                     {

@@ -4,11 +4,14 @@
 using System.Linq;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -17,6 +20,8 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuDropdown<T> : Dropdown<T>, IHasAccentColour
     {
+        private const float corner_radius = 4;
+
         private Color4 accentColour;
 
         public Color4 AccentColour
@@ -54,19 +59,45 @@ namespace osu.Game.Graphics.UserInterface
         {
             public override bool HandleNonPositionalInput => State == MenuState.Open;
 
+            private Sample sampleOpen;
+            private Sample sampleClose;
+
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
             public OsuDropdownMenu()
             {
-                CornerRadius = 4;
+                CornerRadius = corner_radius;
                 BackgroundColour = Color4.Black.Opacity(0.5f);
+
+                MaskingContainer.CornerRadius = corner_radius;
 
                 // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
                 ItemsContainer.Padding = new MarginPadding(5);
             }
 
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio)
+            {
+                sampleOpen = audio.Samples.Get(@"UI/dropdown-open");
+                sampleClose = audio.Samples.Get(@"UI/dropdown-close");
+            }
+
+            // todo: this shouldn't be required after https://github.com/ppy/osu-framework/issues/4519 is fixed.
+            private bool wasOpened;
+
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
-            protected override void AnimateOpen() => this.FadeIn(300, Easing.OutQuint);
-            protected override void AnimateClose() => this.FadeOut(300, Easing.OutQuint);
+            protected override void AnimateOpen()
+            {
+                wasOpened = true;
+                this.FadeIn(300, Easing.OutQuint);
+                sampleOpen?.Play();
+            }
+
+            protected override void AnimateClose()
+            {
+                this.FadeOut(300, Easing.OutQuint);
+                if (wasOpened)
+                    sampleClose?.Play();
+            }
 
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
             protected override void UpdateSize(Vector2 newSize)
@@ -138,7 +169,7 @@ namespace osu.Game.Graphics.UserInterface
                     Foreground.Padding = new MarginPadding(2);
 
                     Masking = true;
-                    CornerRadius = 6;
+                    CornerRadius = corner_radius;
                 }
 
                 [BackgroundDependencyLoader]
@@ -150,7 +181,7 @@ namespace osu.Game.Graphics.UserInterface
                     nonAccentSelectedColour = Color4.Black.Opacity(0.5f);
                     updateColours();
 
-                    AddInternal(new HoverClickSounds(HoverSampleSet.Soft));
+                    AddInternal(new HoverSounds());
                 }
 
                 protected override void UpdateForegroundColour()
@@ -164,7 +195,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 protected new class Content : FillFlowContainer, IHasText
                 {
-                    public string Text
+                    public LocalisableString Text
                     {
                         get => Label.Text;
                         set => Label.Text = value;
@@ -211,7 +242,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             protected readonly SpriteText Text;
 
-            protected override string Label
+            protected override LocalisableString Label
             {
                 get => Text.Text;
                 set => Text.Text = value;
@@ -237,7 +268,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 AutoSizeAxes = Axes.None;
                 Margin = new MarginPadding { Bottom = 4 };
-                CornerRadius = 4;
+                CornerRadius = corner_radius;
                 Height = 40;
 
                 Foreground.Children = new Drawable[]
@@ -257,7 +288,7 @@ namespace osu.Game.Graphics.UserInterface
                     },
                 };
 
-                AddInternal(new HoverClickSounds());
+                AddInternal(new HoverSounds());
             }
 
             [BackgroundDependencyLoader]

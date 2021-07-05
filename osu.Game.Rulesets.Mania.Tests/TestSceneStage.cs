@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         [Cached(typeof(IReadOnlyList<Mod>))]
         private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
 
-        private readonly List<ManiaStage> stages = new List<ManiaStage>();
+        private readonly List<Stage> stages = new List<Stage>();
 
         private FillFlowContainer<ScrollingTestContainer> fill;
 
@@ -81,9 +81,9 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddAssert("check bar anchors", () => barsInStageAreAnchored(stages[1], Anchor.TopCentre));
         }
 
-        private bool notesInStageAreAnchored(ManiaStage stage, Anchor anchor) => stage.Columns.SelectMany(c => c.AllHitObjects).All(o => o.Anchor == anchor);
+        private bool notesInStageAreAnchored(Stage stage, Anchor anchor) => stage.Columns.SelectMany(c => c.AllHitObjects).All(o => o.Anchor == anchor);
 
-        private bool barsInStageAreAnchored(ManiaStage stage, Anchor anchor) => stage.AllHitObjects.Where(obj => obj is DrawableBarLine).All(o => o.Anchor == anchor);
+        private bool barsInStageAreAnchored(Stage stage, Anchor anchor) => stage.AllHitObjects.Where(obj => obj is DrawableBarLine).All(o => o.Anchor == anchor);
 
         private void createNote()
         {
@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             var specialAction = ManiaAction.Special1;
 
-            var stage = new ManiaStage(0, new StageDefinition { Columns = 2 }, ref action, ref specialAction);
+            var stage = new Stage(0, new StageDefinition { Columns = 2 }, ref action, ref specialAction);
             stages.Add(stage);
 
             return new ScrollingTestContainer(direction)

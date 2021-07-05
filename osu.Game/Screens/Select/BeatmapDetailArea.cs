@@ -30,6 +30,8 @@ namespace osu.Game.Screens.Select
 
         protected Bindable<BeatmapDetailAreaTabItem> CurrentTab => tabControl.Current;
 
+        protected Bindable<bool> CurrentModsFilter => tabControl.CurrentModsFilter;
+
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 

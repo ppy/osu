@@ -1,0 +1,16 @@
+osu file format v14
+
+[Difficulty]
+HPDrainRate:5
+CircleSize:5
+OverallDifficulty:5
+ApproachRate:5
+SliderMultiplier:1.4
+SliderTickRate:1
+
+[TimingPoints]
+0,500,4,1,0,100,1,0
+
+[HitObjects]
+88,99,1000,6,0,L|306:259,2,245,0|0|0,1:0|2:0|3:0,0:0:0:0:
+259,118,3750,1,0,1:0:0:0:

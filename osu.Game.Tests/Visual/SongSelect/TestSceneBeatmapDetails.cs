@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -13,6 +14,8 @@ namespace osu.Game.Tests.Visual.SongSelect
     public class TestSceneBeatmapDetails : OsuTestScene
     {
         private BeatmapDetails details;
+
+        private DummyAPIAccess api => (DummyAPIAccess)API;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -173,6 +176,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 OnlineBeatmapID = 162,
             });
+            AddStep("set online", () => api.SetState(APIState.Online));
+            AddStep("set offline", () => api.SetState(APIState.Offline));
         }
     }
 }

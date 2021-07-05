@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class MultiMod : Mod
+    public sealed class MultiMod : Mod
     {
         public override string Name => string.Empty;
         public override string Acronym => string.Empty;
@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Mods
         {
             Mods = mods;
         }
+
+        public override Mod CreateCopy() => new MultiMod(Mods.Select(m => m.CreateCopy()).ToArray());
 
         public override Type[] IncompatibleMods => Mods.SelectMany(m => m.IncompatibleMods).ToArray();
     }
