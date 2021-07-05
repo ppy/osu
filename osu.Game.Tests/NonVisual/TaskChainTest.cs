@@ -32,7 +32,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public async Task TestChainedTasksRunSequentially()
         {
-            var (task, mutex, cancellation) = addTask();
+            var (task1, mutex, _) = addTask();
             var task2 = addTask();
             var task3 = addTask();
 
@@ -40,9 +40,9 @@ namespace osu.Game.Tests.NonVisual
             task2.mutex.Set();
             mutex.Set();
 
-            await Task.WhenAll(task, task2.task, task3.task);
+            await Task.WhenAll(task1, task2.task, task3.task);
 
-            Assert.That(task.Result, Is.EqualTo(1));
+            Assert.That(task1.Result, Is.EqualTo(1));
             Assert.That(task2.task.Result, Is.EqualTo(2));
             Assert.That(task3.task.Result, Is.EqualTo(3));
         }
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public async Task TestChainedTaskWithIntermediateCancelRunsInSequence()
         {
-            var (task, mutex, cancellation) = addTask();
+            var (task1, mutex, _) = addTask();
             var task2 = addTask();
             var task3 = addTask();
 
@@ -66,9 +66,9 @@ namespace osu.Game.Tests.NonVisual
             mutex.Set();
 
             // Wait on both tasks.
-            await Task.WhenAll(task, task3.task);
+            await Task.WhenAll(task1, task3.task);
 
-            Assert.That(task.Result, Is.EqualTo(1));
+            Assert.That(task1.Result, Is.EqualTo(1));
             Assert.That(task2.task.IsCompleted, Is.False);
             Assert.That(task3.task.Result, Is.EqualTo(2));
         }
