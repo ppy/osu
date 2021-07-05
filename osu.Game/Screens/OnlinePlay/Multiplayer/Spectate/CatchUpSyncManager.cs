@@ -130,6 +130,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 // This is a quiet case in which the catchup is done by the master clock, so IsCatchingUp is not set on the player clock.
                 if (timeDelta < -SYNC_TARGET)
                 {
+                    // Importantly, set the clock to a non-catchup state. if this isn't done, updateMasterState may incorrectly pause the master clock
+                    // when it is required to be running (ie. if all players are ahead of the master).
+                    clock.IsCatchingUp = false;
                     clock.Stop();
                     continue;
                 }
