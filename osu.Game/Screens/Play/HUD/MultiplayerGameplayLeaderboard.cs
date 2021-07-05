@@ -53,22 +53,22 @@ namespace osu.Game.Screens.Play.HUD
         {
             scoringMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
 
-            foreach (var userId in playingUsers)
+            userLookupCache.GetUsersAsync(playingUsers.ToArray()).ContinueWith(users => Schedule(() =>
             {
-                // probably won't be required in the final implementation.
-                var resolvedUser = userLookupCache.GetUserAsync(userId).Result;
+                foreach (var user in users.Result)
+                {
+                    var trackedUser = CreateUserData(user.Id, scoreProcessor);
+                    trackedUser.ScoringMode.BindTo(scoringMode);
 
-                var trackedUser = CreateUserData(userId, scoreProcessor);
-                trackedUser.ScoringMode.BindTo(scoringMode);
+                    var leaderboardScore = AddPlayer(user, user.Id == api.LocalUser.Value.Id);
+                    leaderboardScore.Accuracy.BindTo(trackedUser.Accuracy);
+                    leaderboardScore.TotalScore.BindTo(trackedUser.Score);
+                    leaderboardScore.Combo.BindTo(trackedUser.CurrentCombo);
+                    leaderboardScore.HasQuit.BindTo(trackedUser.UserQuit);
 
-                var leaderboardScore = AddPlayer(resolvedUser, resolvedUser?.Id == api.LocalUser.Value.Id);
-                leaderboardScore.Accuracy.BindTo(trackedUser.Accuracy);
-                leaderboardScore.TotalScore.BindTo(trackedUser.Score);
-                leaderboardScore.Combo.BindTo(trackedUser.CurrentCombo);
-                leaderboardScore.HasQuit.BindTo(trackedUser.UserQuit);
-
-                UserScores[userId] = trackedUser;
-            }
+                    UserScores[user.Id] = trackedUser;
+                }
+            }));
         }
 
         protected override void LoadComplete()

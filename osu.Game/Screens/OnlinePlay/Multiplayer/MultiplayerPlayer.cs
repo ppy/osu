@@ -125,9 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             const float padding = 44; // enough margin to avoid the hit error display.
 
-            leaderboard.Position = new Vector2(
-                padding,
-                padding + HUDOverlay.TopScoringElementsHeight);
+            leaderboard.Position = new Vector2(padding, padding + HUDOverlay.TopScoringElementsHeight);
         }
 
         private void onMatchStarted() => Scheduler.Add(() =>
