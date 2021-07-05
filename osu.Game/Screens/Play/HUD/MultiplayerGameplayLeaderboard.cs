@@ -71,9 +71,17 @@ namespace osu.Game.Screens.Play.HUD
 
                     UserScores[user.Id] = trackedUser;
                 }
-
-                prepareDataStreams();
             }));
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // this is *required* to be here due to the spectator leaderboard not correctly populating clocks if done later.
+            // note that running this here is probably not 100% correct (if a user quits before user population occurs for instance,
+            // an incorrect state will be reached).
+            prepareDataStreams();
         }
 
         private void prepareDataStreams()
