@@ -71,13 +71,13 @@ namespace osu.Game.Screens.Play.HUD
 
                     UserScores[user.Id] = trackedUser;
                 }
+
+                prepareDataStreams();
             }));
         }
 
-        protected override void LoadComplete()
+        private void prepareDataStreams()
         {
-            base.LoadComplete();
-
             // BindableList handles binding in a really bad way (Clear then AddRange) so we need to do this manually..
             foreach (int userId in playingUsers)
             {
