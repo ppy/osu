@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             {
                 double startTime = Math.Min(Time.Current, DrawableSpinner.HitStateUpdateTime - 400);
 
-                using (BeginAbsoluteSequence(startTime, true))
+                using (BeginAbsoluteSequence(startTime))
                 {
                     clear.FadeInFromZero(400, Easing.Out);
 
@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 }
 
                 const double fade_out_duration = 50;
-                using (BeginAbsoluteSequence(DrawableSpinner.HitStateUpdateTime - fade_out_duration, true))
+                using (BeginAbsoluteSequence(DrawableSpinner.HitStateUpdateTime - fade_out_duration))
                     clear.FadeOut(fade_out_duration);
             }
             else
@@ -182,14 +182,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                     double spinFadeOutLength = Math.Min(400, d.HitObject.Duration);
 
-                    using (BeginAbsoluteSequence(drawableHitObject.HitStateUpdateTime - spinFadeOutLength, true))
+                    using (BeginAbsoluteSequence(drawableHitObject.HitStateUpdateTime - spinFadeOutLength))
                         spin.FadeOutFromOne(spinFadeOutLength);
                     break;
 
                 case DrawableSpinnerTick d:
                     if (state == ArmedState.Hit)
                     {
-                        using (BeginAbsoluteSequence(d.HitStateUpdateTime, true))
+                        using (BeginAbsoluteSequence(d.HitStateUpdateTime))
                             spin.FadeOut(300);
                     }
 

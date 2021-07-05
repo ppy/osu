@@ -404,13 +404,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             clearExistingStateTransforms();
 
-            using (BeginAbsoluteSequence(transformTime, true))
+            using (BeginAbsoluteSequence(transformTime))
                 UpdateInitialTransforms();
 
-            using (BeginAbsoluteSequence(StateUpdateTime, true))
+            using (BeginAbsoluteSequence(StateUpdateTime))
                 UpdateStartTimeStateTransforms();
 
-            using (BeginAbsoluteSequence(HitStateUpdateTime, true))
+            using (BeginAbsoluteSequence(HitStateUpdateTime))
                 UpdateHitStateTransforms(newState);
 
             state.Value = newState;
