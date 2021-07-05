@@ -207,17 +207,17 @@ namespace osu.Game.Scoring
 
         public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
         {
-            foreach (var (hitResult, displayName) in Ruleset.CreateInstance().GetHitResults())
+            foreach (var r in Ruleset.CreateInstance().GetHitResults())
             {
-                int value = Statistics.GetOrDefault(hitResult);
+                int value = Statistics.GetOrDefault(r.result);
 
-                switch (hitResult)
+                switch (r.result)
                 {
                     case HitResult.SmallTickHit:
                     {
                         int total = value + Statistics.GetOrDefault(HitResult.SmallTickMiss);
                         if (total > 0)
-                            yield return new HitResultDisplayStatistic(hitResult, value, total, displayName);
+                            yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
 
                         break;
                     }
@@ -226,7 +226,7 @@ namespace osu.Game.Scoring
                     {
                         int total = value + Statistics.GetOrDefault(HitResult.LargeTickMiss);
                         if (total > 0)
-                            yield return new HitResultDisplayStatistic(hitResult, value, total, displayName);
+                            yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
 
                         break;
                     }
@@ -236,7 +236,7 @@ namespace osu.Game.Scoring
                         break;
 
                     default:
-                        yield return new HitResultDisplayStatistic(hitResult, value, null, displayName);
+                        yield return new HitResultDisplayStatistic(r.result, value, null, r.displayName);
 
                         break;
                 }

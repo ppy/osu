@@ -699,13 +699,13 @@ namespace osu.Game.Database
             var fileInfos = new List<TFileModel>();
 
             // import files to manager
-            foreach (var (original, shortened) in getShortenedFilenames(reader))
+            foreach (var filenames in getShortenedFilenames(reader))
             {
-                using (Stream s = reader.GetStream(original))
+                using (Stream s = reader.GetStream(filenames.original))
                 {
                     fileInfos.Add(new TFileModel
                     {
-                        Filename = shortened,
+                        Filename = filenames.shortened,
                         FileInfo = files.Add(s)
                     });
                 }

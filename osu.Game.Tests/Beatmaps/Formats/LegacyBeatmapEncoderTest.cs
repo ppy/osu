@@ -40,13 +40,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void TestEncodeDecodeStability(string name)
         {
             var decoded = decodeFromLegacy(beatmaps_resource_store.GetStream(name), name);
-            var (beatmap, beatmapSkin) = decodeFromLegacy(encodeToLegacy(decoded), name);
+            var decodedAfterEncode = decodeFromLegacy(encodeToLegacy(decoded), name);
 
             sort(decoded.beatmap);
-            sort(beatmap);
+            sort(decodedAfterEncode.beatmap);
 
-            Assert.That(beatmap.Serialize(), Is.EqualTo(decoded.beatmap.Serialize()));
-            Assert.IsTrue(areComboColoursEqual(beatmapSkin.Configuration, decoded.beatmapSkin.Configuration));
+            Assert.That(decodedAfterEncode.beatmap.Serialize(), Is.EqualTo(decoded.beatmap.Serialize()));
+            Assert.IsTrue(areComboColoursEqual(decodedAfterEncode.beatmapSkin.Configuration, decoded.beatmapSkin.Configuration));
         }
 
         [Test]
