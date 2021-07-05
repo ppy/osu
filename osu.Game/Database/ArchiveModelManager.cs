@@ -722,7 +722,7 @@ namespace osu.Game.Database
 
             // import files to manager
             foreach (string file in reader.Filenames)
-                yield return (file, file[prefix.Length..].ToStandardisedPath());
+                yield return (file, file.Substring(prefix.Length).ToStandardisedPath());
         }
 
         #region osu-stable import

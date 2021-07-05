@@ -241,7 +241,7 @@ namespace osu.Game.IO.Legacy
                         {
                             if (typ.Contains("Version"))
                             {
-                                string asmTmp = typ[(typ.IndexOf(',') + 1)..];
+                                string asmTmp = typ.Substring(typ.IndexOf(',') + 1);
                                 string asmName = asmTmp.Remove(asmTmp.IndexOf(']')).Trim();
                                 string typName = typ.Remove(typ.IndexOf(','));
                                 tmpTypes.Add(BindToType(asmName, typName));
