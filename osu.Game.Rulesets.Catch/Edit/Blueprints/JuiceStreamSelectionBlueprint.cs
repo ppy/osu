@@ -4,6 +4,7 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Catch.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Catch.Objects;
@@ -21,12 +22,18 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
         private readonly ScrollingPath scrollingPath;
 
+        private readonly NestedOutlineContainer nestedOutlineContainer;
+
         private readonly Cached pathCache = new Cached();
 
         public JuiceStreamSelectionBlueprint(JuiceStream hitObject)
             : base(hitObject)
         {
-            InternalChild = scrollingPath = new ScrollingPath();
+            InternalChildren = new Drawable[]
+            {
+                scrollingPath = new ScrollingPath(),
+                nestedOutlineContainer = new NestedOutlineContainer()
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -43,10 +50,13 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             if (!IsSelected) return;
 
             scrollingPath.UpdatePositionFrom(HitObjectContainer, HitObject);
+            nestedOutlineContainer.UpdatePositionFrom(HitObjectContainer, HitObject);
 
             if (pathCache.IsValid) return;
 
             scrollingPath.UpdatePathFrom(HitObjectContainer, HitObject);
+            nestedOutlineContainer.UpdateNestedObjectsFrom(HitObjectContainer, HitObject);
+
             pathCache.Validate();
         }
 
