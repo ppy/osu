@@ -23,11 +23,6 @@ namespace osu.Game.Skinning
     {
         public event Action SourceChanged;
 
-        /// <summary>
-        /// A dictionary mapping each <see cref="ISkin"/> source to a wrapper which handles lookup allowances.
-        /// </summary>
-        private readonly Dictionary<ISkin, DisableableSkinSource> skinSources = new Dictionary<ISkin, DisableableSkinSource>();
-
         [CanBeNull]
         protected ISkinSource ParentSource { get; private set; }
 
@@ -45,6 +40,11 @@ namespace osu.Game.Skinning
         protected virtual bool AllowConfigurationLookup => true;
 
         protected virtual bool AllowColourLookup => true;
+
+        /// <summary>
+        /// A dictionary mapping each <see cref="ISkin"/> source to a wrapper which handles lookup allowances.
+        /// </summary>
+        private readonly Dictionary<ISkin, DisableableSkinSource> skinSources = new Dictionary<ISkin, DisableableSkinSource>();
 
         /// <summary>
         /// Constructs a new <see cref="SkinProvidingContainer"/> initialised with a single skin source.
