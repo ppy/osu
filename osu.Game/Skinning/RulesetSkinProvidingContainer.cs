@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -47,22 +48,19 @@ namespace osu.Game.Skinning
             };
         }
 
-        private ISkinSource parentSource;
-
         private ResourceStoreBackedSkin rulesetResourcesSkin;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            parentSource = parent.Get<ISkinSource>();
-            parentSource.SourceChanged += OnSourceChanged;
-
             if (Ruleset.CreateResourceStore() is IResourceStore<byte[]> resources)
                 rulesetResourcesSkin = new ResourceStoreBackedSkin(resources, parent.Get<GameHost>(), parent.Get<AudioManager>());
+
+            var dependencies = base.CreateChildDependencies(parent);
 
             // ensure sources are populated and ready for use before childrens' asynchronous load flow.
             UpdateSkinSources();
 
-            return base.CreateChildDependencies(parent);
+            return dependencies;
         }
 
         protected override void OnSourceChanged()
@@ -77,7 +75,9 @@ namespace osu.Game.Skinning
 
             var skinSources = new List<ISkin>();
 
-            foreach (var skin in parentSource.AllSources)
+            Debug.Assert(ParentSource != null);
+
+            foreach (var skin in ParentSource.AllSources)
             {
                 switch (skin)
                 {
@@ -120,9 +120,6 @@ namespace osu.Game.Skinning
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-
-            if (parentSource != null)
-                parentSource.SourceChanged -= OnSourceChanged;
 
             rulesetResourcesSkin?.Dispose();
         }

@@ -35,7 +35,7 @@ namespace osu.Game.Skinning
         private readonly Dictionary<ISkin, DisableableSkinSource> skinSources = new Dictionary<ISkin, DisableableSkinSource>();
 
         [CanBeNull]
-        private ISkinSource fallbackSource;
+        protected ISkinSource ParentSource { get; private set; }
 
         /// <summary>
         /// Whether falling back to parent <see cref="ISkinSource"/>s is allowed in this container.
@@ -101,7 +101,10 @@ namespace osu.Game.Skinning
                     return skin;
             }
 
-            return fallbackSource?.FindProvider(lookupFunction);
+            if (!AllowFallingBackToParent)
+                return null;
+
+            return ParentSource?.FindProvider(lookupFunction);
         }
 
         public IEnumerable<ISkin> AllSources
@@ -111,9 +114,9 @@ namespace osu.Game.Skinning
                 foreach (var skin in SkinSources)
                     yield return skin;
 
-                if (fallbackSource != null)
+                if (AllowFallingBackToParent && ParentSource != null)
                 {
-                    foreach (var skin in fallbackSource.AllSources)
+                    foreach (var skin in ParentSource.AllSources)
                         yield return skin;
                 }
             }
@@ -128,7 +131,10 @@ namespace osu.Game.Skinning
                     return sourceDrawable;
             }
 
-            return fallbackSource?.GetDrawableComponent(component);
+            if (!AllowFallingBackToParent)
+                return null;
+
+            return ParentSource?.GetDrawableComponent(component);
         }
 
         public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
@@ -140,7 +146,10 @@ namespace osu.Game.Skinning
                     return sourceTexture;
             }
 
-            return fallbackSource?.GetTexture(componentName, wrapModeS, wrapModeT);
+            if (!AllowFallingBackToParent)
+                return null;
+
+            return ParentSource?.GetTexture(componentName, wrapModeS, wrapModeT);
         }
 
         public ISample GetSample(ISampleInfo sampleInfo)
@@ -152,7 +161,10 @@ namespace osu.Game.Skinning
                     return sourceSample;
             }
 
-            return fallbackSource?.GetSample(sampleInfo);
+            if (!AllowFallingBackToParent)
+                return null;
+
+            return ParentSource?.GetSample(sampleInfo);
         }
 
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
@@ -164,7 +176,10 @@ namespace osu.Game.Skinning
                     return bindable;
             }
 
-            return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
+            if (!AllowFallingBackToParent)
+                return null;
+
+            return ParentSource?.GetConfig<TLookup, TValue>(lookup);
         }
 
         protected virtual void OnSourceChanged() => SourceChanged?.Invoke();
@@ -173,12 +188,9 @@ namespace osu.Game.Skinning
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            if (AllowFallingBackToParent)
-            {
-                fallbackSource = dependencies.Get<ISkinSource>();
-                if (fallbackSource != null)
-                    fallbackSource.SourceChanged += OnSourceChanged;
-            }
+            ParentSource = dependencies.Get<ISkinSource>();
+            if (ParentSource != null)
+                ParentSource.SourceChanged += OnSourceChanged;
 
             dependencies.CacheAs<ISkinSource>(this);
 
@@ -192,8 +204,8 @@ namespace osu.Game.Skinning
 
             base.Dispose(isDisposing);
 
-            if (fallbackSource != null)
-                fallbackSource.SourceChanged -= OnSourceChanged;
+            if (ParentSource != null)
+                ParentSource.SourceChanged -= OnSourceChanged;
 
             foreach (var source in SkinSources.OfType<ISkinSource>())
                 source.SourceChanged -= OnSourceChanged;
