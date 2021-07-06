@@ -73,7 +73,7 @@ namespace osu.Game.Skinning
             skinSources.Add(skin, new DisableableSkinSource(skin, this));
 
             if (skin is ISkinSource source)
-                source.SourceChanged += anySourceChanged;
+                source.SourceChanged += TriggerSourceChanged;
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace osu.Game.Skinning
                 return;
 
             if (skin is ISkinSource source)
-                source.SourceChanged -= anySourceChanged;
+                source.SourceChanged -= TriggerSourceChanged;
         }
 
         /// <summary>
@@ -199,16 +199,16 @@ namespace osu.Game.Skinning
 
             ParentSource = dependencies.Get<ISkinSource>();
             if (ParentSource != null)
-                ParentSource.SourceChanged += anySourceChanged;
+                ParentSource.SourceChanged += TriggerSourceChanged;
 
             dependencies.CacheAs<ISkinSource>(this);
 
-            anySourceChanged();
+            TriggerSourceChanged();
 
             return dependencies;
         }
 
-        private void anySourceChanged()
+        protected void TriggerSourceChanged()
         {
             // Expose to implementations, giving them a chance to react before notifying external consumers.
             OnSourceChanged();
@@ -224,10 +224,10 @@ namespace osu.Game.Skinning
             base.Dispose(isDisposing);
 
             if (ParentSource != null)
-                ParentSource.SourceChanged -= anySourceChanged;
+                ParentSource.SourceChanged -= TriggerSourceChanged;
 
             foreach (var source in skinSources.Keys.OfType<ISkinSource>())
-                source.SourceChanged -= anySourceChanged;
+                source.SourceChanged -= TriggerSourceChanged;
         }
 
         private class DisableableSkinSource : ISkin
