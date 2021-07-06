@@ -320,6 +320,7 @@ namespace osu.Game.Online.Chat
         JoinMultiplayerMatch,
         Spectate,
         OpenUserProfile,
+        SearchBeatmapSet,
         OpenWiki,
         Custom,
     }

@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Catch.UI
             CatcherTrail sprite = trailPool.Get();
 
             sprite.AnimationState = catcher.CurrentState;
-            sprite.Scale = catcher.Scale;
+            sprite.Scale = catcher.Scale * catcher.Body.Scale;
             sprite.Position = catcher.Position;
 
             target.Add(sprite);
