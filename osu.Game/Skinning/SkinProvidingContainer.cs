@@ -44,7 +44,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// A dictionary mapping each <see cref="ISkin"/> source to a wrapper which handles lookup allowances.
         /// </summary>
-        private readonly Dictionary<ISkin, DisableableSkinSource> skinSources = new Dictionary<ISkin, DisableableSkinSource>();
+        private readonly List<(ISkin skin, DisableableSkinSource wrapped)> skinSources = new List<(ISkin, DisableableSkinSource)>();
 
         /// <summary>
         /// Constructs a new <see cref="SkinProvidingContainer"/> initialised with a single skin source.
@@ -70,7 +70,7 @@ namespace osu.Game.Skinning
         /// <param name="skin">The skin to add.</param>
         protected void AddSource(ISkin skin)
         {
-            skinSources.Add(skin, new DisableableSkinSource(skin, this));
+            skinSources.Add((skin, new DisableableSkinSource(skin, this)));
 
             if (skin is ISkinSource source)
                 source.SourceChanged += TriggerSourceChanged;
@@ -82,7 +82,7 @@ namespace osu.Game.Skinning
         /// <param name="skin">The skin to remove.</param>
         protected void RemoveSource(ISkin skin)
         {
-            if (!skinSources.Remove(skin))
+            if (skinSources.RemoveAll(s => s.skin == skin) == 0)
                 return;
 
             if (skin is ISkinSource source)
@@ -116,8 +116,8 @@ namespace osu.Game.Skinning
         {
             get
             {
-                foreach (var skin in skinSources.Keys)
-                    yield return skin;
+                foreach (var i in skinSources)
+                    yield return i.skin;
 
                 if (AllowFallingBackToParent && ParentSource != null)
                 {
@@ -226,8 +226,11 @@ namespace osu.Game.Skinning
             if (ParentSource != null)
                 ParentSource.SourceChanged -= TriggerSourceChanged;
 
-            foreach (var source in skinSources.Keys.OfType<ISkinSource>())
-                source.SourceChanged -= TriggerSourceChanged;
+            foreach (var i in skinSources)
+            {
+                if (i.skin is ISkinSource source)
+                    source.SourceChanged -= TriggerSourceChanged;
+            }
         }
 
         private class DisableableSkinSource : ISkin
