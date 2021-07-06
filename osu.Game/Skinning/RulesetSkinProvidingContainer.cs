@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -72,31 +73,36 @@ namespace osu.Game.Skinning
 
         protected virtual void UpdateSkinSources()
         {
-            SkinSources.Clear();
+            ResetSources();
+
+            var skinSources = new List<ISkin>();
 
             foreach (var skin in parentSource.AllSources)
             {
                 switch (skin)
                 {
                     case LegacySkin legacySkin:
-                        SkinSources.Add(GetLegacyRulesetTransformedSkin(legacySkin));
+                        skinSources.Add(GetLegacyRulesetTransformedSkin(legacySkin));
                         break;
 
                     default:
-                        SkinSources.Add(skin);
+                        skinSources.Add(skin);
                         break;
                 }
             }
 
-            int lastDefaultSkinIndex = SkinSources.IndexOf(SkinSources.OfType<DefaultSkin>().LastOrDefault());
+            int lastDefaultSkinIndex = skinSources.IndexOf(skinSources.OfType<DefaultSkin>().LastOrDefault());
 
             // Ruleset resources should be given the ability to override game-wide defaults
             // This is achieved by placing them before the last instance of DefaultSkin.
             // Note that DefaultSkin may not be present in some test scenes.
             if (lastDefaultSkinIndex >= 0)
-                SkinSources.Insert(lastDefaultSkinIndex, rulesetResourcesSkin);
+                skinSources.Insert(lastDefaultSkinIndex, rulesetResourcesSkin);
             else
-                SkinSources.Add(rulesetResourcesSkin);
+                skinSources.Add(rulesetResourcesSkin);
+
+            foreach (var skin in skinSources)
+                AddSource(skin);
         }
 
         protected ISkin GetLegacyRulesetTransformedSkin(ISkin legacySkin)

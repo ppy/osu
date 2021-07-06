@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -27,13 +26,13 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Skins which should be exposed by this container, in order of lookup precedence.
         /// </summary>
-        protected readonly BindableList<ISkin> SkinSources = new BindableList<ISkin>();
+        protected IEnumerable<ISkin> SkinSources => skinSources.Keys;
 
         /// <summary>
         /// A dictionary mapping each <see cref="ISkin"/> from the <see cref="SkinSources"/>
         /// to one that performs the "allow lookup" checks before proceeding with a lookup.
         /// </summary>
-        private readonly Dictionary<ISkin, DisableableSkinSource> disableableSkinSources = new Dictionary<ISkin, DisableableSkinSource>();
+        private readonly Dictionary<ISkin, DisableableSkinSource> skinSources = new Dictionary<ISkin, DisableableSkinSource>();
 
         [CanBeNull]
         private ISkinSource fallbackSource;
@@ -60,7 +59,7 @@ namespace osu.Game.Skinning
             : this()
         {
             if (skin != null)
-                SkinSources.Add(skin);
+                AddSource(skin);
         }
 
         /// <summary>
@@ -70,61 +69,35 @@ namespace osu.Game.Skinning
         protected SkinProvidingContainer()
         {
             RelativeSizeAxes = Axes.Both;
+        }
 
-            SkinSources.BindCollectionChanged(((_, args) =>
-            {
-                switch (args.Action)
-                {
-                    case NotifyCollectionChangedAction.Add:
-                        foreach (var skin in args.NewItems.Cast<ISkin>())
-                        {
-                            disableableSkinSources.Add(skin, new DisableableSkinSource(skin, this));
+        public void AddSource(ISkin skin)
+        {
+            skinSources.Add(skin, new DisableableSkinSource(skin, this));
 
-                            if (skin is ISkinSource source)
-                                source.SourceChanged += OnSourceChanged;
-                        }
+            if (skin is ISkinSource source)
+                source.SourceChanged += OnSourceChanged;
+        }
 
-                        break;
+        public void RemoveSource(ISkin skin)
+        {
+            skinSources.Remove(skin);
 
-                    case NotifyCollectionChangedAction.Reset:
-                    case NotifyCollectionChangedAction.Remove:
-                        foreach (var skin in args.OldItems.Cast<ISkin>())
-                        {
-                            disableableSkinSources.Remove(skin);
+            if (skin is ISkinSource source)
+                source.SourceChanged += OnSourceChanged;
+        }
 
-                            if (skin is ISkinSource source)
-                                source.SourceChanged -= OnSourceChanged;
-                        }
-
-                        break;
-
-                    case NotifyCollectionChangedAction.Replace:
-                        foreach (var skin in args.OldItems.Cast<ISkin>())
-                        {
-                            disableableSkinSources.Remove(skin);
-
-                            if (skin is ISkinSource source)
-                                source.SourceChanged -= OnSourceChanged;
-                        }
-
-                        foreach (var skin in args.NewItems.Cast<ISkin>())
-                        {
-                            disableableSkinSources.Add(skin, new DisableableSkinSource(skin, this));
-
-                            if (skin is ISkinSource source)
-                                source.SourceChanged += OnSourceChanged;
-                        }
-
-                        break;
-                }
-            }), true);
+        public void ResetSources()
+        {
+            foreach (var skin in AllSources.ToArray())
+                RemoveSource(skin);
         }
 
         public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
         {
             foreach (var skin in SkinSources)
             {
-                if (lookupFunction(disableableSkinSources[skin]))
+                if (lookupFunction(skinSources[skin]))
                     return skin;
             }
 
@@ -151,7 +124,7 @@ namespace osu.Game.Skinning
             foreach (var skin in SkinSources)
             {
                 Drawable sourceDrawable;
-                if ((sourceDrawable = disableableSkinSources[skin]?.GetDrawableComponent(component)) != null)
+                if ((sourceDrawable = skinSources[skin]?.GetDrawableComponent(component)) != null)
                     return sourceDrawable;
             }
 
@@ -163,7 +136,7 @@ namespace osu.Game.Skinning
             foreach (var skin in SkinSources)
             {
                 Texture sourceTexture;
-                if ((sourceTexture = disableableSkinSources[skin]?.GetTexture(componentName, wrapModeS, wrapModeT)) != null)
+                if ((sourceTexture = skinSources[skin]?.GetTexture(componentName, wrapModeS, wrapModeT)) != null)
                     return sourceTexture;
             }
 
@@ -175,7 +148,7 @@ namespace osu.Game.Skinning
             foreach (var skin in SkinSources)
             {
                 ISample sourceSample;
-                if ((sourceSample = disableableSkinSources[skin]?.GetSample(sampleInfo)) != null)
+                if ((sourceSample = skinSources[skin]?.GetSample(sampleInfo)) != null)
                     return sourceSample;
             }
 
@@ -187,7 +160,7 @@ namespace osu.Game.Skinning
             foreach (var skin in SkinSources)
             {
                 IBindable<TValue> bindable;
-                if ((bindable = disableableSkinSources[skin]?.GetConfig<TLookup, TValue>(lookup)) != null)
+                if ((bindable = skinSources[skin]?.GetConfig<TLookup, TValue>(lookup)) != null)
                     return bindable;
             }
 
