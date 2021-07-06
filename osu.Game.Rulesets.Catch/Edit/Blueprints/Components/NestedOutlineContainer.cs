@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.UI.Scrolling;
 
@@ -12,15 +13,11 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 {
     public class NestedOutlineContainer : CompositeDrawable
     {
-        private readonly Container<FruitOutline> nestedOutlines;
-
         private readonly List<CatchHitObject> nestedHitObjects = new List<CatchHitObject>();
 
         public NestedOutlineContainer()
         {
             Anchor = Anchor.BottomLeft;
-
-            InternalChild = nestedOutlines = new Container<FruitOutline>();
         }
 
         public void UpdatePositionFrom(ScrollingHitObjectContainer hitObjectContainer, CatchHitObject parentHitObject)
@@ -36,18 +33,21 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
                                                      .OfType<CatchHitObject>()
                                                      .Where(h => !(h is TinyDroplet)));
 
-            while (nestedHitObjects.Count < nestedOutlines.Count)
-                nestedOutlines.Remove(nestedOutlines[^1]);
+            while (nestedHitObjects.Count < InternalChildren.Count)
+                RemoveInternal(InternalChildren[^1]);
 
-            while (nestedOutlines.Count < nestedHitObjects.Count)
-                nestedOutlines.Add(new FruitOutline());
+            while (InternalChildren.Count < nestedHitObjects.Count)
+                AddInternal(new FruitOutline());
 
             for (int i = 0; i < nestedHitObjects.Count; i++)
             {
                 var hitObject = nestedHitObjects[i];
-                nestedOutlines[i].UpdateFrom(hitObjectContainer, hitObject, parentHitObject);
-                nestedOutlines[i].Scale *= hitObject is Droplet ? 0.5f : 1;
+                var outline = (FruitOutline)InternalChildren[i];
+                outline.UpdateFrom(hitObjectContainer, hitObject, parentHitObject);
+                outline.Scale *= hitObject is Droplet ? 0.5f : 1;
             }
         }
+
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
     }
 }
