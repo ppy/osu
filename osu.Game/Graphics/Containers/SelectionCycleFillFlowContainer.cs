@@ -69,7 +69,9 @@ namespace osu.Game.Graphics.Containers
         {
             // This event is used to update selection state when modified within the drawable itself.
             // It is added to a dictionary so that we can unsubscribe if the drawable is removed from this container
-            drawable.StateChanged += handlerMap[drawable] = state => selectionChanged(drawable, state);
+            handlerMap[drawable] = state => selectionChanged(drawable, state);
+
+            drawable.StateChanged += handlerMap[drawable];
 
             base.Add(drawable);
         }
@@ -79,8 +81,12 @@ namespace osu.Game.Graphics.Containers
             if (!base.Remove(drawable))
                 return false;
 
-            drawable.StateChanged -= handlerMap[drawable];
-            handlerMap.Remove(drawable);
+            if (handlerMap.TryGetValue(drawable, out var action))
+            {
+                drawable.StateChanged -= action;
+                handlerMap.Remove(drawable);
+            }
+
             return true;
         }
 
