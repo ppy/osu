@@ -38,7 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         public event Action<SelectionState> StateChanged;
 
-        private readonly Box selectionBox;
+        private Box selectionBox;
 
         [Resolved(canBeNull: true)]
         private OnlinePlayScreen parentScreen { get; set; }
@@ -55,14 +55,18 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             get => state;
             set
             {
-                if (value == state) return;
+                if (value == state)
+                    return;
 
                 state = value;
 
-                if (state == SelectionState.Selected)
-                    selectionBox.FadeIn(transition_duration);
-                else
-                    selectionBox.FadeOut(transition_duration);
+                if (selectionBox != null)
+                {
+                    if (state == SelectionState.Selected)
+                        selectionBox.FadeIn(transition_duration);
+                    else
+                        selectionBox.FadeOut(transition_duration);
+                }
 
                 StateChanged?.Invoke(State);
             }
@@ -99,13 +103,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             Height = height + SELECTION_BORDER_WIDTH * 2;
             CornerRadius = corner_radius + SELECTION_BORDER_WIDTH / 2;
             Masking = true;
-
-            // create selectionBox here so State can be set before being loaded
-            selectionBox = new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Alpha = 0f,
-            };
         }
 
         [BackgroundDependencyLoader]
@@ -118,7 +115,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 new StatusColouredContainer(transition_duration)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = selectionBox
+                    Child = selectionBox = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = state == SelectionState.Selected ? 1 : 0,
+                    }
                 },
                 new Container
                 {
