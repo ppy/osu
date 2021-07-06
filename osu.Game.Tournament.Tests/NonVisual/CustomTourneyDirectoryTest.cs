@@ -20,7 +20,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
         [Test]
         public void TestDefaultDirectory()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestDefaultDirectory)))
             {
                 try
                 {
@@ -139,8 +139,13 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 }
                 finally
                 {
-                    host.Storage.Delete("tournament.ini");
-                    host.Storage.DeleteDirectory("tournaments");
+                    try
+                    {
+                        host.Storage.Delete("tournament.ini");
+                        host.Storage.DeleteDirectory("tournaments");
+                    }
+                    catch { }
+
                     host.Exit();
                 }
             }
