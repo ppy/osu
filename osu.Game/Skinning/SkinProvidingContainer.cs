@@ -24,13 +24,7 @@ namespace osu.Game.Skinning
         public event Action SourceChanged;
 
         /// <summary>
-        /// Skins which should be exposed by this container, in order of lookup precedence.
-        /// </summary>
-        protected IEnumerable<ISkin> SkinSources => skinSources.Keys;
-
-        /// <summary>
-        /// A dictionary mapping each <see cref="ISkin"/> from the <see cref="SkinSources"/>
-        /// to one that performs the "allow lookup" checks before proceeding with a lookup.
+        /// A dictionary mapping each <see cref="ISkin"/> source to a wrapper which handles lookup allowances.
         /// </summary>
         private readonly Dictionary<ISkin, DisableableSkinSource> skinSources = new Dictionary<ISkin, DisableableSkinSource>();
 
@@ -64,7 +58,6 @@ namespace osu.Game.Skinning
 
         /// <summary>
         /// Constructs a new <see cref="SkinProvidingContainer"/> with no sources.
-        /// Implementations can add or change sources through the <see cref="SkinSources"/> list.
         /// </summary>
         protected SkinProvidingContainer()
         {
@@ -95,9 +88,9 @@ namespace osu.Game.Skinning
 
         public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
         {
-            foreach (var skin in SkinSources)
+            foreach (var (skin, lookupWrapper) in skinSources)
             {
-                if (lookupFunction(skinSources[skin]))
+                if (lookupFunction(lookupWrapper))
                     return skin;
             }
 
@@ -111,7 +104,7 @@ namespace osu.Game.Skinning
         {
             get
             {
-                foreach (var skin in SkinSources)
+                foreach (var skin in skinSources.Keys)
                     yield return skin;
 
                 if (AllowFallingBackToParent && ParentSource != null)
@@ -124,10 +117,10 @@ namespace osu.Game.Skinning
 
         public Drawable GetDrawableComponent(ISkinComponent component)
         {
-            foreach (var skin in SkinSources)
+            foreach (var (_, lookupWrapper) in skinSources)
             {
                 Drawable sourceDrawable;
-                if ((sourceDrawable = skinSources[skin]?.GetDrawableComponent(component)) != null)
+                if ((sourceDrawable = lookupWrapper.GetDrawableComponent(component)) != null)
                     return sourceDrawable;
             }
 
@@ -139,10 +132,10 @@ namespace osu.Game.Skinning
 
         public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
         {
-            foreach (var skin in SkinSources)
+            foreach (var (_, lookupWrapper) in skinSources)
             {
                 Texture sourceTexture;
-                if ((sourceTexture = skinSources[skin]?.GetTexture(componentName, wrapModeS, wrapModeT)) != null)
+                if ((sourceTexture = lookupWrapper.GetTexture(componentName, wrapModeS, wrapModeT)) != null)
                     return sourceTexture;
             }
 
@@ -154,10 +147,10 @@ namespace osu.Game.Skinning
 
         public ISample GetSample(ISampleInfo sampleInfo)
         {
-            foreach (var skin in SkinSources)
+            foreach (var (_, lookupWrapper) in skinSources)
             {
                 ISample sourceSample;
-                if ((sourceSample = skinSources[skin]?.GetSample(sampleInfo)) != null)
+                if ((sourceSample = lookupWrapper.GetSample(sampleInfo)) != null)
                     return sourceSample;
             }
 
@@ -169,10 +162,10 @@ namespace osu.Game.Skinning
 
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
-            foreach (var skin in SkinSources)
+            foreach (var (_, lookupWrapper) in skinSources)
             {
                 IBindable<TValue> bindable;
-                if ((bindable = skinSources[skin]?.GetConfig<TLookup, TValue>(lookup)) != null)
+                if ((bindable = lookupWrapper.GetConfig<TLookup, TValue>(lookup)) != null)
                     return bindable;
             }
 
@@ -218,7 +211,7 @@ namespace osu.Game.Skinning
             if (ParentSource != null)
                 ParentSource.SourceChanged -= anySourceChanged;
 
-            foreach (var source in SkinSources.OfType<ISkinSource>())
+            foreach (var source in skinSources.Keys.OfType<ISkinSource>())
                 source.SourceChanged -= anySourceChanged;
         }
 
