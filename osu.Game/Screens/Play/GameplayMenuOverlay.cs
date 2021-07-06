@@ -213,6 +213,7 @@ namespace osu.Game.Screens.Play
         public void OnReleased(GlobalAction action)
         {
         }
+
         private void updateRetryCount()
         {
             // "You've retried 1,065 times in this session"
