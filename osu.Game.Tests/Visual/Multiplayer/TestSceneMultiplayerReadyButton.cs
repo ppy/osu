@@ -219,7 +219,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Client.ChangeUserState(Client.Room?.Users[0].UserID ?? 0, MultiplayerUserState.FinishedPlay);
             });
 
-            AddAssert("ready button enabled", () => button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
+            AddUntilStep("ready button enabled", () => button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
         }
     }
 }
