@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -60,5 +62,34 @@ namespace osu.Game.Graphics.Containers
         }
 
         public T Selected => (selectedIndex >= 0 && selectedIndex < Count) ? this[selectedIndex.Value] : null;
+
+        private readonly Dictionary<T, Action<SelectionState>> handlerMap = new Dictionary<T, Action<SelectionState>>();
+
+        public override void Add(T drawable)
+        {
+            // This event is used to update selection state when modified within the drawable itself.
+            // It is added to a dictionary so that we can unsubscribe if the drawable is removed from this container
+            drawable.StateChanged += handlerMap[drawable] = state => selectionChanged(drawable, state);
+
+            base.Add(drawable);
+        }
+
+        public override bool Remove(T drawable)
+        {
+            if (!base.Remove(drawable))
+                return false;
+
+            drawable.StateChanged -= handlerMap[drawable];
+            handlerMap.Remove(drawable);
+            return true;
+        }
+
+        private void selectionChanged(T drawable, SelectionState state)
+        {
+            if (state == SelectionState.NotSelected)
+                Deselect();
+            else
+                Select(drawable);
+        }
     }
 }
