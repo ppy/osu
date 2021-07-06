@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             AddStep("finish hyper-dashing", () =>
             {
-                catcherArea.MovableCatcher.SetHyperDashState(1);
+                catcherArea.MovableCatcher.SetHyperDashState();
                 catcherArea.MovableCatcher.FinishTransforms();
             });
 

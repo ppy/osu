@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Judgements
 
             LifetimeStart = Result.TimeAbsolute;
 
-            using (BeginAbsoluteSequence(Result.TimeAbsolute, true))
+            using (BeginAbsoluteSequence(Result.TimeAbsolute))
             {
                 // not sure if this should remain going forward.
                 JudgementBody.ResetAnimation();

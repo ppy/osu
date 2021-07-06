@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Mods
 
                     backgroundIcon.Mod = newSelection;
 
-                    using (BeginDelayedSequence(mod_switch_duration, true))
+                    using (BeginDelayedSequence(mod_switch_duration))
                     {
                         foregroundIcon
                             .RotateTo(-rotate_angle * direction)
