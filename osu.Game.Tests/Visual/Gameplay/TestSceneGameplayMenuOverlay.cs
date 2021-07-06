@@ -145,7 +145,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("Hover first button", () => InputManager.MoveMouseTo(failOverlay.Buttons.First()));
             AddStep("Hide overlay", () => failOverlay.Hide());
 
-            AddAssert("Overlay state is reset", () => !failOverlay.Buttons.Any(b => b.State == SelectionState.Selected));
+            AddAssert("Overlay state is reset", () => failOverlay.Buttons.All(b => b.State == SelectionState.NotSelected));
         }
 
         /// <summary>
