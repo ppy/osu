@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
@@ -29,16 +30,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
     public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>, IFilterable, IHasContextMenu
     {
         public const float SELECTION_BORDER_WIDTH = 4;
-        private const float corner_radius = 5;
+        private const float corner_radius = 10;
         private const float transition_duration = 60;
-        private const float content_padding = 10;
-        private const float height = 110;
-        private const float side_strip_width = 5;
-        private const float cover_width = 145;
+        private const float height = 100;
 
         public event Action<SelectionState> StateChanged;
 
-        private Box selectionBox;
+        private Drawable selectionBox;
 
         [Resolved(canBeNull: true)]
         private OnlinePlayScreen parentScreen { get; set; }
@@ -108,23 +106,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            float stripWidth = side_strip_width * (Room.Category.Value == RoomCategory.Spotlight ? 2 : 1);
-
             Children = new Drawable[]
             {
-                new StatusColouredContainer(transition_duration)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = selectionBox = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = state == SelectionState.Selected ? 1 : 0,
-                    }
-                },
                 new Container
                 {
+                    Name = @"Room content",
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding(SELECTION_BORDER_WIDTH),
                     Child = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -141,68 +128,73 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4Extensions.FromHex(@"212121"),
-                            },
-                            new StatusColouredContainer(transition_duration)
-                            {
-                                RelativeSizeAxes = Axes.Y,
-                                Width = stripWidth,
-                                Child = new Box { RelativeSizeAxes = Axes.Both }
+                                Colour = Color4Extensions.FromHex(@"#27302E"),
                             },
                             new Container
                             {
-                                RelativeSizeAxes = Axes.Y,
-                                Width = cover_width,
-                                Masking = true,
-                                Margin = new MarginPadding { Left = stripWidth },
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                RelativeSizeAxes = Axes.Both,
+                                FillMode = FillMode.Fill,
                                 Child = new OnlinePlayBackgroundSprite(BeatmapSetCoverType.List) { RelativeSizeAxes = Axes.Both }
                             },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = ColourInfo.GradientHorizontal(Color4Extensions.FromHex(@"#27302E"), Color4Extensions.FromHex(@"#27302E").Opacity(0.3f))
+                            },
                             new Container
                             {
+                                Name = @"Left details",
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding
                                 {
-                                    Vertical = content_padding,
-                                    Left = stripWidth + cover_width + content_padding,
-                                    Right = content_padding,
+                                    Left = 20,
+                                    Vertical = 5
                                 },
                                 Children = new Drawable[]
                                 {
-                                    new FillFlowContainer
+                                    new RoomStatusInfo(),
+                                    new RoomName
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Direction = FillDirection.Vertical,
-                                        Spacing = new Vector2(5f),
-                                        Children = new Drawable[]
-                                        {
-                                            new RoomName { Font = OsuFont.GetFont(size: 18) },
-                                            new ParticipantInfo(),
-                                        },
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Font = OsuFont.GetFont(size: 28)
                                     },
                                     new FillFlowContainer
                                     {
                                         Anchor = Anchor.BottomLeft,
                                         Origin = Anchor.BottomLeft,
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Direction = FillDirection.Vertical,
-                                        Spacing = new Vector2(0, 5),
+                                        AutoSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Horizontal,
                                         Children = new Drawable[]
                                         {
-                                            new RoomStatusInfo(),
-                                            new BeatmapTitle { TextSize = 14 },
-                                        },
-                                    },
-                                    new ModeTypeInfo
-                                    {
-                                        Anchor = Anchor.BottomRight,
-                                        Origin = Anchor.BottomRight,
-                                    },
-                                },
+                                            new StarRatingRangeDisplay { Scale = new Vector2(0.85f) }
+                                        }
+                                    }
+                                }
                             },
                         },
                     },
+                },
+                new StatusColouredContainer(transition_duration)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = selectionBox = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = state == SelectionState.Selected ? 1 : 0,
+                        Masking = true,
+                        CornerRadius = corner_radius,
+                        BorderThickness = SELECTION_BORDER_WIDTH,
+                        BorderColour = Color4.White,
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            AlwaysPresent = true
+                        }
+                    }
                 },
             };
         }
