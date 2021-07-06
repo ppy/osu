@@ -51,7 +51,7 @@
     <Reference Include="Java.Interop" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2021.701.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2021.706.0" />
     <PackageReference Include="ppy.osu.Framework.Android" Version="2021.702.0" />
   </ItemGroup>
   <ItemGroup Label="Transitive Dependencies">
