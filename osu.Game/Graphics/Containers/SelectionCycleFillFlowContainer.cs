@@ -18,6 +18,8 @@ namespace osu.Game.Graphics.Containers
     {
         private int? selectedIndex;
 
+        public T Selected => (selectedIndex >= 0 && selectedIndex < Count) ? this[selectedIndex.Value] : null;
+
         private void setSelected(int? value)
         {
             if (selectedIndex == value)
@@ -51,6 +53,7 @@ namespace osu.Game.Graphics.Containers
         }
 
         public void Deselect() => setSelected(null);
+
         public void Select(T item)
         {
             var newIndex = IndexOf(item);
@@ -61,19 +64,20 @@ namespace osu.Game.Graphics.Containers
                 setSelected(IndexOf(item));
         }
 
-        public T Selected => (selectedIndex >= 0 && selectedIndex < Count) ? this[selectedIndex.Value] : null;
-
         private readonly Dictionary<T, Action<SelectionState>> handlerMap = new Dictionary<T, Action<SelectionState>>();
 
         public override void Add(T drawable)
         {
-            // This event is used to update selection state when modified within the drawable itself.
-            // It is added to a dictionary so that we can unsubscribe if the drawable is removed from this container
-            handlerMap[drawable] = state => selectionChanged(drawable, state);
-
-            drawable.StateChanged += handlerMap[drawable];
-
             base.Add(drawable);
+
+            if (drawable != null)
+            {
+                // This event is used to update selection state when modified within the drawable itself.
+                // It is added to a dictionary so that we can unsubscribe if the drawable is removed from this container
+                handlerMap[drawable] = state => selectionChanged(drawable, state);
+
+                drawable.StateChanged += handlerMap[drawable];
+            }
         }
 
         public override bool Remove(T drawable)
@@ -81,7 +85,7 @@ namespace osu.Game.Graphics.Containers
             if (!base.Remove(drawable))
                 return false;
 
-            if (handlerMap.TryGetValue(drawable, out var action))
+            if (drawable != null && handlerMap.TryGetValue(drawable, out var action))
             {
                 drawable.StateChanged -= action;
                 handlerMap.Remove(drawable);
