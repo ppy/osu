@@ -4,12 +4,16 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
@@ -23,26 +27,28 @@ namespace osu.Game.Screens.OnlinePlay.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            StatusPart statusPart;
+            StatusPill statusPill;
             EndDatePart endDatePart;
 
             InternalChild = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(2),
                 Children = new Drawable[]
                 {
-                    statusPart = new StatusPart
+                    statusPill = new StatusPill(),
+                    endDatePart = new EndDatePart
                     {
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14)
-                    },
-                    endDatePart = new EndDatePart { Font = OsuFont.GetFont(size: 14) }
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 12)
+                    }
                 }
             };
 
-            statusPart.EndDate.BindTo(EndDate);
-            statusPart.Status.BindTo(Status);
-            statusPart.Availability.BindTo(Availability);
+            statusPill.EndDate.BindTo(EndDate);
+            statusPill.Status.BindTo(Status);
             endDatePart.EndDate.BindTo(EndDate);
         }
 
@@ -80,37 +86,49 @@ namespace osu.Game.Screens.OnlinePlay.Components
             }
         }
 
-        private class StatusPart : EndDatePart
+        private class StatusPill : CompositeDrawable
         {
+            public readonly IBindable<DateTimeOffset?> EndDate = new Bindable<DateTimeOffset?>();
             public readonly IBindable<RoomStatus> Status = new Bindable<RoomStatus>();
-            public readonly IBindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
 
             [Resolved]
             private OsuColour colours { get; set; }
 
-            public StatusPart()
+            private Drawable background;
+            private SpriteText statusText;
+
+            [BackgroundDependencyLoader]
+            private void load()
             {
-                EndDate.BindValueChanged(_ => Format());
-                Status.BindValueChanged(_ => Format());
-                Availability.BindValueChanged(_ => Format());
+                Size = new Vector2(60, 16);
+
+                InternalChildren = new[]
+                {
+                    background = new Circle { RelativeSizeAxes = Axes.Both },
+                    statusText = new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 12),
+                        Colour = Color4.Black
+                    }
+                };
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                Text = Format();
+                EndDate.BindValueChanged(_ => updateDisplay());
+                Status.BindValueChanged(_ => updateDisplay(), true);
             }
 
-            protected override string Format()
+            private void updateDisplay()
             {
-                if (!IsLoaded)
-                    return string.Empty;
+                RoomStatus status = EndDate.Value < DateTimeOffset.Now ? new RoomStatusEnded() : Status.Value ?? new RoomStatusOpen();
 
-                RoomStatus status = Date < DateTimeOffset.Now ? new RoomStatusEnded() : Status.Value ?? new RoomStatusOpen();
-
-                this.FadeColour(status.GetAppropriateColour(colours), 100);
-                return $"{Availability.Value.GetDescription()}, {status.Message}";
+                background.FadeColour(status.GetAppropriateColour(colours), 100);
+                statusText.Text = status.Message;
             }
         }
     }
