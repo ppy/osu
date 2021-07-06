@@ -13,7 +13,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Volume;
 using osuTK;
@@ -92,10 +91,7 @@ namespace osu.Game.Overlays
             base.LoadComplete();
 
             foreach (var volumeMeter in volumeMeters)
-            {
                 volumeMeter.Bindable.ValueChanged += _ => Show();
-                volumeMeter.StateChanged += selected => volumeMeterSelectionChanged(volumeMeter, selected);
-            }
 
             muteButton.Current.ValueChanged += _ => Show();
         }
@@ -139,14 +135,6 @@ namespace osu.Game.Overlays
             }
 
             return false;
-        }
-
-        private void volumeMeterSelectionChanged(VolumeMeter meter, SelectionState state)
-        {
-            if (state == SelectionState.NotSelected)
-                volumeMeters.Deselect();
-            else
-                volumeMeters.Select(meter);
         }
 
         private ScheduledDelegate popOutDelegate;

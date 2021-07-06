@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -184,8 +183,6 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            button.StateChanged += selected => buttonSelectionChanged(button, selected);
-
             InternalButtons.Add(button);
         }
 
@@ -216,15 +213,6 @@ namespace osu.Game.Screens.Play
         public void OnReleased(GlobalAction action)
         {
         }
-
-        private void buttonSelectionChanged(DialogButton button, SelectionState state)
-        {
-            if (state == SelectionState.NotSelected)
-                InternalButtons.Deselect();
-            else
-                InternalButtons.Select(button);
-        }
-
         private void updateRetryCount()
         {
             // "You've retried 1,065 times in this session"
