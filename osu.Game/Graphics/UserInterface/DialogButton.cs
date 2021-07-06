@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -19,7 +21,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DialogButton : OsuClickableContainer, ISelectable
+    public class DialogButton : OsuClickableContainer, IStateful<SelectionState>
     {
         private const float idle_width = 0.8f;
         private const float hover_width = 0.9f;
@@ -27,12 +29,21 @@ namespace osu.Game.Graphics.UserInterface
         private const float hover_duration = 500;
         private const float click_duration = 200;
 
-        public readonly BindableBool SelectedBindable = new BindableBool();
+        public event Action<SelectionState> StateChanged;
 
-        public bool Selected
+        private SelectionState state;
+
+        public SelectionState State
         {
-            get => SelectedBindable.Value;
-            set => SelectedBindable.Value = value;
+            get => state;
+            set
+            {
+                if (state == value)
+                    return;
+
+                state = value;
+                StateChanged?.Invoke(value);
+            }
         }
 
         private readonly Container backgroundContainer;
@@ -159,7 +170,7 @@ namespace osu.Game.Graphics.UserInterface
 
             updateGlow();
 
-            SelectedBindable.ValueChanged += selectionChanged;
+            StateChanged += selectionChanged;
         }
 
         private Color4 buttonColour;
@@ -227,7 +238,7 @@ namespace osu.Game.Graphics.UserInterface
                            .OnComplete(_ =>
                            {
                                clickAnimating = false;
-                               SelectedBindable.TriggerChange();
+                               StateChanged?.Invoke(State);
                            });
 
             return base.OnClick(e);
@@ -241,7 +252,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (Selected)
+            if (State == SelectionState.Selected)
                 colourContainer.ResizeWidthTo(hover_width, click_duration, Easing.In);
             base.OnMouseUp(e);
         }
@@ -249,7 +260,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
-            Selected = true;
+            State = SelectionState.Selected;
 
             return true;
         }
@@ -257,15 +268,15 @@ namespace osu.Game.Graphics.UserInterface
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            Selected = false;
+            State = SelectionState.NotSelected;
         }
 
-        private void selectionChanged(ValueChangedEvent<bool> args)
+        private void selectionChanged(SelectionState newState)
         {
             if (clickAnimating)
                 return;
 
-            if (args.NewValue)
+            if (newState == SelectionState.Selected)
             {
                 spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
                 colourContainer.ResizeWidthTo(hover_width, hover_duration, Easing.OutElastic);

@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            button.SelectedBindable.ValueChanged += selected => buttonSelectionChanged(button, selected.NewValue);
+            button.StateChanged += selected => buttonSelectionChanged(button, selected);
 
             InternalButtons.Add(button);
         }
@@ -217,9 +217,9 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        private void buttonSelectionChanged(DialogButton button, bool isSelected)
+        private void buttonSelectionChanged(DialogButton button, SelectionState state)
         {
-            if (!isSelected)
+            if (state == SelectionState.NotSelected)
                 InternalButtons.Deselect();
             else
                 InternalButtons.Select(button);
@@ -263,7 +263,7 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                Selected = true;
+                State = SelectionState.Selected;
                 return base.OnMouseMove(e);
             }
         }
