@@ -55,25 +55,15 @@ namespace osu.Game.Skinning
             if (Ruleset.CreateResourceStore() is IResourceStore<byte[]> resources)
                 rulesetResourcesSkin = new ResourceStoreBackedSkin(resources, parent.Get<GameHost>(), parent.Get<AudioManager>());
 
-            var dependencies = base.CreateChildDependencies(parent);
-
-            // ensure sources are populated and ready for use before childrens' asynchronous load flow.
-            UpdateSkinSources();
-
-            return dependencies;
+            return base.CreateChildDependencies(parent);
         }
 
         protected override void OnSourceChanged()
         {
-            UpdateSkinSources();
-            base.OnSourceChanged();
-        }
-
-        protected virtual void UpdateSkinSources()
-        {
             ResetSources();
 
-            var skinSources = new List<ISkin>();
+            // Populate a local list first so we can adjust the returned order as we go.
+            var sources = new List<ISkin>();
 
             Debug.Assert(ParentSource != null);
 
@@ -82,26 +72,26 @@ namespace osu.Game.Skinning
                 switch (skin)
                 {
                     case LegacySkin legacySkin:
-                        skinSources.Add(GetLegacyRulesetTransformedSkin(legacySkin));
+                        sources.Add(GetLegacyRulesetTransformedSkin(legacySkin));
                         break;
 
                     default:
-                        skinSources.Add(skin);
+                        sources.Add(skin);
                         break;
                 }
             }
 
-            int lastDefaultSkinIndex = skinSources.IndexOf(skinSources.OfType<DefaultSkin>().LastOrDefault());
+            int lastDefaultSkinIndex = sources.IndexOf(sources.OfType<DefaultSkin>().LastOrDefault());
 
             // Ruleset resources should be given the ability to override game-wide defaults
             // This is achieved by placing them before the last instance of DefaultSkin.
             // Note that DefaultSkin may not be present in some test scenes.
             if (lastDefaultSkinIndex >= 0)
-                skinSources.Insert(lastDefaultSkinIndex, rulesetResourcesSkin);
+                sources.Insert(lastDefaultSkinIndex, rulesetResourcesSkin);
             else
-                skinSources.Add(rulesetResourcesSkin);
+                sources.Add(rulesetResourcesSkin);
 
-            foreach (var skin in skinSources)
+            foreach (var skin in sources)
                 AddSource(skin);
         }
 
