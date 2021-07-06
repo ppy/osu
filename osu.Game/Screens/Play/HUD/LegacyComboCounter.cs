@@ -23,8 +23,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private const double pop_out_duration = 150;
 
-        private const Easing pop_out_easing = Easing.None;
-
         private const double fade_out_duration = 100;
 
         /// <summary>
@@ -170,9 +168,9 @@ namespace osu.Game.Screens.Play.HUD
             popOutCount.FadeTo(0.75f);
             popOutCount.MoveTo(Vector2.Zero);
 
-            popOutCount.ScaleTo(1, pop_out_duration, pop_out_easing);
-            popOutCount.FadeOut(pop_out_duration, pop_out_easing);
-            popOutCount.MoveTo(displayedCountSpriteText.Position, pop_out_duration, pop_out_easing);
+            popOutCount.ScaleTo(1, pop_out_duration);
+            popOutCount.FadeOut(pop_out_duration);
+            popOutCount.MoveTo(displayedCountSpriteText.Position, pop_out_duration);
         }
 
         private void transformNoPopOut(int newValue)
@@ -186,7 +184,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             ((IHasText)displayedCountSpriteText).Text = formatCount(newValue);
             displayedCountSpriteText.ScaleTo(1.1f);
-            displayedCountSpriteText.ScaleTo(1, pop_out_duration, pop_out_easing);
+            displayedCountSpriteText.ScaleTo(1, pop_out_duration);
         }
 
         private void scheduledPopOutSmall(uint id)
@@ -261,7 +259,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         private void transformRoll(int currentValue, int newValue) =>
-            this.TransformTo(nameof(DisplayedCount), newValue, getProportionalDuration(currentValue, newValue), Easing.None);
+            this.TransformTo(nameof(DisplayedCount), newValue, getProportionalDuration(currentValue, newValue));
 
         private string formatCount(int count) => $@"{count}x";
 

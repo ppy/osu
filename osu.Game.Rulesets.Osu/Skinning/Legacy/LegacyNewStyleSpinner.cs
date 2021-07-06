@@ -100,17 +100,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 case DrawableSpinner d:
                     Spinner spinner = d.HitObject;
 
-                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
                         this.FadeOut();
 
-                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2, true))
+                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2))
                         this.FadeInFromZero(spinner.TimeFadeIn / 2);
 
-                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+                    using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
                     {
                         fixedMiddle.FadeColour(Color4.White);
 
-                        using (BeginDelayedSequence(spinner.TimePreempt, true))
+                        using (BeginDelayedSequence(spinner.TimePreempt))
                             fixedMiddle.FadeColour(Color4.Red, spinner.Duration);
                     }
 

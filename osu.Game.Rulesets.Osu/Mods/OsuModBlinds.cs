@@ -158,17 +158,17 @@ namespace osu.Game.Rulesets.Osu.Mods
                 var firstObj = beatmap.HitObjects[0];
                 var startDelay = firstObj.StartTime - firstObj.TimePreempt;
 
-                using (BeginAbsoluteSequence(startDelay + break_close_late, true))
+                using (BeginAbsoluteSequence(startDelay + break_close_late))
                     leaveBreak();
 
                 foreach (var breakInfo in beatmap.Breaks)
                 {
                     if (breakInfo.HasEffect)
                     {
-                        using (BeginAbsoluteSequence(breakInfo.StartTime - break_open_early, true))
+                        using (BeginAbsoluteSequence(breakInfo.StartTime - break_open_early))
                         {
                             enterBreak();
-                            using (BeginDelayedSequence(breakInfo.Duration + break_open_early + break_close_late, true))
+                            using (BeginDelayedSequence(breakInfo.Duration + break_open_early + break_close_late))
                                 leaveBreak();
                         }
                     }
