@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
@@ -75,5 +76,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
                 sliderVertices.Reverse();
             }
         }
+
+        // Because this has 0x0 size, the contents are otherwise masked away if the start position is outside the screen.
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
     }
 }
