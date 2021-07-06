@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -11,7 +12,7 @@ namespace osu.Game.Graphics.Containers
     /// A FillFlowContainer that provides functionality to cycle selection between children
     /// The selection wraps around when overflowing past the first or last child.
     /// </summary>
-    public class SelectionCycleFillFlowContainer<T> : FillFlowContainer<T> where T : Drawable, ISelectable
+    public class SelectionCycleFillFlowContainer<T> : FillFlowContainer<T> where T : Drawable, IStateful<SelectionState>
     {
         private int? selectedIndex;
 
@@ -22,13 +23,13 @@ namespace osu.Game.Graphics.Containers
 
             // Deselect the previously-selected button
             if (selectedIndex.HasValue)
-                this[selectedIndex.Value].Selected = false;
+                this[selectedIndex.Value].State = SelectionState.NotSelected;
 
             selectedIndex = value;
 
             // Select the newly-selected button
             if (selectedIndex.HasValue)
-                this[selectedIndex.Value].Selected = true;
+                this[selectedIndex.Value].State = SelectionState.Selected;
         }
 
         public void SelectNext()

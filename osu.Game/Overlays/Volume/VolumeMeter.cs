@@ -3,6 +3,7 @@
 
 using System;
 using System.Globalization;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -26,7 +27,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>, ISelectable
+    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>, IStateful<SelectionState>
     {
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
@@ -44,12 +45,21 @@ namespace osu.Game.Overlays.Volume
         private Sample sample;
         private double sampleLastPlaybackTime;
 
-        public BindableBool SelectedBindable = new BindableBool();
+        public event Action<SelectionState> StateChanged;
 
-        public bool Selected
+        private SelectionState state;
+
+        public SelectionState State
         {
-            get => SelectedBindable.Value;
-            set => SelectedBindable.Value = value;
+            get => state;
+            set
+            {
+                if (state == value)
+                    return;
+
+                state = value;
+                StateChanged?.Invoke(value);
+            }
         }
 
         public VolumeMeter(string name, float circleSize, Color4 meterColour)
@@ -220,7 +230,7 @@ namespace osu.Game.Overlays.Volume
 
             bgProgress.Current.Value = 0.75f;
 
-            SelectedBindable.ValueChanged += selectionChanged;
+            StateChanged += stateChanged;
         }
 
         private int? displayVolumeInt;
@@ -341,7 +351,7 @@ namespace osu.Game.Overlays.Volume
 
         protected override bool OnHover(HoverEvent e)
         {
-            Selected = true;
+            State = SelectionState.Selected;
             return false;
         }
 
@@ -349,9 +359,9 @@ namespace osu.Game.Overlays.Volume
         {
         }
 
-        private void selectionChanged(ValueChangedEvent<bool> selected)
+        private void stateChanged(SelectionState newState)
         {
-            if (selected.NewValue)
+            if (newState == SelectionState.Selected)
             {
                 this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
                 focusGlowContainer.FadeIn(transition_length, Easing.OutExpo);
@@ -371,12 +381,12 @@ namespace osu.Game.Overlays.Volume
             switch (action)
             {
                 case GlobalAction.SelectPrevious:
-                    Selected = true;
+                    State = SelectionState.Selected;
                     adjust(1, false);
                     return true;
 
                 case GlobalAction.SelectNext:
-                    Selected = true;
+                    State = SelectionState.Selected;
                     adjust(-1, false);
                     return true;
             }
