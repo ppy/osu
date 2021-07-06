@@ -103,13 +103,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             var easierMods = osu.GetModsFor(ModType.DifficultyReduction);
             var harderMods = osu.GetModsFor(ModType.DifficultyIncrease);
-            var conversionMods = osu.GetModsFor(ModType.Conversion);
 
             var noFailMod = osu.GetModsFor(ModType.DifficultyReduction).FirstOrDefault(m => m is OsuModNoFail);
 
             var doubleTimeMod = harderMods.OfType<MultiMod>().FirstOrDefault(m => m.Mods.Any(a => a is OsuModDoubleTime));
-
-            var targetMod = conversionMods.FirstOrDefault(m => m is OsuModTarget);
 
             var easy = easierMods.FirstOrDefault(m => m is OsuModEasy);
             var hardRock = harderMods.FirstOrDefault(m => m is OsuModHardRock);
@@ -118,8 +115,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             testMultiMod(doubleTimeMod);
             testIncompatibleMods(easy, hardRock);
             testDeselectAll(easierMods.Where(m => !(m is MultiMod)));
-
-            testUnimplementedMod(targetMod);
         }
 
         [Test]
@@ -249,6 +244,19 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("DT + HD still selected", () => modSelect.ChildrenOfType<ModButton>().Count(b => b.Selected) == 2);
         }
 
+        [Test]
+        public void TestUnimplementedModIsUnselectable()
+        {
+            var testRuleset = new TestUnimplementedModOsuRuleset();
+            changeTestRuleset(testRuleset.RulesetInfo);
+
+            var conversionMods = testRuleset.GetModsFor(ModType.Conversion);
+
+            var unimplementedMod = conversionMods.FirstOrDefault(m => m is TestUnimplementedMod);
+
+            testUnimplementedMod(unimplementedMod);
+        }
+
         private void testSingleMod(Mod mod)
         {
             selectNext(mod);
@@ -343,6 +351,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             waitForLoad();
         }
 
+        private void changeTestRuleset(RulesetInfo rulesetInfo)
+        {
+            AddStep($"change ruleset to {rulesetInfo.Name}", () => { Ruleset.Value = rulesetInfo; });
+            waitForLoad();
+        }
+
         private void waitForLoad() =>
             AddUntilStep("wait for icons to load", () => modSelect.AllLoaded);
 
@@ -400,6 +414,25 @@ namespace osu.Game.Tests.Visual.UserInterface
         private class TestNonStackedModSelectOverlay : TestModSelectOverlay
         {
             protected override bool Stacked => false;
+        }
+
+        private class TestUnimplementedMod : Mod
+        {
+            public override string Name => "Unimplemented mod";
+            public override string Acronym => "UM";
+            public override string Description => "A mod that is not implemented.";
+            public override double ScoreMultiplier => 1;
+            public override ModType Type => ModType.Conversion;
+        }
+
+        private class TestUnimplementedModOsuRuleset : OsuRuleset
+        {
+            public override IEnumerable<Mod> GetModsFor(ModType type)
+            {
+                if (type == ModType.Conversion) return base.GetModsFor(type).Concat(new[] { new TestUnimplementedMod() });
+
+                return base.GetModsFor(type);
+            }
         }
     }
 }

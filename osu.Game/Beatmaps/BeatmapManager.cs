@@ -324,7 +324,7 @@ namespace osu.Game.Beatmaps
 
         protected override bool CanSkipImport(BeatmapSetInfo existing, BeatmapSetInfo import)
         {
-            if (!base.CanReuseExisting(existing, import))
+            if (!base.CanSkipImport(existing, import))
                 return false;
 
             return existing.Beatmaps.Any(b => b.OnlineBeatmapID != null);

@@ -77,6 +77,9 @@ namespace osu.Game.Database
                 {
                     cmd.CommandText = "PRAGMA journal_mode=WAL;";
                     cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = "PRAGMA foreign_keys=OFF;";
+                    cmd.ExecuteNonQuery();
                 }
             }
             catch
