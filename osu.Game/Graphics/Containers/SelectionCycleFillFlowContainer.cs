@@ -13,43 +13,51 @@ namespace osu.Game.Graphics.Containers
     /// </summary>
     public class SelectionCycleFillFlowContainer<T> : FillFlowContainer<T> where T : Drawable, ISelectable
     {
-        private int selectedIndex = -1;
+        private int? selectedIndex;
 
-        private void setSelected(int value)
+        private void setSelected(int? value)
         {
             if (selectedIndex == value)
                 return;
 
             // Deselect the previously-selected button
-            if (selectedIndex != -1)
-                this[selectedIndex].Selected = false;
+            if (selectedIndex.HasValue)
+                this[selectedIndex.Value].Selected = false;
 
             selectedIndex = value;
 
             // Select the newly-selected button
-            if (selectedIndex != -1)
-                this[selectedIndex].Selected = true;
+            if (selectedIndex.HasValue)
+                this[selectedIndex.Value].Selected = true;
         }
 
         public void SelectNext()
         {
-            if (selectedIndex == -1 || selectedIndex == Count - 1)
+            if (!selectedIndex.HasValue || selectedIndex == Count - 1)
                 setSelected(0);
             else
-                setSelected(selectedIndex + 1);
+                setSelected(selectedIndex.Value + 1);
         }
 
         public void SelectPrevious()
         {
-            if (selectedIndex == -1 || selectedIndex == 0)
+            if (!selectedIndex.HasValue || selectedIndex == 0)
                 setSelected(Count - 1);
             else
-                setSelected(selectedIndex - 1);
+                setSelected(selectedIndex.Value - 1);
         }
 
-        public void Deselect() => setSelected(-1);
-        public void Select(T item) => setSelected(IndexOf(item));
+        public void Deselect() => setSelected(null);
+        public void Select(T item)
+        {
+            var newIndex = IndexOf(item);
 
-        public T Selected => (selectedIndex >= 0 && selectedIndex < Count) ? this[selectedIndex] : null;
+            if (newIndex < 0)
+                setSelected(null);
+            else
+                setSelected(IndexOf(item));
+        }
+
+        public T Selected => (selectedIndex >= 0 && selectedIndex < Count) ? this[selectedIndex.Value] : null;
     }
 }
