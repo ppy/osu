@@ -76,7 +76,7 @@ namespace osu.Game.Skinning
             skinSources.Add(skin, new DisableableSkinSource(skin, this));
 
             if (skin is ISkinSource source)
-                source.SourceChanged += OnSourceChanged;
+                source.SourceChanged += anySourceChanged;
         }
 
         public void RemoveSource(ISkin skin)
@@ -84,7 +84,7 @@ namespace osu.Game.Skinning
             skinSources.Remove(skin);
 
             if (skin is ISkinSource source)
-                source.SourceChanged += OnSourceChanged;
+                source.SourceChanged += anySourceChanged;
         }
 
         public void ResetSources()
@@ -182,7 +182,10 @@ namespace osu.Game.Skinning
             return ParentSource?.GetConfig<TLookup, TValue>(lookup);
         }
 
-        protected virtual void OnSourceChanged() => SourceChanged?.Invoke();
+        /// <summary>
+        /// Invoked when any source has changed (either <see cref="ParentSource"/> or <see cref="AllSources"/>
+        /// </summary>
+        protected virtual void OnSourceChanged() { }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -190,11 +193,19 @@ namespace osu.Game.Skinning
 
             ParentSource = dependencies.Get<ISkinSource>();
             if (ParentSource != null)
-                ParentSource.SourceChanged += OnSourceChanged;
+                ParentSource.SourceChanged += anySourceChanged;
 
             dependencies.CacheAs<ISkinSource>(this);
 
             return dependencies;
+        }
+
+        private void anySourceChanged()
+        {
+            // Expose to implementations, giving them a chance to react before notifying external consumers.
+            OnSourceChanged();
+
+            SourceChanged?.Invoke();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -205,10 +216,10 @@ namespace osu.Game.Skinning
             base.Dispose(isDisposing);
 
             if (ParentSource != null)
-                ParentSource.SourceChanged -= OnSourceChanged;
+                ParentSource.SourceChanged -= anySourceChanged;
 
             foreach (var source in SkinSources.OfType<ISkinSource>())
-                source.SourceChanged -= OnSourceChanged;
+                source.SourceChanged -= anySourceChanged;
         }
 
         private class DisableableSkinSource : ISkin
