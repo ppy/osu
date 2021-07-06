@@ -113,10 +113,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             addClickButtonStep();
-            AddAssert("user is ready", () => Client.Room?.Users[0].State == MultiplayerUserState.Ready);
+            AddUntilStep("user is ready", () => Client.Room?.Users[0].State == MultiplayerUserState.Ready);
 
             addClickButtonStep();
-            AddAssert("user is idle", () => Client.Room?.Users[0].State == MultiplayerUserState.Idle);
+            AddUntilStep("user is idle", () => Client.Room?.Users[0].State == MultiplayerUserState.Idle);
         }
 
         [TestCase(true)]
@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             addClickButtonStep();
-            AddAssert("user is ready", () => Client.Room?.Users[0].State == MultiplayerUserState.Ready);
+            AddUntilStep("user is ready", () => Client.Room?.Users[0].State == MultiplayerUserState.Ready);
 
             verifyGameplayStartFlow();
         }
@@ -206,8 +206,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void verifyGameplayStartFlow()
         {
+            AddUntilStep("user is ready", () => Client.Room?.Users[0].State == MultiplayerUserState.Ready);
             addClickButtonStep();
-            AddAssert("user waiting for load", () => Client.Room?.Users[0].State == MultiplayerUserState.WaitingForLoad);
+            AddUntilStep("user waiting for load", () => Client.Room?.Users[0].State == MultiplayerUserState.WaitingForLoad);
 
             AddAssert("ready button disabled", () => !button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
             AddStep("transitioned to gameplay", () => readyClickOperation.Dispose());
