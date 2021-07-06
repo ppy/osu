@@ -53,6 +53,13 @@ namespace osu.Game.Screens.Play.HUD
         {
             scoringMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
 
+            foreach (var userId in playingUsers)
+            {
+                var trackedUser = CreateUserData(userId, scoreProcessor);
+                trackedUser.ScoringMode.BindTo(scoringMode);
+                UserScores[userId] = trackedUser;
+            }
+
             userLookupCache.GetUsersAsync(playingUsers.ToArray()).ContinueWith(users => Schedule(() =>
             {
                 foreach (var user in users.Result)
@@ -60,16 +67,13 @@ namespace osu.Game.Screens.Play.HUD
                     if (user == null)
                         continue;
 
-                    var trackedUser = CreateUserData(user.Id, scoreProcessor);
-                    trackedUser.ScoringMode.BindTo(scoringMode);
+                    var trackedUser = UserScores[user.Id];
 
                     var leaderboardScore = AddPlayer(user, user.Id == api.LocalUser.Value.Id);
                     leaderboardScore.Accuracy.BindTo(trackedUser.Accuracy);
                     leaderboardScore.TotalScore.BindTo(trackedUser.Score);
                     leaderboardScore.Combo.BindTo(trackedUser.CurrentCombo);
                     leaderboardScore.HasQuit.BindTo(trackedUser.UserQuit);
-
-                    UserScores[user.Id] = trackedUser;
                 }
             }));
         }
@@ -78,14 +82,6 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            // this is *required* to be here due to the spectator leaderboard not correctly populating clocks if done later.
-            // note that running this here is probably not 100% correct (if a user quits before user population occurs for instance,
-            // an incorrect state will be reached).
-            prepareDataStreams();
-        }
-
-        private void prepareDataStreams()
-        {
             // BindableList handles binding in a really bad way (Clear then AddRange) so we need to do this manually..
             foreach (int userId in playingUsers)
             {
@@ -95,6 +91,8 @@ namespace osu.Game.Screens.Play.HUD
                     usersChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new[] { userId }));
             }
 
+            // bind here is to support players leaving the match.
+            // new players are not supported.
             playingUsers.BindTo(multiplayerClient.CurrentMatchPlayingUserIds);
             playingUsers.BindCollectionChanged(usersChanged);
 
