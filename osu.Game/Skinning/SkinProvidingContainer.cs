@@ -64,6 +64,10 @@ namespace osu.Game.Skinning
             RelativeSizeAxes = Axes.Both;
         }
 
+        /// <summary>
+        /// Add a new skin to this provider. Will be added to the end of the lookup order precedence.
+        /// </summary>
+        /// <param name="skin">The skin to add.</param>
         protected void AddSource(ISkin skin)
         {
             skinSources.Add(skin, new DisableableSkinSource(skin, this));
@@ -72,14 +76,22 @@ namespace osu.Game.Skinning
                 source.SourceChanged += anySourceChanged;
         }
 
+        /// <summary>
+        /// Remove a skin from this provider.
+        /// </summary>
+        /// <param name="skin">The skin to remove.</param>
         protected void RemoveSource(ISkin skin)
         {
-            skinSources.Remove(skin);
+            if (!skinSources.Remove(skin))
+                return;
 
             if (skin is ISkinSource source)
-                source.SourceChanged += anySourceChanged;
+                source.SourceChanged -= anySourceChanged;
         }
 
+        /// <summary>
+        /// Clears all skin sources.
+        /// </summary>
         protected void ResetSources()
         {
             foreach (var skin in AllSources.ToArray())
@@ -176,7 +188,8 @@ namespace osu.Game.Skinning
         }
 
         /// <summary>
-        /// Invoked when any source has changed (either <see cref="ParentSource"/> or <see cref="AllSources"/>
+        /// Invoked when any source has changed (either <see cref="ParentSource"/> or a source registered via <see cref="AddSource"/>).
+        /// This is also invoked once initially during <see cref="CreateChildDependencies"/> to ensure sources are ready for children consumption.
         /// </summary>
         protected virtual void OnSourceChanged() { }
 
@@ -189,6 +202,8 @@ namespace osu.Game.Skinning
                 ParentSource.SourceChanged += anySourceChanged;
 
             dependencies.CacheAs<ISkinSource>(this);
+
+            anySourceChanged();
 
             return dependencies;
         }
