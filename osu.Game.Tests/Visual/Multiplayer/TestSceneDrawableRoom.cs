@@ -10,9 +10,9 @@ using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneRoomStatus : OsuTestScene
+    public class TestSceneDrawableRoom : OsuTestScene
     {
-        public TestSceneRoomStatus()
+        public TestSceneDrawableRoom()
         {
             Child = new FillFlowContainer
             {
