@@ -3,7 +3,9 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Caching;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Rulesets.Catch.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Objects;
 using osuTK;
@@ -17,9 +19,14 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         private float minNestedX;
         private float maxNestedX;
 
+        private readonly ScrollingPath scrollingPath;
+
+        private readonly Cached pathCache = new Cached();
+
         public JuiceStreamSelectionBlueprint(JuiceStream hitObject)
             : base(hitObject)
         {
+            InternalChild = scrollingPath = new ScrollingPath();
         }
 
         [BackgroundDependencyLoader]
@@ -29,7 +36,25 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             computeObjectBounds();
         }
 
-        private void onDefaultsApplied(HitObject _) => computeObjectBounds();
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!IsSelected) return;
+
+            scrollingPath.UpdatePositionFrom(HitObjectContainer, HitObject);
+
+            if (pathCache.IsValid) return;
+
+            scrollingPath.UpdatePathFrom(HitObjectContainer, HitObject);
+            pathCache.Validate();
+        }
+
+        private void onDefaultsApplied(HitObject _)
+        {
+            computeObjectBounds();
+            pathCache.Invalidate();
+        }
 
         private void computeObjectBounds()
         {
