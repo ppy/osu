@@ -7,7 +7,7 @@ namespace osu.Game.Localisation
 {
     public static class ChatStrings
     {
-        private const string prefix = @"osu.Game.Localisation.Chat";
+        private const string prefix = @"osu.Game.Resources.Localisation.Chat";
 
         /// <summary>
         /// "chat"

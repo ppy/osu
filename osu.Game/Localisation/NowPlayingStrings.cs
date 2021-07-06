@@ -7,7 +7,7 @@ namespace osu.Game.Localisation
 {
     public static class NowPlayingStrings
     {
-        private const string prefix = @"osu.Game.Localisation.NowPlaying";
+        private const string prefix = @"osu.Game.Resources.Localisation.NowPlaying";
 
         /// <summary>
         /// "now playing"
