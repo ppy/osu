@@ -7,7 +7,7 @@ namespace osu.Game.Localisation
 {
     public static class CommonStrings
     {
-        private const string prefix = @"osu.Game.Localisation.Common";
+        private const string prefix = @"osu.Game.Resources.Localisation.Common";
 
         /// <summary>
         /// "Cancel"
