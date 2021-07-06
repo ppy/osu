@@ -64,7 +64,7 @@ namespace osu.Game.Skinning
             RelativeSizeAxes = Axes.Both;
         }
 
-        public void AddSource(ISkin skin)
+        protected void AddSource(ISkin skin)
         {
             skinSources.Add(skin, new DisableableSkinSource(skin, this));
 
@@ -72,7 +72,7 @@ namespace osu.Game.Skinning
                 source.SourceChanged += anySourceChanged;
         }
 
-        public void RemoveSource(ISkin skin)
+        protected void RemoveSource(ISkin skin)
         {
             skinSources.Remove(skin);
 
@@ -80,7 +80,7 @@ namespace osu.Game.Skinning
                 source.SourceChanged += anySourceChanged;
         }
 
-        public void ResetSources()
+        protected void ResetSources()
         {
             foreach (var skin in AllSources.ToArray())
                 RemoveSource(skin);
