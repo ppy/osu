@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Volume
         private OsuSpriteText text;
         private BufferedContainer maxGlow;
 
-        private Container focusGlowContainer;
+        private Container selectedGlowContainer;
 
         private Sample sample;
         private double sampleLastPlaybackTime;
@@ -59,6 +59,8 @@ namespace osu.Game.Overlays.Volume
 
                 state = value;
                 StateChanged?.Invoke(value);
+
+                updateSelectedState();
             }
         }
 
@@ -94,28 +96,8 @@ namespace osu.Game.Overlays.Volume
                     Size = new Vector2(circleSize),
                     Children = new Drawable[]
                     {
-                        focusGlowContainer = new CircularContainer
-                        {
-                            Masking = true,
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0,
-                                AlwaysPresent = true,
-                            },
-                            EdgeEffect = new EdgeEffectParameters
-                            {
-                                Type = EdgeEffectType.Glow,
-                                Colour = meterColour.Opacity(0.5f),
-                                Radius = 5,
-                                Hollow = true,
-                            }
-                        },
                         new BufferedContainer
                         {
-                            Alpha = 0.9f,
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
@@ -187,6 +169,24 @@ namespace osu.Game.Overlays.Volume
                                 },
                             },
                         },
+                        selectedGlowContainer = new CircularContainer
+                        {
+                            Masking = true,
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            Child = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
+                                AlwaysPresent = true,
+                            },
+                            EdgeEffect = new EdgeEffectParameters
+                            {
+                                Type = EdgeEffectType.Glow,
+                                Colour = meterColour.Opacity(0.1f),
+                                Radius = 10,
+                            }
+                        },
                         maxGlow = (text = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
@@ -211,7 +211,6 @@ namespace osu.Game.Overlays.Volume
                     {
                         new Box
                         {
-                            Alpha = 0.9f,
                             RelativeSizeAxes = Axes.Both,
                             Colour = backgroundColour,
                         },
@@ -229,8 +228,6 @@ namespace osu.Game.Overlays.Volume
             Bindable.BindValueChanged(volume => { this.TransformTo(nameof(DisplayVolume), volume.NewValue, 400, Easing.OutQuint); }, true);
 
             bgProgress.Current.Value = 0.75f;
-
-            StateChanged += stateChanged;
         }
 
         private int? displayVolumeInt;
@@ -359,20 +356,6 @@ namespace osu.Game.Overlays.Volume
         {
         }
 
-        private void stateChanged(SelectionState newState)
-        {
-            if (newState == SelectionState.Selected)
-            {
-                this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
-                focusGlowContainer.FadeIn(transition_length, Easing.OutExpo);
-            }
-            else
-            {
-                this.ScaleTo(1f, transition_length, Easing.OutExpo);
-                focusGlowContainer.FadeOut(transition_length, Easing.OutExpo);
-            }
-        }
-
         public bool OnPressed(GlobalAction action)
         {
             if (!IsHovered)
@@ -396,6 +379,22 @@ namespace osu.Game.Overlays.Volume
 
         public void OnReleased(GlobalAction action)
         {
+        }
+
+        private void updateSelectedState()
+        {
+            switch (state)
+            {
+                case SelectionState.Selected:
+                    this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
+                    selectedGlowContainer.FadeIn(transition_length, Easing.OutExpo);
+                    break;
+
+                case SelectionState.NotSelected:
+                    this.ScaleTo(1f, transition_length, Easing.OutExpo);
+                    selectedGlowContainer.FadeOut(transition_length, Easing.OutExpo);
+                    break;
+            }
         }
     }
 }
