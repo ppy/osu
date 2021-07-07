@@ -361,6 +361,7 @@ namespace osu.Game
             dependencies.CacheAs(MusicController);
 
             Ruleset.BindValueChanged(onRulesetChanged);
+            SelectedMods.BindValueChanged(onModsChanged);
         }
 
         private IDisposable blocking;
@@ -483,6 +484,19 @@ namespace osu.Game
                 SelectedMods.Value = Array.Empty<Mod>();
 
             AvailableMods.Value = dict;
+        }
+
+        private void onModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
+        {
+            BeatmapDifficulty baseDifficulty = Beatmap.Value.BeatmapInfo.BaseDifficulty;
+
+            if (baseDifficulty != null && SelectedMods.Value.Any(m => m is IApplicableToDifficulty))
+            {
+                var adjustedDifficulty = baseDifficulty.Clone();
+
+                foreach (var mod in SelectedMods.Value.OfType<IApplicableToDifficulty>())
+                    mod.ReadFromDifficulty(adjustedDifficulty);
+            }
         }
 
         private void runMigrations()
