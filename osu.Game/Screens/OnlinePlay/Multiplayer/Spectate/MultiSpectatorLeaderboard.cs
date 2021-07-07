@@ -19,7 +19,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public void AddClock(int userId, IClock clock)
         {
             if (!UserScores.TryGetValue(userId, out var data))
-                return;
+                throw new ArgumentException(@"Provided user is not tracked by this leaderboard", nameof(userId));
 
             ((SpectatingTrackedUserData)data).Clock = clock;
         }
@@ -27,7 +27,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public void RemoveClock(int userId)
         {
             if (!UserScores.TryGetValue(userId, out var data))
-                return;
+                throw new ArgumentException(@"Provided user is not tracked by this leaderboard", nameof(userId));
 
             ((SpectatingTrackedUserData)data).Clock = null;
         }

@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
@@ -104,14 +103,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             var easierMods = osu.GetModsFor(ModType.DifficultyReduction);
             var harderMods = osu.GetModsFor(ModType.DifficultyIncrease);
-            var conversionMods = osu.GetModsFor(ModType.Conversion);
 
             var noFailMod = osu.GetModsFor(ModType.DifficultyReduction).FirstOrDefault(m => m is OsuModNoFail);
-            var hiddenMod = harderMods.FirstOrDefault(m => m is OsuModHidden);
 
             var doubleTimeMod = harderMods.OfType<MultiMod>().FirstOrDefault(m => m.Mods.Any(a => a is OsuModDoubleTime));
-
-            var targetMod = conversionMods.FirstOrDefault(m => m is OsuModTarget);
 
             var easy = easierMods.FirstOrDefault(m => m is OsuModEasy);
             var hardRock = harderMods.FirstOrDefault(m => m is OsuModHardRock);
@@ -120,10 +115,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             testMultiMod(doubleTimeMod);
             testIncompatibleMods(easy, hardRock);
             testDeselectAll(easierMods.Where(m => !(m is MultiMod)));
-            testMultiplierTextColour(noFailMod, () => modSelect.LowMultiplierColour);
-            testMultiplierTextColour(hiddenMod, () => modSelect.HighMultiplierColour);
-
-            testUnimplementedMod(targetMod);
         }
 
         [Test]
@@ -149,7 +140,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             changeRuleset(0);
 
-            AddAssert("ensure mods still selected", () => modDisplay.Current.Value.Single(m => m is OsuModNoFail) != null);
+            AddAssert("ensure mods still selected", () => modDisplay.Current.Value.SingleOrDefault(m => m is OsuModNoFail) != null);
 
             changeRuleset(3);
 
@@ -253,6 +244,19 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("DT + HD still selected", () => modSelect.ChildrenOfType<ModButton>().Count(b => b.Selected) == 2);
         }
 
+        [Test]
+        public void TestUnimplementedModIsUnselectable()
+        {
+            var testRuleset = new TestUnimplementedModOsuRuleset();
+            changeTestRuleset(testRuleset.RulesetInfo);
+
+            var conversionMods = testRuleset.GetModsFor(ModType.Conversion);
+
+            var unimplementedMod = conversionMods.FirstOrDefault(m => m is TestUnimplementedMod);
+
+            testUnimplementedMod(unimplementedMod);
+        }
+
         private void testSingleMod(Mod mod)
         {
             selectNext(mod);
@@ -316,17 +320,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("check for no selection", () => !modSelect.SelectedMods.Value.Any());
         }
 
-        private void testMultiplierTextColour(Mod mod, Func<Color4> getCorrectColour)
-        {
-            checkLabelColor(() => Color4.White);
-            selectNext(mod);
-            AddWaitStep("wait for changing colour", 1);
-            checkLabelColor(getCorrectColour);
-            selectPrevious(mod);
-            AddWaitStep("wait for changing colour", 1);
-            checkLabelColor(() => Color4.White);
-        }
-
         private void testModsWithSameBaseType(Mod modA, Mod modB)
         {
             selectNext(modA);
@@ -348,13 +341,19 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert($"check {mod.Name} is selected", () =>
             {
                 var button = modSelect.GetModButton(mod);
-                return modSelect.SelectedMods.Value.Single(m => m.Name == mod.Name) != null && button.SelectedMod.GetType() == mod.GetType() && button.Selected;
+                return modSelect.SelectedMods.Value.SingleOrDefault(m => m.Name == mod.Name) != null && button.SelectedMod.GetType() == mod.GetType() && button.Selected;
             });
         }
 
         private void changeRuleset(int? id)
         {
             AddStep($"change ruleset to {(id?.ToString() ?? "none")}", () => { Ruleset.Value = rulesets.AvailableRulesets.FirstOrDefault(r => r.ID == id); });
+            waitForLoad();
+        }
+
+        private void changeTestRuleset(RulesetInfo rulesetInfo)
+        {
+            AddStep($"change ruleset to {rulesetInfo.Name}", () => { Ruleset.Value = rulesetInfo; });
             waitForLoad();
         }
 
@@ -369,8 +368,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 return modSelect.SelectedMods.Value.All(m => m.GetType() != mod.GetType()) && button.SelectedMod?.GetType() != mod.GetType();
             });
         }
-
-        private void checkLabelColor(Func<Color4> getColour) => AddAssert("check label has expected colour", () => modSelect.MultiplierLabel.Colour.AverageColour == getColour());
 
         private void createDisplay(Func<TestModSelectOverlay> createOverlayFunc)
         {
@@ -408,7 +405,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 return section.ButtonsContainer.OfType<ModButton>().Single(b => b.Mods.Any(m => m.GetType() == mod.GetType()));
             }
 
-            public new OsuSpriteText MultiplierLabel => base.MultiplierLabel;
             public new TriangleButton DeselectAllButton => base.DeselectAllButton;
 
             public new Color4 LowMultiplierColour => base.LowMultiplierColour;
@@ -418,6 +414,25 @@ namespace osu.Game.Tests.Visual.UserInterface
         private class TestNonStackedModSelectOverlay : TestModSelectOverlay
         {
             protected override bool Stacked => false;
+        }
+
+        private class TestUnimplementedMod : Mod
+        {
+            public override string Name => "Unimplemented mod";
+            public override string Acronym => "UM";
+            public override string Description => "A mod that is not implemented.";
+            public override double ScoreMultiplier => 1;
+            public override ModType Type => ModType.Conversion;
+        }
+
+        private class TestUnimplementedModOsuRuleset : OsuRuleset
+        {
+            public override IEnumerable<Mod> GetModsFor(ModType type)
+            {
+                if (type == ModType.Conversion) return base.GetModsFor(type).Concat(new[] { new TestUnimplementedMod() });
+
+                return base.GetModsFor(type);
+            }
         }
     }
 }

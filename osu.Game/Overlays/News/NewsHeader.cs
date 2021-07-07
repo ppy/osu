@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.News
 
         public Action ShowFrontPage;
 
-        private readonly Bindable<string> article = new Bindable<string>(null);
+        private readonly Bindable<string> article = new Bindable<string>();
 
         public NewsHeader()
         {

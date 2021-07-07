@@ -97,7 +97,7 @@ namespace osu.Game.Graphics.Containers
             if (timingPoint == lastTimingPoint && beatIndex == lastBeat)
                 return;
 
-            using (BeginDelayedSequence(-TimeSinceLastBeat, true))
+            using (BeginDelayedSequence(-TimeSinceLastBeat))
                 OnNewBeat(beatIndex, timingPoint, effectPoint, track?.CurrentAmplitudes ?? ChannelAmplitudes.Empty);
 
             lastBeat = beatIndex;

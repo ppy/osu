@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Bindables;
@@ -71,6 +72,9 @@ namespace osu.Game.Scoring
                 }
             }
         }
+
+        protected override Task Populate(ScoreInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
+            => Task.CompletedTask;
 
         protected override void ExportModelTo(ScoreInfo model, Stream outputStream)
         {
@@ -204,7 +208,7 @@ namespace osu.Game.Scoring
                 }
                 else
                 {
-                    // This score is guaranteed to be an osu!lazer score.
+                    // This is guaranteed to be a non-legacy score.
                     // The combo must be determined through the score's statistics, as both the beatmap's max combo and the difficulty calculator will provide osu!stable combo values.
                     beatmapMaxCombo = Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r.AffectsCombo()).Select(r => score.Statistics.GetOrDefault(r)).Sum();
                 }

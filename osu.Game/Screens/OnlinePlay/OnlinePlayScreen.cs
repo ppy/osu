@@ -240,13 +240,15 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override bool OnExiting(IScreen next)
         {
+            if (screenStack.CurrentScreen?.OnExiting(next) == true)
+                return true;
+
             RoomManager.PartRoom();
 
             waves.Hide();
 
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
-            screenStack.CurrentScreen?.OnExiting(next);
             base.OnExiting(next);
             return false;
         }

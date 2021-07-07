@@ -1,14 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.Online.API;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
@@ -16,7 +20,7 @@ namespace osu.Game.Tests.Visual
     /// <summary>
     /// A player that exposes many components that would otherwise not be available, for testing purposes.
     /// </summary>
-    public class TestPlayer : Player
+    public class TestPlayer : SoloPlayer
     {
         protected override bool PauseOnFocusLost { get; }
 
@@ -35,6 +39,10 @@ namespace osu.Game.Tests.Visual
 
         public new HealthProcessor HealthProcessor => base.HealthProcessor;
 
+        public bool TokenCreationRequested { get; private set; }
+
+        public Score SubmittedScore { get; private set; }
+
         public new bool PauseCooldownActive => base.PauseCooldownActive;
 
         public readonly List<JudgementResult> Results = new List<JudgementResult>();
@@ -47,6 +55,20 @@ namespace osu.Game.Tests.Visual
             })
         {
             PauseOnFocusLost = pauseOnFocusLost;
+        }
+
+        protected override bool HandleTokenRetrievalFailure(Exception exception) => false;
+
+        protected override APIRequest<APIScoreToken> CreateTokenRequest()
+        {
+            TokenCreationRequested = true;
+            return base.CreateTokenRequest();
+        }
+
+        protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token)
+        {
+            SubmittedScore = score;
+            return base.CreateSubmissionRequest(score, token);
         }
 
         protected override void PrepareReplay()
