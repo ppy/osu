@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual
             private readonly WorkingBeatmap testBeatmap;
 
             public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host, WorkingBeatmap defaultBeatmap, WorkingBeatmap testBeatmap)
-                : base(storage, contextFactory, rulesets, api, audioManager, resources, host, defaultBeatmap, false)
+                : base(storage, contextFactory, rulesets, api, audioManager, resources, host, defaultBeatmap)
             {
                 this.testBeatmap = testBeatmap;
             }

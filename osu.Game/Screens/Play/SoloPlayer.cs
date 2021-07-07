@@ -12,6 +12,16 @@ namespace osu.Game.Screens.Play
 {
     public class SoloPlayer : SubmittingPlayer
     {
+        public SoloPlayer()
+            : this(null)
+        {
+        }
+
+        protected SoloPlayer(PlayerConfiguration configuration = null)
+            : base(configuration)
+        {
+        }
+
         protected override APIRequest<APIScoreToken> CreateTokenRequest()
         {
             if (!(Beatmap.Value.BeatmapInfo.OnlineBeatmapID is int beatmapId))
@@ -27,9 +37,11 @@ namespace osu.Game.Screens.Play
 
         protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token)
         {
-            Debug.Assert(Beatmap.Value.BeatmapInfo.OnlineBeatmapID != null);
+            var beatmap = score.ScoreInfo.Beatmap;
 
-            int beatmapId = Beatmap.Value.BeatmapInfo.OnlineBeatmapID.Value;
+            Debug.Assert(beatmap.OnlineBeatmapID != null);
+
+            int beatmapId = beatmap.OnlineBeatmapID.Value;
 
             return new SubmitSoloScoreRequest(beatmapId, token, score.ScoreInfo);
         }

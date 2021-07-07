@@ -4,9 +4,7 @@
 using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -111,12 +109,9 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             var rating = Current.Value.DifficultyRating;
 
-            background.Colour = rating == DifficultyRating.ExpertPlus
-                ? ColourInfo.GradientVertical(Color4Extensions.FromHex("#C1C1C1"), Color4Extensions.FromHex("#595959"))
-                : (ColourInfo)colours.ForDifficultyRating(rating);
+            background.Colour = colours.ForDifficultyRating(rating, true);
 
             textFlow.Clear();
-
             textFlow.AddText($"{wholePart}", s =>
             {
                 s.Colour = Color4.Black;

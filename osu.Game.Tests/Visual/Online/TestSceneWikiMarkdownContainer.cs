@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using Markdig.Syntax.Inlines;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -9,6 +10,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Containers.Markdown;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Wiki.Markdown;
@@ -102,7 +106,7 @@ needs_cleanup: true
         {
             AddStep("Add absolute image", () =>
             {
-                markdownContainer.DocumentUrl = "https://dev.ppy.sh";
+                markdownContainer.CurrentPath = "https://dev.ppy.sh";
                 markdownContainer.Text = "![intro](/wiki/Interface/img/intro-screen.jpg)";
             });
         }
@@ -112,8 +116,7 @@ needs_cleanup: true
         {
             AddStep("Add relative image", () =>
             {
-                markdownContainer.DocumentUrl = "https://dev.ppy.sh";
-                markdownContainer.CurrentPath = $"{API.WebsiteRootUrl}/wiki/Interface/";
+                markdownContainer.CurrentPath = "https://dev.ppy.sh/wiki/Interface/";
                 markdownContainer.Text = "![intro](img/intro-screen.jpg)";
             });
         }
@@ -123,8 +126,7 @@ needs_cleanup: true
         {
             AddStep("Add paragraph with block image", () =>
             {
-                markdownContainer.DocumentUrl = "https://dev.ppy.sh";
-                markdownContainer.CurrentPath = $"{API.WebsiteRootUrl}/wiki/Interface/";
+                markdownContainer.CurrentPath = "https://dev.ppy.sh/wiki/Interface/";
                 markdownContainer.Text = @"Line before image
 
 ![play menu](img/play-menu.jpg ""Main Menu in osu!"")
@@ -138,7 +140,7 @@ Line after image";
         {
             AddStep("Add inline image", () =>
             {
-                markdownContainer.DocumentUrl = "https://dev.ppy.sh";
+                markdownContainer.CurrentPath = "https://dev.ppy.sh";
                 markdownContainer.Text = "![osu! mode icon](/wiki/shared/mode/osu.png) osu!";
             });
         }
@@ -148,7 +150,7 @@ Line after image";
         {
             AddStep("Add Table", () =>
             {
-                markdownContainer.DocumentUrl = "https://dev.ppy.sh";
+                markdownContainer.CurrentPath = "https://dev.ppy.sh";
                 markdownContainer.Text = @"
 | Image | Name | Effect |
 | :-: | :-: | :-- |
@@ -162,14 +164,32 @@ Line after image";
             });
         }
 
+        [Test]
+        public void TestWideImageNotExceedContainer()
+        {
+            AddStep("Add image", () =>
+            {
+                markdownContainer.CurrentPath = "https://dev.ppy.sh/wiki/osu!_Program_Files/";
+                markdownContainer.Text = "![](img/file_structure.jpg \"The file structure of osu!'s installation folder, on Windows and macOS\")";
+            });
+
+            AddUntilStep("Wait image to load", () => markdownContainer.ChildrenOfType<DelayedLoadWrapper>().First().DelayedLoadCompleted);
+
+            AddStep("Change container width", () =>
+            {
+                markdownContainer.Width = 0.5f;
+            });
+
+            AddAssert("Image not exceed container width", () =>
+            {
+                var spriteImage = markdownContainer.ChildrenOfType<Sprite>().First();
+                return Precision.DefinitelyBigger(markdownContainer.DrawWidth, spriteImage.DrawWidth);
+            });
+        }
+
         private class TestMarkdownContainer : WikiMarkdownContainer
         {
             public LinkInline Link;
-
-            public new string DocumentUrl
-            {
-                set => base.DocumentUrl = value;
-            }
 
             public override MarkdownTextFlowContainer CreateTextFlow() => new TestMarkdownTextFlowContainer
             {

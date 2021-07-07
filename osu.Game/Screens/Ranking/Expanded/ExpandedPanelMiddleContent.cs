@@ -256,7 +256,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             // Score counter value setting must be scheduled so it isn't transferred instantaneously
             ScheduleAfterChildren(() =>
             {
-                using (BeginDelayedSequence(AccuracyCircle.ACCURACY_TRANSFORM_DELAY, true))
+                using (BeginDelayedSequence(AccuracyCircle.ACCURACY_TRANSFORM_DELAY))
                 {
                     scoreCounter.FadeIn();
                     scoreCounter.Current = scoreManager.GetBindableTotalScore(score);
@@ -265,7 +265,7 @@ namespace osu.Game.Screens.Ranking.Expanded
 
                     foreach (var stat in statisticDisplays)
                     {
-                        using (BeginDelayedSequence(delay, true))
+                        using (BeginDelayedSequence(delay))
                             stat.Appear();
 
                         delay += 200;

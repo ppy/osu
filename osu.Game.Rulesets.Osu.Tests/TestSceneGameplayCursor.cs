@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     case OsuSkinConfiguration osuLookup:
                         if (osuLookup == OsuSkinConfiguration.CursorCentre)
-                            return SkinUtils.As<TValue>(new BindableBool(false));
+                            return SkinUtils.As<TValue>(new BindableBool());
 
                         break;
                 }

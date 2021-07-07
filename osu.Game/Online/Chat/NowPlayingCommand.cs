@@ -21,6 +21,17 @@ namespace osu.Game.Online.Chat
         [Resolved]
         private Bindable<WorkingBeatmap> currentBeatmap { get; set; }
 
+        private readonly Channel target;
+
+        /// <summary>
+        /// Creates a new <see cref="NowPlayingCommand"/> to post the currently-playing beatmap to a parenting <see cref="IChannelPostTarget"/>.
+        /// </summary>
+        /// <param name="target">The target channel to post to. If <c>null</c>, the currently-selected channel will be posted to.</param>
+        public NowPlayingCommand(Channel target = null)
+        {
+            this.target = target;
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -48,7 +59,7 @@ namespace osu.Game.Online.Chat
 
             var beatmapString = beatmap.OnlineBeatmapID.HasValue ? $"[{api.WebsiteRootUrl}/b/{beatmap.OnlineBeatmapID} {beatmap}]" : beatmap.ToString();
 
-            channelManager.PostMessage($"is {verb} {beatmapString}", true);
+            channelManager.PostMessage($"is {verb} {beatmapString}", true, target);
             Expire();
         }
     }

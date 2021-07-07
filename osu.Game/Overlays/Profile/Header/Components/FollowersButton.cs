@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Header.Components
@@ -12,7 +13,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         public readonly Bindable<User> User = new Bindable<User>();
 
-        public override string TooltipText => "followers";
+        public override LocalisableString TooltipText => "followers";
 
         protected override IconUsage Icon => FontAwesome.Solid.User;
 

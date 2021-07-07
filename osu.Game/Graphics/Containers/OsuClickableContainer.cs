@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.Containers
@@ -24,7 +25,7 @@ namespace osu.Game.Graphics.Containers
             this.sampleSet = sampleSet;
         }
 
-        public virtual string TooltipText { get; set; }
+        public virtual LocalisableString TooltipText { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()

@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
@@ -76,7 +77,7 @@ namespace osu.Game.Overlays
             UpdateState();
         }
 
-        public string TooltipText => "revert to default";
+        public LocalisableString TooltipText => "revert to default";
 
         protected override bool OnHover(HoverEvent e)
         {

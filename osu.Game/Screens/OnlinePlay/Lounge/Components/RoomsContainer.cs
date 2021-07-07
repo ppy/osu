@@ -93,7 +93,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 {
                     bool matchingFilter = true;
 
-                    matchingFilter &= r.Room.Playlist.Count == 0 || r.Room.Playlist.Any(i => i.Ruleset.Value.Equals(criteria.Ruleset));
+                    matchingFilter &= r.Room.Playlist.Count == 0 || criteria.Ruleset == null || r.Room.Playlist.Any(i => i.Ruleset.Value.Equals(criteria.Ruleset));
 
                     if (!string.IsNullOrEmpty(criteria.SearchString))
                         matchingFilter &= r.FilterTerms.Any(term => term.Contains(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase));
