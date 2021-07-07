@@ -35,6 +35,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("channel_id")]
         public readonly Bindable<int> ChannelId = new Bindable<int>();
 
+        [JsonProperty("password")]
+        public readonly Bindable<string> Password = new Bindable<string>();
+
         [Cached]
         [JsonIgnore]
         public readonly Bindable<RoomCategory> Category = new Bindable<RoomCategory>();
@@ -143,6 +146,7 @@ namespace osu.Game.Online.Rooms
 
             ChannelId.Value = other.ChannelId.Value;
             Status.Value = other.Status.Value;
+            Password.Value = other.Password.Value;
             Availability.Value = other.Availability.Value;
             Type.Value = other.Type.Value;
             MaxParticipants.Value = other.MaxParticipants.Value;
