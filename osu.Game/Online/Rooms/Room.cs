@@ -35,9 +35,6 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("channel_id")]
         public readonly Bindable<int> ChannelId = new Bindable<int>();
 
-        [JsonProperty("password")]
-        public readonly Bindable<string> Password = new Bindable<string>();
-
         [Cached]
         [JsonIgnore]
         public readonly Bindable<RoomCategory> Category = new Bindable<RoomCategory>();
@@ -50,10 +47,6 @@ namespace osu.Game.Online.Rooms
             get => Category.Value;
             set => Category.Value = value;
         }
-
-        [Cached]
-        [JsonIgnore]
-        public readonly Bindable<TimeSpan?> Duration = new Bindable<TimeSpan?>();
 
         [Cached]
         [JsonIgnore]
@@ -79,6 +72,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("current_user_score")]
         public readonly Bindable<PlaylistAggregateScore> UserScore = new Bindable<PlaylistAggregateScore>();
 
+        [JsonProperty("has_password")]
+        public readonly BindableBool HasPassword = new BindableBool();
+
         [Cached]
         [JsonProperty("recent_participants")]
         public readonly BindableList<User> RecentParticipants = new BindableList<User>();
@@ -86,6 +82,15 @@ namespace osu.Game.Online.Rooms
         [Cached]
         [JsonProperty("participant_count")]
         public readonly Bindable<int> ParticipantCount = new Bindable<int>();
+
+        #region Properties only used for room creation request
+
+        [JsonProperty("password")]
+        public readonly Bindable<string> Password = new Bindable<string>();
+
+        [Cached]
+        [JsonIgnore]
+        public readonly Bindable<TimeSpan?> Duration = new Bindable<TimeSpan?>();
 
         [JsonProperty("duration")]
         private int? duration
@@ -99,6 +104,8 @@ namespace osu.Game.Online.Rooms
                     Duration.Value = TimeSpan.FromMinutes(value.Value);
             }
         }
+
+        #endregion
 
         // Only supports retrieval for now
         [Cached]
