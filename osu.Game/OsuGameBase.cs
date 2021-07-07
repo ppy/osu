@@ -360,7 +360,9 @@ namespace osu.Game
             AddInternal(MusicController = new MusicController());
             dependencies.CacheAs(MusicController);
 
+            Beatmap.BindValueChanged(onBeatmapChanged);
             Ruleset.BindValueChanged(onRulesetChanged);
+            SelectedMods.BindValueChanged(onModsChanged);
         }
 
         private IDisposable blocking;
@@ -469,20 +471,37 @@ namespace osu.Game
             }
         }
 
-        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
+        private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap) => updateModDefaults();
+
+        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
         {
             var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
 
-            if (r.NewValue?.Available == true)
+            if (ruleset.NewValue?.Available == true)
             {
                 foreach (ModType type in Enum.GetValues(typeof(ModType)))
-                    dict[type] = r.NewValue.CreateInstance().GetModsFor(type).ToList();
+                    dict[type] = ruleset.NewValue.CreateInstance().GetModsFor(type).ToList();
             }
 
             if (!SelectedMods.Disabled)
                 SelectedMods.Value = Array.Empty<Mod>();
 
             AvailableMods.Value = dict;
+        }
+
+        private void onModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods) => updateModDefaults();
+
+        private void updateModDefaults()
+        {
+            BeatmapDifficulty baseDifficulty = Beatmap.Value.BeatmapInfo.BaseDifficulty;
+
+            if (baseDifficulty != null && SelectedMods.Value.Any(m => m is IApplicableToDifficulty))
+            {
+                var adjustedDifficulty = baseDifficulty.Clone();
+
+                foreach (var mod in SelectedMods.Value.OfType<IApplicableToDifficulty>())
+                    mod.ReadFromDifficulty(adjustedDifficulty);
+            }
         }
 
         private void runMigrations()
