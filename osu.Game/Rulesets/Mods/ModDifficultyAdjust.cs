@@ -141,13 +141,12 @@ namespace osu.Game.Rulesets.Mods
         }
 
         /// <summary>
-        /// Applies a setting from a configuration bindable using <paramref name="applyFunc"/>, if it has been changed by the user.
+        /// Applies a setting from a configuration bindable using <paramref name="applyFunc"/>.
         /// </summary>
         protected void ApplySetting<T>(BindableNumber<T> setting, Action<T> applyFunc)
             where T : struct, IComparable<T>, IConvertible, IEquatable<T>
         {
-            if (userChangedSettings.TryGetValue(setting, out bool userChangedSetting) && userChangedSetting)
-                applyFunc.Invoke(setting.Value);
+            applyFunc.Invoke(setting.Value);
         }
 
         /// <summary>
