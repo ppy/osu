@@ -353,8 +353,6 @@ namespace osu.Game.Database
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            delayEvents();
-
             bool checkedExisting = false;
             TModel existing = null;
 
@@ -393,6 +391,8 @@ namespace osu.Game.Database
                     Files.Dereference(item.Files.Select(f => f.FileInfo).ToArray());
                 }
             }
+
+            delayEvents();
 
             try
             {

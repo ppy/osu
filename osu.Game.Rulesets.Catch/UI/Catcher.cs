@@ -57,11 +57,6 @@ namespace osu.Game.Rulesets.Catch.UI
         public double Speed => (Dashing ? 1 : 0.5) * BASE_SPEED * hyperDashModifier;
 
         /// <summary>
-        /// The amount by which caught fruit should be offset from the plate surface to make them look visually "caught".
-        /// </summary>
-        public const float CAUGHT_FRUIT_VERTICAL_OFFSET = -5;
-
-        /// <summary>
         /// The amount by which caught fruit should be scaled down to fit on the plate.
         /// </summary>
         private const float caught_fruit_scale_adjust = 0.5f;
@@ -84,8 +79,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatcherAnimationState CurrentState
         {
-            get => body.AnimationState.Value;
-            private set => body.AnimationState.Value = value;
+            get => Body.AnimationState.Value;
+            private set => Body.AnimationState.Value = value;
         }
 
         /// <summary>
@@ -108,18 +103,22 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        public Direction VisualDirection
-        {
-            get => Scale.X > 0 ? Direction.Right : Direction.Left;
-            set => Scale = new Vector2((value == Direction.Right ? 1 : -1) * Math.Abs(Scale.X), Scale.Y);
-        }
+        /// <summary>
+        /// The currently facing direction.
+        /// </summary>
+        public Direction VisualDirection { get; set; } = Direction.Right;
+
+        /// <summary>
+        /// Whether the contents of the catcher plate should be visually flipped when the catcher direction is changed.
+        /// </summary>
+        private bool flipCatcherPlate;
 
         /// <summary>
         /// Width of the area that can be used to attempt catches during gameplay.
         /// </summary>
         private readonly float catchWidth;
 
-        private readonly SkinnableCatcher body;
+        internal readonly SkinnableCatcher Body;
 
         private Color4 hyperDashColour = DEFAULT_HYPER_DASH_COLOUR;
         private Color4 hyperDashEndGlowColour = DEFAULT_HYPER_DASH_COLOUR;
@@ -157,8 +156,10 @@ namespace osu.Game.Rulesets.Catch.UI
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.BottomCentre,
+                    // offset fruit vertically to better place "above" the plate.
+                    Y = -5
                 },
-                body = new SkinnableCatcher(),
+                Body = new SkinnableCatcher(),
                 hitExplosionContainer = new HitExplosionContainer
                 {
                     Anchor = Anchor.TopCentre,
@@ -347,12 +348,18 @@ namespace osu.Game.Rulesets.Catch.UI
             trails.HyperDashTrailsColour = hyperDashColour;
             trails.EndGlowSpritesColour = hyperDashEndGlowColour;
 
+            flipCatcherPlate = skin.GetConfig<CatchSkinConfiguration, bool>(CatchSkinConfiguration.FlipCatcherPlate)?.Value ?? true;
+
             runHyperDashStateTransition(HyperDashing);
         }
 
         protected override void Update()
         {
             base.Update();
+
+            var scaleFromDirection = new Vector2((int)VisualDirection, 1);
+            Body.Scale = scaleFromDirection;
+            caughtObjectContainer.Scale = hitExplosionContainer.Scale = flipCatcherPlate ? scaleFromDirection : Vector2.One;
 
             // Correct overshooting.
             if ((hyperDashDirection > 0 && hyperDashTargetPosition < X) ||
@@ -387,9 +394,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
             float adjustedRadius = displayRadius * lenience_adjust;
             float checkDistance = MathF.Pow(adjustedRadius, 2);
-
-            // offset fruit vertically to better place "above" the plate.
-            position.Y += CAUGHT_FRUIT_VERTICAL_OFFSET;
 
             while (caughtObjectContainer.Any(f => Vector2Extensions.DistanceSquared(f.Position, position) < checkDistance))
             {
@@ -465,7 +469,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     break;
 
                 case DroppedObjectAnimation.Explode:
-                    var originalX = droppedObjectTarget.ToSpaceOfOtherDrawable(d.DrawPosition, caughtObjectContainer).X * Scale.X;
+                    float originalX = droppedObjectTarget.ToSpaceOfOtherDrawable(d.DrawPosition, caughtObjectContainer).X * caughtObjectContainer.Scale.X;
                     d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then().MoveToY(d.Y + 50, 500, Easing.InSine);
                     d.MoveToX(d.X + originalX * 6, 1000);
                     d.FadeOut(750);
