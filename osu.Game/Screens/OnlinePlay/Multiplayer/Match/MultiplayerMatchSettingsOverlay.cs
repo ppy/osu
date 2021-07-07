@@ -27,16 +27,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerMatchSettingsOverlay : MatchSettingsOverlay
     {
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Child = Settings = new MatchSettings
+        protected override OnlinePlayComposite CreateSettings()
+            => new MatchSettings
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Y,
                 SettingsApplied = Hide
             };
-        }
 
         protected class MatchSettings : OnlinePlayComposite
         {
