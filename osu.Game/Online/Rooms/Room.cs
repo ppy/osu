@@ -146,7 +146,6 @@ namespace osu.Game.Online.Rooms
 
             ChannelId.Value = other.ChannelId.Value;
             Status.Value = other.Status.Value;
-            Password.Value = other.Password.Value;
             Availability.Value = other.Availability.Value;
             Type.Value = other.Type.Value;
             MaxParticipants.Value = other.MaxParticipants.Value;
