@@ -119,14 +119,17 @@ namespace osu.Game.Beatmaps
                 // Apply difficulty mods
                 if (mods.Any(m => m is IApplicableToDifficulty))
                 {
+                    var originalDifficulty = converted.BeatmapInfo.BaseDifficulty;
+
                     converted.BeatmapInfo = converted.BeatmapInfo.Clone();
-                    converted.BeatmapInfo.BaseDifficulty = converted.BeatmapInfo.BaseDifficulty.Clone();
+                    converted.BeatmapInfo.BaseDifficulty = originalDifficulty.Clone();
 
                     foreach (var mod in mods.OfType<IApplicableToDifficulty>())
                     {
                         if (cancellationSource.IsCancellationRequested)
                             throw new BeatmapLoadTimeoutException(BeatmapInfo);
 
+                        mod.ReadFromDifficulty(originalDifficulty);
                         mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
                     }
                 }
