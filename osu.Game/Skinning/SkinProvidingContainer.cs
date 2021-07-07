@@ -64,38 +64,19 @@ namespace osu.Game.Skinning
             RelativeSizeAxes = Axes.Both;
         }
 
-        /// <summary>
-        /// Add a new skin to this provider. Will be added to the end of the lookup order precedence.
-        /// </summary>
-        /// <param name="skin">The skin to add.</param>
-        protected void AddSource(ISkin skin)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            skinSources.Add((skin, new DisableableSkinSource(skin, this)));
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            if (skin is ISkinSource source)
-                source.SourceChanged += TriggerSourceChanged;
-        }
+            ParentSource = dependencies.Get<ISkinSource>();
+            if (ParentSource != null)
+                ParentSource.SourceChanged += TriggerSourceChanged;
 
-        /// <summary>
-        /// Remove a skin from this provider.
-        /// </summary>
-        /// <param name="skin">The skin to remove.</param>
-        protected void RemoveSource(ISkin skin)
-        {
-            if (skinSources.RemoveAll(s => s.skin == skin) == 0)
-                return;
+            dependencies.CacheAs<ISkinSource>(this);
 
-            if (skin is ISkinSource source)
-                source.SourceChanged -= TriggerSourceChanged;
-        }
+            TriggerSourceChanged();
 
-        /// <summary>
-        /// Clears all skin sources.
-        /// </summary>
-        protected void ResetSources()
-        {
-            foreach (var skin in AllSources.ToArray())
-                RemoveSource(skin);
+            return dependencies;
         }
 
         public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
@@ -188,25 +169,44 @@ namespace osu.Game.Skinning
         }
 
         /// <summary>
+        /// Add a new skin to this provider. Will be added to the end of the lookup order precedence.
+        /// </summary>
+        /// <param name="skin">The skin to add.</param>
+        protected void AddSource(ISkin skin)
+        {
+            skinSources.Add((skin, new DisableableSkinSource(skin, this)));
+
+            if (skin is ISkinSource source)
+                source.SourceChanged += TriggerSourceChanged;
+        }
+
+        /// <summary>
+        /// Remove a skin from this provider.
+        /// </summary>
+        /// <param name="skin">The skin to remove.</param>
+        protected void RemoveSource(ISkin skin)
+        {
+            if (skinSources.RemoveAll(s => s.skin == skin) == 0)
+                return;
+
+            if (skin is ISkinSource source)
+                source.SourceChanged -= TriggerSourceChanged;
+        }
+
+        /// <summary>
+        /// Clears all skin sources.
+        /// </summary>
+        protected void ResetSources()
+        {
+            foreach (var skin in AllSources.ToArray())
+                RemoveSource(skin);
+        }
+
+        /// <summary>
         /// Invoked when any source has changed (either <see cref="ParentSource"/> or a source registered via <see cref="AddSource"/>).
         /// This is also invoked once initially during <see cref="CreateChildDependencies"/> to ensure sources are ready for children consumption.
         /// </summary>
         protected virtual void OnSourceChanged() { }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
-            ParentSource = dependencies.Get<ISkinSource>();
-            if (ParentSource != null)
-                ParentSource.SourceChanged += TriggerSourceChanged;
-
-            dependencies.CacheAs<ISkinSource>(this);
-
-            TriggerSourceChanged();
-
-            return dependencies;
-        }
 
         protected void TriggerSourceChanged()
         {
