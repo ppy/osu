@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,25 +17,11 @@ namespace osu.Game.Graphics.Containers
     /// </summary>
     public class SelectionCycleFillFlowContainer<T> : FillFlowContainer<T> where T : Drawable, IStateful<SelectionState>
     {
-        private int? selectedIndex;
-
         public T Selected => (selectedIndex >= 0 && selectedIndex < Count) ? this[selectedIndex.Value] : null;
 
-        private void setSelected(int? value)
-        {
-            if (selectedIndex == value)
-                return;
+        private int? selectedIndex;
 
-            // Deselect the previously-selected button
-            if (selectedIndex.HasValue)
-                this[selectedIndex.Value].State = SelectionState.NotSelected;
-
-            selectedIndex = value;
-
-            // Select the newly-selected button
-            if (selectedIndex.HasValue)
-                this[selectedIndex.Value].State = SelectionState.Selected;
-        }
+        private readonly Dictionary<T, Action<SelectionState>> handlerMap = new Dictionary<T, Action<SelectionState>>();
 
         public void SelectNext()
         {
@@ -64,20 +51,17 @@ namespace osu.Game.Graphics.Containers
                 setSelected(IndexOf(item));
         }
 
-        private readonly Dictionary<T, Action<SelectionState>> handlerMap = new Dictionary<T, Action<SelectionState>>();
-
         public override void Add(T drawable)
         {
             base.Add(drawable);
 
-            if (drawable != null)
-            {
-                // This event is used to update selection state when modified within the drawable itself.
-                // It is added to a dictionary so that we can unsubscribe if the drawable is removed from this container
-                handlerMap[drawable] = state => selectionChanged(drawable, state);
+            Debug.Assert(drawable != null);
 
-                drawable.StateChanged += handlerMap[drawable];
-            }
+            // This event is used to update selection state when modified within the drawable itself.
+            // It is added to a dictionary so that we can unsubscribe if the drawable is removed from this container
+            handlerMap[drawable] = state => selectionChanged(drawable, state);
+
+            drawable.StateChanged += handlerMap[drawable];
         }
 
         public override bool Remove(T drawable)
@@ -85,13 +69,31 @@ namespace osu.Game.Graphics.Containers
             if (!base.Remove(drawable))
                 return false;
 
-            if (drawable != null && handlerMap.TryGetValue(drawable, out var action))
+            Debug.Assert(drawable != null);
+
+            if (handlerMap.TryGetValue(drawable, out var action))
             {
                 drawable.StateChanged -= action;
                 handlerMap.Remove(drawable);
             }
 
             return true;
+        }
+
+        private void setSelected(int? value)
+        {
+            if (selectedIndex == value)
+                return;
+
+            // Deselect the previously-selected button
+            if (selectedIndex.HasValue)
+                this[selectedIndex.Value].State = SelectionState.NotSelected;
+
+            selectedIndex = value;
+
+            // Select the newly-selected button
+            if (selectedIndex.HasValue)
+                this[selectedIndex.Value].State = SelectionState.Selected;
         }
 
         private void selectionChanged(T drawable, SelectionState state)
