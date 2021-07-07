@@ -197,7 +197,7 @@ namespace osu.Game.Skinning
         /// </summary>
         protected void ResetSources()
         {
-            foreach (var i in skinSources)
+            foreach (var i in skinSources.ToArray())
                 RemoveSource(i.skin);
         }
 
