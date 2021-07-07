@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
     public abstract class CatchSelectionBlueprint<THitObject> : HitObjectSelectionBlueprint<THitObject>
         where THitObject : CatchHitObject
     {
+        protected override bool AlwaysShowWhenSelected => true;
+
         public override Vector2 ScreenSpaceSelectionPoint
         {
             get
