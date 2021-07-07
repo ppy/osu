@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework;
 using osu.Framework.Graphics;
@@ -20,8 +19,6 @@ namespace osu.Game.Graphics.Containers
         public T Selected => (selectedIndex >= 0 && selectedIndex < Count) ? this[selectedIndex.Value] : null;
 
         private int? selectedIndex;
-
-        private readonly Dictionary<T, Action<SelectionState>> handlerMap = new Dictionary<T, Action<SelectionState>>();
 
         public void SelectNext()
         {
@@ -57,28 +54,12 @@ namespace osu.Game.Graphics.Containers
 
             Debug.Assert(drawable != null);
 
-            // This event is used to update selection state when modified within the drawable itself.
-            // It is added to a dictionary so that we can unsubscribe if the drawable is removed from this container
-            handlerMap[drawable] = state => selectionChanged(drawable, state);
-
-            drawable.StateChanged += handlerMap[drawable];
+            drawable.StateChanged += state => selectionChanged(drawable, state);
         }
 
         public override bool Remove(T drawable)
-        {
-            if (!base.Remove(drawable))
-                return false;
+            => throw new NotSupportedException($"Cannot remove drawables from {nameof(SelectionCycleFillFlowContainer<T>)}");
 
-            Debug.Assert(drawable != null);
-
-            if (handlerMap.TryGetValue(drawable, out var action))
-            {
-                drawable.StateChanged -= action;
-                handlerMap.Remove(drawable);
-            }
-
-            return true;
-        }
 
         private void setSelected(int? value)
         {
