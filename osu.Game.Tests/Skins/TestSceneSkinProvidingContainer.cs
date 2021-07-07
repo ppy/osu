@@ -10,12 +10,14 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.Skins
 {
+    [HeadlessTest]
     public class TestSceneSkinProvidingContainer : OsuTestScene
     {
         /// <summary>
