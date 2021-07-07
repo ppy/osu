@@ -80,7 +80,7 @@ namespace osu.Game
                     return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
 
                 var version = AssemblyVersion;
-                return $@"{version.Major}.{version.Minor}.{version.Build}";
+                return $@"{version.Major}.{version.Minor}.{version.Build}-lazer";
             }
         }
 
@@ -162,7 +162,7 @@ namespace osu.Game
         public OsuGameBase()
         {
             UseDevelopmentServer = DebugUtils.IsDebugBuild;
-            Name = @"osu!lazer";
+            Name = @"osu!";
         }
 
         [BackgroundDependencyLoader]

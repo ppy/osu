@@ -128,7 +128,7 @@ namespace osu.Game.Overlays.Mods
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.Absolute, 90),
-                        new Dimension(GridSizeMode.Distributed),
+                        new Dimension(),
                         new Dimension(GridSizeMode.AutoSize),
                     },
                     Content = new[]

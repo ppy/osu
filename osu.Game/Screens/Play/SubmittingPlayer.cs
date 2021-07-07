@@ -10,6 +10,7 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Play
@@ -143,6 +144,10 @@ namespace osu.Game.Screens.Play
 
             if (scoreSubmissionSource != null)
                 return scoreSubmissionSource.Task;
+
+            // if the user never hit anything, this score should not be counted in any way.
+            if (!score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0))
+                return Task.CompletedTask;
 
             scoreSubmissionSource = new TaskCompletionSource<bool>();
             var request = CreateSubmissionRequest(score, token.Value);

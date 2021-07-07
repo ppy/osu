@@ -248,7 +248,7 @@ namespace osu.Game.Online.Leaderboards
             this.FadeIn(200);
             content.MoveToY(0, 800, Easing.OutQuint);
 
-            using (BeginDelayedSequence(100, true))
+            using (BeginDelayedSequence(100))
             {
                 avatar.FadeIn(300, Easing.OutQuint);
                 nameLabel.FadeIn(350, Easing.OutQuint);
@@ -256,12 +256,12 @@ namespace osu.Game.Online.Leaderboards
                 avatar.MoveToX(0, 300, Easing.OutQuint);
                 nameLabel.MoveToX(0, 350, Easing.OutQuint);
 
-                using (BeginDelayedSequence(250, true))
+                using (BeginDelayedSequence(250))
                 {
                     scoreLabel.FadeIn(200);
                     scoreRank.FadeIn(200);
 
-                    using (BeginDelayedSequence(50, true))
+                    using (BeginDelayedSequence(50))
                     {
                         var drawables = new Drawable[] { flagBadgeContainer, modsContainer }.Concat(statisticsLabels).ToArray();
                         for (int i = 0; i < drawables.Length; i++)
