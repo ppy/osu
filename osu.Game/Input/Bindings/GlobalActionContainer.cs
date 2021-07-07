@@ -103,6 +103,9 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Alt, InputKey.Up }, GlobalAction.IncreaseVolume),
             new KeyBinding(new[] { InputKey.Alt, InputKey.Down }, GlobalAction.DecreaseVolume),
 
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Left }, GlobalAction.PreviousVolumeMeter),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Right }, GlobalAction.NextVolumeMeter),
+
             new KeyBinding(new[] { InputKey.Control, InputKey.F4 }, GlobalAction.ToggleMute),
 
             new KeyBinding(InputKey.TrackPrevious, GlobalAction.MusicPrev),
@@ -263,5 +266,11 @@ namespace osu.Game.Input.Bindings
 
         [Description("Toggle skin editor")]
         ToggleSkinEditor,
+
+        [Description("Previous volume meter")]
+        PreviousVolumeMeter,
+
+        [Description("Next volume meter")]
+        NextVolumeMeter,
     }
 }
