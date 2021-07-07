@@ -64,6 +64,8 @@ namespace osu.Game.Overlays.Volume
             }
         }
 
+        private const float transition_length = 500;
+
         public VolumeMeter(string name, float circleSize, Color4 meterColour)
         {
             this.circleSize = circleSize;
@@ -344,12 +346,10 @@ namespace osu.Game.Overlays.Volume
             return true;
         }
 
-        private const float transition_length = 500;
-
-        protected override bool OnHover(HoverEvent e)
+        protected override bool OnMouseMove(MouseMoveEvent e)
         {
             State = SelectionState.Selected;
-            return false;
+            return base.OnMouseMove(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
