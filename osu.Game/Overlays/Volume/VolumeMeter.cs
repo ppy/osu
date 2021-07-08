@@ -3,6 +3,7 @@
 
 using System;
 using System.Globalization;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -19,13 +20,14 @@ using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
+    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>, IStateful<SelectionState>
     {
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
@@ -38,8 +40,31 @@ namespace osu.Game.Overlays.Volume
         private OsuSpriteText text;
         private BufferedContainer maxGlow;
 
+        private Container selectedGlowContainer;
+
         private Sample sample;
         private double sampleLastPlaybackTime;
+
+        public event Action<SelectionState> StateChanged;
+
+        private SelectionState state;
+
+        public SelectionState State
+        {
+            get => state;
+            set
+            {
+                if (state == value)
+                    return;
+
+                state = value;
+                StateChanged?.Invoke(value);
+
+                updateSelectedState();
+            }
+        }
+
+        private const float transition_length = 500;
 
         public VolumeMeter(string name, float circleSize, Color4 meterColour)
         {
@@ -75,7 +100,6 @@ namespace osu.Game.Overlays.Volume
                     {
                         new BufferedContainer
                         {
-                            Alpha = 0.9f,
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
@@ -147,6 +171,24 @@ namespace osu.Game.Overlays.Volume
                                 },
                             },
                         },
+                        selectedGlowContainer = new CircularContainer
+                        {
+                            Masking = true,
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            Child = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
+                                AlwaysPresent = true,
+                            },
+                            EdgeEffect = new EdgeEffectParameters
+                            {
+                                Type = EdgeEffectType.Glow,
+                                Colour = meterColour.Opacity(0.1f),
+                                Radius = 10,
+                            }
+                        },
                         maxGlow = (text = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
@@ -171,7 +213,6 @@ namespace osu.Game.Overlays.Volume
                     {
                         new Box
                         {
-                            Alpha = 0.9f,
                             RelativeSizeAxes = Axes.Both,
                             Colour = backgroundColour,
                         },
@@ -305,17 +346,14 @@ namespace osu.Game.Overlays.Volume
             return true;
         }
 
-        private const float transition_length = 500;
-
-        protected override bool OnHover(HoverEvent e)
+        protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
-            return false;
+            State = SelectionState.Selected;
+            return base.OnMouseMove(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            this.ScaleTo(1f, transition_length, Easing.OutExpo);
         }
 
         public bool OnPressed(GlobalAction action)
@@ -326,10 +364,12 @@ namespace osu.Game.Overlays.Volume
             switch (action)
             {
                 case GlobalAction.SelectPrevious:
+                    State = SelectionState.Selected;
                     adjust(1, false);
                     return true;
 
                 case GlobalAction.SelectNext:
+                    State = SelectionState.Selected;
                     adjust(-1, false);
                     return true;
             }
@@ -339,6 +379,22 @@ namespace osu.Game.Overlays.Volume
 
         public void OnReleased(GlobalAction action)
         {
+        }
+
+        private void updateSelectedState()
+        {
+            switch (state)
+            {
+                case SelectionState.Selected:
+                    this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
+                    selectedGlowContainer.FadeIn(transition_length, Easing.OutExpo);
+                    break;
+
+                case SelectionState.NotSelected:
+                    this.ScaleTo(1f, transition_length, Easing.OutExpo);
+                    selectedGlowContainer.FadeOut(transition_length, Easing.OutExpo);
+                    break;
+            }
         }
     }
 }

@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Import
     {
         public override bool HideOverlaysOnEnter => true;
 
-        private FileSelector fileSelector;
+        private OsuFileSelector fileSelector;
         private Container contentContainer;
         private TextFlowContainer currentFileText;
 
@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Import
                         Colour = colours.GreySeafoamDark,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    fileSelector = new FileSelector(validFileExtensions: game.HandledExtensions.ToArray())
+                    fileSelector = new OsuFileSelector(validFileExtensions: game.HandledExtensions.ToArray())
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0.65f
