@@ -15,23 +15,12 @@ namespace osu.Game.Tests.Mods
     [TestFixture]
     public class ModDifficultyAdjustTest
     {
-        // Todo: This shouldn't exist, but is currently required for the mod to accept a new BeatmapDifficulty object...
-        private int currentId;
-
         private TestModDifficultyAdjust testMod;
 
         [SetUp]
         public void Setup()
         {
-            currentId = 0;
             testMod = new TestModDifficultyAdjust();
-
-            // Todo: This shouldn't be a thing, but is currently required because this causes the mod to keep track of the bindables internally...
-            applyDifficulty(new BeatmapDifficulty
-            {
-                DrainRate = -1,
-                OverallDifficulty = -1
-            });
         }
 
         [Test]
@@ -136,7 +125,6 @@ namespace osu.Game.Tests.Mods
             // ensure that ReadFromDifficulty doesn't pollute the values.
             var newDifficulty = difficulty.Clone();
 
-            difficulty.ID = ++currentId;
             testMod.ReadFromDifficulty(difficulty);
 
             testMod.ApplyToDifficulty(newDifficulty);
