@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
@@ -12,6 +13,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
+using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -24,6 +26,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         protected override bool HasCustomSteps => true;
+
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
+        {
+            var beatmap = (TestBeatmap)base.CreateBeatmap(ruleset);
+
+            beatmap.HitObjects = beatmap.HitObjects.Take(10).ToList();
+
+            return beatmap;
+        }
 
         protected override TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false);
 
