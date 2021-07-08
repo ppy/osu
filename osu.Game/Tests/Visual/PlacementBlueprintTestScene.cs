@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual
     public abstract class PlacementBlueprintTestScene : OsuManualInputManagerTestScene, IPlacementHandler
     {
         protected readonly Container HitObjectContainer;
-        private PlacementBlueprint currentBlueprint;
+        protected PlacementBlueprint CurrentBlueprint { get; private set; }
 
         protected PlacementBlueprintTestScene()
         {
@@ -63,9 +63,9 @@ namespace osu.Game.Tests.Visual
 
         protected void ResetPlacement()
         {
-            if (currentBlueprint != null)
-                Remove(currentBlueprint);
-            Add(currentBlueprint = CreateBlueprint());
+            if (CurrentBlueprint != null)
+                Remove(CurrentBlueprint);
+            Add(CurrentBlueprint = CreateBlueprint());
         }
 
         public void Delete(HitObject hitObject)
@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual
         {
             base.Update();
 
-            currentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(currentBlueprint));
+            CurrentBlueprint.UpdateTimeAndPosition(SnapForBlueprint(CurrentBlueprint));
         }
 
         protected virtual SnapResult SnapForBlueprint(PlacementBlueprint blueprint) =>
