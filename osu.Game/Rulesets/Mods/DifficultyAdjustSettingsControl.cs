@@ -16,9 +16,13 @@ namespace osu.Game.Rulesets.Mods
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
 
-        protected readonly BindableNumber<float> CurrentNumber = new BindableNumber<float>();
+        /// <summary>
+        /// Used to track the display value on the setting slider.
+        /// This can either be a user override or the beatmap default (when <see cref="Current"/> is null).
+        /// </summary>
+        private readonly BindableNumber<float> displayNumber = new BindableNumber<float>();
 
-        protected override Drawable CreateControl() => new ControlDrawable(CurrentNumber);
+        protected override Drawable CreateControl() => new ControlDrawable(displayNumber);
 
         private bool isInternalChange;
 
@@ -31,7 +35,10 @@ namespace osu.Game.Rulesets.Mods
             {
                 // intercept and extract the DifficultyBindable.
                 difficultyBindable = (DifficultyBindable)value;
-                CurrentNumber.BindTo(difficultyBindable.CurrentNumber);
+
+                // this bind is used to transfer bounds/precision only.
+                displayNumber.BindTo(difficultyBindable.CurrentNumber);
+
                 base.Current = value;
             }
         }
@@ -40,18 +47,18 @@ namespace osu.Game.Rulesets.Mods
         {
             base.LoadComplete();
 
-            beatmap.BindValueChanged(b =>
-            {
-                updateFromDifficulty();
-            }, true);
+            beatmap.BindValueChanged(b => updateFromDifficulty(), true);
 
             Current.BindValueChanged(current =>
             {
+                // the user override has changed; transfer the correct value to the visual display.
                 if (current.NewValue == null)
                     updateFromDifficulty();
+                else
+                    displayNumber.Value = current.NewValue.Value;
             });
 
-            CurrentNumber.BindValueChanged(number =>
+            displayNumber.BindValueChanged(number =>
             {
                 if (!isInternalChange)
                     Current.Value = number.NewValue;
@@ -67,8 +74,9 @@ namespace osu.Game.Rulesets.Mods
 
             if (Current.Value == null)
             {
+                // ensure the beatmap's value is not transferred as a user override.
                 isInternalChange = true;
-                CurrentNumber.Value = difficultyBindable.ReadFromDifficulty(difficulty);
+                displayNumber.Value = difficultyBindable.ReadFromDifficulty(difficulty);
                 isInternalChange = false;
             }
         }
@@ -77,6 +85,8 @@ namespace osu.Game.Rulesets.Mods
         {
             private readonly BindableWithCurrent<float?> current = new BindableWithCurrent<float?>();
 
+            // Mainly just for fulfilling the interface requirements.
+            // The actual update flow is done via the provided number.
             public Bindable<float?> Current
             {
                 get => current.Current;
