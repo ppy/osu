@@ -12,13 +12,13 @@ namespace osu.Game.Rulesets.Taiko.Mods
     public class TaikoModDifficultyAdjust : ModDifficultyAdjust
     {
         [SettingSource("Scroll Speed", "Adjust a beatmap's set scroll speed", LAST_SETTING_ORDER + 1)]
-        public BindableNumber<float> ScrollSpeed { get; } = new BindableFloat
+        public Bindable<float?> ScrollSpeed { get; } = new Bindable<float?>
         {
+            /*
             Precision = 0.05f,
             MinValue = 0.25f,
             MaxValue = 4,
-            Default = 1,
-            Value = 1,
+            */
         };
 
         public override string SettingDescription
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             base.ApplySettings(difficulty);
 
-            ApplySetting(ScrollSpeed, scroll => difficulty.SliderMultiplier *= scroll);
+            if (ScrollSpeed.Value != null) difficulty.SliderMultiplier = ScrollSpeed.Value.Value;
         }
     }
 }
