@@ -13,7 +13,6 @@ using osu.Game.Rulesets.UI;
 namespace osu.Game.Tests.Mods
 {
     [TestFixture]
-    [Ignore("Currently broken, pending fixes/reworking of ModDifficultyAdjust.")]
     public class ModDifficultyAdjustTest
     {
         // Todo: This shouldn't exist, but is currently required for the mod to accept a new BeatmapDifficulty object...
@@ -116,8 +115,16 @@ namespace osu.Game.Tests.Mods
             testMod.OverallDifficulty.Value = 4;
             testMod.ResetSettingsToDefaults();
 
-            Assert.That(testMod.DrainRate.Value, Is.EqualTo(10));
-            Assert.That(testMod.OverallDifficulty.Value, Is.EqualTo(10));
+            Assert.That(testMod.DrainRate.Value, Is.Null);
+            Assert.That(testMod.OverallDifficulty.Value, Is.Null);
+
+            var applied = applyDifficulty(new BeatmapDifficulty
+            {
+                DrainRate = 10,
+                OverallDifficulty = 10
+            });
+
+            Assert.That(applied.OverallDifficulty, Is.EqualTo(10));
         }
 
         /// <summary>
@@ -126,10 +133,12 @@ namespace osu.Game.Tests.Mods
         /// </summary>
         private BeatmapDifficulty applyDifficulty(BeatmapDifficulty difficulty)
         {
+            // ensure that ReadFromDifficulty doesn't pollute the values.
+            var newDifficulty = difficulty.Clone();
+
             difficulty.ID = ++currentId;
             testMod.ReadFromDifficulty(difficulty);
 
-            var newDifficulty = new BeatmapDifficulty();
             testMod.ApplyToDifficulty(newDifficulty);
             return newDifficulty;
         }
