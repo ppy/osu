@@ -7,14 +7,6 @@ namespace osu.Game.Rulesets.Mods
 {
     public class ApproachRateSettingsControl : DifficultyAdjustSettingsControl
     {
-        public ApproachRateSettingsControl()
-        {
-            CurrentNumber.Precision = 0.1f;
-
-            CurrentNumber.MinValue = 0;
-            CurrentNumber.MaxValue = 10;
-        }
-
         protected override float UpdateFromDifficulty(BeatmapDifficulty difficulty) => difficulty.ApproachRate;
     }
 }

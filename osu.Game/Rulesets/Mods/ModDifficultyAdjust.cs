@@ -33,23 +33,21 @@ namespace osu.Game.Rulesets.Mods
         protected const int LAST_SETTING_ORDER = 2;
 
         [SettingSource("HP Drain", "Override a beatmap's set HP.", FIRST_SETTING_ORDER, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
-        public Bindable<float?> DrainRate { get; } = new Bindable<float?>
+        public DifficultyBindable DrainRate { get; } = new DifficultyBindable
         {
-            /*
             Precision = 0.1f,
             MinValue = 0,
             MaxValue = 10,
-            */
+            ExtendedMaxValue = 11,
         };
 
         [SettingSource("Accuracy", "Override a beatmap's set OD.", LAST_SETTING_ORDER, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
-        public Bindable<float?> OverallDifficulty { get; } = new Bindable<float?>
+        public DifficultyBindable OverallDifficulty { get; } = new DifficultyBindable
         {
-            /*
             Precision = 0.1f,
             MinValue = 0,
             MaxValue = 10,
-            */
+            ExtendedMaxValue = 11,
         };
 
         [SettingSource("Extended Limits", "Adjust difficulty beyond sane limits.")]
@@ -57,18 +55,8 @@ namespace osu.Game.Rulesets.Mods
 
         protected ModDifficultyAdjust()
         {
-            ExtendedLimits.BindValueChanged(extend => ApplyLimits(extend.NewValue));
-        }
-
-        /// <summary>
-        /// Changes the difficulty adjustment limits. Occurs when the value of <see cref="ExtendedLimits"/> is changed.
-        /// </summary>
-        /// <param name="extended">Whether limits should extend beyond sane ranges.</param>
-        protected virtual void ApplyLimits(bool extended)
-        {
-            // TODO: reimplement
-            // DrainRate.MaxValue = extended ? 11 : 10;
-            // OverallDifficulty.MaxValue = extended ? 11 : 10;
+            OverallDifficulty.ExtendedLimits.BindTo(ExtendedLimits);
+            DrainRate.ExtendedLimits.BindTo(ExtendedLimits);
         }
 
         public override string SettingDescription
@@ -100,63 +88,6 @@ namespace osu.Game.Rulesets.Mods
         {
             if (DrainRate.Value != null) difficulty.DrainRate = DrainRate.Value.Value;
             if (OverallDifficulty.Value != null) difficulty.OverallDifficulty = OverallDifficulty.Value.Value;
-        }
-
-        /// <summary>
-        /// A <see cref="BindableDouble"/> that extends its min/max values to support any assigned value.
-        /// </summary>
-        protected class BindableDoubleWithLimitExtension : BindableDouble
-        {
-            public override double Value
-            {
-                get => base.Value;
-                set
-                {
-                    if (value < MinValue)
-                        MinValue = value;
-                    if (value > MaxValue)
-                        MaxValue = value;
-                    base.Value = value;
-                }
-            }
-        }
-
-        /// <summary>
-        /// A <see cref="BindableFloat"/> that extends its min/max values to support any assigned value.
-        /// </summary>
-        protected class BindableFloatWithLimitExtension : BindableFloat
-        {
-            public override float Value
-            {
-                get => base.Value;
-                set
-                {
-                    if (value < MinValue)
-                        MinValue = value;
-                    if (value > MaxValue)
-                        MaxValue = value;
-                    base.Value = value;
-                }
-            }
-        }
-
-        /// <summary>
-        /// A <see cref="BindableInt"/> that extends its min/max values to support any assigned value.
-        /// </summary>
-        protected class BindableIntWithLimitExtension : BindableInt
-        {
-            public override int Value
-            {
-                get => base.Value;
-                set
-                {
-                    if (value < MinValue)
-                        MinValue = value;
-                    if (value > MaxValue)
-                        MaxValue = value;
-                    base.Value = value;
-                }
-            }
         }
     }
 }

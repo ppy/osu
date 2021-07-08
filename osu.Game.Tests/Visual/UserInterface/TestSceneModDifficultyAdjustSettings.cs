@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void setBeatmapWithDifficultyParameters(float value)
         {
-            AddStep($"set beatmap with all {value}", () => Beatmap.Value = CreateWorkingBeatmap(new Beatmap()
+            AddStep($"set beatmap with all {value}", () => Beatmap.Value = CreateWorkingBeatmap(new Beatmap
             {
                 BeatmapInfo = new BeatmapInfo
                 {

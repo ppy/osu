@@ -17,16 +17,25 @@ namespace osu.Game.Rulesets.Mods
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
 
-        protected readonly BindableNumber<float> CurrentNumber = new BindableNumber<float>
-        {
-            // TODO: these need to be pulled out of the main bindable.
-            MinValue = 0,
-            MaxValue = 10,
-        };
+        protected readonly BindableNumber<float> CurrentNumber = new BindableNumber<float>();
 
         protected override Drawable CreateControl() => new ControlDrawable(CurrentNumber);
 
         private bool isInternalChange;
+
+        private DifficultyBindable difficultyBindable;
+
+        public override Bindable<float?> Current
+        {
+            get => base.Current;
+            set
+            {
+                // intercept and extract the DifficultyBindable.
+                difficultyBindable = (DifficultyBindable)value;
+                CurrentNumber.BindTo(difficultyBindable.CurrentNumber);
+                base.Current = value;
+            }
+        }
 
         protected override void LoadComplete()
         {
