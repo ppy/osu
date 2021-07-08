@@ -73,13 +73,19 @@ namespace osu.Game.Rulesets.Mods
         public DifficultyBindable()
         {
             ExtendedLimits.BindValueChanged(_ => updateMaxValue());
+        }
 
-            BindValueChanged(val =>
+        public override float? Value
+        {
+            get => base.Value;
+            set
             {
                 // Ensure that in the case serialisation runs in the wrong order (and limit extensions aren't applied yet) the deserialised value is still propagated.
-                if (val.NewValue != null)
-                    CurrentNumber.MaxValue = MathF.Max(CurrentNumber.MaxValue, val.NewValue.Value);
-            });
+                if (value != null)
+                    CurrentNumber.MaxValue = MathF.Max(CurrentNumber.MaxValue, value.Value);
+
+                base.Value = value;
+            }
         }
 
         private void updateMaxValue()
