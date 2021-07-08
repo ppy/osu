@@ -35,9 +35,9 @@ namespace osu.Game.Overlays
                 current?.UnbindAll();
                 current = value.GetBoundCopy();
 
-                current.ValueChanged += onValueChanged;
-                current.DefaultChanged += onDefaultChanged;
-                current.DisabledChanged += onDisabledChanged;
+                current.ValueChanged += _ => UpdateState();
+                current.DefaultChanged += _ => UpdateState();
+                current.DisabledChanged += _ => UpdateState();
                 UpdateState();
             }
         }
@@ -92,10 +92,6 @@ namespace osu.Game.Overlays
             hovering = false;
             UpdateState();
         }
-
-        private void onValueChanged(ValueChangedEvent<T> _) => UpdateState();
-        private void onDefaultChanged(ValueChangedEvent<T> _) => UpdateState();
-        private void onDisabledChanged(bool _) => UpdateState();
 
         public void UpdateState() => Scheduler.AddOnce(updateState);
 
