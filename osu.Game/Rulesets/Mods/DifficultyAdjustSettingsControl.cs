@@ -11,7 +11,6 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Mods
 {
-    // TODO: make abstract once we finish making each implementation.
     public class DifficultyAdjustSettingsControl : SettingsItem<float?>
     {
         [Resolved]
@@ -69,13 +68,10 @@ namespace osu.Game.Rulesets.Mods
             if (Current.Value == null)
             {
                 isInternalChange = true;
-                CurrentNumber.Value = UpdateFromDifficulty(difficulty);
+                CurrentNumber.Value = difficultyBindable.ReadFromDifficulty(difficulty);
                 isInternalChange = false;
             }
         }
-
-        // TODO: make abstract
-        protected virtual float UpdateFromDifficulty(BeatmapDifficulty difficulty) => 0;
 
         private class ControlDrawable : CompositeDrawable, IHasCurrentValue<float?>
         {

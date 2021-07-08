@@ -17,15 +17,17 @@ namespace osu.Game.Rulesets.Osu.Mods
             MinValue = 0,
             MaxValue = 10,
             ExtendedMaxValue = 11,
+            ReadFromDifficulty = diff => diff.CircleSize,
         };
 
-        [SettingSource("Approach Rate", "Override a beatmap's set AR.", LAST_SETTING_ORDER + 1, SettingControlType = typeof(ApproachRateSettingsControl))]
+        [SettingSource("Approach Rate", "Override a beatmap's set AR.", LAST_SETTING_ORDER + 1, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
         public DifficultyBindable ApproachRate { get; } = new DifficultyBindable
         {
             Precision = 0.1f,
             MinValue = 0,
             MaxValue = 10,
             ExtendedMaxValue = 11,
+            ReadFromDifficulty = diff => diff.ApproachRate,
         };
 
         public OsuModDifficultyAdjust()
