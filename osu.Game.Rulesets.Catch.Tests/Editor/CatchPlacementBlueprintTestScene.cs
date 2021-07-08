@@ -33,10 +33,9 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
 
         protected CatchPlacementBlueprintTestScene()
         {
-            base.Content.Add(contentContainer = new CatchEditorTestSceneContainer
-            {
-                Clock = new FramedClock(new ManualClock())
-            });
+            base.Content.Add(contentContainer = new CatchEditorTestSceneContainer());
+
+            contentContainer.Playfield.Clock = new FramedClock(new ManualClock());
         }
 
         [SetUp]
