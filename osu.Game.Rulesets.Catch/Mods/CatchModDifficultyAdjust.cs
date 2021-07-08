@@ -35,12 +35,6 @@ namespace osu.Game.Rulesets.Catch.Mods
         [SettingSource("Spicy Patterns", "Adjust the patterns as if Hard Rock is enabled.")]
         public BindableBool HardRockOffsets { get; } = new BindableBool();
 
-        public CatchModDifficultyAdjust()
-        {
-            CircleSize.ExtendedLimits.BindTo(ExtendedLimits);
-            ApproachRate.ExtendedLimits.BindTo(ExtendedLimits);
-        }
-
         public override string SettingDescription
         {
             get
