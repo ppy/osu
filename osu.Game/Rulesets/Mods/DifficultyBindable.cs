@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Bindables;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -22,6 +23,11 @@ namespace osu.Game.Rulesets.Mods
             MinValue = 0,
             MaxValue = 10,
         };
+
+        /// <summary>
+        /// A function that can extract the current value of this setting from a beatmap difficulty for display purposes.
+        /// </summary>
+        public Func<BeatmapDifficulty, float> ReadFromDifficulty;
 
         public float Precision
         {

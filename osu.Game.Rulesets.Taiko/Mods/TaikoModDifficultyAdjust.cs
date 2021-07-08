@@ -16,6 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             Precision = 0.05f,
             MinValue = 0.25f,
             MaxValue = 4,
+            ReadFromDifficulty = _ => 1,
         };
 
         public override string SettingDescription

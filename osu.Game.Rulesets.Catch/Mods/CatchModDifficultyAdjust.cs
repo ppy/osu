@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Catch.Mods
             Precision = 0.1f,
             MinValue = 1,
             MaxValue = 10,
+            ExtendedMaxValue = 11,
+            ReadFromDifficulty = diff => diff.CircleSize,
         };
 
         [SettingSource("Approach Rate", "Override a beatmap's set AR.", LAST_SETTING_ORDER + 1)]
@@ -26,6 +28,8 @@ namespace osu.Game.Rulesets.Catch.Mods
             Precision = 0.1f,
             MinValue = 1,
             MaxValue = 10,
+            ExtendedMaxValue = 11,
+            ReadFromDifficulty = diff => diff.ApproachRate,
         };
 
         [SettingSource("Spicy Patterns", "Adjust the patterns as if Hard Rock is enabled.")]
