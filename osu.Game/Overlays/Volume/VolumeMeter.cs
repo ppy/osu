@@ -391,6 +391,7 @@ namespace osu.Game.Overlays.Volume
                 case SelectionState.Selected:
                     this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
                     selectedGlowContainer.FadeIn(transition_length, Easing.OutExpo);
+                    hoverSample?.Play();
                     break;
 
                 case SelectionState.NotSelected:
@@ -398,8 +399,6 @@ namespace osu.Game.Overlays.Volume
                     selectedGlowContainer.FadeOut(transition_length, Easing.OutExpo);
                     break;
             }
-
-            hoverSample?.Play();
         }
     }
 }
