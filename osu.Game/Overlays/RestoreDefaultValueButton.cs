@@ -23,12 +23,8 @@ namespace osu.Game.Overlays
         // this is done to ensure a click on this button doesn't trigger focus on a parent element which contains the button.
         public override bool AcceptsFocus => true;
 
-        // this is intentionally not using BindableWithCurrent as this needs a BindableNumber instance for an accurate IsDefault value.
-        //
-        // this also cannot use IBindableWithCurrent.Create() due to BindableNumberWithCurrent
-        // directly casting given bindables to BindableNumber, which is not necessarily the case.
-        //
-        // therefore rely on the old method of taking each current bindable instance for now, until things are settled framework-side.
+        // this is intentionally not using BindableWithCurrent, as it can use the wrong IsDefault implementation when passed a BindableNumber.
+        // using GetBoundCopy() ensures that the received bindable is of the exact same type as the source bindable and uses the proper IsDefault implementation.
         private Bindable<T> current;
 
         public Bindable<T> Current
