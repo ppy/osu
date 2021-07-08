@@ -57,8 +57,11 @@ namespace osu.Game.Rulesets.Mods
 
         protected ModDifficultyAdjust()
         {
-            OverallDifficulty.ExtendedLimits.BindTo(ExtendedLimits);
-            DrainRate.ExtendedLimits.BindTo(ExtendedLimits);
+            foreach (var (_, property) in this.GetOrderedSettingsSourceProperties())
+            {
+                if (property.GetValue(this) is DifficultyBindable diffAdjustBindable)
+                    diffAdjustBindable.ExtendedLimits.BindTo(ExtendedLimits);
+            }
         }
 
         public override string SettingDescription

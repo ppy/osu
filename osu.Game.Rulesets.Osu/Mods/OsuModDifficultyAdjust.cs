@@ -30,12 +30,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             ReadFromDifficulty = diff => diff.ApproachRate,
         };
 
-        public OsuModDifficultyAdjust()
-        {
-            CircleSize.ExtendedLimits.BindTo(ExtendedLimits);
-            ApproachRate.ExtendedLimits.BindTo(ExtendedLimits);
-        }
-
         public override string SettingDescription
         {
             get
