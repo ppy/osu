@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -42,7 +43,8 @@ namespace osu.Game.Overlays.Volume
 
         private Container selectedGlowContainer;
 
-        private Sample sample;
+        private Sample hoverSample;
+        private Sample notchSample;
         private double sampleLastPlaybackTime;
 
         public event Action<SelectionState> StateChanged;
@@ -78,7 +80,8 @@ namespace osu.Game.Overlays.Volume
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, AudioManager audio)
         {
-            sample = audio.Samples.Get(@"UI/notch-tick");
+            hoverSample = audio.Samples.Get($"UI/{HoverSampleSet.Button.GetDescription()}-hover");
+            notchSample = audio.Samples.Get(@"UI/notch-tick");
             sampleLastPlaybackTime = Time.Current;
 
             Color4 backgroundColour = colours.Gray1;
@@ -274,7 +277,7 @@ namespace osu.Game.Overlays.Volume
             if (Time.Current - sampleLastPlaybackTime <= tick_debounce_time)
                 return;
 
-            var channel = sample.GetChannel();
+            var channel = notchSample.GetChannel();
 
             channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + displayVolume * 0.1f;
 
@@ -388,6 +391,7 @@ namespace osu.Game.Overlays.Volume
                 case SelectionState.Selected:
                     this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
                     selectedGlowContainer.FadeIn(transition_length, Easing.OutExpo);
+                    hoverSample?.Play();
                     break;
 
                 case SelectionState.NotSelected:
