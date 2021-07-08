@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual
 
         protected PlacementBlueprintTestScene()
         {
-            Add(HitObjectContainer = CreateHitObjectContainer().With(c => c.Clock = new FramedClock(new StopwatchClock())));
+            base.Content.Add(HitObjectContainer = CreateHitObjectContainer().With(c => c.Clock = new FramedClock(new StopwatchClock())));
         }
 
         [BackgroundDependencyLoader]
