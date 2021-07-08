@@ -13,35 +13,28 @@ namespace osu.Game.Rulesets.Catch.Mods
     public class CatchModDifficultyAdjust : ModDifficultyAdjust, IApplicableToBeatmapProcessor
     {
         [SettingSource("Circle Size", "Override a beatmap's set CS.", FIRST_SETTING_ORDER - 1)]
-        public Bindable<float?> CircleSize { get; } = new Bindable<float?>
+        public DifficultyBindable CircleSize { get; } = new DifficultyBindable
         {
-            /*
             Precision = 0.1f,
             MinValue = 1,
             MaxValue = 10,
-            */
         };
 
         [SettingSource("Approach Rate", "Override a beatmap's set AR.", LAST_SETTING_ORDER + 1)]
-        public Bindable<float?> ApproachRate { get; } = new Bindable<float?>
+        public DifficultyBindable ApproachRate { get; } = new DifficultyBindable
         {
-            /*
             Precision = 0.1f,
             MinValue = 1,
             MaxValue = 10,
-            */
         };
 
         [SettingSource("Spicy Patterns", "Adjust the patterns as if Hard Rock is enabled.")]
         public BindableBool HardRockOffsets { get; } = new BindableBool();
 
-        protected override void ApplyLimits(bool extended)
+        public CatchModDifficultyAdjust()
         {
-            base.ApplyLimits(extended);
-
-            // TODO: reimplement
-            // CircleSize.MaxValue = extended ? 11 : 10;
-            // ApproachRate.MaxValue = extended ? 11 : 10;
+            CircleSize.ExtendedLimits.BindTo(ExtendedLimits);
+            ApproachRate.ExtendedLimits.BindTo(ExtendedLimits);
         }
 
         public override string SettingDescription
