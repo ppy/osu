@@ -98,9 +98,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor += Attributes.ApproachRate - 10.33;
+                approachRateFactor = Attributes.ApproachRate - 10.33;
             else if (Attributes.ApproachRate < 8.0)
-                approachRateFactor += 0.025 * (8.0 - Attributes.ApproachRate);
+                approachRateFactor = 0.025 * (8.0 - Attributes.ApproachRate);
 
             aimValue *= 1.0 + (0.03 + 0.37 * (1.0 / Math.Exp(-(0.0007 * (totalHits - 400))))) * approachRateFactor;
 
@@ -146,12 +146,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
                 approachRateFactor = Attributes.ApproachRate - 10.33;
-
-            speedValue *= 1.0 + Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
-
-            double approachRateFactor = 0.0;
-            if (Attributes.ApproachRate > 10.33)
-                approachRateFactor += Attributes.ApproachRate - 10.33;
 
             speedValue *= 1.0 + (0.03 + 0.37 * (1.0 / Math.Exp(-(0.0007 * (totalHits - 400))))) * approachRateFactor;
 
