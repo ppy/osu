@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         private readonly BindableNumber<float> displayNumber = new BindableNumber<float>();
 
-        protected override Drawable CreateControl() => new ControlDrawable(displayNumber);
+        protected override Drawable CreateControl() => new SliderControl(displayNumber);
 
         private bool isInternalChange;
 
@@ -81,19 +81,20 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        private class ControlDrawable : CompositeDrawable, IHasCurrentValue<float?>
+        private class SliderControl : CompositeDrawable, IHasCurrentValue<float?>
         {
             private readonly BindableWithCurrent<float?> current = new BindableWithCurrent<float?>();
 
             // Mainly just for fulfilling the interface requirements.
             // The actual update flow is done via the provided number.
+            // Of note, this is used for the "reset to default" flow.
             public Bindable<float?> Current
             {
                 get => current.Current;
                 set => current.Current = value;
             }
 
-            public ControlDrawable(BindableNumber<float> currentNumber)
+            public SliderControl(BindableNumber<float> currentNumber)
             {
                 InternalChildren = new Drawable[]
                 {
