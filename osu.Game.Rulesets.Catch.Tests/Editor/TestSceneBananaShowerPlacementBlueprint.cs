@@ -75,11 +75,11 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
         {
             AddMoveStep(100, 0);
             AddClickStep(MouseButton.Left);
-            AddAssert("outline is semitransparent", () => timeSpanOutline.Alpha < 1);
+            AddUntilStep("outline is semitransparent", () => Precision.DefinitelyBigger(1, timeSpanOutline.Alpha));
             AddMoveStep(200, 0);
-            AddAssert("outline is opaque", () => Precision.AlmostEquals(timeSpanOutline.Alpha, 1));
+            AddUntilStep("outline is opaque", () => Precision.AlmostEquals(timeSpanOutline.Alpha, 1));
             AddMoveStep(100, 0);
-            AddAssert("outline is semitransparent", () => timeSpanOutline.Alpha < 1);
+            AddUntilStep("outline is semitransparent", () => Precision.DefinitelyBigger(1, timeSpanOutline.Alpha));
         }
 
         private TimeSpanOutline timeSpanOutline => Content.ChildrenOfType<TimeSpanOutline>().Single();
