@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
             if (deltaX == 0)
             {
-                // Returns true: even there is no positional change, there may be a time change.
+                // Even there is no positional change, there may be a time change.
                 return true;
             }
 
@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Catch.Edit
                 case JuiceStream juiceStream:
                     foreach (var nested in juiceStream.NestedHitObjects.OfType<CatchHitObject>())
                     {
-                        // Exclude tiny droplets: even if `OriginalX` is outside the playfield, it can be moved inside the playfield after the random offset application.
+                        // Even if `OriginalX` is outside the playfield, tiny droplets can be moved inside the playfield after the random offset application.
                         if (!(nested is TinyDroplet))
                             yield return nested.OriginalX;
                     }
