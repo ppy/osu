@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Whether the extended limits should be applied to this bindable.
         /// </summary>
-        public BindableBool ExtendedLimits { get; } = new BindableBool();
+        public readonly BindableBool ExtendedLimits = new BindableBool();
 
         /// <summary>
         /// An internal numeric bindable to hold and propagate min/max/precision.
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// A function that can extract the current value of this setting from a beatmap difficulty for display purposes.
         /// </summary>
-        public Func<BeatmapDifficulty, float> ReadFromDifficulty;
+        public Func<BeatmapDifficulty, float> ReadCurrentFromDifficulty;
 
         public float Precision
         {
