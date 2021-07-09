@@ -227,7 +227,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.UpdateStartTimeStateTransforms();
 
-            using (BeginDelayedSequence(-ring_appear_offset, true))
+            using (BeginDelayedSequence(-ring_appear_offset))
                 targetRing.ScaleTo(target_ring_scale, 400, Easing.OutQuint);
         }
 

@@ -82,7 +82,7 @@ namespace osu.Game.Online.Leaderboards
 
                     foreach (var s in scrollFlow.Children)
                     {
-                        using (s.BeginDelayedSequence(i++ * 50, true))
+                        using (s.BeginDelayedSequence(i++ * 50))
                             s.Show();
                     }
 

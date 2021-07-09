@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Mf.Sections
             var t = new MfLinkFlowContainer();
 
             t.AddLink("Mf-osu", "https://github.com/MATRIX-feather/osu");
-            t.AddText("是一个基于osu!lazer(ppy/osu)的分支版本");
+            t.AddText("是一个ppy/osu的派生分支。");
 
             return t;
         }

@@ -2,31 +2,32 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
-using osuTK;
-using osuTK.Graphics;
-using osu.Game.Graphics;
-using osu.Framework.Allocation;
-using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Input.Bindings;
-using osu.Framework.Graphics.Effects;
-using osu.Game.Screens.Play.PlayerSettings;
-using osu.Framework.Bindables;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
+using osu.Game.Screens.Play.PlayerSettings;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
     public abstract class GameplayMenuOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
-        private readonly Bindable<bool> Optui = new Bindable<bool>();
+        private readonly Bindable<bool> optui = new Bindable<bool>();
         protected const int TRANSITION_DURATION = 200;
 
         private const int button_height = 70;
@@ -49,16 +50,16 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Select"/> is triggered.
         /// </summary>
-        protected virtual Action SelectAction => () => InternalButtons.Children.FirstOrDefault(f => f.Selected.Value)?.Click();
+        protected virtual Action SelectAction => () => InternalButtons.Selected?.Click();
 
         public abstract string Header { get; }
 
         public abstract string Description { get; }
 
-        protected ButtonContainer InternalButtons;
+        protected SelectionCycleFillFlowContainer<DialogButton> InternalButtons;
         public IReadOnlyList<DialogButton> Buttons => InternalButtons;
 
-        private VisualSettings VisualSettings;
+        private VisualSettings visualSettings;
         private FillFlowContainer retryCounterContainer;
 
         protected GameplayMenuOverlay()
@@ -71,7 +72,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, MConfigManager config)
         {
-            config.BindWith(MSetting.OptUI, Optui);
+            config.BindWith(MSetting.OptUI, optui);
 
             Children = new Drawable[]
             {
@@ -122,7 +123,7 @@ namespace osu.Game.Screens.Play
                                 }
                             }
                         },
-                        InternalButtons = new ButtonContainer
+                        InternalButtons = new SelectionCycleFillFlowContainer<DialogButton>
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
@@ -155,7 +156,7 @@ namespace osu.Game.Screens.Play
                     Margin = new MarginPadding(25),
                     Children = new PlayerSettingsGroup[]
                     {
-                        VisualSettings = new VisualSettings
+                        visualSettings = new VisualSettings
                         {
                             IgnoreOptUI = false,
                         },
@@ -165,20 +166,20 @@ namespace osu.Game.Screens.Play
 
             updateRetryCount();
 
-            Optui.ValueChanged += _ => UpdateVisibilities();
-            UpdateVisibilities();
+            optui.ValueChanged += _ => updateVisibilities();
+            updateVisibilities();
         }
 
-        private void UpdateVisibilities()
+        private void updateVisibilities()
         {
-            switch (Optui.Value)
+            switch (optui.Value)
             {
                 case true:
-                    VisualSettings.FadeIn(250);
+                    visualSettings.FadeIn(250);
                     break;
 
                 case false:
-                    VisualSettings.FadeOut(250);
+                    visualSettings.FadeOut(250);
                     break;
             }
         }
@@ -222,8 +223,6 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            button.Selected.ValueChanged += selected => buttonSelectionChanged(button, selected.NewValue);
-
             InternalButtons.Add(button);
         }
 
@@ -255,14 +254,6 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        private void buttonSelectionChanged(DialogButton button, bool isSelected)
-        {
-            if (!isSelected)
-                InternalButtons.Deselect();
-            else
-                InternalButtons.Select(button);
-        }
-
         private void updateRetryCount()
         {
             // "You've retried 1,065 times in this session"
@@ -280,46 +271,6 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        protected class ButtonContainer : FillFlowContainer<DialogButton>
-        {
-            private int selectedIndex = -1;
-
-            private void setSelected(int value)
-            {
-                if (selectedIndex == value)
-                    return;
-
-                // Deselect the previously-selected button
-                if (selectedIndex != -1)
-                    this[selectedIndex].Selected.Value = false;
-
-                selectedIndex = value;
-
-                // Select the newly-selected button
-                if (selectedIndex != -1)
-                    this[selectedIndex].Selected.Value = true;
-            }
-
-            public void SelectNext()
-            {
-                if (selectedIndex == -1 || selectedIndex == Count - 1)
-                    setSelected(0);
-                else
-                    setSelected(selectedIndex + 1);
-            }
-
-            public void SelectPrevious()
-            {
-                if (selectedIndex == -1 || selectedIndex == 0)
-                    setSelected(Count - 1);
-                else
-                    setSelected(selectedIndex - 1);
-            }
-
-            public void Deselect() => setSelected(-1);
-            public void Select(DialogButton button) => setSelected(IndexOf(button));
-        }
-
         private class Button : DialogButton
         {
             // required to ensure keyboard navigation always starts from an extremity (unless the cursor is moved)
@@ -327,7 +278,7 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                Selected.Value = true;
+                State = SelectionState.Selected;
                 return base.OnMouseMove(e);
             }
         }

@@ -194,9 +194,9 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddStep("catch more fruits", () => attemptCatch(() => new Fruit(), 9));
             checkPlate(10);
             AddAssert("caught objects are stacked", () =>
-                catcher.CaughtObjects.All(obj => obj.Y <= Catcher.CAUGHT_FRUIT_VERTICAL_OFFSET) &&
-                catcher.CaughtObjects.Any(obj => obj.Y == Catcher.CAUGHT_FRUIT_VERTICAL_OFFSET) &&
-                catcher.CaughtObjects.Any(obj => obj.Y < -25));
+                catcher.CaughtObjects.All(obj => obj.Y <= 0) &&
+                catcher.CaughtObjects.Any(obj => obj.Y == 0) &&
+                catcher.CaughtObjects.Any(obj => obj.Y < 0));
         }
 
         [Test]

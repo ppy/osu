@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     {
         private TriangleButton selectionButton;
 
-        private DirectorySelector directorySelector;
+        private OsuDirectorySelector directorySelector;
 
         /// <summary>
         /// Text to display in the header to inform the user of what they are selecting.
@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             },
                             new Drawable[]
                             {
-                                directorySelector = new DirectorySelector
+                                directorySelector = new OsuDirectorySelector
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 }

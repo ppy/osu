@@ -33,6 +33,6 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         };
 
-        protected override string HighlightedColumn() => @"Rank分";
+        protected override string HighlightedColumn => @"Rank分";
     }
 }
