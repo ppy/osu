@@ -18,11 +18,14 @@ namespace osu.Game.Rulesets.Mods
 
         /// <summary>
         /// Used to track the display value on the setting slider.
-        /// This can either be a user override or the beatmap default (when <see cref="Current"/> is null).
         /// </summary>
-        private readonly BindableNumber<float> displayNumber = new BindableNumber<float>();
+        /// <remarks>
+        /// When the mod is overriding a default, this will match the value of <see cref="Current"/>.
+        /// When there is no override (ie. <see cref="Current"/> is null), this value will match the beatmap provided default via <see cref="updateFromDifficulty"/>.
+        /// </remarks>
+        private readonly BindableNumber<float> sliderDisplayCurrent = new BindableNumber<float>();
 
-        protected override Drawable CreateControl() => new SliderControl(displayNumber);
+        protected override Drawable CreateControl() => new SliderControl(sliderDisplayCurrent);
 
         private bool isInternalChange;
 
@@ -33,11 +36,10 @@ namespace osu.Game.Rulesets.Mods
             get => base.Current;
             set
             {
-                // intercept and extract the DifficultyBindable.
+                // Intercept and extract the internal number bindable from DifficultyBindable.
+                // This will provide bounds and precision specifications for the slider bar.
                 difficultyBindable = (DifficultyBindable)value;
-
-                // this bind is used to transfer bounds/precision only.
-                displayNumber.BindTo(difficultyBindable.CurrentNumber);
+                sliderDisplayCurrent.BindTo(difficultyBindable.CurrentNumber);
 
                 base.Current = value;
             }
@@ -51,15 +53,22 @@ namespace osu.Game.Rulesets.Mods
 
             Current.BindValueChanged(current =>
             {
-                // the user override has changed; transfer the correct value to the visual display.
-                if (current.NewValue == null)
-                    updateFromDifficulty();
+                if (current.NewValue != null)
+                {
+                    // a user override has been added or updated.
+                    sliderDisplayCurrent.Value = current.NewValue.Value;
+                }
                 else
-                    displayNumber.Value = current.NewValue.Value;
+                {
+                    // user override was removed, so restore the beatmap provided value.
+                    updateFromDifficulty();
+                }
             });
 
-            displayNumber.BindValueChanged(number =>
+            sliderDisplayCurrent.BindValueChanged(number =>
             {
+                // this handles the transfer of the slider value to the main bindable.
+                // as such, should be skipped if the slider is being updated via updateFromDifficulty().
                 if (!isInternalChange)
                     Current.Value = number.NewValue;
             });
@@ -76,23 +85,16 @@ namespace osu.Game.Rulesets.Mods
             {
                 // ensure the beatmap's value is not transferred as a user override.
                 isInternalChange = true;
-                displayNumber.Value = difficultyBindable.ReadCurrentFromDifficulty(difficulty);
+                sliderDisplayCurrent.Value = difficultyBindable.ReadCurrentFromDifficulty(difficulty);
                 isInternalChange = false;
             }
         }
 
         private class SliderControl : CompositeDrawable, IHasCurrentValue<float?>
         {
-            private readonly BindableWithCurrent<float?> current = new BindableWithCurrent<float?>();
-
-            // Mainly just for fulfilling the interface requirements.
-            // The actual update flow is done via the provided number.
-            // Of note, this is used for the "reset to default" flow.
-            public Bindable<float?> Current
-            {
-                get => current.Current;
-                set => current.Current = value;
-            }
+            // This is required as SettingsItem relies heavily on this bindable for internal use.
+            // The actual update flow is done via the bindable provided in the constructor.
+            public Bindable<float?> Current { get; set; } = new Bindable<float?>();
 
             public SliderControl(BindableNumber<float> currentNumber)
             {
