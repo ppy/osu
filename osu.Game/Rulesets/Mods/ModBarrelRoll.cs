@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mods
         };
 
         [SettingSource("方向", "滚动方向")]
-        public Bindable<RotationDirection> Direction { get; } = new Bindable<RotationDirection>(RotationDirection.Clockwise);
+        public Bindable<RotationDirection> Direction { get; } = new Bindable<RotationDirection>();
 
         public override string Name => "滚筒";
         public override string Acronym => "BR";

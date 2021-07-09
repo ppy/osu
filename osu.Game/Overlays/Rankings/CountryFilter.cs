@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Rankings
     public class CountryFilter : CompositeDrawable, IHasCurrentValue<Country>
     {
         private const int duration = 200;
-        private const int height = 50;
+        private const int height = 70;
 
         private readonly BindableWithCurrent<Country> current = new BindableWithCurrent<Country>();
 

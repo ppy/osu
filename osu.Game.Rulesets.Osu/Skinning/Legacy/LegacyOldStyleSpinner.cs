@@ -89,10 +89,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             Spinner spinner = d.HitObject;
 
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt, true))
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimePreempt))
                 this.FadeOut();
 
-            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2, true))
+            using (BeginAbsoluteSequence(spinner.StartTime - spinner.TimeFadeIn / 2))
                 this.FadeInFromZero(spinner.TimeFadeIn / 2);
         }
 

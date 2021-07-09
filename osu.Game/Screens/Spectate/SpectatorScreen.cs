@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -61,10 +60,15 @@ namespace osu.Game.Screens.Spectate
         {
             base.LoadComplete();
 
-            getAllUsers().ContinueWith(users => Schedule(() =>
+            userLookupCache.GetUsersAsync(userIds.ToArray()).ContinueWith(users => Schedule(() =>
             {
                 foreach (var u in users.Result)
+                {
+                    if (u == null)
+                        continue;
+
                     userMap[u.Id] = u;
+                }
 
                 playingUserStates.BindTo(spectatorClient.PlayingUserStates);
                 playingUserStates.BindCollectionChanged(onPlayingUserStatesChanged, true);
@@ -75,24 +79,6 @@ namespace osu.Game.Screens.Spectate
                 foreach (var (id, _) in userMap)
                     spectatorClient.WatchUser(id);
             }));
-        }
-
-        private Task<User[]> getAllUsers()
-        {
-            var userLookupTasks = new List<Task<User>>();
-
-            foreach (var u in userIds)
-            {
-                userLookupTasks.Add(userLookupCache.GetUserAsync(u).ContinueWith(task =>
-                {
-                    if (!task.IsCompletedSuccessfully)
-                        return null;
-
-                    return task.Result;
-                }));
-            }
-
-            return Task.WhenAll(userLookupTasks);
         }
 
         private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> e)

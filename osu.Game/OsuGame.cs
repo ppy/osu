@@ -372,6 +372,9 @@ namespace osu.Game
 
                 case LinkAction.OpenPictureURL:
                     Picture.UpdateImage(link.Argument, true);
+
+                case LinkAction.SearchBeatmapSet:
+                    SearchBeatmapSet(link.Argument);
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
@@ -443,6 +446,12 @@ namespace osu.Game
         /// </summary>
         /// <param name="beatmapId">The beatmap to show.</param>
         public void ShowBeatmap(int beatmapId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId));
+
+        /// <summary>
+        /// Shows the beatmap listing overlay, with the given <paramref name="query"/> in the search box.
+        /// </summary>
+        /// <param name="query">The query to search for.</param>
+        public void SearchBeatmapSet(string query) => waitForReady(() => beatmapListing, _ => beatmapListing.ShowWithSearch(query));
 
         /// <summary>
         /// Show a wiki's page as an overlay

@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private void applyCirclePieceState(DrawableOsuHitObject hitObject, IDrawable hitCircle = null)
         {
             var h = hitObject.HitObject;
-            using (hitObject.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+            using (hitObject.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
                 (hitCircle ?? hitObject).Hide();
         }
 
