@@ -27,10 +27,9 @@ namespace osu.Game.Rulesets.Catch.Edit
             var blueprint = moveEvent.Blueprint;
             Vector2 originalPosition = HitObjectContainer.ToLocalSpace(blueprint.ScreenSpaceSelectionPoint);
             Vector2 targetPosition = HitObjectContainer.ToLocalSpace(blueprint.ScreenSpaceSelectionPoint + moveEvent.ScreenSpaceDelta);
-            float deltaX = targetPosition.X - originalPosition.X;
 
-            foreach (float x in EditorBeatmap.SelectedHitObjects.SelectMany(getOriginalPositions))
-                deltaX = Math.Clamp(deltaX, -x, CatchPlayfield.WIDTH - x);
+            float deltaX = targetPosition.X - originalPosition.X;
+            deltaX = limitMovement(deltaX, EditorBeatmap.SelectedHitObjects);
 
             if (deltaX == 0)
             {
@@ -50,6 +49,36 @@ namespace osu.Game.Rulesets.Catch.Edit
             });
 
             return true;
+        }
+
+        /// <summary>
+        /// Limit positional movement of the objects by the constraint that moved objects should stay in bounds.
+        /// </summary>
+        /// <param name="deltaX">The positional movement.</param>
+        /// <param name="movingObjects">The objects to be moved.</param>
+        /// <returns>The positional movement with the restriction applied.</returns>
+        private float limitMovement(float deltaX, IEnumerable<HitObject> movingObjects)
+        {
+            float minX = float.PositiveInfinity;
+            float maxX = float.NegativeInfinity;
+
+            foreach (float x in movingObjects.SelectMany(getOriginalPositions))
+            {
+                minX = Math.Min(minX, x);
+                maxX = Math.Max(maxX, x);
+            }
+
+            // To make an object with position `x` stay in bounds after `deltaX` movement, `0 <= x + deltaX <= WIDTH` should be satisfied.
+            // Subtracting `x`, we get `-x <= deltaX <= WIDTH - x`.
+            // We only need to apply the inequality to extreme values of `x`.
+            float lowerBound = -minX;
+            float upperBound = CatchPlayfield.WIDTH - maxX;
+            // The inequality may be unsatisfiable if the objects were already out of bounds.
+            // In that case, don't move objects at all.
+            if (!(lowerBound <= upperBound))
+                return 0;
+
+            return Math.Clamp(deltaX, lowerBound, upperBound);
         }
 
         /// <summary>
