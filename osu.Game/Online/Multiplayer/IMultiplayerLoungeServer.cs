@@ -25,6 +25,6 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="password">The password for the join request.</param>
         /// <exception cref="InvalidStateException">If the user is already in the requested (or another) room.</exception>
         /// <exception cref="InvalidPasswordException">If the room provided password was incorrect.</exception>
-        Task<MultiplayerRoom> JoinRoom(long roomId, string password);
+        Task<MultiplayerRoom> JoinRoomWithPassword(long roomId, string password);
     }
 }
