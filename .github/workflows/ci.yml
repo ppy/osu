@@ -39,7 +39,7 @@ jobs:
         with:
           repository: 'MATRIX-feather/osu-framework'
           ref: 'custom'
-          path: 'iriosu-framework'
+          path: 'osu-framework'
 
       - name: Compile
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
