@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mods
             MinValue = 0,
             MaxValue = 10,
             ExtendedMaxValue = 11,
-            ReadFromDifficulty = diff => diff.DrainRate,
+            ReadCurrentFromDifficulty = diff => diff.DrainRate,
         };
 
         [SettingSource("Accuracy", "Override a beatmap's set OD.", LAST_SETTING_ORDER, SettingControlType = typeof(DifficultyAdjustSettingsControl))]
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mods
             MinValue = 0,
             MaxValue = 10,
             ExtendedMaxValue = 11,
-            ReadFromDifficulty = diff => diff.OverallDifficulty,
+            ReadCurrentFromDifficulty = diff => diff.OverallDifficulty,
         };
 
         [SettingSource("Extended Limits", "Adjust difficulty beyond sane limits.")]

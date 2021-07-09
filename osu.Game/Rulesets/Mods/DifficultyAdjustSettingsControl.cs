@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Mods
             {
                 // ensure the beatmap's value is not transferred as a user override.
                 isInternalChange = true;
-                displayNumber.Value = difficultyBindable.ReadFromDifficulty(difficulty);
+                displayNumber.Value = difficultyBindable.ReadCurrentFromDifficulty(difficulty);
                 isInternalChange = false;
             }
         }
