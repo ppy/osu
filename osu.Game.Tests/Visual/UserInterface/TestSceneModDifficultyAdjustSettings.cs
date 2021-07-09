@@ -139,19 +139,22 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestUserOverrideMaintainedOnMatchingBeatmapValue()
         {
-            setBeatmapWithDifficultyParameters(2);
+            setBeatmapWithDifficultyParameters(3);
 
-            checkSliderAtValue("Circle Size", 2);
+            checkSliderAtValue("Circle Size", 3);
             checkBindableAtValue("Circle Size", null);
 
-            setSliderValue("Circle Size", 9);
-            checkSliderAtValue("Circle Size", 9);
-            checkBindableAtValue("Circle Size", 9);
+            // need to initially change it away from the current beatmap value to trigger an override.
+            setSliderValue("Circle Size", 4);
+            setSliderValue("Circle Size", 3);
+
+            checkSliderAtValue("Circle Size", 3);
+            checkBindableAtValue("Circle Size", 3);
 
             setBeatmapWithDifficultyParameters(4);
 
-            checkSliderAtValue("Circle Size", 9);
-            checkBindableAtValue("Circle Size", 9);
+            checkSliderAtValue("Circle Size", 3);
+            checkBindableAtValue("Circle Size", 3);
         }
 
         private void resetToDefault(string name)
