@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
     {
         protected override Drawable CreateCaption() => new OsuSpriteText
         {
-            Text = "Current Directory: ",
+            Text = "当前目录: ",
             Font = OsuFont.Default.With(size: OsuDirectorySelector.ITEM_HEIGHT),
         };
 
@@ -34,7 +34,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             protected override IconUsage? Icon => null;
 
             public OsuBreadcrumbDisplayComputer()
-                : base(null, "Computer")
+                : base(null, "计算机")
             {
             }
         }

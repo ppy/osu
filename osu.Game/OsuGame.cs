@@ -372,6 +372,7 @@ namespace osu.Game
 
                 case LinkAction.OpenPictureURL:
                     Picture.UpdateImage(link.Argument, true);
+                    break;
 
                 case LinkAction.SearchBeatmapSet:
                     SearchBeatmapSet(link.Argument);

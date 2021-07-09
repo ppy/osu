@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         Child = new OsuSpriteText
                         {
                             Text = this.type.ToString(),
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                         },
                     },
                 },

@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,11 +13,13 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Screens.Play.PlayerSettings;
 using osuTK;
 using osuTK.Graphics;
 
@@ -25,7 +27,7 @@ namespace osu.Game.Screens.Play
 {
     public abstract class GameplayMenuOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
-        private readonly Bindable<bool> Optui = new Bindable<bool>();
+        private readonly Bindable<bool> optui = new Bindable<bool>();
         protected const int TRANSITION_DURATION = 200;
 
         private const int button_height = 70;
@@ -57,7 +59,7 @@ namespace osu.Game.Screens.Play
         protected SelectionCycleFillFlowContainer<DialogButton> InternalButtons;
         public IReadOnlyList<DialogButton> Buttons => InternalButtons;
 
-        private VisualSettings VisualSettings;
+        private VisualSettings visualSettings;
         private FillFlowContainer retryCounterContainer;
 
         protected GameplayMenuOverlay()
@@ -70,7 +72,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, MConfigManager config)
         {
-            config.BindWith(MSetting.OptUI, Optui);
+            config.BindWith(MSetting.OptUI, optui);
 
             Children = new Drawable[]
             {
@@ -154,7 +156,7 @@ namespace osu.Game.Screens.Play
                     Margin = new MarginPadding(25),
                     Children = new PlayerSettingsGroup[]
                     {
-                        VisualSettings = new VisualSettings
+                        visualSettings = new VisualSettings
                         {
                             IgnoreOptUI = false,
                         },
@@ -164,20 +166,20 @@ namespace osu.Game.Screens.Play
 
             updateRetryCount();
 
-            Optui.ValueChanged += _ => UpdateVisibilities();
-            UpdateVisibilities();
+            optui.ValueChanged += _ => updateVisibilities();
+            updateVisibilities();
         }
 
-        private void UpdateVisibilities()
+        private void updateVisibilities()
         {
-            switch (Optui.Value)
+            switch (optui.Value)
             {
                 case true:
-                    VisualSettings.FadeIn(250);
+                    visualSettings.FadeIn(250);
                     break;
 
                 case false:
-                    VisualSettings.FadeOut(250);
+                    visualSettings.FadeOut(250);
                     break;
             }
         }
