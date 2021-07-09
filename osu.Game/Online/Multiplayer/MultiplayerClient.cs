@@ -152,8 +152,9 @@ namespace osu.Game.Online.Multiplayer
         /// Joins the <see cref="MultiplayerRoom"/> with a given ID.
         /// </summary>
         /// <param name="roomId">The room ID.</param>
+        /// <param name="password">An optional password to use when joining the room.</param>
         /// <returns>The joined <see cref="MultiplayerRoom"/>.</returns>
-        protected abstract Task<MultiplayerRoom> JoinRoom(long roomId);
+        protected abstract Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null);
 
         public Task LeaveRoom()
         {
