@@ -21,12 +21,15 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         /// <remarks>
         /// When the mod is overriding a default, this will match the value of <see cref="Current"/>.
-        /// When there is no override (ie. <see cref="Current"/> is null), this value will match the beatmap provided default via <see cref="updateFromDifficulty"/>.
+        /// When there is no override (ie. <see cref="Current"/> is null), this value will match the beatmap provided default via <see cref="updateCurrentFromSlider"/>.
         /// </remarks>
         private readonly BindableNumber<float> sliderDisplayCurrent = new BindableNumber<float>();
 
         protected override Drawable CreateControl() => new SliderControl(sliderDisplayCurrent);
 
+        /// <summary>
+        /// Guards against beatmap values displayed on slider bars being transferred to user override.
+        /// </summary>
         private bool isInternalChange;
 
         private DifficultyBindable difficultyBindable;
@@ -49,21 +52,8 @@ namespace osu.Game.Rulesets.Mods
         {
             base.LoadComplete();
 
-            beatmap.BindValueChanged(b => updateFromDifficulty(), true);
-
-            Current.BindValueChanged(current =>
-            {
-                if (current.NewValue != null)
-                {
-                    // a user override has been added or updated.
-                    sliderDisplayCurrent.Value = current.NewValue.Value;
-                }
-                else
-                {
-                    // user override was removed, so restore the beatmap provided value.
-                    updateFromDifficulty();
-                }
-            });
+            Current.BindValueChanged(current => updateCurrentFromSlider());
+            beatmap.BindValueChanged(b => updateCurrentFromSlider(), true);
 
             sliderDisplayCurrent.BindValueChanged(number =>
             {
@@ -74,20 +64,27 @@ namespace osu.Game.Rulesets.Mods
             });
         }
 
-        private void updateFromDifficulty()
+        private void updateCurrentFromSlider()
         {
+            if (Current.Value != null)
+            {
+                // a user override has been added or updated.
+                sliderDisplayCurrent.Value = Current.Value.Value;
+                return;
+            }
+
             var difficulty = beatmap.Value.BeatmapInfo.BaseDifficulty;
 
             if (difficulty == null)
                 return;
 
-            if (Current.Value == null && difficultyBindable.ReadCurrentFromDifficulty != null)
-            {
-                // ensure the beatmap's value is not transferred as a user override.
-                isInternalChange = true;
-                sliderDisplayCurrent.Value = difficultyBindable.ReadCurrentFromDifficulty(difficulty);
-                isInternalChange = false;
-            }
+            // generally should always be implemented, else the slider will have a zero default.
+            if (difficultyBindable.ReadCurrentFromDifficulty == null)
+                return;
+
+            isInternalChange = true;
+            sliderDisplayCurrent.Value = difficultyBindable.ReadCurrentFromDifficulty(difficulty);
+            isInternalChange = false;
         }
 
         private class SliderControl : CompositeDrawable, IHasCurrentValue<float?>
