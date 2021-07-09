@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Mods
             if (difficulty == null)
                 return;
 
-            if (Current.Value == null)
+            if (Current.Value == null && difficultyBindable.ReadCurrentFromDifficulty != null)
             {
                 // ensure the beatmap's value is not transferred as a user override.
                 isInternalChange = true;
