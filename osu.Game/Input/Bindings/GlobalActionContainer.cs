@@ -87,6 +87,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Shift, InputKey.Tab }, GlobalAction.ToggleInGameInterface),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
             new KeyBinding(InputKey.Space, GlobalAction.TogglePauseReplay),
+            new KeyBinding(InputKey.Left, GlobalAction.SeekReplayBackward),
+            new KeyBinding(InputKey.Right, GlobalAction.SeekReplayForward),
             new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
         };
 
@@ -272,5 +274,11 @@ namespace osu.Game.Input.Bindings
 
         [Description("Next volume meter")]
         NextVolumeMeter,
+
+        [Description("Seek replay forward")]
+        SeekReplayForward,
+
+        [Description("Seek replay backward")]
+        SeekReplayBackward,
     }
 }
