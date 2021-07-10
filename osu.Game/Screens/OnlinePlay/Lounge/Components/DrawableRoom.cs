@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -45,6 +46,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
+
+        private Container content;
 
         public readonly Room Room;
 
@@ -124,7 +127,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding(SELECTION_BORDER_WIDTH),
-                    Child = new Container
+                    Child = content = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
@@ -204,6 +207,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     },
                 },
             };
+
+            if (Room.HasPassword.Value)
+            {
+                content.Add(new PasswordProtectedIcon());
+            }
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -245,5 +253,38 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 parentScreen?.OpenNewRoom(Room.CreateCopy());
             })
         };
+
+        private class PasswordProtectedIcon : CompositeDrawable
+        {
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Anchor = Anchor.TopRight;
+                Origin = Anchor.TopRight;
+
+                Size = new Vector2(32);
+
+                InternalChildren = new Drawable[]
+                {
+                    new Box
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopCentre,
+                        Colour = colours.Gray5,
+                        Rotation = 45,
+                        RelativeSizeAxes = Axes.Both,
+                        Width = 2,
+                    },
+                    new SpriteIcon
+                    {
+                        Icon = FontAwesome.Solid.Lock,
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        Margin = new MarginPadding(6),
+                        Size = new Vector2(14),
+                    }
+                };
+            }
+        }
     }
 }

@@ -123,6 +123,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("3 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 3);
         }
 
+        [Test]
+        public void TestPasswordProtectedRooms()
+        {
+            AddStep("add rooms", () => RoomManager.AddRooms(3, withPassword: true));
+        }
+
         private bool checkRoomSelected(Room room) => SelectedRoom.Value == room;
 
         private void joinRequested(Room room) => room.Status.Value = new JoinedRoomStatus();
