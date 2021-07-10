@@ -127,7 +127,7 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(room.RoomID.Value != null);
 
                 // Join the server-side room.
-                var joinedRoom = await JoinRoom(room.RoomID.Value.Value).ConfigureAwait(false);
+                var joinedRoom = await JoinRoom(room.RoomID.Value.Value, room.Password.Value).ConfigureAwait(false);
                 Debug.Assert(joinedRoom != null);
 
                 // Populate users.
@@ -190,8 +190,9 @@ namespace osu.Game.Online.Multiplayer
         /// A room must be joined for this to have any effect.
         /// </remarks>
         /// <param name="name">The new room name, if any.</param>
+        /// <param name="password">The new password, if any.</param>
         /// <param name="item">The new room playlist item, if any.</param>
-        public Task ChangeSettings(Optional<string> name = default, Optional<PlaylistItem> item = default)
+        public Task ChangeSettings(Optional<string> name = default, Optional<string> password = default, Optional<PlaylistItem> item = default)
         {
             if (Room == null)
                 throw new InvalidOperationException("Must be joined to a match to change settings.");
@@ -213,8 +214,7 @@ namespace osu.Game.Online.Multiplayer
             return ChangeSettings(new MultiplayerRoomSettings
             {
                 Name = name.GetOr(Room.Settings.Name),
-                // TODO: add changing support
-                Password = Room.Settings.Password,
+                Password = password.GetOr(Room.Settings.Password),
                 BeatmapID = item.GetOr(existingPlaylistItem).BeatmapID,
                 BeatmapChecksum = item.GetOr(existingPlaylistItem).Beatmap.Value.MD5Hash,
                 RulesetID = item.GetOr(existingPlaylistItem).RulesetID,

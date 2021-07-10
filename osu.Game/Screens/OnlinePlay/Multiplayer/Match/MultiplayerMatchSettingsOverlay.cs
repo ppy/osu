@@ -303,7 +303,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 // Otherwise, update the room directly in preparation for it to be submitted to the API on match creation.
                 if (client.Room != null)
                 {
-                    client.ChangeSettings(name: NameField.Text).ContinueWith(t => Schedule(() =>
+                    client.ChangeSettings(name: NameField.Text, password: PasswordTextBox.Text).ContinueWith(t => Schedule(() =>
                     {
                         if (t.IsCompletedSuccessfully)
                             onSuccess(currentRoom.Value);
