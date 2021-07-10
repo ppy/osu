@@ -145,7 +145,8 @@ namespace osu.Game.Screens.Menu
             buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();
             buttons.OnMfMenuButton = () => mfoverlay?.ToggleVisibility();
 
-            LoadComponentAsync(background = new BackgroundScreenDefault(config.Get<BackgroundSource>(OsuSetting.MenuBackgroundSource) != BackgroundSource.LoaderBackground));
+            LoadComponentAsync(background = new BackgroundScreenDefault(config.Get<BackgroundSource>(OsuSetting.MenuBackgroundSource) != BackgroundSource.LoaderBackground
+                                                                        || config.Get<Configuration.IntroSequence>(OsuSetting.IntroSequence) != Configuration.IntroSequence.SkippedIntro));
             preloadScreens();
         }
 
