@@ -1,15 +1,14 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
 using osu.Game.Users;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
@@ -62,35 +61,20 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         };
 
-        private class CountryName : OsuHoverContainer
+        private class CountryName : LinkFlowContainer
         {
-            protected override IEnumerable<Drawable> EffectTargets => new[] { text };
-
             [Resolved(canBeNull: true)]
             private RankingsOverlay rankings { get; set; }
 
-            private readonly OsuSpriteText text;
-            private readonly Country country;
-
             public CountryName(Country country)
+                : base(t => t.Font = OsuFont.GetFont(size: 12))
             {
-                this.country = country;
+                AutoSizeAxes = Axes.X;
+                RelativeSizeAxes = Axes.Y;
+                TextAnchor = Anchor.CentreLeft;
 
-                AutoSizeAxes = Axes.Both;
-                Add(text = new OsuSpriteText
-                {
-                    Font = OsuFont.GetFont(size: 12),
-                    Text = country.FullName ?? string.Empty,
-                });
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                IdleColour = colourProvider.Light2;
-                HoverColour = colourProvider.Content2;
-
-                Action = () => rankings?.ShowCountry(country);
+                if (!string.IsNullOrEmpty(country.FullName))
+                    AddLink(country.FullName, () => rankings?.ShowCountry(country));
             }
         }
     }
