@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             onSuccess?.Invoke(room);
         }
 
-        public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => onSuccess?.Invoke(room);
+        public void JoinRoom(Room room, string password, Action<Room> onSuccess = null, Action<string> onError = null) => onSuccess?.Invoke(room);
 
         public void PartRoom()
         {

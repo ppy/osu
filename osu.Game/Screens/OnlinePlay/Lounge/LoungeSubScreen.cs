@@ -167,14 +167,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             filter.HoldFocus = false;
         }
 
-        private void joinRequested(Room room)
+        public void Join(Room room, string password)
         {
             if (joiningRoomOperation != null)
                 return;
 
             joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
-            RoomManager?.JoinRoom(room, r =>
+            RoomManager?.JoinRoom(room, password, r =>
             {
                 Open(room);
                 joiningRoomOperation?.Dispose();
