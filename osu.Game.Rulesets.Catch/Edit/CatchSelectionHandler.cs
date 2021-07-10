@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             float upperBound = CatchPlayfield.WIDTH - maxX;
             // The inequality may be unsatisfiable if the objects were already out of bounds.
             // In that case, don't move objects at all.
-            if (!(lowerBound <= upperBound))
+            if (lowerBound > upperBound)
                 return 0;
 
             return Math.Clamp(deltaX, lowerBound, upperBound);
