@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
             if (deltaX == 0)
             {
-                // Even there is no positional change, there may be a time change.
+                // Even if there is no positional change, there may be a time change.
                 return true;
             }
 
