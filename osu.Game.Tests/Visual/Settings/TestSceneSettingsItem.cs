@@ -4,7 +4,6 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays;
@@ -17,28 +16,63 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestRestoreDefaultValueButtonVisibility()
         {
-            TestSettingsTextBox textBox = null;
+            SettingsTextBox textBox = null;
+            RestoreDefaultValueButton<string> restoreDefaultValueButton = null;
 
-            AddStep("create settings item", () => Child = textBox = new TestSettingsTextBox
+            AddStep("create settings item", () =>
             {
-                Current = new Bindable<string>
+                Child = textBox = new SettingsTextBox
                 {
-                    Default = "test",
-                    Value = "test"
-                }
+                    Current = new Bindable<string>
+                    {
+                        Default = "test",
+                        Value = "test"
+                    }
+                };
+
+                restoreDefaultValueButton = textBox.ChildrenOfType<RestoreDefaultValueButton<string>>().Single();
             });
-            AddAssert("restore button hidden", () => textBox.RestoreDefaultValueButton.Alpha == 0);
+            AddAssert("restore button hidden", () => restoreDefaultValueButton.Alpha == 0);
 
             AddStep("change value from default", () => textBox.Current.Value = "non-default");
-            AddUntilStep("restore button shown", () => textBox.RestoreDefaultValueButton.Alpha > 0);
+            AddUntilStep("restore button shown", () => restoreDefaultValueButton.Alpha > 0);
 
             AddStep("restore default", () => textBox.Current.SetDefault());
-            AddUntilStep("restore button hidden", () => textBox.RestoreDefaultValueButton.Alpha == 0);
+            AddUntilStep("restore button hidden", () => restoreDefaultValueButton.Alpha == 0);
         }
 
-        private class TestSettingsTextBox : SettingsTextBox
+        /// <summary>
+        /// Tests precision of the restore default value button, with a couple of single floating-point numbers that could potentially underflow.
+        /// </summary>
+        [TestCase(4.2f)]
+        [TestCase(9.9f)]
+        public void TestRestoreDefaultValueButtonPrecision(float initialValue)
         {
-            public Drawable RestoreDefaultValueButton => this.ChildrenOfType<RestoreDefaultValueButton<string>>().Single();
+            SettingsSlider<float> sliderBar = null;
+            RestoreDefaultValueButton<float> restoreDefaultValueButton = null;
+
+            AddStep("create settings item", () =>
+            {
+                Child = sliderBar = new SettingsSlider<float>
+                {
+                    Current = new BindableFloat(initialValue)
+                    {
+                        MinValue = 0f,
+                        MaxValue = 10f,
+                        Precision = 0.1f,
+                    }
+                };
+
+                restoreDefaultValueButton = sliderBar.ChildrenOfType<RestoreDefaultValueButton<float>>().Single();
+            });
+
+            AddAssert("restore button hidden", () => restoreDefaultValueButton.Alpha == 0);
+
+            AddStep("change value to 5.1f", () => sliderBar.Current.Value = 5.0f);
+            AddUntilStep("restore button shown", () => restoreDefaultValueButton.Alpha > 0);
+
+            AddStep("restore default", () => sliderBar.Current.SetDefault());
+            AddUntilStep("restore button hidden", () => restoreDefaultValueButton.Alpha == 0);
         }
     }
 }
