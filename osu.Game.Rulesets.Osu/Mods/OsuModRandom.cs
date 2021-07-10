@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <returns>The <see cref="Vector2"/> that this slider has been shifted by.</returns>
         private Vector2 moveSliderIntoPlayfield(Slider slider, RandomObjectInfo currentObjectInfo)
         {
-            var area = getSliderPlacementArea(slider);
+            var area = calculatePossibleMovementBounds(slider);
 
             var prevPosition = slider.Position;
 
@@ -192,46 +192,52 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
 
         /// <summary>
-        /// Calculates a <see cref="RectangleF"/> that includes all possible positions of the slider such that
-        /// the entire slider is inside the playfield.
+        /// Calculates a <see cref="RectangleF"/> which contains all of the possible movements of the slider (in relative X/Y coordinates)
+        /// such that the entire slider is inside the playfield.
         /// </summary>
         /// <remarks>
         /// If the slider is larger than the playfield, the returned <see cref="RectangleF"/> may have negative width/height.
         /// </remarks>
-        private RectangleF getSliderPlacementArea(Slider slider)
+        private RectangleF calculatePossibleMovementBounds(Slider slider)
         {
             var pathPositions = new List<Vector2>();
             slider.Path.GetPathToProgress(pathPositions, 0, 1);
 
-            // Initially, assume that the slider can be placed anywhere in the playfield
-            var box = new RectangleF(Vector2.Zero, OsuPlayfield.BASE_SIZE);
+            float minX = float.PositiveInfinity;
+            float maxX = float.NegativeInfinity;
 
-            // Then narrow down the area with each path position
+            float minY = float.PositiveInfinity;
+            float maxY = float.NegativeInfinity;
+
+            // Compute the bounding box of the slider.
             foreach (var pos in pathPositions)
             {
-                // Reduce Width and Height accordingly after increasing X and Y
-                // to keep the right and bottom edge of the rectangle in place
-                var right = box.Right;
-                box.X = Math.Max(box.X, -pos.X);
-                box.Width = right - box.X;
+                minX = MathF.Min(minX, pos.X);
+                maxX = MathF.Max(maxX, pos.X);
 
-                var bottom = box.Bottom;
-                box.Y = Math.Max(box.Y, -pos.Y);
-                box.Height = bottom - box.Y;
-
-                box.Width = Math.Min(box.Width, OsuPlayfield.BASE_SIZE.X - pos.X - box.X);
-                box.Height = Math.Min(box.Height, OsuPlayfield.BASE_SIZE.Y - pos.Y - box.Y);
+                minY = MathF.Min(minY, pos.Y);
+                maxY = MathF.Max(maxY, pos.Y);
             }
 
-            // Reduce the area by slider radius, so that the slider fits inside the playfield completely
+            // Take the circle radius into account.
             var radius = (float)slider.Radius;
 
-            box.X += radius;
-            box.Y += radius;
-            box.Width -= radius * 2;
-            box.Height -= radius * 2;
+            minX -= radius;
+            minY -= radius;
 
-            return box;
+            maxX += radius;
+            maxY += radius;
+
+            // Given the bounding box of the slider (via min/max X/Y),
+            // the amount that the slider can move to the left is minX (with the sign flipped, since positive X is to the right),
+            // and the amount that it can move to the right is WIDTH - maxX.
+            // Same calculation applies for the Y axis.
+            float left = -minX;
+            float right = OsuPlayfield.BASE_SIZE.X - maxX;
+            float top = -minY;
+            float bottom = OsuPlayfield.BASE_SIZE.Y - maxY;
+
+            return new RectangleF(left, top, right - left, bottom - top);
         }
 
         /// <summary>
