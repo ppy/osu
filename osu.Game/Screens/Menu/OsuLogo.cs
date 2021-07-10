@@ -42,7 +42,6 @@ namespace osu.Game.Screens.Menu
         private readonly MenuLogoVisualisation visualizer;
 
         private readonly IntroSequence intro;
-        private readonly IntroSequenceCN introCN;
 
         private Sample sampleClick;
         private Sample sampleBeat;
@@ -104,10 +103,6 @@ namespace osu.Game.Screens.Menu
             Children = new Drawable[]
             {
                 intro = new IntroSequence
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-                introCN = new IntroSequenceCN
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
@@ -322,26 +317,15 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public void PlayIntro()
+        public void PlayIntro(bool useTranslate)
         {
             const double length = 3150;
             const double fade = 200;
 
             logoHoverContainer.FadeOut().Delay(length).FadeIn(fade);
             intro.Show();
-            intro.Start(length);
+            intro.Start(length, useTranslate);
             intro.Delay(length + fade).FadeOut();
-        }
-
-        public void PlayIntroCN()
-        {
-            const double length = 3150;
-            const double fade = 200;
-
-            logoHoverContainer.FadeOut().Delay(length).FadeIn(fade);
-            introCN.Show();
-            introCN.Start(length);
-            introCN.Delay(length + fade).FadeOut();
         }
 
         [Resolved]

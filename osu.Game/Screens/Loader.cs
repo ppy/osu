@@ -47,13 +47,13 @@ namespace osu.Game.Screens
             switch (introSequence)
             {
                 case IntroSequence.Circles:
-                    return new IntroCircles();
+                    return new IntroCircles(false);
 
                 case IntroSequence.CirclesCN:
-                    return new IntroCirclesCN();
+                    return new IntroCircles(true);
 
                 case IntroSequence.TrianglesCN:
-                    return new IntroTrianglesCN();
+                    return new IntroTriangles(true);
 
                 case IntroSequence.SkippedIntro:
                     return new IntroSkipped();
