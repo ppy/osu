@@ -126,6 +126,11 @@ namespace osu.Game.Online.Rooms
         [JsonIgnore]
         public readonly Bindable<int> Position = new Bindable<int>(-1);
 
+        public Room()
+        {
+            Password.BindValueChanged(p => HasPassword.Value = !string.IsNullOrEmpty(p.NewValue));
+        }
+
         /// <summary>
         /// Create a copy of this room without online information.
         /// Should be used to create a local copy of a room for submitting in the future.
