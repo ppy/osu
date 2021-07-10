@@ -78,6 +78,12 @@ namespace osu.Game.Overlays
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            UpdateState();
+        }
+
         public LocalisableString TooltipText => "revert to default";
 
         protected override bool OnHover(HoverEvent e)
