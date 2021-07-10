@@ -56,9 +56,9 @@ namespace osu.Game.Screens.Edit.Setup
 
         public void DisplayFileChooser()
         {
-            FileSelector fileSelector;
+            OsuFileSelector fileSelector;
 
-            Target.Child = fileSelector = new FileSelector(currentFile.Value?.DirectoryName, handledExtensions)
+            Target.Child = fileSelector = new OsuFileSelector(currentFile.Value?.DirectoryName, handledExtensions)
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 400,
