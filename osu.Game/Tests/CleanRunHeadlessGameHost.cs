@@ -25,8 +25,11 @@ namespace osu.Game.Tests
 
         protected override void SetupForRun()
         {
-            base.SetupForRun();
             Storage.DeleteDirectory(string.Empty);
+
+            // base call needs to be run *after* storage is emptied, as it updates the (static) logger's storage and may start writing
+            // log entries from another source if a unit test host is shared over multiple tests, causing a file access denied exception.
+            base.SetupForRun();
         }
     }
 }
