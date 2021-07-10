@@ -115,7 +115,8 @@ namespace osu.Game.Online.Multiplayer
         /// Joins the <see cref="MultiplayerRoom"/> for a given API <see cref="Room"/>.
         /// </summary>
         /// <param name="room">The API <see cref="Room"/>.</param>
-        public async Task JoinRoom(Room room)
+        /// <param name="password">An optional password to use for the join operation.</param>
+        public async Task JoinRoom(Room room, string? password = null)
         {
             var cancellationSource = joinCancellationSource = new CancellationTokenSource();
 
@@ -127,7 +128,7 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(room.RoomID.Value != null);
 
                 // Join the server-side room.
-                var joinedRoom = await JoinRoom(room.RoomID.Value.Value, room.Password.Value).ConfigureAwait(false);
+                var joinedRoom = await JoinRoom(room.RoomID.Value.Value, password ?? room.Password.Value).ConfigureAwait(false);
                 Debug.Assert(joinedRoom != null);
 
                 // Populate users.
