@@ -60,12 +60,12 @@ namespace osu.Game.Overlays
                         new OsuSpriteText
                         {
                             Text = MainText,
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
                         },
                         new OsuSpriteText
                         {
                             Text = AdditionalText,
-                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
+                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Regular),
                         },
                         new OsuSpriteText
                         {
