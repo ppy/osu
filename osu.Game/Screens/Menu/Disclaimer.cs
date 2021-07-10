@@ -10,6 +10,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Screens;
@@ -18,6 +19,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
+using osu.Game.Screens.Backgrounds;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Users;
@@ -26,6 +28,8 @@ namespace osu.Game.Screens.Menu
 {
     public class Disclaimer : StartupScreen
     {
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenPureColor(backgroundColor);
+
         private SpriteIcon icon;
         private Color4 iconColour;
         private LinkFlowContainer textFlow;
@@ -47,11 +51,13 @@ namespace osu.Game.Screens.Menu
         private Texture avatarTexture;
 
         private bool showDisclaimer;
+        private Color4 backgroundColor;
 
-        public Disclaimer(OsuScreen nextScreen = null, bool showDisclaimer = true)
+        public Disclaimer(OsuScreen nextScreen = null, bool showDisclaimer = true, Color4 backgroundColor = new Color4())
         {
             this.nextScreen = nextScreen;
             this.showDisclaimer = showDisclaimer;
+            this.backgroundColor = backgroundColor;
             ValidForResume = false;
         }
 
@@ -124,8 +130,20 @@ namespace osu.Game.Screens.Menu
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Texture = avatarTexture,
-                    Colour = showDisclaimer ? Color4.Gray.Opacity(0.2f) : Color4.White,
                     Depth = float.MaxValue
+                });
+            }
+
+            if (showDisclaimer)
+            {
+                AddInternal(new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black.Opacity(0.7f),
+                    Depth = float.MaxValue,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(1.5f)
                 });
             }
 
@@ -220,6 +238,8 @@ namespace osu.Game.Screens.Menu
 
             if (showDisclaimer)
             {
+                //显示Disclaimer
+
                 using (BeginDelayedSequence(3000, true))
                 {
                     icon.FadeColour(iconColour, 200, Easing.OutQuint);
@@ -260,6 +280,8 @@ namespace osu.Game.Screens.Menu
             }
             else
             {
+                //不显示Disclaimer
+
                 var instantPush = avatarTexture == null;
 
                 icon.FadeOut();
@@ -268,14 +290,14 @@ namespace osu.Game.Screens.Menu
 
                 if (!instantPush)
                 {
-                    supportFlow.Delay(2000).FadeIn(500);
+                    supportFlow.FadeIn(500);
 
                     animateHeart();
                 }
 
                 this
                     .FadeInFromZero(instantPush ? 0 : 500)
-                    .Then(instantPush ? 0 : 3500)
+                    .Then(instantPush ? 0 : 2500)
                     .FadeOut(250)
                     .ScaleTo(0.9f, 250, Easing.InQuint)
                     .Finally(d =>

@@ -1,10 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.ComponentModel;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Screens.Mvis.SideBar.Tabs;
+using osuTK.Graphics;
 
 namespace osu.Game.Configuration
 {
@@ -60,9 +64,27 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.FadeInWindowWhenEntering, false);
             SetDefault(MSetting.UseSystemCursor, false);
             SetDefault(MSetting.PreferredFont, "Torus");
+            SetDefault(MSetting.LoaderBackgroundColor, "#000000");
 
             //Gamemode集成
             SetDefault(MSetting.Gamemode, GamemodeActivateCondition.InGame);
+        }
+
+        public Color4 GetCustomLoaderColor()
+        {
+            try
+            {
+                if (Get<bool>(MSetting.UseCustomGreetingPicture))
+                    return Color4Extensions.FromHex(Get<string>(MSetting.LoaderBackgroundColor));
+                else
+                    return Color4.Black;
+            }
+            catch (Exception e)
+            {
+                SetValue(MSetting.LoaderBackgroundColor, "#000000");
+                Logger.Error(e, "无法获取加载器背景色, 已重置此键的值。");
+                return Color4.Black;
+            }
         }
     }
 
@@ -96,7 +118,8 @@ namespace osu.Game.Configuration
         AlwaysHideTextIndicator,
         MvisCurrentAudioProvider,
         Gamemode,
-        DoNotShowDisclaimer
+        DoNotShowDisclaimer,
+        LoaderBackgroundColor
     }
 
     public enum GamemodeActivateCondition

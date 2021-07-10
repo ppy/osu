@@ -218,11 +218,11 @@ namespace osu.Game
 
         private BindableFloat windowOpacity;
 
-        public void TransformWindowOpacity(float final, float duration = 0) =>
-            this.TransformBindableTo(windowOpacity, final, duration);
+        public void TransformWindowOpacity(float final, float duration = 0, Easing easing = Easing.None) =>
+            this.TransformBindableTo(windowOpacity, final, duration, easing);
 
-        public void TransformWindowOpacity(float final, double duration) =>
-            this.TransformBindableTo(windowOpacity, final, duration);
+        public void TransformWindowOpacity(float final, double duration = 0, Easing easing = Easing.None) =>
+            this.TransformBindableTo(windowOpacity, final, duration, easing);
 
         public void SetWindowOpacity(float value)
         {

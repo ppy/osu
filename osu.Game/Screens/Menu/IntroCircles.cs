@@ -6,6 +6,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
+using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Screens.Menu
 {
@@ -14,6 +15,8 @@ namespace osu.Game.Screens.Menu
         protected override string BeatmapHash => "3c8b1fcc9434dbb29e2fb613d3b9eada9d7bb6c125ceb32396c3b53437280c83";
 
         protected override string BeatmapFile => "circles.osz";
+
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenPureColor();
 
         private const double delay_step_one = 2300;
         private const double delay_step_two = 600;

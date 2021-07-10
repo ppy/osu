@@ -86,6 +86,8 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
                 Add(new ExperimentalSettingsSetupContainer("自定义窗口图标", MSetting.CustomWindowIconPath));
 
+                Add(new ExperimentalSettingsSetupContainer("加载页背景色(HEX颜色)", MSetting.LoaderBackgroundColor));
+
                 Add(new SettingsCheckbox
                 {
                     LabelText = "退出时淡出窗口",

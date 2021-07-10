@@ -6,6 +6,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Allocation;
 using osu.Game.Configuration;
 using osu.Framework.Bindables;
+using osu.Game.Screens.Backgrounds;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
@@ -14,6 +16,10 @@ namespace osu.Game.Screens.Menu
         protected override string BeatmapHash => "3c8b1fcc9434dbb29e2fb613d3b9eada9d7bb6c125ceb32396c3b53437280c83";
 
         protected override string BeatmapFile => "circles.osz";
+
+        private Color4 backgroundColor;
+
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenPureColor(backgroundColor);
 
         protected IBindable<bool> LoadDirectToSongSelect { get; private set; }
 
@@ -24,6 +30,7 @@ namespace osu.Game.Screens.Menu
         private void load(MConfigManager config)
         {
             LoadDirectToSongSelect = config.GetBindable<bool>(MSetting.IntroLoadDirectToSongSelect);
+            backgroundColor = config.GetCustomLoaderColor();
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
