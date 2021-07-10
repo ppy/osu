@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 },
                 backgroundSourceDropdown = new SettingsEnumDropdown<BackgroundSource>
                 {
-                    LabelText = "背景来源(需要osu!supporter)",
+                    LabelText = "背景来源",
                     Current = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource),
                 },
                 new SettingsEnumDropdown<SeasonalBackgroundMode>
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 
             user.BindValueChanged(u =>
             {
-                const string not_supporter_note = "该设置需要osu!supporter。";
+                const string not_supporter_note = "部分设置需要osu!supporter。";
 
                 backgroundSourceDropdown.WarningText = u.NewValue?.IsSupporter != true ? not_supporter_note : string.Empty;
             }, true);

@@ -15,5 +15,8 @@ namespace osu.Game.Configuration
 
         [Description("谱面 (带故事版)")]
         BeatmapWithStoryboard,
+
+        [Description("加载页纯色背景")]
+        LoaderBackground
     }
 }
