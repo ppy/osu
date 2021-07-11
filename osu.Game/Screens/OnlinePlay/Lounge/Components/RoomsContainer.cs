@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
@@ -24,8 +25,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public class RoomsContainer : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
-        public Action<Room> JoinRequested;
-
         private readonly IBindableList<Room> rooms = new BindableList<Room>();
 
         private readonly FillFlowContainer<DrawableRoom> roomFlow;
@@ -51,16 +50,21 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = new OsuContextMenuContainer
+            InternalChild = new PopoverContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Child = roomFlow = new FillFlowContainer<DrawableRoom>
+                Child = new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(2),
+                    Child = roomFlow = new FillFlowContainer<DrawableRoom>
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(2),
+                    }
                 }
             };
         }
@@ -121,19 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             foreach (var room in rooms)
             {
-                roomFlow.Add(new DrawableRoom(room)
-                {
-                    Action = () =>
-                    {
-                        if (room == selectedRoom.Value)
-                        {
-                            joinSelected();
-                            return;
-                        }
-
-                        selectRoom(room);
-                    }
-                });
+                roomFlow.Add(new DrawableRoom(room));
             }
 
             Filter(filter?.Value);
@@ -150,7 +142,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 roomFlow.Remove(toRemove);
 
-                selectRoom(null);
+                selectedRoom.Value = null;
             }
         }
 
@@ -160,18 +152,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 roomFlow.SetLayoutPosition(room, room.Room.Position.Value);
         }
 
-        private void selectRoom(Room room) => selectedRoom.Value = room;
-
-        private void joinSelected()
-        {
-            if (selectedRoom.Value == null) return;
-
-            JoinRequested?.Invoke(selectedRoom.Value);
-        }
-
         protected override bool OnClick(ClickEvent e)
         {
-            selectRoom(null);
+            selectedRoom.Value = null;
             return base.OnClick(e);
         }
 
@@ -181,10 +164,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             switch (action)
             {
-                case GlobalAction.Select:
-                    joinSelected();
-                    return true;
-
                 case GlobalAction.SelectNext:
                     beginRepeatSelection(() => selectNext(1), action);
                     return true;
@@ -253,7 +232,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             // we already have a valid selection only change selection if we still have a room to switch to.
             if (room != null)
-                selectRoom(room);
+                selectedRoom.Value = room;
         }
 
         #endregion
