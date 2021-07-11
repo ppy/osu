@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
@@ -10,6 +11,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
@@ -17,17 +19,26 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePlayerScoreSubmission : OsuPlayerTestScene
+    public class TestScenePlayerScoreSubmission : PlayerTestScene
     {
         protected override bool AllowFail => allowFail;
 
         private bool allowFail;
 
+        private Func<RulesetInfo, IBeatmap> createCustomBeatmap;
+        private Func<Ruleset> createCustomRuleset;
+
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         protected override bool HasCustomSteps => true;
 
-        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
+        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false);
+
+        protected override Ruleset CreatePlayerRuleset() => createCustomRuleset?.Invoke() ?? new OsuRuleset();
+
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => createCustomBeatmap?.Invoke(ruleset) ?? createTestBeatmap(ruleset);
+
+        private IBeatmap createTestBeatmap(RulesetInfo ruleset)
         {
             var beatmap = (TestBeatmap)base.CreateBeatmap(ruleset);
 
@@ -36,14 +47,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             return beatmap;
         }
 
-        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new TestPlayer(false);
-
         [Test]
         public void TestNoSubmissionOnResultsWithNoToken()
         {
             prepareTokenResponse(false);
 
-            CreateTest(() => allowFail = false);
+            createPlayerTest();
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
 
@@ -63,7 +72,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             prepareTokenResponse(true);
 
-            CreateTest(() => allowFail = false);
+            createPlayerTest();
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
 
@@ -82,7 +91,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             prepareTokenResponse(false);
 
-            CreateTest(() => allowFail = false);
+            createPlayerTest();
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
 
@@ -99,7 +108,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             prepareTokenResponse(true);
 
-            CreateTest(() => allowFail = true);
+            createPlayerTest(true);
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
 
@@ -114,7 +123,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             prepareTokenResponse(true);
 
-            CreateTest(() => allowFail = true);
+            createPlayerTest(true);
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
 
@@ -131,7 +140,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             prepareTokenResponse(true);
 
-            CreateTest(() => allowFail = false);
+            createPlayerTest();
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
 
@@ -144,7 +153,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             prepareTokenResponse(true);
 
-            CreateTest(() => allowFail = false);
+            createPlayerTest();
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
 
@@ -154,18 +163,49 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("ensure failing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == false);
         }
 
-        private void addFakeHit()
+        [Test]
+        public void TestNoSubmissionOnLocalBeatmap()
         {
-            AddUntilStep("wait for first result", () => Player.Results.Count > 0);
+            prepareTokenResponse(true);
 
-            AddStep("force successfuly hit", () =>
+            createPlayerTest(false, r =>
             {
-                Player.ScoreProcessor.RevertResult(Player.Results.First());
-                Player.ScoreProcessor.ApplyResult(new OsuJudgementResult(Beatmap.Value.Beatmap.HitObjects.First(), new OsuJudgement())
-                {
-                    Type = HitResult.Great,
-                });
+                var beatmap = createTestBeatmap(r);
+                beatmap.BeatmapInfo.OnlineBeatmapID = null;
+                return beatmap;
             });
+
+            AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            addFakeHit();
+
+            AddStep("exit", () => Player.Exit());
+            AddAssert("ensure no submission", () => Player.SubmittedScore == null);
+        }
+
+        [Test]
+        public void TestNoSubmissionOnCustomRuleset()
+        {
+            prepareTokenResponse(true);
+
+            createPlayerTest(false, createRuleset: () => new OsuRuleset { RulesetInfo = { ID = 10 } });
+
+            AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
+
+            addFakeHit();
+
+            AddStep("exit", () => Player.Exit());
+            AddAssert("ensure no submission", () => Player.SubmittedScore == null);
+        }
+
+        private void createPlayerTest(bool allowFail = false, Func<RulesetInfo, IBeatmap> createBeatmap = null, Func<Ruleset> createRuleset = null)
+        {
+            CreateTest(() => AddStep("set up requirements", () =>
+            {
+                this.allowFail = allowFail;
+                createCustomBeatmap = createBeatmap;
+                createCustomRuleset = createRuleset;
+            }));
         }
 
         private void prepareTokenResponse(bool validToken)
@@ -186,6 +226,20 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                     return false;
                 };
+            });
+        }
+
+        private void addFakeHit()
+        {
+            AddUntilStep("wait for first result", () => Player.Results.Count > 0);
+
+            AddStep("force successfuly hit", () =>
+            {
+                Player.ScoreProcessor.RevertResult(Player.Results.First());
+                Player.ScoreProcessor.ApplyResult(new OsuJudgementResult(Beatmap.Value.Beatmap.HitObjects.First(), new OsuJudgement())
+                {
+                    Type = HitResult.Great,
+                });
             });
         }
     }
