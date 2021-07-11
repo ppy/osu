@@ -6,6 +6,7 @@ using System.Diagnostics;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
+using osu.Game.Rulesets;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Play
@@ -27,7 +28,7 @@ namespace osu.Game.Screens.Play
             if (!(Beatmap.Value.BeatmapInfo.OnlineBeatmapID is int beatmapId))
                 return null;
 
-            if (!(Ruleset.Value.ID is int rulesetId))
+            if (!(Ruleset.Value.ID is int rulesetId) || Ruleset.Value.ID > ILegacyRuleset.MAX_LEGACY_RULESET_ID)
                 return null;
 
             return new CreateSoloScoreRequest(beatmapId, rulesetId, Game.VersionHash);
