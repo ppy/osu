@@ -42,12 +42,14 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         /// <summary>
-        /// Tests precision of the restore default value button, with a couple of single floating-point numbers that could potentially underflow.
+        /// Ensures that the reset to default button uses the correct implementation of IsDefault to determine whether it should be shown or not.
+        /// Values have been chosen so that after being set, Value != Default (but they are close enough that the difference is negligible compared to Precision).
         /// </summary>
         [TestCase(4.2f)]
         [TestCase(9.9f)]
         public void TestRestoreDefaultValueButtonPrecision(float initialValue)
         {
+            BindableFloat current = null;
             SettingsSlider<float> sliderBar = null;
             RestoreDefaultValueButton<float> restoreDefaultValueButton = null;
 
@@ -55,7 +57,7 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 Child = sliderBar = new SettingsSlider<float>
                 {
-                    Current = new BindableFloat(initialValue)
+                    Current = current = new BindableFloat(initialValue)
                     {
                         MinValue = 0f,
                         MaxValue = 10f,
@@ -68,7 +70,7 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddAssert("restore button hidden", () => restoreDefaultValueButton.Alpha == 0);
 
-            AddStep("change value to 5.1f", () => sliderBar.Current.Value = 5.0f);
+            AddStep("change value to next closest", () => sliderBar.Current.Value += current.Precision * 0.6f);
             AddUntilStep("restore button shown", () => restoreDefaultValueButton.Alpha > 0);
 
             AddStep("restore default", () => sliderBar.Current.SetDefault());
