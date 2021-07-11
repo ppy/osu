@@ -14,12 +14,15 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
@@ -27,7 +30,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>, IFilterable, IHasContextMenu
+    public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>, IFilterable, IHasContextMenu, IHasPopover, IKeyBindingHandler<GlobalAction>
     {
         public const float SELECTION_BORDER_WIDTH = 4;
         private const float corner_radius = 5;
@@ -46,6 +49,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
+
+        [Resolved]
+        private Bindable<Room> selectedRoom { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private LoungeSubScreen lounge { get; set; }
 
         private Container content;
 
@@ -232,6 +241,22 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 Alpha = 0;
         }
 
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Select:
+                    // TODO: this needs to be able to show the popover on demand.
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
+        }
+
         protected override bool ShouldBeConsideredForInput(Drawable child) => state == SelectionState.Selected;
 
         private class RoomName : OsuSpriteText
@@ -285,6 +310,79 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     }
                 };
             }
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (selectedRoom.Value != Room)
+                return true;
+
+            return base.OnMouseDown(e);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (Room != selectedRoom.Value)
+            {
+                selectedRoom.Value = Room;
+                return true;
+            }
+
+            if (Room.HasPassword.Value)
+                // we want our popover to show. this is a bit of a hack.
+                return false;
+
+            lounge?.Join(Room, null);
+
+            return base.OnClick(e);
+        }
+
+        public Popover GetPopover() => new PasswordEntryPopover(Room);
+
+        public class PasswordEntryPopover : Popover
+        {
+            [Resolved(canBeNull: true)]
+            private LoungeSubScreen lounge { get; set; }
+
+            public PasswordEntryPopover(Room room)
+            {
+                OsuPasswordTextBox passwordTextbox;
+
+                Child = new Container
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = Color4.OliveDrab,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new FillFlowContainer
+                        {
+                            Margin = new MarginPadding(10),
+                            Spacing = new Vector2(5),
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Horizontal,
+                            Children = new Drawable[]
+                            {
+                                passwordTextbox = new OsuPasswordTextBox
+                                {
+                                    Width = 200,
+                                },
+                                new TriangleButton
+                                {
+                                    Width = 80,
+                                    Text = "Join Room",
+                                    Action = () => lounge?.Join(room, passwordTextbox.Text)
+                                }
+                            }
+                        },
+                    }
+                };
+            }
+
+            protected override Drawable CreateArrow() => Drawable.Empty();
         }
     }
 }

@@ -70,7 +70,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                     RelativeSizeAxes = Axes.Both,
                                     ScrollbarOverlapsContent = false,
                                     Padding = new MarginPadding(10),
-                                    Child = roomsContainer = new RoomsContainer { JoinRequested = joinRequested }
+                                    Child = roomsContainer = new RoomsContainer()
                                 },
                                 loadingLayer = new LoadingLayer(true),
                             }
