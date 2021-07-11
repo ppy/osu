@@ -13,9 +13,15 @@ namespace osu.Game.Rulesets.Mods
     {
         public abstract BindableNumber<double> SpeedChange { get; }
 
+        public abstract BindableBool AdjustPitch { get; }
+
+        protected ITrack Track;
+
         public virtual void ApplyToTrack(ITrack track)
         {
-            track.AddAdjustment(AdjustableProperty.Tempo, SpeedChange);
+            Track = track;
+
+            AdjustPitch.TriggerChange();
         }
 
         public virtual void ApplyToSample(DrawableSample sample)
@@ -28,5 +34,19 @@ namespace osu.Game.Rulesets.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModTimeRamp) };
 
         public override string SettingDescription => SpeedChange.IsDefault ? string.Empty : $"{SpeedChange.Value:N2}x";
+
+        protected ModRateAdjust()
+        {
+            AdjustPitch.BindValueChanged(applyPitchAdjustment);
+        }
+
+        private void applyPitchAdjustment(ValueChangedEvent<bool> adjustPitchSetting)
+        {
+            Track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
+            Track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
+        }
+
+        private AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
+            => adjustPitchSettingValue ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
     }
 }
