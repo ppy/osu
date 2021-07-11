@@ -27,9 +27,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
 
         /// <summary>
-        /// Number of previous hit circles to be shifted together when a slider needs to be moved.
+        /// Number of previous hitobjects to be shifted together when another object is being moved.
         /// </summary>
-        private const int objects_to_shift_before_slider = 10;
+        private const int preceding_hitobjects_to_shift = 10;
 
         private Random rng;
 
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     var toBeShifted = new List<OsuHitObject>();
 
-                    for (int j = i - 1; j >= i - objects_to_shift_before_slider && j >= 0; j--)
+                    for (int j = i - 1; j >= i - preceding_hitobjects_to_shift && j >= 0; j--)
                     {
                         // only shift hit circles
                         if (!(hitObjects[j] is HitCircle)) break;
