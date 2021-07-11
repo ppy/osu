@@ -116,7 +116,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             }
         }
 
-        private class AddColourButton : CompositeDrawable
+        internal class AddColourButton : CompositeDrawable
         {
             public Action Action
             {
