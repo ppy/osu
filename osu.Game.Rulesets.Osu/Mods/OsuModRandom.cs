@@ -146,19 +146,19 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <returns>The deviation from the original randomised position in order to fit within the playfield.</returns>
         private Vector2 clampSliderToPlayfield(Slider slider, RandomObjectInfo objectInfo)
         {
-            var area = calculatePossibleMovementBounds(slider);
+            var possibleMovementBounds = calculatePossibleMovementBounds(slider);
 
             var previousPosition = objectInfo.PositionRandomised;
 
             // Clamp slider position to the placement area
             // If the slider is larger than the playfield, force it to stay at the original position
-            var newX = area.Width < 0
+            var newX = possibleMovementBounds.Width < 0
                 ? objectInfo.PositionOriginal.X
-                : Math.Clamp(previousPosition.X, area.Left, area.Right);
+                : Math.Clamp(previousPosition.X, possibleMovementBounds.Left, possibleMovementBounds.Right);
 
-            var newY = area.Height < 0
+            var newY = possibleMovementBounds.Height < 0
                 ? objectInfo.PositionOriginal.Y
-                : Math.Clamp(previousPosition.Y, area.Top, area.Bottom);
+                : Math.Clamp(previousPosition.Y, possibleMovementBounds.Top, possibleMovementBounds.Bottom);
 
             slider.Position = objectInfo.PositionRandomised = new Vector2(newX, newY);
             objectInfo.EndPositionRandomised = slider.EndPosition;
