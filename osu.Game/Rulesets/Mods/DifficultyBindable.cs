@@ -92,5 +92,16 @@ namespace osu.Game.Rulesets.Mods
         {
             CurrentNumber.MaxValue = ExtendedLimits.Value && extendedMaxValue != null ? extendedMaxValue.Value : maxValue;
         }
+
+        public new DifficultyBindable GetBoundCopy() => new DifficultyBindable
+        {
+            BindTarget = this,
+            CurrentNumber = { BindTarget = CurrentNumber },
+            ExtendedLimits = { BindTarget = ExtendedLimits },
+            ReadCurrentFromDifficulty = ReadCurrentFromDifficulty,
+            // the following is only safe as long as these values are effectively constants.
+            MaxValue = maxValue,
+            ExtendedMaxValue = extendedMaxValue
+        };
     }
 }
