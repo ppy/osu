@@ -92,6 +92,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 });
 
                 display.Current.BindValueChanged(colour => Colours[colourIndex] = colour.NewValue);
+                display.DeleteRequested += colourDeletionRequested;
             }
 
             palette.Add(new AddColourButton
@@ -101,6 +102,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             reindexItems();
         }
+
+        private void colourDeletionRequested(ColourDisplay display) => Colours.RemoveAt(palette.IndexOf(display));
 
         private void reindexItems()
         {
