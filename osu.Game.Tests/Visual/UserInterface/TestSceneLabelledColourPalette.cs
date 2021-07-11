@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK.Graphics;
 
@@ -34,17 +35,21 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("create component", () =>
             {
-                Child = new Container
+                Child = new OsuContextMenuContainer
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Width = 500,
-                    AutoSizeAxes = Axes.Y,
-                    Child = component = new LabelledColourPalette
+                    RelativeSizeAxes = Axes.Both,
+                    Child = new Container
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        ColourNamePrefix = "My colour #"
+                        Width = 500,
+                        AutoSizeAxes = Axes.Y,
+                        Child = component = new LabelledColourPalette
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            ColourNamePrefix = "My colour #"
+                        }
                     }
                 };
 
