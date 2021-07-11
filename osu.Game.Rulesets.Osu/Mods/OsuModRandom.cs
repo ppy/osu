@@ -67,34 +67,32 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 applyRandomisation(rateOfChangeMultiplier, previous, current);
 
-                // Move hit objects back into the playfield if they are outside of it,
-                // which would sometimes happen during big jumps otherwise.
-                current.PositionRandomised = clampToPlayfield(current.PositionRandomised, (float)hitObject.Radius);
+                // Move hit objects back into the playfield if they are outside of it
+                Vector2 shift = Vector2.Zero;
 
-                hitObject.Position = current.PositionRandomised;
-
-                // update end position as it may have changed as a result of the position update.
-                current.EndPositionRandomised = current.PositionRandomised;
-
-                if (hitObject is Slider slider)
+                if (hitObject is HitCircle circle)
                 {
-                    Vector2 shift = moveSliderIntoPlayfield(slider, current);
+                    shift = clampHitCircleToPlayfield(circle, current);
+                }
+                else if (hitObject is Slider slider)
+                {
+                    shift = clampSliderToPlayfield(slider, current);
+                }
 
-                    if (shift != Vector2.Zero)
+                if (shift != Vector2.Zero)
+                {
+                    var toBeShifted = new List<OsuHitObject>();
+
+                    for (int j = i - 1; j >= i - objects_to_shift_before_slider && j >= 0; j--)
                     {
-                        var toBeShifted = new List<OsuHitObject>();
+                        // only shift hit circles
+                        if (!(hitObjects[j] is HitCircle)) break;
 
-                        for (int j = i - 1; j >= i - objects_to_shift_before_slider && j >= 0; j--)
-                        {
-                            // only shift hit circles
-                            if (!(hitObjects[j] is HitCircle)) break;
-
-                            toBeShifted.Add(hitObjects[j]);
-                        }
-
-                        if (toBeShifted.Count > 0)
-                            applyDecreasingShift(toBeShifted, shift);
+                        toBeShifted.Add(hitObjects[j]);
                     }
+
+                    if (toBeShifted.Count > 0)
+                        applyDecreasingShift(toBeShifted, shift);
                 }
 
                 previous = current;
@@ -145,31 +143,29 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <summary>
         /// Moves the <see cref="Slider"/> and all necessary nested <see cref="OsuHitObject"/>s into the <see cref="OsuPlayfield"/> if they aren't already.
         /// </summary>
-        /// <returns>The <see cref="Vector2"/> that this slider has been shifted by.</returns>
-        private Vector2 moveSliderIntoPlayfield(Slider slider, RandomObjectInfo currentObjectInfo)
+        /// <returns>The deviation from the original randomised position in order to fit within the playfield.</returns>
+        private Vector2 clampSliderToPlayfield(Slider slider, RandomObjectInfo objectInfo)
         {
             var area = calculatePossibleMovementBounds(slider);
 
-            var prevPosition = slider.Position;
+            var previousPosition = objectInfo.PositionRandomised;
 
             // Clamp slider position to the placement area
             // If the slider is larger than the playfield, force it to stay at the original position
             var newX = area.Width < 0
-                ? currentObjectInfo.PositionOriginal.X
-                : Math.Clamp(slider.Position.X, area.Left, area.Right);
+                ? objectInfo.PositionOriginal.X
+                : Math.Clamp(previousPosition.X, area.Left, area.Right);
 
             var newY = area.Height < 0
-                ? currentObjectInfo.PositionOriginal.Y
-                : Math.Clamp(slider.Position.Y, area.Top, area.Bottom);
+                ? objectInfo.PositionOriginal.Y
+                : Math.Clamp(previousPosition.Y, area.Top, area.Bottom);
 
-            slider.Position = new Vector2(newX, newY);
+            slider.Position = objectInfo.PositionRandomised = new Vector2(newX, newY);
+            objectInfo.EndPositionRandomised = slider.EndPosition;
 
-            currentObjectInfo.PositionRandomised = slider.Position;
-            currentObjectInfo.EndPositionRandomised = slider.EndPosition;
+            shiftNestedObjects(slider, objectInfo.PositionRandomised - objectInfo.PositionOriginal);
 
-            shiftNestedObjects(slider, currentObjectInfo.PositionRandomised - currentObjectInfo.PositionOriginal);
-
-            return slider.Position - prevPosition;
+            return objectInfo.PositionRandomised - previousPosition;
         }
 
         /// <summary>
@@ -187,7 +183,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 // The last object is shifted by a vector slightly larger than zero
                 Vector2 position = hitObject.Position + shift * ((hitObjects.Count - i) / (float)(hitObjects.Count + 1));
 
-                hitObject.Position = clampToPlayfield(position, (float)hitObject.Radius);
+                hitObject.Position = clampToPlayfieldWithPadding(position, (float)hitObject.Radius);
             }
         }
 
@@ -256,12 +252,35 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        private Vector2 clampToPlayfield(Vector2 position, float radius)
+        /// <summary>
+        /// Move the randomised position of a hit circle so that it fits inside the playfield.
+        /// </summary>
+        /// <returns>The deviation from the original randomised position in order to fit within the playfield.</returns>
+        private Vector2 clampHitCircleToPlayfield(HitCircle circle, RandomObjectInfo objectInfo)
         {
-            position.X = Math.Clamp(position.X, radius, OsuPlayfield.BASE_SIZE.X - radius);
-            position.Y = Math.Clamp(position.Y, radius, OsuPlayfield.BASE_SIZE.Y - radius);
+            var previousPosition = objectInfo.PositionRandomised;
+            objectInfo.EndPositionRandomised = objectInfo.PositionRandomised = clampToPlayfieldWithPadding(
+                objectInfo.PositionRandomised,
+                (float)circle.Radius
+            );
 
-            return position;
+            circle.Position = objectInfo.PositionRandomised;
+
+            return objectInfo.PositionRandomised - previousPosition;
+        }
+
+        /// <summary>
+        /// Clamp a position to playfield, keeping a specified distance from the edges.
+        /// </summary>
+        /// <param name="position">The position to be clamped.</param>
+        /// <param name="padding">The minimum distance allowed from playfield edges.</param>
+        /// <returns>The clamped position.</returns>
+        private Vector2 clampToPlayfieldWithPadding(Vector2 position, float padding)
+        {
+            return new Vector2(
+                Math.Clamp(position.X, padding, OsuPlayfield.BASE_SIZE.X - padding),
+                Math.Clamp(position.Y, padding, OsuPlayfield.BASE_SIZE.Y - padding)
+            );
         }
 
         private class RandomObjectInfo
