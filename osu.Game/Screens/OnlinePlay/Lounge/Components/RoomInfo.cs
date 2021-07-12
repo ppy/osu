@@ -21,7 +21,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             AutoSizeAxes = Axes.Y;
 
             RoomLocalUserInfo localUserInfo;
-            RoomStatusInfo statusInfo;
+            EndDateInfo statusInfo;
             ModeTypeInfo typeInfo;
             ParticipantInfo participantInfo;
 
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
-                            statusInfo = new RoomStatusInfo(),
+                            statusInfo = new EndDateInfo(),
                             typeInfo = new ModeTypeInfo
                             {
                                 Anchor = Anchor.BottomRight,
