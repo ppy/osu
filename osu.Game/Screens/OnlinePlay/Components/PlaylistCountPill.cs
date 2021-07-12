@@ -1,0 +1,39 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System.Collections.Specialized;
+using osu.Framework.Graphics;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+
+namespace osu.Game.Screens.OnlinePlay.Components
+{
+    /// <summary>
+    /// A pill that displays the playlist item count.
+    /// </summary>
+    public class PlaylistCountPill : RoomInfoPill
+    {
+        private OsuTextFlowContainer count;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Playlist.BindCollectionChanged(updateCount, true);
+        }
+
+        private void updateCount(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            count.Clear();
+            count.AddText(Playlist.Count.ToString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
+            count.AddText(" Maps");
+        }
+
+        protected override Drawable CreateContent() => count = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12))
+        {
+            AutoSizeAxes = Axes.Both,
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+        };
+    }
+}
