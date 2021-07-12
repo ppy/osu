@@ -111,6 +111,7 @@ namespace osu.Desktop.Updater
             catch (Exception)
             {
                 // we'll ignore this and retry later. can be triggered by no internet connection or thread abortion.
+                scheduleRecheck = true;
             }
             finally
             {
