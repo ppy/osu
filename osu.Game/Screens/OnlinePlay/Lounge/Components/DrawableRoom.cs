@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -241,12 +242,25 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 Alpha = 0;
         }
 
+        public Popover GetPopover() => new PasswordEntryPopover(Room);
+
+        public MenuItem[] ContextMenuItems => new MenuItem[]
+        {
+            new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
+            {
+                parentScreen?.OpenNewRoom(Room.CreateCopy());
+            })
+        };
+
         public bool OnPressed(GlobalAction action)
         {
+            if (selectedRoom.Value != Room)
+                return false;
+
             switch (action)
             {
                 case GlobalAction.Select:
-                    // TODO: this needs to be able to show the popover on demand.
+                    Click();
                     return true;
             }
 
@@ -259,6 +273,33 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => state == SelectionState.Selected;
 
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (selectedRoom.Value != Room)
+                return true;
+
+            return base.OnMouseDown(e);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (Room != selectedRoom.Value)
+            {
+                selectedRoom.Value = Room;
+                return true;
+            }
+
+            if (Room.HasPassword.Value)
+            {
+                this.ShowPopover();
+                return true;
+            }
+
+            lounge?.Join(Room, null);
+
+            return base.OnClick(e);
+        }
+
         private class RoomName : OsuSpriteText
         {
             [Resolved(typeof(Room), nameof(Online.Rooms.Room.Name))]
@@ -270,14 +311,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 Current = name;
             }
         }
-
-        public MenuItem[] ContextMenuItems => new MenuItem[]
-        {
-            new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
-            {
-                parentScreen?.OpenNewRoom(Room.CreateCopy());
-            })
-        };
 
         private class PasswordProtectedIcon : CompositeDrawable
         {
@@ -311,33 +344,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 };
             }
         }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            if (selectedRoom.Value != Room)
-                return true;
-
-            return base.OnMouseDown(e);
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            if (Room != selectedRoom.Value)
-            {
-                selectedRoom.Value = Room;
-                return true;
-            }
-
-            if (Room.HasPassword.Value)
-                // we want our popover to show. this is a bit of a hack.
-                return false;
-
-            lounge?.Join(Room, null);
-
-            return base.OnClick(e);
-        }
-
-        public Popover GetPopover() => new PasswordEntryPopover(Room);
 
         public class PasswordEntryPopover : Popover
         {
