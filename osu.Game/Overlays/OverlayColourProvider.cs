@@ -66,7 +66,7 @@ namespace osu.Game.Overlays
                     return 333 / 360f;
 
                 case OverlayColourScheme.Orange:
-                    return 46 / 360f;
+                    return 45 / 360f;
 
                 case OverlayColourScheme.Green:
                     return 115 / 360f;
