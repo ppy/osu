@@ -5,21 +5,27 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
     /// <summary>
-    /// Abstract class for "pill" components displayed as part of <see cref="DrawableRoom"/>s.
+    /// Displays contents in a "pill".
     /// </summary>
-    public abstract class RoomInfoPill : OnlinePlayComposite
+    public class PillContainer : Container
     {
         private const float padding = 8;
 
-        protected Drawable Background { get; private set; }
+        public Drawable Background { get; private set; }
 
-        protected RoomInfoPill()
+        protected override Container<Drawable> Content { get; } = new Container
+        {
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            AutoSizeAxes = Axes.Both,
+        };
+
+        public PillContainer()
         {
             AutoSizeAxes = Axes.X;
             Height = 16;
@@ -58,21 +64,12 @@ namespace osu.Game.Screens.OnlinePlay.Components
                             },
                             Content = new[]
                             {
-                                new[]
-                                {
-                                    CreateContent().With(d =>
-                                    {
-                                        d.Anchor = Anchor.Centre;
-                                        d.Origin = Anchor.Centre;
-                                    })
-                                }
+                                new[] { Content }
                             }
                         }
                     }
                 }
             };
         }
-
-        protected abstract Drawable CreateContent();
     }
 }

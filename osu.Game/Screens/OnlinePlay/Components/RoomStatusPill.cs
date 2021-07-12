@@ -16,13 +16,34 @@ namespace osu.Game.Screens.OnlinePlay.Components
     /// <summary>
     /// A pill that displays the room's current status.
     /// </summary>
-    public class RoomStatusPill : RoomInfoPill
+    public class RoomStatusPill : OnlinePlayComposite
     {
         [Resolved]
         private OsuColour colours { get; set; }
 
         private bool firstDisplay = true;
+        private PillContainer pill;
         private SpriteText statusText;
+
+        public RoomStatusPill()
+        {
+            AutoSizeAxes = Axes.Both;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            InternalChild = pill = new PillContainer
+            {
+                Child = statusText = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 12),
+                    Colour = Color4.Black
+                }
+            };
+        }
 
         protected override void LoadComplete()
         {
@@ -36,19 +57,11 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             RoomStatus status = EndDate.Value < DateTimeOffset.Now ? new RoomStatusEnded() : Status.Value ?? new RoomStatusOpen();
 
-            Background.Alpha = 1;
-            Background.FadeColour(status.GetAppropriateColour(colours), firstDisplay ? 0 : 100);
+            pill.Background.Alpha = 1;
+            pill.Background.FadeColour(status.GetAppropriateColour(colours), firstDisplay ? 0 : 100);
             statusText.Text = status.Message;
 
             firstDisplay = false;
         }
-
-        protected override Drawable CreateContent() => statusText = new OsuSpriteText
-        {
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-            Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 12),
-            Colour = Color4.Black
-        };
     }
 }
