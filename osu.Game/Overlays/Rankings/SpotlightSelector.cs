@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -46,6 +47,7 @@ namespace osu.Game.Overlays.Rankings
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
             InternalChildren = new Drawable[]
             {
                 background = new Box
@@ -139,7 +141,7 @@ namespace osu.Game.Overlays.Rankings
             {
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Vertical;
-                Margin = new MarginPadding { Vertical = 10 };
+                Padding = new MarginPadding { Vertical = 15 };
                 Children = new Drawable[]
                 {
                     new OsuSpriteText
@@ -150,11 +152,11 @@ namespace osu.Game.Overlays.Rankings
                     new Container
                     {
                         AutoSizeAxes = Axes.X,
-                        Height = 20,
+                        Height = 25,
                         Child = valueText = new OsuSpriteText
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.Light),
                         }
                     }
@@ -174,11 +176,34 @@ namespace osu.Game.Overlays.Rankings
 
             protected override DropdownMenu CreateMenu() => menu = base.CreateMenu().With(m => m.MaxHeight = 400);
 
+            protected override DropdownHeader CreateHeader() => new SpotlightsDropdownHeader();
+
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
+                // osu-web adds a 0.6 opacity container on top of the 0.5 base one when hovering, 0.8 on a single container here matches the resulting colour
+                AccentColour = colourProvider.Background6.Opacity(0.8f);
                 menu.BackgroundColour = colourProvider.Background5;
-                AccentColour = colourProvider.Background6;
+                Padding = new MarginPadding { Vertical = 20 };
+            }
+
+            private class SpotlightsDropdownHeader : OsuDropdownHeader
+            {
+                public SpotlightsDropdownHeader()
+                {
+                    AutoSizeAxes = Axes.Y;
+                    Text.Font = OsuFont.GetFont(size: 15);
+                    Text.Padding = new MarginPadding { Vertical = 1.5f }; // osu-web line-height difference compensation
+                    Foreground.Padding = new MarginPadding { Horizontal = 10, Vertical = 15 };
+                    Margin = Icon.Margin = new MarginPadding(0);
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OverlayColourProvider colourProvider)
+                {
+                    BackgroundColour = colourProvider.Background6.Opacity(0.5f);
+                    BackgroundColourHover = colourProvider.Background5;
+                }
             }
         }
     }

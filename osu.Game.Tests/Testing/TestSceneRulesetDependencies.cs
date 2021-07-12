@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration.Tracking;
+using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
@@ -43,6 +44,14 @@ namespace osu.Game.Tests.Testing
         {
             AddAssert("ruleset sample retrieved", () =>
                 Dependencies.Get<ISampleStore>().Get(@"test-sample") != null);
+        }
+
+        [Test]
+        public void TestRetrieveShader()
+        {
+            AddAssert("ruleset shaders retrieved", () =>
+                Dependencies.Get<ShaderManager>().LoadRaw(@"sh_TestVertex.vs") != null &&
+                Dependencies.Get<ShaderManager>().LoadRaw(@"sh_TestFragment.fs") != null);
         }
 
         [Test]
