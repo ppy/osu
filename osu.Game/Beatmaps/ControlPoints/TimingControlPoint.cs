@@ -4,6 +4,7 @@
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
+using osu.Game.Overlays;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
@@ -20,7 +21,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         private const double default_beat_length = 60000.0 / 60.0;
 
-        public override Color4 GetRepresentingColour(OsuColour colours) => colours.Orange1;
+        public override Color4 GetRepresentingColour(OsuColour colours) => OverlayColourProvider.Orange.Colour1;
 
         public static readonly TimingControlPoint DEFAULT = new TimingControlPoint
         {
