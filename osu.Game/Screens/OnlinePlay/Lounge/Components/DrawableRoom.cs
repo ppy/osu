@@ -168,7 +168,25 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                 },
                                 Children = new Drawable[]
                                 {
-                                    new RoomStatusInfo(),
+                                    new FillFlowContainer
+                                    {
+                                        AutoSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(4),
+                                        Children = new Drawable[]
+                                        {
+                                            new RoomStatusPill
+                                            {
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft
+                                            },
+                                            new EndDateInfo
+                                            {
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft
+                                            },
+                                        }
+                                    },
                                     new RoomName
                                     {
                                         Anchor = Anchor.CentreLeft,
@@ -184,7 +202,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                         Spacing = new Vector2(4),
                                         Children = new Drawable[]
                                         {
-                                            new PlaylistInfoPill
+                                            new PlaylistCountPill
                                             {
                                                 Anchor = Anchor.CentreLeft,
                                                 Origin = Anchor.CentreLeft,
