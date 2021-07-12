@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Utils;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics
@@ -37,6 +39,33 @@ namespace osu.Game.Graphics
 
                 case DifficultyRating.ExpertPlus:
                     return useLighterColour ? Gray9 : Color4Extensions.FromHex("#121415");
+            }
+        }
+
+        public Color4 ForDifficultyRatingNew(DifficultyRating difficulty)
+        {
+            switch (difficulty)
+            {
+                case DifficultyRating.Easy:
+                    return Color4Extensions.FromHex("4ebfff");
+
+                case DifficultyRating.Normal:
+                    return Color4Extensions.FromHex("66ff91");
+
+                case DifficultyRating.Hard:
+                    return Color4Extensions.FromHex("f7e75d");
+
+                case DifficultyRating.Insane:
+                    return Color4Extensions.FromHex("ff7e68");
+
+                case DifficultyRating.Expert:
+                    return Color4Extensions.FromHex("fe3c71");
+
+                case DifficultyRating.ExpertPlus:
+                    return Color4Extensions.FromHex("6662dd");
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(difficulty));
             }
         }
 
