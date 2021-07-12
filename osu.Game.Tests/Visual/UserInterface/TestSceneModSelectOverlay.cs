@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Mods;
@@ -48,6 +49,38 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void SetUpSteps()
         {
             AddStep("show", () => modSelect.Show());
+        }
+
+        /// <summary>
+        /// Ensure that two mod overlays are not cross polluting via central settings instances.
+        /// </summary>
+        [Test]
+        public void TestSettingsNotCrossPolluting()
+        {
+            Bindable<IReadOnlyList<Mod>> selectedMods2 = null;
+
+            AddStep("select diff adjust", () => SelectedMods.Value = new Mod[] { new OsuModDifficultyAdjust() });
+
+            AddStep("set setting", () => modSelect.ChildrenOfType<SettingsSlider<float>>().First().Current.Value = 8);
+
+            AddAssert("ensure setting is propagated", () => SelectedMods.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value == 8);
+
+            AddStep("create second bindable", () => selectedMods2 = new Bindable<IReadOnlyList<Mod>>(new Mod[] { new OsuModDifficultyAdjust() }));
+
+            AddStep("create second overlay", () =>
+            {
+                Add(modSelect = new TestModSelectOverlay().With(d =>
+                {
+                    d.Origin = Anchor.TopCentre;
+                    d.Anchor = Anchor.TopCentre;
+                    d.SelectedMods.BindTarget = selectedMods2;
+                }));
+            });
+
+            AddStep("show", () => modSelect.Show());
+
+            AddAssert("ensure first is unchanged", () => SelectedMods.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value == 8);
+            AddAssert("ensure second is default", () => selectedMods2.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value == null);
         }
 
         [Test]

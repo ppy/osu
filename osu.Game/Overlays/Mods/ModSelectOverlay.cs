@@ -429,7 +429,7 @@ namespace osu.Game.Overlays.Mods
                 if (!Stacked)
                     modEnumeration = ModUtils.FlattenMods(modEnumeration);
 
-                section.Mods = modEnumeration.Select(getValidModOrNull).Where(m => m != null);
+                section.Mods = modEnumeration.Select(getValidModOrNull).Where(m => m != null).Select(m => m.CreateCopy());
             }
 
             updateSelectedButtons();
