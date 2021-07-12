@@ -115,6 +115,17 @@ namespace osu.Game.Rulesets.Mods
             ExtendedMaxValue = otherDifficultyBindable.extendedMaxValue;
         }
 
+        public override void UnbindFrom(IUnbindable them)
+        {
+            if (!(them is DifficultyBindable otherDifficultyBindable))
+                throw new InvalidOperationException($"Cannot unbind from a non-{nameof(DifficultyBindable)}.");
+
+            base.UnbindFrom(them);
+
+            CurrentNumber.UnbindFrom(otherDifficultyBindable.CurrentNumber);
+            ExtendedLimits.UnbindFrom(otherDifficultyBindable.ExtendedLimits);
+        }
+
         public new DifficultyBindable GetBoundCopy() => new DifficultyBindable { BindTarget = this };
     }
 }
