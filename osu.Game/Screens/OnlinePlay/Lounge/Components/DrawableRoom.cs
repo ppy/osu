@@ -345,50 +345,44 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        public class PasswordEntryPopover : Popover
+        public class PasswordEntryPopover : BasicPopover
         {
+            private readonly Room room;
+
             [Resolved(canBeNull: true)]
             private LoungeSubScreen lounge { get; set; }
 
             public PasswordEntryPopover(Room room)
             {
+                this.room = room;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
                 OsuPasswordTextBox passwordTextbox;
 
-                Child = new Container
+                Child = new FillFlowContainer
                 {
+                    Margin = new MarginPadding(10),
+                    Spacing = new Vector2(5),
                     AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
                     Children = new Drawable[]
                     {
-                        new Box
+                        passwordTextbox = new OsuPasswordTextBox
                         {
-                            Colour = Color4.OliveDrab,
-                            RelativeSizeAxes = Axes.Both,
+                            Width = 200,
                         },
-                        new FillFlowContainer
+                        new TriangleButton
                         {
-                            Margin = new MarginPadding(10),
-                            Spacing = new Vector2(5),
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Children = new Drawable[]
-                            {
-                                passwordTextbox = new OsuPasswordTextBox
-                                {
-                                    Width = 200,
-                                },
-                                new TriangleButton
-                                {
-                                    Width = 80,
-                                    Text = "Join Room",
-                                    Action = () => lounge?.Join(room, passwordTextbox.Text)
-                                }
-                            }
-                        },
+                            Width = 80,
+                            Text = "Join Room",
+                            Action = () => lounge?.Join(room, passwordTextbox.Text)
+                        }
                     }
                 };
             }
-
-            protected override Drawable CreateArrow() => Drawable.Empty();
         }
     }
 }
