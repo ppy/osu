@@ -12,11 +12,12 @@ namespace osu.Game.Overlays
         private readonly OverlayColourScheme colourScheme;
 
         public static OverlayColourProvider Red { get; } = new OverlayColourProvider(OverlayColourScheme.Red);
-        public static OverlayColourProvider Pink { get; } = new OverlayColourProvider(OverlayColourScheme.Pink);
+        public static OverlayColourProvider DarkOrange { get; } = new OverlayColourProvider(OverlayColourScheme.DarkOrange);
         public static OverlayColourProvider Orange { get; } = new OverlayColourProvider(OverlayColourScheme.Orange);
         public static OverlayColourProvider Green { get; } = new OverlayColourProvider(OverlayColourScheme.Green);
-        public static OverlayColourProvider Purple { get; } = new OverlayColourProvider(OverlayColourScheme.Purple);
         public static OverlayColourProvider Blue { get; } = new OverlayColourProvider(OverlayColourScheme.Blue);
+        public static OverlayColourProvider Purple { get; } = new OverlayColourProvider(OverlayColourScheme.Purple);
+        public static OverlayColourProvider Pink { get; } = new OverlayColourProvider(OverlayColourScheme.Pink);
 
         public OverlayColourProvider(OverlayColourScheme colourScheme)
         {
@@ -62,8 +63,8 @@ namespace osu.Game.Overlays
                 case OverlayColourScheme.Red:
                     return 0;
 
-                case OverlayColourScheme.Pink:
-                    return 333 / 360f;
+                case OverlayColourScheme.DarkOrange:
+                    return 20 / 360f;
 
                 case OverlayColourScheme.Orange:
                     return 45 / 360f;
@@ -71,11 +72,17 @@ namespace osu.Game.Overlays
                 case OverlayColourScheme.Green:
                     return 115 / 360f;
 
-                case OverlayColourScheme.Purple:
-                    return 255 / 360f;
+                case OverlayColourScheme.Cyan:
+                    return 160 / 360f;
 
                 case OverlayColourScheme.Blue:
                     return 200 / 360f;
+
+                case OverlayColourScheme.Purple:
+                    return 255 / 360f;
+
+                case OverlayColourScheme.Pink:
+                    return 333 / 360f;
             }
         }
     }
@@ -84,9 +91,11 @@ namespace osu.Game.Overlays
     {
         Red,
         Pink,
+        DarkOrange,
         Orange,
         Green,
         Purple,
-        Blue
+        Blue,
+        Cyan,
     }
 }
