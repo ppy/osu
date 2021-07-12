@@ -48,6 +48,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
+        [Resolved]
+        private Bindable<Room> currentRoom { get; set; }
+
         private MultiplayerMatchSettingsOverlay settingsOverlay;
 
         private readonly IBindable<bool> isConnected = new Bindable<bool>();
@@ -272,6 +275,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 if (!connected.NewValue)
                     Schedule(this.Exit);
+            }, true);
+
+            currentRoom.BindValueChanged(room =>
+            {
+                if (room.NewValue == null)
+                {
+                    // the room has gone away.
+                    // this could mean something happened during the join process, or an external connection issue occurred.
+                    Schedule(this.Exit);
+                }
             }, true);
         }
 
