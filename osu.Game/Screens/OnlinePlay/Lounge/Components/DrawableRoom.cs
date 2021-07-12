@@ -187,11 +187,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                             },
                                         }
                                     },
-                                    new RoomName
+                                    new FillFlowContainer
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(size: 28)
+                                        AutoSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Vertical,
+                                        Children = new Drawable[]
+                                        {
+                                            new RoomNameText(),
+                                            new RoomHostText()
+                                        }
                                     },
                                     new FillFlowContainer
                                     {
@@ -262,15 +268,55 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => state == SelectionState.Selected;
 
-        private class RoomName : OsuSpriteText
+        private class RoomNameText : OsuSpriteText
         {
             [Resolved(typeof(Room), nameof(Online.Rooms.Room.Name))]
             private Bindable<string> name { get; set; }
+
+            public RoomNameText()
+            {
+                Font = OsuFont.GetFont(size: 24);
+            }
 
             [BackgroundDependencyLoader]
             private void load()
             {
                 Current = name;
+            }
+        }
+
+        private class RoomHostText : OnlinePlayComposite
+        {
+            private LinkFlowContainer hostText;
+
+            public RoomHostText()
+            {
+                AutoSizeAxes = Axes.Both;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                InternalChild = hostText = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
+                {
+                    AutoSizeAxes = Axes.Both
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Host.BindValueChanged(host =>
+                {
+                    hostText.Clear();
+
+                    if (host.NewValue != null)
+                    {
+                        hostText.AddText("hosted by ");
+                        hostText.AddUserLink(host.NewValue);
+                    }
+                }, true);
             }
         }
 

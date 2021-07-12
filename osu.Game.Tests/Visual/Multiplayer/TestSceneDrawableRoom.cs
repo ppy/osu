@@ -8,6 +8,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -27,27 +28,31 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     createDrawableRoom(new Room
                     {
-                        Name = { Value = "Room name: Open - ending in 1 day" },
+                        Name = { Value = "Room 1" },
                         Status = { Value = new RoomStatusOpen() },
-                        EndDate = { Value = DateTimeOffset.Now.AddDays(1) }
+                        EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
+                        Host = { Value = new User { Username = "peppy", Id = 2 } }
                     }),
                     createDrawableRoom(new Room
                     {
-                        Name = { Value = "Room name: Playing - ending in 1 day" },
+                        Name = { Value = "Room 2" },
                         Status = { Value = new RoomStatusPlaying() },
-                        EndDate = { Value = DateTimeOffset.Now.AddDays(1) }
+                        EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
+                        Host = { Value = new User { Username = "peppy", Id = 2 } }
                     }),
                     createDrawableRoom(new Room
                     {
-                        Name = { Value = "Room name: Ended" },
+                        Name = { Value = "Room 3" },
                         Status = { Value = new RoomStatusEnded() },
-                        EndDate = { Value = DateTimeOffset.Now }
+                        EndDate = { Value = DateTimeOffset.Now },
+                        Host = { Value = new User { Username = "peppy", Id = 2 } }
                     }),
                     createDrawableRoom(new Room
                     {
-                        Name = { Value = "Room name: Open" },
+                        Name = { Value = "Room 4" },
                         Status = { Value = new RoomStatusOpen() },
-                        Category = { Value = RoomCategory.Realtime }
+                        Category = { Value = RoomCategory.Realtime },
+                        Host = { Value = new User { Username = "peppy", Id = 2 } }
                     }),
                 }
             };
