@@ -71,6 +71,12 @@ namespace osu.Game.Rulesets.Mods
         }
 
         public DifficultyBindable()
+            : this(null)
+        {
+        }
+
+        public DifficultyBindable(float? defaultValue = null)
+            : base(defaultValue)
         {
             ExtendedLimits.BindValueChanged(_ => updateMaxValue());
         }
@@ -93,15 +99,22 @@ namespace osu.Game.Rulesets.Mods
             CurrentNumber.MaxValue = ExtendedLimits.Value && extendedMaxValue != null ? extendedMaxValue.Value : maxValue;
         }
 
-        public new DifficultyBindable GetBoundCopy() => new DifficultyBindable
+        public override void BindTo(Bindable<float?> them)
         {
-            BindTarget = this,
-            CurrentNumber = { BindTarget = CurrentNumber },
-            ExtendedLimits = { BindTarget = ExtendedLimits },
-            ReadCurrentFromDifficulty = ReadCurrentFromDifficulty,
+            if (!(them is DifficultyBindable otherDifficultyBindable))
+                throw new InvalidOperationException($"Cannot bind to a non-{nameof(DifficultyBindable)}.");
+
+            base.BindTo(them);
+
+            CurrentNumber.BindTarget = otherDifficultyBindable.CurrentNumber;
+            ExtendedLimits.BindTarget = otherDifficultyBindable.ExtendedLimits;
+            ReadCurrentFromDifficulty = otherDifficultyBindable.ReadCurrentFromDifficulty;
+
             // the following is only safe as long as these values are effectively constants.
-            MaxValue = maxValue,
-            ExtendedMaxValue = extendedMaxValue
-        };
+            MaxValue = otherDifficultyBindable.maxValue;
+            ExtendedMaxValue = otherDifficultyBindable.extendedMaxValue;
+        }
+
+        public new DifficultyBindable GetBoundCopy() => new DifficultyBindable { BindTarget = this };
     }
 }
