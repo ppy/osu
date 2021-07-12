@@ -50,7 +50,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private Bindable<Room> selectedRoom { get; set; }
 
         [Resolved(canBeNull: true)]
