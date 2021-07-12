@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("show", () => modSelect.Show());
 
             AddAssert("ensure first is unchanged", () => SelectedMods.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value == 8);
-            AddAssert("ensure second is default", () => selectedMods2.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value == 5);
+            AddAssert("ensure second is default", () => selectedMods2.Value.OfType<OsuModDifficultyAdjust>().Single().CircleSize.Value == null);
         }
 
         [Test]
