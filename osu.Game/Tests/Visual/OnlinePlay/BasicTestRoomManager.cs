@@ -26,6 +26,8 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
         public readonly BindableList<Room> Rooms = new BindableList<Room>();
 
+        public Action<Room, string> JoinRoomRequested;
+
         public IBindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>(true);
 
         IBindableList<Room> IRoomManager.Rooms => Rooms;
@@ -37,7 +39,11 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             onSuccess?.Invoke(room);
         }
 
-        public void JoinRoom(Room room, string password, Action<Room> onSuccess = null, Action<string> onError = null) => onSuccess?.Invoke(room);
+        public void JoinRoom(Room room, string password, Action<Room> onSuccess = null, Action<string> onError = null)
+        {
+            JoinRoomRequested?.Invoke(room, password);
+            onSuccess?.Invoke(room);
+        }
 
         public void PartRoom()
         {
