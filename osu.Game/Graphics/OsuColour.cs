@@ -69,6 +69,26 @@ namespace osu.Game.Graphics
             }
         }
 
+        public Color4 ForStarDifficulty(double starDifficulty)
+        {
+            var spectrumPoint = (float)(starDifficulty / 8.00);
+
+            if (spectrumPoint > 1f)
+                return Color4.Black;
+
+            return ColourUtils.SampleFromLinearGradient(new[]
+            {
+                (0.2159f, Color4Extensions.FromHex("4fc0ff")),
+                (0.2693f, Color4Extensions.FromHex("4fffd5")),
+                (0.3217f, Color4Extensions.FromHex("7cff4f")),
+                (0.4111f, Color4Extensions.FromHex("f6f05c")),
+                (0.5767f, Color4Extensions.FromHex("ff8068")),
+                (0.7307f, Color4Extensions.FromHex("ff3c71")),
+                (0.8667f, Color4Extensions.FromHex("6563de")),
+                (0.9996f, Color4Extensions.FromHex("18158e")),
+            }, spectrumPoint);
+        }
+
         /// <summary>
         /// Retrieves the colour for a <see cref="ScoreRank"/>.
         /// </summary>
