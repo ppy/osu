@@ -125,6 +125,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         },
                         Children = new Drawable[]
                         {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4Extensions.FromHex(@"#27302E"),
+                            },
                             new Container
                             {
                                 Anchor = Anchor.CentreRight,
