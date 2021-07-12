@@ -34,7 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(2),
+                Spacing = new Vector2(4),
                 Children = new Drawable[]
                 {
                     statusPill = new StatusPill(),

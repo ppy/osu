@@ -98,7 +98,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             Room = room;
 
             RelativeSizeAxes = Axes.X;
-            Height = height + SELECTION_BORDER_WIDTH * 2;
+            Height = height;
             CornerRadius = corner_radius + SELECTION_BORDER_WIDTH / 2;
             Masking = true;
         }
@@ -125,11 +125,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         },
                         Children = new Drawable[]
                         {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4Extensions.FromHex(@"#27302E"),
-                            },
                             new Container
                             {
                                 Anchor = Anchor.CentreRight,
@@ -138,10 +133,29 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                 FillMode = FillMode.Fill,
                                 Child = new OnlinePlayBackgroundSprite(BeatmapSetCoverType.List) { RelativeSizeAxes = Axes.Both }
                             },
-                            new Box
+                            new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = ColourInfo.GradientHorizontal(Color4Extensions.FromHex(@"#27302E"), Color4Extensions.FromHex(@"#27302E").Opacity(0.3f))
+                                ColumnDimensions = new[]
+                                {
+                                    new Dimension(GridSizeMode.Relative, 0.2f)
+                                },
+                                Content = new[]
+                                {
+                                    new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = Color4Extensions.FromHex(@"#27302E"),
+                                        },
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = ColourInfo.GradientHorizontal(Color4Extensions.FromHex(@"#27302E"), Color4Extensions.FromHex(@"#27302E").Opacity(0.3f))
+                                        },
+                                    }
+                                }
                             },
                             new Container
                             {
