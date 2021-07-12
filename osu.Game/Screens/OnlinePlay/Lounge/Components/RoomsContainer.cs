@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -243,6 +244,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             if (roomManager != null)
                 roomManager.RoomsUpdated -= updateSorting;
+        }
+
+        public void HideAnyPopovers()
+        {
+            // must be called on a child of the PopoverContainer due to parent traversal not considering self.
+            roomFlow.HidePopover();
         }
     }
 }

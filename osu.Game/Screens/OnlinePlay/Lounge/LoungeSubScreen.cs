@@ -46,10 +46,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         [CanBeNull]
         private IDisposable joiningRoomOperation { get; set; }
 
+        private RoomsContainer roomsContainer;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            RoomsContainer roomsContainer;
             OsuScrollContainer scrollContainer;
 
             InternalChildren = new Drawable[]
@@ -165,6 +166,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
             base.OnSuspending(next);
             filter.HoldFocus = false;
+
+            // ensure any password prompt is dismissed.
+            roomsContainer.HideAnyPopovers();
         }
 
         public void Join(Room room, string password)
