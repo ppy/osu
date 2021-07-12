@@ -181,9 +181,20 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                         Origin = Anchor.BottomLeft,
                                         AutoSizeAxes = Axes.Both,
                                         Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(4),
                                         Children = new Drawable[]
                                         {
-                                            new StarRatingRangeDisplay { Scale = new Vector2(0.85f) }
+                                            new PlaylistInfoPill
+                                            {
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                            },
+                                            new StarRatingRangeDisplay
+                                            {
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                Scale = new Vector2(0.85f)
+                                            }
                                         }
                                     }
                                 }
