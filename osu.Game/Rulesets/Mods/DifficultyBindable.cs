@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mods
         /// An internal numeric bindable to hold and propagate min/max/precision.
         /// The value of this bindable should not be set.
         /// </summary>
-        public readonly BindableFloat CurrentNumber = new BindableFloat
+        internal readonly BindableFloat CurrentNumber = new BindableFloat
         {
             MinValue = 0,
             MaxValue = 10,
