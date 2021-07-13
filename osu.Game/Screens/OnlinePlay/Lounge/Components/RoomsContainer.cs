@@ -11,7 +11,6 @@ using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
@@ -51,21 +50,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = new PopoverContainer
+            InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Child = new OsuContextMenuContainer
+                Child = roomFlow = new FillFlowContainer<DrawableRoom>
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Child = roomFlow = new FillFlowContainer<DrawableRoom>
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(2),
-                    }
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(2),
                 }
             };
         }
