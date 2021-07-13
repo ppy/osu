@@ -402,6 +402,8 @@ namespace osu.Game.Screens.Select
         private FilterCriteria activeCriteria = new FilterCriteria();
 
         protected ScheduledDelegate PendingFilter;
+        protected ScheduledDelegate FilteringCooldown;
+        protected bool NeedsFiltering;
 
         public bool AllowSelection = true;
 
@@ -443,29 +445,43 @@ namespace osu.Game.Screens.Select
 
         private void applyActiveCriteria(bool debounce, bool alwaysResetScrollPosition = true)
         {
-            PendingFilter?.Cancel();
-            PendingFilter = null;
-
-            if (debounce)
-                PendingFilter = Scheduler.AddDelayed(perform, 250);
-            else
-            {
-                // if initial load is not yet finished, this will be run inline in loadBeatmapSets to ensure correct order of operation.
-                if (!BeatmapSetsLoaded)
-                    PendingFilter = Schedule(perform);
-                else
-                    perform();
+            NeedsFiltering = true;
+            if (debounce && (FilteringCooldown != null)) {
+                // The `FilteringCooldown` task executes as soon as filtering
+                // is off cooldown. When it executes, it sees that `NeedsFiltering`
+                // is set to true and calls `perform`. This will happen no more
+                // than 100 milliseconds from now.
+                return;
             }
+
+            // If initial load is not yet finished, this will be run inline in
+            // loadBeatmapSets to ensure correct order of operation.
+            if (!(BeatmapSetsLoaded || debounce))
+                PendingFilter = Schedule(perform);
+            else
+                perform();
 
             void perform()
             {
                 PendingFilter = null;
+                NeedsFiltering = false;
 
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
 
                 if (alwaysResetScrollPosition || !Scroll.UserScrolling)
                     ScrollToSelected(true);
+
+                FilteringCooldown = Scheduler.AddDelayed(cooldown, 100);
+            }
+
+            void cooldown() {
+                FilteringCooldown = null;
+                if (NeedsFiltering) {
+                    // At least one filtering request was made while on
+                    // cooldown. We can now fulfill them.
+                    perform();
+                }
             }
         }
 
