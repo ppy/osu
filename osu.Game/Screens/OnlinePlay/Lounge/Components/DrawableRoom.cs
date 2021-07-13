@@ -91,6 +91,22 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
+        private int numberOfAvatars = 3;
+
+        public int NumberOfAvatars
+        {
+            get => numberOfAvatars;
+            set
+            {
+                numberOfAvatars = value;
+
+                if (recentParticipantsList != null)
+                    recentParticipantsList.NumberOfAvatars = value;
+            }
+        }
+
+        private RecentParticipantsList recentParticipantsList;
+
         public bool FilteringActive { get; set; }
 
         public DrawableRoom(Room room)
@@ -228,6 +244,28 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     }
                                 }
                             },
+                            new FillFlowContainer
+                            {
+                                Name = "Right content",
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                AutoSizeAxes = Axes.X,
+                                RelativeSizeAxes = Axes.Y,
+                                Padding = new MarginPadding
+                                {
+                                    Right = 10,
+                                    Vertical = 5
+                                },
+                                Children = new Drawable[]
+                                {
+                                    recentParticipantsList = new RecentParticipantsList
+                                    {
+                                        Anchor = Anchor.CentreRight,
+                                        Origin = Anchor.CentreRight,
+                                        NumberOfAvatars = NumberOfAvatars
+                                    }
+                                }
+                            }
                         },
                     },
                 },

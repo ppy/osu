@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -31,28 +32,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         Name = { Value = "Room 1" },
                         Status = { Value = new RoomStatusOpen() },
                         EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
-                        Host = { Value = new User { Username = "peppy", Id = 2 } }
                     }),
                     createDrawableRoom(new Room
                     {
                         Name = { Value = "Room 2" },
                         Status = { Value = new RoomStatusPlaying() },
                         EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
-                        Host = { Value = new User { Username = "peppy", Id = 2 } }
                     }),
                     createDrawableRoom(new Room
                     {
                         Name = { Value = "Room 3" },
                         Status = { Value = new RoomStatusEnded() },
                         EndDate = { Value = DateTimeOffset.Now },
-                        Host = { Value = new User { Username = "peppy", Id = 2 } }
                     }),
                     createDrawableRoom(new Room
                     {
                         Name = { Value = "Room 4" },
                         Status = { Value = new RoomStatusOpen() },
                         Category = { Value = RoomCategory.Realtime },
-                        Host = { Value = new User { Username = "peppy", Id = 2 } }
                     }),
                 }
             };
@@ -60,11 +57,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private DrawableRoom createDrawableRoom(Room room)
         {
-            var drawableRoom = new DrawableRoom(room)
-            {
-                MatchingFilter = true
-            };
+            room.Host.Value ??= new User { Username = "peppy", Id = 2 };
 
+            if (room.RecentParticipants.Count == 0)
+            {
+                room.RecentParticipants.AddRange(Enumerable.Range(0, 20).Select(i => new User
+                {
+                    Id = i,
+                    Username = $"User {i}"
+                }));
+            }
+
+            var drawableRoom = new DrawableRoom(room) { MatchingFilter = true };
             drawableRoom.Action = () => drawableRoom.State = drawableRoom.State == SelectionState.Selected ? SelectionState.NotSelected : SelectionState.Selected;
 
             return drawableRoom;
