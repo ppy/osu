@@ -68,6 +68,8 @@ namespace osu.Desktop.Updater
                     return false;
                 }
 
+                scheduleRecheck = false;
+
                 if (notification == null)
                 {
                     notification = new UpdateProgressNotification(this) { State = ProgressNotificationState.Active };
@@ -98,7 +100,6 @@ namespace osu.Desktop.Updater
                         // could fail if deltas are unavailable for full update path (https://github.com/Squirrel/Squirrel.Windows/issues/959)
                         // try again without deltas.
                         await checkForUpdateAsync(false, notification).ConfigureAwait(false);
-                        scheduleRecheck = false;
                     }
                     else
                     {
@@ -110,6 +111,7 @@ namespace osu.Desktop.Updater
             catch (Exception)
             {
                 // we'll ignore this and retry later. can be triggered by no internet connection or thread abortion.
+                scheduleRecheck = true;
             }
             finally
             {
