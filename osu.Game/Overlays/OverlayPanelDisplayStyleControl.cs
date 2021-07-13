@@ -12,6 +12,9 @@ using osu.Framework.Allocation;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
+using System;
+using osu.Game.Resources.Localisation.Web;
+using osu.Framework.Extensions;
 
 namespace osu.Game.Overlays
 {
@@ -57,7 +60,7 @@ namespace osu.Game.Overlays
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; }
 
-            public LocalisableString TooltipText => $@"{Value} view";
+            public LocalisableString TooltipText => Value.GetLocalisableDescription();
 
             private readonly SpriteIcon icon;
 
@@ -98,10 +101,32 @@ namespace osu.Game.Overlays
         }
     }
 
+    [LocalisableEnum(typeof(OverlayPanelDisplayStyleEnumLocalisationMapper))]
     public enum OverlayPanelDisplayStyle
     {
         Card,
         List,
         Brick
+    }
+
+    public class OverlayPanelDisplayStyleEnumLocalisationMapper : EnumLocalisationMapper<OverlayPanelDisplayStyle>
+    {
+        public override LocalisableString Map(OverlayPanelDisplayStyle value)
+        {
+            switch (value)
+            {
+                case OverlayPanelDisplayStyle.Card:
+                    return UsersStrings.ViewModeCard;
+
+                case OverlayPanelDisplayStyle.List:
+                    return UsersStrings.ViewModeList;
+
+                case OverlayPanelDisplayStyle.Brick:
+                    return UsersStrings.ViewModeBrick;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
+            }
+        }
     }
 }

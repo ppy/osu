@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
                     double moveDuration = hitObject.TimePreempt + 1;
 
-                    using (drawable.BeginAbsoluteSequence(appearTime, true))
+                    using (drawable.BeginAbsoluteSequence(appearTime))
                     {
                         drawable
                             .MoveToOffset(appearOffset)

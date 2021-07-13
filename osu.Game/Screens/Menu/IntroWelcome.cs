@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Menu
             {
                 base.LoadComplete();
 
-                using (BeginDelayedSequence(0, true))
+                using (BeginDelayedSequence(0))
                 {
                     scaleContainer.ScaleTo(0.9f).ScaleTo(1, delay_step_two).OnComplete(_ => Expire());
                     scaleContainer.FadeInFromZero(1800);

@@ -128,7 +128,7 @@ namespace osu.Game.Overlays.Mods
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.Absolute, 90),
-                        new Dimension(GridSizeMode.Distributed),
+                        new Dimension(),
                         new Dimension(GridSizeMode.AutoSize),
                     },
                     Content = new[]
@@ -429,7 +429,7 @@ namespace osu.Game.Overlays.Mods
                 if (!Stacked)
                     modEnumeration = ModUtils.FlattenMods(modEnumeration);
 
-                section.Mods = modEnumeration.Select(getValidModOrNull).Where(m => m != null);
+                section.Mods = modEnumeration.Select(getValidModOrNull).Where(m => m != null).Select(m => m.CreateCopy());
             }
 
             updateSelectedButtons();

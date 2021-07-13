@@ -101,10 +101,10 @@ namespace osu.Game.Overlays.Settings
 
         public event Action SettingChanged;
 
+        private readonly RestoreDefaultValueButton<T> restoreDefaultButton;
+
         protected SettingsItem()
         {
-            RestoreDefaultValueButton<T> restoreDefaultButton;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding { Right = SettingsPanel.CONTENT_MARGINS };
@@ -126,14 +126,19 @@ namespace osu.Game.Overlays.Settings
 
             // all bindable logic is in constructor intentionally to support "CreateSettingsControls" being used in a context it is
             // never loaded, but requires bindable storage.
-            if (controlWithCurrent != null)
-            {
-                controlWithCurrent.Current.ValueChanged += _ => SettingChanged?.Invoke();
-                controlWithCurrent.Current.DisabledChanged += _ => updateDisabled();
+            if (controlWithCurrent == null)
+                throw new ArgumentException(@$"Control created via {nameof(CreateControl)} must implement {nameof(IHasCurrentValue<T>)}");
 
-                if (ShowsDefaultIndicator)
-                    restoreDefaultButton.Current = controlWithCurrent.Current;
-            }
+            controlWithCurrent.Current.ValueChanged += _ => SettingChanged?.Invoke();
+            controlWithCurrent.Current.DisabledChanged += _ => updateDisabled();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (ShowsDefaultIndicator)
+                restoreDefaultButton.Current = controlWithCurrent.Current;
         }
 
         private void updateDisabled()
