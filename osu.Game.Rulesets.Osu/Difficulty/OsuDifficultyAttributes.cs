@@ -7,11 +7,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyAttributes : DifficultyAttributes
     {
-        public double AimStrain { get; set; }
-        public double SpeedStrain { get; set; }
+        public double[] AimComboBasedDifficulties { get; set; }
+        public double[] AimMissCounts { get; set; }
+
+        public double[] SpeedComboBasedDifficulties { get; set; }
+        public double[] SpeedMissCounts { get; set; }
+
         public double ApproachRate { get; set; }
         public double OverallDifficulty { get; set; }
         public int HitCircleCount { get; set; }
+        public int HitSliderCount { get; set; }
         public int SpinnerCount { get; set; }
     }
 }

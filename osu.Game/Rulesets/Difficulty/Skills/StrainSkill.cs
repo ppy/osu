@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
         /// </summary>
-        protected sealed override void Process(DifficultyHitObject current)
+        protected override void Process(DifficultyHitObject current)
         {
             // The first object doesn't generate a strain, so we begin with an incremented section end
             if (Previous.Count == 0)
@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
         /// </summary>
-        public sealed override double DifficultyValue()
+        public override double DifficultyValue()
         {
             double difficulty = 0;
             double weight = 1;
