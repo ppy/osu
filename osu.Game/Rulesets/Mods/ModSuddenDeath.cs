@@ -3,7 +3,9 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -20,6 +22,13 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModPerfect)).ToArray();
+
+        [SettingSource("Restart on fail", "Automatically restarts when failed.")]
+        public BindableBool Restart { get; } = new BindableBool();
+
+        public override bool PerformFail() => true;
+
+        public override bool RestartOnFail => Restart.Value;
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result)
             => result.Type.AffectsCombo()
