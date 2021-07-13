@@ -38,6 +38,16 @@ namespace osu.Game.Rulesets.Objects
         public readonly Bindable<double> StartTimeBindable = new BindableDouble();
 
         /// <summary>
+        /// An optional difficulty control point group which overrides global applications.
+        /// </summary>
+        public DifficultyControlPoint LocalDifficultyControlPoint;
+
+        /// <summary>
+        /// An optional sample control point group which overrides global applications.
+        /// </summary>
+        public SampleControlPoint LocalSampleControlPoint;
+
+        /// <summary>
         /// The time at which the HitObject starts.
         /// </summary>
         public virtual double StartTime
@@ -65,8 +75,17 @@ namespace osu.Game.Rulesets.Objects
             }
         }
 
+        /// <summary>
+        /// The established sample control point to be used by this hit object.
+        /// </summary>
         [JsonIgnore]
-        public SampleControlPoint SampleControlPoint;
+        public SampleControlPoint SampleControlPoint { get; private set; }
+
+        /// <summary>
+        /// The established difficulty control point to be used by this hit object.
+        /// </summary>
+        [JsonIgnore]
+        public DifficultyControlPoint DifficultyControlPoint { get; private set; }
 
         /// <summary>
         /// Whether this <see cref="HitObject"/> is in Kiai time.
@@ -104,10 +123,12 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="cancellationToken">The cancellation token.</param>
         public void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty, CancellationToken cancellationToken = default)
         {
+            DifficultyControlPoint = LocalDifficultyControlPoint ?? controlPointInfo.DifficultyPointAt(StartTime);
+
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             // This is done here since ApplyDefaultsToSelf may be used to determine the end time
-            SampleControlPoint = controlPointInfo.SamplePointAt(this.GetEndTime() + control_point_leniency);
+            SampleControlPoint = LocalSampleControlPoint ?? controlPointInfo.SamplePointAt(this.GetEndTime() + control_point_leniency);
 
             nestedHitObjects.Clear();
 
