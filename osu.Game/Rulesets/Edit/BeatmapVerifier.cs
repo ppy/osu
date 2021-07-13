@@ -25,6 +25,9 @@ namespace osu.Game.Rulesets.Edit
             new CheckMutedObjects(),
             new CheckFewHitsounds(),
 
+            // Files
+            new CheckZeroByteFiles(),
+
             // Compose
             new CheckUnsnappedObjects(),
             new CheckConcurrentObjects()
