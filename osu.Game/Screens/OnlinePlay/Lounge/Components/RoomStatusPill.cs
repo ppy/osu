@@ -11,7 +11,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.OnlinePlay.Components
+namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     /// <summary>
     /// A pill that displays the room's current status.

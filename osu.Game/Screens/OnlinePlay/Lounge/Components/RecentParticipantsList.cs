@@ -15,7 +15,7 @@ using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.OnlinePlay.Components
+namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public class RecentParticipantsList : OnlinePlayComposite
     {
