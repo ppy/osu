@@ -71,6 +71,12 @@ namespace osu.Game.Rulesets.Mods
         }
 
         public DifficultyBindable()
+            : this(null)
+        {
+        }
+
+        public DifficultyBindable(float? defaultValue = null)
+            : base(defaultValue)
         {
             ExtendedLimits.BindValueChanged(_ => updateMaxValue());
         }
@@ -93,15 +99,35 @@ namespace osu.Game.Rulesets.Mods
             CurrentNumber.MaxValue = ExtendedLimits.Value && extendedMaxValue != null ? extendedMaxValue.Value : maxValue;
         }
 
-        public new DifficultyBindable GetBoundCopy() => new DifficultyBindable
+        public override void BindTo(Bindable<float?> them)
         {
-            BindTarget = this,
-            CurrentNumber = { BindTarget = CurrentNumber },
-            ExtendedLimits = { BindTarget = ExtendedLimits },
-            ReadCurrentFromDifficulty = ReadCurrentFromDifficulty,
-            // the following is only safe as long as these values are effectively constants.
-            MaxValue = maxValue,
-            ExtendedMaxValue = extendedMaxValue
-        };
+            if (!(them is DifficultyBindable otherDifficultyBindable))
+                throw new InvalidOperationException($"Cannot bind to a non-{nameof(DifficultyBindable)}.");
+
+            ReadCurrentFromDifficulty = otherDifficultyBindable.ReadCurrentFromDifficulty;
+
+            // the following max value copies are only safe as long as these values are effectively constants.
+            MaxValue = otherDifficultyBindable.maxValue;
+            ExtendedMaxValue = otherDifficultyBindable.extendedMaxValue;
+
+            ExtendedLimits.BindTarget = otherDifficultyBindable.ExtendedLimits;
+
+            // the actual values need to be copied after the max value constraints.
+            CurrentNumber.BindTarget = otherDifficultyBindable.CurrentNumber;
+            base.BindTo(them);
+        }
+
+        public override void UnbindFrom(IUnbindable them)
+        {
+            if (!(them is DifficultyBindable otherDifficultyBindable))
+                throw new InvalidOperationException($"Cannot unbind from a non-{nameof(DifficultyBindable)}.");
+
+            base.UnbindFrom(them);
+
+            CurrentNumber.UnbindFrom(otherDifficultyBindable.CurrentNumber);
+            ExtendedLimits.UnbindFrom(otherDifficultyBindable.ExtendedLimits);
+        }
+
+        public new DifficultyBindable GetBoundCopy() => new DifficultyBindable { BindTarget = this };
     }
 }
