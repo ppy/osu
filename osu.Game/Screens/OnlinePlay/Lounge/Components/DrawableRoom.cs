@@ -141,41 +141,49 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         },
                         Children = new Drawable[]
                         {
-                            new Box
+                            // This resolves 1px gaps due to applying the (parenting) corner radius and masking across multiple filling background sprites.
+                            new BufferedContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4Extensions.FromHex(@"#27302E"),
-                            },
-                            new Container
-                            {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                RelativeSizeAxes = Axes.Both,
-                                FillMode = FillMode.Fill,
-                                Child = new OnlinePlayBackgroundSprite(BeatmapSetCoverType.List) { RelativeSizeAxes = Axes.Both }
-                            },
-                            new GridContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                ColumnDimensions = new[]
+                                Children = new Drawable[]
                                 {
-                                    new Dimension(GridSizeMode.Relative, 0.2f)
-                                },
-                                Content = new[]
-                                {
-                                    new Drawable[]
+                                    new Box
                                     {
-                                        new Box
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = Color4Extensions.FromHex(@"#27302E"),
+                                    },
+                                    new Container
+                                    {
+                                        Anchor = Anchor.CentreRight,
+                                        Origin = Anchor.CentreRight,
+                                        RelativeSizeAxes = Axes.Both,
+                                        FillMode = FillMode.Fill,
+                                        Child = new OnlinePlayBackgroundSprite(BeatmapSetCoverType.List) { RelativeSizeAxes = Axes.Both }
+                                    },
+                                    new GridContainer
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        ColumnDimensions = new[]
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = Color4Extensions.FromHex(@"#27302E"),
+                                            new Dimension(GridSizeMode.Relative, 0.2f)
                                         },
-                                        new Box
+                                        Content = new[]
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = ColourInfo.GradientHorizontal(Color4Extensions.FromHex(@"#27302E"), Color4Extensions.FromHex(@"#27302E").Opacity(0.3f))
-                                        },
-                                    }
+                                            new Drawable[]
+                                            {
+                                                new Box
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Colour = Color4Extensions.FromHex(@"#27302E"),
+                                                },
+                                                new Box
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Colour = ColourInfo.GradientHorizontal(Color4Extensions.FromHex(@"#27302E"), Color4Extensions.FromHex(@"#27302E").Opacity(0.3f))
+                                                },
+                                            }
+                                        }
+                                    },
                                 }
                             },
                             new Container
