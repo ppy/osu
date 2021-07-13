@@ -70,13 +70,15 @@ namespace osu.Game.Rulesets.Osu.Mods
                 // Move hit objects back into the playfield if they are outside of it
                 Vector2 shift = Vector2.Zero;
 
-                if (hitObject is HitCircle circle)
+                switch (hitObject)
                 {
-                    shift = clampHitCircleToPlayfield(circle, current);
-                }
-                else if (hitObject is Slider slider)
-                {
-                    shift = clampSliderToPlayfield(slider, current);
+                    case HitCircle circle:
+                        shift = clampHitCircleToPlayfield(circle, current);
+                        break;
+
+                    case Slider slider:
+                        shift = clampSliderToPlayfield(slider, current);
+                        break;
                 }
 
                 if (shift != Vector2.Zero)
