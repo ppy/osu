@@ -5,12 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
@@ -31,32 +34,41 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private OsuInputManager osuInputManager;
 
+        private Score score;
+        private DrawableRuleset<OsuHitObject> drawableRuleset;
         private ReplayState<OsuAction> state;
         private double lastStateChangeTime;
+        private OsuFramedReplayInputHandler replayInputHandler;
+        private readonly BindableBool replayLoaded = new BindableBool();
 
-        private bool hasReplay;
+        public void ApplyToPlayer(Player player)
+        {
+            replayInputHandler = (OsuFramedReplayInputHandler)osuInputManager.ReplayInputHandler;
+            updateState();
+            osuInputManager.AllowUserPresses = false;
+        }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // grab the input manager for future use.
             osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
+            replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
+            replayLoaded.BindValueChanged(_ => updateState());
+            this.drawableRuleset = drawableRuleset;
         }
 
-        public void ApplyToPlayer(Player player)
+        private void updateState()
         {
-            if (osuInputManager.ReplayInputHandler != null)
+            if (replayInputHandler != null)
             {
-                hasReplay = true;
-                return;
+                score = drawableRuleset.ReplayScore;
+                replayInputHandler.HandleActionInput = !(replayLoaded.Value && score.ScoreInfo.IsLegacyScore);
             }
-
-            osuInputManager.AllowUserPresses = false;
         }
 
         public void Update(Playfield playfield)
         {
-            if (hasReplay)
-                return;
+            if (replayInputHandler?.HandleActionInput ?? false) return;
 
             bool requiresHold = false;
             bool requiresHit = false;
