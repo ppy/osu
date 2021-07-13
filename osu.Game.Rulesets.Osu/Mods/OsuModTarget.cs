@@ -31,6 +31,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -143,22 +144,24 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             if (!(drawable is DrawableHitCircle circle)) return;
 
-            var h = (OsuHitObject)drawable.HitObject;
+            double startTime = circle.HitObject.StartTime;
+            double preempt = circle.HitObject.TimePreempt;
 
-            using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
+            using (drawable.BeginAbsoluteSequence(startTime - preempt))
             {
+                // initial state
                 drawable.ScaleTo(0.5f)
-                        .Then().ScaleTo(1f, h.TimePreempt);
+                        .FadeColour(OsuColour.Gray(0.5f));
 
-                var colour = drawable.Colour;
-
-                drawable.FadeColour(OsuColour.Gray(0.45f))
-                        .Then().Delay(h.TimePreempt - controlPointInfo.TimingPointAt(h.StartTime).BeatLength - undim_duration)
-                        .FadeColour(colour, undim_duration);
-
-                // Remove approach circles
-                circle.ApproachCircle.Hide();
+                // scale to final size
+                drawable.ScaleTo(1f, preempt);
             }
+
+            using (drawable.BeginAbsoluteSequence(startTime - controlPointInfo.TimingPointAt(startTime).BeatLength - undim_duration))
+                drawable.FadeColour(Color4.White, undim_duration);
+
+            // Remove approach circles
+            circle.ApproachCircle.Hide();
         }
 
         #endregion
