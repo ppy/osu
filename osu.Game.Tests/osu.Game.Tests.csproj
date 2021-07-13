@@ -22,7 +22,4 @@
     <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\Videos" />
-  </ItemGroup>
 </Project>
