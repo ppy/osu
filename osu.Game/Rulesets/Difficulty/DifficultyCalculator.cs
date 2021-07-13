@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Difficulty
             var track = new TrackVirtual(10000);
             mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
 
-            return calculate(playableBeatmap, mods, track.Rate);
+            return Calculate(playableBeatmap, mods, track.Rate);
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Difficulty
             }
         }
 
-        private DifficultyAttributes calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
+        protected virtual DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             var skills = CreateSkills(beatmap, mods, clockRate);
 
