@@ -11,11 +11,12 @@ using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
     [Cached(typeof(IPreviewTrackOwner))]
-    public class TestSceneDirectPanel : OsuTestScene, IPreviewTrackOwner
+    public class TestSceneDirectPanel : OsuManualInputManagerTestScene, IPreviewTrackOwner
     {
         private BeatmapSetInfo getUndownloadableBeatmapSet() => new BeatmapSetInfo
         {
@@ -99,6 +100,8 @@ namespace osu.Game.Tests.Visual.Online
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
+            PlayDisabledGridBeatmapPanel playDisabledPanel;
+
             var normal = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet;
             normal.OnlineInfo.HasVideo = true;
             normal.OnlineInfo.HasStoryboard = true;
@@ -125,6 +128,7 @@ namespace osu.Game.Tests.Visual.Online
                         new GridBeatmapPanel(undownloadable),
                         new GridBeatmapPanel(manyDifficulties),
                         new GridBeatmapPanel(explicitMap),
+                        playDisabledPanel = new PlayDisabledGridBeatmapPanel(explicitMap),
                         new ListBeatmapPanel(normal),
                         new ListBeatmapPanel(undownloadable),
                         new ListBeatmapPanel(manyDifficulties),
@@ -132,6 +136,30 @@ namespace osu.Game.Tests.Visual.Online
                     },
                 },
             };
+
+            AddStep("click disabled play button", () =>
+            {
+                InputManager.MoveMouseTo(playDisabledPanel.PlayButton);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("nothing played", () => playDisabledPanel.PreviewPlaying.Value == false);
+        }
+
+        private class PlayDisabledGridBeatmapPanel : GridBeatmapPanel
+        {
+            public new PlayButton PlayButton => base.PlayButton;
+
+            public PlayDisabledGridBeatmapPanel(BeatmapSetInfo beatmap)
+                : base(beatmap)
+            {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                PlayButton.Disabled.Value = true;
+            }
         }
     }
 }

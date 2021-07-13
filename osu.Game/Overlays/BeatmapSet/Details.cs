@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.BeatmapSet
     {
         protected readonly UserRatings Ratings;
 
-        private readonly PreviewButton preview;
+        private readonly HeaderPlayButton preview;
         private readonly BasicStats basic;
         private readonly AdvancedStats advanced;
         private readonly DetailBox ratingBox;
@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             Children = new Drawable[]
             {
-                preview = new PreviewButton
+                preview = new HeaderPlayButton
                 {
                     RelativeSizeAxes = Axes.X,
                 },
