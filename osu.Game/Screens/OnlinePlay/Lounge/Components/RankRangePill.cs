@@ -11,7 +11,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osuTK;
 
-namespace osu.Game.Screens.OnlinePlay.Components
+namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public class RankRangePill : MultiplayerRoomComposite
     {

@@ -7,7 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 
-namespace osu.Game.Screens.OnlinePlay.Components
+namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public class EndDateInfo : OnlinePlayComposite
     {

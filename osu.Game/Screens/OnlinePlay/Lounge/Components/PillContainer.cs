@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.OnlinePlay.Components
+namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     /// <summary>
     /// Displays contents in a "pill".
