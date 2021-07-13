@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateTooShort : IssueTemplate
         {
             public IssueTemplateTooShort(ICheck check)
-                : base(check, IssueType.Problem, "\"{0}\" is too short ({1:0f} ms), should be at least {2:0f} ms.")
+                : base(check, IssueType.Problem, "\"{0}\" is too short ({1:0} ms), should be at least {2:0} ms.")
             {
             }
 
