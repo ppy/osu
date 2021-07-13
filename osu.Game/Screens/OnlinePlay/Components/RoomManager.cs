@@ -86,11 +86,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         public virtual void JoinRoom(Room room, string password = null, Action<Room> onSuccess = null, Action<string> onError = null)
         {
-            // todo: send into JoinRoomRequest directly?
-            room.Password.Value = password;
-
             currentJoinRoomRequest?.Cancel();
-            currentJoinRoomRequest = new JoinRoomRequest(room);
+            currentJoinRoomRequest = new JoinRoomRequest(room, password);
 
             currentJoinRoomRequest.Success += () =>
             {
