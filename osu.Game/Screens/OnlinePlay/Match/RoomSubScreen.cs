@@ -211,7 +211,22 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (SelectedItem.Value == null)
                 return;
 
+            ApplyToUserMods();
+
             Mods.Value = UserMods.Value.Concat(SelectedItem.Value.RequiredMods).ToList();
+        }
+
+        protected void ApplyToUserMods()
+        {
+            BeatmapDifficulty baseDifficulty = Beatmap.Value.BeatmapInfo.BaseDifficulty;
+
+            if (baseDifficulty != null && UserMods.Value.Any(m => m is IApplicableToDifficulty))
+            {
+                var adjustedDifficulty = baseDifficulty.Clone();
+
+                foreach (var mod in UserMods.Value.OfType<IApplicableToDifficulty>())
+                    mod.ReadFromDifficulty(adjustedDifficulty);
+            }
         }
 
         private void beginHandlingTrack()
