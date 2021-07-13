@@ -143,6 +143,23 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
 
         /// <summary>
+        /// Move the randomised position of a hit circle so that it fits inside the playfield.
+        /// </summary>
+        /// <returns>The deviation from the original randomised position in order to fit within the playfield.</returns>
+        private Vector2 clampHitCircleToPlayfield(HitCircle circle, RandomObjectInfo objectInfo)
+        {
+            var previousPosition = objectInfo.PositionRandomised;
+            objectInfo.EndPositionRandomised = objectInfo.PositionRandomised = clampToPlayfieldWithPadding(
+                objectInfo.PositionRandomised,
+                (float)circle.Radius
+            );
+
+            circle.Position = objectInfo.PositionRandomised;
+
+            return objectInfo.PositionRandomised - previousPosition;
+        }
+
+        /// <summary>
         /// Moves the <see cref="Slider"/> and all necessary nested <see cref="OsuHitObject"/>s into the <see cref="OsuPlayfield"/> if they aren't already.
         /// </summary>
         /// <returns>The deviation from the original randomised position in order to fit within the playfield.</returns>
@@ -252,23 +269,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 osuHitObject.Position += shift;
             }
-        }
-
-        /// <summary>
-        /// Move the randomised position of a hit circle so that it fits inside the playfield.
-        /// </summary>
-        /// <returns>The deviation from the original randomised position in order to fit within the playfield.</returns>
-        private Vector2 clampHitCircleToPlayfield(HitCircle circle, RandomObjectInfo objectInfo)
-        {
-            var previousPosition = objectInfo.PositionRandomised;
-            objectInfo.EndPositionRandomised = objectInfo.PositionRandomised = clampToPlayfieldWithPadding(
-                objectInfo.PositionRandomised,
-                (float)circle.Radius
-            );
-
-            circle.Position = objectInfo.PositionRandomised;
-
-            return objectInfo.PositionRandomised - previousPosition;
         }
 
         /// <summary>
