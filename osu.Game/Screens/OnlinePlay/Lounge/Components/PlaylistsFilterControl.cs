@@ -9,18 +9,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public class PlaylistsFilterControl : FilterControl
     {
-        private readonly Dropdown<PlaylistsCategory> dropdown;
+        private readonly Dropdown<PlaylistsCategory> categoryDropdown;
 
         public PlaylistsFilterControl()
         {
-            AddInternal(dropdown = new SlimEnumDropdown<PlaylistsCategory>
+            Filters.Add(categoryDropdown = new SlimEnumDropdown<PlaylistsCategory>
             {
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.TopRight,
                 RelativeSizeAxes = Axes.None,
                 Width = 160,
-                X = -HORIZONTAL_PADDING,
-                Y = -30
             });
         }
 
@@ -28,14 +26,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             base.LoadComplete();
 
-            dropdown.Current.BindValueChanged(_ => UpdateFilter());
+            categoryDropdown.Current.BindValueChanged(_ => UpdateFilter());
         }
 
         protected override FilterCriteria CreateCriteria()
         {
             var criteria = base.CreateCriteria();
 
-            switch (dropdown.Current.Value)
+            switch (categoryDropdown.Current.Value)
             {
                 case PlaylistsCategory.Normal:
                     criteria.Category = "normal";
