@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Edit
             new CheckMutedObjects(),
             new CheckFewHitsounds(),
             new CheckTooShortAudioFiles(),
+            new CheckAudioInVideo(),
 
             // Files
             new CheckZeroByteFiles(),
