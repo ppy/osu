@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -38,21 +40,29 @@ namespace osu.Game.Database
         private static readonly GlobalStatistic<int> pending_writes = GlobalStatistics.Get<int>("Realm", "Pending writes");
         private static readonly GlobalStatistic<int> active_usages = GlobalStatistics.Get<int>("Realm", "Active usages");
 
+        private readonly object updateContextLock = new object();
+
         private Realm context;
 
         public Realm Context
         {
             get
             {
-                if (context == null)
+                if (!ThreadSafety.IsUpdateThread)
+                    throw new InvalidOperationException($"Use {nameof(GetForRead)} or {nameof(GetForWrite)} when performing realm operations from a non-update thread");
+
+                lock (updateContextLock)
                 {
-                    context = createContext();
-                    Logger.Log($"Opened realm \"{context.Config.DatabasePath}\" at version {context.Config.SchemaVersion}");
+                    if (context == null)
+                    {
+                        context = createContext();
+                        Logger.Log($"Opened realm \"{context.Config.DatabasePath}\" at version {context.Config.SchemaVersion}");
+                    }
+
+                    // creating a context will ensure our schema is up-to-date and migrated.
+
+                    return context;
                 }
-
-                // creating a context will ensure our schema is up-to-date and migrated.
-
-                return context;
             }
         }
 
@@ -107,8 +117,11 @@ namespace osu.Game.Database
         {
             base.Update();
 
-            if (context?.Refresh() == true)
-                refreshes.Value++;
+            lock (updateContextLock)
+            {
+                if (context?.Refresh() == true)
+                    refreshes.Value++;
+            }
         }
 
         private Realm createContext()
@@ -154,9 +167,15 @@ namespace osu.Game.Database
         private void flushContexts()
         {
             Logger.Log(@"Flushing realm contexts...", LoggingTarget.Database);
+            Debug.Assert(blockingLock.CurrentCount == 0);
 
-            var previousContext = context;
-            context = null;
+            Realm previousContext;
+
+            lock (updateContextLock)
+            {
+                previousContext = context;
+                context = null;
+            }
 
             // wait for all threaded usages to finish
             while (active_usages.Value > 0)

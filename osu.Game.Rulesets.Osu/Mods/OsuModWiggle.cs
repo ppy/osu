@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             for (int i = 0; i < amountWiggles; i++)
             {
-                using (drawable.BeginAbsoluteSequence(osuObject.StartTime - osuObject.TimePreempt + i * wiggle_duration, true))
+                using (drawable.BeginAbsoluteSequence(osuObject.StartTime - osuObject.TimePreempt + i * wiggle_duration))
                     wiggle();
             }
 
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             for (int i = 0; i < amountWiggles; i++)
             {
-                using (drawable.BeginAbsoluteSequence(osuObject.StartTime + i * wiggle_duration, true))
+                using (drawable.BeginAbsoluteSequence(osuObject.StartTime + i * wiggle_duration))
                     wiggle();
             }
         }

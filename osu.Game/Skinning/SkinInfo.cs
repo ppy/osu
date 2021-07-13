@@ -46,7 +46,7 @@ namespace osu.Game.Skinning
         public static SkinInfo Default { get; } = new SkinInfo
         {
             ID = DEFAULT_SKIN,
-            Name = "osu!lazer",
+            Name = "osu! (triangles)",
             Creator = "team osu!",
             InstantiationInfo = typeof(DefaultSkin).GetInvariantInstantiationInfo()
         };

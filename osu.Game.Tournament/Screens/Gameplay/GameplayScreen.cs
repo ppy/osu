@@ -172,7 +172,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 {
                     chat?.Contract();
 
-                    using (BeginDelayedSequence(300, true))
+                    using (BeginDelayedSequence(300))
                     {
                         scoreDisplay.FadeIn(100);
                         SongBar.Expanded = true;

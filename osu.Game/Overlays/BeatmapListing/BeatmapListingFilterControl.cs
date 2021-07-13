@@ -122,6 +122,9 @@ namespace osu.Game.Overlays.BeatmapListing
             sortControlBackground.Colour = colourProvider.Background5;
         }
 
+        public void Search(string query)
+            => searchControl.Query.Value = query;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();

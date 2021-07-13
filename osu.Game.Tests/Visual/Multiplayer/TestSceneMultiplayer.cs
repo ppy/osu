@@ -11,6 +11,7 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -18,7 +19,9 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
@@ -30,19 +33,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayer : ScreenTestScene
     {
-        private TestMultiplayer multiplayerScreen;
-
         private BeatmapManager beatmaps;
         private RulesetStore rulesets;
         private BeatmapSetInfo importedSet;
 
-        private TestMultiplayerClient client => multiplayerScreen.Client;
-        private Room room => client.APIRoom;
+        private DependenciesScreen dependenciesScreen;
+        private TestMultiplayer multiplayerScreen;
+        private TestMultiplayerClient client;
 
-        public TestSceneMultiplayer()
-        {
-            loadMultiplayer();
-        }
+        [Cached(typeof(UserLookupCache))]
+        private UserLookupCache lookupCache = new TestUserLookupCache();
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -51,18 +51,43 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
         }
 
-        [SetUp]
-        public void Setup() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
-            importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
-        });
+            base.SetUpSteps();
+
+            AddStep("import beatmap", () =>
+            {
+                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
+            });
+
+            AddStep("create multiplayer screen", () => multiplayerScreen = new TestMultiplayer());
+
+            AddStep("load dependencies", () =>
+            {
+                client = new TestMultiplayerClient(multiplayerScreen.RoomManager);
+
+                // The screen gets suspended so it stops receiving updates.
+                Child = client;
+
+                LoadScreen(dependenciesScreen = new DependenciesScreen(client));
+            });
+
+            AddUntilStep("wait for dependencies to load", () => dependenciesScreen.IsLoaded);
+
+            AddStep("load multiplayer", () => LoadScreen(multiplayerScreen));
+            AddUntilStep("wait for multiplayer to load", () => multiplayerScreen.IsLoaded);
+        }
+
+        [Test]
+        public void TestEmpty()
+        {
+            // used to test the flow of multiplayer from visual tests.
+        }
 
         [Test]
         public void TestUserSetToIdleWhenBeatmapDeleted()
         {
-            loadMultiplayer();
-
             createRoom(() => new Room
             {
                 Name = { Value = "Test Room" },
@@ -85,8 +110,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestLocalPlayDoesNotStartWhileSpectatingWithNoBeatmap()
         {
-            loadMultiplayer();
-
             createRoom(() => new Room
             {
                 Name = { Value = "Test Room" },
@@ -123,8 +146,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestLocalPlayStartsWhileSpectatingWhenBeatmapBecomesAvailable()
         {
-            loadMultiplayer();
-
             createRoom(() => new Room
             {
                 Name = { Value = "Test Room" },
@@ -165,10 +186,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestSubScreenExitedWhenDisconnectedFromMultiplayerServer()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            AddStep("disconnect", () => client.Disconnect());
+            AddUntilStep("back in lounge", () => this.ChildrenOfType<LoungeSubScreen>().FirstOrDefault()?.IsCurrentScreen() == true);
+        }
+
+        [Test]
         public void TestLeaveNavigation()
         {
-            loadMultiplayer();
-
             createRoom(() => new Room
             {
                 Name = { Value = "Test Room" },
@@ -227,32 +266,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for join", () => client.Room != null);
         }
 
-        private void loadMultiplayer()
-        {
-            AddStep("show", () =>
-            {
-                multiplayerScreen = new TestMultiplayer();
-
-                // Needs to be added at a higher level since the multiplayer screen becomes non-current.
-                Child = multiplayerScreen.Client;
-
-                LoadScreen(multiplayerScreen);
-            });
-
-            AddUntilStep("wait for loaded", () => multiplayerScreen.IsLoaded);
-        }
-
-        private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
+        /// <summary>
+        /// Used for the sole purpose of adding <see cref="TestMultiplayerClient"/> as a resolvable dependency.
+        /// </summary>
+        private class DependenciesScreen : OsuScreen
         {
             [Cached(typeof(MultiplayerClient))]
             public readonly TestMultiplayerClient Client;
 
-            public TestMultiplayer()
+            public DependenciesScreen(TestMultiplayerClient client)
             {
-                Client = new TestMultiplayerClient((TestMultiplayerRoomManager)RoomManager);
+                Client = client;
             }
+        }
 
-            protected override RoomManager CreateRoomManager() => new TestMultiplayerRoomManager();
+        private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
+        {
+            public new TestMultiplayerRoomManager RoomManager { get; private set; }
+
+            protected override RoomManager CreateRoomManager() => RoomManager = new TestMultiplayerRoomManager();
         }
     }
 }

@@ -3,74 +3,40 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
-using osu.Game.Database;
-using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Tests.Visual.Spectator;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiSpectatorLeaderboard : MultiplayerTestScene
     {
-        [Cached(typeof(SpectatorClient))]
-        private TestSpectatorClient spectatorClient = new TestSpectatorClient();
-
-        [Cached(typeof(UserLookupCache))]
-        private UserLookupCache lookupCache = new TestUserLookupCache();
-
-        protected override Container<Drawable> Content => content;
-        private readonly Container content;
-
-        private readonly Dictionary<int, ManualClock> clocks = new Dictionary<int, ManualClock>
-        {
-            { PLAYER_1_ID, new ManualClock() },
-            { PLAYER_2_ID, new ManualClock() }
-        };
-
-        public TestSceneMultiSpectatorLeaderboard()
-        {
-            base.Content.AddRange(new Drawable[]
-            {
-                spectatorClient,
-                lookupCache,
-                content = new Container { RelativeSizeAxes = Axes.Both }
-            });
-        }
+        private Dictionary<int, ManualClock> clocks;
+        private MultiSpectatorLeaderboard leaderboard;
 
         [SetUpSteps]
         public new void SetUpSteps()
         {
-            MultiSpectatorLeaderboard leaderboard = null;
-
             AddStep("reset", () =>
             {
                 Clear();
 
-                foreach (var (userId, clock) in clocks)
+                clocks = new Dictionary<int, ManualClock>
                 {
-                    spectatorClient.EndPlay(userId);
-                    clock.CurrentTime = 0;
-                }
+                    { PLAYER_1_ID, new ManualClock() },
+                    { PLAYER_2_ID, new ManualClock() }
+                };
+
+                foreach (var (userId, _) in clocks)
+                    SpectatorClient.StartPlay(userId, 0);
             });
 
             AddStep("create leaderboard", () =>
             {
-                foreach (var (userId, _) in clocks)
-                    spectatorClient.StartPlay(userId, 0);
-
                 Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
-
                 var playable = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
                 var scoreProcessor = new OsuScoreProcessor();
                 scoreProcessor.ApplyBeatmap(playable);
@@ -96,10 +62,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 // For player 2, send frames in sets of 10.
                 for (int i = 0; i < 100; i++)
                 {
-                    spectatorClient.SendFrames(PLAYER_1_ID, i, 1);
+                    SpectatorClient.SendFrames(PLAYER_1_ID, 1);
 
                     if (i % 10 == 0)
-                        spectatorClient.SendFrames(PLAYER_2_ID, i, 10);
+                        SpectatorClient.SendFrames(PLAYER_2_ID, 10);
                 }
             });
 
@@ -145,17 +111,5 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void assertCombo(int userId, int expectedCombo)
             => AddUntilStep($"player {userId} has {expectedCombo} combo", () => this.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.Id == userId).Combo.Value == expectedCombo);
-
-        private class TestUserLookupCache : UserLookupCache
-        {
-            protected override Task<User> ComputeValueAsync(int lookup, CancellationToken token = default)
-            {
-                return Task.FromResult(new User
-                {
-                    Id = lookup,
-                    Username = $"User {lookup}"
-                });
-            }
-        }
     }
 }
