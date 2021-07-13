@@ -46,10 +46,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         [CanBeNull]
         private IDisposable joiningRoomOperation { get; set; }
 
+        private RoomsContainer roomsContainer;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            RoomsContainer roomsContainer;
             OsuScrollContainer scrollContainer;
 
             InternalChildren = new Drawable[]
@@ -70,7 +71,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                     RelativeSizeAxes = Axes.Both,
                                     ScrollbarOverlapsContent = false,
                                     Padding = new MarginPadding(10),
-                                    Child = roomsContainer = new RoomsContainer { JoinRequested = joinRequested }
+                                    Child = roomsContainer = new RoomsContainer()
                                 },
                                 loadingLayer = new LoadingLayer(true),
                             }
@@ -165,16 +166,19 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
             base.OnSuspending(next);
             filter.HoldFocus = false;
+
+            // ensure any password prompt is dismissed.
+            roomsContainer.HideAnyPopovers();
         }
 
-        private void joinRequested(Room room)
+        public void Join(Room room, string password)
         {
             if (joiningRoomOperation != null)
                 return;
 
             joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
-            RoomManager?.JoinRoom(room, r =>
+            RoomManager?.JoinRoom(room, password, r =>
             {
                 Open(room);
                 joiningRoomOperation?.Dispose();

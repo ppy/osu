@@ -62,12 +62,12 @@ namespace osu.Game.Online.Multiplayer
             }
         }
 
-        protected override Task<MultiplayerRoom> JoinRoom(long roomId)
+        protected override Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null)
         {
             if (!IsConnected.Value)
                 return Task.FromCanceled<MultiplayerRoom>(new CancellationToken(true));
 
-            return connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoom), roomId);
+            return connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoomWithPassword), roomId, password ?? string.Empty);
         }
 
         protected override Task LeaveRoomInternal()

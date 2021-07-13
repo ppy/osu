@@ -27,16 +27,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerMatchSettingsOverlay : MatchSettingsOverlay
     {
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Child = Settings = new MatchSettings
+        protected override OnlinePlayComposite CreateSettings()
+            => new MatchSettings
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Y,
                 SettingsApplied = Hide
             };
-        }
 
         protected class MatchSettings : OnlinePlayComposite
         {
@@ -47,6 +44,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             public OsuTextBox NameField, MaxParticipantsField;
             public RoomAvailabilityPicker AvailabilityPicker;
             public GameTypePicker TypePicker;
+            public OsuTextBox PasswordTextBox;
             public TriangleButton ApplyButton;
 
             public OsuSpriteText ErrorText;
@@ -193,12 +191,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                 },
                                                                 new Section("Password (optional)")
                                                                 {
-                                                                    Alpha = disabled_alpha,
-                                                                    Child = new SettingsPasswordTextBox
+                                                                    Child = PasswordTextBox = new SettingsPasswordTextBox
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
-                                                                        ReadOnly = true,
                                                                     },
                                                                 },
                                                             }
@@ -307,7 +303,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 // Otherwise, update the room directly in preparation for it to be submitted to the API on match creation.
                 if (client.Room != null)
                 {
-                    client.ChangeSettings(name: NameField.Text).ContinueWith(t => Schedule(() =>
+                    client.ChangeSettings(name: NameField.Text, password: PasswordTextBox.Text).ContinueWith(t => Schedule(() =>
                     {
                         if (t.IsCompletedSuccessfully)
                             onSuccess(currentRoom.Value);
@@ -320,6 +316,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     currentRoom.Value.Name.Value = NameField.Text;
                     currentRoom.Value.Availability.Value = AvailabilityPicker.Current.Value;
                     currentRoom.Value.Type.Value = TypePicker.Current.Value;
+                    currentRoom.Value.Password.Value = PasswordTextBox.Current.Value;
 
                     if (int.TryParse(MaxParticipantsField.Text, out int max))
                         currentRoom.Value.MaxParticipants.Value = max;

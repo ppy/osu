@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ((IMultiplayerClient)this).UserBeatmapAvailabilityChanged(userId, newBeatmapAvailability);
         }
 
-        protected override Task<MultiplayerRoom> JoinRoom(long roomId)
+        protected override Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null)
         {
             var apiRoom = roomManager.Rooms.Single(r => r.RoomID.Value == roomId);
 
@@ -134,7 +134,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     BeatmapChecksum = apiRoom.Playlist.Last().Beatmap.Value.MD5Hash,
                     RequiredMods = apiRoom.Playlist.Last().RequiredMods.Select(m => new APIMod(m)).ToArray(),
                     AllowedMods = apiRoom.Playlist.Last().AllowedMods.Select(m => new APIMod(m)).ToArray(),
-                    PlaylistItemId = apiRoom.Playlist.Last().ID
+                    PlaylistItemId = apiRoom.Playlist.Last().ID,
+                    Password = password ?? string.Empty,
                 },
                 Users = { localUser },
                 Host = localUser

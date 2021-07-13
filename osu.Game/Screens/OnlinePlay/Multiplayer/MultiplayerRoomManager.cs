@@ -38,9 +38,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         }
 
         public override void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
-            => base.CreateRoom(room, r => joinMultiplayerRoom(r, onSuccess, onError), onError);
+            => base.CreateRoom(room, r => joinMultiplayerRoom(r, r.Password.Value, onSuccess, onError), onError);
 
-        public override void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
+        public override void JoinRoom(Room room, string password = null, Action<Room> onSuccess = null, Action<string> onError = null)
         {
             if (!multiplayerClient.IsConnected.Value)
             {
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
-            base.JoinRoom(room, r => joinMultiplayerRoom(r, onSuccess, onError), onError);
+            base.JoinRoom(room, password, r => joinMultiplayerRoom(r, password, onSuccess, onError), onError);
         }
 
         public override void PartRoom()
@@ -79,11 +79,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             });
         }
 
-        private void joinMultiplayerRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
+        private void joinMultiplayerRoom(Room room, string password, Action<Room> onSuccess = null, Action<string> onError = null)
         {
             Debug.Assert(room.RoomID.Value != null);
 
-            multiplayerClient.JoinRoom(room).ContinueWith(t =>
+            multiplayerClient.JoinRoom(room, password).ContinueWith(t =>
             {
                 if (t.IsCompletedSuccessfully)
                     Schedule(() => onSuccess?.Invoke(room));
