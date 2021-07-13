@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -72,25 +71,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             var localUser = Client.LocalUser;
 
-            if (localUser == null)
-                return;
+            int newCountReady = Room?.Users.Count(u => u.State == MultiplayerUserState.Ready) ?? 0;
+            int newCountTotal = Room?.Users.Count(u => u.State != MultiplayerUserState.Spectating) ?? 0;
 
-            Debug.Assert(Room != null);
-
-            int newCountReady = Room.Users.Count(u => u.State == MultiplayerUserState.Ready);
-            int newCountTotal = Room.Users.Count(u => u.State != MultiplayerUserState.Spectating);
-
-            string countText = $"({newCountReady} / {newCountTotal} ready)";
-
-            switch (localUser.State)
+            switch (localUser?.State)
             {
-                case MultiplayerUserState.Idle:
+                default:
                     button.Text = "Ready";
                     updateButtonColour(true);
                     break;
 
                 case MultiplayerUserState.Spectating:
                 case MultiplayerUserState.Ready:
+                    string countText = $"({newCountReady} / {newCountTotal} ready)";
+
                     if (Room?.Host?.Equals(localUser) == true)
                     {
                         button.Text = $"Start match {countText}";
@@ -108,7 +102,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             bool enableButton = Client.Room?.State == MultiplayerRoomState.Open && !operationInProgress.Value;
 
             // When the local user is the host and spectating the match, the "start match" state should be enabled if any users are ready.
-            if (localUser.State == MultiplayerUserState.Spectating)
+            if (localUser?.State == MultiplayerUserState.Spectating)
                 enableButton &= Room?.Host?.Equals(localUser) == true && newCountReady > 0;
 
             button.Enabled.Value = enableButton;
