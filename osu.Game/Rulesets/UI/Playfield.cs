@@ -258,11 +258,10 @@ namespace osu.Game.Rulesets.UI
         /// <param name="hitObject"></param>
         public virtual void Add(HitObject hitObject)
         {
-            var entry = CreateLifetimeEntry(hitObject);
-            lifetimeEntryMap[entry.HitObject] = entry;
+            var entry = addHitObjectEntry(hitObject);
 
             HitObjectContainer.Add(entry);
-            OnHitObjectAdded(entry.HitObject);
+            OnHitObjectAdded(hitObject);
         }
 
         /// <summary>
@@ -272,7 +271,7 @@ namespace osu.Game.Rulesets.UI
         /// <returns>Whether the <see cref="HitObject"/> was successfully removed.</returns>
         public virtual bool Remove(HitObject hitObject)
         {
-            if (lifetimeEntryMap.Remove(hitObject, out var entry))
+            if (removeHitObjectEntry(hitObject, out var entry))
             {
                 HitObjectContainer.Remove(entry);
                 OnHitObjectRemoved(hitObject);
@@ -280,6 +279,35 @@ namespace osu.Game.Rulesets.UI
             }
 
             return nestedPlayfields.Any(p => p.Remove(hitObject));
+        }
+
+        private HitObjectLifetimeEntry addHitObjectEntry(HitObject hitObject)
+        {
+            if (lifetimeEntryMap.TryGetValue(hitObject, out var entry))
+                return entry;
+
+            hitObject.RemoveNestedHitObjects += removeNestedHitObjects;
+
+            entry = CreateLifetimeEntry(hitObject);
+            lifetimeEntryMap[hitObject] = entry;
+
+            return entry;
+        }
+
+        private bool removeHitObjectEntry(HitObject hitObject, out HitObjectLifetimeEntry entry)
+        {
+            if (!lifetimeEntryMap.Remove(hitObject, out entry))
+                return false;
+
+            hitObject.RemoveNestedHitObjects -= removeNestedHitObjects;
+
+            return true;
+        }
+
+        private void removeNestedHitObjects(HitObject hitObject)
+        {
+            foreach (var nestedHitObject in hitObject.NestedHitObjects)
+                removeHitObjectEntry(nestedHitObject, out _);
         }
 
         /// <summary>
@@ -361,8 +389,7 @@ namespace osu.Game.Rulesets.UI
                     }
                 }
 
-                if (!lifetimeEntryMap.TryGetValue(hitObject, out var entry))
-                    lifetimeEntryMap[hitObject] = entry = CreateLifetimeEntry(hitObject);
+                var entry = addHitObjectEntry(hitObject);
 
                 dho.ParentHitObject = parent;
                 dho.Apply(entry);

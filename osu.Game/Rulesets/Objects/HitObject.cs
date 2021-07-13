@@ -35,6 +35,11 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public event Action<HitObject> DefaultsApplied;
 
+        /// <summary>
+        /// Invoked before <see cref="NestedHitObjects"/> are cleared.
+        /// </summary>
+        internal event Action<HitObject> RemoveNestedHitObjects;
+
         public readonly Bindable<double> StartTimeBindable = new BindableDouble();
 
         /// <summary>
@@ -108,6 +113,8 @@ namespace osu.Game.Rulesets.Objects
 
             // This is done here since ApplyDefaultsToSelf may be used to determine the end time
             SampleControlPoint = controlPointInfo.SamplePointAt(this.GetEndTime() + control_point_leniency);
+
+            RemoveNestedHitObjects?.Invoke(this);
 
             nestedHitObjects.Clear();
 
