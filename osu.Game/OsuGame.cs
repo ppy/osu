@@ -525,16 +525,11 @@ namespace osu.Game
         private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
             beatmap.OldValue?.CancelAsyncLoad();
-
-            updateModDefaults();
-
             beatmap.NewValue?.BeginAsyncLoad();
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
-            updateModDefaults();
-
             // a lease may be taken on the mods bindable, at which point we can't really ensure valid mods.
             if (SelectedMods.Disabled)
                 return;
@@ -543,19 +538,6 @@ namespace osu.Game
             {
                 // ensure we always have a valid set of mods.
                 SelectedMods.Value = mods.NewValue.Except(invalid).ToArray();
-            }
-        }
-
-        private void updateModDefaults()
-        {
-            BeatmapDifficulty baseDifficulty = Beatmap.Value.BeatmapInfo.BaseDifficulty;
-
-            if (baseDifficulty != null && SelectedMods.Value.Any(m => m is IApplicableToDifficulty))
-            {
-                var adjustedDifficulty = baseDifficulty.Clone();
-
-                foreach (var mod in SelectedMods.Value.OfType<IApplicableToDifficulty>())
-                    mod.ReadFromDifficulty(adjustedDifficulty);
             }
         }
 
