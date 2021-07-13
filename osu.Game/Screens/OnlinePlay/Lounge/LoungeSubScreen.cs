@@ -57,31 +57,20 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Child = new Container
                     {
-                        new Container
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 0.55f,
-                            Children = new Drawable[]
+                            scrollContainer = new OsuScrollContainer
                             {
-                                scrollContainer = new OsuScrollContainer
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    ScrollbarOverlapsContent = false,
-                                    Padding = new MarginPadding(10),
-                                    Child = roomsContainer = new RoomsContainer { JoinRequested = joinRequested }
-                                },
-                                loadingLayer = new LoadingLayer(true),
-                            }
-                        },
-                        new RoomInspector
-                        {
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 0.45f,
-                        },
+                                RelativeSizeAxes = Axes.Both,
+                                ScrollbarOverlapsContent = false,
+                                Padding = new MarginPadding(10),
+                                Child = roomsContainer = new RoomsContainer { JoinRequested = joinRequested }
+                            },
+                            loadingLayer = new LoadingLayer(true),
+                        }
                     },
                 },
                 filter = CreateFilterControl().With(d =>
