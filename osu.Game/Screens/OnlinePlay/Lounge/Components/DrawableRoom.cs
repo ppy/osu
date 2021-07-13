@@ -357,11 +357,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 this.room = room;
             }
 
+            private OsuPasswordTextBox passwordTextbox;
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                OsuPasswordTextBox passwordTextbox;
-
                 Child = new FillFlowContainer
                 {
                     Margin = new MarginPadding(10),
@@ -382,6 +382,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         }
                     }
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                GetContainingInputManager().ChangeFocus(passwordTextbox);
             }
         }
     }
