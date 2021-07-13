@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Wiki.Markdown
 {
@@ -66,7 +65,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
             public string Text { get; set; }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider, OsuColour colour)
+            private void load(OverlayColourProvider colourProvider)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
@@ -81,7 +80,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
                     },
                     textFlow = parentFlowComponent.CreateTextFlow().With(t =>
                     {
-                        t.Colour = colour.Orange1;
+                        t.Colour = OverlayColourProvider.Orange.Colour1;
                         t.Padding = new MarginPadding
                         {
                             Vertical = 10,
