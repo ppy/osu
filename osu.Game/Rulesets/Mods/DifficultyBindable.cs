@@ -104,15 +104,17 @@ namespace osu.Game.Rulesets.Mods
             if (!(them is DifficultyBindable otherDifficultyBindable))
                 throw new InvalidOperationException($"Cannot bind to a non-{nameof(DifficultyBindable)}.");
 
-            base.BindTo(them);
-
-            CurrentNumber.BindTarget = otherDifficultyBindable.CurrentNumber;
-            ExtendedLimits.BindTarget = otherDifficultyBindable.ExtendedLimits;
             ReadCurrentFromDifficulty = otherDifficultyBindable.ReadCurrentFromDifficulty;
 
-            // the following is only safe as long as these values are effectively constants.
+            // the following max value copies are only safe as long as these values are effectively constants.
             MaxValue = otherDifficultyBindable.maxValue;
             ExtendedMaxValue = otherDifficultyBindable.extendedMaxValue;
+
+            ExtendedLimits.BindTarget = otherDifficultyBindable.ExtendedLimits;
+
+            // the actual values need to be copied after the max value constraints.
+            CurrentNumber.BindTarget = otherDifficultyBindable.CurrentNumber;
+            base.BindTo(them);
         }
 
         public override void UnbindFrom(IUnbindable them)
