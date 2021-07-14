@@ -48,6 +48,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
+        [Resolved]
+        private Bindable<Room> currentRoom { get; set; }
+
         private MultiplayerMatchSettingsOverlay settingsOverlay;
 
         private readonly IBindable<bool> isConnected = new Bindable<bool>();
@@ -273,6 +276,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 if (!connected.NewValue)
                     Schedule(this.Exit);
             }, true);
+
+            currentRoom.BindValueChanged(room =>
+            {
+                if (room.NewValue == null)
+                {
+                    // the room has gone away.
+                    // this could mean something happened during the join process, or an external connection issue occurred.
+                    // one specific scenario is where the underlying room is created, but the signalr server returns an error during the join process. this triggers a PartRoom operation (see https://github.com/ppy/osu/blob/7654df94f6f37b8382be7dfcb4f674e03bd35427/osu.Game/Screens/OnlinePlay/Multiplayer/MultiplayerRoomManager.cs#L97)
+                    Schedule(this.Exit);
+                }
+            }, true);
         }
 
         protected override void UpdateMods()
@@ -310,7 +324,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override bool OnExiting(IScreen next)
         {
-            if (client.Room == null)
+            // the room may not be left immediately after a disconnection due to async flow,
+            // so checking the IsConnected status is also required.
+            if (client.Room == null || !client.IsConnected.Value)
             {
                 // room has not been created yet; exit immediately.
                 return base.OnExiting(next);
