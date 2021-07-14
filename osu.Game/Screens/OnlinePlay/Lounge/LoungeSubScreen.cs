@@ -52,32 +52,49 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             RoomsContainer roomsContainer;
             OsuScrollContainer scrollContainer;
 
-            InternalChildren = new Drawable[]
+            InternalChild = content = new Container
             {
-                content = new Container
+                RelativeSizeAxes = Axes.Both,
+                Child = new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new Container
+                    RowDimensions = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.Absolute, 10)
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
                         {
-                            scrollContainer = new OsuScrollContainer
+                            filter = CreateFilterControl().With(d =>
+                            {
+                                d.RelativeSizeAxes = Axes.X;
+                                d.Height = 80;
+                                d.Depth = -1;
+                            }),
+                        },
+                        null,
+                        new Drawable[]
+                        {
+                            new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                ScrollbarOverlapsContent = false,
-                                Padding = new MarginPadding(10),
-                                Child = roomsContainer = new RoomsContainer { JoinRequested = joinRequested }
+                                Children = new Drawable[]
+                                {
+                                    scrollContainer = new OsuScrollContainer
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        ScrollbarOverlapsContent = false,
+                                        Padding = new MarginPadding(10),
+                                        Child = roomsContainer = new RoomsContainer { JoinRequested = joinRequested }
+                                    },
+                                    loadingLayer = new LoadingLayer(true),
+                                }
                             },
-                            loadingLayer = new LoadingLayer(true),
                         }
-                    },
+                    }
                 },
-                filter = CreateFilterControl().With(d =>
-                {
-                    d.RelativeSizeAxes = Axes.X;
-                    d.Height = 80;
-                })
             };
 
             // scroll selected room into view on selection.
@@ -109,9 +126,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             content.Padding = new MarginPadding
             {
-                Top = filter.DrawHeight,
-                Left = WaveOverlayContainer.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH + HORIZONTAL_OVERFLOW_PADDING,
-                Right = WaveOverlayContainer.WIDTH_PADDING + HORIZONTAL_OVERFLOW_PADDING,
+                Left = WaveOverlayContainer.WIDTH_PADDING,
+                Right = WaveOverlayContainer.WIDTH_PADDING,
             };
         }
 
