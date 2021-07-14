@@ -16,9 +16,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public abstract class FilterControl : CompositeDrawable
     {
-        protected const float VERTICAL_PADDING = 10;
-        protected const float HORIZONTAL_PADDING = 20;
-
         protected readonly FillFlowContainer Filters;
 
         [Resolved(CanBeNull = true)]
@@ -32,14 +29,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected FilterControl()
         {
-            InternalChild = new Container
+            RelativeSizeAxes = Axes.X;
+            Height = 70;
+
+            InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding
-                {
-                    Top = VERTICAL_PADDING,
-                    Horizontal = HORIZONTAL_PADDING
-                },
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(10),
                 Children = new Drawable[]
                 {
                     search = new FilterSearchTextBox
@@ -54,10 +51,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         RelativeSizeAxes = Axes.Both,
                         Direction = FillDirection.Horizontal,
                         Spacing = new Vector2(10),
-                        Padding = new MarginPadding { Vertical = 30 },
                         Child = statusDropdown = new SlimEnumDropdown<RoomStatusFilter>
                         {
-                            Anchor = Anchor.BottomRight,
+                            Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             RelativeSizeAxes = Axes.None,
                             Width = 160,
