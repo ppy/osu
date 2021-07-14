@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
@@ -117,8 +118,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             RelativeSizeAxes = Axes.X;
             Height = height;
-            CornerRadius = corner_radius + SELECTION_BORDER_WIDTH / 2;
+
             Masking = true;
+            CornerRadius = corner_radius + SELECTION_BORDER_WIDTH / 2;
+            EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Shadow,
+                Colour = Color4.Black.Opacity(40),
+                Radius = 5,
+            };
         }
 
         [BackgroundDependencyLoader]
