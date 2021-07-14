@@ -12,6 +12,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private void load()
         {
             Triangles.TriangleScale = 1.5f;
+            SpriteText.Font = SpriteText.Font.With(size: 14);
 
             Text = "Create playlist";
         }

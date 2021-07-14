@@ -3,6 +3,8 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge;
@@ -13,12 +15,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     public class MultiplayerLoungeSubScreen : LoungeSubScreen
     {
-        protected override FilterControl CreateFilterControl() => new MultiplayerFilterControl();
-
-        protected override RoomSubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen(room);
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         [Resolved]
         private MultiplayerClient client { get; set; }
+
+        protected override FilterControl CreateFilterControl() => new MultiplayerFilterControl();
+
+        protected override OsuButton CreateNewRoomButton() => new CreateMultiplayerMatchButton();
+
+        protected override Room CreateNewRoom() => new Room
+        {
+            Name = { Value = $"{api.LocalUser}'s awesome room" },
+            Category = { Value = RoomCategory.Realtime }
+        };
+
+        protected override RoomSubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen(room);
 
         public override void Open(Room room)
         {
