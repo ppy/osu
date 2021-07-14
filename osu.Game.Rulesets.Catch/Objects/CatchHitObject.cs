@@ -9,10 +9,11 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public abstract class CatchHitObject : HitObject, IHasXPosition, IHasComboInformation
+    public abstract class CatchHitObject : HitObject, IHasPosition, IHasComboInformation
     {
         public const float OBJECT_RADIUS = 64;
 
@@ -30,8 +31,6 @@ namespace osu.Game.Rulesets.Catch.Objects
         {
             set => OriginalXBindable.Value = value;
         }
-
-        float IHasXPosition.X => OriginalXBindable.Value;
 
         public readonly Bindable<float> XOffsetBindable = new Bindable<float>();
 
@@ -131,5 +130,24 @@ namespace osu.Game.Rulesets.Catch.Objects
         }
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        #region Hit object conversion
+
+        // The half of the height of the osu! playfield.
+        public const float DEFAULT_LEGACY_CONVERT_Y = 192;
+
+        /// <summary>
+        /// The Y position of the hit object is not used in the normal osu!catch gameplay.
+        /// It is preserved to maximize the backward compatibility with the legacy editor, in which the mappers use the Y position to organize the patterns.
+        /// </summary>
+        public float LegacyConvertedY { get; set; } = DEFAULT_LEGACY_CONVERT_Y;
+
+        float IHasXPosition.X => OriginalX;
+
+        float IHasYPosition.Y => LegacyConvertedY;
+
+        Vector2 IHasPosition.Position => new Vector2(OriginalX, LegacyConvertedY);
+
+        #endregion
     }
 }
