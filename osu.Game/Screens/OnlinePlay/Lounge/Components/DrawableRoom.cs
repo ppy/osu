@@ -39,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private Drawable selectionBox;
 
         [Resolved(canBeNull: true)]
-        private OnlinePlayScreen parentScreen { get; set; }
+        private LoungeSubScreen loungeScreen { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -408,7 +408,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
             {
-                parentScreen?.OpenNewRoom(Room.CreateCopy());
+                loungeScreen?.OpenNewRoom(Room.CreateCopy());
             })
         };
     }

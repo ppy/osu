@@ -48,7 +48,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     },
                     Filters = new FillFlowContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Horizontal,
                         Spacing = new Vector2(10),
                         Child = statusDropdown = new SlimEnumDropdown<RoomStatusFilter>

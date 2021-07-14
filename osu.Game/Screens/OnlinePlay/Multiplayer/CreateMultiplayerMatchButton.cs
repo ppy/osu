@@ -23,6 +23,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void load()
         {
             Triangles.TriangleScale = 1.5f;
+            SpriteText.Font = SpriteText.Font.With(size: 14);
 
             Text = "Create room";
 

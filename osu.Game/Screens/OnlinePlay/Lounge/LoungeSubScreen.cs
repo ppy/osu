@@ -18,6 +18,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Users;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge
@@ -29,11 +30,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
 
+        protected Container<OsuButton> Buttons { get; } = new Container<OsuButton>
+        {
+            Anchor = Anchor.BottomLeft,
+            Origin = Anchor.BottomLeft,
+            AutoSizeAxes = Axes.Both
+        };
+
         private readonly IBindable<bool> initialRoomsReceived = new Bindable<bool>();
         private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
 
         private FilterControl filter;
-        private Container content;
         private LoadingLayer loadingLayer;
 
         [Resolved]
@@ -63,7 +70,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                     Colour = Color4.Black,
                     Alpha = 0.5f,
                 },
-                content = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding
@@ -84,7 +91,21 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         {
                             new Drawable[]
                             {
-                                filter = CreateFilterControl().With(d => d.Depth = -1),
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 70,
+                                    Depth = -1,
+                                    Children = new Drawable[]
+                                    {
+                                        filter = CreateFilterControl(),
+                                        Buttons.WithChild(CreateNewRoomButton().With(d =>
+                                        {
+                                            d.Size = new Vector2(150, 25);
+                                            d.Action = () => OpenNewRoom();
+                                        }))
+                                    }
+                                }
                             },
                             null,
                             new Drawable[]
@@ -215,6 +236,20 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         }
 
         protected abstract FilterControl CreateFilterControl();
+
+        /// <summary>
+        /// Creates and opens the newly-created room.
+        /// </summary>
+        /// <param name="room">An optional template to use when creating the room.</param>
+        public void OpenNewRoom(Room room = null) => Open(room ?? CreateNewRoom());
+
+        protected abstract OsuButton CreateNewRoomButton();
+
+        /// <summary>
+        /// Creates a new room.
+        /// </summary>
+        /// <returns>The created <see cref="Room"/>.</returns>
+        protected abstract Room CreateNewRoom();
 
         protected abstract RoomSubScreen CreateRoomSubScreen(Room room);
     }
