@@ -3,6 +3,7 @@
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osuTK.Graphics;
@@ -198,8 +199,14 @@ namespace osu.Game.Graphics
         public readonly Color4 GrayE = Color4Extensions.FromHex(@"eee");
         public readonly Color4 GrayF = Color4Extensions.FromHex(@"fff");
 
-        // in latest editor design logic, need to figure out where these sit...
+        /// <summary>
+        /// Equivalent to <see cref="OverlayColourProvider.Lime"/>'s <see cref="OverlayColourProvider.Colour1"/>.
+        /// </summary>
         public readonly Color4 Lime1 = Color4Extensions.FromHex(@"b2ff66");
+
+        /// <summary>
+        /// Equivalent to <see cref="OverlayColourProvider.Orange"/>'s <see cref="OverlayColourProvider.Colour1"/>.
+        /// </summary>
         public readonly Color4 Orange1 = Color4Extensions.FromHex(@"ffd966");
 
         // Content Background
