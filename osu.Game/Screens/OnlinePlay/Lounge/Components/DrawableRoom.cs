@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
@@ -109,7 +108,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private RecentParticipantsList recentParticipantsList;
         private RoomSpecialCategoryPill specialCategoryPill;
-        private Drawable spotlightGlow;
 
         public bool FilteringActive { get; set; }
 
@@ -153,7 +151,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     new BufferedContainer
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Children = new[]
+                                        Children = new Drawable[]
                                         {
                                             new Box
                                             {
@@ -188,12 +186,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                     }
                                                 }
                                             },
-                                            spotlightGlow = new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Y,
-                                                Width = 50,
-                                                Colour = ColourInfo.GradientHorizontal(colours.Pink.Opacity(0.5f), colours.Pink.Opacity(0))
-                                            }
                                         },
                                     },
                                     new Container
@@ -336,16 +328,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             roomCategory.BindTo(Room.Category);
             roomCategory.BindValueChanged(c =>
             {
+                // Todo: Tournament category...
                 if (c.NewValue == RoomCategory.Spotlight)
-                {
                     specialCategoryPill.Show();
-                    spotlightGlow.Show();
-                }
                 else
-                {
                     specialCategoryPill.Hide();
-                    spotlightGlow.Hide();
-                }
             }, true);
         }
 
