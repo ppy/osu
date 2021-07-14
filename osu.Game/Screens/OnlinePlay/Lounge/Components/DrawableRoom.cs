@@ -126,165 +126,171 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             Children = new Drawable[]
             {
-                new Container
+                // This resolves internal 1px gaps due to applying the (parenting) corner radius and masking across multiple filling background sprites.
+                new BufferedContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4Extensions.FromHex(@"#27302E"),
+                        },
                         new OnlinePlayBackgroundSprite(BeatmapSetCoverType.List)
                         {
                             RelativeSizeAxes = Axes.Both
                         },
-                        new Container
+                    }
+                },
+                new Container
+                {
+                    Name = @"Room content",
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Left = 20, Vertical = -0.5f },
+                    Child = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        CornerRadius = corner_radius,
+                        Children = new Drawable[]
                         {
-                            Name = @"Room content",
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Left = 20, Vertical = -0.5f },
-                            Child = new Container
+                            // This resolves internal 1px gaps due to applying the (parenting) corner radius and masking across multiple filling background sprites.
+                            new BufferedContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Masking = true,
-                                CornerRadius = corner_radius,
                                 Children = new Drawable[]
                                 {
-                                    // This resolves internal 1px gaps due to applying the (parenting) corner radius and masking across multiple filling background sprites.
-                                    new BufferedContainer
+                                    new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Children = new Drawable[]
-                                        {
-                                            new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Colour = Color4Extensions.FromHex(@"#27302E"),
-                                            },
-                                            new OnlinePlayBackgroundSprite(BeatmapSetCoverType.List)
-                                            {
-                                                RelativeSizeAxes = Axes.Both
-                                            },
-                                            new GridContainer
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                ColumnDimensions = new[]
-                                                {
-                                                    new Dimension(GridSizeMode.Relative, 0.2f)
-                                                },
-                                                Content = new[]
-                                                {
-                                                    new Drawable[]
-                                                    {
-                                                        new Box
-                                                        {
-                                                            RelativeSizeAxes = Axes.Both,
-                                                            Colour = Color4Extensions.FromHex(@"#27302E"),
-                                                        },
-                                                        new Box
-                                                        {
-                                                            RelativeSizeAxes = Axes.Both,
-                                                            Colour = ColourInfo.GradientHorizontal(Color4Extensions.FromHex(@"#27302E"), Color4Extensions.FromHex(@"#27302E").Opacity(0.3f))
-                                                        },
-                                                    }
-                                                }
-                                            },
-                                        },
+                                        Colour = Color4Extensions.FromHex(@"#27302E"),
                                     },
-                                    new Container
+                                    new OnlinePlayBackgroundSprite(BeatmapSetCoverType.List)
                                     {
-                                        Name = @"Left details",
+                                        RelativeSizeAxes = Axes.Both
+                                    },
+                                    new GridContainer
+                                    {
                                         RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding
+                                        ColumnDimensions = new[]
                                         {
-                                            Left = 20,
-                                            Vertical = 5
+                                            new Dimension(GridSizeMode.Relative, 0.2f)
                                         },
+                                        Content = new[]
+                                        {
+                                            new Drawable[]
+                                            {
+                                                new Box
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Colour = Color4Extensions.FromHex(@"#27302E"),
+                                                },
+                                                new Box
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Colour = ColourInfo.GradientHorizontal(Color4Extensions.FromHex(@"#27302E"), Color4Extensions.FromHex(@"#27302E").Opacity(0.3f))
+                                                },
+                                            }
+                                        }
+                                    },
+                                },
+                            },
+                            new Container
+                            {
+                                Name = @"Left details",
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding
+                                {
+                                    Left = 20,
+                                    Vertical = 5
+                                },
+                                Children = new Drawable[]
+                                {
+                                    new FillFlowContainer
+                                    {
+                                        AutoSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(4),
                                         Children = new Drawable[]
                                         {
-                                            new FillFlowContainer
-                                            {
-                                                AutoSizeAxes = Axes.Both,
-                                                Direction = FillDirection.Horizontal,
-                                                Spacing = new Vector2(4),
-                                                Children = new Drawable[]
-                                                {
-                                                    new RoomStatusPill
-                                                    {
-                                                        Anchor = Anchor.CentreLeft,
-                                                        Origin = Anchor.CentreLeft
-                                                    },
-                                                    specialCategoryPill = new RoomSpecialCategoryPill
-                                                    {
-                                                        Anchor = Anchor.CentreLeft,
-                                                        Origin = Anchor.CentreLeft
-                                                    },
-                                                    new EndDateInfo
-                                                    {
-                                                        Anchor = Anchor.CentreLeft,
-                                                        Origin = Anchor.CentreLeft
-                                                    },
-                                                }
-                                            },
-                                            new FillFlowContainer
+                                            new RoomStatusPill
                                             {
                                                 Anchor = Anchor.CentreLeft,
-                                                Origin = Anchor.CentreLeft,
-                                                AutoSizeAxes = Axes.Both,
-                                                Direction = FillDirection.Vertical,
-                                                Children = new Drawable[]
-                                                {
-                                                    new RoomNameText(),
-                                                    new RoomHostText()
-                                                }
+                                                Origin = Anchor.CentreLeft
                                             },
-                                            new FillFlowContainer
+                                            specialCategoryPill = new RoomSpecialCategoryPill
                                             {
-                                                Anchor = Anchor.BottomLeft,
-                                                Origin = Anchor.BottomLeft,
-                                                AutoSizeAxes = Axes.Both,
-                                                Direction = FillDirection.Horizontal,
-                                                Spacing = new Vector2(4),
-                                                Children = new Drawable[]
-                                                {
-                                                    new PlaylistCountPill
-                                                    {
-                                                        Anchor = Anchor.CentreLeft,
-                                                        Origin = Anchor.CentreLeft,
-                                                    },
-                                                    new StarRatingRangeDisplay
-                                                    {
-                                                        Anchor = Anchor.CentreLeft,
-                                                        Origin = Anchor.CentreLeft,
-                                                        Scale = new Vector2(0.85f)
-                                                    }
-                                                }
-                                            }
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft
+                                            },
+                                            new EndDateInfo
+                                            {
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft
+                                            },
                                         }
                                     },
                                     new FillFlowContainer
                                     {
-                                        Name = "Right content",
-                                        Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight,
-                                        AutoSizeAxes = Axes.X,
-                                        RelativeSizeAxes = Axes.Y,
-                                        Padding = new MarginPadding
-                                        {
-                                            Right = 10,
-                                            Vertical = 5
-                                        },
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        AutoSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Vertical,
                                         Children = new Drawable[]
                                         {
-                                            recentParticipantsList = new RecentParticipantsList
+                                            new RoomNameText(),
+                                            new RoomHostText()
+                                        }
+                                    },
+                                    new FillFlowContainer
+                                    {
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft,
+                                        AutoSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(4),
+                                        Children = new Drawable[]
+                                        {
+                                            new PlaylistCountPill
                                             {
-                                                Anchor = Anchor.CentreRight,
-                                                Origin = Anchor.CentreRight,
-                                                NumberOfAvatars = NumberOfAvatars
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                            },
+                                            new StarRatingRangeDisplay
+                                            {
+                                                Anchor = Anchor.CentreLeft,
+                                                Origin = Anchor.CentreLeft,
+                                                Scale = new Vector2(0.85f)
                                             }
                                         }
                                     }
-                                },
+                                }
                             },
+                            new FillFlowContainer
+                            {
+                                Name = "Right content",
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                AutoSizeAxes = Axes.X,
+                                RelativeSizeAxes = Axes.Y,
+                                Padding = new MarginPadding
+                                {
+                                    Right = 10,
+                                    Vertical = 5
+                                },
+                                Children = new Drawable[]
+                                {
+                                    recentParticipantsList = new RecentParticipantsList
+                                    {
+                                        Anchor = Anchor.CentreRight,
+                                        Origin = Anchor.CentreRight,
+                                        NumberOfAvatars = NumberOfAvatars
+                                    }
+                                }
+                            }
                         },
-                    }
+                    },
                 },
                 new StatusColouredContainer(transition_duration)
                 {
