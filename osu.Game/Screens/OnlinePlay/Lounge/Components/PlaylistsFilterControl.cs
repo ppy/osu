@@ -15,7 +15,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             Filters.Add(categoryDropdown = new SlimEnumDropdown<PlaylistsCategory>
             {
-                Anchor = Anchor.BottomRight,
+                Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 RelativeSizeAxes = Axes.None,
                 Width = 160,

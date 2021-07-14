@@ -55,24 +55,25 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             InternalChild = content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding
+                {
+                    Top = 20,
+                    Left = WaveOverlayContainer.WIDTH_PADDING,
+                    Right = WaveOverlayContainer.WIDTH_PADDING,
+                },
                 Child = new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.Absolute, 10)
+                        new Dimension(GridSizeMode.Absolute, 20)
                     },
                     Content = new[]
                     {
                         new Drawable[]
                         {
-                            filter = CreateFilterControl().With(d =>
-                            {
-                                d.RelativeSizeAxes = Axes.X;
-                                d.Height = 80;
-                                d.Depth = -1;
-                            }),
+                            filter = CreateFilterControl().With(d => d.Depth = -1),
                         },
                         null,
                         new Drawable[]
@@ -86,7 +87,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         ScrollbarOverlapsContent = false,
-                                        Padding = new MarginPadding(10),
                                         Child = roomsContainer = new RoomsContainer { JoinRequested = joinRequested }
                                     },
                                     loadingLayer = new LoadingLayer(true),
@@ -118,17 +118,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 operationInProgress.BindTo(ongoingOperationTracker.InProgress);
                 operationInProgress.BindValueChanged(_ => updateLoadingLayer(), true);
             }
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            content.Padding = new MarginPadding
-            {
-                Left = WaveOverlayContainer.WIDTH_PADDING,
-                Right = WaveOverlayContainer.WIDTH_PADDING,
-            };
         }
 
         protected override void OnFocus(FocusEvent e)
