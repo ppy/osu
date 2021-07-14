@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -16,7 +15,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
     {
         private const float padding = 8;
 
-        public Drawable Background { get; private set; }
+        public readonly Drawable Background;
 
         protected override Container<Drawable> Content { get; } = new Container
         {
@@ -29,11 +28,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             AutoSizeAxes = Axes.X;
             Height = 16;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             InternalChild = new CircularContainer
             {
                 Anchor = Anchor.Centre,
