@@ -389,7 +389,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             {
                 base.LoadComplete();
 
-                GetContainingInputManager().ChangeFocus(passwordTextbox);
+                Schedule(() => GetContainingInputManager().ChangeFocus(passwordTextbox));
             }
         }
     }
