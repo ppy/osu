@@ -157,6 +157,23 @@ namespace osu.Game.Tests.Visual.UserInterface
             checkBindableAtValue("Circle Size", 3);
         }
 
+        [Test]
+        public void TestResetToDefaults()
+        {
+            setBeatmapWithDifficultyParameters(5);
+
+            setSliderValue("Circle Size", 3);
+            setExtendedLimits(true);
+
+            checkSliderAtValue("Circle Size", 3);
+            checkBindableAtValue("Circle Size", 3);
+
+            AddStep("reset mod settings", () => modDifficultyAdjust.ResetSettingsToDefaults());
+
+            checkSliderAtValue("Circle Size", 5);
+            checkBindableAtValue("Circle Size", null);
+        }
+
         private void resetToDefault(string name)
         {
             AddStep($"Reset {name} to default", () =>

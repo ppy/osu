@@ -27,7 +27,8 @@ namespace osu.Game.Rulesets.Edit
 
             // Compose
             new CheckUnsnappedObjects(),
-            new CheckConcurrentObjects()
+            new CheckConcurrentObjects(),
+            new CheckZeroLengthObjects(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
