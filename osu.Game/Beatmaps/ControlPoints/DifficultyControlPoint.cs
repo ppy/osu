@@ -3,7 +3,6 @@
 
 using osu.Framework.Bindables;
 using osu.Game.Graphics;
-using osu.Game.Overlays;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
@@ -26,7 +25,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             MaxValue = 10
         };
 
-        public override Color4 GetRepresentingColour(OsuColour colours) => OverlayColourProvider.Lime.Colour1;
+        public override Color4 GetRepresentingColour(OsuColour colours) => colours.Lime1;
 
         /// <summary>
         /// The speed multiplier at this control point.
