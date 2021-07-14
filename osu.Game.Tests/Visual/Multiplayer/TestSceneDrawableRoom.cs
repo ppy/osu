@@ -47,9 +47,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     }),
                     createDrawableRoom(new Room
                     {
-                        Name = { Value = "Room 4" },
+                        Name = { Value = "Room 4 (realtime)" },
                         Status = { Value = new RoomStatusOpen() },
                         Category = { Value = RoomCategory.Realtime },
+                    }),
+                    createDrawableRoom(new Room
+                    {
+                        Name = { Value = "Room 4 (spotlight)" },
+                        Status = { Value = new RoomStatusOpen() },
+                        Category = { Value = RoomCategory.Spotlight },
                     }),
                 }
             };
