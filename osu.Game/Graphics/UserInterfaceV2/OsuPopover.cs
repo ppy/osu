@@ -14,10 +14,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
     public class OsuPopover : Popover
     {
         private const float fade_duration = 250;
+        private const double scale_duration = 500;
 
         public OsuPopover(bool withPadding = true)
         {
             Content.Padding = withPadding ? new MarginPadding(20) : new MarginPadding();
+
             Body.Masking = true;
             Body.CornerRadius = 10;
             Body.Margin = new MarginPadding(10);
@@ -38,7 +40,16 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         protected override Drawable CreateArrow() => Empty();
 
-        protected override void PopIn() => this.FadeIn(fade_duration, Easing.OutQuint);
-        protected override void PopOut() => this.FadeOut(fade_duration, Easing.OutQuint);
+        protected override void PopIn()
+        {
+            this.ScaleTo(1, scale_duration, Easing.OutElasticHalf);
+            this.FadeIn(fade_duration, Easing.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            this.ScaleTo(0.7f, scale_duration, Easing.OutQuint);
+            this.FadeOut(fade_duration, Easing.OutQuint);
+        }
     }
 }
