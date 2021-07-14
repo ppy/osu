@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
@@ -17,6 +18,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Users;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge
 {
@@ -52,49 +54,59 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             RoomsContainer roomsContainer;
             OsuScrollContainer scrollContainer;
 
-            InternalChild = content = new Container
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding
+                new Box
                 {
-                    Top = 20,
-                    Left = WaveOverlayContainer.WIDTH_PADDING,
-                    Right = WaveOverlayContainer.WIDTH_PADDING,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 100,
+                    Colour = Color4.Black,
+                    Alpha = 0.5f,
                 },
-                Child = new GridContainer
+                content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RowDimensions = new[]
+                    Padding = new MarginPadding
                     {
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.Absolute, 20)
+                        Top = 20,
+                        Left = WaveOverlayContainer.WIDTH_PADDING,
+                        Right = WaveOverlayContainer.WIDTH_PADDING,
                     },
-                    Content = new[]
+                    Child = new GridContainer
                     {
-                        new Drawable[]
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[]
                         {
-                            filter = CreateFilterControl().With(d => d.Depth = -1),
+                            new Dimension(GridSizeMode.AutoSize),
+                            new Dimension(GridSizeMode.Absolute, 20)
                         },
-                        null,
-                        new Drawable[]
+                        Content = new[]
                         {
-                            new Container
+                            new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Children = new Drawable[]
-                                {
-                                    scrollContainer = new OsuScrollContainer
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        ScrollbarOverlapsContent = false,
-                                        Child = roomsContainer = new RoomsContainer { JoinRequested = joinRequested }
-                                    },
-                                    loadingLayer = new LoadingLayer(true),
-                                }
+                                filter = CreateFilterControl().With(d => d.Depth = -1),
                             },
+                            null,
+                            new Drawable[]
+                            {
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        scrollContainer = new OsuScrollContainer
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            ScrollbarOverlapsContent = false,
+                                            Child = roomsContainer = new RoomsContainer { JoinRequested = joinRequested }
+                                        },
+                                        loadingLayer = new LoadingLayer(true),
+                                    }
+                                },
+                            }
                         }
-                    }
-                },
+                    },
+                }
             };
 
             // scroll selected room into view on selection.
