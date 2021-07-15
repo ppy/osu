@@ -78,8 +78,31 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddUntilStep("wait for trigger", () => lastBpm != null);
-            AddAssert("bpm is from beatmap", () => lastBpm != null&&Precision.AlmostEquals(lastBpm.Value, 128));
+            AddAssert("bpm is from beatmap", () => lastBpm != null && Precision.AlmostEquals(lastBpm.Value, 128));
             AddAssert("beat index is less than zero", () => lastBeatIndex < 0);
+        }
+
+        [Test]
+        public void TestIdleBeatOnPausedClock()
+        {
+            double? lastBpm = null;
+
+            AddStep("bind event", () =>
+            {
+                beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) => lastBpm = timingControlPoint.BPM;
+            });
+
+            AddUntilStep("wait for trigger", () => lastBpm != null);
+            AddAssert("bpm is from beatmap", () => lastBpm != null && Precision.AlmostEquals(lastBpm.Value, 128));
+
+            AddStep("pause gameplay clock", () =>
+            {
+                lastBpm = null;
+                gameplayClockContainer.Stop();
+            });
+
+            AddUntilStep("wait for trigger", () => lastBpm != null);
+            AddAssert("bpm is from beatmap", () => lastBpm != null && Precision.AlmostEquals(lastBpm.Value, 60));
         }
 
         private class BeatContainer : BeatSyncedContainer
