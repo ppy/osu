@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
     [TestFixture]
     public class TestSceneBeatSyncedContainer : OsuTestScene
     {
-        private BeatContainer beatContainer;
+        private TestBeatSyncedContainer beatContainer;
 
         private MasterGameplayClockContainer gameplayClockContainer;
 
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
                     {
-                        Child = beatContainer = new BeatContainer
+                        Child = beatContainer = new TestBeatSyncedContainer
                         {
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
@@ -55,12 +55,15 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Start playback", () => gameplayClockContainer.Start());
         }
 
-        [Test]
-        public void TestSeekBackDoesntPlayMidBeat()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestDisallowMistimedEventFiring(bool allowMistimed)
         {
             int? lastBeatIndex = null;
             double? lastActuationTime = null;
             TimingControlPoint lastTimingPoint = null;
+
+            AddStep("set mistimed to disallow", () => beatContainer.AllowMistimedEventFiring = allowMistimed);
 
             AddStep("bind event", () =>
             {
@@ -79,7 +82,15 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddUntilStep("wait for trigger", () => lastBeatIndex != null);
-            AddAssert("trigger is near beat length", () => lastActuationTime != null && lastBeatIndex != null && Precision.AlmostEquals(lastTimingPoint.Time + lastBeatIndex.Value * lastTimingPoint.BeatLength, lastActuationTime.Value, 32));
+
+            if (!allowMistimed)
+            {
+                AddAssert("trigger is near beat length", () => lastActuationTime != null && lastBeatIndex != null && Precision.AlmostEquals(lastTimingPoint.Time + lastBeatIndex.Value * lastTimingPoint.BeatLength, lastActuationTime.Value, BeatSyncedContainer.MISTIMED_ALLOWANCE));
+            }
+            else
+            {
+                AddAssert("trigger is not near beat length", () => lastActuationTime != null && lastBeatIndex != null && !Precision.AlmostEquals(lastTimingPoint.Time + lastBeatIndex.Value * lastTimingPoint.BeatLength, lastActuationTime.Value, BeatSyncedContainer.MISTIMED_ALLOWANCE));
+            }
         }
 
         [Test]
@@ -132,9 +143,15 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("bpm is from beatmap", () => lastBpm != null && Precision.AlmostEquals(lastBpm.Value, 60));
         }
 
-        private class BeatContainer : BeatSyncedContainer
+        private class TestBeatSyncedContainer : BeatSyncedContainer
         {
             private const int flash_layer_height = 150;
+
+            public new bool AllowMistimedEventFiring
+            {
+                get => base.AllowMistimedEventFiring;
+                set => base.AllowMistimedEventFiring = value;
+            }
 
             private readonly InfoString timingPointCount;
             private readonly InfoString currentTimingPoint;
@@ -148,7 +165,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             private readonly Box flashLayer;
 
-            public BeatContainer()
+            public TestBeatSyncedContainer()
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
