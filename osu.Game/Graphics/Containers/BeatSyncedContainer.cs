@@ -94,6 +94,9 @@ namespace osu.Game.Graphics.Containers
 
             TimeSinceLastBeat = beatLength - TimeUntilNextBeat;
 
+            if (currentTrackTime < TimeSinceLastBeat)
+                return;
+
             if (timingPoint == lastTimingPoint && beatIndex == lastBeat)
                 return;
 
