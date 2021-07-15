@@ -47,7 +47,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 new SettingsCheckbox
                 {
                     LabelText = "High precision mouse",
-                    Current = relativeMode
+                    TooltipText = "Attempts to bypass any operation system mouse acceleration. On windows, this is equivalent to what used to be known as \"Raw Input\".",
+                    Current = relativeMode,
+                    Keywords = new[] { "raw", "input", "relative", "cursor" }
                 },
                 new SensitivitySetting
                 {
