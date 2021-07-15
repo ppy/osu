@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -57,15 +58,28 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestFirstBeatAtFirstTimingPoint()
         {
-            AddStep("Set time before zero", () =>
-            {
-                gameplayClockContainer.Seek(-1000);
-            });
+            int? lastBeatIndex = null;
+            double? lastBpm = null;
 
             AddStep("bind event", () =>
             {
-                beatContainer.NewBeat = (i, point, effectControlPoint, channelAmplitudes) => { };
+                beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) =>
+                {
+                    lastBeatIndex = i;
+                    lastBpm = timingControlPoint.BPM;
+                };
             });
+
+            AddStep("Set time before zero", () =>
+            {
+                lastBeatIndex = null;
+                lastBpm = null;
+                gameplayClockContainer.Seek(-1000);
+            });
+
+            AddUntilStep("wait for trigger", () => lastBpm != null);
+            AddAssert("bpm is from beatmap", () => lastBpm != null&&Precision.AlmostEquals(lastBpm.Value, 128));
+            AddAssert("beat index is less than zero", () => lastBeatIndex < 0);
         }
 
         private class BeatContainer : BeatSyncedContainer
