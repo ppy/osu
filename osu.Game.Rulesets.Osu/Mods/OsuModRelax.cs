@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             if (requiresHold)
                 changeState(true);
-            else if (isDownState && time >= beatmapLength || time - lastStateChangeTime > AutoGenerator.KEY_UP_DELAY)
+            else if ((isDownState && time + AutoGenerator.KEY_UP_DELAY >= beatmapLength) || time - lastStateChangeTime > AutoGenerator.KEY_UP_DELAY)
                 changeState(false);
 
             void handleHitCircle(DrawableHitCircle circle)
