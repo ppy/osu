@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             double? lastActuationTime = null;
             TimingControlPoint lastTimingPoint = null;
 
-            AddStep("set mistimed to disallow", () => beatContainer.AllowMistimedEventFiring = allowMistimed);
+            AddStep($"set mistimed to {(allowMistimed ? "allowed" : "disallowed")}", () => beatContainer.AllowMistimedEventFiring = allowMistimed);
 
             AddStep("bind event", () =>
             {
