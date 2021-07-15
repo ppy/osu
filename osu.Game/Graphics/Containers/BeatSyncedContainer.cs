@@ -1,19 +1,29 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Graphics.Containers
 {
+    /// <summary>
+    /// A container which fires a callback when a new beat is reached.
+    /// Consumes a parent <see cref="GameplayClock"/> or <see cref="Beatmap"/> (whichever is first available).
+    /// </summary>
+    /// <remarks>
+    /// This container does not set its own clock to the source used for beat matching.
+    /// This means that if the beat source clock is playing faster or slower, animations may unexpectedly overlap.
+    /// Make sure this container's Clock is also set to the expected source (or within a parent element which provides this).
+    /// </remarks>
     public class BeatSyncedContainer : Container
     {
-        protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
-
         private int lastBeat;
         private TimingControlPoint lastTimingPoint;
 
@@ -45,14 +55,44 @@ namespace osu.Game.Graphics.Containers
 
         protected bool IsBeatSyncedWithTrack { get; private set; }
 
+        protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
+        {
+        }
+
+        [Resolved]
+        protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
+
+        [Resolved(canBeNull: true)]
+        protected GameplayClock GameplayClock { get; private set; }
+
+        protected IClock BeatSyncClock
+        {
+            get
+            {
+                if (GameplayClock != null)
+                    return GameplayClock;
+
+                if (Beatmap.Value.TrackLoaded)
+                    return Beatmap.Value.Track;
+
+                return null;
+            }
+        }
+
         protected override void Update()
         {
             ITrack track = null;
             IBeatmap beatmap = null;
 
             double currentTrackTime = 0;
+
             TimingControlPoint timingPoint = null;
             EffectControlPoint effectPoint = null;
+
+            var clock = BeatSyncClock;
+
+            if (clock == null)
+                return;
 
             if (Beatmap.Value.TrackLoaded && Beatmap.Value.BeatmapLoaded)
             {
@@ -62,7 +102,7 @@ namespace osu.Game.Graphics.Containers
 
             if (track != null && beatmap != null && track.IsRunning && track.Length > 0)
             {
-                currentTrackTime = track.CurrentTime + EarlyActivationMilliseconds;
+                currentTrackTime = clock.CurrentTime + EarlyActivationMilliseconds;
 
                 timingPoint = beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
                 effectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
@@ -70,12 +110,14 @@ namespace osu.Game.Graphics.Containers
 
             IsBeatSyncedWithTrack = timingPoint?.BeatLength > 0;
 
-            if (timingPoint == null || !IsBeatSyncedWithTrack)
+            if (!IsBeatSyncedWithTrack)
             {
-                currentTrackTime = Clock.CurrentTime;
+                currentTrackTime = clock.CurrentTime;
                 timingPoint = TimingControlPoint.DEFAULT;
                 effectPoint = EffectControlPoint.DEFAULT;
             }
+
+            Debug.Assert(timingPoint != null);
 
             double beatLength = timingPoint.BeatLength / Divisor;
 
@@ -102,16 +144,6 @@ namespace osu.Game.Graphics.Containers
 
             lastBeat = beatIndex;
             lastTimingPoint = timingPoint;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap)
-        {
-            Beatmap.BindTo(beatmap);
-        }
-
-        protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
-        {
         }
     }
 }

@@ -11,12 +11,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.Play;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -25,7 +25,8 @@ namespace osu.Game.Tests.Visual.UserInterface
     public class TestSceneBeatSyncedContainer : OsuTestScene
     {
         private BeatContainer beatContainer;
-        private DecoupleableInterpolatingFramedClock decoupledClock;
+
+        private MasterGameplayClockContainer gameplayClockContainer;
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -39,21 +40,18 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Children = new Drawable[]
                 {
-                    beatContainer = new BeatContainer
+                    gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
                     {
-                        Clock = decoupledClock = new DecoupleableInterpolatingFramedClock
+                        Child = beatContainer = new BeatContainer
                         {
-                            IsCoupled = false,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
                         },
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                    },
+                    }
                 };
-
-                decoupledClock.ChangeSource(Beatmap.Value.Track);
             });
 
-            AddStep("Start playback", () => decoupledClock.Start());
+            AddStep("Start playback", () => gameplayClockContainer.Start());
         }
 
         [Test]
@@ -61,7 +59,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("Set time before zero", () =>
             {
-                decoupledClock.Seek(-1000);
+                gameplayClockContainer.Seek(-1000);
             });
 
             AddStep("bind event", () =>
@@ -150,8 +148,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                         }
                     }
                 };
+            }
 
-                Beatmap.ValueChanged += delegate
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Beatmap.BindValueChanged(_ =>
                 {
                     timingPointCount.Value = 0;
                     currentTimingPoint.Value = 0;
@@ -161,7 +164,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     adjustedBeatLength.Value = 0;
                     timeUntilNextBeat.Value = 0;
                     timeSinceLastBeat.Value = 0;
-                };
+                }, true);
             }
 
             private List<TimingControlPoint> timingPoints => Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.ToList();
@@ -181,7 +184,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 if (timingPoints.Count == 0) return 0;
 
                 if (timingPoints[^1] == current)
-                    return (int)Math.Ceiling((Clock.CurrentTime - current.Time) / current.BeatLength);
+                    return (int)Math.Ceiling((BeatSyncClock.CurrentTime - current.Time) / current.BeatLength);
 
                 return (int)Math.Ceiling((getNextTimingPoint(current).Time - current.Time) / current.BeatLength);
             }
@@ -191,7 +194,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 base.Update();
                 timeUntilNextBeat.Value = TimeUntilNextBeat;
                 timeSinceLastBeat.Value = TimeSinceLastBeat;
-                currentTime.Value = Clock.CurrentTime;
+                currentTime.Value = BeatSyncClock.CurrentTime;
             }
 
             public Action<int, TimingControlPoint, EffectControlPoint, ChannelAmplitudes> NewBeat;
