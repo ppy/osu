@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
@@ -34,6 +35,19 @@ namespace osu.Game.Graphics.Containers
         /// This allows for adding easing to animations that may be synchronised to the beat.
         /// </summary>
         protected double EarlyActivationMilliseconds;
+
+        /// <summary>
+        /// While this container automatically applied an animation delay (meaning any animations inside a <see cref="OnNewBeat"/> implementation will
+        /// always be correctly timed), the event itself can potentially fire away from the related beat.
+        ///
+        /// By setting this to false, cases where the event is to be fired more than <see cref="MISTIMED_ALLOWANCE"/> from the related beat will be skipped.
+        /// </summary>
+        protected bool AllowMistimedEventFiring = true;
+
+        /// <summary>
+        /// The maximum deviance from the actual beat that an <see cref="OnNewBeat"/> can fire when <see cref="AllowMistimedEventFiring"/> is set to false.
+        /// </summary>
+        public const double MISTIMED_ALLOWANCE = 16;
 
         /// <summary>
         /// The time in milliseconds until the next beat.
@@ -145,8 +159,13 @@ namespace osu.Game.Graphics.Containers
             if (timingPoint == lastTimingPoint && beatIndex == lastBeat)
                 return;
 
-            using (BeginDelayedSequence(-TimeSinceLastBeat))
-                OnNewBeat(beatIndex, timingPoint, effectPoint, track?.CurrentAmplitudes ?? ChannelAmplitudes.Empty);
+            // as this event is sometimes used for sound triggers where `BeginDelayedSequence` has no effect, avoid firing it if too far away from the beat.
+            // this can happen after a seek operation.
+            if (AllowMistimedEventFiring || Math.Abs(TimeSinceLastBeat) < MISTIMED_ALLOWANCE)
+            {
+                using (BeginDelayedSequence(-TimeSinceLastBeat))
+                    OnNewBeat(beatIndex, timingPoint, effectPoint, track?.CurrentAmplitudes ?? ChannelAmplitudes.Empty);
+            }
 
             lastBeat = beatIndex;
             lastTimingPoint = timingPoint;
