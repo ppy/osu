@@ -56,7 +56,34 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestFirstBeatAtFirstTimingPoint()
+        public void TestSeekBackDoesntPlayMidBeat()
+        {
+            int? lastBeatIndex = null;
+            double? lastActuationTime = null;
+            TimingControlPoint lastTimingPoint = null;
+
+            AddStep("bind event", () =>
+            {
+                beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) =>
+                {
+                    lastActuationTime = gameplayClockContainer.CurrentTime;
+                    lastTimingPoint = timingControlPoint;
+                    lastBeatIndex = i;
+                };
+            });
+
+            AddStep("Set time before zero", () =>
+            {
+                lastBeatIndex = null;
+                gameplayClockContainer.Seek(-1000);
+            });
+
+            AddUntilStep("wait for trigger", () => lastBeatIndex != null);
+            AddAssert("trigger is near beat length", () => lastActuationTime != null && lastBeatIndex != null && Precision.AlmostEquals(lastTimingPoint.Time + lastBeatIndex.Value * lastTimingPoint.BeatLength, lastActuationTime.Value, 32));
+        }
+
+        [Test]
+        public void TestNegativeBeatsStillUsingBeatmapTiming()
         {
             int? lastBeatIndex = null;
             double? lastBpm = null;
