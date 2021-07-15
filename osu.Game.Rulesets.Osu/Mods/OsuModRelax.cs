@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             // grab the input manager for future use.
             osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
-            beatmapLength = drawableRuleset.Beatmap.BeatmapInfo.Length;
+            beatmapLength = drawableRuleset.Beatmap.HitObjects.LastOrDefault()?.GetEndTime() ?? 0;
         }
 
         public void ApplyToPlayer(Player player)
