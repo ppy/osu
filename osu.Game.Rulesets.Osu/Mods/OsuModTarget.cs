@@ -353,22 +353,23 @@ namespace osu.Game.Rulesets.Osu.Mods
                 Divisor = 1;
             }
 
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                InternalChildren = new Drawable[]
+                {
+                    sample = new PausableSkinnableSound(new SampleInfo("Gameplay/catch-banana"))
+                };
+            }
+
             protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
                 if (!IsBeatSyncedWithTrack) return;
 
+                sample.Frequency.Value = beatIndex % (int)timingPoint.TimeSignature == 0 ? 1 : 0.5f;
                 sample?.Play();
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                InternalChildren = new Drawable[]
-                {
-                    sample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-hat")) // todo: use another sample
-                };
             }
         }
 
