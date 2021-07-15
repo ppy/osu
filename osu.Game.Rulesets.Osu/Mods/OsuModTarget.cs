@@ -341,15 +341,18 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(new TargetBeatContainer());
+            drawableRuleset.Overlays.Add(new TargetBeatContainer(drawableRuleset.Beatmap.HitObjects.First().StartTime));
         }
 
         public class TargetBeatContainer : BeatSyncedContainer
         {
+            private readonly double firstHitTime;
+
             private PausableSkinnableSound sample;
 
-            public TargetBeatContainer()
+            public TargetBeatContainer(double firstHitTime)
             {
+                this.firstHitTime = firstHitTime;
                 Divisor = 1;
             }
 
@@ -368,8 +371,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 if (!IsBeatSyncedWithTrack) return;
 
-                sample.Frequency.Value = beatIndex % (int)timingPoint.TimeSignature == 0 ? 1 : 0.5f;
-                sample?.Play();
+                int timeSignature = (int)timingPoint.TimeSignature;
+
+                // play metronome from one measure before the first object.
+                // TODO: Use BeatSyncClock from https://github.com/ppy/osu/pull/13894.
+                if (Clock.CurrentTime < firstHitTime - timingPoint.BeatLength * timeSignature)
+                    return;
+
+                sample.Frequency.Value = beatIndex % timeSignature == 0 ? 1 : 0.5f;
+                sample.Play();
             }
         }
 
