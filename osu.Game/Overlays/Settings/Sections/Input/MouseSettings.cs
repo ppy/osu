@@ -47,29 +47,29 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "High precision mouse",
-                    TooltipText = "Attempts to bypass any operation system mouse acceleration. On windows, this is equivalent to what used to be known as \"Raw Input\".",
+                    LabelText = MouseSettingsStrings.HighPrecisionMouse,
+                    TooltipText = MouseSettingsStrings.HighPrecisionMouseTooltip,
                     Current = relativeMode,
-                    Keywords = new[] { "raw", "input", "relative", "cursor" }
+                    Keywords = new[] { @"raw", @"input", @"relative", @"cursor" }
                 },
                 new SensitivitySetting
                 {
-                    LabelText = "Cursor sensitivity",
+                    LabelText = MouseSettingsStrings.CursorSensitivity,
                     Current = localSensitivity
                 },
                 confineMouseModeSetting = new SettingsEnumDropdown<OsuConfineMouseMode>
                 {
-                    LabelText = "Confine mouse cursor to window",
+                    LabelText = MouseSettingsStrings.ConfineMouseMode,
                     Current = osuConfig.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Disable mouse wheel during gameplay",
+                    LabelText = MouseSettingsStrings.DisableMouseWheel,
                     Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Disable mouse buttons during gameplay",
+                    LabelText = MouseSettingsStrings.DisableMouseButtons,
                     Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
                 },
             };
@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 if (isFullscreen)
                 {
                     confineMouseModeSetting.Current.Disabled = true;
-                    confineMouseModeSetting.TooltipText = "Not applicable in full screen mode";
+                    confineMouseModeSetting.TooltipText = MouseSettingsStrings.NotApplicableFullscreen;
                 }
                 else
                 {
@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private class SensitivitySlider : OsuSliderBar<double>
         {
-            public override LocalisableString TooltipText => Current.Disabled ? "enable high precision mouse to adjust sensitivity" : $"{base.TooltipText}x";
+            public override LocalisableString TooltipText => Current.Disabled ? MouseSettingsStrings.EnableHighPrecisionForSensitivityAdjust : $"{base.TooltipText}x";
         }
     }
 }
