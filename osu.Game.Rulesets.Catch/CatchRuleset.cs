@@ -22,7 +22,9 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using System;
 using osu.Framework.Extensions.EnumExtensions;
+using osu.Game.Rulesets.Catch.Edit;
 using osu.Game.Rulesets.Catch.Skinning.Legacy;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch
@@ -161,13 +163,13 @@ namespace osu.Game.Rulesets.Catch
             switch (result)
             {
                 case HitResult.LargeTickHit:
-                    return "large droplet";
+                    return "Large droplet";
 
                 case HitResult.SmallTickHit:
-                    return "small droplet";
+                    return "Small droplet";
 
                 case HitResult.LargeBonus:
-                    return "banana";
+                    return "Banana";
             }
 
             return base.GetDisplayNameForHitResult(result);
@@ -175,12 +177,14 @@ namespace osu.Game.Rulesets.Catch
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new CatchDifficultyCalculator(this, beatmap);
 
-        public override ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => new CatchLegacySkinTransformer(source);
+        public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new CatchLegacySkinTransformer(skin);
 
         public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new CatchPerformanceCalculator(this, attributes, score);
 
         public int LegacyID => 2;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new CatchReplayFrame();
+
+        public override HitObjectComposer CreateHitObjectComposer() => new CatchHitObjectComposer(this);
     }
 }

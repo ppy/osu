@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Dialog
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = @"Cancel",
+                    Text = Localisation.CommonStrings.Cancel,
                     Action = onCancel
                 },
             };

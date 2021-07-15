@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using MessagePack;
 using osu.Game.Online.API;
 
@@ -28,11 +27,9 @@ namespace osu.Game.Online.Multiplayer
         [Key(3)]
         public string Name { get; set; } = "Unnamed room";
 
-        [NotNull]
         [Key(4)]
         public IEnumerable<APIMod> RequiredMods { get; set; } = Enumerable.Empty<APIMod>();
 
-        [NotNull]
         [Key(5)]
         public IEnumerable<APIMod> AllowedMods { get; set; } = Enumerable.Empty<APIMod>();
 

@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
@@ -38,6 +39,14 @@ namespace osu.Game.Rulesets.Mania.Mods
                     c.Coverage = 0.5f;
                 }));
             }
+        }
+
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
+        }
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
         }
     }
 }

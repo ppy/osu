@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.Containers
         protected override bool BlockNonPositionalInput => true;
 
         /// <summary>
-        /// Temporary to allow for overlays in the main screen content to not dim theirselves.
+        /// Temporary to allow for overlays in the main screen content to not dim themselves.
         /// Should be eventually replaced by dimming which is aware of the target dim container (traverse parent for certain interface type?).
         /// </summary>
         protected virtual bool DimMainContent => true;
@@ -107,10 +107,10 @@ namespace osu.Game.Graphics.Containers
         {
         }
 
-        private bool playedPopInSound;
-
         protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {
+            bool didChange = state.NewValue != state.OldValue;
+
             switch (state.NewValue)
             {
                 case Visibility.Visible:
@@ -121,18 +121,15 @@ namespace osu.Game.Graphics.Containers
                         return;
                     }
 
-                    samplePopIn?.Play();
-                    playedPopInSound = true;
+                    if (didChange)
+                        samplePopIn?.Play();
 
                     if (BlockScreenWideMouse && DimMainContent) game?.AddBlockingOverlay(this);
                     break;
 
                 case Visibility.Hidden:
-                    if (playedPopInSound)
-                    {
+                    if (didChange)
                         samplePopOut?.Play();
-                        playedPopInSound = false;
-                    }
 
                     if (BlockScreenWideMouse) game?.RemoveBlockingOverlay(this);
                     break;

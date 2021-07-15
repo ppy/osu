@@ -26,7 +26,10 @@ namespace osu.Game.Overlays
                 AccentColour = colourProvider.Light2;
             }
 
-            protected override TabItem<string> CreateTabItem(string value) => new ControlTabItem(value);
+            protected override TabItem<string> CreateTabItem(string value) => new ControlTabItem(value)
+            {
+                AccentColour = AccentColour,
+            };
 
             private class ControlTabItem : BreadcrumbTabItem
             {

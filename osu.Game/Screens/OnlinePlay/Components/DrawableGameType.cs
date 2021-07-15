@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
 
@@ -16,7 +17,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
     {
         private readonly GameType type;
 
-        public string TooltipText => type.Name;
+        public LocalisableString TooltipText => type.Name;
 
         public DrawableGameType(GameType type)
         {

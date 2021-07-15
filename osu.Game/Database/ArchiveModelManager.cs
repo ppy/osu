@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -79,9 +78,7 @@ namespace osu.Game.Database
 
         private readonly Bindable<WeakReference<TModel>> itemRemoved = new Bindable<WeakReference<TModel>>();
 
-        public virtual IEnumerable<string> HandledExtensions => new[] { ".zip" };
-
-        public virtual bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
+        public virtual IEnumerable<string> HandledExtensions => new[] { @".zip" };
 
         protected readonly FileStore Files;
 
@@ -102,7 +99,7 @@ namespace osu.Game.Database
             ModelStore.ItemUpdated += item => handleEvent(() => itemUpdated.Value = new WeakReference<TModel>(item));
             ModelStore.ItemRemoved += item => handleEvent(() => itemRemoved.Value = new WeakReference<TModel>(item));
 
-            exportStorage = storage.GetStorageForDirectory("exports");
+            exportStorage = storage.GetStorageForDirectory(@"exports");
 
             Files = new FileStore(contextFactory, storage);
 
@@ -285,7 +282,7 @@ namespace osu.Game.Database
             }
             catch (Exception e)
             {
-                LogForModel(model, $"Model creation of {archive.Name} failed.", e);
+                LogForModel(model, @$"Model creation of {archive.Name} failed.", e);
                 return null;
             }
 
@@ -313,6 +310,12 @@ namespace osu.Game.Database
         }
 
         /// <summary>
+        /// Whether the implementation overrides <see cref="ComputeHash"/> with a custom implementation.
+        /// Custom hash implementations must bypass the early exit in the import flow (see <see cref="computeHashFast"/> usage).
+        /// </summary>
+        protected virtual bool HasCustomHashFunction => false;
+
+        /// <summary>
         /// Create a SHA-2 hash from the provided archive based on file content of all files matching <see cref="HashableFileTypes"/>.
         /// </summary>
         /// <remarks>
@@ -320,7 +323,11 @@ namespace osu.Game.Database
         /// </remarks>
         protected virtual string ComputeHash(TModel item, ArchiveReader reader = null)
         {
-            // for now, concatenate all .osu files in the set to create a unique hash.
+            if (reader != null)
+                // fast hashing for cases where the item's files may not be populated.
+                return computeHashFast(reader);
+
+            // for now, concatenate all hashable files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
 
             foreach (TFileModel file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
@@ -331,9 +338,6 @@ namespace osu.Game.Database
 
             if (hashable.Length > 0)
                 return hashable.ComputeSHA2Hash();
-
-            if (reader != null)
-                return reader.Name.ComputeSHA2Hash();
 
             return item.Hash;
         }
@@ -349,21 +353,50 @@ namespace osu.Game.Database
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            delayEvents();
+            bool checkedExisting = false;
+            TModel existing = null;
+
+            if (archive != null && !HasCustomHashFunction)
+            {
+                // this is a fast bail condition to improve large import performance.
+                item.Hash = computeHashFast(archive);
+
+                checkedExisting = true;
+                existing = CheckForExisting(item);
+
+                if (existing != null)
+                {
+                    // bare minimum comparisons
+                    //
+                    // note that this should really be checking filesizes on disk (of existing files) for some degree of sanity.
+                    // or alternatively doing a faster hash check. either of these require database changes and reprocessing of existing files.
+                    if (CanSkipImport(existing, item) &&
+                        getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)))
+                    {
+                        LogForModel(item, @$"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
+                        Undelete(existing);
+                        return existing;
+                    }
+
+                    LogForModel(item, @"Found existing (optimised) but failed pre-check.");
+                }
+            }
 
             void rollback()
             {
                 if (!Delete(item))
                 {
                     // We may have not yet added the model to the underlying table, but should still clean up files.
-                    LogForModel(item, "Dereferencing files for incomplete import.");
+                    LogForModel(item, @"Dereferencing files for incomplete import.");
                     Files.Dereference(item.Files.Select(f => f.FileInfo).ToArray());
                 }
             }
 
+            delayEvents();
+
             try
             {
-                LogForModel(item, "Beginning import...");
+                LogForModel(item, @"Beginning import...");
 
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
                 item.Hash = ComputeHash(item, archive);
@@ -374,22 +407,24 @@ namespace osu.Game.Database
                 {
                     try
                     {
-                        if (!write.IsTransactionLeader) throw new InvalidOperationException($"Ensure there is no parent transaction so errors can correctly be handled by {this}");
+                        if (!write.IsTransactionLeader) throw new InvalidOperationException(@$"Ensure there is no parent transaction so errors can correctly be handled by {this}");
 
-                        var existing = CheckForExisting(item);
+                        if (!checkedExisting)
+                            existing = CheckForExisting(item);
 
                         if (existing != null)
                         {
                             if (CanReuseExisting(existing, item))
                             {
                                 Undelete(existing);
-                                LogForModel(item, $"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
+                                LogForModel(item, @$"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
                                 // existing item will be used; rollback new import and exit early.
                                 rollback();
                                 flushEvents(true);
                                 return existing;
                             }
 
+                            LogForModel(item, @"Found existing but failed re-use check.");
                             Delete(existing);
                             ModelStore.PurgeDeletable(s => s.ID == existing.ID);
                         }
@@ -406,12 +441,12 @@ namespace osu.Game.Database
                     }
                 }
 
-                LogForModel(item, "Import successfully completed!");
+                LogForModel(item, @"Import successfully completed!");
             }
             catch (Exception e)
             {
                 if (!(e is TaskCanceledException))
-                    LogForModel(item, "Database import or population failed and has been rolled back.", e);
+                    LogForModel(item, @"Database import or population failed and has been rolled back.", e);
 
                 rollback();
                 flushEvents(false);
@@ -431,7 +466,7 @@ namespace osu.Game.Database
             var retrievedItem = ModelStore.ConsumableItems.FirstOrDefault(s => s.ID == item.ID);
 
             if (retrievedItem == null)
-                throw new ArgumentException("Specified model could not be found", nameof(item));
+                throw new ArgumentException(@"Specified model could not be found", nameof(item));
 
             using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
                 ExportModelTo(retrievedItem, outputStream);
@@ -472,7 +507,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Delete new file.
+        /// Delete an existing file.
         /// </summary>
         /// <param name="model">The item to operate on.</param>
         /// <param name="file">The existing file to be deleted.</param>
@@ -640,6 +675,22 @@ namespace osu.Game.Database
             }
         }
 
+        private string computeHashFast(ArchiveReader reader)
+        {
+            MemoryStream hashable = new MemoryStream();
+
+            foreach (var file in reader.Filenames.Where(f => HashableFileTypes.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f))
+            {
+                using (Stream s = reader.GetStream(file))
+                    s.CopyTo(hashable);
+            }
+
+            if (hashable.Length > 0)
+                return hashable.ComputeSHA2Hash();
+
+            return reader.Name.ComputeSHA2Hash();
+        }
+
         /// <summary>
         /// Create all required <see cref="IO.FileInfo"/>s for the provided archive, adding them to the global file store.
         /// </summary>
@@ -647,18 +698,14 @@ namespace osu.Game.Database
         {
             var fileInfos = new List<TFileModel>();
 
-            string prefix = reader.Filenames.GetCommonPrefix();
-            if (!(prefix.EndsWith('/') || prefix.EndsWith('\\')))
-                prefix = string.Empty;
-
             // import files to manager
-            foreach (string file in reader.Filenames)
+            foreach (var filenames in getShortenedFilenames(reader))
             {
-                using (Stream s = reader.GetStream(file))
+                using (Stream s = reader.GetStream(filenames.original))
                 {
                     fileInfos.Add(new TFileModel
                     {
-                        Filename = file.Substring(prefix.Length).ToStandardisedPath(),
+                        Filename = filenames.shortened,
                         FileInfo = files.Add(s)
                     });
                 }
@@ -667,17 +714,18 @@ namespace osu.Game.Database
             return fileInfos;
         }
 
+        private IEnumerable<(string original, string shortened)> getShortenedFilenames(ArchiveReader reader)
+        {
+            string prefix = reader.Filenames.GetCommonPrefix();
+            if (!(prefix.EndsWith('/') || prefix.EndsWith('\\')))
+                prefix = string.Empty;
+
+            // import files to manager
+            foreach (string file in reader.Filenames)
+                yield return (file, file.Substring(prefix.Length).ToStandardisedPath());
+        }
+
         #region osu-stable import
-
-        /// <summary>
-        /// Set a storage with access to an osu-stable install for import purposes.
-        /// </summary>
-        public Func<StableStorage> GetStableStorage { private get; set; }
-
-        /// <summary>
-        /// Denotes whether an osu-stable installation is present to perform automated imports from.
-        /// </summary>
-        public bool StableInstallationAvailable => GetStableStorage?.Invoke() != null;
 
         /// <summary>
         /// The relative path from osu-stable's data directory to import items from.
@@ -700,22 +748,16 @@ namespace osu.Game.Database
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
-        public Task ImportFromStableAsync()
+        public Task ImportFromStableAsync(StableStorage stableStorage)
         {
-            var stableStorage = GetStableStorage?.Invoke();
-
-            if (stableStorage == null)
-            {
-                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
-                return Task.CompletedTask;
-            }
-
             var storage = PrepareStableStorage(stableStorage);
 
+            // Handle situations like when the user does not have a Skins folder.
             if (!storage.ExistsDirectory(ImportFromStablePath))
             {
-                // This handles situations like when the user does not have a Skins folder
-                Logger.Log($"No {ImportFromStablePath} folder available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
+                string fullPath = storage.GetFullPath(ImportFromStablePath);
+
+                Logger.Log(@$"Folder ""{fullPath}"" not available in the target osu!stable installation to import {HumanisedModelName}s.", LoggingTarget.Information, LogLevel.Error);
                 return Task.CompletedTask;
             }
 
@@ -746,7 +788,7 @@ namespace osu.Game.Database
         /// <param name="model">The model to populate.</param>
         /// <param name="archive">The archive to use as a reference for population. May be null.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        protected virtual Task Populate(TModel model, [CanBeNull] ArchiveReader archive, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        protected abstract Task Populate(TModel model, [CanBeNull] ArchiveReader archive, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Perform any final actions before the import to database executes.
@@ -762,6 +804,15 @@ namespace osu.Game.Database
         /// <param name="model">The new model proposed for import.</param>
         /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
         protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
+
+        /// <summary>
+        /// Whether inport can be skipped after finding an existing import early in the process.
+        /// Only valid when <see cref="ComputeHash"/> is not overridden.
+        /// </summary>
+        /// <param name="existing">The existing model.</param>
+        /// <param name="import">The newly imported model.</param>
+        /// <returns>Whether to skip this import completely.</returns>
+        protected virtual bool CanSkipImport(TModel existing, TModel import) => true;
 
         /// <summary>
         /// After an existing <typeparamref name="TModel"/> is found during an import process, the default behaviour is to use/restore the existing
@@ -790,7 +841,7 @@ namespace osu.Game.Database
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
-        protected virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace("Info", "").ToLower()}";
+        protected virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace(@"Info", "").ToLower()}";
 
         #region Event handling / delaying
 

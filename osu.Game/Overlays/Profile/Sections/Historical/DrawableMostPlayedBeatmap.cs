@@ -41,12 +41,11 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         {
             AddRangeInternal(new Drawable[]
             {
-                new UpdateableBeatmapSetCover
+                new UpdateableBeatmapSetCover(BeatmapSetCoverType.List)
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = cover_width,
                     BeatmapSet = beatmap.BeatmapSet,
-                    CoverType = BeatmapSetCoverType.List,
                 },
                 new Container
                 {
@@ -144,7 +143,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         private class PlayCountText : CompositeDrawable, IHasTooltip
         {
-            public string TooltipText => "times played";
+            public LocalisableString TooltipText => "times played";
 
             public PlayCountText(int playCount)
             {

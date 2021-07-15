@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Difficulty
 
         private DifficultyAttributes calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            var skills = CreateSkills(beatmap, mods);
+            var skills = CreateSkills(beatmap, mods, clockRate);
 
             if (!beatmap.HitObjects.Any())
                 return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
@@ -180,7 +180,8 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty will be calculated.</param>
         /// <param name="mods">Mods to calculate difficulty with.</param>
+        /// <param name="clockRate">Clockrate to calculate difficulty with.</param>
         /// <returns>The <see cref="Skill"/>s.</returns>
-        protected abstract Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods);
+        protected abstract Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate);
     }
 }

@@ -4,6 +4,8 @@
 using System.Linq;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -57,6 +59,9 @@ namespace osu.Game.Graphics.UserInterface
         {
             public override bool HandleNonPositionalInput => State == MenuState.Open;
 
+            private Sample sampleOpen;
+            private Sample sampleClose;
+
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
             public OsuDropdownMenu()
             {
@@ -69,9 +74,30 @@ namespace osu.Game.Graphics.UserInterface
                 ItemsContainer.Padding = new MarginPadding(5);
             }
 
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio)
+            {
+                sampleOpen = audio.Samples.Get(@"UI/dropdown-open");
+                sampleClose = audio.Samples.Get(@"UI/dropdown-close");
+            }
+
+            // todo: this shouldn't be required after https://github.com/ppy/osu-framework/issues/4519 is fixed.
+            private bool wasOpened;
+
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
-            protected override void AnimateOpen() => this.FadeIn(300, Easing.OutQuint);
-            protected override void AnimateClose() => this.FadeOut(300, Easing.OutQuint);
+            protected override void AnimateOpen()
+            {
+                wasOpened = true;
+                this.FadeIn(300, Easing.OutQuint);
+                sampleOpen?.Play();
+            }
+
+            protected override void AnimateClose()
+            {
+                this.FadeOut(300, Easing.OutQuint);
+                if (wasOpened)
+                    sampleClose?.Play();
+            }
 
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
             protected override void UpdateSize(Vector2 newSize)
@@ -155,7 +181,7 @@ namespace osu.Game.Graphics.UserInterface
                     nonAccentSelectedColour = Color4.Black.Opacity(0.5f);
                     updateColours();
 
-                    AddInternal(new HoverClickSounds(HoverSampleSet.Soft));
+                    AddInternal(new HoverSounds());
                 }
 
                 protected override void UpdateForegroundColour()
@@ -262,7 +288,7 @@ namespace osu.Game.Graphics.UserInterface
                     },
                 };
 
-                AddInternal(new HoverClickSounds());
+                AddInternal(new HoverSounds());
             }
 
             [BackgroundDependencyLoader]

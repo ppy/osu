@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Taiko.Objects;
 using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Default
@@ -20,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AccentColour = colours.PinkDarker;
+            AccentColour = Hit.COLOUR_CENTRE;
         }
 
         /// <summary>

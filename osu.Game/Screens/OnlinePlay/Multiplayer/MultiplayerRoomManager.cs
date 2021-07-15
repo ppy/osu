@@ -19,7 +19,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public class MultiplayerRoomManager : RoomManager
     {
         [Resolved]
-        private StatefulMultiplayerClient multiplayerClient { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; }
 
         public readonly Bindable<double> TimeBetweenListingPolls = new Bindable<double>();
         public readonly Bindable<double> TimeBetweenSelectionPolls = new Bindable<double>();

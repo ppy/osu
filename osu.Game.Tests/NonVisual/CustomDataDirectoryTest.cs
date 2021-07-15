@@ -142,7 +142,10 @@ namespace osu.Game.Tests.NonVisual
 
                     foreach (var file in osuStorage.IgnoreFiles)
                     {
-                        Assert.That(File.Exists(Path.Combine(originalDirectory, file)));
+                        // avoid touching realm files which may be a pipe and break everything.
+                        // this is also done locally inside OsuStorage via the IgnoreFiles list.
+                        if (file.EndsWith(".ini", StringComparison.Ordinal))
+                            Assert.That(File.Exists(Path.Combine(originalDirectory, file)));
                         Assert.That(storage.Exists(file), Is.False);
                     }
 
@@ -180,6 +183,9 @@ namespace osu.Game.Tests.NonVisual
 
                     Assert.DoesNotThrow(() => osu.Migrate(customPath2));
                     Assert.That(File.Exists(Path.Combine(customPath2, database_filename)));
+
+                    // some files may have been left behind for whatever reason, but that's not what we're testing here.
+                    customPath = prepareCustomPath();
 
                     Assert.DoesNotThrow(() => osu.Migrate(customPath));
                     Assert.That(File.Exists(Path.Combine(customPath, database_filename)));

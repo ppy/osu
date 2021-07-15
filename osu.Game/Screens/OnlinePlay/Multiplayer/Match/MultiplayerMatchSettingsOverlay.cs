@@ -59,7 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private IRoomManager manager { get; set; }
 
             [Resolved]
-            private StatefulMultiplayerClient client { get; set; }
+            private MultiplayerClient client { get; set; }
 
             [Resolved]
             private Bindable<Room> currentRoom { get; set; }
@@ -93,7 +93,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                         RelativeSizeAxes = Axes.Both,
                         RowDimensions = new[]
                         {
-                            new Dimension(GridSizeMode.Distributed),
+                            new Dimension(),
                             new Dimension(GridSizeMode.AutoSize),
                         },
                         Content = new[]

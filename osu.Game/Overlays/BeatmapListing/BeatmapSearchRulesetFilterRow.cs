@@ -3,6 +3,8 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.BeatmapListing
@@ -10,7 +12,7 @@ namespace osu.Game.Overlays.BeatmapListing
     public class BeatmapSearchRulesetFilterRow : BeatmapSearchFilterRow<RulesetInfo>
     {
         public BeatmapSearchRulesetFilterRow()
-            : base(@"Mode")
+            : base(BeatmapsStrings.ListingSearchFiltersMode)
         {
         }
 
@@ -21,13 +23,20 @@ namespace osu.Game.Overlays.BeatmapListing
             [BackgroundDependencyLoader]
             private void load(RulesetStore rulesets)
             {
-                AddItem(new RulesetInfo
-                {
-                    Name = @"Any"
-                });
+                AddTabItem(new RulesetFilterTabItemAny());
 
                 foreach (var r in rulesets.AvailableRulesets)
                     AddItem(r);
+            }
+        }
+
+        private class RulesetFilterTabItemAny : FilterTabItem<RulesetInfo>
+        {
+            protected override LocalisableString LabelFor(RulesetInfo info) => BeatmapsStrings.ModeAny;
+
+            public RulesetFilterTabItemAny()
+                : base(new RulesetInfo())
+            {
             }
         }
     }

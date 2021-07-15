@@ -4,10 +4,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
@@ -21,12 +19,6 @@ namespace osu.Game.Rulesets.Catch.Tests
 {
     public class TestSceneCatchModHidden : ModTestScene
     {
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            LocalConfig.SetValue(OsuSetting.IncreaseFirstObjectVisibility, false);
-        }
-
         [Test]
         public void TestJuiceStream()
         {

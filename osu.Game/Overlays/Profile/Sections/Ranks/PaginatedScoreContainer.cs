@@ -18,8 +18,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
     {
         private readonly ScoreType type;
 
-        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string headerText, CounterVisibilityState counterVisibilityState, string missingText = "")
-            : base(user, headerText, missingText, counterVisibilityState)
+        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string headerText)
+            : base(user, headerText)
         {
             this.type = type;
 
@@ -36,8 +36,14 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         {
             switch (type)
             {
+                case ScoreType.Best:
+                    return user.ScoresBestCount;
+
                 case ScoreType.Firsts:
                     return user.ScoresFirstCount;
+
+                case ScoreType.Recent:
+                    return user.ScoresRecentCount;
 
                 default:
                     return 0;
@@ -50,9 +56,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 drawableItemIndex = 0;
 
             base.OnItemsReceived(items);
-
-            if (type == ScoreType.Recent)
-                SetCount(items.Count);
         }
 
         protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>
