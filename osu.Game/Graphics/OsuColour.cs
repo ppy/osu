@@ -69,25 +69,18 @@ namespace osu.Game.Graphics
             }
         }
 
-        public Color4 ForStarDifficulty(double starDifficulty)
+        public Color4 ForStarDifficulty(double starDifficulty) => ColourUtils.SampleFromLinearGradient(new[]
         {
-            var spectrumPoint = (float)(starDifficulty / 8.00);
-
-            if (spectrumPoint > 1f)
-                return Color4.Black;
-
-            return ColourUtils.SampleFromLinearGradient(new[]
-            {
-                (0.2159f, Color4Extensions.FromHex("4fc0ff")),
-                (0.2693f, Color4Extensions.FromHex("4fffd5")),
-                (0.3217f, Color4Extensions.FromHex("7cff4f")),
-                (0.4111f, Color4Extensions.FromHex("f6f05c")),
-                (0.5767f, Color4Extensions.FromHex("ff8068")),
-                (0.7307f, Color4Extensions.FromHex("ff3c71")),
-                (0.8667f, Color4Extensions.FromHex("6563de")),
-                (0.9996f, Color4Extensions.FromHex("18158e")),
-            }, spectrumPoint);
-        }
+            (1.5f, Color4Extensions.FromHex("4fc0ff")),
+            (2.0f, Color4Extensions.FromHex("4fffd5")),
+            (2.5f, Color4Extensions.FromHex("7cff4f")),
+            (3.25f, Color4Extensions.FromHex("f6f05c")),
+            (4.5f, Color4Extensions.FromHex("ff8068")),
+            (6.0f, Color4Extensions.FromHex("ff3c71")),
+            (7.0f, Color4Extensions.FromHex("6563de")),
+            (8.0f, Color4Extensions.FromHex("18158e")),
+            (8.0f, Color4.Black),
+        }, (float)starDifficulty);
 
         /// <summary>
         /// Retrieves the colour for a <see cref="ScoreRank"/>.
