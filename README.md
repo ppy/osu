@@ -11,7 +11,7 @@
 
 A free-to-win rhythm game. Rhythm is just a *click* away!
 
-The future of [osu!](https://osu.ppy.sh) and the beginning of an open era! Commonly known by the codename *osu!lazer*. Pew pew.
+The future of [osu!](https://osu.ppy.sh) and the beginning of an open era! Currently known by and released under the codename "*lazer*". As in sharper than cutting-edge.
 
 ## Status
 
@@ -23,7 +23,7 @@ We are accepting bug reports (please report with as much detail as possible and 
 
 - Detailed release changelogs are available on the [official osu! site](https://osu.ppy.sh/home/changelog/lazer).
 - You can learn more about our approach to [project management](https://github.com/ppy/osu/wiki/Project-management).
-- Read peppy's [latest blog post](https://blog.ppy.sh/a-definitive-lazer-faq/) exploring where lazer is currently and the roadmap going forward.
+- Read peppy's [blog post](https://blog.ppy.sh/a-definitive-lazer-faq/) exploring where the project is currently and the roadmap going forward.
 
 ## Running osu!
 

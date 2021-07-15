@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override Container<Drawable> Content => content;
 
-        protected virtual HoverClickSounds CreateHoverClickSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet);
+        protected virtual HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet);
 
         public OsuClickableContainer(HoverSampleSet sampleSet = HoverSampleSet.Default)
         {
@@ -39,7 +39,7 @@ namespace osu.Game.Graphics.Containers
             InternalChildren = new Drawable[]
             {
                 content,
-                CreateHoverClickSounds(sampleSet)
+                CreateHoverSounds(sampleSet)
             };
         }
     }

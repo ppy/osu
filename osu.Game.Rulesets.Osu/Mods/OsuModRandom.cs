@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -25,6 +25,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "It never gets boring!";
 
         private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
+
+        /// <summary>
+        /// Number of previous hitobjects to be shifted together when another object is being moved.
+        /// </summary>
+        private const int preceding_hitobjects_to_shift = 10;
 
         private Random rng;
 
@@ -49,8 +54,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 var current = new RandomObjectInfo(hitObject);
 
-                // rateOfChangeMultiplier only changes every i iterations to prevent shaky-line-shaped streams
-                if (i % 3 == 0)
+                // rateOfChangeMultiplier only changes every 5 iterations in a combo
+                // to prevent shaky-line-shaped streams
+                if (hitObject.IndexInCurrentCombo % 5 == 0)
                     rateOfChangeMultiplier = (float)rng.NextDouble() * 2 - 1;
 
                 if (hitObject is Spinner)
@@ -61,13 +67,35 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 applyRandomisation(rateOfChangeMultiplier, previous, current);
 
-                hitObject.Position = current.PositionRandomised;
+                // Move hit objects back into the playfield if they are outside of it
+                Vector2 shift = Vector2.Zero;
 
-                // update end position as it may have changed as a result of the position update.
-                current.EndPositionRandomised = current.PositionRandomised;
+                switch (hitObject)
+                {
+                    case HitCircle circle:
+                        shift = clampHitCircleToPlayfield(circle, current);
+                        break;
 
-                if (hitObject is Slider slider)
-                    moveSliderIntoPlayfield(slider, current);
+                    case Slider slider:
+                        shift = clampSliderToPlayfield(slider, current);
+                        break;
+                }
+
+                if (shift != Vector2.Zero)
+                {
+                    var toBeShifted = new List<OsuHitObject>();
+
+                    for (int j = i - 1; j >= i - preceding_hitobjects_to_shift && j >= 0; j--)
+                    {
+                        // only shift hit circles
+                        if (!(hitObjects[j] is HitCircle)) break;
+
+                        toBeShifted.Add(hitObjects[j]);
+                    }
+
+                    if (toBeShifted.Count > 0)
+                        applyDecreasingShift(toBeShifted, shift);
+                }
 
                 previous = current;
             }
@@ -94,7 +122,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             // The max. angle (relative to the angle of the vector pointing from the 2nd last to the last hit object)
             // is proportional to the distance between the last and the current hit object
             // to allow jumps and prevent too sharp turns during streams.
-            var randomAngleRad = rateOfChangeMultiplier * 2 * Math.PI * distanceToPrev / playfield_diagonal;
+
+            // Allow maximum jump angle when jump distance is more than half of playfield diagonal length
+            var randomAngleRad = rateOfChangeMultiplier * 2 * Math.PI * Math.Min(1f, distanceToPrev / (playfield_diagonal * 0.5f));
 
             current.AngleRad = (float)randomAngleRad + previous.AngleRad;
             if (current.AngleRad < 0)
@@ -109,56 +139,120 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             current.AngleRad = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
 
-            var position = previous.EndPositionRandomised + posRelativeToPrev;
+            current.PositionRandomised = previous.EndPositionRandomised + posRelativeToPrev;
+        }
 
-            // Move hit objects back into the playfield if they are outside of it,
-            // which would sometimes happen during big jumps otherwise.
-            position.X = MathHelper.Clamp(position.X, 0, OsuPlayfield.BASE_SIZE.X);
-            position.Y = MathHelper.Clamp(position.Y, 0, OsuPlayfield.BASE_SIZE.Y);
+        /// <summary>
+        /// Move the randomised position of a hit circle so that it fits inside the playfield.
+        /// </summary>
+        /// <returns>The deviation from the original randomised position in order to fit within the playfield.</returns>
+        private Vector2 clampHitCircleToPlayfield(HitCircle circle, RandomObjectInfo objectInfo)
+        {
+            var previousPosition = objectInfo.PositionRandomised;
+            objectInfo.EndPositionRandomised = objectInfo.PositionRandomised = clampToPlayfieldWithPadding(
+                objectInfo.PositionRandomised,
+                (float)circle.Radius
+            );
 
-            current.PositionRandomised = position;
+            circle.Position = objectInfo.PositionRandomised;
+
+            return objectInfo.PositionRandomised - previousPosition;
         }
 
         /// <summary>
         /// Moves the <see cref="Slider"/> and all necessary nested <see cref="OsuHitObject"/>s into the <see cref="OsuPlayfield"/> if they aren't already.
         /// </summary>
-        private void moveSliderIntoPlayfield(Slider slider, RandomObjectInfo currentObjectInfo)
+        /// <returns>The deviation from the original randomised position in order to fit within the playfield.</returns>
+        private Vector2 clampSliderToPlayfield(Slider slider, RandomObjectInfo objectInfo)
         {
-            var minMargin = getMinSliderMargin(slider);
+            var possibleMovementBounds = calculatePossibleMovementBounds(slider);
 
-            slider.Position = new Vector2(
-                Math.Clamp(slider.Position.X, minMargin.Left, OsuPlayfield.BASE_SIZE.X - minMargin.Right),
-                Math.Clamp(slider.Position.Y, minMargin.Top, OsuPlayfield.BASE_SIZE.Y - minMargin.Bottom)
-            );
+            var previousPosition = objectInfo.PositionRandomised;
 
-            currentObjectInfo.PositionRandomised = slider.Position;
-            currentObjectInfo.EndPositionRandomised = slider.EndPosition;
+            // Clamp slider position to the placement area
+            // If the slider is larger than the playfield, force it to stay at the original position
+            var newX = possibleMovementBounds.Width < 0
+                ? objectInfo.PositionOriginal.X
+                : Math.Clamp(previousPosition.X, possibleMovementBounds.Left, possibleMovementBounds.Right);
 
-            shiftNestedObjects(slider, currentObjectInfo.PositionRandomised - currentObjectInfo.PositionOriginal);
+            var newY = possibleMovementBounds.Height < 0
+                ? objectInfo.PositionOriginal.Y
+                : Math.Clamp(previousPosition.Y, possibleMovementBounds.Top, possibleMovementBounds.Bottom);
+
+            slider.Position = objectInfo.PositionRandomised = new Vector2(newX, newY);
+            objectInfo.EndPositionRandomised = slider.EndPosition;
+
+            shiftNestedObjects(slider, objectInfo.PositionRandomised - objectInfo.PositionOriginal);
+
+            return objectInfo.PositionRandomised - previousPosition;
         }
 
         /// <summary>
-        /// Calculates the min. distances from the <see cref="Slider"/>'s position to the playfield border for the slider to be fully inside of the playfield.
+        /// Decreasingly shift a list of <see cref="OsuHitObject"/>s by a specified amount.
+        /// The first item in the list is shifted by the largest amount, while the last item is shifted by the smallest amount.
         /// </summary>
-        private MarginPadding getMinSliderMargin(Slider slider)
+        /// <param name="hitObjects">The list of hit objects to be shifted.</param>
+        /// <param name="shift">The amount to be shifted.</param>
+        private void applyDecreasingShift(IList<OsuHitObject> hitObjects, Vector2 shift)
+        {
+            for (int i = 0; i < hitObjects.Count; i++)
+            {
+                var hitObject = hitObjects[i];
+                // The first object is shifted by a vector slightly smaller than shift
+                // The last object is shifted by a vector slightly larger than zero
+                Vector2 position = hitObject.Position + shift * ((hitObjects.Count - i) / (float)(hitObjects.Count + 1));
+
+                hitObject.Position = clampToPlayfieldWithPadding(position, (float)hitObject.Radius);
+            }
+        }
+
+        /// <summary>
+        /// Calculates a <see cref="RectangleF"/> which contains all of the possible movements of the slider (in relative X/Y coordinates)
+        /// such that the entire slider is inside the playfield.
+        /// </summary>
+        /// <remarks>
+        /// If the slider is larger than the playfield, the returned <see cref="RectangleF"/> may have negative width/height.
+        /// </remarks>
+        private RectangleF calculatePossibleMovementBounds(Slider slider)
         {
             var pathPositions = new List<Vector2>();
             slider.Path.GetPathToProgress(pathPositions, 0, 1);
 
-            var minMargin = new MarginPadding();
+            float minX = float.PositiveInfinity;
+            float maxX = float.NegativeInfinity;
 
+            float minY = float.PositiveInfinity;
+            float maxY = float.NegativeInfinity;
+
+            // Compute the bounding box of the slider.
             foreach (var pos in pathPositions)
             {
-                minMargin.Left = Math.Max(minMargin.Left, -pos.X);
-                minMargin.Right = Math.Max(minMargin.Right, pos.X);
-                minMargin.Top = Math.Max(minMargin.Top, -pos.Y);
-                minMargin.Bottom = Math.Max(minMargin.Bottom, pos.Y);
+                minX = MathF.Min(minX, pos.X);
+                maxX = MathF.Max(maxX, pos.X);
+
+                minY = MathF.Min(minY, pos.Y);
+                maxY = MathF.Max(maxY, pos.Y);
             }
 
-            minMargin.Left = Math.Min(minMargin.Left, OsuPlayfield.BASE_SIZE.X - minMargin.Right);
-            minMargin.Top = Math.Min(minMargin.Top, OsuPlayfield.BASE_SIZE.Y - minMargin.Bottom);
+            // Take the circle radius into account.
+            var radius = (float)slider.Radius;
 
-            return minMargin;
+            minX -= radius;
+            minY -= radius;
+
+            maxX += radius;
+            maxY += radius;
+
+            // Given the bounding box of the slider (via min/max X/Y),
+            // the amount that the slider can move to the left is minX (with the sign flipped, since positive X is to the right),
+            // and the amount that it can move to the right is WIDTH - maxX.
+            // Same calculation applies for the Y axis.
+            float left = -minX;
+            float right = OsuPlayfield.BASE_SIZE.X - maxX;
+            float top = -minY;
+            float bottom = OsuPlayfield.BASE_SIZE.Y - maxY;
+
+            return new RectangleF(left, top, right - left, bottom - top);
         }
 
         /// <summary>
@@ -175,6 +269,20 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 osuHitObject.Position += shift;
             }
+        }
+
+        /// <summary>
+        /// Clamp a position to playfield, keeping a specified distance from the edges.
+        /// </summary>
+        /// <param name="position">The position to be clamped.</param>
+        /// <param name="padding">The minimum distance allowed from playfield edges.</param>
+        /// <returns>The clamped position.</returns>
+        private Vector2 clampToPlayfieldWithPadding(Vector2 position, float padding)
+        {
+            return new Vector2(
+                Math.Clamp(position.X, padding, OsuPlayfield.BASE_SIZE.X - padding),
+                Math.Clamp(position.Y, padding, OsuPlayfield.BASE_SIZE.Y - padding)
+            );
         }
 
         private class RandomObjectInfo

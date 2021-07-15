@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (drawable)
             {
                 case DrawableHitCircle circle:
-                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
                     {
                         circle.ApproachCircle.Hide();
 

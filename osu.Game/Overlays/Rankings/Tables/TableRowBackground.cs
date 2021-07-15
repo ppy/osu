@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -22,10 +22,10 @@ namespace osu.Game.Overlays.Rankings.Tables
         public TableRowBackground()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 25;
 
-            CornerRadius = 3;
+            CornerRadius = 4;
             Masking = true;
+            MaskingSmoothness = 0.5f;
 
             InternalChild = background = new Box
             {

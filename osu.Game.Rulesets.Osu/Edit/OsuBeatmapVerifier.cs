@@ -15,10 +15,12 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             // Compose
             new CheckOffscreenObjects(),
+            new CheckTooShortSpinners(),
 
             // Spread
             new CheckTimeDistanceEquality(),
-            new CheckLowDiffOverlaps()
+            new CheckLowDiffOverlaps(),
+            new CheckTooShortSliders(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

@@ -7,7 +7,7 @@ namespace osu.Game.Localisation
 {
     public static class NotificationsStrings
     {
-        private const string prefix = @"osu.Game.Localisation.Notifications";
+        private const string prefix = @"osu.Game.Resources.Localisation.Notifications";
 
         /// <summary>
         /// "notifications"

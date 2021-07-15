@@ -122,10 +122,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestToggleWhenIdle(MultiplayerUserState initialState)
         {
             addClickSpectateButtonStep();
-            AddAssert("user is spectating", () => Client.Room?.Users[0].State == MultiplayerUserState.Spectating);
+            AddUntilStep("user is spectating", () => Client.Room?.Users[0].State == MultiplayerUserState.Spectating);
 
             addClickSpectateButtonStep();
-            AddAssert("user is idle", () => Client.Room?.Users[0].State == MultiplayerUserState.Idle);
+            AddUntilStep("user is idle", () => Client.Room?.Users[0].State == MultiplayerUserState.Idle);
         }
 
         [TestCase(MultiplayerRoomState.Closed)]
@@ -174,9 +174,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         });
 
         private void assertSpectateButtonEnablement(bool shouldBeEnabled)
-            => AddAssert($"spectate button {(shouldBeEnabled ? "is" : "is not")} enabled", () => spectateButton.ChildrenOfType<OsuButton>().Single().Enabled.Value == shouldBeEnabled);
+            => AddUntilStep($"spectate button {(shouldBeEnabled ? "is" : "is not")} enabled", () => spectateButton.ChildrenOfType<OsuButton>().Single().Enabled.Value == shouldBeEnabled);
 
         private void assertReadyButtonEnablement(bool shouldBeEnabled)
-            => AddAssert($"ready button {(shouldBeEnabled ? "is" : "is not")} enabled", () => readyButton.ChildrenOfType<OsuButton>().Single().Enabled.Value == shouldBeEnabled);
+            => AddUntilStep($"ready button {(shouldBeEnabled ? "is" : "is not")} enabled", () => readyButton.ChildrenOfType<OsuButton>().Single().Enabled.Value == shouldBeEnabled);
     }
 }

@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     ColumnDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.Distributed)
+                        new Dimension()
                     },
                     Content = new[]
                     {
