@@ -10,6 +10,7 @@ using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -17,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     {
         private readonly MouseHandler mouseHandler;
 
-        protected override string Header => "Mouse";
+        protected override LocalisableString Header => MouseSettingsStrings.Mouse;
 
         private Bindable<double> handlerSensitivity;
 

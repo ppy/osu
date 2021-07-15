@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Handlers.Tablet;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
@@ -52,7 +53,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private OsuSpriteText noTabletMessage;
 
-        protected override string Header => "Tablet";
+        protected override LocalisableString Header => "Tablet";
 
         public TabletSettings(ITabletHandler tabletHandler)
         {
