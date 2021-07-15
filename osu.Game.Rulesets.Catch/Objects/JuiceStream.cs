@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Newtonsoft.Json;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -25,7 +26,10 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public int RepeatCount { get; set; }
 
+        [JsonIgnore]
         public double Velocity { get; private set; }
+
+        [JsonIgnore]
         public double TickDistance { get; private set; }
 
         /// <summary>
@@ -113,6 +117,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public float EndX => OriginalX + this.CurvePositionAt(1).X;
 
+        [JsonIgnore]
         public double Duration
         {
             get => this.SpanCount() * Path.Distance / Velocity;

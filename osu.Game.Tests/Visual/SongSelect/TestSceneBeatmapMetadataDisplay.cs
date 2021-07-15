@@ -31,10 +31,11 @@ namespace osu.Game.Tests.Visual.SongSelect
         private readonly TestBeatmapDifficultyCache testDifficultyCache = new TestBeatmapDifficultyCache();
 
         [Test]
-        public void TestLocal([Values("Beatmap", "Some long title and stuff")]
-                              string title,
-                              [Values("Trial", "Some1's very hardest difficulty")]
-                              string version)
+        public void TestLocal(
+            [Values("Beatmap", "Some long title and stuff")]
+            string title,
+            [Values("Trial", "Some1's very hardest difficulty")]
+            string version)
         {
             showMetadataForBeatmap(() => CreateWorkingBeatmap(new Beatmap
             {

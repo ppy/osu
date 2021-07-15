@@ -234,7 +234,7 @@ namespace osu.Game.Screens.Ranking
             bool topLayerExpanded = topLayerContainer.Y < 0;
 
             // If the top layer was already expanded, then we don't need to wait for the resize and can instead transform immediately. This looks better when changing the panel state.
-            using (BeginDelayedSequence(topLayerExpanded ? 0 : RESIZE_DURATION + TOP_LAYER_EXPAND_DELAY, true))
+            using (BeginDelayedSequence(topLayerExpanded ? 0 : RESIZE_DURATION + TOP_LAYER_EXPAND_DELAY))
             {
                 topLayerContainer.FadeIn();
 

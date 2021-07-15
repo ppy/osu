@@ -191,7 +191,7 @@ namespace osu.Game.Screens
                 boxContainer.ScaleTo(0.2f);
                 boxContainer.RotateTo(-20);
 
-                using (BeginDelayedSequence(300, true))
+                using (BeginDelayedSequence(300))
                 {
                     boxContainer.ScaleTo(1, transition_time, Easing.OutElastic);
                     boxContainer.RotateTo(0, transition_time / 2, Easing.OutQuint);

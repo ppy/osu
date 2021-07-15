@@ -55,20 +55,27 @@ namespace osu.Game.Screens.Play.HUD
 
             foreach (var userId in playingUsers)
             {
-                // probably won't be required in the final implementation.
-                var resolvedUser = userLookupCache.GetUserAsync(userId).Result;
-
                 var trackedUser = CreateUserData(userId, scoreProcessor);
                 trackedUser.ScoringMode.BindTo(scoringMode);
-
-                var leaderboardScore = AddPlayer(resolvedUser, resolvedUser?.Id == api.LocalUser.Value.Id);
-                leaderboardScore.Accuracy.BindTo(trackedUser.Accuracy);
-                leaderboardScore.TotalScore.BindTo(trackedUser.Score);
-                leaderboardScore.Combo.BindTo(trackedUser.CurrentCombo);
-                leaderboardScore.HasQuit.BindTo(trackedUser.UserQuit);
-
                 UserScores[userId] = trackedUser;
             }
+
+            userLookupCache.GetUsersAsync(playingUsers.ToArray()).ContinueWith(users => Schedule(() =>
+            {
+                foreach (var user in users.Result)
+                {
+                    if (user == null)
+                        continue;
+
+                    var trackedUser = UserScores[user.Id];
+
+                    var leaderboardScore = AddPlayer(user, user.Id == api.LocalUser.Value.Id);
+                    leaderboardScore.Accuracy.BindTo(trackedUser.Accuracy);
+                    leaderboardScore.TotalScore.BindTo(trackedUser.Score);
+                    leaderboardScore.Combo.BindTo(trackedUser.CurrentCombo);
+                    leaderboardScore.HasQuit.BindTo(trackedUser.UserQuit);
+                }
+            }));
         }
 
         protected override void LoadComplete()
@@ -84,6 +91,8 @@ namespace osu.Game.Screens.Play.HUD
                     usersChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new[] { userId }));
             }
 
+            // bind here is to support players leaving the match.
+            // new players are not supported.
             playingUsers.BindTo(multiplayerClient.CurrentMatchPlayingUserIds);
             playingUsers.BindCollectionChanged(usersChanged);
 

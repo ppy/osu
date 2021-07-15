@@ -20,15 +20,26 @@ namespace osu.Game.Overlays
     {
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
-        private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
-
         // this is done to ensure a click on this button doesn't trigger focus on a parent element which contains the button.
         public override bool AcceptsFocus => true;
 
+        // this is intentionally not using BindableWithCurrent, as it can use the wrong IsDefault implementation when passed a BindableNumber.
+        // using GetBoundCopy() ensures that the received bindable is of the exact same type as the source bindable and uses the proper IsDefault implementation.
+        private Bindable<T> current;
+
         public Bindable<T> Current
         {
-            get => current.Current;
-            set => current.Current = value;
+            get => current;
+            set
+            {
+                current?.UnbindAll();
+                current = value.GetBoundCopy();
+
+                current.ValueChanged += _ => UpdateState();
+                current.DefaultChanged += _ => UpdateState();
+                current.DisabledChanged += _ => UpdateState();
+                UpdateState();
+            }
         }
 
         private Color4 buttonColour;
@@ -62,18 +73,14 @@ namespace osu.Game.Overlays
 
             Action += () =>
             {
-                if (!current.Disabled) current.SetDefault();
+                if (!current.Disabled)
+                    current.SetDefault();
             };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            Current.ValueChanged += _ => UpdateState();
-            Current.DisabledChanged += _ => UpdateState();
-            Current.DefaultChanged += _ => UpdateState();
-
             UpdateState();
         }
 
