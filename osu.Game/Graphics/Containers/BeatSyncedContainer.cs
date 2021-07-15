@@ -97,7 +97,7 @@ namespace osu.Game.Graphics.Containers
             if (clock == null)
                 return;
 
-            double currentTrackTime = clock.CurrentTime + EarlyActivationMilliseconds;
+            double currentTrackTime = clock.CurrentTime;
 
             if (Beatmap.Value.TrackLoaded && Beatmap.Value.BeatmapLoaded)
             {
@@ -123,7 +123,7 @@ namespace osu.Game.Graphics.Containers
                 effectPoint = EffectControlPoint.DEFAULT;
             }
 
-            Debug.Assert(timingPoint != null);
+            currentTrackTime += EarlyActivationMilliseconds;
 
             double beatLength = timingPoint.BeatLength / Divisor;
 
