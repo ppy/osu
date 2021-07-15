@@ -21,6 +21,8 @@ namespace osu.Game.Graphics.Containers
     /// This container does not set its own clock to the source used for beat matching.
     /// This means that if the beat source clock is playing faster or slower, animations may unexpectedly overlap.
     /// Make sure this container's Clock is also set to the expected source (or within a parent element which provides this).
+    ///
+    /// This container will also trigger beat events when the beat matching clock is paused at <see cref="TimingControlPoint.DEFAULT"/>'s BPM.
     /// </remarks>
     public class BeatSyncedContainer : Container
     {
@@ -53,6 +55,9 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public double MinimumBeatLength { get; set; }
 
+        /// <summary>
+        /// Whether this container is currently tracking a beatmap's timing data.
+        /// </summary>
         protected bool IsBeatSyncedWithTrack { get; private set; }
 
         protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
@@ -84,15 +89,15 @@ namespace osu.Game.Graphics.Containers
             ITrack track = null;
             IBeatmap beatmap = null;
 
-            double currentTrackTime = 0;
+            TimingControlPoint timingPoint;
+            EffectControlPoint effectPoint;
 
-            TimingControlPoint timingPoint = null;
-            EffectControlPoint effectPoint = null;
-
-            var clock = BeatSyncClock;
+            IClock clock = BeatSyncClock;
 
             if (clock == null)
                 return;
+
+            double currentTrackTime = clock.CurrentTime + EarlyActivationMilliseconds;
 
             if (Beatmap.Value.TrackLoaded && Beatmap.Value.BeatmapLoaded)
             {
@@ -100,19 +105,20 @@ namespace osu.Game.Graphics.Containers
                 beatmap = Beatmap.Value.Beatmap;
             }
 
-            if (track != null && beatmap != null && clock.IsRunning && track.Length > 0)
+            IsBeatSyncedWithTrack = beatmap != null && clock.IsRunning && track?.Length > 0;
+
+            if (IsBeatSyncedWithTrack)
             {
-                currentTrackTime = clock.CurrentTime + EarlyActivationMilliseconds;
+                Debug.Assert(beatmap != null);
 
                 timingPoint = beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
                 effectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
             }
-
-            IsBeatSyncedWithTrack = timingPoint?.BeatLength > 0;
-
-            if (!IsBeatSyncedWithTrack)
+            else
             {
-                currentTrackTime = clock.CurrentTime;
+                // this may be the case where the beat syncing clock has been paused.
+                // we still want to show an idle animation, so use this container's time instead.
+                currentTrackTime = Clock.CurrentTime;
                 timingPoint = TimingControlPoint.DEFAULT;
                 effectPoint = EffectControlPoint.DEFAULT;
             }
