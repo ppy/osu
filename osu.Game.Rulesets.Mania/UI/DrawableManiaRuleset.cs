@@ -33,12 +33,12 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// The minimum time range. This occurs at a <see cref="relativeTimeRange"/> of 40.
         /// </summary>
-        public const double MIN_TIME_RANGE = 340;
+        public const double MIN_TIME_RANGE = 290;
 
         /// <summary>
         /// The maximum time range. This occurs at a <see cref="relativeTimeRange"/> of 1.
         /// </summary>
-        public const double MAX_TIME_RANGE = 13720;
+        public const double MAX_TIME_RANGE = 11485;
 
         protected new ManiaPlayfield Playfield => (ManiaPlayfield)base.Playfield;
 
