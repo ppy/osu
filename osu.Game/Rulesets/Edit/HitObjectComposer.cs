@@ -219,7 +219,8 @@ namespace osu.Game.Rulesets.Edit
 
                 if (item != null)
                 {
-                    item.Select();
+                    if (!item.Selected.Disabled)
+                        item.Select();
                     return true;
                 }
             }
