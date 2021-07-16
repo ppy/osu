@@ -31,18 +31,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved(CanBeNull = true)]
         private Timeline timeline { get; set; }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         private DragEvent lastDragEvent;
         private Bindable<HitObject> placement;
         private SelectionBlueprint<HitObject> placementBlueprint;
 
-        private SelectableAreaBackground backgroundBox;
+        // We want children to be able to be clicked and dragged
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-        // we only care about checking vertical validity.
-        // this allows selecting and dragging selections before time=0.
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        // This drawable itself should still check whether the mouse is over it
+        private bool shouldHandleInputAt(Vector2 screenSpacePos)
         {
             float localY = ToLocalSpace(screenSpacePos).Y;
             return DrawRectangle.Top <= localY && DrawRectangle.Bottom >= localY;
@@ -61,7 +58,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(backgroundBox = new SelectableAreaBackground
+            AddInternal(new SelectableAreaBackground
             {
                 Colour = Color4.Black,
                 Depth = float.MaxValue,
@@ -100,16 +97,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override Container<SelectionBlueprint<HitObject>> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
 
-        protected override bool OnHover(HoverEvent e)
+        protected override bool OnDragStart(DragStartEvent e)
         {
-            backgroundBox.FadeColour(colours.BlueLighter, 120, Easing.OutQuint);
-            return base.OnHover(e);
-        }
+            if (!shouldHandleInputAt(e.ScreenSpaceMouseDownPosition))
+                return false;
 
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            backgroundBox.FadeColour(Color4.Black, 600, Easing.OutQuint);
-            base.OnHoverLost(e);
+            return base.OnDragStart(e);
         }
 
         protected override void OnDrag(DragEvent e)
@@ -184,7 +177,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             return new TimelineHitObjectBlueprint(item)
             {
-                OnDragHandled = handleScrollViaDrag
+                OnDragHandled = handleScrollViaDrag,
             };
         }
 
@@ -212,6 +205,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private class SelectableAreaBackground : CompositeDrawable
         {
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+            {
+                float localY = ToLocalSpace(screenSpacePos).Y;
+                return DrawRectangle.Top <= localY && DrawRectangle.Bottom >= localY;
+            }
+
             [BackgroundDependencyLoader]
             private void load()
             {
@@ -234,6 +233,21 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         RelativeSizeAxes = Axes.Both,
                     }
                 });
+            }
+
+            [Resolved]
+            private OsuColour colours { get; set; }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                this.FadeColour(colours.BlueLighter, 120, Easing.OutQuint);
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                this.FadeColour(Color4.Black, 600, Easing.OutQuint);
+                base.OnHoverLost(e);
             }
         }
 
