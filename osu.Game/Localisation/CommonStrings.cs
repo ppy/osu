@@ -14,6 +14,6 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Cancel => new TranslatableString(getKey(@"cancel"), @"Cancel");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

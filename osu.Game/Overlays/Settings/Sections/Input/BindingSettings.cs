@@ -2,12 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public class BindingSettings : SettingsSubsection
     {
-        protected override string Header => "Shortcut and gameplay bindings";
+        protected override LocalisableString Header => "Shortcut and gameplay bindings";
 
         public BindingSettings(KeyBindingPanel keyConfig)
         {
