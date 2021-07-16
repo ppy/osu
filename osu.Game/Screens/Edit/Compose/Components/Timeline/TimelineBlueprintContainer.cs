@@ -97,6 +97,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override Container<SelectionBlueprint<HitObject>> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
 
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            int selectionCount = SelectedItems.Count;
+
+            // We let BlueprintContainer attempt a HitObject selection
+            // If it fails, we'll pass it this input back to the timeline so it can be dragged
+            // We know it failed if the selection count is unchanged after the selection attempt
+            if (base.OnMouseDown(e) && selectionCount != SelectedItems.Count)
+                return true;
+
+            return false;
+        }
+
         protected override bool OnDragStart(DragStartEvent e)
         {
             if (!shouldHandleInputAt(e.ScreenSpaceMouseDownPosition))
