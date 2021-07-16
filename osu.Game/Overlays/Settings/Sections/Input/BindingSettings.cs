@@ -3,12 +3,13 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public class BindingSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "Shortcut and gameplay bindings";
+        protected override LocalisableString Header => BindingSettingsStrings.ShortcutAndGameplayBindings;
 
         public BindingSettings(KeyBindingPanel keyConfig)
         {
@@ -16,8 +17,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 new SettingsButton
                 {
-                    Text = "Configure",
-                    TooltipText = "change global shortcut keys and gameplay bindings",
+                    Text = BindingSettingsStrings.Configure,
+                    TooltipText = BindingSettingsStrings.ChangeBindingsButton,
                     Action = keyConfig.ToggleVisibility
                 },
             };
