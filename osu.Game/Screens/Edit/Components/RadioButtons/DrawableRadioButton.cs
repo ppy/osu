@@ -39,9 +39,9 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
 
         public DrawableRadioButton(RadioButton button)
         {
-            this.Button = button;
+            Button = button;
 
-            Text = button.Item.ToString();
+            Text = button.Label;
             Action = button.Select;
 
             RelativeSizeAxes = Axes.X;

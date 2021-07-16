@@ -72,10 +72,10 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("clear all control points", () => editorBeatmap.ControlPointInfo.Clear());
 
             AddAssert("Tool is selection", () => hitObjectComposer.ChildrenOfType<ComposeBlueprintContainer>().First().CurrentTool is SelectTool);
-            AddAssert("Hitcircle button not clickable", () => !hitObjectComposer.ChildrenOfType<DrawableRadioButton>().First(d => d.Button.Item == "HitCircle").Enabled.Value);
+            AddAssert("Hitcircle button not clickable", () => !hitObjectComposer.ChildrenOfType<DrawableRadioButton>().First(d => d.Button.Label == "HitCircle").Enabled.Value);
             AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
-            AddAssert("Hitcircle button is clickable", () => hitObjectComposer.ChildrenOfType<DrawableRadioButton>().First(d => d.Button.Item == "HitCircle").Enabled.Value);
-            AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<DrawableRadioButton>().First(d => d.Button.Item == "HitCircle").Click());
+            AddAssert("Hitcircle button is clickable", () => hitObjectComposer.ChildrenOfType<DrawableRadioButton>().First(d => d.Button.Label == "HitCircle").Enabled.Value);
+            AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<DrawableRadioButton>().First(d => d.Button.Label == "HitCircle").Click());
             AddAssert("Tool changed", () => hitObjectComposer.ChildrenOfType<ComposeBlueprintContainer>().First().CurrentTool is HitCircleCompositionTool);
         }
 
