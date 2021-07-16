@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         /// <summary>
         /// The item related to this button.
         /// </summary>
-        public object Item;
+        public string Item;
 
         /// <summary>
         /// A function which creates a drawable icon to represent this item. If null, a sane default should be used.
@@ -26,19 +26,12 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
 
         private readonly Action action;
 
-        public RadioButton(object item, Action action, Func<Drawable> createIcon = null)
+        public RadioButton(string item, Action action, Func<Drawable> createIcon = null)
         {
             Item = item;
             CreateIcon = createIcon;
             this.action = action;
             Selected = new BindableBool();
-        }
-
-        public RadioButton(string item)
-            : this(item, null)
-        {
-            Item = item;
-            action = null;
         }
 
         /// <summary>
