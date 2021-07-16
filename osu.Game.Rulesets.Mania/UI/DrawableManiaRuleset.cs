@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override ScrollVisualisationMethod VisualisationMethod => scrollMethod;
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
-        private readonly Bindable<double> configTimeRange = new BindableDouble();
+        private readonly BindableDouble configTimeRange = new BindableDouble();
 
         // Stores the current speed adjustment active in gameplay.
         private readonly Track speedAdjustmentTrack = new TrackVirtual(0);
@@ -103,6 +103,8 @@ namespace osu.Game.Rulesets.Mania.UI
             configDirection.BindValueChanged(direction => Direction.Value = (ScrollingDirection)direction.NewValue, true);
 
             Config.BindWith(ManiaRulesetSetting.ScrollTime, configTimeRange);
+            TimeRange.MinValue = configTimeRange.MinValue;
+            TimeRange.MaxValue = configTimeRange.MaxValue;
         }
 
         protected override void AdjustScrollSpeed(int amount)
