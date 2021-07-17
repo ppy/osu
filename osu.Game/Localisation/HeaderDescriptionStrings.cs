@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Changelog => new TranslatableString(getKey(@"changelog"), @"track recent dev updates in the osu! ecosystem");
 
         /// <summary>
+        /// "view your friends and other information"
+        /// </summary>
+        public static LocalisableString Dashboard => new TranslatableString(getKey(@"dashboard"), @"view your friends and other information");
+
+        /// <summary>
         /// "find out who's the best right now"
         /// </summary>
         public static LocalisableString Rankings => new TranslatableString(getKey(@"rankings"), @"find out who's the best right now");
