@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -19,8 +20,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         private const float panel_padding = 10f;
         private readonly BeatmapSetType type;
 
-        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string headerText)
-            : base(user, headerText)
+        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, LocalisableString headerText)
+            : base(user, headerText, null)
         {
             this.type = type;
             ItemsPerPage = 6;
