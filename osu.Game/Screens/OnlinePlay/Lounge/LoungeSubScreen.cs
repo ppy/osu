@@ -6,6 +6,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -151,24 +152,29 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             onReturning();
         }
 
-        private void onReturning()
-        {
-            filter.HoldFocus = true;
-        }
-
         public override bool OnExiting(IScreen next)
         {
-            filter.HoldFocus = false;
+            onLeaving();
             return base.OnExiting(next);
         }
 
         public override void OnSuspending(IScreen next)
         {
+            onLeaving();
             base.OnSuspending(next);
+        }
+
+        private void onReturning()
+        {
+            filter.HoldFocus = true;
+        }
+
+        private void onLeaving()
+        {
             filter.HoldFocus = false;
 
             // ensure any password prompt is dismissed.
-            roomsContainer.HideAnyPopovers();
+            this.HidePopover();
         }
 
         public void Join(Room room, string password)
