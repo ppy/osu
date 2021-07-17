@@ -10,6 +10,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 using osuTK.Graphics;
 
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         public LevelProgressBar()
         {
-            TooltipText = "progress to next level";
+            TooltipText = UsersStrings.ShowStatsLevelProgress;
         }
 
         [BackgroundDependencyLoader]
