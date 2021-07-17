@@ -3,6 +3,9 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -60,7 +63,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
             AddStep("select room", () => InputManager.Key(Key.Down));
             AddStep("attempt join room", () => InputManager.Key(Key.Enter));
-            AddUntilStep("password prompt appeared", () => (passwordEntryPopover = loungeScreen.ChildrenOfType<DrawableRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
+            AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
             AddStep("enter password in text box", () => passwordEntryPopover.ChildrenOfType<TextBox>().First().Text = "password");
             AddStep("press join room button", () => passwordEntryPopover.ChildrenOfType<OsuButton>().First().Click());
 

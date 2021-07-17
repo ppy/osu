@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing.Input;
 using osu.Game.Graphics.Cursor;
@@ -35,8 +36,9 @@ namespace osu.Game.Tests.Visual
             MenuCursorContainer cursorContainer;
 
             CompositeDrawable mainContent =
-                (cursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both })
-                .WithChild(content = new OsuTooltipContainer(cursorContainer.Cursor) { RelativeSizeAxes = Axes.Both });
+                new PopoverContainer { RelativeSizeAxes = Axes.Both }
+                    .WithChild(cursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both })
+                    .WithChild(content = new OsuTooltipContainer(cursorContainer.Cursor) { RelativeSizeAxes = Axes.Both });
 
             if (CreateNestedActionContainer)
             {
