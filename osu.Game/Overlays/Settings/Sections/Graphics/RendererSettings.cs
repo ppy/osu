@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
 
@@ -11,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
     public class RendererSettings : SettingsSubsection
     {
-        protected override string Header => "Renderer";
+        protected override LocalisableString Header => "Renderer";
 
         private SettingsEnumDropdown<FrameSync> frameLimiterDropdown;
 
