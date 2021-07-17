@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 
@@ -160,7 +161,12 @@ namespace osu.Game.Graphics.UserInterface
                         Margin = new MarginPadding { Top = 5, Bottom = 5 },
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
-                        Text = (value as IHasDescription)?.Description ?? (value as Enum)?.GetLocalisableDescription() ?? value.ToString(),
+                        Text = value switch{
+                            IHasDescription desc => desc?.Description,
+                            Enum e => e.GetLocalisableDescription(),
+                            LocalisableString l => l,
+                            var other => other.ToString()
+                        },
                         Font = OsuFont.GetFont(size: 14)
                     },
                     Bar = new Box
