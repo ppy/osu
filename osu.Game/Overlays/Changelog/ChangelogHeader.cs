@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Resources.Localisation.Web;
 
@@ -117,7 +118,7 @@ namespace osu.Game.Overlays.Changelog
             public ChangelogHeaderTitle()
             {
                 Title = LayoutStrings.MenuHomeChangelogIndex;
-                Description = osu.Game.Localisation.ChangelogStrings.HeaderDescription;
+                Description = HeaderDescriptionStrings.Changelog;
                 IconTexture = "Icons/Hexacons/devtools";
             }
         }
