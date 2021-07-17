@@ -35,10 +35,16 @@ namespace osu.Game.Tests.Visual
         {
             MenuCursorContainer cursorContainer;
 
-            CompositeDrawable mainContent =
-                new PopoverContainer { RelativeSizeAxes = Axes.Both }
-                    .WithChild(cursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both })
-                    .WithChild(content = new OsuTooltipContainer(cursorContainer.Cursor) { RelativeSizeAxes = Axes.Both });
+            CompositeDrawable mainContent = new PopoverContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = cursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both, }
+            };
+
+            cursorContainer.Child = content = new OsuTooltipContainer(cursorContainer.Cursor)
+            {
+                RelativeSizeAxes = Axes.Both
+            };
 
             if (CreateNestedActionContainer)
             {
