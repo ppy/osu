@@ -43,8 +43,6 @@ namespace osu.Game.Beatmaps.Drawables
         /// <param name="starDifficulty">The already computed <see cref="StarDifficulty"/> to display the star difficulty of.</param>
         public StarRatingDisplayV2(StarDifficulty starDifficulty)
         {
-            Size = new Vector2(52f, 20f);
-
             Current.Value = starDifficulty;
 
             InternalChild = new CircularContainer
