@@ -65,19 +65,16 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep($"set mistimed to {(allowMistimed ? "allowed" : "disallowed")}", () => beatContainer.AllowMistimedEventFiring = allowMistimed);
 
-            AddStep("bind event", () =>
+            AddStep("Set time before zero", () =>
             {
                 beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) =>
                 {
                     lastActuationTime = gameplayClockContainer.CurrentTime;
                     lastTimingPoint = timingControlPoint;
                     lastBeatIndex = i;
+                    beatContainer.NewBeat = null;
                 };
-            });
 
-            AddStep("Set time before zero", () =>
-            {
-                lastBeatIndex = null;
                 gameplayClockContainer.Seek(-1000);
             });
 
@@ -99,19 +96,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             int? lastBeatIndex = null;
             double? lastBpm = null;
 
-            AddStep("bind event", () =>
+            AddStep("Set time before zero", () =>
             {
                 beatContainer.NewBeat = (i, timingControlPoint, effectControlPoint, channelAmplitudes) =>
                 {
                     lastBeatIndex = i;
                     lastBpm = timingControlPoint.BPM;
                 };
-            });
 
-            AddStep("Set time before zero", () =>
-            {
-                lastBeatIndex = null;
-                lastBpm = null;
                 gameplayClockContainer.Seek(-1000);
             });
 
