@@ -179,44 +179,48 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 [BackgroundDependencyLoader]
                 private void load(TextureStore textures)
                 {
+                    FillFlowContainer row;
+
                     InternalChildren = new Drawable[]
                     {
-                        new FillFlowContainer
+                        row = new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(5),
-                            Children = new Drawable[]
-                            {
-                                new Sprite
-                                {
-                                    Texture = textures.Get($"mods/{mods.ToLower()}"),
-                                    Scale = new Vector2(0.5f)
-                                },
-                                new Container
-                                {
-                                    Size = new Vector2(50, 16),
-                                    CornerRadius = 10,
-                                    Masking = true,
-                                    Children = new Drawable[]
-                                    {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = TournamentGame.ELEMENT_BACKGROUND_COLOUR,
-                                        },
-                                        new TournamentSpriteText
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Text = seeding.ToString("#,0"),
-                                            Colour = TournamentGame.ELEMENT_FOREGROUND_COLOUR
-                                        },
-                                    }
-                                },
-                            }
                         },
                     };
+
+                    if (!string.IsNullOrEmpty(mods))
+                    {
+                        row.Add(new Sprite
+                        {
+                            Texture = textures.Get($"mods/{mods.ToLower()}"),
+                            Scale = new Vector2(0.5f)
+                        });
+                    }
+
+                    row.Add(new Container
+                    {
+                        Size = new Vector2(50, 16),
+                        CornerRadius = 10,
+                        Masking = true,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = TournamentGame.ELEMENT_BACKGROUND_COLOUR,
+                            },
+                            new TournamentSpriteText
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Text = seeding.ToString("#,0"),
+                                Colour = TournamentGame.ELEMENT_FOREGROUND_COLOUR
+                            },
+                        }
+                    });
                 }
             }
         }
