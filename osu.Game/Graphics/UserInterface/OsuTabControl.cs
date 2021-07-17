@@ -154,6 +154,26 @@ namespace osu.Game.Graphics.UserInterface
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
 
+                LocalisableString text;
+                switch (value)
+                {
+                    case IHasDescription hasDescription:
+                        text = hasDescription.GetDescription();
+                        break;
+
+                    case Enum e:
+                        text = e.GetLocalisableDescription();
+                        break;
+
+                    case LocalisableString l:
+                        text = l;
+                        break;
+
+                    default:
+                        text = value.ToString();
+                        break;
+                };
+
                 Children = new Drawable[]
                 {
                     Text = new OsuSpriteText
@@ -161,12 +181,7 @@ namespace osu.Game.Graphics.UserInterface
                         Margin = new MarginPadding { Top = 5, Bottom = 5 },
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
-                        Text = value switch{
-                            IHasDescription desc => desc?.Description,
-                            Enum e => e.GetLocalisableDescription(),
-                            LocalisableString l => l,
-                            var other => other.ToString()
-                        },
+                        Text = text,
                         Font = OsuFont.GetFont(size: 14)
                     },
                     Bar = new Box
