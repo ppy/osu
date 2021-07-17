@@ -9,7 +9,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -21,16 +23,16 @@ namespace osu.Game.Overlays.Changelog
 
         public ChangelogUpdateStreamControl Streams;
 
-        private const string listing_string = "listing";
+        public LocalisableString ListingString => LayoutStrings.HeaderChangelogIndex;
 
         private Box streamsBackground;
 
         public ChangelogHeader()
         {
-            TabControl.AddItem(listing_string);
+            TabControl.AddItem(ListingString);
             Current.ValueChanged += e =>
             {
-                if (e.NewValue == listing_string)
+                if (e.NewValue == ListingString)
                     ListingSelected?.Invoke();
             };
 
@@ -63,7 +65,7 @@ namespace osu.Game.Overlays.Changelog
             }
             else
             {
-                Current.Value = listing_string;
+                Current.Value = ListingString;
                 Streams.Current.Value = null;
             }
         }
@@ -114,8 +116,8 @@ namespace osu.Game.Overlays.Changelog
         {
             public ChangelogHeaderTitle()
             {
-                Title = "changelog";
-                Description = "track recent dev updates in the osu! ecosystem";
+                Title = LayoutStrings.MenuHomeChangelogIndex;
+                Description = osu.Game.Localisation.ChangelogStrings.HeaderDescription;
                 IconTexture = "Icons/Hexacons/devtools";
             }
         }
