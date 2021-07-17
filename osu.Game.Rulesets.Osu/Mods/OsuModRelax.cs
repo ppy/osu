@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             // grab the input manager for future use.
             osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
-            lastHitTime = drawableRuleset.Beatmap.HitObjects.Max(h => h.GetEndTime());
+            lastHitTime = drawableRuleset.Objects.Max(h => h.GetEndTime());
         }
 
         public void ApplyToPlayer(Player player)
