@@ -3,12 +3,14 @@
 
 using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Online.API.Requests;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
     public class RanksSection : ProfileSection
     {
-        public override string Title => "Ranks";
+        public override LocalisableString Title => UsersStrings.ShowExtraTopRanksTitle;
 
         public override string Identifier => "top_ranks";
 
