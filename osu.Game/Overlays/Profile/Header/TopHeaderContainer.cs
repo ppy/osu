@@ -7,11 +7,13 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Profile.Header.Components;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -179,19 +181,19 @@ namespace osu.Game.Overlays.Profile.Header
 
             if (user?.Statistics != null)
             {
-                userStats.Add(new UserStatsLine("Ranked Score", user.Statistics.RankedScore.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("Hit Accuracy", user.Statistics.DisplayAccuracy));
-                userStats.Add(new UserStatsLine("Play Count", user.Statistics.PlayCount.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("Total Score", user.Statistics.TotalScore.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("Total Hits", user.Statistics.TotalHits.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("Maximum Combo", user.Statistics.MaxCombo.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("Replays Watched by Others", user.Statistics.ReplaysWatched.ToString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsRankedScore, user.Statistics.RankedScore.ToString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsHitAccuracy, user.Statistics.DisplayAccuracy));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsPlayCount, user.Statistics.PlayCount.ToString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsTotalScore, user.Statistics.TotalScore.ToString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsTotalHits, user.Statistics.TotalHits.ToString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsMaximumCombo, user.Statistics.MaxCombo.ToString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsReplaysWatchedByOthers, user.Statistics.ReplaysWatched.ToString("#,##0")));
             }
         }
 
         private class UserStatsLine : Container
         {
-            public UserStatsLine(string left, string right)
+            public UserStatsLine(LocalisableString left, string right)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
