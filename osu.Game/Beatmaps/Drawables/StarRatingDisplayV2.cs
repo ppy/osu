@@ -86,8 +86,8 @@ namespace osu.Game.Beatmaps.Drawables
 
                 background.Colour = colours.ForStarDifficulty(c.NewValue.Stars);
 
-                starIcon.Colour = c.NewValue.Stars >= 6.5 ? Color4.Yellow : colourProvider?.Background5 ?? Color4Extensions.FromHex("303d47");
-                starsText.Colour = c.NewValue.Stars >= 6.5 ? Color4.Yellow : colourProvider?.Background5 ?? Color4.Black.Opacity(0.75f);
+                starIcon.Colour = c.NewValue.Stars >= 6.5 ? colours.Orange1 : colourProvider?.Background5 ?? Color4Extensions.FromHex("303d47");
+                starsText.Colour = c.NewValue.Stars >= 6.5 ? colours.Orange1 : colourProvider?.Background5 ?? Color4.Black.Opacity(0.75f);
             }, true);
         }
     }
