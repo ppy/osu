@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.News
@@ -63,7 +64,7 @@ namespace osu.Game.Overlays.News
             public NewsHeaderTitle()
             {
                 Title = LayoutStrings.MenuHomeNewsIndex;
-                Description = osu.Game.Localisation.NewsStrings.HeaderDescription;
+                Description = HeaderDescriptionStrings.News;
                 IconTexture = "Icons/Hexacons/news";
             }
         }
