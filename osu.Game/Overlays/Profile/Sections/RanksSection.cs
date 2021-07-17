@@ -18,8 +18,8 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             Children = new[]
             {
-                new PaginatedScoreContainer(ScoreType.Best, User, "Best Performance"),
-                new PaginatedScoreContainer(ScoreType.Firsts, User, "First Place Ranks")
+                new PaginatedScoreContainer(ScoreType.Best, User, UsersStrings.ShowExtraTopRanksBestTitle),
+                new PaginatedScoreContainer(ScoreType.Firsts, User, UsersStrings.ShowExtraTopRanksFirstTitle)
             };
         }
     }
