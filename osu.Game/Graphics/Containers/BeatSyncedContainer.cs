@@ -151,7 +151,7 @@ namespace osu.Game.Graphics.Containers
                 beatIndex--;
 
             TimeUntilNextBeat = (timingPoint.Time - currentTrackTime) % beatLength;
-            if (TimeUntilNextBeat < 0)
+            if (TimeUntilNextBeat <= 0)
                 TimeUntilNextBeat += beatLength;
 
             TimeSinceLastBeat = beatLength - TimeUntilNextBeat;
