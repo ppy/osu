@@ -10,6 +10,11 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.HeaderDescription";
 
         /// <summary>
+        /// "browse for new beatmaps"
+        /// </summary>
+        public static LocalisableString BeatmapListing => new TranslatableString(getKey(@"beatmap_listing"), @"browse for new beatmaps");
+
+        /// <summary>
         /// "track recent dev updates in the osu! ecosystem"
         /// </summary>
         public static LocalisableString Changelog => new TranslatableString(getKey(@"changelog"), @"track recent dev updates in the osu! ecosystem");
