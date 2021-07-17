@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -127,7 +128,7 @@ namespace osu.Game.Overlays.Profile
                     return LayoutStrings.HeaderUsersModding;
 
                 default:
-                    return string.Empty;
+                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
             }
         }
     }
