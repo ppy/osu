@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private ReplayState<OsuAction> state;
         private double lastStateChangeTime;
-        private double beatmapLength;
+        private double lastHitTime;
 
         private bool hasReplay;
 
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             // grab the input manager for future use.
             osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
-            beatmapLength = drawableRuleset.Beatmap.HitObjects.LastOrDefault()?.GetEndTime() ?? 0;
+            lastHitTime = drawableRuleset.Beatmap.HitObjects.Max(h => h.GetEndTime());
         }
 
         public void ApplyToPlayer(Player player)
@@ -104,8 +104,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             if (requiresHold)
                 changeState(true);
-            else if ((isDownState && time + AutoGenerator.KEY_UP_DELAY >= beatmapLength) || time - lastStateChangeTime > AutoGenerator.KEY_UP_DELAY)
-                changeState(false);
+            else
+            {
+                bool hasCompleted = time >= lastHitTime;
+                bool shouldRelease = isDownState && (time - lastStateChangeTime > AutoGenerator.KEY_UP_DELAY || hasCompleted);
+
+                if (shouldRelease)
+                    changeState(false);
+            }
 
             void handleHitCircle(DrawableHitCircle circle)
             {
