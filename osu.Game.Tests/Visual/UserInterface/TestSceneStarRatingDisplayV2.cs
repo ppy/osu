@@ -14,8 +14,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneStarRatingDisplayV2 : OsuTestScene
     {
-        [Test]
-        public void TestDisplay()
+        [TestCase(52f, 20f)]
+        [TestCase(52f, 16f)]
+        [TestCase(50f, 14f)]
+        public void TestDisplay(float width, float height)
         {
             AddStep("load displays", () =>
             {
@@ -37,6 +39,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            Size = new Vector2(width, height),
                         })
                     })
                 };
@@ -52,6 +55,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                Size = new Vector2(52f, 20f),
             });
 
             AddRepeatStep("set random value", () =>
