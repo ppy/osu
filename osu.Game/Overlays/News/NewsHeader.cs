@@ -5,16 +5,13 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
-using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.News
 {
     public class NewsHeader : BreadcrumbControlOverlayHeader
     {
-        public static LocalisableString FrontPageString => NewsStrings.FrontPageString;
-        public static LocalisableString HeaderTitle => NewsStrings.HeaderTitle;
-        public static LocalisableString HeaderDescription => NewsStrings.HeaderDescription;
-
+        public LocalisableString FrontPageString => osu.Game.Resources.Localisation.Web.NewsStrings.IndexTitleInfo;
         public Action ShowFrontPage;
 
         private readonly Bindable<string> article = new Bindable<string>();
@@ -65,8 +62,8 @@ namespace osu.Game.Overlays.News
         {
             public NewsHeaderTitle()
             {
-                Title = HeaderTitle;
-                Description = HeaderDescription;
+                Title = LayoutStrings.MenuHomeNewsIndex;
+                Description = osu.Game.Localisation.NewsStrings.HeaderDescription;
                 IconTexture = "Icons/Hexacons/news";
             }
         }
