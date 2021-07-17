@@ -10,16 +10,6 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.News";
 
         /// <summary>
-        /// "frontpage"
-        /// </summary>
-        public static LocalisableString FrontPageString => new TranslatableString(getKey(@"front_page"), @"frontpage");
-
-        /// <summary>
-        /// "news"
-        /// </summary>
-        public static LocalisableString HeaderTitle => new TranslatableString(getKey(@"header_title"), @"news");
-
-        /// <summary>
         /// "join the real-time discussion"
         /// </summary>
         public static LocalisableString HeaderDescription => new TranslatableString(getKey(@"header_description"), @"get up-to-date on community happenings");

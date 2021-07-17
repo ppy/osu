@@ -6,17 +6,15 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
-using osu.Game.Localisation;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Wiki
 {
     public class WikiHeader : BreadcrumbControlOverlayHeader
     {
         private const string index_path = "Main_Page";
-        public static LocalisableString IndexPageString => WikiStrings.IndexPageString;
-        public static LocalisableString HeaderTitle => WikiStrings.HeaderTitle;
-        public static LocalisableString HeaderDescription => WikiStrings.HeaderDescription;
+        public LocalisableString IndexPageString => LayoutStrings.HeaderHelpIndex;
 
         public readonly Bindable<APIWikiPage> WikiPageData = new Bindable<APIWikiPage>();
 
@@ -77,8 +75,8 @@ namespace osu.Game.Overlays.Wiki
         {
             public WikiHeaderTitle()
             {
-                Title = HeaderTitle;
-                Description = HeaderDescription;
+                Title = LayoutStrings.MenuHelpGetWiki;
+                Description = PageTitleStrings.MainWikiControllerDefault;
                 IconTexture = "Icons/Hexacons/wiki";
             }
         }
