@@ -155,6 +155,7 @@ namespace osu.Game.Graphics.UserInterface
                 RelativeSizeAxes = Axes.Y;
 
                 LocalisableString text;
+
                 switch (value)
                 {
                     case IHasDescription hasDescription:
@@ -172,7 +173,7 @@ namespace osu.Game.Graphics.UserInterface
                     default:
                         text = value.ToString();
                         break;
-                };
+                }
 
                 Children = new Drawable[]
                 {
