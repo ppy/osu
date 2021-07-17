@@ -8,14 +8,16 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Screens.Ranking.Expanded;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
     public class StarRatingRangeDisplay : OnlinePlayComposite
     {
+        private readonly bool useNewDifficultyColours;
+
         [Resolved]
         private OsuColour colours { get; set; }
 
@@ -24,8 +26,10 @@ namespace osu.Game.Screens.OnlinePlay.Components
         private StarRatingDisplay maxDisplay;
         private Drawable maxBackground;
 
-        public StarRatingRangeDisplay()
+        public StarRatingRangeDisplay(bool useNewDifficultyColours = false)
         {
+            this.useNewDifficultyColours = useNewDifficultyColours;
+
             AutoSizeAxes = Axes.Both;
         }
 
@@ -62,8 +66,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        minDisplay = new StarRatingDisplay(default),
-                        maxDisplay = new StarRatingDisplay(default)
+                        minDisplay = new StarRatingDisplay(default) { Size = new Vector2(52f, 16f) },
+                        maxDisplay = new StarRatingDisplay(default) { Size = new Vector2(52f, 16f) }
                     }
                 }
             };
