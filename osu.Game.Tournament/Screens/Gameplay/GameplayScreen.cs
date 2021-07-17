@@ -24,8 +24,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
     {
         private readonly BindableBool warmup = new BindableBool();
 
-        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
-
         public readonly Bindable<TourneyState> State = new Bindable<TourneyState>();
         private OsuButton warmupButton;
         private MatchIPCInfo ipc;
@@ -131,19 +129,22 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             ladder.ChromaKeyWidth.BindValueChanged(width => chroma.Width = width.NewValue, true);
 
-            currentMatch.BindValueChanged(m =>
-            {
-                warmup.Value = m.NewValue.Team1Score.Value + m.NewValue.Team2Score.Value == 0;
-                scheduledOperation?.Cancel();
-            });
-
-            currentMatch.BindTo(ladder.CurrentMatch);
-
             warmup.BindValueChanged(w =>
             {
                 warmupButton.Alpha = !w.NewValue ? 0.5f : 1;
                 header.ShowScores = !w.NewValue;
             }, true);
+        }
+
+        protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
+        {
+            base.CurrentMatchChanged(match);
+
+            if (match.NewValue == null)
+                return;
+
+            warmup.Value = match.NewValue.Team1Score.Value + match.NewValue.Team2Score.Value == 0;
+            scheduledOperation?.Cancel();
         }
 
         private ScheduledDelegate scheduledOperation;
@@ -161,9 +162,9 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     if (warmup.Value) return;
 
                     if (ipc.Score1.Value > ipc.Score2.Value)
-                        currentMatch.Value.Team1Score.Value++;
+                        CurrentMatch.Value.Team1Score.Value++;
                     else
-                        currentMatch.Value.Team2Score.Value++;
+                        CurrentMatch.Value.Team2Score.Value++;
                 }
 
                 scheduledOperation?.Cancel();
@@ -198,9 +199,9 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         // we should automatically proceed after a short delay
                         if (lastState == TourneyState.Ranking && !warmup.Value)
                         {
-                            if (currentMatch.Value?.Completed.Value == true)
+                            if (CurrentMatch.Value?.Completed.Value == true)
                                 scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, delay_before_progression);
-                            else if (currentMatch.Value?.Completed.Value == false)
+                            else if (CurrentMatch.Value?.Completed.Value == false)
                                 scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(MapPoolScreen)); }, delay_before_progression);
                         }
 
