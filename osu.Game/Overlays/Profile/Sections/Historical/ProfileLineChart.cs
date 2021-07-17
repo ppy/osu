@@ -13,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osuTK;
 using static osu.Game.Users.User;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
@@ -42,7 +43,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         private readonly Container<TickLine> rowLinesContainer;
         private readonly Container<TickLine> columnLinesContainer;
 
-        public ProfileLineChart(string graphCounterName)
+        public ProfileLineChart(LocalisableString graphCounterName)
         {
             RelativeSizeAxes = Axes.X;
             Height = 250;
