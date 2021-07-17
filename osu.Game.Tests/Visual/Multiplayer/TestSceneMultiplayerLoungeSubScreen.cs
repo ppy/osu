@@ -53,6 +53,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestPopoverHidesOnLeavingScreen()
+        {
+            AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
+            AddStep("select room", () => InputManager.Key(Key.Down));
+            AddStep("attempt join room", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("password prompt appeared", () => InputManager.ChildrenOfType<DrawableRoom.PasswordEntryPopover>().Any());
+            AddStep("exit screen", () => Stack.Exit());
+            AddUntilStep("password prompt hidden", () => !InputManager.ChildrenOfType<DrawableRoom.PasswordEntryPopover>().Any());
+        }
+
+        [Test]
         public void TestJoinRoomWithPassword()
         {
             DrawableRoom.PasswordEntryPopover passwordEntryPopover = null;
