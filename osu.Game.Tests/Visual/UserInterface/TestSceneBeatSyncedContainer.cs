@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddUntilStep("wait for trigger", () => lastBpm != null);
-            AddAssert("bpm is from beatmap", () => lastBpm != null && Precision.AlmostEquals(lastBpm.Value, 60));
+            AddAssert("bpm is default", () => lastBpm != null && Precision.AlmostEquals(lastBpm.Value, 60));
         }
 
         private class TestBeatSyncedContainer : BeatSyncedContainer
