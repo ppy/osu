@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Users;
 using JetBrains.Annotations;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -14,12 +15,12 @@ namespace osu.Game.Overlays.Profile.Sections
     {
         protected readonly Bindable<User> User = new Bindable<User>();
 
-        private readonly string headerText;
+        private readonly LocalisableString headerText;
         private readonly CounterVisibilityState counterVisibilityState;
 
         private ProfileSubsectionHeader header;
 
-        protected ProfileSubsection(Bindable<User> user, string headerText = "", CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
+        protected ProfileSubsection(Bindable<User> user, LocalisableString headerText, CounterVisibilityState counterVisibilityState = CounterVisibilityState.AlwaysHidden)
         {
             this.headerText = headerText;
             this.counterVisibilityState = counterVisibilityState;
