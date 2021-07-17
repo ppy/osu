@@ -243,7 +243,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 Alpha = 0;
         }
 
-        public Popover GetPopover() => new PasswordEntryPopover(Room);
+        public Popover GetPopover() => new PasswordEntryPopover(Room) { JoinRequested = lounge.Join };
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
@@ -350,8 +350,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             private readonly Room room;
 
-            [Resolved(canBeNull: true)]
-            private LoungeSubScreen lounge { get; set; }
+            public Action<Room, string> JoinRequested;
 
             public PasswordEntryPopover(Room room)
             {
@@ -379,7 +378,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         {
                             Width = 80,
                             Text = "Join Room",
-                            Action = () => lounge?.Join(room, passwordTextbox.Text)
+                            Action = () => JoinRequested?.Invoke(room, passwordTextbox.Text)
                         }
                     }
                 };
