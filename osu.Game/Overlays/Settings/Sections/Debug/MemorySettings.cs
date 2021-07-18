@@ -4,13 +4,14 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 
 namespace osu.Game.Overlays.Settings.Sections.Debug
 {
     public class MemorySettings : SettingsSubsection
     {
-        protected override string Header => "Memory";
+        protected override LocalisableString Header => "Memory";
 
         [BackgroundDependencyLoader]
         private void load(FrameworkDebugConfigManager config, GameHost host)
