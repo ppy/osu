@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 // initial state
                 circle.ScaleTo(0.5f)
-                        .FadeColour(OsuColour.Gray(0.5f));
+                      .FadeColour(OsuColour.Gray(0.5f));
 
                 // scale to final size
                 circle.ScaleTo(1f, preempt);
@@ -162,7 +162,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             using (circle.BeginAbsoluteSequence(startTime - controlPointInfo.TimingPointAt(startTime).BeatLength - undim_duration))
                 circle.FadeColour(Color4.White, undim_duration);
-
         }
 
         #endregion
