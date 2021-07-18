@@ -12,7 +12,8 @@ namespace osu.Game.Overlays.News
 {
     public class NewsHeader : BreadcrumbControlOverlayHeader
     {
-        public LocalisableString FrontPageString => osu.Game.Resources.Localisation.Web.NewsStrings.IndexTitleInfo;
+        public static LocalisableString FrontPageString => NewsStrings.IndexTitleInfo;
+
         public Action ShowFrontPage;
 
         private readonly Bindable<string> article = new Bindable<string>();

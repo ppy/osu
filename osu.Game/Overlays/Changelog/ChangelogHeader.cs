@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Changelog
 
         public ChangelogUpdateStreamControl Streams;
 
-        public LocalisableString ListingString => LayoutStrings.HeaderChangelogIndex;
+        public static LocalisableString ListingString => LayoutStrings.HeaderChangelogIndex;
 
         private Box streamsBackground;
 
