@@ -28,6 +28,8 @@ namespace osu.Game.Overlays
             protected set => titleText.Text = title = value;
         }
 
+        public LocalisableString? ToolbarName { get; protected set; }
+
         public LocalisableString Description { get; protected set; }
 
         private string iconTexture;

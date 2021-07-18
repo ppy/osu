@@ -11,6 +11,12 @@ namespace osu.Game.Overlays
 
         LocalisableString Title { get; }
 
+        /// <summary>
+        /// An optional name used specifically for toolbar overlay toggle buttons.
+        /// If null, <see cref="Title"/> should be used directly instead.
+        /// </summary>
+        LocalisableString? ToolbarName => null;
+
         LocalisableString Description { get; }
     }
 }

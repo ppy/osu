@@ -20,6 +20,7 @@ namespace osu.Game.Overlays
     {
         public virtual string IconTexture => Header.Title.IconTexture ?? string.Empty;
         public virtual LocalisableString Title => Header.Title.Title;
+        public virtual LocalisableString? ToolbarName => Header.Title.ToolbarName;
         public virtual LocalisableString Description => Header.Title.Description;
 
         public T Header { get; }

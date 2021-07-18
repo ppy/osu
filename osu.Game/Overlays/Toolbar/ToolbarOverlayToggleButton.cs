@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Toolbar
 
                 if (stateContainer is INamedOverlayComponent named)
                 {
-                    TooltipMain = named.Title;
+                    TooltipMain = named.ToolbarName ?? named.Title;
                     TooltipSub = named.Description;
                     SetIcon(named.IconTexture);
                 }
