@@ -68,7 +68,7 @@ namespace osu.Game.Beatmaps.Drawables
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Margin = new MarginPadding { Right = 30f },
+                        Margin = new MarginPadding { Right = 26.5f },
                         Icon = FontAwesome.Solid.Star,
                         Size = new Vector2(8f),
                     },
@@ -76,7 +76,7 @@ namespace osu.Game.Beatmaps.Drawables
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Margin = new MarginPadding { Left = 10f, Bottom = 1f },
+                        Margin = new MarginPadding { Left = 10f, Bottom = 1.5f },
                         Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.Bold),
                         Shadow = false,
                     }
