@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Size = new Vector2(52f, 20f),
+                Scale = new Vector2(3f),
             });
 
             AddRepeatStep("set random value", () =>
