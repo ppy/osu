@@ -78,6 +78,7 @@ namespace osu.Game.Beatmaps.Drawables
                         Origin = Anchor.Centre,
                         Margin = new MarginPadding { Left = 10f, Bottom = 1f },
                         Font = OsuFont.Torus.With(size: 12f, weight: FontWeight.Bold),
+                        Shadow = false,
                     }
                 }
             };
