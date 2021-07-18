@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Wiki
@@ -51,7 +52,7 @@ namespace osu.Game.Overlays.Wiki
             Current.Value = e.NewValue.Title;
         }
 
-        private void onCurrentChange(ValueChangedEvent<string> e)
+        private void onCurrentChange(ValueChangedEvent<LocalisableString?> e)
         {
             if (e.NewValue == TabControl.Items.LastOrDefault())
                 return;

@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Wiki;
@@ -96,7 +97,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestHeader : WikiHeader
         {
-            public IReadOnlyList<string> TabControlItems => TabControl.Items;
+            public IReadOnlyList<LocalisableString?> TabControlItems => TabControl.Items;
         }
     }
 }
