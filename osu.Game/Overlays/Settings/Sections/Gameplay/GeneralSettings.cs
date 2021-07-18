@@ -4,6 +4,7 @@
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
 
@@ -11,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
     public class GeneralSettings : SettingsSubsection
     {
-        protected override string Header => "General";
+        protected override LocalisableString Header => "General";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

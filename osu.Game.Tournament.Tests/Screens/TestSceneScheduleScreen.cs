@@ -28,6 +28,12 @@ namespace osu.Game.Tournament.Tests.Screens
             setMatchDate(TimeSpan.FromHours(3));
         }
 
+        [Test]
+        public void TestNoCurrentMatch()
+        {
+            AddStep("Set null current match", () => Ladder.CurrentMatch.Value = null);
+        }
+
         private void setMatchDate(TimeSpan relativeTime)
             // Humanizer cannot handle negative timespans.
             => AddStep($"start time is {relativeTime}", () =>
