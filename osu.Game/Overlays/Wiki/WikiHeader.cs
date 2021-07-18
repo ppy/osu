@@ -73,7 +73,8 @@ namespace osu.Game.Overlays.Wiki
         {
             public WikiHeaderTitle()
             {
-                Title = "wiki";
+                Title = "knowledge base";
+                ToolbarName = "wiki";
                 Description = "knowledge base";
                 IconTexture = "Icons/Hexacons/wiki";
             }
