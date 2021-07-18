@@ -147,21 +147,22 @@ namespace osu.Game.Rulesets.Osu.Mods
             double startTime = circle.HitObject.StartTime;
             double preempt = circle.HitObject.TimePreempt;
 
-            using (drawable.BeginAbsoluteSequence(startTime - preempt))
+            using (circle.BeginAbsoluteSequence(startTime - preempt))
             {
                 // initial state
-                drawable.ScaleTo(0.5f)
+                circle.ScaleTo(0.5f)
                         .FadeColour(OsuColour.Gray(0.5f));
 
                 // scale to final size
-                drawable.ScaleTo(1f, preempt);
+                circle.ScaleTo(1f, preempt);
+
+                // Remove approach circles
+                circle.ApproachCircle.Hide();
             }
 
-            using (drawable.BeginAbsoluteSequence(startTime - controlPointInfo.TimingPointAt(startTime).BeatLength - undim_duration))
-                drawable.FadeColour(Color4.White, undim_duration);
+            using (circle.BeginAbsoluteSequence(startTime - controlPointInfo.TimingPointAt(startTime).BeatLength - undim_duration))
+                circle.FadeColour(Color4.White, undim_duration);
 
-            // Remove approach circles
-            circle.ApproachCircle.Hide();
         }
 
         #endregion
