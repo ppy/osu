@@ -32,7 +32,6 @@ namespace osu.Game.Overlays.Profile
             TabControl.AddItem(LayoutStrings.HeaderUsersShow);
             TabControl.AddItem(LayoutStrings.HeaderUsersModding);
 
-
             centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }
 
