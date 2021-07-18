@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Rankings
             public RankingsTitle()
             {
                 Title = LayoutStrings.MenuRankingsDefault;
-                Description = HeaderDescriptionStrings.Rankings;
+                Description = NamedOverlayComponentStrings.RankingsDescription;
                 IconTexture = "Icons/Hexacons/rankings";
             }
         }

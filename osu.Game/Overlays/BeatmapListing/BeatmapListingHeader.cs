@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.BeatmapListing
             public BeatmapListingTitle()
             {
                 Title = PageTitleStrings.MainBeatmapsetsControllerIndex;
-                Description = HeaderDescriptionStrings.BeatmapListing;
+                Description = NamedOverlayComponentStrings.BeatmapListingDescription;
                 IconTexture = "Icons/Hexacons/beatmap";
             }
         }
