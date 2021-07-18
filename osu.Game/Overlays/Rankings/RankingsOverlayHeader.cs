@@ -30,6 +30,7 @@ namespace osu.Game.Overlays.Rankings
             public RankingsTitle()
             {
                 Title = "ranking";
+                ToolbarName = "rankings";
                 Description = "find out who's the best right now";
                 IconTexture = "Icons/Hexacons/rankings";
             }
