@@ -35,8 +35,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Bindable<HitObject> placement;
         private SelectionBlueprint<HitObject> placementBlueprint;
 
-        private SelectableAreaBackground backgroundBox;
-
         // We want children to be able to be clicked and dragged, regardless of this drawable's size
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -53,7 +51,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(backgroundBox = new SelectableAreaBackground
+            AddInternal(new SelectableAreaBackground
             {
                 Colour = Color4.Black,
                 Depth = float.MaxValue,
@@ -91,15 +89,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         protected override Container<SelectionBlueprint<HitObject>> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
-
-        protected override bool OnDragStart(DragStartEvent e)
-        {
-            // We should only allow BlueprintContainer to create a drag box if the mouse is within selection bounds
-            if (backgroundBox.ReceivePositionalInputAt(e.ScreenSpaceMouseDownPosition))
-                return base.OnDragStart(e);
-
-            return false;
-        }
 
         protected override void OnDrag(DragEvent e)
         {
@@ -319,6 +308,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             public override bool HandleDrag(MouseButtonEvent e)
             {
+                // The dragbox should only be active if the mouseDownPosition.Y is within this drawable's bounds.
+                if (DrawRectangle.Top > e.MouseDownPosition.Y || DrawRectangle.Bottom < e.MouseDownPosition.Y)
+                    return false;
+
                 selectionStart ??= e.MouseDownPosition.X / timeline.CurrentZoom;
 
                 // only calculate end when a transition is not in progress to avoid bouncing.
