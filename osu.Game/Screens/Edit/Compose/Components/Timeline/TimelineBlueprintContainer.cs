@@ -35,15 +35,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Bindable<HitObject> placement;
         private SelectionBlueprint<HitObject> placementBlueprint;
 
-        // We want children to be able to be clicked and dragged
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+        private SelectableAreaBackground backgroundBox;
 
-        // This drawable itself should still check whether the mouse is over it
-        private bool shouldHandleInputAt(Vector2 screenSpacePos)
-        {
-            float localY = ToLocalSpace(screenSpacePos).Y;
-            return DrawRectangle.Top <= localY && DrawRectangle.Bottom >= localY;
-        }
+        // We want children to be able to be clicked and dragged, regardless of this drawable's size
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public TimelineBlueprintContainer(HitObjectComposer composer)
             : base(composer)
@@ -58,7 +53,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(new SelectableAreaBackground
+            AddInternal(backgroundBox = new SelectableAreaBackground
             {
                 Colour = Color4.Black,
                 Depth = float.MaxValue,
@@ -97,25 +92,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override Container<SelectionBlueprint<HitObject>> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            int selectionCount = SelectedItems.Count;
-
-            // We let BlueprintContainer attempt a HitObject selection
-            // If it fails, we'll pass it this input back to the timeline so it can be dragged
-            // We know it failed if the selection count is unchanged after the selection attempt
-            if (base.OnMouseDown(e) && selectionCount != SelectedItems.Count)
-                return true;
-
-            return false;
-        }
-
         protected override bool OnDragStart(DragStartEvent e)
         {
-            if (!shouldHandleInputAt(e.ScreenSpaceMouseDownPosition))
-                return false;
+            // We should only allow BlueprintContainer to create a drag box if the mouse is within selection bounds
+            if (backgroundBox.ReceivePositionalInputAt(e.ScreenSpaceMouseDownPosition))
+                return base.OnDragStart(e);
 
-            return base.OnDragStart(e);
+            return false;
         }
 
         protected override void OnDrag(DragEvent e)
