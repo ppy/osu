@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.News
             public NewsHeaderTitle()
             {
                 Title = LayoutStrings.MenuHomeNewsIndex;
-                Description = HeaderDescriptionStrings.News;
+                Description = NamedOverlayComponentStrings.NewsDescription;
                 IconTexture = "Icons/Hexacons/news";
             }
         }
