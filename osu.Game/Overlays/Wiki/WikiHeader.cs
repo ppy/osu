@@ -14,7 +14,8 @@ namespace osu.Game.Overlays.Wiki
     public class WikiHeader : BreadcrumbControlOverlayHeader
     {
         private const string index_path = "Main_Page";
-        public LocalisableString IndexPageString => LayoutStrings.HeaderHelpIndex;
+
+        public static LocalisableString IndexPageString => LayoutStrings.HeaderHelpIndex;
 
         public readonly Bindable<APIWikiPage> WikiPageData = new Bindable<APIWikiPage>();
 

@@ -72,5 +72,4 @@ namespace osu.Game.Overlays.Rankings
             }
         }
     }
-
 }
