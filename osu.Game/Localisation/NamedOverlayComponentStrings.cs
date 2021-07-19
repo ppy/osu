@@ -18,6 +18,9 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString BeatmapListingDescription => new TranslatableString(getKey(@"beatmap_listing"), @"browse for new beatmaps");
 
+        /// <inheritdoc cref="PageTitleStrings.MainBeatmapsetsControllerShow"/>
+        public static LocalisableString BeatmapSetTitle => PageTitleStrings.MainBeatmapsetsControllerShow;
+
         /// <inheritdoc cref="PageTitleStrings.MainChangelogControllerDefault"/>
         public static LocalisableString ChangelogTitle => PageTitleStrings.MainChangelogControllerDefault;
 
