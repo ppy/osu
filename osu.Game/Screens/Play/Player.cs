@@ -1023,13 +1023,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="score">The <see cref="Scoring.Score"/> to prepare.</param>
         /// <returns>A task that prepares the provided score. On completion, the score is assumed to be ready for display.</returns>
-        protected virtual Task PrepareScoreForResultsAsync(Score score)
-        {
-            // perform one final population to ensure everything is up-to-date.
-            ScoreProcessor.PopulateScore(score.ScoreInfo);
-
-            return Task.CompletedTask;
-        }
+        protected virtual Task PrepareScoreForResultsAsync(Score score) => Task.CompletedTask;
 
         /// <summary>
         /// Creates the <see cref="ResultsScreen"/> for a <see cref="ScoreInfo"/>.

@@ -109,6 +109,8 @@ namespace osu.Game.Screens.Play
         {
             await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
 
+            score.ScoreInfo.Date = DateTimeOffset.Now;
+
             await submitScore(score).ConfigureAwait(false);
         }
 
