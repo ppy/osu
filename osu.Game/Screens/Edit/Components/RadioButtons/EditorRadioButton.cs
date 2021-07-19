@@ -18,10 +18,10 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.RadioButtons
 {
-    public class DrawableRadioButton : OsuButton, IHasTooltip
+    public class EditorRadioButton : OsuButton, IHasTooltip
     {
         /// <summary>
-        /// Invoked when this <see cref="DrawableRadioButton"/> has been selected.
+        /// Invoked when this <see cref="EditorRadioButton"/> has been selected.
         /// </summary>
         public Action<RadioButton> Selected;
 
@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         [Resolved(canBeNull: true)]
         private EditorBeatmap editorBeatmap { get; set; }
 
-        public DrawableRadioButton(RadioButton button)
+        public EditorRadioButton(RadioButton button)
         {
             Button = button;
 
