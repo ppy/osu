@@ -1,23 +1,30 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Catch.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 {
     public class JuiceStreamSelectionBlueprint : CatchSelectionBlueprint<JuiceStream>
     {
         public override Quad SelectionQuad => HitObjectContainer.ToScreenSpace(getBoundingBox().Offset(new Vector2(0, HitObjectContainer.DrawHeight)));
+
+        public override MenuItem[] ContextMenuItems => getContextMenuItems().ToArray();
 
         private float minNestedX;
         private float maxNestedX;
@@ -33,6 +40,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         private int lastEditablePathId = -1;
 
         private int lastSliderPathVersion = -1;
+
+        private Vector2 rightMouseDownPosition;
 
         [Resolved(CanBeNull = true)]
         [CanBeNull]
@@ -84,6 +93,25 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             base.OnSelected();
         }
 
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (!IsSelected) return base.OnMouseDown(e);
+
+            switch (e.Button)
+            {
+                case MouseButton.Left when e.ControlPressed:
+                    editablePath.AddVertex(editablePath.ToRelativePosition(e.ScreenSpaceMouseDownPosition));
+                    return true;
+
+                case MouseButton.Right:
+                    // Record the mouse position to be used in the "add vertex" action.
+                    rightMouseDownPosition = editablePath.ToRelativePosition(e.ScreenSpaceMouseDownPosition);
+                    break;
+            }
+
+            return base.OnMouseDown(e);
+        }
+
         private void onDefaultsApplied(HitObject _)
         {
             computeObjectBounds();
@@ -131,6 +159,14 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
             lastEditablePathId = editablePath.PathId;
             lastSliderPathVersion = HitObject.Path.Version.Value;
+        }
+
+        private IEnumerable<MenuItem> getContextMenuItems()
+        {
+            yield return new OsuMenuItem("Add vertex", MenuItemType.Standard, () =>
+            {
+                editablePath.AddVertex(rightMouseDownPosition);
+            });
         }
 
         protected override void Dispose(bool isDisposing)

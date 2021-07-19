@@ -26,6 +26,13 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         {
         }
 
+        public void AddVertex(Vector2 relativePosition)
+        {
+            double distance = Math.Max(0, PositionToDistance(relativePosition.Y));
+            int index = AddVertex(distance, relativePosition.X);
+            selectOnly(index);
+        }
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => InternalChildren.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
 
         protected override bool OnMouseDown(MouseDownEvent e)
