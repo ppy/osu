@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
@@ -49,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Whether <see cref="HitExplosion"/>s should be generated on the catcher plate when a hit object is caught.
         /// </summary>
-        public readonly Bindable<bool> GenerateHitLighting = new Bindable<bool>(true);
+        public bool GenerateHitLighting { get; set; } = true;
 
         /// <summary>
         /// The relative space to cover in 1 millisecond. based on 1 game pixel per millisecond as in osu-stable.
@@ -175,7 +174,7 @@ namespace osu.Game.Rulesets.Catch.UI
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            GenerateHitLighting.BindTo(config.GetBindable<bool>(OsuSetting.HitLighting));
+            GenerateHitLighting = config.GetBindable<bool>(OsuSetting.HitLighting).Value;
             trails = new CatcherTrailDisplay(this);
         }
 
@@ -244,7 +243,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 if (CatchFruitOnPlate)
                     placeCaughtObject(palpableObject, positionInStack);
 
-                if (GenerateHitLighting.Value)
+                if (GenerateHitLighting)
                     addLighting(hitObject, positionInStack.X, drawableObject.AccentColour.Value);
             }
 
