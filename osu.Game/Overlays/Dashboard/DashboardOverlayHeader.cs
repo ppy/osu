@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Dashboard
         {
             public DashboardTitle()
             {
-                Title = HomeStrings.UserTitle;
+                Title = NamedOverlayComponentStrings.DashboardTitle;
                 Description = NamedOverlayComponentStrings.DashboardDescription;
                 IconTexture = "Icons/Hexacons/social";
             }
