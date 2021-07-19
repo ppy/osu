@@ -106,6 +106,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestLocalPasswordUpdatedWhenMultiplayerSettingsChange()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Password = { Value = "password" },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            AddStep("change password", () => client.ChangeSettings(password: "password2"));
+            AddUntilStep("local password changed", () => client.APIRoom?.Password.Value == "password2");
+        }
+
+        [Test]
         public void TestUserSetToIdleWhenBeatmapDeleted()
         {
             createRoom(() => new Room
