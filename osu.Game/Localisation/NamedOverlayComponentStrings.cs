@@ -51,10 +51,12 @@ namespace osu.Game.Localisation
         public static LocalisableString NewsDescription => new TranslatableString(getKey(@"news"), @"get up-to-date on community happenings");
 
         /// <inheritdoc cref="LayoutStrings.MenuHelpGetWiki"/>
-        public static LocalisableString WikiTitle => LayoutStrings.MenuHelpGetWiki;
+        public static LocalisableString WikiTitle => PageTitleStrings.MainWikiControllerDefault;
 
-        /// <inheritdoc cref="PageTitleStrings.MainWikiControllerDefault"/>
-        public static LocalisableString WikiDescription => PageTitleStrings.MainWikiControllerDefault;
+        /// <summary>
+        /// "knowledge base"
+        /// </summary>
+        public static LocalisableString WikiDescription => new TranslatableString(getKey(@"wiki"), @"knowledge base");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }
