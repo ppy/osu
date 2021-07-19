@@ -13,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
@@ -143,7 +144,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         private class PlayCountText : CompositeDrawable, IHasTooltip
         {
-            public LocalisableString TooltipText => "times played";
+            public LocalisableString TooltipText => UsersStrings.ShowExtraHistoricalMostPlayedCount;
 
             public PlayCountText(int playCount)
             {
