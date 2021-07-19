@@ -127,6 +127,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             var responseRoom = new Room();
             responseRoom.CopyFrom(room);
+            responseRoom.HasPassword.Value = !string.IsNullOrEmpty(responseRoom.Password.Value);
             responseRoom.Password.Value = null;
             if (!withParticipants)
                 responseRoom.RecentParticipants.Clear();
