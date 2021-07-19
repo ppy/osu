@@ -96,19 +96,18 @@ namespace osu.Game.Tournament.Screens.Schedule
                     }
                 },
             };
+        }
 
-            currentMatch.BindValueChanged(matchChanged);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             currentMatch.BindTo(ladder.CurrentMatch);
+            currentMatch.BindValueChanged(matchChanged, true);
         }
 
         private void matchChanged(ValueChangedEvent<TournamentMatch> match)
         {
-            if (match.NewValue == null)
-            {
-                mainContainer.Clear();
-                return;
-            }
-
             var upcoming = ladder.Matches.Where(p => !p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4);
             var conditionals = ladder
                                .Matches.Where(p => !p.Completed.Value && (p.Team1.Value == null || p.Team2.Value == null) && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4)
@@ -116,6 +115,8 @@ namespace osu.Game.Tournament.Screens.Schedule
 
             upcoming = upcoming.Concat(conditionals);
             upcoming = upcoming.OrderBy(p => p.Date.Value).Take(8);
+
+            ScheduleContainer comingUpNext;
 
             mainContainer.Child = new FillFlowContainer
             {
@@ -153,57 +154,58 @@ namespace osu.Game.Tournament.Screens.Schedule
                             }
                         }
                     },
-                    new ScheduleContainer("coming up next")
+                    comingUpNext = new ScheduleContainer("coming up next")
                     {
                         RelativeSizeAxes = Axes.Both,
                         Height = 0.25f,
-                        Children = new Drawable[]
-                        {
-                            new FillFlowContainer
-                            {
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(30),
-                                Children = new Drawable[]
-                                {
-                                    new ScheduleMatch(match.NewValue, false)
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                    },
-                                    new TournamentSpriteTextWithBackground(match.NewValue.Round.Value?.Name.Value)
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Scale = new Vector2(0.5f)
-                                    },
-                                    new TournamentSpriteText
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Text = match.NewValue.Team1.Value?.FullName + " vs " + match.NewValue.Team2.Value?.FullName,
-                                        Font = OsuFont.Torus.With(size: 24, weight: FontWeight.SemiBold)
-                                    },
-                                    new FillFlowContainer
-                                    {
-                                        AutoSizeAxes = Axes.Both,
-                                        Direction = FillDirection.Horizontal,
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Children = new Drawable[]
-                                        {
-                                            new ScheduleMatchDate(match.NewValue.Date.Value)
-                                            {
-                                                Font = OsuFont.Torus.With(size: 24, weight: FontWeight.Regular)
-                                            }
-                                        }
-                                    },
-                                }
-                            },
-                        }
                     }
                 }
             };
+
+            if (match.NewValue != null)
+            {
+                comingUpNext.Child = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(30),
+                    Children = new Drawable[]
+                    {
+                        new ScheduleMatch(match.NewValue, false)
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        },
+                        new TournamentSpriteTextWithBackground(match.NewValue.Round.Value?.Name.Value)
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Scale = new Vector2(0.5f)
+                        },
+                        new TournamentSpriteText
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Text = match.NewValue.Team1.Value?.FullName + " vs " + match.NewValue.Team2.Value?.FullName,
+                            Font = OsuFont.Torus.With(size: 24, weight: FontWeight.SemiBold)
+                        },
+                        new FillFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Horizontal,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Children = new Drawable[]
+                            {
+                                new ScheduleMatchDate(match.NewValue.Date.Value)
+                                {
+                                    Font = OsuFont.Torus.With(size: 24, weight: FontWeight.Regular)
+                                }
+                            }
+                        },
+                    }
+                };
+            }
         }
 
         public class ScheduleMatch : DrawableTournamentMatch
