@@ -338,7 +338,6 @@ namespace osu.Game.Rulesets.Scoring
             score.MaxCombo = HighestCombo.Value;
             score.Accuracy = Accuracy.Value;
             score.Rank = Rank.Value;
-            score.Date = DateTimeOffset.Now;
 
             foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r.IsScorable()))
                 score.Statistics[result] = GetStatistic(result);
