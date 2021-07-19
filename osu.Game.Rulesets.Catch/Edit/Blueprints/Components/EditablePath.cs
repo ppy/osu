@@ -120,6 +120,24 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             return index;
         }
 
+        protected bool RemoveVertex(int index)
+        {
+            if (index < 0 || index >= path.Vertices.Count)
+                return false;
+
+            if (vertexStates[index].IsFixed)
+                return false;
+
+            path.RemoveVertices((_, i) => i == index);
+
+            vertexStates.RemoveAt(index);
+            if (vertexStates.Count == 0)
+                vertexStates.Add(new VertexState());
+
+            Debug.Assert(vertexStates.Count == VertexCount);
+            return true;
+        }
+
         protected void MoveSelectedVertices(double distanceDelta, float xDelta)
         {
             // Because the vertex list may be reordered due to distance change, the state list must be reordered as well.
