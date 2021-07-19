@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Wiki
                 return;
 
             TabControl.Clear();
-            Current.Value = string.Empty;
+            Current.Value = null;
 
             TabControl.AddItem(IndexPageString);
 
