@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatchPlayfield : ScrollingPlayfield
     {
+        private readonly BeatmapDifficulty difficulty;
+
         /// <summary>
         /// The width of the playfield.
         /// The horizontal movement of the catcher is confined in the area of this width.
@@ -31,11 +33,17 @@ namespace osu.Game.Rulesets.Catch.UI
             // only check the X position; handle all vertical space.
             base.ReceivePositionalInputAt(new Vector2(screenSpacePos.X, ScreenSpaceDrawQuad.Centre.Y));
 
-        internal readonly Catcher Catcher;
+        internal Catcher Catcher { get; private set; }
 
-        internal readonly CatcherArea CatcherArea;
+        internal CatcherArea CatcherArea { get; private set; }
 
         public CatchPlayfield(BeatmapDifficulty difficulty)
+        {
+            this.difficulty = difficulty;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             var trailContainer = new Container
             {
@@ -49,7 +57,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 X = CENTER_X
             };
 
-            InternalChildren = new[]
+            AddRangeInternal(new[]
             {
                 droppedObjectContainer,
                 Catcher.CreateProxiedContent(),
@@ -64,12 +72,8 @@ namespace osu.Game.Rulesets.Catch.UI
                 },
                 trailContainer,
                 HitObjectContainer,
-            };
-        }
+            });
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             RegisterPool<Droplet, DrawableDroplet>(50);
             RegisterPool<TinyDroplet, DrawableTinyDroplet>(50);
             RegisterPool<Fruit, DrawableFruit>(100);
