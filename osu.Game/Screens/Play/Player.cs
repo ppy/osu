@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuConfigManager config, OsuGameBase game)
         {
-            Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
+            Mods.Value = base.Mods.Value.Select(m => m.DeepClone()).ToArray();
 
             if (Beatmap.Value is DummyWorkingBeatmap)
                 return;
@@ -694,9 +694,11 @@ namespace osu.Game.Screens.Play
         /// <returns>The final score.</returns>
         private async Task<ScoreInfo> prepareScoreForResults()
         {
+            var scoreCopy = Score.DeepClone();
+
             try
             {
-                await PrepareScoreForResultsAsync(Score).ConfigureAwait(false);
+                await PrepareScoreForResultsAsync(scoreCopy).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -705,14 +707,14 @@ namespace osu.Game.Screens.Play
 
             try
             {
-                await ImportScore(Score).ConfigureAwait(false);
+                await ImportScore(scoreCopy).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, @"Score import failed!");
             }
 
-            return Score.ScoreInfo;
+            return scoreCopy.ScoreInfo;
         }
 
         /// <summary>

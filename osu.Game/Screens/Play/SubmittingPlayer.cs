@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Play
         {
             var exiting = base.OnExiting(next);
 
-            submitScore(Score);
+            submitScore(Score.DeepClone());
 
             return exiting;
         }
