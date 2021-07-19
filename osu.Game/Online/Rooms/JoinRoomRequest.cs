@@ -9,11 +9,13 @@ namespace osu.Game.Online.Rooms
 {
     public class JoinRoomRequest : APIRequest
     {
-        private readonly Room room;
+        public readonly Room Room;
+        public readonly string Password;
 
-        public JoinRoomRequest(Room room)
+        public JoinRoomRequest(Room room, string password)
         {
-            this.room = room;
+            Room = room;
+            Password = password;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -23,6 +25,7 @@ namespace osu.Game.Online.Rooms
             return req;
         }
 
-        protected override string Target => $"rooms/{room.RoomID.Value}/users/{User.Id}";
+        // Todo: Password needs to be specified here rather than via AddParameter() because this is a PUT request. May be a framework bug.
+        protected override string Target => $"rooms/{Room.RoomID.Value}/users/{User.Id}?password={Password}";
     }
 }
