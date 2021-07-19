@@ -58,8 +58,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         [Resolved(canBeNull: true)]
         private LoungeSubScreen lounge { get; set; }
 
-        private Container content;
-
         public readonly Room Room;
 
         private SelectionState state;
@@ -105,6 +103,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         public bool FilteringActive { get; set; }
 
+        private PasswordProtectedIcon passwordIcon;
+
+        private readonly Bindable<bool> hasPassword = new Bindable<bool>();
+
         public DrawableRoom(Room room)
         {
             Room = room;
@@ -138,7 +140,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding(SELECTION_BORDER_WIDTH),
-                    Child = content = new Container
+                    Child = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
@@ -214,15 +216,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     },
                                 },
                             },
+                            passwordIcon = new PasswordProtectedIcon { Alpha = 0 }
                         },
                     },
                 },
             };
-
-            if (Room.HasPassword.Value)
-            {
-                content.Add(new PasswordProtectedIcon());
-            }
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -241,6 +239,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 this.FadeInFromZero(transition_duration);
             else
                 Alpha = 0;
+
+            hasPassword.BindTo(Room.HasPassword);
+            hasPassword.BindValueChanged(v => passwordIcon.Alpha = v.NewValue ? 1 : 0, true);
         }
 
         public Popover GetPopover() => new PasswordEntryPopover(Room) { JoinRequested = lounge.Join };
@@ -313,7 +314,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        private class PasswordProtectedIcon : CompositeDrawable
+        public class PasswordProtectedIcon : CompositeDrawable
         {
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
