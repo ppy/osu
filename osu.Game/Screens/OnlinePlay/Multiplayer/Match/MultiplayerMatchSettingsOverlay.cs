@@ -271,6 +271,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
                 RoomID.BindValueChanged(roomId => initialBeatmapControl.Alpha = roomId.NewValue == null ? 1 : 0, true);
+                Password.BindValueChanged(password => PasswordTextBox.Text = password.NewValue ?? string.Empty, true);
 
                 operationInProgress.BindTo(ongoingOperationTracker.InProgress);
                 operationInProgress.BindValueChanged(v =>
