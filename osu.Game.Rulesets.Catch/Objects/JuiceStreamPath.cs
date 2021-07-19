@@ -29,6 +29,12 @@ namespace osu.Game.Rulesets.Catch.Objects
     public class JuiceStreamPath
     {
         /// <summary>
+        /// The height of legacy osu!standard playfield.
+        /// The sliders converted by <see cref="ConvertToSliderPath"/> are vertically contained in this height.
+        /// </summary>
+        internal const float OSU_PLAYFIELD_HEIGHT = 384;
+
+        /// <summary>
         /// The list of vertices of the path, which is represented as a polyline connecting the vertices.
         /// </summary>
         public IReadOnlyList<JuiceStreamPathVertex> Vertices => vertices;
@@ -210,12 +216,6 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             invalidate();
         }
-
-        /// <summary>
-        /// The height of legacy osu!standard playfield.
-        /// The sliders converted by <see cref="ConvertToSliderPath"/> are vertically contained in this height.
-        /// </summary>
-        public const float OSU_PLAYFIELD_HEIGHT = 384;
 
         /// <summary>
         /// Convert the path of this <see cref="JuiceStreamPath"/> to a <see cref="SliderPath"/> and write the result to <paramref name="sliderPath"/>.
