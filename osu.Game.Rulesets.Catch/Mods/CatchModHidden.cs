@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             var drawableCatchRuleset = (DrawableCatchRuleset)drawableRuleset;
             var catchPlayfield = (CatchPlayfield)drawableCatchRuleset.Playfield;
 
-            catchPlayfield.CatcherArea.MovableCatcher.CatchFruitOnPlate = false;
+            catchPlayfield.Catcher.CatchFruitOnPlate = false;
         }
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
