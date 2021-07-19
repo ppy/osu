@@ -200,6 +200,21 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             addVertexCheckStep(1, 0, times[0], positions[0]);
         }
 
+        [Test]
+        public void TestVertexResampling()
+        {
+            addBlueprintStep(100, 100, new SliderPath(PathType.PerfectCurve, new[]
+            {
+                Vector2.Zero,
+                new Vector2(100, 100),
+                new Vector2(50, 200),
+            }), 0.5);
+            AddAssert("1 vertex per 1 nested HO", () => getVertices().Count == hitObject.NestedHitObjects.Count);
+            AddAssert("slider path not yet changed", () => hitObject.Path.ControlPoints[0].Type.Value == PathType.PerfectCurve);
+            addAddVertexSteps(150, 150);
+            AddAssert("slider path change to linear", () => hitObject.Path.ControlPoints[0].Type.Value == PathType.Linear);
+        }
+
         private void addBlueprintStep(double time, float x, SliderPath sliderPath, double velocity) => AddStep("add selection blueprint", () =>
         {
             hitObject = new JuiceStream
