@@ -119,6 +119,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             var apiRoom = roomManager.Rooms.Single(r => r.RoomID.Value == roomId);
 
+            if (password != apiRoom.Password.Value)
+                throw new InvalidOperationException("Invalid password.");
+
             var localUser = new MultiplayerRoomUser(api.LocalUser.Value.Id)
             {
                 User = api.LocalUser.Value
