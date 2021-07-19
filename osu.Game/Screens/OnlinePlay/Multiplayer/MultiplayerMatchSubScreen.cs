@@ -326,7 +326,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             // the room may not be left immediately after a disconnection due to async flow,
             // so checking the IsConnected status is also required.
-            if (client.Room == null || !client.IsConnected.Value)
+            if (client?.Room == null || !client.IsConnected.Value)
             {
                 // room has not been created yet; exit immediately.
                 return base.OnExiting(next);
