@@ -16,40 +16,44 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneRoomStatus : OsuTestScene
     {
-        public TestSceneRoomStatus()
+        [Test]
+        public void TestMultipleStatuses()
         {
-            Child = new FillFlowContainer
+            AddStep("create rooms", () =>
             {
-                RelativeSizeAxes = Axes.Both,
-                Width = 0.5f,
-                Children = new Drawable[]
+                Child = new FillFlowContainer
                 {
-                    new DrawableRoom(new Room
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.5f,
+                    Children = new Drawable[]
                     {
-                        Name = { Value = "Open - ending in 1 day" },
-                        Status = { Value = new RoomStatusOpen() },
-                        EndDate = { Value = DateTimeOffset.Now.AddDays(1) }
-                    }) { MatchingFilter = true },
-                    new DrawableRoom(new Room
-                    {
-                        Name = { Value = "Playing - ending in 1 day" },
-                        Status = { Value = new RoomStatusPlaying() },
-                        EndDate = { Value = DateTimeOffset.Now.AddDays(1) }
-                    }) { MatchingFilter = true },
-                    new DrawableRoom(new Room
-                    {
-                        Name = { Value = "Ended" },
-                        Status = { Value = new RoomStatusEnded() },
-                        EndDate = { Value = DateTimeOffset.Now }
-                    }) { MatchingFilter = true },
-                    new DrawableRoom(new Room
-                    {
-                        Name = { Value = "Open" },
-                        Status = { Value = new RoomStatusOpen() },
-                        Category = { Value = RoomCategory.Realtime }
-                    }) { MatchingFilter = true },
-                }
-            };
+                        new DrawableRoom(new Room
+                        {
+                            Name = { Value = "Open - ending in 1 day" },
+                            Status = { Value = new RoomStatusOpen() },
+                            EndDate = { Value = DateTimeOffset.Now.AddDays(1) }
+                        }) { MatchingFilter = true },
+                        new DrawableRoom(new Room
+                        {
+                            Name = { Value = "Playing - ending in 1 day" },
+                            Status = { Value = new RoomStatusPlaying() },
+                            EndDate = { Value = DateTimeOffset.Now.AddDays(1) }
+                        }) { MatchingFilter = true },
+                        new DrawableRoom(new Room
+                        {
+                            Name = { Value = "Ended" },
+                            Status = { Value = new RoomStatusEnded() },
+                            EndDate = { Value = DateTimeOffset.Now }
+                        }) { MatchingFilter = true },
+                        new DrawableRoom(new Room
+                        {
+                            Name = { Value = "Open" },
+                            Status = { Value = new RoomStatusOpen() },
+                            Category = { Value = RoomCategory.Realtime }
+                        }) { MatchingFilter = true },
+                    }
+                };
+            });
         }
 
         [Test]
