@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public override IBindable<bool> IsConnected => isConnected;
         private readonly Bindable<bool> isConnected = new Bindable<bool>(true);
 
-        public Room? APIRoom { get; private set; }
+        public new Room? APIRoom => base.APIRoom;
 
         public Action<MultiplayerRoom>? RoomSetupAction;
 
@@ -138,6 +138,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     RequiredMods = apiRoom.Playlist.Last().RequiredMods.Select(m => new APIMod(m)).ToArray(),
                     AllowedMods = apiRoom.Playlist.Last().AllowedMods.Select(m => new APIMod(m)).ToArray(),
                     PlaylistItemId = apiRoom.Playlist.Last().ID,
+                    // ReSharper disable once ConstantNullCoalescingCondition Incorrect inspection due to lack of nullable in Room.cs.
                     Password = password ?? string.Empty,
                 },
                 Users = { localUser },
@@ -147,16 +148,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             RoomSetupAction?.Invoke(room);
             RoomSetupAction = null;
 
-            APIRoom = apiRoom;
-
             return Task.FromResult(room);
         }
 
-        protected override Task LeaveRoomInternal()
-        {
-            APIRoom = null;
-            return Task.CompletedTask;
-        }
+        protected override Task LeaveRoomInternal() => Task.CompletedTask;
 
         public override Task TransferHost(int userId) => ((IMultiplayerClient)this).HostChanged(userId);
 
