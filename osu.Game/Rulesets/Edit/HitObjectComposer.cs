@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Edit
 
         private InputManager inputManager;
 
-        private RadioButtonCollection toolboxCollection;
+        private EditorRadioButtonCollection toolboxCollection;
 
         private FillFlowContainer togglesCollection;
 
@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Edit
                     {
                         new ToolboxGroup("toolbox (1-9)")
                         {
-                            Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X }
+                            Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X }
                         },
                         new ToolboxGroup("toggles (Q~P)")
                         {
