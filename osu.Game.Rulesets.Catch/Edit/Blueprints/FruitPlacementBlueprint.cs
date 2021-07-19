@@ -29,7 +29,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         {
             base.Update();
 
-            outline.UpdateFrom(HitObjectContainer, HitObject);
+            outline.Position = CatchHitObjectUtils.GetStartPosition(HitObjectContainer, HitObject);
+            outline.UpdateFrom(HitObject);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)

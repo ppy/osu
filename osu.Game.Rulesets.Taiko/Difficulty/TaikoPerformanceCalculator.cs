@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -31,10 +30,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
             mods = Score.Mods;
-            countGreat = Score.Statistics.GetOrDefault(HitResult.Great);
-            countOk = Score.Statistics.GetOrDefault(HitResult.Ok);
-            countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
-            countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
+            countGreat = Score.Statistics.GetValueOrDefault(HitResult.Great);
+            countOk = Score.Statistics.GetValueOrDefault(HitResult.Ok);
+            countMeh = Score.Statistics.GetValueOrDefault(HitResult.Meh);
+            countMiss = Score.Statistics.GetValueOrDefault(HitResult.Miss);
 
             // Custom multipliers for NoFail and SpunOut.
             double multiplier = 1.1; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things

@@ -5,9 +5,11 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -16,12 +18,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.RadioButtons
 {
-    public class DrawableRadioButton : OsuButton
+    public class EditorRadioButton : OsuButton, IHasTooltip
     {
         /// <summary>
-        /// Invoked when this <see cref="DrawableRadioButton"/> has been selected.
+        /// Invoked when this <see cref="EditorRadioButton"/> has been selected.
         /// </summary>
         public Action<RadioButton> Selected;
+
+        public readonly RadioButton Button;
 
         private Color4 defaultBackgroundColour;
         private Color4 defaultBubbleColour;
@@ -29,13 +33,15 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         private Color4 selectedBubbleColour;
 
         private Drawable icon;
-        private readonly RadioButton button;
 
-        public DrawableRadioButton(RadioButton button)
+        [Resolved(canBeNull: true)]
+        private EditorBeatmap editorBeatmap { get; set; }
+
+        public EditorRadioButton(RadioButton button)
         {
-            this.button = button;
+            Button = button;
 
-            Text = button.Item.ToString();
+            Text = button.Label;
             Action = button.Select;
 
             RelativeSizeAxes = Axes.X;
@@ -57,7 +63,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
                 Colour = Color4.Black.Opacity(0.5f)
             };
 
-            Add(icon = (button.CreateIcon?.Invoke() ?? new Circle()).With(b =>
+            Add(icon = (Button.CreateIcon?.Invoke() ?? new Circle()).With(b =>
             {
                 b.Blending = BlendingParameters.Additive;
                 b.Anchor = Anchor.CentreLeft;
@@ -71,13 +77,16 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         {
             base.LoadComplete();
 
-            button.Selected.ValueChanged += selected =>
+            Button.Selected.ValueChanged += selected =>
             {
                 updateSelectionState();
                 if (selected.NewValue)
-                    Selected?.Invoke(button);
+                    Selected?.Invoke(Button);
             };
 
+            editorBeatmap?.HasTiming.BindValueChanged(hasTiming => Button.Selected.Disabled = !hasTiming.NewValue, true);
+
+            Button.Selected.BindDisabledChanged(disabled => Enabled.Value = !disabled, true);
             updateSelectionState();
         }
 
@@ -86,8 +95,8 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             if (!IsLoaded)
                 return;
 
-            BackgroundColour = button.Selected.Value ? selectedBackgroundColour : defaultBackgroundColour;
-            icon.Colour = button.Selected.Value ? selectedBubbleColour : defaultBubbleColour;
+            BackgroundColour = Button.Selected.Value ? selectedBackgroundColour : defaultBackgroundColour;
+            icon.Colour = Button.Selected.Value ? selectedBubbleColour : defaultBubbleColour;
         }
 
         protected override SpriteText CreateText() => new OsuSpriteText
@@ -97,5 +106,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             Anchor = Anchor.CentreLeft,
             X = 40f
         };
+
+        public LocalisableString TooltipText => Enabled.Value ? string.Empty : "Add at least one timing point first!";
     }
 }
