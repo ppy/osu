@@ -213,8 +213,11 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             public TestCatcherArea()
             {
-                Scale = new Vector2(4f);
-
+                MovableCatcher = new Catcher(this, new BeatmapDifficulty())
+                {
+                    X = CatchPlayfield.CENTER_X,
+                    Scale = new Vector2(4)
+                };
                 AddInternal(droppedObjectContainer = new DroppedObjectContainer());
             }
         }

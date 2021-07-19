@@ -123,8 +123,11 @@ namespace osu.Game.Rulesets.Catch.Tests
             private readonly DroppedObjectContainer droppedObjectContainer;
 
             public TestCatcherArea(BeatmapDifficulty beatmapDifficulty)
-                : base(beatmapDifficulty)
             {
+                MovableCatcher = new Catcher(this, beatmapDifficulty)
+                {
+                    X = CatchPlayfield.CENTER_X
+                };
                 AddInternal(droppedObjectContainer = new DroppedObjectContainer());
             }
 

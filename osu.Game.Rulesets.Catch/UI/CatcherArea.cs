@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Replays;
@@ -20,8 +19,21 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         public const float CATCHER_SIZE = 106.75f;
 
-        public readonly Catcher MovableCatcher;
+        public Catcher MovableCatcher
+        {
+            get => catcher;
+            set
+            {
+                if (catcher != null)
+                    Remove(catcher);
+
+                Add(catcher = value);
+            }
+        }
+
         private readonly CatchComboDisplay comboDisplay;
+
+        private Catcher catcher;
 
         /// <summary>
         /// <c>-1</c> when only left button is pressed.
@@ -30,21 +42,17 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         private int currentDirection;
 
-        public CatcherArea(BeatmapDifficulty difficulty = null)
+        public CatcherArea()
         {
             Size = new Vector2(CatchPlayfield.WIDTH, CATCHER_SIZE);
-            Children = new Drawable[]
+            Child = comboDisplay = new CatchComboDisplay
             {
-                comboDisplay = new CatchComboDisplay
-                {
-                    RelativeSizeAxes = Axes.None,
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.Centre,
-                    Margin = new MarginPadding { Bottom = 350f },
-                    X = CatchPlayfield.CENTER_X
-                },
-                MovableCatcher = new Catcher(this, difficulty) { X = CatchPlayfield.CENTER_X },
+                RelativeSizeAxes = Axes.None,
+                AutoSizeAxes = Axes.Both,
+                Anchor = Anchor.TopLeft,
+                Origin = Anchor.Centre,
+                Margin = new MarginPadding { Bottom = 350f },
+                X = CatchPlayfield.CENTER_X
             };
         }
 
