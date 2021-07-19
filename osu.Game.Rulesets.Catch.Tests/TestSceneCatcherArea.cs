@@ -119,16 +119,16 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class TestCatcherArea : CatcherArea
         {
-            [Cached]
-            private readonly DroppedObjectContainer droppedObjectContainer;
-
             public TestCatcherArea(BeatmapDifficulty beatmapDifficulty)
             {
-                MovableCatcher = new Catcher(this, beatmapDifficulty)
+                var droppedObjectContainer = new DroppedObjectContainer();
+
+                Add(droppedObjectContainer);
+
+                MovableCatcher = new Catcher(this, droppedObjectContainer, beatmapDifficulty)
                 {
                     X = CatchPlayfield.CENTER_X
                 };
-                AddInternal(droppedObjectContainer = new DroppedObjectContainer());
             }
 
             public void ToggleHyperDash(bool status) => MovableCatcher.SetHyperDashState(status ? 2 : 1);

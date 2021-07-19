@@ -35,21 +35,19 @@ namespace osu.Game.Rulesets.Catch.UI
 
         internal readonly CatcherArea CatcherArea;
 
-        [Cached]
-        private readonly DroppedObjectContainer droppedObjectContainer;
-
         public CatchPlayfield(BeatmapDifficulty difficulty)
         {
             var trailContainer = new Container();
+            var droppedObjectContainer = new DroppedObjectContainer();
 
-            Catcher = new Catcher(trailContainer, difficulty)
+            Catcher = new Catcher(trailContainer, droppedObjectContainer, difficulty)
             {
                 X = CENTER_X
             };
 
             InternalChildren = new[]
             {
-                droppedObjectContainer = new DroppedObjectContainer(),
+                droppedObjectContainer,
                 Catcher.CreateProxiedContent(),
                 HitObjectContainer.CreateProxy(),
                 // This ordering (`CatcherArea` before `HitObjectContainer`) is important to
@@ -58,7 +56,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
-                    MovableCatcher = Catcher
+                    MovableCatcher = Catcher,
                 },
                 trailContainer,
                 HitObjectContainer,

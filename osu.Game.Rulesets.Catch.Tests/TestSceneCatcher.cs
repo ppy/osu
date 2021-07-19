@@ -31,22 +31,11 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        [Cached]
-        private readonly DroppedObjectContainer droppedObjectContainer;
+        private Container trailContainer;
 
-        private readonly Container trailContainer;
+        private DroppedObjectContainer droppedObjectContainer;
 
         private TestCatcher catcher;
-
-        public TestSceneCatcher()
-        {
-            Add(trailContainer = new Container
-            {
-                Anchor = Anchor.Centre,
-                Depth = -1
-            });
-            Add(droppedObjectContainer = new DroppedObjectContainer());
-        }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -56,13 +45,19 @@ namespace osu.Game.Rulesets.Catch.Tests
                 CircleSize = 0,
             };
 
-            if (catcher != null)
-                Remove(catcher);
+            trailContainer = new Container();
+            droppedObjectContainer = new DroppedObjectContainer();
 
-            Add(catcher = new TestCatcher(trailContainer, difficulty)
+            Child = new Container
             {
-                Anchor = Anchor.Centre
-            });
+                Anchor = Anchor.Centre,
+                Children = new Drawable[]
+                {
+                    droppedObjectContainer,
+                    catcher = new TestCatcher(trailContainer, droppedObjectContainer, difficulty),
+                    trailContainer,
+                }
+            };
         });
 
         [Test]
@@ -299,8 +294,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             public IEnumerable<CaughtObject> CaughtObjects => this.ChildrenOfType<CaughtObject>();
 
-            public TestCatcher(Container trailsTarget, BeatmapDifficulty difficulty)
-                : base(trailsTarget, difficulty)
+            public TestCatcher(Container trailsTarget, DroppedObjectContainer droppedObjectTarget, BeatmapDifficulty difficulty)
+                : base(trailsTarget, droppedObjectTarget, difficulty)
             {
             }
         }
