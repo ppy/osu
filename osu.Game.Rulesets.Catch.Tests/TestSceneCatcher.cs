@@ -47,15 +47,16 @@ namespace osu.Game.Rulesets.Catch.Tests
             {
                 Anchor = Anchor.Centre,
             };
+            droppedObjectContainer = new DroppedObjectContainer();
             Child = new DependencyProvidingContainer
             {
-                Types = new[]
+                CachedDependencies = new (Type, object)[]
                 {
-                    typeof(DroppedObjectContainer),
+                    (typeof(DroppedObjectContainer), droppedObjectContainer),
                 },
                 Children = new Drawable[]
                 {
-                    droppedObjectContainer = new DroppedObjectContainer(),
+                    droppedObjectContainer,
                     catcher = new TestCatcher(trailContainer, difficulty),
                     trailContainer
                 },
