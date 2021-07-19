@@ -10,11 +10,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Lists;
 using osu.Framework.Utils;
 using osu.Game.Screens.Edit;
+using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
     [Serializable]
-    public class ControlPointInfo
+    public class ControlPointInfo : IDeepCloneable<ControlPointInfo>
     {
         /// <summary>
         /// All control points grouped by time.
@@ -350,12 +351,12 @@ namespace osu.Game.Beatmaps.ControlPoints
             }
         }
 
-        public ControlPointInfo CreateCopy()
+        public ControlPointInfo DeepClone()
         {
             var controlPointInfo = new ControlPointInfo();
 
             foreach (var point in AllControlPoints)
-                controlPointInfo.Add(point.Time, point.CreateCopy());
+                controlPointInfo.Add(point.Time, point.DeepClone());
 
             return controlPointInfo;
         }
