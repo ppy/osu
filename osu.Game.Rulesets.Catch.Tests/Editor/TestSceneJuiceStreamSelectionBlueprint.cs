@@ -182,6 +182,24 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             AddAssert("duration is changed", () => Precision.AlmostEquals(hitObject.Duration, 800 - times[0], 1e-3));
         }
 
+        [Test]
+        public void TestDeleteVertex()
+        {
+            double[] times = { 100, 300, 500 };
+            float[] positions = { 100, 200, 150 };
+            addBlueprintStep(times, positions);
+
+            addDeleteVertexSteps(times[1], positions[1]);
+            addVertexCheckStep(2, 1, times[2], positions[2]);
+
+            // The first vertex cannot be deleted.
+            addDeleteVertexSteps(times[0], positions[0]);
+            addVertexCheckStep(2, 0, times[0], positions[0]);
+
+            addDeleteVertexSteps(times[2], positions[2]);
+            addVertexCheckStep(1, 0, times[0], positions[0]);
+        }
+
         private void addBlueprintStep(double time, float x, SliderPath sliderPath, double velocity) => AddStep("add selection blueprint", () =>
         {
             hitObject = new JuiceStream
@@ -236,6 +254,17 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
                 InputManager.PressKey(Key.ControlLeft);
                 InputManager.Click(MouseButton.Left);
                 InputManager.ReleaseKey(Key.ControlLeft);
+            });
+        }
+
+        private void addDeleteVertexSteps(double time, float x)
+        {
+            AddMouseMoveStep(time, x);
+            AddStep("delete vertex", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ShiftLeft);
             });
         }
     }
