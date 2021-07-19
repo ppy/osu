@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Wiki
             Current.Value = e.NewValue.Title;
         }
 
-        private void onCurrentChange(ValueChangedEvent<LocalisableString> e)
+        private void onCurrentChange(ValueChangedEvent<LocalisableString?> e)
         {
             if (e.NewValue == TabControl.Items.LastOrDefault())
                 return;

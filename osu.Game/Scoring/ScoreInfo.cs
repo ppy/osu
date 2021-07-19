@@ -7,7 +7,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
@@ -209,13 +208,13 @@ namespace osu.Game.Scoring
         {
             foreach (var r in Ruleset.CreateInstance().GetHitResults())
             {
-                int value = Statistics.GetOrDefault(r.result);
+                int value = Statistics.GetValueOrDefault(r.result);
 
                 switch (r.result)
                 {
                     case HitResult.SmallTickHit:
                     {
-                        int total = value + Statistics.GetOrDefault(HitResult.SmallTickMiss);
+                        int total = value + Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
                         if (total > 0)
                             yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
 
@@ -224,7 +223,7 @@ namespace osu.Game.Scoring
 
                     case HitResult.LargeTickHit:
                     {
-                        int total = value + Statistics.GetOrDefault(HitResult.LargeTickMiss);
+                        int total = value + Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
                         if (total > 0)
                             yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
 

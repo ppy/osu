@@ -20,12 +20,6 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             Anchor = Anchor.BottomLeft;
         }
 
-        public void UpdatePositionFrom(ScrollingHitObjectContainer hitObjectContainer, CatchHitObject parentHitObject)
-        {
-            X = parentHitObject.OriginalX;
-            Y = hitObjectContainer.PositionAtTime(parentHitObject.StartTime);
-        }
-
         public void UpdateNestedObjectsFrom(ScrollingHitObjectContainer hitObjectContainer, CatchHitObject parentHitObject)
         {
             nestedHitObjects.Clear();
@@ -43,7 +37,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             {
                 var hitObject = nestedHitObjects[i];
                 var outline = (FruitOutline)InternalChildren[i];
-                outline.UpdateFrom(hitObjectContainer, hitObject, parentHitObject);
+                outline.Position = CatchHitObjectUtils.GetStartPosition(hitObjectContainer, hitObject) - Position;
+                outline.UpdateFrom(hitObject);
                 outline.Scale *= hitObject is Droplet ? 0.5f : 1;
             }
         }

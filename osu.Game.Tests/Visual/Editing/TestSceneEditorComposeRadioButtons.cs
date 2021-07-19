@@ -13,8 +13,8 @@ namespace osu.Game.Tests.Visual.Editing
     {
         public TestSceneEditorComposeRadioButtons()
         {
-            RadioButtonCollection collection;
-            Add(collection = new RadioButtonCollection
+            EditorRadioButtonCollection collection;
+            Add(collection = new EditorRadioButtonCollection
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
