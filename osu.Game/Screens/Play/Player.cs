@@ -955,7 +955,11 @@ namespace osu.Game.Screens.Play
 
             // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
             if (prepareScoreForDisplayTask == null)
+            {
                 Score.ScoreInfo.Passed = false;
+                // potentially should be ScoreRank.F instead? this is the best alternative for now.
+                Score.ScoreInfo.Rank = ScoreRank.D;
+            }
 
             // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
             // To resolve test failures, forcefully end playing synchronously when this screen exits.
