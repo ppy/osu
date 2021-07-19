@@ -49,6 +49,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                         apiRoom.CopyFrom(createRoomRequest.Room);
                         apiRoom.RoomID.Value ??= currentRoomId++;
+
+                        // Passwords are explicitly not copied between rooms.
+                        apiRoom.HasPassword.Value = !string.IsNullOrEmpty(createRoomRequest.Room.Password.Value);
+                        apiRoom.Password.Value = createRoomRequest.Room.Password.Value;
+
                         for (int i = 0; i < apiRoom.Playlist.Count; i++)
                             apiRoom.Playlist[i].ID = currentPlaylistItemId++;
 
@@ -127,7 +132,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             var responseRoom = new Room();
             responseRoom.CopyFrom(room);
-            responseRoom.HasPassword.Value = !string.IsNullOrEmpty(responseRoom.Password.Value);
             responseRoom.Password.Value = null;
             if (!withParticipants)
                 responseRoom.RecentParticipants.Clear();
