@@ -249,7 +249,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
             {
-                parentScreen?.OpenNewRoom(Room.CreateCopy());
+                parentScreen?.OpenNewRoom(Room.DeepClone());
             })
         };
 
