@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     RelativeSizeAxes = Axes.X,
                     Height = height,
                     Width = 0.25f,
-                    Text = $"{presetRotation}º",
+                    Text = $@"{presetRotation}º",
                     Action = () => tabletHandler.Rotation.Value = presetRotation,
                 });
             }

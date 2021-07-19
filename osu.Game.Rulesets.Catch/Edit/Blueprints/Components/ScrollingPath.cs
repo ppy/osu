@@ -33,12 +33,6 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             };
         }
 
-        public void UpdatePositionFrom(ScrollingHitObjectContainer hitObjectContainer, CatchHitObject hitObject)
-        {
-            X = hitObject.OriginalX;
-            Y = hitObjectContainer.PositionAtTime(hitObject.StartTime);
-        }
-
         public void UpdatePathFrom(ScrollingHitObjectContainer hitObjectContainer, JuiceStream hitObject)
         {
             double distanceToYFactor = -hitObjectContainer.LengthAtTime(hitObject.StartTime, hitObject.StartTime + 1 / hitObject.Velocity);
