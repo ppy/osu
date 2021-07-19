@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Profile.Sections
     {
         public override LocalisableString Title => UsersStrings.ShowExtraKudosuTitle;
 
-        public override string Identifier => "kudosu";
+        public override string Identifier => @"kudosu";
 
         public KudosuSection()
         {

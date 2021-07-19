@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Profile.Sections
     {
         public override LocalisableString Title => UsersStrings.ShowExtraHistoricalTitle;
 
-        public override string Identifier => "historical";
+        public override string Identifier => @"historical";
 
         public HistoricalSection()
         {
