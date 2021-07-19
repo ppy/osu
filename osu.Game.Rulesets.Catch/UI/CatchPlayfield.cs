@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Catch.UI
             ((DrawableCatchHitObject)d).CheckPosition = checkIfWeCanCatch;
         }
 
-        private bool checkIfWeCanCatch(CatchHitObject obj) => CatcherArea.MovableCatcher.CanCatch(obj);
+        private bool checkIfWeCanCatch(CatchHitObject obj) => Catcher.CanCatch(obj);
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
             => CatcherArea.OnNewResult((DrawableCatchHitObject)judgedObject, result);
