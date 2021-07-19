@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, OsuConfigManager config, OsuGameBase game)
         {
-            Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
+            Mods.Value = base.Mods.Value.Select(m => m.DeepClone()).ToArray();
 
             if (Beatmap.Value is DummyWorkingBeatmap)
                 return;

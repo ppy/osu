@@ -10,10 +10,11 @@ using osu.Game.IO.Serialization.Converters;
 using osu.Game.Online.Rooms.GameTypes;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Users;
+using osu.Game.Utils;
 
 namespace osu.Game.Online.Rooms
 {
-    public class Room
+    public class Room : IDeepCloneable<Room>
     {
         [Cached]
         [JsonProperty("id")]
@@ -120,7 +121,7 @@ namespace osu.Game.Online.Rooms
         /// Create a copy of this room without online information.
         /// Should be used to create a local copy of a room for submitting in the future.
         /// </summary>
-        public Room CreateCopy()
+        public Room DeepClone()
         {
             var copy = new Room();
 
