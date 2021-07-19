@@ -37,7 +37,11 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatchPlayfield(BeatmapDifficulty difficulty)
         {
-            var trailContainer = new Container();
+            var trailContainer = new Container
+            {
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.TopLeft
+            };
             var droppedObjectContainer = new DroppedObjectContainer();
 
             Catcher = new Catcher(trailContainer, droppedObjectContainer, difficulty)
