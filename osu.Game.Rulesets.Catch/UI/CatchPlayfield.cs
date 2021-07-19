@@ -16,8 +16,6 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatchPlayfield : ScrollingPlayfield
     {
-        private readonly BeatmapDifficulty difficulty;
-
         /// <summary>
         /// The width of the playfield.
         /// The horizontal movement of the catcher is confined in the area of this width.
@@ -36,6 +34,8 @@ namespace osu.Game.Rulesets.Catch.UI
         internal Catcher Catcher { get; private set; }
 
         internal CatcherArea CatcherArea { get; private set; }
+
+        private readonly BeatmapDifficulty difficulty;
 
         public CatchPlayfield(BeatmapDifficulty difficulty)
         {
