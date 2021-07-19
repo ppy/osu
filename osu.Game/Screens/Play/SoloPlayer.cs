@@ -38,15 +38,13 @@ namespace osu.Game.Screens.Play
 
         protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token)
         {
-            var scoreCopy = score.DeepClone();
-
-            var beatmap = scoreCopy.ScoreInfo.Beatmap;
+            var beatmap = score.ScoreInfo.Beatmap;
 
             Debug.Assert(beatmap.OnlineBeatmapID != null);
 
             int beatmapId = beatmap.OnlineBeatmapID.Value;
 
-            return new SubmitSoloScoreRequest(beatmapId, token, scoreCopy.ScoreInfo);
+            return new SubmitSoloScoreRequest(beatmapId, token, score.ScoreInfo);
         }
     }
 }

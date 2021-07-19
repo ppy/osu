@@ -694,9 +694,11 @@ namespace osu.Game.Screens.Play
         /// <returns>The final score.</returns>
         private async Task<ScoreInfo> prepareScoreForResults()
         {
+            var scoreCopy = Score.DeepClone();
+
             try
             {
-                await PrepareScoreForResultsAsync(Score).ConfigureAwait(false);
+                await PrepareScoreForResultsAsync(scoreCopy).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -705,14 +707,14 @@ namespace osu.Game.Screens.Play
 
             try
             {
-                await ImportScore(Score).ConfigureAwait(false);
+                await ImportScore(scoreCopy).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, @"Score import failed!");
             }
 
-            return Score.ScoreInfo;
+            return scoreCopy.ScoreInfo;
         }
 
         /// <summary>
