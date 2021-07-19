@@ -16,7 +16,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "browse for new beatmaps"
         /// </summary>
-        public static LocalisableString BeatmapListingDescription => new TranslatableString(getKey(@"beatmap_listing"), @"browse for new beatmaps");
+        public static LocalisableString BeatmapListingDescription => new TranslatableString(getKey(@"beatmap_listing_description"), @"browse for new beatmaps");
 
         /// <inheritdoc cref="PageTitleStrings.MainBeatmapsetsControllerShow"/>
         public static LocalisableString BeatmapSetTitle => PageTitleStrings.MainBeatmapsetsControllerShow;
@@ -27,7 +27,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "track recent dev updates in the osu! ecosystem"
         /// </summary>
-        public static LocalisableString ChangelogDescription => new TranslatableString(getKey(@"changelog"), @"track recent dev updates in the osu! ecosystem");
+        public static LocalisableString ChangelogDescription => new TranslatableString(getKey(@"changelog_description"), @"track recent dev updates in the osu! ecosystem");
 
         /// <inheritdoc cref="PageTitleStrings.MainHomeControllerIndex"/>
         public static LocalisableString DashboardTitle => PageTitleStrings.MainHomeControllerIndex;
@@ -35,7 +35,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "view your friends and other information"
         /// </summary>
-        public static LocalisableString DashboardDescription => new TranslatableString(getKey(@"dashboard"), @"view your friends and other information");
+        public static LocalisableString DashboardDescription => new TranslatableString(getKey(@"dashboard_description"), @"view your friends and other information");
 
         /// <inheritdoc cref="PageTitleStrings.MainRankingControllerDefault"/>
         public static LocalisableString RankingsTitle => PageTitleStrings.MainRankingControllerDefault;
@@ -43,7 +43,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "find out who's the best right now"
         /// </summary>
-        public static LocalisableString RankingsDescription => new TranslatableString(getKey(@"rankings"), @"find out who's the best right now");
+        public static LocalisableString RankingsDescription => new TranslatableString(getKey(@"rankings_description"), @"find out who's the best right now");
 
         /// <inheritdoc cref="PageTitleStrings.MainNewsControllerDefault"/>
         public static LocalisableString NewsTitle => PageTitleStrings.MainNewsControllerDefault;
@@ -51,7 +51,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "get up-to-date on community happenings"
         /// </summary>
-        public static LocalisableString NewsDescription => new TranslatableString(getKey(@"news"), @"get up-to-date on community happenings");
+        public static LocalisableString NewsDescription => new TranslatableString(getKey(@"news_description"), @"get up-to-date on community happenings");
 
         /// <inheritdoc cref="LayoutStrings.MenuHelpGetWiki"/>
         public static LocalisableString WikiTitle => PageTitleStrings.MainWikiControllerDefault;
@@ -59,7 +59,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "knowledge base"
         /// </summary>
-        public static LocalisableString WikiDescription => new TranslatableString(getKey(@"wiki"), @"knowledge base");
+        public static LocalisableString WikiDescription => new TranslatableString(getKey(@"wiki_description"), @"knowledge base");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }
