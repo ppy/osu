@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -106,6 +107,18 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         }
 
         protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
+
+        protected int AddVertex(double distance, float x)
+        {
+            int index = path.InsertVertex(distance);
+            path.SetVertexPosition(index, x);
+            vertexStates.Insert(index, new VertexState());
+
+            correctFixedVertexPositions();
+
+            Debug.Assert(vertexStates.Count == VertexCount);
+            return index;
+        }
 
         protected void MoveSelectedVertices(double distanceDelta, float xDelta)
         {

@@ -164,6 +164,24 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             AddAssert("path is updated", () => getVertices().Count > 2);
         }
 
+        [Test]
+        public void TestAddVertex()
+        {
+            double[] times = { 100, 700 };
+            float[] positions = { 200, 200 };
+            addBlueprintStep(times, positions, 0.2);
+
+            addAddVertexSteps(500, 150);
+            addVertexCheckStep(3, 1, 500, 150);
+
+            addAddVertexSteps(90, 220);
+            addVertexCheckStep(4, 1, times[0], positions[0]);
+
+            addAddVertexSteps(750, 180);
+            addVertexCheckStep(5, 4, 750, 180);
+            AddAssert("duration is changed", () => Precision.AlmostEquals(hitObject.Duration, 800 - times[0], 1e-3));
+        }
+
         private void addBlueprintStep(double time, float x, SliderPath sliderPath, double velocity) => AddStep("add selection blueprint", () =>
         {
             hitObject = new JuiceStream
@@ -209,5 +227,16 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
         }
 
         private void addDragEndStep() => AddStep("end dragging", () => InputManager.ReleaseButton(MouseButton.Left));
+
+        private void addAddVertexSteps(double time, float x)
+        {
+            AddMouseMoveStep(time, x);
+            AddStep("add vertex", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+        }
     }
 }
