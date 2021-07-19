@@ -45,21 +45,33 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 switch (req)
                 {
                     case CreateRoomRequest createRoomRequest:
-                        var createdRoom = new APICreatedRoom();
+                        var apiRoom = new Room();
 
-                        createdRoom.CopyFrom(createRoomRequest.Room);
-                        createdRoom.RoomID.Value ??= currentRoomId++;
+                        apiRoom.CopyFrom(createRoomRequest.Room);
+                        apiRoom.RoomID.Value ??= currentRoomId++;
+                        for (int i = 0; i < apiRoom.Playlist.Count; i++)
+                            apiRoom.Playlist[i].ID = currentPlaylistItemId++;
 
-                        for (int i = 0; i < createdRoom.Playlist.Count; i++)
-                            createdRoom.Playlist[i].ID = currentPlaylistItemId++;
+                        var responseRoom = new APICreatedRoom();
+                        responseRoom.CopyFrom(createResponseRoom(apiRoom, false));
 
-                        Rooms.Add(createdRoom);
-                        createRoomRequest.TriggerSuccess(createdRoom);
+                        Rooms.Add(apiRoom);
+                        createRoomRequest.TriggerSuccess(responseRoom);
                         return true;
 
                     case JoinRoomRequest joinRoomRequest:
+                    {
+                        var room = Rooms.Single(r => r.RoomID.Value == joinRoomRequest.Room.RoomID.Value);
+
+                        if (joinRoomRequest.Password != room.Password.Value)
+                        {
+                            joinRoomRequest.TriggerFailure(new InvalidOperationException("Invalid password."));
+                            return true;
+                        }
+
                         joinRoomRequest.TriggerSuccess();
                         return true;
+                    }
 
                     case PartRoomRequest partRoomRequest:
                         partRoomRequest.TriggerSuccess();
@@ -69,20 +81,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         var roomsWithoutParticipants = new List<Room>();
 
                         foreach (var r in Rooms)
-                        {
-                            var newRoom = new Room();
-
-                            newRoom.CopyFrom(r);
-                            newRoom.RecentParticipants.Clear();
-
-                            roomsWithoutParticipants.Add(newRoom);
-                        }
+                            roomsWithoutParticipants.Add(createResponseRoom(r, false));
 
                         getRoomsRequest.TriggerSuccess(roomsWithoutParticipants);
                         return true;
 
                     case GetRoomRequest getRoomRequest:
-                        getRoomRequest.TriggerSuccess(Rooms.Single(r => r.RoomID.Value == getRoomRequest.RoomId));
+                        getRoomRequest.TriggerSuccess(createResponseRoom(Rooms.Single(r => r.RoomID.Value == getRoomRequest.RoomId), true));
                         return true;
 
                     case GetBeatmapSetRequest getBeatmapSetRequest:
@@ -116,6 +121,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 return false;
             };
+        }
+
+        private Room createResponseRoom(Room room, bool withParticipants)
+        {
+            var responseRoom = new Room();
+            responseRoom.CopyFrom(room);
+            responseRoom.Password.Value = null;
+            if (!withParticipants)
+                responseRoom.RecentParticipants.Clear();
+            return responseRoom;
         }
 
         public new void ClearRooms() => base.ClearRooms();
