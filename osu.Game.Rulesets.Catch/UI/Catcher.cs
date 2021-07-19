@@ -47,6 +47,11 @@ namespace osu.Game.Rulesets.Catch.UI
         public bool CatchFruitOnPlate { get; set; } = true;
 
         /// <summary>
+        /// Whether <see cref="HitExplosion"/>s should be generated on the catcher plate when a hit object is caught.
+        /// </summary>
+        public readonly Bindable<bool> GenerateHitLighting = new Bindable<bool>(true);
+
+        /// <summary>
         /// The relative space to cover in 1 millisecond. based on 1 game pixel per millisecond as in osu-stable.
         /// </summary>
         public const double BASE_SPEED = 1.0;
@@ -126,7 +131,6 @@ namespace osu.Game.Rulesets.Catch.UI
         private double hyperDashModifier = 1;
         private int hyperDashDirection;
         private float hyperDashTargetPosition;
-        private Bindable<bool> hitLighting;
 
         private readonly HitExplosionContainer hitExplosionContainer;
 
@@ -171,7 +175,7 @@ namespace osu.Game.Rulesets.Catch.UI
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            hitLighting = config.GetBindable<bool>(OsuSetting.HitLighting);
+            GenerateHitLighting.BindTo(config.GetBindable<bool>(OsuSetting.HitLighting));
             trails = new CatcherTrailDisplay(this);
         }
 
@@ -240,7 +244,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 if (CatchFruitOnPlate)
                     placeCaughtObject(palpableObject, positionInStack);
 
-                if (hitLighting.Value)
+                if (GenerateHitLighting.Value)
                     addLighting(hitObject, positionInStack.X, drawableObject.AccentColour.Value);
             }
 
