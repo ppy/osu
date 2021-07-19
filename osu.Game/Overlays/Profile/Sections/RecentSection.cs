@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Profile.Sections
     {
         public override LocalisableString Title => UsersStrings.ShowExtraRecentActivityTitle;
 
-        public override string Identifier => "recent_activity";
+        public override string Identifier => @"recent_activity";
 
         public RecentSection()
         {

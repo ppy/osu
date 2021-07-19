@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Profile.Sections
     {
         public override LocalisableString Title => UsersStrings.ShowExtraBeatmapsTitle;
 
-        public override string Identifier => "beatmaps";
+        public override string Identifier => @"beatmaps";
 
         public BeatmapsSection()
         {

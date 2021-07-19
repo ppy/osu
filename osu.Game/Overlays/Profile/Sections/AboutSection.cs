@@ -10,6 +10,6 @@ namespace osu.Game.Overlays.Profile.Sections
     {
         public override LocalisableString Title => UsersStrings.ShowExtraMeTitle;
 
-        public override string Identifier => "me";
+        public override string Identifier => @"me";
     }
 }

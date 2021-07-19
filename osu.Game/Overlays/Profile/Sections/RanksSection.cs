@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Profile.Sections
     {
         public override LocalisableString Title => UsersStrings.ShowExtraTopRanksTitle;
 
-        public override string Identifier => "top_ranks";
+        public override string Identifier => @"top_ranks";
 
         public RanksSection()
         {
