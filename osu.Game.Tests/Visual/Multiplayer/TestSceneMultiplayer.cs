@@ -86,6 +86,26 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestCreateRoomWithPassword()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Password = { Value = "password" },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            AddAssert("room has password", () => client.APIRoom?.Password.Value == "password");
+        }
+
+        [Test]
         public void TestUserSetToIdleWhenBeatmapDeleted()
         {
             createRoom(() => new Room
