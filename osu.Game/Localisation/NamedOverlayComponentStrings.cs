@@ -53,7 +53,7 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString NewsDescription => new TranslatableString(getKey(@"news_description"), @"get up-to-date on community happenings");
 
-        /// <inheritdoc cref="LayoutStrings.MenuHelpGetWiki"/>
+        /// <inheritdoc cref="PageTitleStrings.MainWikiControllerDefault"/>
         public static LocalisableString WikiTitle => PageTitleStrings.MainWikiControllerDefault;
 
         /// <summary>
