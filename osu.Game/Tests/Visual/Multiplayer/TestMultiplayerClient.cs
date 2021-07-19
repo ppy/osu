@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public override IBindable<bool> IsConnected => isConnected;
         private readonly Bindable<bool> isConnected = new Bindable<bool>(true);
 
-        public Room? APIRoom { get; private set; }
+        public new Room? APIRoom => base.APIRoom;
 
         public Action<MultiplayerRoom>? RoomSetupAction;
 
@@ -115,9 +115,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ((IMultiplayerClient)this).UserBeatmapAvailabilityChanged(userId, newBeatmapAvailability);
         }
 
-        protected override Task<MultiplayerRoom> JoinRoom(long roomId)
+        protected override Task<MultiplayerRoom> JoinRoom(long roomId, string? password = null)
         {
             var apiRoom = roomManager.Rooms.Single(r => r.RoomID.Value == roomId);
+
+            if (password != apiRoom.Password.Value)
+                throw new InvalidOperationException("Invalid password.");
 
             var localUser = new MultiplayerRoomUser(api.LocalUser.Value.Id)
             {
@@ -134,7 +137,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     BeatmapChecksum = apiRoom.Playlist.Last().Beatmap.Value.MD5Hash,
                     RequiredMods = apiRoom.Playlist.Last().RequiredMods.Select(m => new APIMod(m)).ToArray(),
                     AllowedMods = apiRoom.Playlist.Last().AllowedMods.Select(m => new APIMod(m)).ToArray(),
-                    PlaylistItemId = apiRoom.Playlist.Last().ID
+                    PlaylistItemId = apiRoom.Playlist.Last().ID,
+                    // ReSharper disable once ConstantNullCoalescingCondition Incorrect inspection due to lack of nullable in Room.cs.
+                    Password = password ?? string.Empty,
                 },
                 Users = { localUser },
                 Host = localUser
@@ -143,16 +148,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             RoomSetupAction?.Invoke(room);
             RoomSetupAction = null;
 
-            APIRoom = apiRoom;
-
             return Task.FromResult(room);
         }
 
-        protected override Task LeaveRoomInternal()
-        {
-            APIRoom = null;
-            return Task.CompletedTask;
-        }
+        protected override Task LeaveRoomInternal() => Task.CompletedTask;
 
         public override Task TransferHost(int userId) => ((IMultiplayerClient)this).HostChanged(userId);
 
