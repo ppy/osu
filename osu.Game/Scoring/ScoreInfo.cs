@@ -18,7 +18,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete, IEquatable<ScoreInfo>
+    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete, IEquatable<ScoreInfo>, IDeepCloneable<ScoreInfo>
     {
         public int ID { get; set; }
 
@@ -240,6 +240,15 @@ namespace osu.Game.Scoring
                         break;
                 }
             }
+        }
+
+        public ScoreInfo DeepClone()
+        {
+            var clone = (ScoreInfo)MemberwiseClone();
+
+            clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
+
+            return clone;
         }
 
         public override string ToString() => $"{User} playing {Beatmap}";
