@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => FontAwesome.Solid.Adjust;
         public override ModType Type => ModType.DifficultyIncrease;
 
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModBarrelRoll) };
+
         public override double ScoreMultiplier => 1.12;
         private DrawableOsuBlinds blinds;
 
