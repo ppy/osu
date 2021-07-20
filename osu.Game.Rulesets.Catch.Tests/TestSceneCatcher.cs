@@ -31,22 +31,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        [Cached]
-        private readonly DroppedObjectContainer droppedObjectContainer;
-
-        private readonly Container trailContainer;
-
         private TestCatcher catcher;
 
-        public TestSceneCatcher()
-        {
-            Add(trailContainer = new Container
-            {
-                Anchor = Anchor.Centre,
-                Depth = -1
-            });
-            Add(droppedObjectContainer = new DroppedObjectContainer());
-        }
+        private DroppedObjectContainer droppedObjectContainer;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -56,13 +43,25 @@ namespace osu.Game.Rulesets.Catch.Tests
                 CircleSize = 0,
             };
 
-            if (catcher != null)
-                Remove(catcher);
-
-            Add(catcher = new TestCatcher(trailContainer, difficulty)
+            var trailContainer = new Container
             {
+                Anchor = Anchor.Centre,
+            };
+            droppedObjectContainer = new DroppedObjectContainer();
+            Child = new DependencyProvidingContainer
+            {
+                CachedDependencies = new (Type, object)[]
+                {
+                    (typeof(DroppedObjectContainer), droppedObjectContainer),
+                },
+                Children = new Drawable[]
+                {
+                    droppedObjectContainer,
+                    catcher = new TestCatcher(trailContainer, difficulty),
+                    trailContainer
+                },
                 Anchor = Anchor.Centre
-            });
+            };
         });
 
         [Test]
