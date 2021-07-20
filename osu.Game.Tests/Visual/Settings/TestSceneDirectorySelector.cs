@@ -12,7 +12,7 @@ namespace osu.Game.Tests.Visual.Settings
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(new DirectorySelector { RelativeSizeAxes = Axes.Both });
+            Add(new OsuDirectorySelector { RelativeSizeAxes = Axes.Both });
         }
     }
 }

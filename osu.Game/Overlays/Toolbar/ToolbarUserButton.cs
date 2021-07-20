@@ -32,14 +32,13 @@ namespace osu.Game.Overlays.Toolbar
 
             Add(new OpaqueBackground { Depth = 1 });
 
-            Flow.Add(avatar = new UpdateableAvatar
+            Flow.Add(avatar = new UpdateableAvatar(openOnClick: false)
             {
                 Masking = true,
                 Size = new Vector2(32),
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 CornerRadius = 4,
-                OpenOnClick = { Value = false },
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,

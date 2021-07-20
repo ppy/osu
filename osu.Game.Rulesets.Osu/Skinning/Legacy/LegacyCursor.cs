@@ -11,10 +11,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class LegacyCursor : OsuCursorSprite
     {
+        private readonly ISkin skin;
         private bool spin;
 
-        public LegacyCursor()
+        public LegacyCursor(ISkin skin)
         {
+            this.skin = skin;
             Size = new Vector2(50);
 
             Anchor = Anchor.Centre;
@@ -22,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource skin)
+        private void load()
         {
             bool centre = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.CursorCentre)?.Value ?? true;
             spin = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.CursorRotate)?.Value ?? true;

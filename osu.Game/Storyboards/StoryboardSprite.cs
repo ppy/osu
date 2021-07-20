@@ -11,7 +11,7 @@ using JetBrains.Annotations;
 
 namespace osu.Game.Storyboards
 {
-    public class StoryboardSprite : IStoryboardElement
+    public class StoryboardSprite : IStoryboardElementWithDuration
     {
         private readonly List<CommandLoop> loops = new List<CommandLoop>();
         private readonly List<CommandTrigger> triggers = new List<CommandTrigger>();

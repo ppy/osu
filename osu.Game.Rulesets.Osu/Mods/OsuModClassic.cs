@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
@@ -15,7 +14,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModClassic : ModClassic, IApplicableToHitObject, IApplicableToDrawableHitObjects, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModClassic : ModClassic, IApplicableToHitObject, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<OsuHitObject>
     {
         [SettingSource("No slider head accuracy requirement", "Scores sliders proportionally to the number of ticks hit.")]
         public Bindable<bool> NoSliderHeadAccuracy { get; } = new BindableBool(true);
@@ -54,24 +53,21 @@ namespace osu.Game.Rulesets.Osu.Mods
                 osuRuleset.Playfield.HitPolicy = new ObjectOrderedHitPolicy();
         }
 
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        public void ApplyToDrawableHitObject(DrawableHitObject obj)
         {
-            foreach (var obj in drawables)
+            switch (obj)
             {
-                switch (obj)
-                {
-                    case DrawableSlider slider:
-                        slider.Ball.InputTracksVisualSize = !FixedFollowCircleHitArea.Value;
-                        break;
+                case DrawableSlider slider:
+                    slider.Ball.InputTracksVisualSize = !FixedFollowCircleHitArea.Value;
+                    break;
 
-                    case DrawableSliderHead head:
-                        head.TrackFollowCircle = !NoSliderHeadMovement.Value;
-                        break;
+                case DrawableSliderHead head:
+                    head.TrackFollowCircle = !NoSliderHeadMovement.Value;
+                    break;
 
-                    case DrawableSliderTail tail:
-                        tail.SamplePlaysOnlyOnHit = !AlwaysPlayTailSample.Value;
-                        break;
-                }
+                case DrawableSliderTail tail:
+                    tail.SamplePlaysOnlyOnHit = !AlwaysPlayTailSample.Value;
+                    break;
             }
         }
     }

@@ -84,10 +84,10 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         private JoinRoomRequest currentJoinRoomRequest;
 
-        public virtual void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
+        public virtual void JoinRoom(Room room, string password = null, Action<Room> onSuccess = null, Action<string> onError = null)
         {
             currentJoinRoomRequest?.Cancel();
-            currentJoinRoomRequest = new JoinRoomRequest(room);
+            currentJoinRoomRequest = new JoinRoomRequest(room, password);
 
             currentJoinRoomRequest.Success += () =>
             {

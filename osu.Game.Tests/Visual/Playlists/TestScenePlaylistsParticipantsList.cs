@@ -3,21 +3,23 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsParticipantsList : RoomTestScene
+    public class TestScenePlaylistsParticipantsList : OnlinePlayTestScene
     {
         [SetUp]
         public new void Setup() => Schedule(() =>
         {
-            Room.RoomID.Value = 7;
+            SelectedRoom.Value = new Room { RoomID = { Value = 7 } };
 
             for (int i = 0; i < 50; i++)
             {
-                Room.RecentParticipants.Add(new User
+                SelectedRoom.Value.RecentParticipants.Add(new User
                 {
                     Username = "peppy",
                     Statistics = new UserStatistics { GlobalRank = 1234 },

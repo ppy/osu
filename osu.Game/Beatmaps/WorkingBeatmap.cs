@@ -133,6 +133,9 @@ namespace osu.Game.Beatmaps
 
                 IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted);
 
+                foreach (var mod in mods.OfType<IApplicableToBeatmapProcessor>())
+                    mod.ApplyToBeatmapProcessor(processor);
+
                 processor?.PreProcess();
 
                 // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
@@ -324,7 +327,8 @@ namespace osu.Game.Beatmaps
         public bool SkinLoaded => skin.IsResultAvailable;
         public ISkin Skin => skin.Value;
 
-        protected virtual ISkin GetSkin() => new DefaultSkin();
+        protected abstract ISkin GetSkin();
+
         private readonly RecyclableLazy<ISkin> skin;
 
         public abstract Stream GetStream(string storagePath);

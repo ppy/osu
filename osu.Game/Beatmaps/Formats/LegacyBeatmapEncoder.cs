@@ -251,11 +251,8 @@ namespace osu.Game.Beatmaps.Formats
             switch (beatmap.BeatmapInfo.RulesetID)
             {
                 case 0:
-                    position = ((IHasPosition)hitObject).Position;
-                    break;
-
                 case 2:
-                    position.X = ((IHasXPosition)hitObject).X;
+                    position = ((IHasPosition)hitObject).Position;
                     break;
 
                 case 3:

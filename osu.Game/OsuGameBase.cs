@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -14,6 +13,7 @@ using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -25,6 +25,7 @@ using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Logging;
+using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.Input;
@@ -41,7 +42,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Utils;
-using osuTK.Input;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 
 namespace osu.Game
@@ -51,52 +51,63 @@ namespace osu.Game
     /// Unlike <see cref="OsuGame"/>, this class will not load any kind of UI, allowing it to be used
     /// for provide dependencies to test cases without interfering with them.
     /// </summary>
-    public class OsuGameBase : Framework.Game, ICanAcceptFiles
+    public partial class OsuGameBase : Framework.Game, ICanAcceptFiles
     {
-        public const string CLIENT_STREAM_NAME = "lazer";
+        public const string CLIENT_STREAM_NAME = @"lazer";
 
         public const int SAMPLE_CONCURRENCY = 6;
 
+        /// <summary>
+        /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
+        /// </summary>
+        internal const double GLOBAL_TRACK_VOLUME_ADJUST = 0.8;
+
         public bool UseDevelopmentServer { get; }
 
-        protected OsuConfigManager LocalConfig;
+        public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
+
+        /// <summary>
+        /// MD5 representation of the game executable.
+        /// </summary>
+        public string VersionHash { get; private set; }
+
+        public bool IsDeployedBuild => AssemblyVersion.Major > 0;
+
+        public virtual string Version
+        {
+            get
+            {
+                if (!IsDeployedBuild)
+                    return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
+
+                var version = AssemblyVersion;
+                return $@"{version.Major}.{version.Minor}.{version.Build}-lazer";
+            }
+        }
+
+        protected OsuConfigManager LocalConfig { get; private set; }
 
         protected SessionStatics SessionStatics { get; private set; }
 
-        protected BeatmapManager BeatmapManager;
+        protected BeatmapManager BeatmapManager { get; private set; }
 
-        protected ScoreManager ScoreManager;
+        protected ScoreManager ScoreManager { get; private set; }
 
-        protected BeatmapDifficultyCache DifficultyCache;
+        protected SkinManager SkinManager { get; private set; }
 
-        protected UserLookupCache UserCache;
+        protected RulesetStore RulesetStore { get; private set; }
 
-        protected SkinManager SkinManager;
+        protected RealmKeyBindingStore KeyBindingStore { get; private set; }
 
-        protected RulesetStore RulesetStore;
+        protected MenuCursorContainer MenuCursorContainer { get; private set; }
 
-        protected FileStore FileStore;
+        protected MusicController MusicController { get; private set; }
 
-        protected KeyBindingStore KeyBindingStore;
-
-        protected SettingsStore SettingsStore;
-
-        protected RulesetConfigCache RulesetConfigCache;
-
-        protected IAPIProvider API;
-
-        private SpectatorStreamingClient spectatorStreaming;
-        private StatefulMultiplayerClient multiplayerClient;
-
-        protected MenuCursorContainer MenuCursorContainer;
-
-        protected MusicController MusicController;
-
-        private Container content;
-
-        protected override Container<Drawable> Content => content;
+        protected IAPIProvider API { get; set; }
 
         protected Storage Storage { get; set; }
+
+        protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
 
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
@@ -119,54 +130,41 @@ namespace osu.Game
         /// </summary>
         public readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> AvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
 
-        protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
+        private BeatmapDifficultyCache difficultyCache;
+
+        private UserLookupCache userCache;
+
+        private FileStore fileStore;
+
+        private SettingsStore settingsStore;
+
+        private RulesetConfigCache rulesetConfigCache;
+
+        private SpectatorClient spectatorClient;
+
+        private MultiplayerClient multiplayerClient;
+
+        private DatabaseContextFactory contextFactory;
+
+        private RealmContextFactory realmFactory;
+
+        protected override Container<Drawable> Content => content;
+
+        private Container content;
+
+        private DependencyContainer dependencies;
 
         private Bindable<bool> fpsDisplayVisible;
 
-        public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
+        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(GLOBAL_TRACK_VOLUME_ADJUST);
 
-        /// <summary>
-        /// MD5 representation of the game executable.
-        /// </summary>
-        public string VersionHash { get; private set; }
-
-        public bool IsDeployedBuild => AssemblyVersion.Major > 0;
-
-        public virtual string Version
-        {
-            get
-            {
-                if (!IsDeployedBuild)
-                    return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
-
-                var version = AssemblyVersion;
-                return $@"{version.Major}.{version.Minor}.{version.Build}";
-            }
-        }
+        private IBindable<GameThreadState> updateThreadState;
 
         public OsuGameBase()
         {
             UseDevelopmentServer = DebugUtils.IsDebugBuild;
-            Name = @"osu!lazer";
+            Name = @"osu!";
         }
-
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
-        private DatabaseContextFactory contextFactory;
-
-        protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
-
-        protected virtual BatteryInfo CreateBatteryInfo() => null;
-
-        /// <summary>
-        /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
-        /// </summary>
-        internal const double GLOBAL_TRACK_VOLUME_ADJUST = 0.5;
-
-        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(GLOBAL_TRACK_VOLUME_ADJUST);
 
         [BackgroundDependencyLoader]
         private void load()
@@ -187,6 +185,13 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
+            dependencies.Cache(realmFactory = new RealmContextFactory(Storage));
+
+            updateThreadState = Host.UpdateThread.State.GetBoundCopy();
+            updateThreadState.BindValueChanged(updateThreadStateChanged);
+
+            AddInternal(realmFactory);
+
             dependencies.CacheAs(Storage);
 
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
@@ -198,26 +203,35 @@ namespace osu.Game
 
             AddFont(Resources, @"Fonts/osuFont");
 
-            AddFont(Resources, @"Fonts/Torus-Regular");
-            AddFont(Resources, @"Fonts/Torus-Light");
-            AddFont(Resources, @"Fonts/Torus-SemiBold");
-            AddFont(Resources, @"Fonts/Torus-Bold");
+            AddFont(Resources, @"Fonts/Torus/Torus-Regular");
+            AddFont(Resources, @"Fonts/Torus/Torus-Light");
+            AddFont(Resources, @"Fonts/Torus/Torus-SemiBold");
+            AddFont(Resources, @"Fonts/Torus/Torus-Bold");
 
-            AddFont(Resources, @"Fonts/Noto-Basic");
-            AddFont(Resources, @"Fonts/Noto-Hangul");
-            AddFont(Resources, @"Fonts/Noto-CJK-Basic");
-            AddFont(Resources, @"Fonts/Noto-CJK-Compatibility");
-            AddFont(Resources, @"Fonts/Noto-Thai");
+            AddFont(Resources, @"Fonts/Inter/Inter-Regular");
+            AddFont(Resources, @"Fonts/Inter/Inter-RegularItalic");
+            AddFont(Resources, @"Fonts/Inter/Inter-Light");
+            AddFont(Resources, @"Fonts/Inter/Inter-LightItalic");
+            AddFont(Resources, @"Fonts/Inter/Inter-SemiBold");
+            AddFont(Resources, @"Fonts/Inter/Inter-SemiBoldItalic");
+            AddFont(Resources, @"Fonts/Inter/Inter-Bold");
+            AddFont(Resources, @"Fonts/Inter/Inter-BoldItalic");
 
-            AddFont(Resources, @"Fonts/Venera-Light");
-            AddFont(Resources, @"Fonts/Venera-Bold");
-            AddFont(Resources, @"Fonts/Venera-Black");
+            AddFont(Resources, @"Fonts/Noto/Noto-Basic");
+            AddFont(Resources, @"Fonts/Noto/Noto-Hangul");
+            AddFont(Resources, @"Fonts/Noto/Noto-CJK-Basic");
+            AddFont(Resources, @"Fonts/Noto/Noto-CJK-Compatibility");
+            AddFont(Resources, @"Fonts/Noto/Noto-Thai");
+
+            AddFont(Resources, @"Fonts/Venera/Venera-Light");
+            AddFont(Resources, @"Fonts/Venera/Venera-Bold");
+            AddFont(Resources, @"Fonts/Venera/Venera-Black");
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
             runMigrations();
 
-            dependencies.Cache(SkinManager = new SkinManager(Storage, contextFactory, Host, Audio, new NamespacedResourceStore<byte[]>(Resources, "Skins/Legacy")));
+            dependencies.Cache(SkinManager = new SkinManager(Storage, contextFactory, Host, Resources, Audio));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
             // needs to be done here rather than inside SkinManager to ensure thread safety of CurrentSkinInfo.
@@ -240,19 +254,19 @@ namespace osu.Game
 
             dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints, VersionHash));
 
-            dependencies.CacheAs(spectatorStreaming = new SpectatorStreamingClient(endpoints));
-            dependencies.CacheAs(multiplayerClient = new MultiplayerClient(endpoints));
+            dependencies.CacheAs(spectatorClient = new OnlineSpectatorClient(endpoints));
+            dependencies.CacheAs(multiplayerClient = new OnlineMultiplayerClient(endpoints));
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
-            dependencies.Cache(FileStore = new FileStore(contextFactory, Storage));
+            dependencies.Cache(fileStore = new FileStore(contextFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Host, () => DifficultyCache, LocalConfig));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap, true));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Host, () => difficultyCache, LocalConfig));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, true));
 
-            // this should likely be moved to ArchiveModelManager when another case appers where it is necessary
+            // this should likely be moved to ArchiveModelManager when another case appears where it is necessary
             // to have inter-dependent model managers. this could be obtained with an IHasForeign<T> interface to
             // allow lookups to be done on the child (ScoreManager in this case) to perform the cascading delete.
             List<ScoreInfo> getBeatmapScores(BeatmapSetInfo set)
@@ -273,19 +287,20 @@ namespace osu.Game
                     ScoreManager.Undelete(getBeatmapScores(item), true);
             });
 
-            dependencies.Cache(DifficultyCache = new BeatmapDifficultyCache());
-            AddInternal(DifficultyCache);
+            dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
+            AddInternal(difficultyCache);
 
-            dependencies.Cache(UserCache = new UserLookupCache());
-            AddInternal(UserCache);
+            dependencies.Cache(userCache = new UserLookupCache());
+            AddInternal(userCache);
 
             var scorePerformanceManager = new ScorePerformanceCache();
             dependencies.Cache(scorePerformanceManager);
             AddInternal(scorePerformanceManager);
 
-            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
-            dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
-            dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
+            migrateDataToRealm();
+
+            dependencies.Cache(settingsStore = new SettingsStore(contextFactory));
+            dependencies.Cache(rulesetConfigCache = new RulesetConfigCache(settingsStore));
 
             var powerStatus = CreateBatteryInfo();
             if (powerStatus != null)
@@ -308,15 +323,15 @@ namespace osu.Game
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
             dependencies.CacheAs(Beatmap);
 
-            FileStore.Cleanup();
+            fileStore.Cleanup();
 
             // add api components to hierarchy.
             if (API is APIAccess apiAccess)
                 AddInternal(apiAccess);
-            AddInternal(spectatorStreaming);
+            AddInternal(spectatorClient);
             AddInternal(multiplayerClient);
 
-            AddInternal(RulesetConfigCache);
+            AddInternal(rulesetConfigCache);
 
             GlobalActionContainer globalBindings;
 
@@ -327,11 +342,20 @@ namespace osu.Game
                 globalBindings = new GlobalActionContainer(this)
             };
 
-            MenuCursorContainer.Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both };
+            MenuCursorContainer.Child = new PopoverContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }
+            };
 
             base.Content.Add(CreateScalingContainer().WithChildren(mainContent));
 
+            KeyBindingStore = new RealmKeyBindingStore(realmFactory);
             KeyBindingStore.Register(globalBindings);
+
+            foreach (var r in RulesetStore.AvailableRulesets)
+                KeyBindingStore.Register(r);
+
             dependencies.Cache(globalBindings);
 
             PreviewTrackManager previewTrackManager;
@@ -344,23 +368,22 @@ namespace osu.Game
             Ruleset.BindValueChanged(onRulesetChanged);
         }
 
-        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
+        private IDisposable blocking;
+
+        private void updateThreadStateChanged(ValueChangedEvent<GameThreadState> state)
         {
-            var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
-
-            if (r.NewValue?.Available == true)
+            switch (state.NewValue)
             {
-                foreach (ModType type in Enum.GetValues(typeof(ModType)))
-                    dict[type] = r.NewValue.CreateInstance().GetModsFor(type).ToList();
+                case GameThreadState.Running:
+                    blocking?.Dispose();
+                    blocking = null;
+                    break;
+
+                case GameThreadState.Paused:
+                    blocking = realmFactory.BlockAllOperations();
+                    break;
             }
-
-            if (!SelectedMods.Disabled)
-                SelectedMods.Value = Array.Empty<Mod>();
-
-            AvailableMods.Value = dict;
         }
-
-        protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
 
         protected override void LoadComplete()
         {
@@ -375,28 +398,8 @@ namespace osu.Game
             FrameStatistics.ValueChanged += e => fpsDisplayVisible.Value = e.NewValue != FrameStatisticsMode.None;
         }
 
-        private void runMigrations()
-        {
-            try
-            {
-                using (var db = contextFactory.GetForWrite(false))
-                    db.Context.Migrate();
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e.InnerException ?? e, "Migration failed! We'll be starting with a fresh database.", LoggingTarget.Database);
-
-                // if we failed, let's delete the database and start fresh.
-                // todo: we probably want a better (non-destructive) migrations/recovery process at a later point than this.
-                contextFactory.ResetDatabase();
-
-                Logger.Log("Database purged successfully.", LoggingTarget.Database);
-
-                // only run once more, then hard bail.
-                using (var db = contextFactory.GetForWrite(false))
-                    db.Context.Migrate();
-            }
-        }
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         public override void SetHost(GameHost host)
         {
@@ -422,50 +425,93 @@ namespace osu.Game
                 Scheduler.AddDelayed(GracefullyExit, 2000);
         }
 
+        public void Migrate(string path)
+        {
+            Logger.Log($@"Migrating osu! data from ""{Storage.GetFullPath(string.Empty)}"" to ""{path}""...");
+
+            using (realmFactory.BlockAllOperations())
+            {
+                contextFactory.FlushConnections();
+                (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
+            }
+
+            Logger.Log(@"Migration complete!");
+        }
+
+        protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
+
+        protected virtual BatteryInfo CreateBatteryInfo() => null;
+
+        protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
+
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
 
-        private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
-
-        /// <summary>
-        /// Register a global handler for file imports. Most recently registered will have precedence.
-        /// </summary>
-        /// <param name="handler">The handler to register.</param>
-        public void RegisterImportHandler(ICanAcceptFiles handler) => fileImporters.Insert(0, handler);
-
-        /// <summary>
-        /// Unregister a global handler for file imports.
-        /// </summary>
-        /// <param name="handler">The previously registered handler.</param>
-        public void UnregisterImportHandler(ICanAcceptFiles handler) => fileImporters.Remove(handler);
-
-        public async Task Import(params string[] paths)
+        private void migrateDataToRealm()
         {
-            if (paths.Length == 0)
-                return;
-
-            var filesPerExtension = paths.GroupBy(p => Path.GetExtension(p).ToLowerInvariant());
-
-            foreach (var groups in filesPerExtension)
+            using (var db = contextFactory.GetForWrite())
+            using (var usage = realmFactory.GetForWrite())
             {
-                foreach (var importer in fileImporters)
+                var existingBindings = db.Context.DatabasedKeyBinding;
+
+                // only migrate data if the realm database is empty.
+                if (!usage.Realm.All<RealmKeyBinding>().Any())
                 {
-                    if (importer.HandledExtensions.Contains(groups.Key))
-                        await importer.Import(groups.ToArray()).ConfigureAwait(false);
+                    foreach (var dkb in existingBindings)
+                    {
+                        usage.Realm.Add(new RealmKeyBinding
+                        {
+                            KeyCombinationString = dkb.KeyCombination.ToString(),
+                            ActionInt = (int)dkb.Action,
+                            RulesetID = dkb.RulesetID,
+                            Variant = dkb.Variant
+                        });
+                    }
                 }
+
+                db.Context.RemoveRange(existingBindings);
+
+                usage.Commit();
             }
         }
 
-        public virtual async Task Import(params ImportTask[] tasks)
+        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {
-            var tasksPerExtension = tasks.GroupBy(t => Path.GetExtension(t.Path).ToLowerInvariant());
-            await Task.WhenAll(tasksPerExtension.Select(taskGroup =>
+            var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
+
+            if (r.NewValue?.Available == true)
             {
-                var importer = fileImporters.FirstOrDefault(i => i.HandledExtensions.Contains(taskGroup.Key));
-                return importer?.Import(taskGroup.ToArray()) ?? Task.CompletedTask;
-            })).ConfigureAwait(false);
+                foreach (ModType type in Enum.GetValues(typeof(ModType)))
+                    dict[type] = r.NewValue.CreateInstance().GetModsFor(type).ToList();
+            }
+
+            if (!SelectedMods.Disabled)
+                SelectedMods.Value = Array.Empty<Mod>();
+
+            AvailableMods.Value = dict;
         }
 
-        public IEnumerable<string> HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions);
+        private void runMigrations()
+        {
+            try
+            {
+                using (var db = contextFactory.GetForWrite(false))
+                    db.Context.Migrate();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.InnerException ?? e, "Migration failed! We'll be starting with a fresh database.", LoggingTarget.Database);
+
+                // if we failed, let's delete the database and start fresh.
+                // todo: we probably want a better (non-destructive) migrations/recovery process at a later point than this.
+                contextFactory.ResetDatabase();
+
+                Logger.Log("Database purged successfully.", LoggingTarget.Database);
+
+                // only run once more, then hard bail.
+                using (var db = contextFactory.GetForWrite(false))
+                    db.Context.Migrate();
+            }
+        }
 
         protected override void Dispose(bool isDisposing)
         {
@@ -476,38 +522,6 @@ namespace osu.Game
             LocalConfig?.Dispose();
 
             contextFactory.FlushConnections();
-        }
-
-        private class OsuUserInputManager : UserInputManager
-        {
-            protected override MouseButtonEventManager CreateButtonEventManagerFor(MouseButton button)
-            {
-                switch (button)
-                {
-                    case MouseButton.Right:
-                        return new RightMouseManager(button);
-                }
-
-                return base.CreateButtonEventManagerFor(button);
-            }
-
-            private class RightMouseManager : MouseButtonEventManager
-            {
-                public RightMouseManager(MouseButton button)
-                    : base(button)
-                {
-                }
-
-                public override bool EnableDrag => true; // allow right-mouse dragging for absolute scroll in scroll containers.
-                public override bool EnableClick => false;
-                public override bool ChangeFocusOnClick => false;
-            }
-        }
-
-        public void Migrate(string path)
-        {
-            contextFactory.FlushConnections();
-            (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
         }
     }
 }

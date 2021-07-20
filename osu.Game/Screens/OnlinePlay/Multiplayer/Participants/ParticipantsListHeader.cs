@@ -10,7 +10,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
     public class ParticipantsListHeader : OverlinedHeader
     {
         [Resolved]
-        private StatefulMultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; }
 
         public ParticipantsListHeader()
             : base("Participants")

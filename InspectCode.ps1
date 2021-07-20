@@ -1,27 +1,11 @@
-[CmdletBinding()]
-Param(
-    [string]$Target,
-    [string]$Configuration,
-    [ValidateSet("Quiet", "Minimal", "Normal", "Verbose", "Diagnostic")]
-    [string]$Verbosity,
-    [switch]$ShowDescription,
-    [Alias("WhatIf", "Noop")]
-    [switch]$DryRun,
-    [Parameter(Position = 0, Mandatory = $false, ValueFromRemainingArguments = $true)]
-    [string[]]$ScriptArgs
-)
-
-# Build Cake arguments
-$cakeArguments = "";
-if ($Target) { $cakeArguments += "-target=$Target" }
-if ($Configuration) { $cakeArguments += "-configuration=$Configuration" }
-if ($Verbosity) { $cakeArguments += "-verbosity=$Verbosity" }
-if ($ShowDescription) { $cakeArguments += "-showdescription" }
-if ($DryRun) { $cakeArguments += "-dryrun" }
-if ($Experimental) { $cakeArguments += "-experimental" }
-$cakeArguments += $ScriptArgs
-
 dotnet tool restore
-dotnet cake ./build/InspectCode.cake --bootstrap
-dotnet cake ./build/InspectCode.cake $cakeArguments
+
+# Temporarily disabled until the tool is upgraded to 5.0.
+  # The version specified in .config/dotnet-tools.json (3.1.37601) won't run on .NET hosts >=5.0.7.
+  # - cmd: dotnet format --dry-run --check
+
+dotnet CodeFileSanity
+dotnet jb inspectcode "osu.Desktop.slnf" --output="inspectcodereport.xml" --caches-home="inspectcode" --verbosity=WARN
+dotnet nvika parsereport "inspectcodereport.xml" --treatwarningsaserrors
+
 exit $LASTEXITCODE

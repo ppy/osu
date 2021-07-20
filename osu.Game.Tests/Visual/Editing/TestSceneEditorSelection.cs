@@ -50,9 +50,9 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects = new[]
             {
                 new HitCircle { StartTime = 100 },
-                new HitCircle { StartTime = 200, Position = new Vector2(50) },
-                new HitCircle { StartTime = 300, Position = new Vector2(100) },
-                new HitCircle { StartTime = 400, Position = new Vector2(150) },
+                new HitCircle { StartTime = 200, Position = new Vector2(100) },
+                new HitCircle { StartTime = 300, Position = new Vector2(200) },
+                new HitCircle { StartTime = 400, Position = new Vector2(300) },
             }));
 
             AddStep("select objects", () => EditorBeatmap.SelectedHitObjects.AddRange(addedObjects));
@@ -95,9 +95,9 @@ namespace osu.Game.Tests.Visual.Editing
             var addedObjects = new[]
             {
                 new HitCircle { StartTime = 100 },
-                new HitCircle { StartTime = 200, Position = new Vector2(50) },
-                new HitCircle { StartTime = 300, Position = new Vector2(100) },
-                new HitCircle { StartTime = 400, Position = new Vector2(150) },
+                new HitCircle { StartTime = 200, Position = new Vector2(100) },
+                new HitCircle { StartTime = 300, Position = new Vector2(200) },
+                new HitCircle { StartTime = 400, Position = new Vector2(300) },
             };
 
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects));
@@ -131,9 +131,9 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects = new[]
             {
                 new HitCircle { StartTime = 100 },
-                new HitCircle { StartTime = 200, Position = new Vector2(50) },
-                new HitCircle { StartTime = 300, Position = new Vector2(100) },
-                new HitCircle { StartTime = 400, Position = new Vector2(150) },
+                new HitCircle { StartTime = 200, Position = new Vector2(100) },
+                new HitCircle { StartTime = 300, Position = new Vector2(200) },
+                new HitCircle { StartTime = 400, Position = new Vector2(300) },
             }));
 
             moveMouseToObject(() => addedObjects[0]);

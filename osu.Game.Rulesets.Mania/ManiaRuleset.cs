@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor();
 
-        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new DrainingHealthProcessor(drainStartTime, 0.2);
+        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new DrainingHealthProcessor(drainStartTime, 0.5);
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap, this);
 
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override HitObjectComposer CreateHitObjectComposer() => new ManiaHitObjectComposer(this);
 
-        public override ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => new ManiaLegacySkinTransformer(source, beatmap);
+        public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new ManiaLegacySkinTransformer(skin, beatmap);
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {

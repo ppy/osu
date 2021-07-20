@@ -26,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override bool CheckModsAllowFailure() => false;
 
         [Resolved]
-        private StatefulMultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; }
 
         private IBindable<bool> isConnected;
 
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 AllowPause = false,
                 AllowRestart = false,
-                AllowSkippingIntro = false,
+                AllowSkipping = false,
             })
         {
             this.userIds = userIds;
@@ -125,9 +125,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             const float padding = 44; // enough margin to avoid the hit error display.
 
-            leaderboard.Position = new Vector2(
-                padding,
-                padding + HUDOverlay.TopScoringElementsHeight);
+            leaderboard.Position = new Vector2(padding, padding + HUDOverlay.TopScoringElementsHeight);
         }
 
         private void onMatchStarted() => Scheduler.Add(() =>

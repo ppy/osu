@@ -99,5 +99,14 @@ namespace osu.Game.Graphics.Backgrounds
             // ensure we're not loading in without a transition.
             this.FadeInFromZero(200, Easing.InOutSine);
         }
+
+        public override bool Equals(Background other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return other.GetType() == GetType()
+                   && ((SeasonalBackground)other).url == url;
+        }
     }
 }

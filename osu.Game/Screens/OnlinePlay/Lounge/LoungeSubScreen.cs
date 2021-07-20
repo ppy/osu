@@ -6,6 +6,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -46,10 +47,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         [CanBeNull]
         private IDisposable joiningRoomOperation { get; set; }
 
+        private RoomsContainer roomsContainer;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            RoomsContainer roomsContainer;
             OsuScrollContainer scrollContainer;
 
             InternalChildren = new Drawable[]
@@ -70,7 +72,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                     RelativeSizeAxes = Axes.Both,
                                     ScrollbarOverlapsContent = false,
                                     Padding = new MarginPadding(10),
-                                    Child = roomsContainer = new RoomsContainer { JoinRequested = joinRequested }
+                                    Child = roomsContainer = new RoomsContainer()
                                 },
                                 loadingLayer = new LoadingLayer(true),
                             }
@@ -150,31 +152,39 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             onReturning();
         }
 
-        private void onReturning()
-        {
-            filter.HoldFocus = true;
-        }
-
         public override bool OnExiting(IScreen next)
         {
-            filter.HoldFocus = false;
+            onLeaving();
             return base.OnExiting(next);
         }
 
         public override void OnSuspending(IScreen next)
         {
+            onLeaving();
             base.OnSuspending(next);
-            filter.HoldFocus = false;
         }
 
-        private void joinRequested(Room room)
+        private void onReturning()
+        {
+            filter.HoldFocus = true;
+        }
+
+        private void onLeaving()
+        {
+            filter.HoldFocus = false;
+
+            // ensure any password prompt is dismissed.
+            this.HidePopover();
+        }
+
+        public void Join(Room room, string password)
         {
             if (joiningRoomOperation != null)
                 return;
 
             joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
-            RoomManager?.JoinRoom(room, r =>
+            RoomManager?.JoinRoom(room, password, r =>
             {
                 Open(room);
                 joiningRoomOperation?.Dispose();

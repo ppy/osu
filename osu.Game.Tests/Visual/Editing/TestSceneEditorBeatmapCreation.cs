@@ -24,18 +24,24 @@ namespace osu.Game.Tests.Visual.Editing
 
         protected override bool EditorComponentsReady => Editor.ChildrenOfType<SetupScreen>().SingleOrDefault()?.IsLoaded == true;
 
+        protected override bool IsolateSavingFromDatabase => false;
+
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
         public override void SetUpSteps()
         {
-            AddStep("set dummy", () => Beatmap.Value = new DummyWorkingBeatmap(Audio, null));
-
             base.SetUpSteps();
 
             // if we save a beatmap with a hash collision, things fall over.
             // probably needs a more solid resolution in the future but this will do for now.
             AddStep("make new beatmap unique", () => EditorBeatmap.Metadata.Title = Guid.NewGuid().ToString());
+        }
+
+        protected override void LoadEditor()
+        {
+            Beatmap.Value = new DummyWorkingBeatmap(Audio, null);
+            base.LoadEditor();
         }
 
         [Test]
@@ -49,7 +55,12 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestExitWithoutSave()
         {
-            AddStep("exit without save", () => Editor.Exit());
+            AddStep("exit without save", () =>
+            {
+                Editor.Exit();
+                DialogOverlay.CurrentDialog.PerformOkAction();
+            });
+
             AddUntilStep("wait for exit", () => !Editor.IsCurrentScreen());
             AddAssert("new beatmap not persisted", () => beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID)?.DeletePending == true);
         }

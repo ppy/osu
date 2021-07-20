@@ -137,7 +137,6 @@ namespace osu.Game.Screens.Ranking.Contracted
                                             Origin = Anchor.TopCentre,
                                             AutoSizeAxes = Axes.Both,
                                             ExpansionMode = ExpansionMode.AlwaysExpanded,
-                                            DisplayUnrankedText = false,
                                             Current = { Value = score.Mods },
                                             Scale = new Vector2(0.5f),
                                         }

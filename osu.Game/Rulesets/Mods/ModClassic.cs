@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Mods
 
         public override string Description => "Feeling nostalgic?";
 
-        public override bool Ranked => false;
-
         public override ModType Type => ModType.Conversion;
     }
 }

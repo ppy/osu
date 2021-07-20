@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapListing
@@ -19,8 +20,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private MultipleSelectionFilter filter;
 
-        public BeatmapSearchMultipleSelectionFilterRow(string headerName)
-            : base(headerName)
+        public BeatmapSearchMultipleSelectionFilterRow(LocalisableString header)
+            : base(header)
         {
             Current.BindTo(filter.Current);
         }
