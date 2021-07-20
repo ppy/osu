@@ -309,7 +309,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             public override bool HandleDrag(MouseButtonEvent e)
             {
                 // The dragbox should only be active if the mouseDownPosition.Y is within this drawable's bounds.
-                if (DrawRectangle.Top > e.MouseDownPosition.Y || DrawRectangle.Bottom < e.MouseDownPosition.Y)
+                float localY = ToLocalSpace(e.ScreenSpaceMouseDownPosition).Y;
+                if (DrawRectangle.Top > localY || DrawRectangle.Bottom < localY)
                     return false;
 
                 selectionStart ??= e.MouseDownPosition.X / timeline.CurrentZoom;
