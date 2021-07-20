@@ -13,6 +13,8 @@ namespace osu.Game.Skinning
         protected override double RollingDuration => 1000;
         protected override Easing RollingEasing => Easing.Out;
 
+        public bool UsesFixedAnchor { get; set; }
+
         public LegacyScoreCounter()
             : base(6)
         {

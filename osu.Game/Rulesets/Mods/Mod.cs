@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mods
     /// The base class for gameplay modifiers.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public abstract class Mod : IMod, IEquatable<Mod>, IJsonSerializable
+    public abstract class Mod : IMod, IEquatable<Mod>, IJsonSerializable, IDeepCloneable<Mod>
     {
         /// <summary>
         /// The name of this mod.
@@ -108,9 +108,13 @@ namespace osu.Game.Rulesets.Mods
         public virtual bool HasImplementation => this is IApplicableMod;
 
         /// <summary>
-        /// Returns if this mod is ranked.
+        /// Whether this mod is playable by an end user.
+        /// Should be <c>false</c> for cases where the user is not interacting with the game (so it can be excluded from mutliplayer selection, for example).
         /// </summary>
         [JsonIgnore]
+        public virtual bool UserPlayable => true;
+
+        [Obsolete("Going forward, the concept of \"ranked\" doesn't exist. The only exceptions are automation mods, which should now override and set UserPlayable to false.")] // Can be removed 20211009
         public virtual bool Ranked => false;
 
         /// <summary>
@@ -128,7 +132,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
         /// </summary>
-        public virtual Mod CreateCopy()
+        public virtual Mod DeepClone()
         {
             var result = (Mod)Activator.CreateInstance(GetType());
             result.CopyFrom(this);

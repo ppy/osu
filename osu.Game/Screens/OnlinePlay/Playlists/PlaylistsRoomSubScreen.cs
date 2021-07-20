@@ -175,7 +175,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                                     {
                                                                                         Anchor = Anchor.CentreLeft,
                                                                                         Origin = Anchor.CentreLeft,
-                                                                                        DisplayUnrankedText = false,
                                                                                         Current = UserMods,
                                                                                         Scale = new Vector2(0.8f),
                                                                                     },

@@ -4,14 +4,15 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mods;
@@ -29,15 +30,22 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneHitErrorMeter : OsuTestScene
     {
-        [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor();
+        [Cached(typeof(ScoreProcessor))]
+        private TestScoreProcessor scoreProcessor = new TestScoreProcessor();
 
         [Cached(typeof(DrawableRuleset))]
         private TestDrawableRuleset drawableRuleset = new TestDrawableRuleset();
 
-        public TestSceneHitErrorMeter()
+        [SetUpSteps]
+        public void SetUp()
         {
-            recreateDisplay(new OsuHitWindows(), 5);
+            AddStep("reset score processor", () => scoreProcessor.Reset());
+        }
+
+        [Test]
+        public void TestBasic()
+        {
+            AddStep("create display", () => recreateDisplay(new OsuHitWindows(), 5));
 
             AddRepeatStep("New random judgement", () => newJudgement(), 40);
 
@@ -45,11 +53,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep("New max positive", () => newJudgement(drawableRuleset.HitWindows.WindowFor(HitResult.Meh)), 20);
             AddStep("New fixed judgement (50ms)", () => newJudgement(50));
 
+            ScheduledDelegate del = null;
             AddStep("Judgement barrage", () =>
             {
                 int runCount = 0;
-
-                ScheduledDelegate del = null;
 
                 del = Scheduler.AddDelayed(() =>
                 {
@@ -60,6 +67,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         del?.Cancel();
                 }, 10, true);
             });
+            AddUntilStep("wait for barrage", () => del.Cancelled);
         }
 
         [Test]
@@ -84,10 +92,49 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestCatch()
+        public void TestEmpty()
         {
-            AddStep("OD 1", () => recreateDisplay(new CatchHitWindows(), 1));
-            AddStep("OD 10", () => recreateDisplay(new CatchHitWindows(), 10));
+            AddStep("empty windows", () => recreateDisplay(HitWindows.Empty, 5));
+
+            AddStep("hit", () => newJudgement());
+            AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddAssert("circle added", () =>
+                this.ChildrenOfType<ColourHitErrorMeter>().All(
+                    meter => meter.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Count() == 1));
+
+            AddStep("miss", () => newJudgement(50, HitResult.Miss));
+            AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddAssert("circle added", () =>
+                this.ChildrenOfType<ColourHitErrorMeter>().All(
+                    meter => meter.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Count() == 2));
+        }
+
+        [Test]
+        public void TestBonus()
+        {
+            AddStep("OD 1", () => recreateDisplay(new OsuHitWindows(), 1));
+
+            AddStep("small bonus", () => newJudgement(result: HitResult.SmallBonus));
+            AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Any());
+
+            AddStep("large bonus", () => newJudgement(result: HitResult.LargeBonus));
+            AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Any());
+        }
+
+        [Test]
+        public void TestIgnore()
+        {
+            AddStep("OD 1", () => recreateDisplay(new OsuHitWindows(), 1));
+
+            AddStep("ignore hit", () => newJudgement(result: HitResult.IgnoreHit));
+            AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Any());
+
+            AddStep("ignore miss", () => newJudgement(result: HitResult.IgnoreMiss));
+            AddAssert("no bars added", () => !this.ChildrenOfType<BarHitErrorMeter.JudgementLine>().Any());
+            AddAssert("no circle added", () => !this.ChildrenOfType<ColourHitErrorMeter.HitErrorCircle>().Any());
         }
 
         private void recreateDisplay(HitWindows hitWindows, float overallDifficulty)
@@ -154,12 +201,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private void newJudgement(double offset = 0)
+        private void newJudgement(double offset = 0, HitResult result = HitResult.Perfect)
         {
             scoreProcessor.ApplyResult(new JudgementResult(new HitCircle { HitWindows = drawableRuleset.HitWindows }, new Judgement())
             {
                 TimeOffset = offset == 0 ? RNG.Next(-150, 150) : offset,
-                Type = HitResult.Perfect,
+                Type = result,
             });
         }
 
@@ -177,6 +224,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override Container Overlays { get; }
             public override Container FrameStableComponents { get; }
             public override IFrameStableClock FrameStableClock { get; }
+            internal override bool FrameStablePlayback { get; set; }
             public override IReadOnlyList<Mod> Mods { get; }
 
             public override double GameplayStartTime { get; }
@@ -197,6 +245,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override void RequestResume(Action continueResume) => throw new NotImplementedException();
 
             public override void CancelResume() => throw new NotImplementedException();
+        }
+
+        private class TestScoreProcessor : ScoreProcessor
+        {
+            public void Reset() => base.Reset(false);
         }
     }
 }

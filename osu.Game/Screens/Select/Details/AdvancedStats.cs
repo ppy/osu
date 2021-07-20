@@ -186,11 +186,11 @@ namespace osu.Game.Screens.Select.Details
                 set => name.Text = value;
             }
 
-            private (float baseValue, float? adjustedValue) value;
+            private (float baseValue, float? adjustedValue)? value;
 
             public (float baseValue, float? adjustedValue) Value
             {
-                get => value;
+                get => value ?? (0, null);
                 set
                 {
                     if (value == this.value)

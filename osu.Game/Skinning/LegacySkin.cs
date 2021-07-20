@@ -16,6 +16,7 @@ using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
@@ -60,10 +61,17 @@ namespace osu.Game.Skinning
         {
         }
 
-        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string filename)
+        /// <summary>
+        /// Construct a new legacy skin instance.
+        /// </summary>
+        /// <param name="skin">The model for this skin.</param>
+        /// <param name="storage">A storage for looking up files within this skin using user-facing filenames.</param>
+        /// <param name="resources">Access to raw game resources.</param>
+        /// <param name="configurationFilename">The user-facing filename of the configuration file to be parsed. Can accept an .osu or skin.ini file.</param>
+        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename)
             : base(skin, resources)
         {
-            using (var stream = storage?.GetStream(filename))
+            using (var stream = storage?.GetStream(configurationFilename))
             {
                 if (stream != null)
                 {
@@ -122,12 +130,15 @@ namespace osu.Game.Skinning
 
                     break;
 
+                case SkinComboColourLookup comboColour:
+                    return SkinUtils.As<TValue>(GetComboColour(Configuration, comboColour.ColourIndex, comboColour.Combo));
+
                 case SkinCustomColourLookup customColour:
                     return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString()));
 
                 case LegacyManiaSkinConfigurationLookup maniaLookup:
                     if (!AllowManiaSkin)
-                        return null;
+                        break;
 
                     var result = lookupForMania<TValue>(maniaLookup);
                     if (result != null)
@@ -279,6 +290,18 @@ namespace osu.Game.Skinning
             return null;
         }
 
+        /// <summary>
+        /// Retrieves the correct combo colour for a given colour index and information on the combo.
+        /// </summary>
+        /// <param name="source">The source to retrieve the combo colours from.</param>
+        /// <param name="colourIndex">The preferred index for retrieving the combo colour with.</param>
+        /// <param name="combo">Information on the combo whose using the returned colour.</param>
+        protected virtual IBindable<Color4> GetComboColour(IHasComboColours source, int colourIndex, IHasComboInformation combo)
+        {
+            var colour = source.ComboColours?[colourIndex % source.ComboColours.Count];
+            return colour.HasValue ? new Bindable<Color4>(colour.Value) : null;
+        }
+
         private IBindable<Color4> getCustomColour(IHasCustomColours source, string lookup)
             => source.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
 
@@ -390,6 +413,7 @@ namespace osu.Game.Skinning
                     return null;
 
                 case GameplaySkinComponent<HitResult> resultComponent:
+                    // TODO: this should be inside the judgement pieces.
                     Func<Drawable> createDrawable = () => getJudgementAnimation(resultComponent.Component);
 
                     // kind of wasteful that we throw this away, but should do for now.
@@ -485,7 +509,9 @@ namespace osu.Game.Skinning
                 var sample = Samples?.Get(lookup);
 
                 if (sample != null)
+                {
                     return sample;
+                }
             }
 
             return null;
@@ -518,8 +544,7 @@ namespace osu.Game.Skinning
             yield return componentName;
 
             // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
-            string lastPiece = componentName.Split('/').Last();
-            yield return componentName.StartsWith("Gameplay/taiko/", StringComparison.Ordinal) ? "taiko-" + lastPiece : lastPiece;
+            yield return componentName.Split('/').Last();
         }
 
         protected override void Dispose(bool isDisposing)

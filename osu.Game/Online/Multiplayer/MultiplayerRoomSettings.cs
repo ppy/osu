@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using MessagePack;
 using osu.Game.Online.API;
 
@@ -28,16 +27,17 @@ namespace osu.Game.Online.Multiplayer
         [Key(3)]
         public string Name { get; set; } = "Unnamed room";
 
-        [NotNull]
         [Key(4)]
         public IEnumerable<APIMod> RequiredMods { get; set; } = Enumerable.Empty<APIMod>();
 
-        [NotNull]
         [Key(5)]
         public IEnumerable<APIMod> AllowedMods { get; set; } = Enumerable.Empty<APIMod>();
 
         [Key(6)]
         public long PlaylistItemId { get; set; }
+
+        [Key(7)]
+        public string Password { get; set; } = string.Empty;
 
         public bool Equals(MultiplayerRoomSettings other)
             => BeatmapID == other.BeatmapID
@@ -45,6 +45,7 @@ namespace osu.Game.Online.Multiplayer
                && RequiredMods.SequenceEqual(other.RequiredMods)
                && AllowedMods.SequenceEqual(other.AllowedMods)
                && RulesetID == other.RulesetID
+               && Password.Equals(other.Password, StringComparison.Ordinal)
                && Name.Equals(other.Name, StringComparison.Ordinal)
                && PlaylistItemId == other.PlaylistItemId;
 
@@ -52,6 +53,7 @@ namespace osu.Game.Online.Multiplayer
                                              + $" Beatmap:{BeatmapID} ({BeatmapChecksum})"
                                              + $" RequiredMods:{string.Join(',', RequiredMods)}"
                                              + $" AllowedMods:{string.Join(',', AllowedMods)}"
+                                             + $" Password:{(string.IsNullOrEmpty(Password) ? "no" : "yes")}"
                                              + $" Ruleset:{RulesetID}"
                                              + $" Item:{PlaylistItemId}";
     }

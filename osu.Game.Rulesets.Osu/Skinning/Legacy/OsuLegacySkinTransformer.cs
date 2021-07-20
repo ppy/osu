@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class OsuLegacySkinTransformer : LegacySkinTransformer
     {
-        private Lazy<bool> hasHitCircle;
+        private readonly Lazy<bool> hasHitCircle;
 
         /// <summary>
         /// On osu-stable, hitcircles have 5 pixels of transparent padding on each side to allow for shadows etc.
@@ -20,16 +20,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         /// </summary>
         public const float LEGACY_CIRCLE_RADIUS = 64 - 5;
 
-        public OsuLegacySkinTransformer(ISkinSource source)
-            : base(source)
+        public OsuLegacySkinTransformer(ISkin skin)
+            : base(skin)
         {
-            Source.SourceChanged += sourceChanged;
-            sourceChanged();
-        }
-
-        private void sourceChanged()
-        {
-            hasHitCircle = new Lazy<bool>(() => Source.GetTexture("hitcircle") != null);
+            hasHitCircle = new Lazy<bool>(() => GetTexture("hitcircle") != null);
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
@@ -55,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         // Math.Max((150 / Velocity) * GameBase.SIXTY_FRAME_TIME, GameBase.SIXTY_FRAME_TIME);
 
                         if (sliderBallContent != null)
-                            return new LegacySliderBall(sliderBallContent);
+                            return new LegacySliderBall(sliderBallContent, this);
 
                         return null;
 
@@ -84,14 +78,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return null;
 
                     case OsuSkinComponents.Cursor:
-                        if (Source.GetTexture("cursor") != null)
-                            return new LegacyCursor();
+                        if (GetTexture("cursor") != null)
+                            return new LegacyCursor(this);
 
                         return null;
 
                     case OsuSkinComponents.CursorTrail:
-                        if (Source.GetTexture("cursortrail") != null)
-                            return new LegacyCursorTrail();
+                        if (GetTexture("cursortrail") != null)
+                            return new LegacyCursorTrail(this);
 
                         return null;
 
@@ -106,9 +100,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         };
 
                     case OsuSkinComponents.SpinnerBody:
-                        bool hasBackground = Source.GetTexture("spinner-background") != null;
+                        bool hasBackground = GetTexture("spinner-background") != null;
 
-                        if (Source.GetTexture("spinner-top") != null && !hasBackground)
+                        if (GetTexture("spinner-top") != null && !hasBackground)
                             return new LegacyNewStyleSpinner();
                         else if (hasBackground)
                             return new LegacyOldStyleSpinner();
@@ -117,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 }
             }
 
-            return Source.GetDrawableComponent(component);
+            return base.GetDrawableComponent(component);
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
@@ -125,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             switch (lookup)
             {
                 case OsuSkinColour colour:
-                    return Source.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
+                    return base.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
 
                 case OsuSkinConfiguration osuLookup:
                     switch (osuLookup)
@@ -139,14 +133,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         case OsuSkinConfiguration.HitCircleOverlayAboveNumber:
                             // See https://osu.ppy.sh/help/wiki/Skinning/skin.ini#%5Bgeneral%5D
                             // HitCircleOverlayAboveNumer (with typo) should still be supported for now.
-                            return Source.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumber) ??
-                                   Source.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumer);
+                            return base.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumber) ??
+                                   base.GetConfig<OsuSkinConfiguration, TValue>(OsuSkinConfiguration.HitCircleOverlayAboveNumer);
                     }
 
                     break;
             }
 
-            return Source.GetConfig<TLookup, TValue>(lookup);
+            return base.GetConfig<TLookup, TValue>(lookup);
         }
     }
 }

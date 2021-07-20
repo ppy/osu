@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -27,7 +29,7 @@ namespace osu.Game.Overlays.KeyBinding
     public class KeyBindingRow : Container, IFilterable
     {
         private readonly object action;
-        private readonly IEnumerable<Framework.Input.Bindings.KeyBinding> bindings;
+        private readonly IEnumerable<RealmKeyBinding> bindings;
 
         private const float transition_time = 150;
 
@@ -62,7 +64,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend(text.Text.ToString());
 
-        public KeyBindingRow(object action, IEnumerable<Framework.Input.Bindings.KeyBinding> bindings)
+        public KeyBindingRow(object action, List<RealmKeyBinding> bindings)
         {
             this.action = action;
             this.bindings = bindings;
@@ -72,7 +74,7 @@ namespace osu.Game.Overlays.KeyBinding
         }
 
         [Resolved]
-        private KeyBindingStore store { get; set; }
+        private RealmContextFactory realmFactory { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -153,7 +155,8 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 var button = buttons[i++];
                 button.UpdateKeyCombination(d);
-                store.Update(button.KeyBinding);
+
+                updateStoreFromButton(button);
             }
 
             isDefault.Value = true;
@@ -314,7 +317,7 @@ namespace osu.Game.Overlays.KeyBinding
         {
             if (bindTarget != null)
             {
-                store.Update(bindTarget.KeyBinding);
+                updateStoreFromButton(bindTarget);
 
                 updateIsDefaultValue();
 
@@ -361,6 +364,17 @@ namespace osu.Game.Overlays.KeyBinding
             if (bindTarget != null) bindTarget.IsBinding = true;
         }
 
+        private void updateStoreFromButton(KeyButton button)
+        {
+            using (var usage = realmFactory.GetForWrite())
+            {
+                var binding = usage.Realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
+                binding.KeyCombinationString = button.KeyBinding.KeyCombinationString;
+
+                usage.Commit();
+            }
+        }
+
         private void updateIsDefaultValue()
         {
             isDefault.Value = bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
@@ -386,7 +400,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         public class KeyButton : Container
         {
-            public readonly Framework.Input.Bindings.KeyBinding KeyBinding;
+            public readonly RealmKeyBinding KeyBinding;
 
             private readonly Box box;
             public readonly OsuSpriteText Text;
@@ -408,8 +422,11 @@ namespace osu.Game.Overlays.KeyBinding
                 }
             }
 
-            public KeyButton(Framework.Input.Bindings.KeyBinding keyBinding)
+            public KeyButton(RealmKeyBinding keyBinding)
             {
+                if (keyBinding.IsManaged)
+                    throw new ArgumentException("Key binding should not be attached as we make temporary changes", nameof(keyBinding));
+
                 KeyBinding = keyBinding;
 
                 Margin = new MarginPadding(padding);
@@ -478,7 +495,7 @@ namespace osu.Game.Overlays.KeyBinding
 
             public void UpdateKeyCombination(KeyCombination newCombination)
             {
-                if ((KeyBinding as DatabasedKeyBinding)?.RulesetID != null && !KeyBindingStore.CheckValidForGameplay(newCombination))
+                if (KeyBinding.RulesetID != null && !RealmKeyBindingStore.CheckValidForGameplay(newCombination))
                     return;
 
                 KeyBinding.KeyCombination = newCombination;

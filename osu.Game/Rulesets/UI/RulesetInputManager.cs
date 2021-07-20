@@ -30,12 +30,14 @@ namespace osu.Game.Rulesets.UI
         {
             set
             {
-                if (recorder != null)
+                if (value != null && recorder != null)
                     throw new InvalidOperationException("Cannot attach more than one recorder");
 
+                recorder?.Expire();
                 recorder = value;
 
-                KeyBindingContainer.Add(recorder);
+                if (recorder != null)
+                    KeyBindingContainer.Add(recorder);
             }
         }
 
@@ -175,7 +177,7 @@ namespace osu.Game.Rulesets.UI
             {
                 base.ReloadMappings();
 
-                KeyBindings = KeyBindings.Where(b => KeyBindingStore.CheckValidForGameplay(b.KeyCombination)).ToList();
+                KeyBindings = KeyBindings.Where(b => RealmKeyBindingStore.CheckValidForGameplay(b.KeyCombination)).ToList();
             }
         }
     }

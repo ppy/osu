@@ -113,7 +113,6 @@ namespace osu.Game.Tests.Collections.IO
                         await importCollectionsFromStream(osu, ms);
                     }
 
-                    Assert.That(host.UpdateThread.Running, Is.True);
                     Assert.That(exceptionThrown, Is.False);
                     Assert.That(osu.CollectionManager.Collections.Count, Is.EqualTo(0));
                 }

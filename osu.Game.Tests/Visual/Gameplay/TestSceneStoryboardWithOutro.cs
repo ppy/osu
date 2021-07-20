@@ -66,12 +66,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestStoryboardExitToSkipOutro()
+        public void TestStoryboardExitDuringOutroStillExits()
         {
             CreateTest(null);
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("exit via pause", () => Player.ExitViaPause());
-            AddAssert("score shown", () => Player.IsScoreShown);
+            AddAssert("player exited", () => !Player.IsCurrentScreen() && Player.GetChildScreen() == null);
         }
 
         [TestCase(false)]

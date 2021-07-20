@@ -20,9 +20,6 @@ namespace osu.Game.Skinning
     {
         private const double epic_cutoff = 0.5;
 
-        [Resolved]
-        private ISkinSource skin { get; set; }
-
         private LegacyHealthPiece fill;
         private LegacyHealthPiece marker;
 
@@ -30,11 +27,16 @@ namespace osu.Game.Skinning
 
         private bool isNewStyle;
 
+        public bool UsesFixedAnchor { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ISkinSource source)
         {
             AutoSizeAxes = Axes.Both;
 
+            var skin = source.FindProvider(s => getTexture(s, "bg") != null);
+
+            // the marker lookup to decide which display style must be performed on the source of the bg, which is the most common element.
             isNewStyle = getTexture(skin, "marker") != null;
 
             // background implementation is the same for both versions.
@@ -76,7 +78,7 @@ namespace osu.Game.Skinning
 
         protected override void Flash(JudgementResult result) => marker.Flash(result);
 
-        private static Texture getTexture(ISkinSource skin, string name) => skin.GetTexture($"scorebar-{name}");
+        private static Texture getTexture(ISkin skin, string name) => skin?.GetTexture($"scorebar-{name}");
 
         private static Color4 getFillColour(double hp)
         {
@@ -95,7 +97,7 @@ namespace osu.Game.Skinning
             private readonly Texture dangerTexture;
             private readonly Texture superDangerTexture;
 
-            public LegacyOldStyleMarker(ISkinSource skin)
+            public LegacyOldStyleMarker(ISkin skin)
             {
                 normalTexture = getTexture(skin, "ki");
                 dangerTexture = getTexture(skin, "kidanger");
@@ -126,9 +128,9 @@ namespace osu.Game.Skinning
 
         public class LegacyNewStyleMarker : LegacyMarker
         {
-            private readonly ISkinSource skin;
+            private readonly ISkin skin;
 
-            public LegacyNewStyleMarker(ISkinSource skin)
+            public LegacyNewStyleMarker(ISkin skin)
             {
                 this.skin = skin;
             }
@@ -148,9 +150,9 @@ namespace osu.Game.Skinning
             }
         }
 
-        internal class LegacyOldStyleFill : LegacyHealthPiece
+        internal abstract class LegacyFill : LegacyHealthPiece
         {
-            public LegacyOldStyleFill(ISkinSource skin)
+            protected LegacyFill(ISkin skin)
             {
                 // required for sizing correctly..
                 var firstFrame = getTexture(skin, "colour-0");
@@ -162,27 +164,29 @@ namespace osu.Game.Skinning
                 }
                 else
                 {
-                    InternalChild = skin.GetAnimation("scorebar-colour", true, true, startAtCurrentTime: false, applyConfigFrameRate: true) ?? Drawable.Empty();
+                    InternalChild = skin.GetAnimation("scorebar-colour", true, true, startAtCurrentTime: false, applyConfigFrameRate: true) ?? Empty();
                     Size = new Vector2(firstFrame.DisplayWidth, firstFrame.DisplayHeight);
                 }
 
-                Position = new Vector2(3, 10) * 1.6f;
                 Masking = true;
             }
         }
 
-        internal class LegacyNewStyleFill : LegacyHealthPiece
+        internal class LegacyOldStyleFill : LegacyFill
         {
-            public LegacyNewStyleFill(ISkinSource skin)
+            public LegacyOldStyleFill(ISkin skin)
+                : base(skin)
             {
-                InternalChild = new Sprite
-                {
-                    Texture = getTexture(skin, "colour"),
-                };
+                Position = new Vector2(3, 10) * 1.6f;
+            }
+        }
 
-                Size = InternalChild.Size;
+        internal class LegacyNewStyleFill : LegacyFill
+        {
+            public LegacyNewStyleFill(ISkin skin)
+                : base(skin)
+            {
                 Position = new Vector2(7.5f, 7.8f) * 1.6f;
-                Masking = true;
             }
 
             protected override void Update()

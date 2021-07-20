@@ -34,7 +34,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         public void Stop() => IsRunning = false;
 
-        public bool Seek(double position) => true;
+        public bool Seek(double position)
+        {
+            CurrentTime = position;
+            return true;
+        }
 
         public void ResetSpeedAdjustments()
         {

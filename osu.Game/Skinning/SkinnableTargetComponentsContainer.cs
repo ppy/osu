@@ -17,6 +17,8 @@ namespace osu.Game.Skinning
     {
         public bool IsEditable => false;
 
+        public bool UsesFixedAnchor { get; set; }
+
         private readonly Action<Container> applyDefaults;
 
         /// <summary>

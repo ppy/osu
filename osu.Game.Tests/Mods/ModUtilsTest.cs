@@ -15,9 +15,25 @@ namespace osu.Game.Tests.Mods
     public class ModUtilsTest
     {
         [Test]
+        public void TestModIsNotCompatibleWithItself()
+        {
+            var mod = new Mock<CustomMod1>();
+            Assert.That(ModUtils.CheckCompatibleSet(new[] { mod.Object, mod.Object }, out var invalid), Is.False);
+            Assert.That(invalid, Is.EquivalentTo(new[] { mod.Object }));
+        }
+
+        [Test]
         public void TestModIsCompatibleByItself()
         {
             var mod = new Mock<CustomMod1>();
+            Assert.That(ModUtils.CheckCompatibleSet(new[] { mod.Object }));
+        }
+
+        [Test]
+        public void TestModIsCompatibleByItselfWithIncompatibleInterface()
+        {
+            var mod = new Mock<CustomMod1>();
+            mod.Setup(m => m.IncompatibleMods).Returns(new[] { typeof(IModCompatibilitySpecification) });
             Assert.That(ModUtils.CheckCompatibleSet(new[] { mod.Object }));
         }
 
@@ -28,6 +44,20 @@ namespace osu.Game.Tests.Mods
             var mod2 = new Mock<CustomMod2>();
 
             mod1.Setup(m => m.IncompatibleMods).Returns(new[] { mod2.Object.GetType() });
+
+            // Test both orderings.
+            Assert.That(ModUtils.CheckCompatibleSet(new Mod[] { mod1.Object, mod2.Object }), Is.False);
+            Assert.That(ModUtils.CheckCompatibleSet(new Mod[] { mod2.Object, mod1.Object }), Is.False);
+        }
+
+        [Test]
+        public void TestIncompatibleThroughInterface()
+        {
+            var mod1 = new Mock<CustomMod1>();
+            var mod2 = new Mock<CustomMod2>();
+
+            mod1.Setup(m => m.IncompatibleMods).Returns(new[] { typeof(IModCompatibilitySpecification) });
+            mod2.Setup(m => m.IncompatibleMods).Returns(new[] { typeof(IModCompatibilitySpecification) });
 
             // Test both orderings.
             Assert.That(ModUtils.CheckCompatibleSet(new Mod[] { mod1.Object, mod2.Object }), Is.False);
@@ -125,7 +155,7 @@ namespace osu.Game.Tests.Mods
             // multi mod.
             new object[]
             {
-                new Mod[] { new MultiMod(new OsuModHalfTime()), new OsuModHalfTime() },
+                new Mod[] { new MultiMod(new OsuModHalfTime()), new OsuModDaycore() },
                 new[] { typeof(MultiMod) }
             },
             // valid pair.
@@ -149,11 +179,15 @@ namespace osu.Game.Tests.Mods
                 Assert.That(invalid.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
         }
 
-        public abstract class CustomMod1 : Mod
+        public abstract class CustomMod1 : Mod, IModCompatibilitySpecification
         {
         }
 
-        public abstract class CustomMod2 : Mod
+        public abstract class CustomMod2 : Mod, IModCompatibilitySpecification
+        {
+        }
+
+        public interface IModCompatibilitySpecification
         {
         }
     }

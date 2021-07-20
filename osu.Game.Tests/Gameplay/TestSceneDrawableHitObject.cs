@@ -44,11 +44,9 @@ namespace osu.Game.Tests.Gameplay
         {
             TestDrawableHitObject dho = null;
             TestLifetimeEntry entry = null;
-            AddStep("Create DHO", () =>
+            AddStep("Create DHO", () => Child = dho = new TestDrawableHitObject
             {
-                dho = new TestDrawableHitObject(null);
-                dho.Apply(entry = new TestLifetimeEntry(new HitObject()));
-                Child = dho;
+                Entry = entry = new TestLifetimeEntry(new HitObject())
             });
 
             AddStep("KeepAlive = true", () =>
@@ -81,12 +79,10 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("Lifetime is updated", () => entry.LifetimeStart == -TestLifetimeEntry.INITIAL_LIFETIME_OFFSET);
 
             TestDrawableHitObject dho = null;
-            AddStep("Create DHO", () =>
+            AddStep("Create DHO", () => Child = dho = new TestDrawableHitObject
             {
-                dho = new TestDrawableHitObject(null);
-                dho.Apply(entry);
-                Child = dho;
-                dho.SetLifetimeStartOnApply = true;
+                Entry = entry,
+                SetLifetimeStartOnApply = true
             });
             AddStep("ApplyDefaults", () => entry.HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty()));
             AddAssert("Lifetime is correct", () => dho.LifetimeStart == TestDrawableHitObject.LIFETIME_ON_APPLY && entry.LifetimeStart == TestDrawableHitObject.LIFETIME_ON_APPLY);
@@ -97,11 +93,9 @@ namespace osu.Game.Tests.Gameplay
         {
             TestDrawableHitObject dho = null;
             TestLifetimeEntry entry = null;
-            AddStep("Create DHO", () =>
+            AddStep("Create DHO", () => Child = dho = new TestDrawableHitObject
             {
-                dho = new TestDrawableHitObject(null);
-                dho.Apply(entry = new TestLifetimeEntry(new HitObject()));
-                Child = dho;
+                Entry = entry = new TestLifetimeEntry(new HitObject())
             });
 
             AddStep("Set entry lifetime", () =>
@@ -135,7 +129,7 @@ namespace osu.Game.Tests.Gameplay
 
             public bool SetLifetimeStartOnApply;
 
-            public TestDrawableHitObject(HitObject hitObject)
+            public TestDrawableHitObject(HitObject hitObject = null)
                 : base(hitObject)
             {
             }

@@ -172,6 +172,8 @@ namespace osu.Game.Graphics.Containers
 
         private class ScalingBackgroundScreen : BackgroundScreenDefault
         {
+            protected override bool AllowStoryboardBackground => false;
+
             public override void OnEntering(IScreen last)
             {
                 this.FadeInFromZero(4000, Easing.OutQuint);

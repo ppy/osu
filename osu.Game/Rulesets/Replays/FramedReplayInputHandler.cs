@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 
@@ -117,7 +116,7 @@ namespace osu.Game.Rulesets.Replays
             }
         }
 
-        protected virtual bool IsImportant([NotNull] TFrame frame) => false;
+        protected virtual bool IsImportant(TFrame frame) => false;
 
         /// <summary>
         /// Update the current frame based on an incoming time value.

@@ -20,6 +20,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class DrawableOsuEditorRuleset : DrawableOsuRuleset
     {
+        /// <summary>
+        /// Hit objects are intentionally made to fade out at a constant slower rate than in gameplay.
+        /// This allows a mapper to gain better historical context and use recent hitobjects as reference / snap points.
+        /// </summary>
+        public const double EDITOR_HIT_OBJECT_FADE_OUT_EXTENSION = 700;
+
         public DrawableOsuEditorRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
@@ -46,12 +52,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                 d.ApplyCustomUpdateState += updateState;
             }
 
-            /// <summary>
-            /// Hit objects are intentionally made to fade out at a constant slower rate than in gameplay.
-            /// This allows a mapper to gain better historical context and use recent hitobjects as reference / snap points.
-            /// </summary>
-            private const double editor_hit_object_fade_out_extension = 700;
-
             private void updateState(DrawableHitObject hitObject, ArmedState state)
             {
                 if (state == ArmedState.Idle || hitAnimations.Value)
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 if (hitObject is DrawableHitCircle circle)
                 {
                     circle.ApproachCircle
-                          .FadeOutFromOne(editor_hit_object_fade_out_extension * 4)
+                          .FadeOutFromOne(EDITOR_HIT_OBJECT_FADE_OUT_EXTENSION * 4)
                           .Expire();
 
                     circle.ApproachCircle.ScaleTo(1.1f, 300, Easing.OutQuint);
@@ -69,14 +69,20 @@ namespace osu.Game.Rulesets.Osu.Edit
                 if (hitObject is IHasMainCirclePiece mainPieceContainer)
                 {
                     // clear any explode animation logic.
-                    mainPieceContainer.CirclePiece.ApplyTransformsAt(hitObject.HitStateUpdateTime, true);
-                    mainPieceContainer.CirclePiece.ClearTransformsAfter(hitObject.HitStateUpdateTime, true);
+                    // this is scheduled after children to ensure that the clear happens after invocations of ApplyCustomUpdateState on the circle piece's nested skinnables.
+                    ScheduleAfterChildren(() =>
+                    {
+                        if (hitObject.HitObject == null) return;
+
+                        mainPieceContainer.CirclePiece.ApplyTransformsAt(hitObject.StateUpdateTime, true);
+                        mainPieceContainer.CirclePiece.ClearTransformsAfter(hitObject.StateUpdateTime, true);
+                    });
                 }
 
                 if (hitObject is DrawableSliderRepeat repeat)
                 {
-                    repeat.Arrow.ApplyTransformsAt(hitObject.HitStateUpdateTime, true);
-                    repeat.Arrow.ClearTransformsAfter(hitObject.HitStateUpdateTime, true);
+                    repeat.Arrow.ApplyTransformsAt(hitObject.StateUpdateTime, true);
+                    repeat.Arrow.ClearTransformsAfter(hitObject.StateUpdateTime, true);
                 }
 
                 // adjust the visuals of top-level object types to make them stay on screen for longer than usual.
@@ -93,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                         hitObject.RemoveTransform(existing);
 
                         using (hitObject.BeginAbsoluteSequence(hitObject.HitStateUpdateTime))
-                            hitObject.FadeOut(editor_hit_object_fade_out_extension).Expire();
+                            hitObject.FadeOut(EDITOR_HIT_OBJECT_FADE_OUT_EXTENSION).Expire();
                         break;
                 }
             }

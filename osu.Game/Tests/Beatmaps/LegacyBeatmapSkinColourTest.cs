@@ -158,6 +158,10 @@ namespace osu.Game.Tests.Beatmaps
                 add { }
                 remove { }
             }
+
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(this) ? this : null;
+
+            public IEnumerable<ISkin> AllSources => new[] { this };
         }
     }
 }

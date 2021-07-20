@@ -10,10 +10,11 @@ using osu.Game.IO.Serialization.Converters;
 using osu.Game.Online.Rooms.GameTypes;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Users;
+using osu.Game.Utils;
 
 namespace osu.Game.Online.Rooms
 {
-    public class Room
+    public class Room : IDeepCloneable<Room>
     {
         [Cached]
         [JsonProperty("id")]
@@ -50,10 +51,6 @@ namespace osu.Game.Online.Rooms
 
         [Cached]
         [JsonIgnore]
-        public readonly Bindable<TimeSpan?> Duration = new Bindable<TimeSpan?>();
-
-        [Cached]
-        [JsonIgnore]
         public readonly Bindable<int?> MaxAttempts = new Bindable<int?>();
 
         [Cached]
@@ -76,6 +73,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("current_user_score")]
         public readonly Bindable<PlaylistAggregateScore> UserScore = new Bindable<PlaylistAggregateScore>();
 
+        [JsonProperty("has_password")]
+        public readonly BindableBool HasPassword = new BindableBool();
+
         [Cached]
         [JsonProperty("recent_participants")]
         public readonly BindableList<User> RecentParticipants = new BindableList<User>();
@@ -83,6 +83,16 @@ namespace osu.Game.Online.Rooms
         [Cached]
         [JsonProperty("participant_count")]
         public readonly Bindable<int> ParticipantCount = new Bindable<int>();
+
+        #region Properties only used for room creation request
+
+        [Cached(Name = nameof(Password))]
+        [JsonProperty("password")]
+        public readonly Bindable<string> Password = new Bindable<string>();
+
+        [Cached]
+        [JsonIgnore]
+        public readonly Bindable<TimeSpan?> Duration = new Bindable<TimeSpan?>();
 
         [JsonProperty("duration")]
         private int? duration
@@ -96,6 +106,8 @@ namespace osu.Game.Online.Rooms
                     Duration.Value = TimeSpan.FromMinutes(value.Value);
             }
         }
+
+        #endregion
 
         // Only supports retrieval for now
         [Cached]
@@ -116,11 +128,16 @@ namespace osu.Game.Online.Rooms
         [JsonIgnore]
         public readonly Bindable<int> Position = new Bindable<int>(-1);
 
+        public Room()
+        {
+            Password.BindValueChanged(p => HasPassword.Value = !string.IsNullOrEmpty(p.NewValue));
+        }
+
         /// <summary>
         /// Create a copy of this room without online information.
         /// Should be used to create a local copy of a room for submitting in the future.
         /// </summary>
-        public Room CreateCopy()
+        public Room DeepClone()
         {
             var copy = new Room();
 
@@ -144,6 +161,7 @@ namespace osu.Game.Online.Rooms
             ChannelId.Value = other.ChannelId.Value;
             Status.Value = other.Status.Value;
             Availability.Value = other.Availability.Value;
+            HasPassword.Value = other.HasPassword.Value;
             Type.Value = other.Type.Value;
             MaxParticipants.Value = other.MaxParticipants.Value;
             ParticipantCount.Value = other.ParticipantCount.Value;

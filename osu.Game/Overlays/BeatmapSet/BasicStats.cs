@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             private readonly OsuSpriteText value;
 
-            public string TooltipText { get; }
+            public LocalisableString TooltipText { get; }
 
             public LocalisableString Value
             {

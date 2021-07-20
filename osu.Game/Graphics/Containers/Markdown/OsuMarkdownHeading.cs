@@ -20,7 +20,8 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         public override MarkdownTextFlowContainer CreateTextFlow() => new HeadingTextFlowContainer
         {
-            Weight = GetFontWeightByLevel(level),
+            FontSize = GetFontSizeByLevel(level),
+            FontWeight = GetFontWeightByLevel(level),
         };
 
         protected override float GetFontSizeByLevel(int level)
@@ -28,27 +29,25 @@ namespace osu.Game.Graphics.Containers.Markdown
             // Reference for this font size
             // https://github.com/ppy/osu-web/blob/376cac43a051b9c85ce95e2c446099be187b3e45/resources/assets/less/bem/osu-md.less#L9
             // https://github.com/ppy/osu-web/blob/376cac43a051b9c85ce95e2c446099be187b3e45/resources/assets/less/variables.less#L161
-            const float base_font_size = 14;
-
             switch (level)
             {
                 case 1:
-                    return 30 / base_font_size;
+                    return 30;
 
                 case 2:
-                    return 26 / base_font_size;
+                    return 26;
 
                 case 3:
-                    return 20 / base_font_size;
+                    return 20;
 
                 case 4:
-                    return 18 / base_font_size;
+                    return 18;
 
                 case 5:
-                    return 16 / base_font_size;
+                    return 16;
 
                 default:
-                    return 1;
+                    return 14;
             }
         }
 
@@ -67,9 +66,11 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         private class HeadingTextFlowContainer : OsuMarkdownTextFlowContainer
         {
-            public FontWeight Weight { get; set; }
+            public float FontSize;
+            public FontWeight FontWeight;
 
-            protected override SpriteText CreateSpriteText() => base.CreateSpriteText().With(t => t.Font = t.Font.With(weight: Weight));
+            protected override SpriteText CreateSpriteText()
+                => base.CreateSpriteText().With(t => t.Font = t.Font.With(size: FontSize, weight: FontWeight));
         }
     }
 }

@@ -202,7 +202,6 @@ namespace osu.Game.Screens.OnlinePlay
                                                 Child = modDisplay = new ModDisplay
                                                 {
                                                     Scale = new Vector2(0.4f),
-                                                    DisplayUnrankedText = false,
                                                     ExpansionMode = ExpansionMode.AlwaysExpanded
                                                 }
                                             }

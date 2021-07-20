@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
@@ -66,6 +68,8 @@ namespace osu.Game.Overlays.Comments
             public readonly BindableBool Checked = new BindableBool();
 
             private readonly SpriteIcon checkboxIcon;
+            private Sample sampleChecked;
+            private Sample sampleUnchecked;
 
             public ShowDeletedButton()
             {
@@ -93,6 +97,13 @@ namespace osu.Game.Overlays.Comments
                 });
             }
 
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio)
+            {
+                sampleChecked = audio.Samples.Get(@"UI/check-on");
+                sampleUnchecked = audio.Samples.Get(@"UI/check-off");
+            }
+
             protected override void LoadComplete()
             {
                 Checked.BindValueChanged(isChecked => checkboxIcon.Icon = isChecked.NewValue ? FontAwesome.Solid.CheckSquare : FontAwesome.Regular.Square, true);
@@ -102,6 +113,12 @@ namespace osu.Game.Overlays.Comments
             protected override bool OnClick(ClickEvent e)
             {
                 Checked.Value = !Checked.Value;
+
+                if (Checked.Value)
+                    sampleChecked?.Play();
+                else
+                    sampleUnchecked?.Play();
+
                 return true;
             }
         }

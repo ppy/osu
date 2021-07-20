@@ -431,7 +431,7 @@ namespace osu.Game.Screens.Select
 
             public class InfoLabel : Container, IHasTooltip
             {
-                public string TooltipText { get; }
+                public LocalisableString TooltipText { get; }
 
                 public InfoLabel(BeatmapStatistic statistic)
                 {

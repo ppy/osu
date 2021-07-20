@@ -20,10 +20,13 @@ namespace osu.Game.Rulesets.Taiko.Mods
         {
             var taikoBeatmap = (TaikoBeatmap)beatmap;
 
+            Seed.Value ??= RNG.Next();
+            var rng = new Random((int)Seed.Value);
+
             foreach (var obj in taikoBeatmap.HitObjects)
             {
                 if (obj is Hit hit)
-                    hit.Type = RNG.Next(2) == 0 ? HitType.Centre : HitType.Rim;
+                    hit.Type = rng.Next(2) == 0 ? HitType.Centre : HitType.Rim;
             }
         }
     }
