@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -45,8 +44,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [BackgroundDependencyLoader]
         private void load()
         {
-            Debug.Assert(Score.Date != null);
-
             AddInternal(new ProfileItemContainer
             {
                 Children = new Drawable[]
@@ -95,7 +92,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                                                         Colour = colours.Yellow
                                                     },
-                                                    new DrawableDate(Score.Date.Value, 12)
+                                                    new DrawableDate(Score.Date, 12)
                                                     {
                                                         Colour = colourProvider.Foreground1
                                                     }
