@@ -13,6 +13,5 @@
     <EmbeddedResource Include="Samples\**\*" />
     <EmbeddedResource Include="Textures\**\*" />
     <EmbeddedResource Include="Tracks\**\*" />
-    <EmbeddedResource Include="Locales\**\*" />
   </ItemGroup>
 </Project>

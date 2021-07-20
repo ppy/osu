@@ -7,7 +7,8 @@ namespace osu.Game.Localisation
 {
     public static class MouseSettingsStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.MouseSettings";
+        //private const string prefix = @"osu.Game.Resources.Localisation.MouseSettings";
+        private const string prefix = @"M.Resources.Localisation.MouseSettings";
 
         /// <summary>
         /// "Mouse"

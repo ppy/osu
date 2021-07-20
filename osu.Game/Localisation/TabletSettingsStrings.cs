@@ -7,7 +7,8 @@ namespace osu.Game.Localisation
 {
     public static class TabletSettingsStrings
     {
-        private const string prefix = @"osu.Game.Resources.Localisation.TabletSettings";
+        //private const string prefix = @"osu.Game.Resources.Localisation.TabletSettings";
+        private const string prefix = @"M.Resources.Localisation.TabletSettings";
 
         /// <summary>
         /// "Tablet"
