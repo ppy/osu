@@ -230,9 +230,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public bool OnPressed(PlatformAction action)
         {
-            switch (action.ActionType)
+            switch (action)
             {
-                case PlatformActionType.SelectAll:
+                case PlatformAction.SelectAll:
                     SelectAll();
                     return true;
             }
