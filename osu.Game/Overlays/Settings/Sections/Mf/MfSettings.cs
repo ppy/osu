@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Platform.Linux;
 using osu.Game.Configuration;
@@ -12,7 +13,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
     public class MfSettings : SettingsSubsection
     {
         private SettingsCheckbox systemCursor;
-        protected override string Header => "Mf-osu";
+        protected override LocalisableString Header => "Mf-osu";
 
         [BackgroundDependencyLoader]
         private void load(MConfigManager config, OsuConfigManager osuConfig, GameHost host)
@@ -46,6 +47,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 new SettingsCheckbox
                 {
                     LabelText = "隐藏Disclaimer",
+                    TooltipText = "要跳过Disclaimer, 自定义开屏页背景也需要关闭。",
                     Current = config.GetBindable<bool>(MSetting.DoNotShowDisclaimer)
                 },
                 new SettingsSlider<float>
@@ -76,6 +78,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 new SettingsCheckbox
                 {
                     LabelText = "使用自定义开屏页背景",
+                    TooltipText = "请将要显示在开屏页的图片放在custom下, 并更名为avatarlogo",
                     Current = config.GetBindable<bool>(MSetting.UseCustomGreetingPicture)
                 }
             };

@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Users;
@@ -12,7 +13,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
     public class MainMenuSettings : SettingsSubsection
     {
-        protected override string Header => "主界面";
+        protected override LocalisableString Header => "主界面";
 
         private IBindable<User> user;
 
@@ -42,7 +43,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 },
                 backgroundSourceDropdown = new SettingsEnumDropdown<BackgroundSource>
                 {
-                    LabelText = "背景来源(需要osu!supporter)",
+                    LabelText = "背景来源",
                     Current = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource),
                 },
                 new SettingsEnumDropdown<SeasonalBackgroundMode>
@@ -59,7 +60,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 
             user.BindValueChanged(u =>
             {
-                const string not_supporter_note = "该设置需要osu!supporter。";
+                const string not_supporter_note = "部分设置需要osu!supporter。";
 
                 backgroundSourceDropdown.WarningText = u.NewValue?.IsSupporter != true ? not_supporter_note : string.Empty;
             }, true);

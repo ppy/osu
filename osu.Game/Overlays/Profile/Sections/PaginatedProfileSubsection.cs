@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -35,9 +36,9 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private ShowMoreButton moreButton;
         private OsuSpriteText missing;
-        private readonly string missingText;
+        private readonly LocalisableString? missingText;
 
-        protected PaginatedProfileSubsection(Bindable<User> user, string headerText = "", string missingText = "")
+        protected PaginatedProfileSubsection(Bindable<User> user, LocalisableString? headerText = null, LocalisableString? missingText = null)
             : base(user, headerText, CounterVisibilityState.AlwaysVisible)
         {
             this.missingText = missingText;
@@ -66,7 +67,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 },
                 missing = new OsuSpriteText
                 {
-                    Text = missingText,
+                    Text = missingText ?? string.Empty,
                     Alpha = 0,
                 }
             }
@@ -112,7 +113,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 moreButton.Hide();
                 moreButton.IsLoading = false;
 
-                if (!string.IsNullOrEmpty(missingText))
+                if (missingText.HasValue)
                     missing.Show();
 
                 return;

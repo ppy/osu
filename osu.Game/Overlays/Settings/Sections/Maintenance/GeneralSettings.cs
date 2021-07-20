@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Database;
@@ -17,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
     public class GeneralSettings : SettingsSubsection
     {
-        protected override string Header => "整体";
+        protected override LocalisableString Header => "整体";
 
         private TriangleButton importBeatmapsButton;
         private TriangleButton importScoresButton;

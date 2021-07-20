@@ -5,13 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Localisation;
 using static osu.Game.Users.User;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
     public class UserHistoryGraph : UserGraph<DateTime, long>
     {
-        private readonly string tooltipCounterName;
+        private readonly LocalisableString tooltipCounterName;
 
         [CanBeNull]
         public UserHistoryCount[] Values
@@ -19,7 +20,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             set => Data = value?.Select(v => new KeyValuePair<DateTime, long>(v.Date, v.Count)).ToArray();
         }
 
-        public UserHistoryGraph(string tooltipCounterName)
+        public UserHistoryGraph(LocalisableString tooltipCounterName)
         {
             this.tooltipCounterName = tooltipCounterName;
         }
@@ -40,9 +41,9 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         protected class HistoryGraphTooltip : UserGraphTooltip
         {
-            private readonly string tooltipCounterName;
+            private readonly LocalisableString tooltipCounterName;
 
-            public HistoryGraphTooltip(string tooltipCounterName)
+            public HistoryGraphTooltip(LocalisableString tooltipCounterName)
                 : base(tooltipCounterName)
             {
                 this.tooltipCounterName = tooltipCounterName;
@@ -61,7 +62,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         private class TooltipDisplayContent
         {
-            public string Name;
+            public LocalisableString Name;
             public string Count;
             public string Date;
         }

@@ -13,6 +13,8 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Backgrounds;
+using osuTK.Graphics;
 using IntroSequence = osu.Game.Configuration.IntroSequence;
 
 namespace osu.Game.Screens
@@ -33,7 +35,9 @@ namespace osu.Game.Screens
         private LoadingSpinner spinner;
         private ScheduledDelegate spinnerShow;
 
-        protected virtual OsuScreen CreateLoadableScreen() => new Disclaimer(getIntroSequence(), showDisclaimer);
+        protected virtual OsuScreen CreateLoadableScreen() => new Disclaimer(getIntroSequence(), showDisclaimer, backgroundColor);
+
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenPureColor(backgroundColor);
 
         private IntroScreen getIntroSequence()
         {
@@ -43,13 +47,13 @@ namespace osu.Game.Screens
             switch (introSequence)
             {
                 case IntroSequence.Circles:
-                    return new IntroCircles();
+                    return new IntroCircles(false);
 
                 case IntroSequence.CirclesCN:
-                    return new IntroCirclesCN();
+                    return new IntroCircles(true);
 
                 case IntroSequence.TrianglesCN:
-                    return new IntroTrianglesCN();
+                    return new IntroTriangles(true);
 
                 case IntroSequence.SkippedIntro:
                     return new IntroSkipped();
@@ -64,13 +68,15 @@ namespace osu.Game.Screens
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();
 
+        private Color4 backgroundColor;
+
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
             LoadComponentAsync(precompiler = CreateShaderPrecompiler(), AddInternal);
-            LoadComponentAsync(loadableScreen = CreateLoadableScreen());
 
+            LoadComponentAsync(loadableScreen = CreateLoadableScreen());
             LoadComponentAsync(spinner = new LoadingSpinner(true, true)
             {
                 Anchor = Anchor.BottomRight,
@@ -105,10 +111,11 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OsuConfigManager config)
+        private void load(OsuGameBase game, OsuConfigManager config, MConfigManager mConfig)
         {
             showDisclaimer = game.IsDeployedBuild;
             introSequence = config.Get<IntroSequence>(OsuSetting.IntroSequence);
+            backgroundColor = mConfig.GetCustomLoaderColor();
         }
 
         /// <summary>

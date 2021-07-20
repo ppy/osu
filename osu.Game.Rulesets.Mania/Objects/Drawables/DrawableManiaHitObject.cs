@@ -22,6 +22,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
+        // Leaving the default (10s) makes hitobjects not appear, as this offset is used for the initial state transforms.
+        // Calculated as DrawableManiaRuleset.MAX_TIME_RANGE + some additional allowance for velocity < 1.
+        protected override double InitialLifetimeOffset => 30000;
+
         [Resolved(canBeNull: true)]
         private ManiaPlayfield playfield { get; set; }
 

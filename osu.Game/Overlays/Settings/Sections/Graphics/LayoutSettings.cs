@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
     public class LayoutSettings : SettingsSubsection
     {
-        protected override string Header => "显示";
+        protected override LocalisableString Header => "布局设置";
 
         private FillFlowContainer<SettingsSlider<float>> scalingSettings;
 

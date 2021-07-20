@@ -9,6 +9,7 @@ using osu.Framework.Input.Handlers.Joystick;
 using osu.Framework.Input.Handlers.Midi;
 using osu.Framework.Input.Handlers.Mouse;
 using osu.Framework.Input.Handlers.Tablet;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Overlays.Settings.Sections.Input;
 
@@ -100,7 +101,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 };
             }
 
-            protected override string Header => handler.Description;
+            protected override LocalisableString Header => handler.Description;
         }
     }
 }

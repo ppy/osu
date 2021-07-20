@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Import
                         Colour = colours.GreySeafoamDark,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    fileSelector = new OsuFileSelector(validFileExtensions: game.HandledExtensions.ToArray())
+                    fileSelector = new OsuFileSelector(storage.GetFullPath("."), validFileExtensions: game.HandledExtensions.ToArray())
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0.65f

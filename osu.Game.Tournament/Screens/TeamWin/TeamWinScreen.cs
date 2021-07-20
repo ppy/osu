@@ -13,11 +13,10 @@ using osuTK;
 
 namespace osu.Game.Tournament.Screens.TeamWin
 {
-    public class TeamWinScreen : TournamentScreen, IProvideVideo
+    public class TeamWinScreen : TournamentMatchScreen, IProvideVideo
     {
         private Container mainContainer;
 
-        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
         private readonly Bindable<bool> currentCompleted = new Bindable<bool>();
 
         private TourneyVideo blueWinVideo;
@@ -48,17 +47,19 @@ namespace osu.Game.Tournament.Screens.TeamWin
                 }
             };
 
-            currentMatch.BindValueChanged(matchChanged);
-            currentMatch.BindTo(ladder.CurrentMatch);
-
             currentCompleted.BindValueChanged(_ => update());
         }
 
-        private void matchChanged(ValueChangedEvent<TournamentMatch> match)
+        protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
         {
-            currentCompleted.UnbindBindings();
-            currentCompleted.BindTo(match.NewValue.Completed);
+            base.CurrentMatchChanged(match);
 
+            currentCompleted.UnbindBindings();
+
+            if (match.NewValue == null)
+                return;
+
+            currentCompleted.BindTo(match.NewValue.Completed);
             update();
         }
 
@@ -66,7 +67,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
 
         private void update() => Schedule(() =>
         {
-            var match = currentMatch.Value;
+            var match = CurrentMatch.Value;
 
             if (match.Winner == null)
             {

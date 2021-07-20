@@ -25,7 +25,11 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         private void load()
         {
             Masking = true;
+
+            Add(Settings = CreateSettings());
         }
+
+        protected abstract OnlinePlayComposite CreateSettings();
 
         protected override void PopIn()
         {

@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Menu
         private SongTicker songTicker;
 
         [BackgroundDependencyLoader(true)]
-        private void load(MfMenuOverlay mfoverlay, BeatmapListingOverlay beatmapListing, SettingsOverlay settings, RankingsOverlay rankings, OsuConfigManager config, SessionStatics statics)
+        private void load(MfMenuOverlay mfoverlay, BeatmapListingOverlay beatmapListing, SettingsOverlay settings, RankingsOverlay rankings, OsuConfigManager config, SessionStatics statics, MConfigManager mConfig)
         {
             holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
@@ -145,7 +145,8 @@ namespace osu.Game.Screens.Menu
             buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();
             buttons.OnMfMenuButton = () => mfoverlay?.ToggleVisibility();
 
-            LoadComponentAsync(background = new BackgroundScreenDefault());
+            LoadComponentAsync(background = new BackgroundScreenDefault(config.Get<BackgroundSource>(OsuSetting.MenuBackgroundSource) != BackgroundSource.LoaderBackground
+                                                                        || config.Get<Configuration.IntroSequence>(OsuSetting.IntroSequence) != Configuration.IntroSequence.SkippedIntro));
             preloadScreens();
         }
 

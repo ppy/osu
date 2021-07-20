@@ -6,6 +6,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
+using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Screens.Menu
 {
@@ -15,10 +16,18 @@ namespace osu.Game.Screens.Menu
 
         protected override string BeatmapFile => "circles.osz";
 
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenPureColor();
+
         private const double delay_step_one = 2300;
         private const double delay_step_two = 600;
 
         private Sample welcome;
+        private readonly bool useTranslate;
+
+        public IntroCircles(bool useTranslate = false)
+        {
+            this.useTranslate = useTranslate;
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -46,7 +55,7 @@ namespace osu.Game.Screens.Menu
 
                 logo.ScaleTo(1);
                 logo.FadeIn();
-                logo.PlayIntro();
+                logo.PlayIntro(useTranslate);
             }
         }
 

@@ -6,10 +6,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Handlers.Tablet;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -52,7 +54,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private OsuSpriteText noTabletMessage;
 
-        protected override string Header => "数位板";
+        protected override LocalisableString Header => TabletSettingsStrings.Tablet;
 
         public TabletSettings(ITabletHandler tabletHandler)
         {
@@ -66,14 +68,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "启用",
+                    LabelText = CommonStrings.Enabled,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Current = tabletHandler.Enabled
                 },
                 noTabletMessage = new OsuSpriteText
                 {
-                    Text = "没有找到任何数位板!",
+                    Text = TabletSettingsStrings.NoTabletDetected,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS }
@@ -94,7 +96,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         },
                         new DangerousSettingsButton
                         {
-                            Text = "重置为全板映射",
+                            Text = TabletSettingsStrings.ResetToFullArea,
                             Action = () =>
                             {
                                 aspectLock.Value = false;
@@ -105,7 +107,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         },
                         new SettingsButton
                         {
-                            Text = "调整至当前游戏长宽比",
+                            Text = TabletSettingsStrings.ConformToCurrentGameAspectRatio,
                             Action = () =>
                             {
                                 forceAspectRatio((float)host.Window.ClientSize.Width / host.Window.ClientSize.Height);
@@ -114,43 +116,43 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = "X位移",
+                            LabelText = TabletSettingsStrings.XOffset,
                             Current = offsetX
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = "Y位移",
+                            LabelText = TabletSettingsStrings.YOffset,
                             Current = offsetY
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = "旋转",
+                            LabelText = TabletSettingsStrings.Rotation,
                             Current = rotation
                         },
                         new RotationPresetButtons(tabletHandler),
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = "长宽比例",
+                            LabelText = TabletSettingsStrings.AspectRatio,
                             Current = aspectRatio
                         },
                         new SettingsCheckbox
                         {
-                            LabelText = "锁定长宽比",
+                            LabelText = TabletSettingsStrings.LockAspectRatio,
                             Current = aspectLock
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = "宽度",
+                            LabelText = CommonStrings.Width,
                             Current = sizeX
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = "高度",
+                            LabelText = CommonStrings.Height,
                             Current = sizeY
                         },
                     }

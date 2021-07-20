@@ -12,6 +12,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using osu.Framework.Allocation;
+using osu.Game.Resources.Localisation.Web;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
@@ -37,7 +39,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         private class CountTotal : CountSection
         {
             public CountTotal()
-                : base("总共获得的Kudosu")
+                : base(UsersStrings.ShowExtraKudosuTotal)
             {
                 DescriptionText.AddText("取决于你对制谱的贡献如何。通过访问");
                 DescriptionText.AddLink("这个页面", "https://osu.ppy.sh/wiki/Kudosu");
@@ -56,7 +58,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                 set => valueText.Text = value.ToString("N0");
             }
 
-            public CountSection(string header)
+            public CountSection(LocalisableString header)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;

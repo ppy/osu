@@ -44,6 +44,7 @@ namespace Mvis.Plugin.Sandbox.Config
             //插件
             SetDefault(SandboxSetting.EnableRulesetPanel, true);
             SetDefault(SandboxSetting.IdleAlpha, 1f, 0, 1f);
+            SetDefault(SandboxSetting.ShowBeatmapInfo, true);
         }
 
         protected override string ConfigName => "RulesetPanel";
@@ -54,6 +55,9 @@ namespace Mvis.Plugin.Sandbox.Config
         //插件
         EnableRulesetPanel,
         IdleAlpha,
+
+        //Type B
+        ShowBeatmapInfo,
 
         //上游
         // Visualizer

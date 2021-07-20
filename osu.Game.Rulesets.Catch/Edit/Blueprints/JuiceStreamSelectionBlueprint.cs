@@ -49,8 +49,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
             if (!IsSelected) return;
 
-            scrollingPath.UpdatePositionFrom(HitObjectContainer, HitObject);
-            nestedOutlineContainer.UpdatePositionFrom(HitObjectContainer, HitObject);
+            nestedOutlineContainer.Position = scrollingPath.Position = CatchHitObjectUtils.GetStartPosition(HitObjectContainer, HitObject);
 
             if (pathCache.IsValid) return;
 

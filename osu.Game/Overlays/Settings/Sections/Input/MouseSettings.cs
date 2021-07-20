@@ -10,6 +10,7 @@ using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -17,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     {
         private readonly MouseHandler mouseHandler;
 
-        protected override string Header => "鼠标";
+        protected override LocalisableString Header => MouseSettingsStrings.Mouse;
 
         private Bindable<double> handlerSensitivity;
 
@@ -46,27 +47,29 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "高精度模式",
-                    Current = relativeMode
+                    LabelText = MouseSettingsStrings.HighPrecisionMouse,
+                    TooltipText = MouseSettingsStrings.HighPrecisionMouseTooltip,
+                    Current = relativeMode,
+                    Keywords = new[] { @"raw", @"input", @"relative", @"cursor" }
                 },
                 new SensitivitySetting
                 {
-                    LabelText = "光标灵敏度",
+                    LabelText = MouseSettingsStrings.CursorSensitivity,
                     Current = localSensitivity
                 },
                 confineMouseModeSetting = new SettingsEnumDropdown<OsuConfineMouseMode>
                 {
-                    LabelText = "光标边界( 将光标限制在窗口中 )",
+                    LabelText = MouseSettingsStrings.ConfineMouseMode,
                     Current = osuConfig.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "在游玩时禁用鼠标滚轮",
+                    LabelText = MouseSettingsStrings.DisableMouseWheel,
                     Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "在游玩时禁用鼠标按键",
+                    LabelText = MouseSettingsStrings.DisableMouseButtons,
                     Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
                 },
             };
@@ -96,7 +99,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 if (isFullscreen)
                 {
                     confineMouseModeSetting.Current.Disabled = true;
-                    confineMouseModeSetting.TooltipText = "不能在全屏模式下启用";
+                    confineMouseModeSetting.TooltipText = MouseSettingsStrings.NotApplicableFullscreen;
                 }
                 else
                 {
@@ -117,7 +120,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private class SensitivitySlider : OsuSliderBar<double>
         {
-            public override LocalisableString TooltipText => Current.Disabled ? "开启高精度模式以调整灵敏度" : $"{base.TooltipText}x";
+            public override LocalisableString TooltipText => Current.Disabled ? MouseSettingsStrings.EnableHighPrecisionForSensitivityAdjust : $"{base.TooltipText}x";
         }
     }
 }

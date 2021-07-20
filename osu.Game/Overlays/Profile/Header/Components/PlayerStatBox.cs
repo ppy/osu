@@ -1,6 +1,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -17,7 +18,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private readonly SpriteIcon icon;
         private readonly OsuSpriteText iconDescription;
         public string ContentText { set => content.Text = value; }
-        public string Title { set => title.Text = value; }
+        public LocalisableString Title { set => title.Text = value; }
         public IconUsage Icon { set => icon.Icon = value; }
         public string IconDescription { set => iconDescription.Text = value; }
 

@@ -97,7 +97,12 @@ namespace osu.Game.Tournament
                         },
                     }
                 },
-                heightWarning = new WarningBox("窗口太窄了, 拉宽一些"),
+                heightWarning = new WarningBox("窗口太窄了, 拉宽一些")
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Margin = new MarginPadding(20),
+                },
                 new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.Both,

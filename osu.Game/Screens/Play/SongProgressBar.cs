@@ -57,9 +57,6 @@ namespace osu.Game.Screens.Play
             set => CurrentNumber.Value = value;
         }
 
-        [Obsolete("Implement this kind of behaviour separately instead.")]
-        protected override bool AllowKeyboardInputWhenNotHovered => true;
-
         public SongProgressBar(float barHeight, float handleBarHeight, Vector2 handleSize)
         {
             CurrentNumber.MinValue = 0;

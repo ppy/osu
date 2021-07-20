@@ -59,7 +59,12 @@ namespace Mvis.Plugin.Sandbox.UI
                 {
                     Description = "界面类型",
                     Bindable = layoutType
-                }
+                },
+                new SettingsTogglePiece
+                {
+                    Description = "显示谱面信息",
+                    Bindable = config.GetBindable<bool>(SandboxSetting.ShowBeatmapInfo)
+                },
             });
 
             //workaround: PluginSidebarSettingsSection的grid

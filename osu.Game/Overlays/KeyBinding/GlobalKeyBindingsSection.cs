@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Settings;
 
@@ -26,9 +27,10 @@ namespace osu.Game.Overlays.KeyBinding
             Add(new InGameKeyBindingsSubsection(manager));
             Add(new EditorKeyBindingsSubsection(manager));
         }
+
         private class MvisBindingsSection : KeyBindingsSubsection
         {
-            protected override string Header => "Mvis播放器";
+            protected override LocalisableString Header => "Mvis播放器";
 
             public MvisBindingsSection(GlobalActionContainer manager)
                 : base(null)
@@ -36,9 +38,10 @@ namespace osu.Game.Overlays.KeyBinding
                 Defaults = manager.MvisControlKeyBindings;
             }
         }
+
         private class DefaultBindingsSubsection : KeyBindingsSubsection
         {
-            protected override string Header => string.Empty;
+            protected override LocalisableString Header => string.Empty;
 
             public DefaultBindingsSubsection(GlobalActionContainer manager)
                 : base(null)
@@ -49,7 +52,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         private class SongSelectKeyBindingSubsection : KeyBindingsSubsection
         {
-            protected override string Header => "歌曲选择";
+            protected override LocalisableString Header => "歌曲选择";
 
             public SongSelectKeyBindingSubsection(GlobalActionContainer manager)
                 : base(null)
@@ -60,7 +63,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         private class InGameKeyBindingsSubsection : KeyBindingsSubsection
         {
-            protected override string Header => "游戏内";
+            protected override LocalisableString Header => "游戏内";
 
             public InGameKeyBindingsSubsection(GlobalActionContainer manager)
                 : base(null)
@@ -71,7 +74,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         private class AudioControlKeyBindingsSubsection : KeyBindingsSubsection
         {
-            protected override string Header => "音频";
+            protected override LocalisableString Header => "音频";
 
             public AudioControlKeyBindingsSubsection(GlobalActionContainer manager)
                 : base(null)
@@ -82,7 +85,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         private class EditorKeyBindingsSubsection : KeyBindingsSubsection
         {
-            protected override string Header => "编辑器";
+            protected override LocalisableString Header => "编辑器";
 
             public EditorKeyBindingsSubsection(GlobalActionContainer manager)
                 : base(null)

@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Header.Components
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Text = "最近什么也没玩",
+                Text = UsersStrings.ShowExtraUnranked,
                 Font = OsuFont.GetFont(size: 17, weight: FontWeight.Regular)
             });
         }
@@ -73,7 +74,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private class RankGraphTooltip : UserGraphTooltip
         {
             public RankGraphTooltip()
-                : base("全球排名")
+                : base(UsersStrings.ShowRankGlobalSimple)
             {
             }
 

@@ -48,6 +48,10 @@ namespace osu.Game.Screens.Backgrounds
 
             AddInternal(seasonalBackgroundLoader);
 
+            //workaround: intro -> MainMenu后背景看上去短暂变黑
+            if (mode.Value == BackgroundSource.LoaderBackground)
+                AddInternal(new PureColorBackground(true));
+
             user.ValueChanged += _ => Next();
             skin.ValueChanged += _ => Next();
             mode.ValueChanged += _ => Next();
@@ -124,6 +128,9 @@ namespace osu.Game.Screens.Backgrounds
                         break;
                 }
             }
+
+            if (newBackground == null && mode.Value == BackgroundSource.LoaderBackground)
+                newBackground = new PureColorBackground(false);
 
             // this method is called in many cases where the background might not necessarily need to change.
             // if an equivalent background is currently being shown, we don't want to load it again.

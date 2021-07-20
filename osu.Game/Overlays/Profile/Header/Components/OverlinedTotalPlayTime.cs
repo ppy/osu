@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Header.Components
@@ -36,7 +37,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             InternalChild = info = new PlayerStatBox
             {
                 Icon = FontAwesome.Regular.Clock,
-                Title = "总游玩时间",
+                Title = UsersStrings.ShowStatsPlayTime
             };
 
             User.BindValueChanged(updateTime, true);

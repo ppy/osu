@@ -40,6 +40,12 @@ namespace osu.Game.Screens.Menu
         private BackgroundScreenDefault background;
 
         private Sample welcome;
+        private readonly bool useTranslate;
+
+        public IntroTriangles(bool useTranslate = false)
+        {
+            this.useTranslate = useTranslate;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -56,7 +62,7 @@ namespace osu.Game.Screens.Menu
             {
                 PrepareMenuLoad();
 
-                LoadComponentAsync(new TrianglesIntroSequence(logo, background)
+                LoadComponentAsync(new TrianglesIntroSequence(logo, background, useTranslate)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Clock = new FramedClock(UsingThemedIntro ? Track : null),
@@ -82,6 +88,7 @@ namespace osu.Game.Screens.Menu
         {
             private readonly OsuLogo logo;
             private readonly BackgroundScreenDefault background;
+            private readonly bool useTranslate;
             private OsuSpriteText welcomeText;
 
             private RulesetFlow rulesets;
@@ -93,10 +100,11 @@ namespace osu.Game.Screens.Menu
 
             public Action LoadMenu;
 
-            public TrianglesIntroSequence(OsuLogo logo, BackgroundScreenDefault background)
+            public TrianglesIntroSequence(OsuLogo logo, BackgroundScreenDefault background, bool useTranslate)
             {
                 this.logo = logo;
                 this.background = background;
+                this.useTranslate = useTranslate;
             }
 
             [Resolved]
@@ -175,17 +183,17 @@ namespace osu.Game.Screens.Menu
                 using (BeginAbsoluteSequence(0))
                 {
                     using (BeginDelayedSequence(text_1))
-                        welcomeText.FadeIn().OnComplete(t => t.Text = "wel");
+                        welcomeText.FadeIn().OnComplete(t => t.Text = useTranslate ? "欢" : "wel");
 
                     using (BeginDelayedSequence(text_2))
-                        welcomeText.FadeIn().OnComplete(t => t.Text = "welcome");
+                        welcomeText.FadeIn().OnComplete(t => t.Text = useTranslate ? "欢迎" : "welcome");
 
                     using (BeginDelayedSequence(text_3))
-                        welcomeText.FadeIn().OnComplete(t => t.Text = "welcome to");
+                        welcomeText.FadeIn().OnComplete(t => t.Text = useTranslate ? "欢迎来到" : "welcome to");
 
                     using (BeginDelayedSequence(text_4))
                     {
-                        welcomeText.FadeIn().OnComplete(t => t.Text = "welcome to osu!");
+                        welcomeText.FadeIn().OnComplete(t => t.Text = useTranslate ? "欢迎来到osu!" : "welcome to osu!");
                         welcomeText.TransformTo(nameof(welcomeText.Spacing), new Vector2(50, 0), 5000);
                     }
 

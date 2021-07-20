@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
@@ -13,7 +14,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private readonly OsuSpriteText title;
         private readonly OsuSpriteText content;
 
-        public string Title
+        public LocalisableString Title
         {
             set => title.Text = value;
         }

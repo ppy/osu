@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public class ExperimentalSettings : SettingsSubsection
     {
-        protected override string Header => "实验性功能";
+        protected override LocalisableString Header => "实验性功能";
 
         private readonly Bindable<string> customWindowIconPath = new Bindable<string>();
         private readonly Bindable<Font> currentFont = new Bindable<Font> { Default = fake_font };
@@ -85,6 +85,8 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 Bindable<bool> fadeInWindowBindable;
 
                 Add(new ExperimentalSettingsSetupContainer("自定义窗口图标", MSetting.CustomWindowIconPath));
+
+                Add(new ExperimentalSettingsSetupContainer("加载页背景色(HEX颜色)", MSetting.LoaderBackgroundColor));
 
                 Add(new SettingsCheckbox
                 {

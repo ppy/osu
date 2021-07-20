@@ -3,13 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
     public class DetailSettings : SettingsSubsection
     {
-        protected override string Header => "细节设置";
+        protected override LocalisableString Header => "细节设置";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

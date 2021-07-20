@@ -6,10 +6,10 @@
     <Description>A free-to-win rhythm game. Rhythm is just a *click* away!</Description>
     <AssemblyName>osu!</AssemblyName>
     <Title>osu!</Title>
-    <Product>osu!</Product>
+    <Product>osu!(lazer)</Product>
     <ApplicationIcon>lazer.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>2021.709.0</Version>
+    <Version>2021.720.0</Version>
     <FileVersion>0.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup>

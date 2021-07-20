@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Menu
             Scale = new Vector2(0.5f);
         }
 
-        public void Start(double length)
+        public void Start(double length, bool useTranslate)
         {
             if (Children.Any())
             {
@@ -181,6 +181,8 @@ namespace osu.Game.Screens.Menu
                 FinishTransforms(true);
                 load();
             }
+
+            welcomeText.Text = useTranslate ? "欢迎来到osu!" : "welcome";
 
             smallRing.ResizeTo(logo_size * 0.086f, 400, Easing.InOutQuint);
 
