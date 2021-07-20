@@ -105,6 +105,36 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestExitMidJoin()
+        {
+            Room room = null;
+
+            AddStep("create room", () =>
+            {
+                room = new Room
+                {
+                    Name = { Value = "Test Room" },
+                    Playlist =
+                    {
+                        new PlaylistItem
+                        {
+                            Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                            Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                        }
+                    }
+                };
+            });
+
+            AddStep("refresh rooms", () => multiplayerScreen.RoomManager.Filter.Value = new FilterCriteria());
+            AddStep("select room", () => InputManager.Key(Key.Down));
+            AddStep("join room and immediately exit", () =>
+            {
+                multiplayerScreen.ChildrenOfType<LoungeSubScreen>().Single().Open(room);
+                Schedule(() => Stack.CurrentScreen.Exit());
+            });
+        }
+
+        [Test]
         public void TestJoinRoomWithoutPassword()
         {
             AddStep("create room", () =>
