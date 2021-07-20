@@ -100,7 +100,13 @@ namespace osu.Game.Screens.Play
         {
             // The source is stopped by a frequency fade first.
             if (isPaused.NewValue)
-                this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ => AdjustableSource.Stop());
+            {
+                this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ =>
+                {
+                    if (IsPaused.Value == isPaused.NewValue)
+                        AdjustableSource.Stop();
+                });
+            }
             else
                 this.TransformBindableTo(pauseFreqAdjust, 1, 200, Easing.In);
         }

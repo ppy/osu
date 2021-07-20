@@ -19,22 +19,32 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
         }
 
+        protected virtual IEnumerable<string> GradeColumns => new List<string> { "SS", "S", "A" };
+
         protected override TableColumn[] CreateAdditionalHeaders() => new[]
+            {
+                new TableColumn("Accuracy", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            }.Concat(CreateUniqueHeaders())
+             .Concat(GradeColumns.Select(grade => new TableColumn(grade, Anchor.Centre, new Dimension(GridSizeMode.AutoSize))))
+             .ToArray();
+
+        protected override Drawable CreateHeader(int index, TableColumn column)
         {
-            new TableColumn("Accuracy", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-        }.Concat(CreateUniqueHeaders()).Concat(new[]
-        {
-            new TableColumn("SS", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("S", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("A", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-        }).ToArray();
+            var title = column?.Header ?? string.Empty;
+            return new UserTableHeaderText(title, HighlightedColumn == title, GradeColumns.Contains(title));
+        }
 
         protected sealed override Country GetCountry(UserStatistics item) => item.User.Country;
 
         protected sealed override Drawable CreateFlagContent(UserStatistics item)
         {
-            var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: TEXT_SIZE, italics: true)) { AutoSizeAxes = Axes.Both };
+            var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: TEXT_SIZE, italics: true))
+            {
+                AutoSizeAxes = Axes.X,
+                RelativeSizeAxes = Axes.Y,
+                TextAnchor = Anchor.CentreLeft
+            };
             username.AddUserLink(item.User);
             return username;
         }
@@ -53,5 +63,19 @@ namespace osu.Game.Overlays.Rankings.Tables
         protected abstract TableColumn[] CreateUniqueHeaders();
 
         protected abstract Drawable[] CreateUniqueContent(UserStatistics item);
+
+        private class UserTableHeaderText : HeaderText
+        {
+            public UserTableHeaderText(string text, bool isHighlighted, bool isGrade)
+                : base(text, isHighlighted)
+            {
+                Margin = new MarginPadding
+                {
+                    // Grade columns have extra horizontal padding for readibility
+                    Horizontal = isGrade ? 20 : 10,
+                    Vertical = 5
+                };
+            }
+        }
     }
 }

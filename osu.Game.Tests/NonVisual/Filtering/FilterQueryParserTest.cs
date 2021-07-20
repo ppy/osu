@@ -33,10 +33,11 @@ namespace osu.Game.Tests.NonVisual.Filtering
          * outside of the range.
          */
 
-        [Test]
-        public void TestApplyStarQueries()
+        [TestCase("star")]
+        [TestCase("stars")]
+        public void TestApplyStarQueries(string variant)
         {
-            const string query = "stars<4 easy";
+            string query = $"{variant}<4 easy";
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("easy", filterCriteria.SearchText.Trim());
@@ -87,6 +88,20 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.Less(filterCriteria.DrainRate.Min, 2.1f);
             Assert.Greater(filterCriteria.DrainRate.Max, 6.0f);
             Assert.Less(filterCriteria.DrainRate.Min, 6.1f);
+        }
+
+        [Test]
+        public void TestApplyOverallDifficultyQueries()
+        {
+            const string query = "od>4 easy od<8";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("easy", filterCriteria.SearchText.Trim());
+            Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
+            Assert.Greater(filterCriteria.OverallDifficulty.Min, 4.0);
+            Assert.Less(filterCriteria.OverallDifficulty.Min, 4.1);
+            Assert.Greater(filterCriteria.OverallDifficulty.Max, 7.9);
+            Assert.Less(filterCriteria.OverallDifficulty.Max, 8.0);
         }
 
         [Test]

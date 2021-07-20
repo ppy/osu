@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
@@ -283,6 +284,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
         }
 
-        public string TooltipText => ControlPoint.Type.Value.ToString() ?? string.Empty;
+        public LocalisableString TooltipText => ControlPoint.Type.Value.ToString() ?? string.Empty;
     }
 }

@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddStep("Drum roll", () => SetContents(() =>
+            AddStep("Drum roll", () => SetContents(_ =>
             {
                 var hoc = new ScrollingHitObjectContainer();
 
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 return hoc;
             }));
 
-            AddStep("Drum roll (strong)", () => SetContents(() =>
+            AddStep("Drum roll (strong)", () => SetContents(_ =>
             {
                 var hoc = new ScrollingHitObjectContainer();
 

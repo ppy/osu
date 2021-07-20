@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             scoreProcessor = new ScoreProcessor();
 
-            SetContents(() => new CatchComboDisplay
+            SetContents(_ => new CatchComboDisplay
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

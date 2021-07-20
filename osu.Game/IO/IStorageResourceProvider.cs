@@ -20,6 +20,11 @@ namespace osu.Game.IO
         IResourceStore<byte[]> Files { get; }
 
         /// <summary>
+        /// Access game-wide resources.
+        /// </summary>
+        IResourceStore<byte[]> Resources { get; }
+
+        /// <summary>
         /// Create a texture loader store based on an underlying data store.
         /// </summary>
         /// <param name="underlyingStore">The underlying provider of texture data (in arbitrary image formats).</param>

@@ -2,11 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -20,6 +23,45 @@ namespace osu.Game.Tests.Visual.UserInterface
         [TestCase(false)]
         [TestCase(true)]
         public void TestNonPadded(bool hasDescription) => createPaddedComponent(hasDescription, false);
+
+        [Test]
+        public void TestFixedWidth()
+        {
+            const float label_width = 200;
+
+            AddStep("create components", () => Child = new FillFlowContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 10),
+                Children = new Drawable[]
+                {
+                    new NonPaddedLabelledDrawable
+                    {
+                        Label = "short",
+                        FixedLabelWidth = label_width
+                    },
+                    new NonPaddedLabelledDrawable
+                    {
+                        Label = "very very very very very very very very very very very long",
+                        FixedLabelWidth = label_width
+                    },
+                    new PaddedLabelledDrawable
+                    {
+                        Label = "short",
+                        FixedLabelWidth = label_width
+                    },
+                    new PaddedLabelledDrawable
+                    {
+                        Label = "very very very very very very very very very very very long",
+                        FixedLabelWidth = label_width
+                    }
+                }
+            });
+
+            AddStep("unset label width", () => this.ChildrenOfType<LabelledDrawable<Drawable>>().ForEach(d => d.FixedLabelWidth = null));
+            AddStep("reset label width", () => this.ChildrenOfType<LabelledDrawable<Drawable>>().ForEach(d => d.FixedLabelWidth = label_width));
+        }
 
         private void createPaddedComponent(bool hasDescription = false, bool padded = true)
         {

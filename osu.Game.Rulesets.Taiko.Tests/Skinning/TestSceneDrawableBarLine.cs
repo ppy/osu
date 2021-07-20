@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddStep("Bar line", () => SetContents(() =>
+            AddStep("Bar line", () => SetContents(_ =>
             {
                 ScrollingHitObjectContainer hoc;
 
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                 return cont;
             }));
 
-            AddStep("Bar line (major)", () => SetContents(() =>
+            AddStep("Bar line (major)", () => SetContents(_ =>
             {
                 ScrollingHitObjectContainer hoc;
 

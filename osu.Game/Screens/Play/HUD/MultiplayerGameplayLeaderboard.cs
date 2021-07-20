@@ -22,10 +22,10 @@ namespace osu.Game.Screens.Play.HUD
         protected readonly Dictionary<int, TrackedUserData> UserScores = new Dictionary<int, TrackedUserData>();
 
         [Resolved]
-        private SpectatorStreamingClient streamingClient { get; set; }
+        private SpectatorClient spectatorClient { get; set; }
 
         [Resolved]
-        private StatefulMultiplayerClient multiplayerClient { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; }
 
         [Resolved]
         private UserLookupCache userLookupCache { get; set; }
@@ -55,22 +55,27 @@ namespace osu.Game.Screens.Play.HUD
 
             foreach (var userId in playingUsers)
             {
-                streamingClient.WatchUser(userId);
-
-                // probably won't be required in the final implementation.
-                var resolvedUser = userLookupCache.GetUserAsync(userId).Result;
-
                 var trackedUser = CreateUserData(userId, scoreProcessor);
                 trackedUser.ScoringMode.BindTo(scoringMode);
-
-                var leaderboardScore = AddPlayer(resolvedUser, resolvedUser?.Id == api.LocalUser.Value.Id);
-                leaderboardScore.Accuracy.BindTo(trackedUser.Accuracy);
-                leaderboardScore.TotalScore.BindTo(trackedUser.Score);
-                leaderboardScore.Combo.BindTo(trackedUser.CurrentCombo);
-                leaderboardScore.HasQuit.BindTo(trackedUser.UserQuit);
-
                 UserScores[userId] = trackedUser;
             }
+
+            userLookupCache.GetUsersAsync(playingUsers.ToArray()).ContinueWith(users => Schedule(() =>
+            {
+                foreach (var user in users.Result)
+                {
+                    if (user == null)
+                        continue;
+
+                    var trackedUser = UserScores[user.Id];
+
+                    var leaderboardScore = AddPlayer(user, user.Id == api.LocalUser.Value.Id);
+                    leaderboardScore.Accuracy.BindTo(trackedUser.Accuracy);
+                    leaderboardScore.TotalScore.BindTo(trackedUser.Score);
+                    leaderboardScore.Combo.BindTo(trackedUser.CurrentCombo);
+                    leaderboardScore.HasQuit.BindTo(trackedUser.UserQuit);
+                }
+            }));
         }
 
         protected override void LoadComplete()
@@ -80,15 +85,19 @@ namespace osu.Game.Screens.Play.HUD
             // BindableList handles binding in a really bad way (Clear then AddRange) so we need to do this manually..
             foreach (int userId in playingUsers)
             {
+                spectatorClient.WatchUser(userId);
+
                 if (!multiplayerClient.CurrentMatchPlayingUserIds.Contains(userId))
                     usersChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new[] { userId }));
             }
 
+            // bind here is to support players leaving the match.
+            // new players are not supported.
             playingUsers.BindTo(multiplayerClient.CurrentMatchPlayingUserIds);
             playingUsers.BindCollectionChanged(usersChanged);
 
             // this leaderboard should be guaranteed to be completely loaded before the gameplay starts (is a prerequisite in MultiplayerPlayer).
-            streamingClient.OnNewFrames += handleIncomingFrames;
+            spectatorClient.OnNewFrames += handleIncomingFrames;
         }
 
         private void usersChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -98,7 +107,7 @@ namespace osu.Game.Screens.Play.HUD
                 case NotifyCollectionChangedAction.Remove:
                     foreach (var userId in e.OldItems.OfType<int>())
                     {
-                        streamingClient.StopWatchingUser(userId);
+                        spectatorClient.StopWatchingUser(userId);
 
                         if (UserScores.TryGetValue(userId, out var trackedData))
                             trackedData.MarkUserQuit();
@@ -123,14 +132,14 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Dispose(isDisposing);
 
-            if (streamingClient != null)
+            if (spectatorClient != null)
             {
                 foreach (var user in playingUsers)
                 {
-                    streamingClient.StopWatchingUser(user);
+                    spectatorClient.StopWatchingUser(user);
                 }
 
-                streamingClient.OnNewFrames -= handleIncomingFrames;
+                spectatorClient.OnNewFrames -= handleIncomingFrames;
             }
         }
 

@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Tests.Visual
 {
@@ -22,10 +24,11 @@ namespace osu.Game.Tests.Visual
             });
         }
 
-        protected void AddBlueprint(OverlaySelectionBlueprint blueprint)
+        protected void AddBlueprint(HitObjectSelectionBlueprint blueprint, [CanBeNull] DrawableHitObject drawableObject = null)
         {
             Add(blueprint.With(d =>
             {
+                d.DrawableObject = drawableObject;
                 d.Depth = float.MinValue;
                 d.Select();
             }));

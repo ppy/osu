@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModSpinIn : ModWithVisibilityAdjustment
+    public class OsuModSpinIn : ModWithVisibilityAdjustment, IHidesApproachCircles
     {
         public override string Name => "Spin In";
         public override string Acronym => "SI";
@@ -21,8 +21,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Circles spin in. No approach circles.";
         public override double ScoreMultiplier => 1;
 
-        // todo: this mod should be able to be compatible with hidden with a bit of further implementation.
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModObjectScaleTween), typeof(OsuModHidden), typeof(OsuModTraceable) };
+        // todo: this mod needs to be incompatible with "hidden" due to forcing the circle to remain opaque,
+        // further implementation will be required for supporting that.
+        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles), typeof(OsuModObjectScaleTween), typeof(OsuModHidden) };
 
         private const int rotate_offset = 360;
         private const float rotate_starting_width = 2;
@@ -43,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (drawable)
             {
                 case DrawableHitCircle circle:
-                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
                     {
                         circle.ApproachCircle.Hide();
 

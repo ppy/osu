@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 
@@ -10,7 +11,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
     public class GeneralSettings : SettingsSubsection
     {
-        protected override string Header => "General";
+        protected override LocalisableString Header => "General";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -44,7 +45,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 
         private class TimeSlider : OsuSliderBar<float>
         {
-            public override string TooltipText => Current.Value.ToString("N0") + "ms";
+            public override LocalisableString TooltipText => Current.Value.ToString(@"N0") + "ms";
         }
     }
 }

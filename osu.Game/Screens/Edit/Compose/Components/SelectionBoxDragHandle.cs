@@ -2,75 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
-using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public class SelectionBoxDragHandle : Container
+    public abstract class SelectionBoxDragHandle : SelectionBoxControl
     {
-        public Action OperationStarted;
-        public Action OperationEnded;
-
         public Action<DragEvent> HandleDrag { get; set; }
-
-        private Circle circle;
-
-        [Resolved]
-        private OsuColour colours { get; set; }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Size = new Vector2(10);
-            Origin = Anchor.Centre;
-
-            InternalChildren = new Drawable[]
-            {
-                circle = new Circle
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                },
-            };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            UpdateHoverState();
-        }
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            UpdateHoverState();
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            base.OnHoverLost(e);
-            UpdateHoverState();
-        }
-
-        protected bool HandlingMouse;
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            HandlingMouse = true;
-            UpdateHoverState();
-            return true;
-        }
 
         protected override bool OnDragStart(DragStartEvent e)
         {
-            OperationStarted?.Invoke();
+            TriggerOperationStarted();
             return true;
         }
 
@@ -82,24 +24,45 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            HandlingMouse = false;
-            OperationEnded?.Invoke();
+            TriggerOperatoinEnded();
 
             UpdateHoverState();
             base.OnDragEnd(e);
         }
 
-        protected override void OnMouseUp(MouseUpEvent e)
+        #region Internal events for SelectionBoxDragHandleContainer
+
+        internal event Action HoverGained;
+        internal event Action HoverLost;
+        internal event Action MouseDown;
+        internal event Action MouseUp;
+
+        protected override bool OnHover(HoverEvent e)
         {
-            HandlingMouse = false;
-            UpdateHoverState();
-            base.OnMouseUp(e);
+            bool result = base.OnHover(e);
+            HoverGained?.Invoke();
+            return result;
         }
 
-        protected virtual void UpdateHoverState()
+        protected override void OnHoverLost(HoverLostEvent e)
         {
-            circle.Colour = HandlingMouse ? colours.GrayF : (IsHovered ? colours.Red : colours.YellowDark);
-            this.ScaleTo(HandlingMouse || IsHovered ? 1.5f : 1, 100, Easing.OutQuint);
+            base.OnHoverLost(e);
+            HoverLost?.Invoke();
         }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            bool result = base.OnMouseDown(e);
+            MouseDown?.Invoke();
+            return result;
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            base.OnMouseUp(e);
+            MouseUp?.Invoke();
+        }
+
+        #endregion
     }
 }

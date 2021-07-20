@@ -1,0 +1,32 @@
+# This is a workaround to allow PRs to report their coverage. This will run inside the base repository.
+# See:
+#   * https://github.com/dorny/test-reporter#recommended-setup-for-public-repositories
+#   * https://docs.github.com/en/actions/reference/authentication-in-a-workflow#permissions-for-the-github_token
+name: Annotate CI run with test results
+on:
+  workflow_run:
+    workflows: ["Continuous Integration"]
+    types:
+      - completed
+jobs:
+  annotate:
+    name: Annotate CI run with test results
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion != 'cancelled' }}
+    strategy:
+       fail-fast: false
+       matrix:
+          os:
+            - { prettyname: Windows }
+            - { prettyname: macOS }
+            - { prettyname: Linux }
+          threadingMode: ['SingleThread', 'MultiThreaded']
+    timeout-minutes: 5
+    steps:
+      - name: Annotate CI run with test results
+        uses: dorny/test-reporter@v1.4.2
+        with:
+          artifact: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
+          name: Test Results (${{matrix.os.prettyname}}, ${{matrix.threadingMode}})
+          path: "*.trx"
+          reporter: dotnet-trx

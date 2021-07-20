@@ -2,29 +2,23 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Game.Beatmaps;
-using osu.Game.Replays;
 using osu.Game.Rulesets.Pippidon.Objects;
 using osu.Game.Rulesets.Pippidon.UI;
 using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Pippidon.Replays
 {
-    public class PippidonAutoGenerator : AutoGenerator
+    public class PippidonAutoGenerator : AutoGenerator<PippidonReplayFrame>
     {
-        protected Replay Replay;
-        protected List<ReplayFrame> Frames => Replay.Frames;
-
         public new Beatmap<PippidonHitObject> Beatmap => (Beatmap<PippidonHitObject>)base.Beatmap;
 
         public PippidonAutoGenerator(IBeatmap beatmap)
             : base(beatmap)
         {
-            Replay = new Replay();
         }
 
-        public override Replay Generate()
+        protected override void GenerateFrames()
         {
             int currentLane = 0;
 
@@ -55,8 +49,6 @@ namespace osu.Game.Rulesets.Pippidon.Replays
 
                 currentLane = hitObject.Lane;
             }
-
-            return Replay;
         }
 
         private void addFrame(double time, PippidonAction direction)

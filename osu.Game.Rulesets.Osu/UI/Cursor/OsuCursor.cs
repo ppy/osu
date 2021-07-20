@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             Size = new Vector2(size);
         }
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected override void SkinChanged(ISkinSource skin)
         {
             cursorExpand = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.CursorExpand)?.Value ?? true;
         }

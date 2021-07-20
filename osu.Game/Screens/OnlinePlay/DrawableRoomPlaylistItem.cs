@@ -108,7 +108,7 @@ namespace osu.Game.Screens.OnlinePlay
             difficultyIconContainer.Child = new DifficultyIcon(beatmap.Value, ruleset.Value, requiredMods) { Size = new Vector2(32) };
 
             beatmapText.Clear();
-            beatmapText.AddLink(Item.Beatmap.ToString(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString());
+            beatmapText.AddLink(Item.Beatmap.Value.ToRomanisableString(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString());
 
             authorText.Clear();
 
@@ -202,7 +202,6 @@ namespace osu.Game.Screens.OnlinePlay
                                                 Child = modDisplay = new ModDisplay
                                                 {
                                                     Scale = new Vector2(0.4f),
-                                                    DisplayUnrankedText = false,
                                                     ExpansionMode = ExpansionMode.AlwaysExpanded
                                                 }
                                             }

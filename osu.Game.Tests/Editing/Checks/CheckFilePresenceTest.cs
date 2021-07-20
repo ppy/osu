@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.IO;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Tests.Beatmaps;
@@ -45,7 +46,8 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestBackgroundSetAndInFiles()
         {
-            Assert.That(check.Run(beatmap, new TestWorkingBeatmap(beatmap)), Is.Empty);
+            var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
+            Assert.That(check.Run(context), Is.Empty);
         }
 
         [Test]
@@ -53,7 +55,8 @@ namespace osu.Game.Tests.Editing.Checks
         {
             beatmap.BeatmapInfo.BeatmapSet.Files.Clear();
 
-            var issues = check.Run(beatmap, new TestWorkingBeatmap(beatmap)).ToList();
+            var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckFilePresence.IssueTemplateDoesNotExist);
@@ -64,7 +67,8 @@ namespace osu.Game.Tests.Editing.Checks
         {
             beatmap.Metadata.BackgroundFile = null;
 
-            var issues = check.Run(beatmap, new TestWorkingBeatmap(beatmap)).ToList();
+            var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckFilePresence.IssueTemplateNoneSet);

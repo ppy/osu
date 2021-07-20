@@ -17,7 +17,6 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModDoubletime;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Zoooooooooom...";
-        public override bool Ranked => true;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModHalfTime)).ToArray();
 

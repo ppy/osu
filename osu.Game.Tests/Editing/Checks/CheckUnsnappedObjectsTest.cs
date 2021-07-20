@@ -7,10 +7,12 @@ using Moq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Editing.Checks
 {
@@ -100,12 +102,12 @@ namespace osu.Game.Tests.Editing.Checks
             }, count: 2);
 
             // Start and end are 2 ms and 1.25 ms off respectively, hence two different issues in one object.
-            var hitobjects = new List<HitObject>
+            var hitObjects = new List<HitObject>
             {
                 getSliderMock(startTime: 98, endTime: 398.75d).Object
             };
 
-            var issues = check.Run(getPlayableBeatmap(hitobjects), null).ToList();
+            var issues = check.Run(getContext(hitObjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(2));
             Assert.That(issues.Any(issue => issue.Template is CheckUnsnappedObjects.IssueTemplateSmallUnsnap));
@@ -122,34 +124,36 @@ namespace osu.Game.Tests.Editing.Checks
             return mockSlider;
         }
 
-        private void assertOk(List<HitObject> hitobjects)
+        private void assertOk(List<HitObject> hitObjects)
         {
-            Assert.That(check.Run(getPlayableBeatmap(hitobjects), null), Is.Empty);
+            Assert.That(check.Run(getContext(hitObjects)), Is.Empty);
         }
 
-        private void assert1Ms(List<HitObject> hitobjects, int count = 1)
+        private void assert1Ms(List<HitObject> hitObjects, int count = 1)
         {
-            var issues = check.Run(getPlayableBeatmap(hitobjects), null).ToList();
+            var issues = check.Run(getContext(hitObjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(count));
             Assert.That(issues.All(issue => issue.Template is CheckUnsnappedObjects.IssueTemplateSmallUnsnap));
         }
 
-        private void assert2Ms(List<HitObject> hitobjects, int count = 1)
+        private void assert2Ms(List<HitObject> hitObjects, int count = 1)
         {
-            var issues = check.Run(getPlayableBeatmap(hitobjects), null).ToList();
+            var issues = check.Run(getContext(hitObjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(count));
             Assert.That(issues.All(issue => issue.Template is CheckUnsnappedObjects.IssueTemplateLargeUnsnap));
         }
 
-        private IBeatmap getPlayableBeatmap(List<HitObject> hitobjects)
+        private BeatmapVerifierContext getContext(List<HitObject> hitObjects)
         {
-            return new Beatmap<HitObject>
+            var beatmap = new Beatmap<HitObject>
             {
                 ControlPointInfo = cpi,
-                HitObjects = hitobjects
+                HitObjects = hitObjects
             };
+
+            return new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
         }
     }
 }

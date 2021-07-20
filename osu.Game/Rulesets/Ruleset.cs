@@ -26,6 +26,7 @@ using JetBrains.Annotations;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Testing;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Screens.Ranking.Statistics;
 
@@ -126,7 +127,7 @@ namespace osu.Game.Rulesets
         [CanBeNull]
         public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().FirstOrDefault();
 
-        public virtual ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => null;
+        public virtual ISkin CreateLegacySkinProvider([NotNull] ISkin skin, IBeatmap beatmap) => null;
 
         protected Ruleset()
         {
@@ -135,7 +136,7 @@ namespace osu.Game.Rulesets
                 Name = Description,
                 ShortName = ShortName,
                 ID = (this as ILegacyRuleset)?.LegacyID,
-                InstantiationInfo = GetType().AssemblyQualifiedName,
+                InstantiationInfo = GetType().GetInvariantInstantiationInfo(),
                 Available = true,
             };
         }

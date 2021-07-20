@@ -11,7 +11,7 @@
 
 A free-to-win rhythm game. Rhythm is just a *click* away!
 
-The future of [osu!](https://osu.ppy.sh) and the beginning of an open era! Commonly known by the codename *osu!lazer*. Pew pew.
+The future of [osu!](https://osu.ppy.sh) and the beginning of an open era! Currently known by and released under the codename "*lazer*". As in sharper than cutting-edge.
 
 ## Status
 
@@ -23,7 +23,7 @@ We are accepting bug reports (please report with as much detail as possible and 
 
 - Detailed release changelogs are available on the [official osu! site](https://osu.ppy.sh/home/changelog/lazer).
 - You can learn more about our approach to [project management](https://github.com/ppy/osu/wiki/Project-management).
-- Read peppy's [latest blog post](https://blog.ppy.sh/a-definitive-lazer-faq/) exploring where lazer is currently and the roadmap going forward.
+- Read peppy's [blog post](https://blog.ppy.sh/a-definitive-lazer-faq/) exploring where the project is currently and the roadmap going forward.
 
 ## Running osu!
 
@@ -43,7 +43,7 @@ If your platform is not listed above, there is still a chance you can manually b
 
 osu! is designed to have extensible modular gameplay modes, called "rulesets". Building one of these allows a developer to harness the power of osu! for their own game style. To get started working on a ruleset, we have some templates available [here](https://github.com/ppy/osu/tree/master/Templates).
 
-You can see some examples of custom rulesets by visiting the [custom ruleset directory](https://github.com/ppy/osu/issues/5852).
+You can see some examples of custom rulesets by visiting the [custom ruleset directory](https://github.com/ppy/osu/discussions/13096).
 
 ## Developing osu!
 
@@ -97,7 +97,7 @@ Before committing your code, please run a code formatter. This can be achieved b
 
 We have adopted some cross-platform, compiler integrated analyzers. They can provide warnings when you are editing, building inside IDE or from command line, as-if they are provided by the compiler itself.
 
-JetBrains ReSharper InspectCode is also used for wider rule sets. You can run it from PowerShell with `.\InspectCode.ps1`, which is [only supported on Windows](https://youtrack.jetbrains.com/issue/RSRP-410004). Alternatively, you can install ReSharper or use Rider to get inline support in your IDE of choice.
+JetBrains ReSharper InspectCode is also used for wider rule sets. You can run it from PowerShell with `.\InspectCode.ps1`. Alternatively, you can install ReSharper or use Rider to get inline support in your IDE of choice.
 
 ## Contributing
 
