@@ -56,13 +56,6 @@ namespace osu.Game.Skinning.Editor
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new TriangleButton
-                    {
-                        Margin = new MarginPadding(10),
-                        Text = "Close",
-                        Width = 100,
-                        Action = Hide,
-                    },
                     headerText = new OsuTextFlowContainer
                     {
                         TextAnchor = Anchor.TopCentre,
@@ -95,6 +88,13 @@ namespace osu.Game.Skinning.Editor
                                     Children = new Drawable[]
                                     {
                                         new SkinBlueprintContainer(targetScreen),
+                                        new TriangleButton
+                                        {
+                                            Margin = new MarginPadding(10),
+                                            Text = "Close",
+                                            Width = 100,
+                                            Action = Hide,
+                                        },
                                         new FillFlowContainer
                                         {
                                             Direction = FillDirection.Horizontal,
