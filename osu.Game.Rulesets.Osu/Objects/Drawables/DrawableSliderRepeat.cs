@@ -97,8 +97,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateHitStateTransforms(state);
 
-            (CirclePiece.Drawable as IMainCirclePiece)?.Animate(state);
-
             switch (state)
             {
                 case ArmedState.Idle:
@@ -154,7 +152,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             while (Math.Abs(aimRotation - Arrow.Rotation) > 180)
                 aimRotation += aimRotation < Arrow.Rotation ? 360 : -360;
 
-            if (!hasRotation)
+            // The clock may be paused in a scenario like the editor.
+            if (!hasRotation || !Clock.IsRunning)
             {
                 Arrow.Rotation = aimRotation;
                 hasRotation = true;

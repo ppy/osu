@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
@@ -23,15 +22,18 @@ namespace osu.Game.Rulesets.Edit
             // Audio
             new CheckAudioPresence(),
             new CheckAudioQuality(),
+            new CheckMutedObjects(),
+            new CheckFewHitsounds(),
 
             // Compose
             new CheckUnsnappedObjects(),
-            new CheckConcurrentObjects()
+            new CheckConcurrentObjects(),
+            new CheckZeroLengthObjects(),
         };
 
-        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, WorkingBeatmap workingBeatmap)
+        public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            return checks.SelectMany(check => check.Run(playableBeatmap, workingBeatmap));
+            return checks.SelectMany(check => check.Run(context));
         }
     }
 }

@@ -26,6 +26,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             {
                 AccentColour = Color4.Transparent
             };
+
+            // SliderSelectionBlueprint relies on calling ReceivePositionalInputAt on this drawable to determine whether selection should occur.
+            // Without AlwaysPresent, a movement in a parent container (ie. the editor composer area resizing) could cause incorrect input handling.
+            AlwaysPresent = true;
         }
 
         [BackgroundDependencyLoader]

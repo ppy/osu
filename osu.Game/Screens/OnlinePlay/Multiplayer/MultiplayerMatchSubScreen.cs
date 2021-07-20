@@ -14,6 +14,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -25,6 +26,8 @@ using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osuTK;
@@ -40,10 +43,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public override string ShortTitle => "room";
 
         [Resolved]
-        private StatefulMultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; }
 
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
+
+        [Resolved]
+        private Bindable<Room> currentRoom { get; set; }
 
         private MultiplayerMatchSettingsOverlay settingsOverlay;
 
@@ -182,7 +188,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                                     {
                                                                                         Anchor = Anchor.CentreLeft,
                                                                                         Origin = Anchor.CentreLeft,
-                                                                                        DisplayUnrankedText = false,
                                                                                         Current = UserMods,
                                                                                         Scale = new Vector2(0.8f),
                                                                                     },
@@ -271,6 +276,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 if (!connected.NewValue)
                     Schedule(this.Exit);
             }, true);
+
+            currentRoom.BindValueChanged(room =>
+            {
+                if (room.NewValue == null)
+                {
+                    // the room has gone away.
+                    // this could mean something happened during the join process, or an external connection issue occurred.
+                    // one specific scenario is where the underlying room is created, but the signalr server returns an error during the join process. this triggers a PartRoom operation (see https://github.com/ppy/osu/blob/7654df94f6f37b8382be7dfcb4f674e03bd35427/osu.Game/Screens/OnlinePlay/Multiplayer/MultiplayerRoomManager.cs#L97)
+                    Schedule(this.Exit);
+                }
+            }, true);
         }
 
         protected override void UpdateMods()
@@ -303,18 +319,36 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return true;
             }
 
+            return base.OnBackButton();
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            // the room may not be left immediately after a disconnection due to async flow,
+            // so checking the IsConnected status is also required.
+            if (client.Room == null || !client.IsConnected.Value)
+            {
+                // room has not been created yet; exit immediately.
+                return base.OnExiting(next);
+            }
+
             if (!exitConfirmed && dialogOverlay != null)
             {
-                dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave this multiplayer match?", () =>
+                if (dialogOverlay.CurrentDialog is ConfirmDialog confirmDialog)
+                    confirmDialog.PerformOkAction();
+                else
                 {
-                    exitConfirmed = true;
-                    this.Exit();
-                }));
+                    dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave this multiplayer match?", () =>
+                    {
+                        exitConfirmed = true;
+                        this.Exit();
+                    }));
+                }
 
                 return true;
             }
 
-            return base.OnBackButton();
+            return base.OnExiting(next);
         }
 
         private ModSettingChangeTracker modSettingChangeTracker;
@@ -353,10 +387,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             client.ChangeBeatmapAvailability(availability.NewValue);
 
-            // while this flow is handled server-side, this covers the edge case of the local user being in a ready state and then deleting the current beatmap.
-            if (availability.NewValue != Online.Rooms.BeatmapAvailability.LocallyAvailable()
-                && client.LocalUser?.State == MultiplayerUserState.Ready)
-                client.ChangeState(MultiplayerUserState.Idle);
+            if (availability.NewValue.State != DownloadState.LocallyAvailable)
+            {
+                // while this flow is handled server-side, this covers the edge case of the local user being in a ready state and then deleting the current beatmap.
+                if (client.LocalUser?.State == MultiplayerUserState.Ready)
+                    client.ChangeState(MultiplayerUserState.Idle);
+            }
+            else
+            {
+                if (client.LocalUser?.State == MultiplayerUserState.Spectating && (client.Room?.State == MultiplayerRoomState.WaitingForLoad || client.Room?.State == MultiplayerRoomState.Playing))
+                    onLoadRequested();
+            }
         }
 
         private void onReadyClick()
@@ -407,20 +448,44 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onRoomUpdated()
         {
-            // user mods may have changed.
             Scheduler.AddOnce(UpdateMods);
         }
 
         private void onLoadRequested()
         {
-            Debug.Assert(client.Room != null);
+            if (BeatmapAvailability.Value.State != DownloadState.LocallyAvailable)
+                return;
 
-            int[] userIds = client.CurrentMatchPlayingUserIds.ToArray();
+            // In the case of spectating, IMultiplayerClient.LoadRequested can be fired while the game is still spectating a previous session.
+            // For now, we want to game to switch to the new game so need to request exiting from the play screen.
+            if (!ParentScreen.IsCurrentScreen())
+            {
+                ParentScreen.MakeCurrent();
 
-            StartPlay(() => new MultiplayerPlayer(SelectedItem.Value, userIds));
+                Schedule(onLoadRequested);
+                return;
+            }
+
+            StartPlay();
 
             readyClickOperation?.Dispose();
             readyClickOperation = null;
+        }
+
+        protected override Screen CreateGameplayScreen()
+        {
+            Debug.Assert(client.LocalUser != null);
+
+            int[] userIds = client.CurrentMatchPlayingUserIds.ToArray();
+
+            switch (client.LocalUser.State)
+            {
+                case MultiplayerUserState.Spectating:
+                    return new MultiSpectatorScreen(userIds);
+
+                default:
+                    return new PlayerLoader(() => new MultiplayerPlayer(SelectedItem.Value, userIds));
+            }
         }
 
         protected override void Dispose(bool isDisposing)

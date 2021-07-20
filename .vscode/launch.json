@@ -113,20 +113,6 @@
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build benchmarks",
             "console": "internalConsole"
-        },
-        {
-            "name": "Cake: Debug Script",
-            "type": "coreclr",
-            "request": "launch",
-            "program": "${workspaceRoot}/build/tools/Cake.CoreCLR/0.30.0/Cake.dll",
-            "args": [
-                "${workspaceRoot}/build/build.cake",
-                "--debug",
-                "--verbosity=diagnostic"
-            ],
-            "cwd": "${workspaceRoot}/build",
-            "stopAtEntry": true,
-            "externalConsole": false
         }
     ]
 }

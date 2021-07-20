@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
@@ -19,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         [Resolved(CanBeNull = true)]
         private UpdateManager updateManager { get; set; }
 
-        protected override string Header => "Updates";
+        protected override LocalisableString Header => "Updates";
 
         private SettingsButton checkForUpdatesButton;
 

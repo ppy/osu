@@ -8,13 +8,13 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.IO;
 using osu.Game.IO.Legacy;
 using osu.Game.Overlays.Notifications;
 
@@ -35,10 +35,9 @@ namespace osu.Game.Collections
         private const int database_version = 30000000;
 
         private const string database_name = "collection.db";
+        private const string database_backup_name = "collection.db.bak";
 
         public readonly BindableList<BeatmapCollection> Collections = new BindableList<BeatmapCollection>();
-
-        public bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
         [Resolved]
         private GameHost host { get; set; }
@@ -58,14 +57,30 @@ namespace osu.Game.Collections
         {
             Collections.CollectionChanged += collectionsChanged;
 
+            if (storage.Exists(database_backup_name))
+            {
+                // If a backup file exists, it means the previous write operation didn't run to completion.
+                // Always prefer the backup file in such a case as it's the most recent copy that is guaranteed to not be malformed.
+                //
+                // The database is saved 100ms after any change, and again when the game is closed, so there shouldn't be a large diff between the two files in the worst case.
+                if (storage.Exists(database_name))
+                    storage.Delete(database_name);
+                File.Copy(storage.GetFullPath(database_backup_name), storage.GetFullPath(database_name));
+            }
+
             if (storage.Exists(database_name))
             {
+                List<BeatmapCollection> beatmapCollections;
+
                 using (var stream = storage.GetStream(database_name))
-                    importCollections(readCollections(stream));
+                    beatmapCollections = readCollections(stream);
+
+                // intentionally fire-and-forget async.
+                importCollections(beatmapCollections);
             }
         }
 
-        private void collectionsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void collectionsChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
         {
             switch (e.Action)
             {
@@ -89,7 +104,7 @@ namespace osu.Game.Collections
             }
 
             backgroundSave();
-        }
+        });
 
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
@@ -97,24 +112,11 @@ namespace osu.Game.Collections
         public Action<Notification> PostNotification { protected get; set; }
 
         /// <summary>
-        /// Set a storage with access to an osu-stable install for import purposes.
-        /// </summary>
-        public Func<Storage> GetStableStorage { private get; set; }
-
-        /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
-        public Task ImportFromStableAsync()
+        public Task ImportFromStableAsync(StableStorage stableStorage)
         {
-            var stable = GetStableStorage?.Invoke();
-
-            if (stable == null)
-            {
-                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
-                return Task.CompletedTask;
-            }
-
-            if (!stable.Exists(database_name))
+            if (!stableStorage.Exists(database_name))
             {
                 // This handles situations like when the user does not have a collections.db file
                 Logger.Log($"No {database_name} available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
@@ -123,7 +125,7 @@ namespace osu.Game.Collections
 
             return Task.Run(async () =>
             {
-                using (var stream = stable.GetStream(database_name))
+                using (var stream = stableStorage.GetStream(database_name))
                     await Import(stream).ConfigureAwait(false);
             });
         }
@@ -267,23 +269,50 @@ namespace osu.Game.Collections
             {
                 Interlocked.Increment(ref lastSave);
 
+                // This is NOT thread-safe!!
                 try
                 {
-                    // This is NOT thread-safe!!
+                    var tempPath = Path.GetTempFileName();
 
-                    using (var sw = new SerializationWriter(storage.GetStream(database_name, FileAccess.Write)))
+                    using (var ms = new MemoryStream())
                     {
-                        sw.Write(database_version);
-                        sw.Write(Collections.Count);
-
-                        foreach (var c in Collections)
+                        using (var sw = new SerializationWriter(ms, true))
                         {
-                            sw.Write(c.Name.Value);
-                            sw.Write(c.Beatmaps.Count);
+                            sw.Write(database_version);
 
-                            foreach (var b in c.Beatmaps)
-                                sw.Write(b.MD5Hash);
+                            var collectionsCopy = Collections.ToArray();
+                            sw.Write(collectionsCopy.Length);
+
+                            foreach (var c in collectionsCopy)
+                            {
+                                sw.Write(c.Name.Value);
+
+                                var beatmapsCopy = c.Beatmaps.ToArray();
+                                sw.Write(beatmapsCopy.Length);
+
+                                foreach (var b in beatmapsCopy)
+                                    sw.Write(b.MD5Hash);
+                            }
                         }
+
+                        using (var fs = File.OpenWrite(tempPath))
+                            ms.WriteTo(fs);
+
+                        var databasePath = storage.GetFullPath(database_name);
+                        var databaseBackupPath = storage.GetFullPath(database_backup_name);
+
+                        // Back up the existing database, clearing any existing backup.
+                        if (File.Exists(databaseBackupPath))
+                            File.Delete(databaseBackupPath);
+                        if (File.Exists(databasePath))
+                            File.Move(databasePath, databaseBackupPath);
+
+                        // Move the new database in-place of the existing one.
+                        File.Move(tempPath, databasePath);
+
+                        // If everything succeeded up to this point, remove the backup file.
+                        if (File.Exists(databaseBackupPath))
+                            File.Delete(databaseBackupPath);
                     }
 
                     if (saveFailures < 10)

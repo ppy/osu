@@ -137,7 +137,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             Size = BaseSize = new Vector2(TaikoHitObject.DEFAULT_SIZE);
 
-            MainPiece?.Expire();
+            if (MainPiece != null)
+                Content.Remove(MainPiece);
+
             Content.Add(MainPiece = CreateMainPiece());
         }
 

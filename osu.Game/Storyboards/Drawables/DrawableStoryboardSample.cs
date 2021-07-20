@@ -31,9 +31,9 @@ namespace osu.Game.Storyboards.Drawables
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; }
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected override void SkinChanged(ISkinSource skin)
         {
-            base.SkinChanged(skin, allowFallback);
+            base.SkinChanged(skin);
 
             foreach (var mod in mods.Value.OfType<IApplicableToSample>())
             {

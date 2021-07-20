@@ -243,7 +243,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             int totalCount = Pieces.Count(p => p.IsSelected.Value);
             int countOfState = Pieces.Where(p => p.IsSelected.Value).Count(p => p.ControlPoint.Type.Value == type);
 
-            var item = new PathTypeMenuItem(type, () =>
+            var item = new TernaryStateRadioMenuItem(type == null ? "Inherit" : type.ToString().Humanize(), MenuItemType.Standard, _ =>
             {
                 foreach (var p in Pieces.Where(p => p.IsSelected.Value))
                     updatePathType(p, type);
@@ -257,16 +257,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 item.State.Value = TernaryState.False;
 
             return item;
-        }
-
-        private class PathTypeMenuItem : TernaryStateMenuItem
-        {
-            public PathTypeMenuItem(PathType? type, Action action)
-                : base(type == null ? "Inherit" : type.ToString().Humanize(), changeState, MenuItemType.Standard, _ => action?.Invoke())
-            {
-            }
-
-            private static TernaryState changeState(TernaryState state) => TernaryState.True;
         }
     }
 }

@@ -18,7 +18,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override RoomSubScreen CreateRoomSubScreen(Room room) => new MultiplayerMatchSubScreen(room);
 
         [Resolved]
-        private StatefulMultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; }
 
         public override void Open(Room room)
         {

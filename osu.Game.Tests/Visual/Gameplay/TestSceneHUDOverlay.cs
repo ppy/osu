@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osuTK.Input;
 
@@ -18,6 +19,12 @@ namespace osu.Game.Tests.Visual.Gameplay
     public class TestSceneHUDOverlay : OsuManualInputManagerTestScene
     {
         private HUDOverlay hudOverlay;
+
+        [Cached]
+        private ScoreProcessor scoreProcessor = new ScoreProcessor();
+
+        [Cached(typeof(HealthProcessor))]
+        private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
 
         // best way to check without exposing.
         private Drawable hideTarget => hudOverlay.KeyCounter;
@@ -31,9 +38,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             createNew();
 
-            AddRepeatStep("increase combo", () => { hudOverlay.ComboCounter.Current.Value++; }, 10);
+            AddRepeatStep("increase combo", () => { scoreProcessor.Combo.Value++; }, 10);
 
-            AddStep("reset combo", () => { hudOverlay.ComboCounter.Current.Value = 0; });
+            AddStep("reset combo", () => { scoreProcessor.Combo.Value = 0; });
         }
 
         [Test]
@@ -139,12 +146,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create overlay", () =>
             {
-                hudOverlay = new HUDOverlay(null, null, null, Array.Empty<Mod>());
+                hudOverlay = new HUDOverlay(null, Array.Empty<Mod>());
 
                 // Add any key just to display the key counter visually.
                 hudOverlay.KeyCounter.Add(new KeyCounterKeyboard(Key.Space));
 
-                hudOverlay.ComboCounter.Current.Value = 1;
+                scoreProcessor.Combo.Value = 1;
 
                 action?.Invoke(hudOverlay);
 

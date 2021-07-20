@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
             InternalChildren = new Drawable[]
             {
-                explosion = new LegacyRollingCounter(skin, LegacyFont.Combo)
+                explosion = new LegacyRollingCounter(LegacyFont.Combo)
                 {
                     Alpha = 0.65f,
                     Blending = BlendingParameters.Additive,
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     Origin = Anchor.Centre,
                     Scale = new Vector2(1.5f),
                 },
-                counter = new LegacyRollingCounter(skin, LegacyFont.Combo)
+                counter = new LegacyRollingCounter(LegacyFont.Combo)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

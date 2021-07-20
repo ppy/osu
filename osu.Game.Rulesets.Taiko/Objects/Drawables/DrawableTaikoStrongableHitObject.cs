@@ -1,11 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Audio;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
@@ -29,14 +27,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void OnApply()
         {
             isStrong.BindTo(HitObject.IsStrongBindable);
-            isStrong.BindValueChanged(_ =>
-            {
-                // will overwrite samples, should only be called on subsequent changes
-                // after the initial application.
-                updateSamplesFromStrong();
-
-                RecreatePieces();
-            });
+            // this doesn't need to be run inline as RecreatePieces is called by the base call below.
+            isStrong.BindValueChanged(_ => Scheduler.AddOnce(RecreatePieces));
 
             base.OnApply();
         }
@@ -48,30 +40,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             isStrong.UnbindFrom(HitObject.IsStrongBindable);
             // ensure the next application does not accidentally overwrite samples.
             isStrong.UnbindEvents();
-        }
-
-        private HitSampleInfo[] getStrongSamples() => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_FINISH).ToArray();
-
-        protected override void LoadSamples()
-        {
-            base.LoadSamples();
-            isStrong.Value = getStrongSamples().Any();
-        }
-
-        private void updateSamplesFromStrong()
-        {
-            var strongSamples = getStrongSamples();
-
-            if (isStrong.Value != strongSamples.Any())
-            {
-                if (isStrong.Value)
-                    HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_FINISH));
-                else
-                {
-                    foreach (var sample in strongSamples)
-                        HitObject.Samples.Remove(sample);
-                }
-            }
         }
 
         protected override void RecreatePieces()

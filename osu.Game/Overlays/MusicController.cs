@@ -252,7 +252,7 @@ namespace osu.Game.Overlays
 
             if (playable != null)
             {
-                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value));
+                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First()));
                 restartTrack();
                 return PreviousTrackResult.Previous;
             }
@@ -283,7 +283,7 @@ namespace osu.Game.Overlays
 
             if (playable != null)
             {
-                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value));
+                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First()));
                 restartTrack();
                 return true;
             }

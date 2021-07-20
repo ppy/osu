@@ -14,7 +14,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private IBindable<bool> operationInProgress;
 
         [Resolved]
-        private StatefulMultiplayerClient multiplayerClient { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; }
 
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }

@@ -13,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
@@ -41,12 +42,11 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         {
             AddRangeInternal(new Drawable[]
             {
-                new UpdateableBeatmapSetCover
+                new UpdateableBeatmapSetCover(BeatmapSetCoverType.List)
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = cover_width,
                     BeatmapSet = beatmap.BeatmapSet,
-                    CoverType = BeatmapSetCoverType.List,
                 },
                 new Container
                 {
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         private class PlayCountText : CompositeDrawable, IHasTooltip
         {
-            public string TooltipText => "times played";
+            public LocalisableString TooltipText => UsersStrings.ShowExtraHistoricalMostPlayedCount;
 
             public PlayCountText(int playCount)
             {

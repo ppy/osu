@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Tests
     public class TestSceneManiaHitObjectSamples : HitObjectSampleTest
     {
         protected override Ruleset CreatePlayerRuleset() => new ManiaRuleset();
-        protected override IResourceStore<byte[]> Resources => new DllResourceStore(Assembly.GetAssembly(typeof(TestSceneManiaHitObjectSamples)));
+        protected override IResourceStore<byte[]> RulesetResources => new DllResourceStore(Assembly.GetAssembly(typeof(TestSceneManiaHitObjectSamples)));
 
         /// <summary>
         /// Tests that when a normal sample bank is used, the normal hitsound will be looked up.

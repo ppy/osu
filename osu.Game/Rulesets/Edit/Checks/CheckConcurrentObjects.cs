@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -22,15 +21,17 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateConcurrentDifferent(this)
         };
 
-        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, IWorkingBeatmap workingBeatmap)
+        public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            for (int i = 0; i < playableBeatmap.HitObjects.Count - 1; ++i)
-            {
-                var hitobject = playableBeatmap.HitObjects[i];
+            var hitObjects = context.Beatmap.HitObjects;
 
-                for (int j = i + 1; j < playableBeatmap.HitObjects.Count; ++j)
+            for (int i = 0; i < hitObjects.Count - 1; ++i)
+            {
+                var hitobject = hitObjects[i];
+
+                for (int j = i + 1; j < hitObjects.Count; ++j)
                 {
-                    var nextHitobject = playableBeatmap.HitObjects[j];
+                    var nextHitobject = hitObjects[j];
 
                     // Accounts for rulesets with hitobjects separated by columns, such as Mania.
                     // In these cases we only care about concurrent objects within the same column.

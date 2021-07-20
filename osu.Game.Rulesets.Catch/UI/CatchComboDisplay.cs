@@ -25,9 +25,9 @@ namespace osu.Game.Rulesets.Catch.UI
         {
         }
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected override void SkinChanged(ISkinSource skin)
         {
-            base.SkinChanged(skin, allowFallback);
+            base.SkinChanged(skin);
             ComboCounter?.UpdateCombo(currentCombo);
         }
 

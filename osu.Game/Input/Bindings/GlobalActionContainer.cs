@@ -48,6 +48,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleBeatmapListing),
             new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.S }, GlobalAction.ToggleSkinEditor),
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
             new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
@@ -86,6 +87,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Shift, InputKey.Tab }, GlobalAction.ToggleInGameInterface),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
             new KeyBinding(InputKey.Space, GlobalAction.TogglePauseReplay),
+            new KeyBinding(InputKey.Left, GlobalAction.SeekReplayBackward),
+            new KeyBinding(InputKey.Right, GlobalAction.SeekReplayForward),
             new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
         };
 
@@ -101,6 +104,9 @@ namespace osu.Game.Input.Bindings
         {
             new KeyBinding(new[] { InputKey.Alt, InputKey.Up }, GlobalAction.IncreaseVolume),
             new KeyBinding(new[] { InputKey.Alt, InputKey.Down }, GlobalAction.DecreaseVolume),
+
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Left }, GlobalAction.PreviousVolumeMeter),
+            new KeyBinding(new[] { InputKey.Alt, InputKey.Right }, GlobalAction.NextVolumeMeter),
 
             new KeyBinding(new[] { InputKey.Control, InputKey.F4 }, GlobalAction.ToggleMute),
 
@@ -258,6 +264,21 @@ namespace osu.Game.Input.Bindings
         EditorNudgeLeft,
 
         [Description("Nudge selection right")]
-        EditorNudgeRight
+        EditorNudgeRight,
+
+        [Description("Toggle skin editor")]
+        ToggleSkinEditor,
+
+        [Description("Previous volume meter")]
+        PreviousVolumeMeter,
+
+        [Description("Next volume meter")]
+        NextVolumeMeter,
+
+        [Description("Seek replay forward")]
+        SeekReplayForward,
+
+        [Description("Seek replay backward")]
+        SeekReplayBackward,
     }
 }

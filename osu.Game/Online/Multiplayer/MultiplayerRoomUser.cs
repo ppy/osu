@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using MessagePack;
 using Newtonsoft.Json;
 using osu.Game.Online.API;
@@ -35,7 +34,6 @@ namespace osu.Game.Online.Multiplayer
         /// Any mods applicable only to the local user.
         /// </summary>
         [Key(3)]
-        [NotNull]
         public IEnumerable<APIMod> Mods { get; set; } = Enumerable.Empty<APIMod>();
 
         [IgnoreMember]

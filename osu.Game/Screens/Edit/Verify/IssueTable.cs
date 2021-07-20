@@ -18,7 +18,9 @@ namespace osu.Game.Screens.Edit.Verify
     public class IssueTable : EditorTable
     {
         [Resolved]
-        private Bindable<Issue> selectedIssue { get; set; }
+        private VerifyScreen verify { get; set; }
+
+        private Bindable<Issue> selectedIssue;
 
         [Resolved]
         private EditorClock clock { get; set; }
@@ -71,6 +73,7 @@ namespace osu.Game.Screens.Edit.Verify
         {
             base.LoadComplete();
 
+            selectedIssue = verify.SelectedIssue.GetBoundCopy();
             selectedIssue.BindValueChanged(issue =>
             {
                 foreach (var b in BackgroundFlow) b.Selected = b.Item == issue.NewValue;

@@ -5,7 +5,7 @@
 
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
+using System.Linq;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 
@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Replays
         {
             // TODO: This replay frame ordering should be enforced on the Replay type.
             // Currently, the ordering can be broken if the frames are added after this construction.
-            replay.Frames.Sort((x, y) => x.Time.CompareTo(y.Time));
+            replay.Frames = replay.Frames.OrderBy(f => f.Time).ToList();
 
             this.replay = replay;
             currentFrameIndex = -1;
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Replays
             }
         }
 
-        protected virtual bool IsImportant([NotNull] TFrame frame) => false;
+        protected virtual bool IsImportant(TFrame frame) => false;
 
         /// <summary>
         /// Update the current frame based on an incoming time value.

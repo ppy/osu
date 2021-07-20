@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
-using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Tests.Editor
@@ -35,7 +34,11 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Test]
         public void TestPlaceBeforeCurrentTimeDownwards()
         {
-            AddStep("move mouse before current time", () => InputManager.MoveMouseTo(this.ChildrenOfType<Column>().Single().ScreenSpaceDrawQuad.BottomLeft - new Vector2(0, 10)));
+            AddStep("move mouse before current time", () =>
+            {
+                var column = this.ChildrenOfType<Column>().Single();
+                InputManager.MoveMouseTo(column.ScreenSpacePositionAtTime(-100));
+            });
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
 
@@ -45,7 +48,11 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Test]
         public void TestPlaceAfterCurrentTimeDownwards()
         {
-            AddStep("move mouse after current time", () => InputManager.MoveMouseTo(this.ChildrenOfType<Column>().Single()));
+            AddStep("move mouse after current time", () =>
+            {
+                var column = this.ChildrenOfType<Column>().Single();
+                InputManager.MoveMouseTo(column.ScreenSpacePositionAtTime(100));
+            });
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
 

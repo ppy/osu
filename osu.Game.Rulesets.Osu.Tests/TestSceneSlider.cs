@@ -30,54 +30,54 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestVariousSliders()
         {
-            AddStep("Big Single", () => SetContents(() => testSimpleBig()));
-            AddStep("Medium Single", () => SetContents(() => testSimpleMedium()));
-            AddStep("Small Single", () => SetContents(() => testSimpleSmall()));
-            AddStep("Big 1 Repeat", () => SetContents(() => testSimpleBig(1)));
-            AddStep("Medium 1 Repeat", () => SetContents(() => testSimpleMedium(1)));
-            AddStep("Small 1 Repeat", () => SetContents(() => testSimpleSmall(1)));
-            AddStep("Big 2 Repeats", () => SetContents(() => testSimpleBig(2)));
-            AddStep("Medium 2 Repeats", () => SetContents(() => testSimpleMedium(2)));
-            AddStep("Small 2 Repeats", () => SetContents(() => testSimpleSmall(2)));
+            AddStep("Big Single", () => SetContents(_ => testSimpleBig()));
+            AddStep("Medium Single", () => SetContents(_ => testSimpleMedium()));
+            AddStep("Small Single", () => SetContents(_ => testSimpleSmall()));
+            AddStep("Big 1 Repeat", () => SetContents(_ => testSimpleBig(1)));
+            AddStep("Medium 1 Repeat", () => SetContents(_ => testSimpleMedium(1)));
+            AddStep("Small 1 Repeat", () => SetContents(_ => testSimpleSmall(1)));
+            AddStep("Big 2 Repeats", () => SetContents(_ => testSimpleBig(2)));
+            AddStep("Medium 2 Repeats", () => SetContents(_ => testSimpleMedium(2)));
+            AddStep("Small 2 Repeats", () => SetContents(_ => testSimpleSmall(2)));
 
-            AddStep("Slow Slider", () => SetContents(testSlowSpeed)); // slow long sliders take ages already so no repeat steps
-            AddStep("Slow Short Slider", () => SetContents(() => testShortSlowSpeed()));
-            AddStep("Slow Short Slider 1 Repeats", () => SetContents(() => testShortSlowSpeed(1)));
-            AddStep("Slow Short Slider 2 Repeats", () => SetContents(() => testShortSlowSpeed(2)));
+            AddStep("Slow Slider", () => SetContents(_ => testSlowSpeed())); // slow long sliders take ages already so no repeat steps
+            AddStep("Slow Short Slider", () => SetContents(_ => testShortSlowSpeed()));
+            AddStep("Slow Short Slider 1 Repeats", () => SetContents(_ => testShortSlowSpeed(1)));
+            AddStep("Slow Short Slider 2 Repeats", () => SetContents(_ => testShortSlowSpeed(2)));
 
-            AddStep("Fast Slider", () => SetContents(() => testHighSpeed()));
-            AddStep("Fast Slider 1 Repeat", () => SetContents(() => testHighSpeed(1)));
-            AddStep("Fast Slider 2 Repeats", () => SetContents(() => testHighSpeed(2)));
-            AddStep("Fast Short Slider", () => SetContents(() => testShortHighSpeed()));
-            AddStep("Fast Short Slider 1 Repeat", () => SetContents(() => testShortHighSpeed(1)));
-            AddStep("Fast Short Slider 2 Repeats", () => SetContents(() => testShortHighSpeed(2)));
-            AddStep("Fast Short Slider 6 Repeats", () => SetContents(() => testShortHighSpeed(6)));
+            AddStep("Fast Slider", () => SetContents(_ => testHighSpeed()));
+            AddStep("Fast Slider 1 Repeat", () => SetContents(_ => testHighSpeed(1)));
+            AddStep("Fast Slider 2 Repeats", () => SetContents(_ => testHighSpeed(2)));
+            AddStep("Fast Short Slider", () => SetContents(_ => testShortHighSpeed()));
+            AddStep("Fast Short Slider 1 Repeat", () => SetContents(_ => testShortHighSpeed(1)));
+            AddStep("Fast Short Slider 2 Repeats", () => SetContents(_ => testShortHighSpeed(2)));
+            AddStep("Fast Short Slider 6 Repeats", () => SetContents(_ => testShortHighSpeed(6)));
 
-            AddStep("Perfect Curve", () => SetContents(() => testPerfect()));
-            AddStep("Perfect Curve 1 Repeat", () => SetContents(() => testPerfect(1)));
-            AddStep("Perfect Curve 2 Repeats", () => SetContents(() => testPerfect(2)));
+            AddStep("Perfect Curve", () => SetContents(_ => testPerfect()));
+            AddStep("Perfect Curve 1 Repeat", () => SetContents(_ => testPerfect(1)));
+            AddStep("Perfect Curve 2 Repeats", () => SetContents(_ => testPerfect(2)));
 
-            AddStep("Linear Slider", () => SetContents(() => testLinear()));
-            AddStep("Linear Slider 1 Repeat", () => SetContents(() => testLinear(1)));
-            AddStep("Linear Slider 2 Repeats", () => SetContents(() => testLinear(2)));
+            AddStep("Linear Slider", () => SetContents(_ => testLinear()));
+            AddStep("Linear Slider 1 Repeat", () => SetContents(_ => testLinear(1)));
+            AddStep("Linear Slider 2 Repeats", () => SetContents(_ => testLinear(2)));
 
-            AddStep("Bezier Slider", () => SetContents(() => testBezier()));
-            AddStep("Bezier Slider 1 Repeat", () => SetContents(() => testBezier(1)));
-            AddStep("Bezier Slider 2 Repeats", () => SetContents(() => testBezier(2)));
+            AddStep("Bezier Slider", () => SetContents(_ => testBezier()));
+            AddStep("Bezier Slider 1 Repeat", () => SetContents(_ => testBezier(1)));
+            AddStep("Bezier Slider 2 Repeats", () => SetContents(_ => testBezier(2)));
 
-            AddStep("Linear Overlapping", () => SetContents(() => testLinearOverlapping()));
-            AddStep("Linear Overlapping 1 Repeat", () => SetContents(() => testLinearOverlapping(1)));
-            AddStep("Linear Overlapping 2 Repeats", () => SetContents(() => testLinearOverlapping(2)));
+            AddStep("Linear Overlapping", () => SetContents(_ => testLinearOverlapping()));
+            AddStep("Linear Overlapping 1 Repeat", () => SetContents(_ => testLinearOverlapping(1)));
+            AddStep("Linear Overlapping 2 Repeats", () => SetContents(_ => testLinearOverlapping(2)));
 
-            AddStep("Catmull Slider", () => SetContents(() => testCatmull()));
-            AddStep("Catmull Slider 1 Repeat", () => SetContents(() => testCatmull(1)));
-            AddStep("Catmull Slider 2 Repeats", () => SetContents(() => testCatmull(2)));
+            AddStep("Catmull Slider", () => SetContents(_ => testCatmull()));
+            AddStep("Catmull Slider 1 Repeat", () => SetContents(_ => testCatmull(1)));
+            AddStep("Catmull Slider 2 Repeats", () => SetContents(_ => testCatmull(2)));
 
-            AddStep("Big Single, Large StackOffset", () => SetContents(() => testSimpleBigLargeStackOffset()));
-            AddStep("Big 1 Repeat, Large StackOffset", () => SetContents(() => testSimpleBigLargeStackOffset(1)));
+            AddStep("Big Single, Large StackOffset", () => SetContents(_ => testSimpleBigLargeStackOffset()));
+            AddStep("Big 1 Repeat, Large StackOffset", () => SetContents(_ => testSimpleBigLargeStackOffset(1)));
 
-            AddStep("Distance Overflow", () => SetContents(() => testDistanceOverflow()));
-            AddStep("Distance Overflow 1 Repeat", () => SetContents(() => testDistanceOverflow(1)));
+            AddStep("Distance Overflow", () => SetContents(_ => testDistanceOverflow()));
+            AddStep("Distance Overflow 1 Repeat", () => SetContents(_ => testDistanceOverflow(1)));
         }
 
         [Test]
@@ -335,8 +335,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             var drawable = CreateDrawableSlider(slider);
 
-            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
-                mod.ApplyToDrawableHitObjects(new[] { drawable });
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObject>())
+                mod.ApplyToDrawableHitObject(drawable);
 
             drawable.OnNewResult += onNewResult;
 

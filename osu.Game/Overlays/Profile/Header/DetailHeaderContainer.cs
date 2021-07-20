@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays.Profile.Header.Components;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 using osu.Game.Users;
 using osuTK;
@@ -100,7 +101,7 @@ namespace osu.Game.Overlays.Profile.Header
                                         },
                                         medalInfo = new OverlinedInfoContainer
                                         {
-                                            Title = "Medals",
+                                            Title = UsersStrings.ShowStatsMedals,
                                             LineColour = colours.GreenLight,
                                         },
                                         ppInfo = new OverlinedInfoContainer
@@ -151,12 +152,12 @@ namespace osu.Game.Overlays.Profile.Header
                                     {
                                         detailGlobalRank = new OverlinedInfoContainer(true, 110)
                                         {
-                                            Title = "Global Ranking",
+                                            Title = UsersStrings.ShowRankGlobalSimple,
                                             LineColour = colourProvider.Highlight1,
                                         },
                                         detailCountryRank = new OverlinedInfoContainer(false, 110)
                                         {
-                                            Title = "Country Ranking",
+                                            Title = UsersStrings.ShowRankCountrySimple,
                                             LineColour = colourProvider.Highlight1,
                                         },
                                     }

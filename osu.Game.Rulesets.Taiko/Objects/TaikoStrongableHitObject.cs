@@ -1,8 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using System.Threading;
 using osu.Framework.Bindables;
+using osu.Game.Audio;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Objects
@@ -33,6 +35,35 @@ namespace osu.Game.Rulesets.Taiko.Objects
             get => IsStrongBindable.Value;
             set => IsStrongBindable.Value = value;
         }
+
+        protected TaikoStrongableHitObject()
+        {
+            IsStrongBindable.BindValueChanged(_ => updateSamplesFromType());
+            SamplesBindable.BindCollectionChanged((_, __) => updateTypeFromSamples());
+        }
+
+        private void updateTypeFromSamples()
+        {
+            IsStrong = getStrongSamples().Any();
+        }
+
+        private void updateSamplesFromType()
+        {
+            var strongSamples = getStrongSamples();
+
+            if (IsStrongBindable.Value != strongSamples.Any())
+            {
+                if (IsStrongBindable.Value)
+                    Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_FINISH));
+                else
+                {
+                    foreach (var sample in strongSamples)
+                        Samples.Remove(sample);
+                }
+            }
+        }
+
+        private HitSampleInfo[] getStrongSamples() => Samples.Where(s => s.Name == HitSampleInfo.HIT_FINISH).ToArray();
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
