@@ -84,22 +84,22 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(true, false)]
         [TestCase(false, true)]
         [TestCase(false, false)]
-        public void TestLegacyOffsetWithBeatmapColours(bool userHasCustomColours, bool useBeatmapSkin)
+        public void TestComboOffsetWithBeatmapColours(bool userHasCustomColours, bool useBeatmapSkin)
         {
             PrepareBeatmap(() => new OsuCustomSkinWorkingBeatmap(audio, true, getHitCirclesWithLegacyOffsets()));
             ConfigureTest(useBeatmapSkin, true, userHasCustomColours);
-            assertCorrectObjectComboColours("is beatmap skin colours with legacy offsets applied",
+            assertCorrectObjectComboColours("is beatmap skin colours with combo offsets applied",
                 TestBeatmapSkin.Colours,
                 (i, obj) => i + 1 + obj.ComboOffset);
         }
 
         [TestCase(true)]
         [TestCase(false)]
-        public void TestLegacyOffsetWithIgnoredBeatmapColours(bool useBeatmapSkin)
+        public void TestComboOffsetWithIgnoredBeatmapColours(bool useBeatmapSkin)
         {
             PrepareBeatmap(() => new OsuCustomSkinWorkingBeatmap(audio, true, getHitCirclesWithLegacyOffsets()));
             ConfigureTest(useBeatmapSkin, false, true);
-            assertCorrectObjectComboColours("is user skin colours without legacy offsets applied",
+            assertCorrectObjectComboColours("is user skin colours without combo offsets applied",
                 TestSkin.Colours,
                 (i, _) => i + 1);
         }
