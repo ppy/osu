@@ -2,7 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
+using System.Diagnostics;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,38 +20,48 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// <summary>
         /// References the time at which the user started holding the hold note.
         /// </summary>
-        public Func<double?> HoldStartTime;
+        private Func<double?> holdStartTime;
+
+        private Container glowContainer;
+
+        public DrawableHoldNoteTick()
+            : this(null)
+        {
+        }
 
         public DrawableHoldNoteTick(HoldNoteTick hitObject)
             : base(hitObject)
         {
-            Container glowContainer;
-
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
 
             RelativeSizeAxes = Axes.X;
-            Size = new Vector2(1);
+        }
 
-            AddRangeInternal(new[]
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddInternal(glowContainer = new CircularContainer
             {
-                glowContainer = new CircularContainer
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                Children = new[]
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Children = new[]
+                    new Box
                     {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
-                            AlwaysPresent = true
-                        }
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        AlwaysPresent = true
                     }
                 }
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             AccentColour.BindValueChanged(colour =>
             {
@@ -64,12 +75,29 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }, true);
         }
 
+        protected override void OnApply()
+        {
+            base.OnApply();
+
+            Debug.Assert(ParentHitObject != null);
+
+            var holdNote = (DrawableHoldNote)ParentHitObject;
+            holdStartTime = () => holdNote.HoldStartTime;
+        }
+
+        protected override void OnFree()
+        {
+            base.OnFree();
+
+            holdStartTime = null;
+        }
+
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (Time.Current < HitObject.StartTime)
                 return;
 
-            var startTime = HoldStartTime?.Invoke();
+            var startTime = holdStartTime?.Invoke();
 
             if (startTime == null || startTime > HitObject.StartTime)
                 ApplyResult(r => r.Type = r.Judgement.MinResult);

@@ -4,24 +4,19 @@
 using System;
 using System.IO;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Screens;
-using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
-    public class MigrationSelectScreen : OsuScreen
+    public class MigrationSelectScreen : DirectorySelectScreen
     {
-        private DirectorySelector directorySelector;
+        [Resolved]
+        private Storage storage { get; set; }
+
+        protected override DirectoryInfo InitialPath => new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent;
 
         public override bool AllowExternalScreenChange => false;
 
@@ -29,84 +24,11 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         public override bool HideOverlaysOnEnter => true;
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, Storage storage, OsuColour colours)
+        public override LocalisableString HeaderText => "Please select a new location";
+
+        protected override void OnSelection(DirectoryInfo directory)
         {
-            game?.Toolbar.Hide();
-
-            // begin selection in the parent directory of the current storage location
-            var initialPath = new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent?.FullName;
-
-            InternalChild = new Container
-            {
-                Masking = true,
-                CornerRadius = 10,
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(0.5f, 0.8f),
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        Colour = colours.GreySeafoamDark,
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                    new GridContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        RowDimensions = new[]
-                        {
-                            new Dimension(),
-                            new Dimension(GridSizeMode.Relative, 0.8f),
-                            new Dimension(),
-                        },
-                        Content = new[]
-                        {
-                            new Drawable[]
-                            {
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Text = "Please select a new location",
-                                    Font = OsuFont.Default.With(size: 40)
-                                },
-                            },
-                            new Drawable[]
-                            {
-                                directorySelector = new DirectorySelector(initialPath)
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                }
-                            },
-                            new Drawable[]
-                            {
-                                new TriangleButton
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Width = 300,
-                                    Text = "Begin folder migration",
-                                    Action = start
-                                },
-                            }
-                        }
-                    }
-                }
-            };
-        }
-
-        public override void OnSuspending(IScreen next)
-        {
-            base.OnSuspending(next);
-
-            this.FadeOut(250);
-        }
-
-        private void start()
-        {
-            var target = directorySelector.CurrentPath.Value;
+            var target = directory;
 
             try
             {

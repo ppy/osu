@@ -12,11 +12,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking.Statistics;
@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Ranking
             if (Score != null)
             {
                 // only show flair / animation when arriving after watching a play that isn't autoplay.
-                bool shouldFlair = player != null && !Score.Mods.Any(m => m is ModAutoplay);
+                bool shouldFlair = player != null && Score.Mods.All(m => m.UserPlayable);
 
                 ScorePanelList.AddScore(Score, shouldFlair);
             }
@@ -237,7 +237,7 @@ namespace osu.Game.Screens.Ranking
             ApplyToBackground(b =>
             {
                 b.BlurAmount.Value = BACKGROUND_BLUR;
-                b.FadeTo(0.5f, 250);
+                b.FadeColour(OsuColour.Gray(0.5f), 250);
             });
 
             bottomPanel.FadeTo(1, 250);
@@ -245,9 +245,11 @@ namespace osu.Game.Screens.Ranking
 
         public override bool OnExiting(IScreen next)
         {
-            ApplyToBackground(b => b.FadeTo(1, 250));
+            if (base.OnExiting(next))
+                return true;
 
-            return base.OnExiting(next);
+            this.FadeOut(100);
+            return false;
         }
 
         public override bool OnBackButton()
@@ -295,7 +297,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.HandleInput = false;
 
                 // Dim background.
-                ApplyToBackground(b => b.FadeTo(0.1f, 150));
+                ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.1f), 150));
 
                 detachedPanel = expandedPanel;
             }
@@ -319,7 +321,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.HandleInput = true;
 
                 // Un-dim background.
-                ApplyToBackground(b => b.FadeTo(0.5f, 150));
+                ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.5f), 150));
 
                 detachedPanel = null;
             }

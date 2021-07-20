@@ -56,6 +56,9 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved(typeof(Room))]
         protected Bindable<RoomAvailability> Availability { get; private set; }
 
+        [Resolved(typeof(Room), nameof(Room.Password))]
+        public Bindable<string> Password { get; private set; }
+
         [Resolved(typeof(Room))]
         protected Bindable<TimeSpan?> Duration { get; private set; }
 

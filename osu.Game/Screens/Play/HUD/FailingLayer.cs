@@ -39,12 +39,11 @@ namespace osu.Game.Screens.Play.HUD
         private readonly Container boxes;
 
         private Bindable<bool> fadePlayfieldWhenHealthLow;
-        private HealthProcessor healthProcessor;
 
         public FailingLayer()
         {
             RelativeSizeAxes = Axes.Both;
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 boxes = new Container
                 {
@@ -88,18 +87,10 @@ namespace osu.Game.Screens.Play.HUD
             updateState();
         }
 
-        public override void BindHealthProcessor(HealthProcessor processor)
-        {
-            base.BindHealthProcessor(processor);
-
-            healthProcessor = processor;
-            updateState();
-        }
-
         private void updateState()
         {
             // Don't display ever if the ruleset is not using a draining health display.
-            var showLayer = healthProcessor is DrainingHealthProcessor && fadePlayfieldWhenHealthLow.Value && ShowHealth.Value;
+            var showLayer = HealthProcessor is DrainingHealthProcessor && fadePlayfieldWhenHealthLow.Value && ShowHealth.Value;
             this.FadeTo(showLayer ? 1 : 0, fade_time, Easing.OutQuint);
         }
 

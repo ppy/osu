@@ -40,19 +40,19 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, SkinManager skinManager, OsuGameBase game)
+        private void load(AudioManager audio, SkinManager skinManager)
         {
             var dllStore = new DllResourceStore(DynamicCompilationOriginal.GetType().Assembly);
 
             metricsSkin = new TestLegacySkin(new SkinInfo { Name = "metrics-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), this, true);
-            defaultSkin = new DefaultLegacySkin(new NamespacedResourceStore<byte[]>(game.Resources, "Skins/Legacy"), this);
+            defaultSkin = new DefaultLegacySkin(this);
             specialSkin = new TestLegacySkin(new SkinInfo { Name = "special-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/special_skin"), this, true);
             oldSkin = new TestLegacySkin(new SkinInfo { Name = "old-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/old_skin"), this, true);
         }
 
         private readonly List<Drawable> createdDrawables = new List<Drawable>();
 
-        public void SetContents(Func<Drawable> creationFunction)
+        protected void SetContents(Func<ISkin, Drawable> creationFunction)
         {
             createdDrawables.Clear();
 
@@ -67,9 +67,9 @@ namespace osu.Game.Tests.Visual
 
         protected IEnumerable<Drawable> CreatedDrawables => createdDrawables;
 
-        private Drawable createProvider(Skin skin, Func<Drawable> creationFunction, IBeatmap beatmap)
+        private Drawable createProvider(Skin skin, Func<ISkin, Drawable> creationFunction, IBeatmap beatmap)
         {
-            var created = creationFunction();
+            var created = creationFunction(skin);
 
             createdDrawables.Add(created);
 
@@ -156,6 +156,7 @@ namespace osu.Game.Tests.Visual
 
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => null;
+        public new IResourceStore<byte[]> Resources => base.Resources;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
 
         #endregion

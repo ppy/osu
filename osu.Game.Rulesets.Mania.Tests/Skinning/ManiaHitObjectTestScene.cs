@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            SetContents(() => new FillFlowContainer
+            SetContents(_ => new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

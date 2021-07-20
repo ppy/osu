@@ -7,7 +7,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
@@ -19,7 +18,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete, IEquatable<ScoreInfo>
+    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete, IEquatable<ScoreInfo>, IDeepCloneable<ScoreInfo>
     {
         public int ID { get; set; }
 
@@ -46,7 +45,7 @@ namespace osu.Game.Scoring
         [JsonIgnore]
         public int Combo { get; set; } // Todo: Shouldn't exist in here
 
-        [JsonIgnore]
+        [JsonProperty("ruleset_id")]
         public int RulesetID { get; set; }
 
         [JsonProperty("passed")]
@@ -75,9 +74,6 @@ namespace osu.Game.Scoring
                     scoreMods = mods;
                 else if (localAPIMods != null)
                     scoreMods = apiMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
-
-                if (IsLegacyScore)
-                    scoreMods = scoreMods.Append(rulesetInstance.GetAllMods().OfType<ModClassic>().Single()).ToArray();
 
                 return scoreMods;
             }
@@ -201,45 +197,24 @@ namespace osu.Game.Scoring
         [JsonProperty("position")]
         public int? Position { get; set; }
 
-        private bool isLegacyScore;
-
         /// <summary>
         /// Whether this <see cref="ScoreInfo"/> represents a legacy (osu!stable) score.
         /// </summary>
         [JsonIgnore]
         [NotMapped]
-        public bool IsLegacyScore
-        {
-            get
-            {
-                if (isLegacyScore)
-                    return true;
-
-                // The above check will catch legacy online scores that have an appropriate UserString + UserId.
-                // For non-online scores such as those imported in, a heuristic is used based on the following table:
-                //
-                //       Mode      | UserString | UserId
-                // --------------- | ---------- | ---------
-                // stable          | <username> | 1
-                // lazer           | <username> | <userid>
-                // lazer (offline) | Guest      | 1
-
-                return ID > 0 && UserID == 1 && UserString != "Guest";
-            }
-            set => isLegacyScore = value;
-        }
+        public bool IsLegacyScore => Mods.OfType<ModClassic>().Any();
 
         public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
         {
             foreach (var r in Ruleset.CreateInstance().GetHitResults())
             {
-                int value = Statistics.GetOrDefault(r.result);
+                int value = Statistics.GetValueOrDefault(r.result);
 
                 switch (r.result)
                 {
                     case HitResult.SmallTickHit:
                     {
-                        int total = value + Statistics.GetOrDefault(HitResult.SmallTickMiss);
+                        int total = value + Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
                         if (total > 0)
                             yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
 
@@ -248,7 +223,7 @@ namespace osu.Game.Scoring
 
                     case HitResult.LargeTickHit:
                     {
-                        int total = value + Statistics.GetOrDefault(HitResult.LargeTickMiss);
+                        int total = value + Statistics.GetValueOrDefault(HitResult.LargeTickMiss);
                         if (total > 0)
                             yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
 
@@ -265,6 +240,15 @@ namespace osu.Game.Scoring
                         break;
                 }
             }
+        }
+
+        public ScoreInfo DeepClone()
+        {
+            var clone = (ScoreInfo)MemberwiseClone();
+
+            clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
+
+            return clone;
         }
 
         public override string ToString() => $"{User} playing {Beatmap}";

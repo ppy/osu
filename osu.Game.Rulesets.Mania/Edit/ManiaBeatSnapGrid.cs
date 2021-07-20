@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                 foreach (var line in grid.Objects.OfType<DrawableGridLine>())
                     availableLines.Push(line);
 
-                grid.Clear(false);
+                grid.Clear();
             }
 
             if (selectionTimeRange == null)

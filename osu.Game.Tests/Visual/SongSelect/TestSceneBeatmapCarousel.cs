@@ -786,9 +786,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             }
         }
 
-        private void checkVisibleItemCount(bool diff, int count) =>
-            AddAssert($"{count} {(diff ? "diffs" : "sets")} visible", () =>
+        private void checkVisibleItemCount(bool diff, int count)
+        {
+            // until step required as we are querying against alive items, which are loaded asynchronously inside DrawableCarouselBeatmapSet.
+            AddUntilStep($"{count} {(diff ? "diffs" : "sets")} visible", () =>
                 carousel.Items.Count(s => (diff ? s.Item is CarouselBeatmap : s.Item is CarouselBeatmapSet) && s.Item.Visible) == count);
+        }
 
         private void checkNoSelection() => AddAssert("Selection is null", () => currentSelection == null);
 

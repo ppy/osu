@@ -55,10 +55,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             item.Ruleset.Value = Ruleset.Value;
 
             item.RequiredMods.Clear();
-            item.RequiredMods.AddRange(Mods.Value.Select(m => m.CreateCopy()));
+            item.RequiredMods.AddRange(Mods.Value.Select(m => m.DeepClone()));
 
             item.AllowedMods.Clear();
-            item.AllowedMods.AddRange(FreeMods.Value.Select(m => m.CreateCopy()));
+            item.AllowedMods.AddRange(FreeMods.Value.Select(m => m.DeepClone()));
         }
     }
 }

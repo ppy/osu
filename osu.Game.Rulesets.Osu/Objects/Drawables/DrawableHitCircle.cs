@@ -12,6 +12,7 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
@@ -19,7 +20,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableHitCircle : DrawableOsuHitObject, IHasMainCirclePiece
+    public class DrawableHitCircle : DrawableOsuHitObject, IHasMainCirclePiece, IHasApproachCircle
     {
         public OsuAction? HitAction => HitArea.HitAction;
         protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
@@ -27,6 +28,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public ApproachCircle ApproachCircle { get; private set; }
         public HitReceptor HitArea { get; private set; }
         public SkinnableDrawable CirclePiece { get; private set; }
+
+        Drawable IHasApproachCircle.ApproachCircle => ApproachCircle;
 
         private Container scaleContainer;
         private InputManager inputManager;
@@ -172,6 +175,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateStartTimeStateTransforms();
 
+            // always fade out at the circle's start time (to match user expectations).
             ApproachCircle.FadeOut(50);
         }
 
@@ -182,7 +186,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // todo: temporary / arbitrary, used for lifetime optimisation.
             this.Delay(800).FadeOut();
 
-            (CirclePiece.Drawable as IMainCirclePiece)?.Animate(state);
+            // in the case of an early state change, the fade should be expedited to the current point in time.
+            if (HitStateUpdateTime < HitObject.StartTime)
+                ApproachCircle.FadeOut(50);
 
             switch (state)
             {

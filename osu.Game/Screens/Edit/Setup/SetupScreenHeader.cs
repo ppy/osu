@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             public SetupScreenTabControl()
             {
-                TabContainer.Margin = new MarginPadding { Horizontal = RoundedContentEditorScreen.HORIZONTAL_PADDING };
+                TabContainer.Margin = new MarginPadding { Horizontal = EditorRoundedScreen.HORIZONTAL_PADDING };
 
                 AddInternal(background = new Box
                 {

@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         [SetUpSteps]
         public void SetUp()
-            => AddStep("clear SHOC", () => hitObjectContainer.Clear(false));
+            => AddStep("clear SHOC", () => hitObjectContainer.Clear());
 
         protected void AddHitObject(DrawableHitObject hitObject)
             => AddStep("add to SHOC", () => hitObjectContainer.Add(hitObject));

@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mods
         };
 
         [SettingSource("Direction", "The direction of rotation")]
-        public Bindable<RotationDirection> Direction { get; } = new Bindable<RotationDirection>(RotationDirection.Clockwise);
+        public Bindable<RotationDirection> Direction { get; } = new Bindable<RotationDirection>();
 
         public override string Name => "Barrel Roll";
         public override string Acronym => "BR";

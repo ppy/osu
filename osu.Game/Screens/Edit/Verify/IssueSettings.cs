@@ -2,45 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    public class IssueSettings : CompositeDrawable
+    public class IssueSettings : EditorRoundedScreenSettings
     {
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        protected override IReadOnlyList<Drawable> CreateSections() => new Drawable[]
         {
-            RelativeSizeAxes = Axes.Both;
-
-            InternalChildren = new Drawable[]
-            {
-                new Box
-                {
-                    Colour = colours.Gray3,
-                    RelativeSizeAxes = Axes.Both,
-                },
-                new OsuScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = new FillFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Children = createSections()
-                    },
-                }
-            };
-        }
-
-        private IReadOnlyList<Drawable> createSections() => new Drawable[]
-        {
+            new InterpretationSection(),
+            new VisibilitySection()
         };
     }
 }

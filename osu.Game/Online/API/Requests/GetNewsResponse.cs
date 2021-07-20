@@ -11,5 +11,8 @@ namespace osu.Game.Online.API.Requests
     {
         [JsonProperty("news_posts")]
         public IEnumerable<APINewsPost> NewsPosts;
+
+        [JsonProperty("news_sidebar")]
+        public APINewsSidebar SidebarMetadata;
     }
 }

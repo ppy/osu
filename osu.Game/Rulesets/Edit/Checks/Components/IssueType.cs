@@ -18,7 +18,6 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// <summary> An error occurred and a complete check could not be made. </summary>
         Error,
 
-        // TODO: Negligible issues should be hidden by default.
         /// <summary> A possible mistake so minor/unlikely that it can often be safely ignored. </summary>
         Negligible,
     }

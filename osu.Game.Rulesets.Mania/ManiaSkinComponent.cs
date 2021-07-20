@@ -10,12 +10,6 @@ namespace osu.Game.Rulesets.Mania
     public class ManiaSkinComponent : GameplaySkinComponent<ManiaSkinComponents>
     {
         /// <summary>
-        /// The intended <see cref="Column"/> index for this component.
-        /// May be null if the component does not exist in a <see cref="Column"/>.
-        /// </summary>
-        public readonly int? TargetColumn;
-
-        /// <summary>
         /// The intended <see cref="StageDefinition"/> for this component.
         /// May be null if the component is not a direct member of a <see cref="Stage"/>.
         /// </summary>
@@ -25,12 +19,10 @@ namespace osu.Game.Rulesets.Mania
         /// Creates a new <see cref="ManiaSkinComponent"/>.
         /// </summary>
         /// <param name="component">The component.</param>
-        /// <param name="targetColumn">The intended <see cref="Column"/> index for this component. May be null if the component does not exist in a <see cref="Column"/>.</param>
         /// <param name="stageDefinition">The intended <see cref="StageDefinition"/> for this component. May be null if the component is not a direct member of a <see cref="Stage"/>.</param>
-        public ManiaSkinComponent(ManiaSkinComponents component, int? targetColumn = null, StageDefinition? stageDefinition = null)
+        public ManiaSkinComponent(ManiaSkinComponents component, StageDefinition? stageDefinition = null)
             : base(component)
         {
-            TargetColumn = targetColumn;
             StageDefinition = stageDefinition;
         }
 

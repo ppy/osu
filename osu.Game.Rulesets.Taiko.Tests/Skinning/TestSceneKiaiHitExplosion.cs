@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [Test]
         public void TestKiaiHits()
         {
-            AddStep("rim hit", () => SetContents(() => getContentFor(createHit(HitType.Rim))));
-            AddStep("centre hit", () => SetContents(() => getContentFor(createHit(HitType.Centre))));
+            AddStep("rim hit", () => SetContents(_ => getContentFor(createHit(HitType.Rim))));
+            AddStep("centre hit", () => SetContents(_ => getContentFor(createHit(HitType.Centre))));
         }
 
         private Drawable getContentFor(DrawableTestHit hit)

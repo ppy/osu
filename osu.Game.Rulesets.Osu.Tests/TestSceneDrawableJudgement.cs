@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 int poolIndex = 0;
 
-                SetContents(() =>
+                SetContents(_ =>
                 {
                     DrawablePool<TestDrawableOsuJudgement> pool;
 

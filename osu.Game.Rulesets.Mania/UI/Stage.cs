@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI.Components;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -132,33 +133,19 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override void Add(DrawableHitObject h)
+        protected override void LoadComplete()
         {
-            var maniaObject = (ManiaHitObject)h.HitObject;
-
-            int columnIndex = -1;
-
-            maniaObject.ColumnBindable.BindValueChanged(_ =>
-            {
-                if (columnIndex != -1)
-                    Columns.ElementAt(columnIndex).Remove(h);
-
-                columnIndex = maniaObject.Column - firstColumnIndex;
-                Columns.ElementAt(columnIndex).Add(h);
-            }, true);
-
-            h.OnNewResult += OnNewResult;
+            base.LoadComplete();
+            NewResult += OnNewResult;
         }
 
-        public override bool Remove(DrawableHitObject h)
-        {
-            var maniaObject = (ManiaHitObject)h.HitObject;
-            int columnIndex = maniaObject.Column - firstColumnIndex;
-            Columns.ElementAt(columnIndex).Remove(h);
+        public override void Add(HitObject hitObject) => Columns.ElementAt(((ManiaHitObject)hitObject).Column - firstColumnIndex).Add(hitObject);
 
-            h.OnNewResult -= OnNewResult;
-            return true;
-        }
+        public override bool Remove(HitObject hitObject) => Columns.ElementAt(((ManiaHitObject)hitObject).Column - firstColumnIndex).Remove(hitObject);
+
+        public override void Add(DrawableHitObject h) => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column - firstColumnIndex).Add(h);
+
+        public override bool Remove(DrawableHitObject h) => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column - firstColumnIndex).Remove(h);
 
         public void Add(BarLine barline) => base.Add(new DrawableBarLine(barline));
 

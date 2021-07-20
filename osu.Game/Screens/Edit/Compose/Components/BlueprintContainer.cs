@@ -3,9 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -24,6 +27,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// Includes selection and manipulation support via a <see cref="Components.SelectionHandler{T}"/>.
     /// </summary>
     public abstract class BlueprintContainer<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>
+        where T : class
     {
         protected DragBox DragBox { get; private set; }
 
@@ -39,6 +43,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved(CanBeNull = true)]
         private IEditorChangeHandler changeHandler { get; set; }
 
+        protected readonly BindableList<T> SelectedItems = new BindableList<T>();
+
         protected BlueprintContainer()
         {
             RelativeSizeAxes = Axes.Both;
@@ -47,6 +53,24 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
+            SelectedItems.CollectionChanged += (selectedObjects, args) =>
+            {
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        foreach (var o in args.NewItems)
+                            SelectionBlueprints.FirstOrDefault(b => b.Item == o)?.Select();
+
+                        break;
+
+                    case NotifyCollectionChangedAction.Remove:
+                        foreach (var o in args.OldItems)
+                            SelectionBlueprints.FirstOrDefault(b => b.Item == o)?.Deselect();
+
+                        break;
+                }
+            };
+
             SelectionHandler = CreateSelectionHandler();
             SelectionHandler.DeselectAll = deselectAll;
 
@@ -71,6 +95,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Creates a <see cref="SelectionBlueprint{T}"/> for a specific item.
         /// </summary>
         /// <param name="item">The item to create the overlay for.</param>
+        [CanBeNull]
         protected virtual SelectionBlueprint<T> CreateBlueprintFor(T item) => null;
 
         protected virtual DragBox CreateDragBox(Action<RectangleF> performSelect) => new DragBox(performSelect);
@@ -275,6 +300,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected virtual void OnBlueprintRemoved(T item)
         {
         }
+
+        /// <summary>
+        /// Retrieves an item's blueprint.
+        /// </summary>
+        /// <param name="item">The item to retrieve the blueprint of.</param>
+        /// <returns>The blueprint.</returns>
+        protected SelectionBlueprint<T> GetBlueprintFor(T item) => blueprintMap[item];
 
         #endregion
 

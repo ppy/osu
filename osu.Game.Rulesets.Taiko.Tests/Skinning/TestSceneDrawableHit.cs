@@ -17,25 +17,25 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddStep("Centre hit", () => SetContents(() => new DrawableHit(createHitAtCurrentTime())
+            AddStep("Centre hit", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             }));
 
-            AddStep("Centre hit (strong)", () => SetContents(() => new DrawableHit(createHitAtCurrentTime(true))
+            AddStep("Centre hit (strong)", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime(true))
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             }));
 
-            AddStep("Rim hit", () => SetContents(() => new DrawableHit(createHitAtCurrentTime())
+            AddStep("Rim hit", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             }));
 
-            AddStep("Rim hit (strong)", () => SetContents(() => new DrawableHit(createHitAtCurrentTime(true))
+            AddStep("Rim hit (strong)", () => SetContents(_ => new DrawableHit(createHitAtCurrentTime(true))
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

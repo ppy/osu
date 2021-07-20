@@ -21,20 +21,37 @@ namespace osu.Game.Rulesets.Osu.Tests
         private int depthIndex;
 
         [Test]
-        public void TestVariousHitCircles()
+        public void TestHits()
         {
-            AddStep("Miss Big Single", () => SetContents(() => testSingle(2)));
-            AddStep("Miss Medium Single", () => SetContents(() => testSingle(5)));
-            AddStep("Miss Small Single", () => SetContents(() => testSingle(7)));
-            AddStep("Hit Big Single", () => SetContents(() => testSingle(2, true)));
-            AddStep("Hit Medium Single", () => SetContents(() => testSingle(5, true)));
-            AddStep("Hit Small Single", () => SetContents(() => testSingle(7, true)));
-            AddStep("Miss Big Stream", () => SetContents(() => testStream(2)));
-            AddStep("Miss Medium Stream", () => SetContents(() => testStream(5)));
-            AddStep("Miss Small Stream", () => SetContents(() => testStream(7)));
-            AddStep("Hit Big Stream", () => SetContents(() => testStream(2, true)));
-            AddStep("Hit Medium Stream", () => SetContents(() => testStream(5, true)));
-            AddStep("Hit Small Stream", () => SetContents(() => testStream(7, true)));
+            AddStep("Hit Big Single", () => SetContents(_ => testSingle(2, true)));
+            AddStep("Hit Medium Single", () => SetContents(_ => testSingle(5, true)));
+            AddStep("Hit Small Single", () => SetContents(_ => testSingle(7, true)));
+            AddStep("Hit Big Stream", () => SetContents(_ => testStream(2, true)));
+            AddStep("Hit Medium Stream", () => SetContents(_ => testStream(5, true)));
+            AddStep("Hit Small Stream", () => SetContents(_ => testStream(7, true)));
+        }
+
+        [Test]
+        public void TestHittingEarly()
+        {
+            AddStep("Hit stream early", () => SetContents(_ => testStream(5, true, -150)));
+        }
+
+        [Test]
+        public void TestMisses()
+        {
+            AddStep("Miss Big Single", () => SetContents(_ => testSingle(2)));
+            AddStep("Miss Medium Single", () => SetContents(_ => testSingle(5)));
+            AddStep("Miss Small Single", () => SetContents(_ => testSingle(7)));
+            AddStep("Miss Big Stream", () => SetContents(_ => testStream(2)));
+            AddStep("Miss Medium Stream", () => SetContents(_ => testStream(5)));
+            AddStep("Miss Small Stream", () => SetContents(_ => testStream(7)));
+        }
+
+        [Test]
+        public void TestHittingLate()
+        {
+            AddStep("Hit stream late", () => SetContents(_ => testStream(5, true, 150)));
         }
 
         private Drawable testSingle(float circleSize, bool auto = false, double timeOffset = 0, Vector2? positionOffset = null)
@@ -46,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             return playfield;
         }
 
-        private Drawable testStream(float circleSize, bool auto = false)
+        private Drawable testStream(float circleSize, bool auto = false, double hitOffset = 0)
         {
             var playfield = new TestOsuPlayfield();
 
@@ -54,14 +71,14 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             for (int i = 0; i <= 1000; i += 100)
             {
-                playfield.Add(createSingle(circleSize, auto, i, pos));
+                playfield.Add(createSingle(circleSize, auto, i, pos, hitOffset));
                 pos.X += 50;
             }
 
             return playfield;
         }
 
-        private TestDrawableHitCircle createSingle(float circleSize, bool auto, double timeOffset, Vector2? positionOffset)
+        private TestDrawableHitCircle createSingle(float circleSize, bool auto, double timeOffset, Vector2? positionOffset, double hitOffset = 0)
         {
             positionOffset ??= Vector2.Zero;
 
@@ -73,14 +90,14 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             circle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = circleSize });
 
-            var drawable = CreateDrawableHitCircle(circle, auto);
+            var drawable = CreateDrawableHitCircle(circle, auto, hitOffset);
 
-            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
-                mod.ApplyToDrawableHitObjects(new[] { drawable });
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObject>())
+                mod.ApplyToDrawableHitObject(drawable);
             return drawable;
         }
 
-        protected virtual TestDrawableHitCircle CreateDrawableHitCircle(HitCircle circle, bool auto) => new TestDrawableHitCircle(circle, auto)
+        protected virtual TestDrawableHitCircle CreateDrawableHitCircle(HitCircle circle, bool auto, double hitOffset = 0) => new TestDrawableHitCircle(circle, auto, hitOffset)
         {
             Depth = depthIndex++
         };
@@ -88,18 +105,20 @@ namespace osu.Game.Rulesets.Osu.Tests
         protected class TestDrawableHitCircle : DrawableHitCircle
         {
             private readonly bool auto;
+            private readonly double hitOffset;
 
-            public TestDrawableHitCircle(HitCircle h, bool auto)
+            public TestDrawableHitCircle(HitCircle h, bool auto, double hitOffset)
                 : base(h)
             {
                 this.auto = auto;
+                this.hitOffset = hitOffset;
             }
 
-            public void TriggerJudgement() => UpdateResult(true);
+            public void TriggerJudgement() => Schedule(() => UpdateResult(true));
 
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
-                if (auto && !userTriggered && timeOffset > 0)
+                if (auto && !userTriggered && timeOffset > hitOffset && CheckHittable?.Invoke(this, Time.Current) != false)
                 {
                     // force success
                     ApplyResult(r => r.Type = HitResult.Great);

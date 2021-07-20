@@ -42,6 +42,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                     Origin = Anchor.Centre,
                     Texture = textures.Get(@"Gameplay/osu/disc"),
                 },
+                new KiaiFlash
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
                 triangles = new TrianglesPiece
                 {
                     RelativeSizeAxes = Axes.Both,

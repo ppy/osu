@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap, this);
 
-        public override ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => new TaikoLegacySkinTransformer(source);
+        public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new TaikoLegacySkinTransformer(skin);
 
         public const string SHORT_NAME = "taiko";
 
@@ -136,6 +136,7 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModRandom(),
                         new TaikoModDifficultyAdjust(),
                         new TaikoModClassic(),
+                        new TaikoModSwap(),
                     };
 
                 case ModType.Automation:

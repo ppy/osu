@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                     new StageDefinition { Columns = 2 }
                 };
 
-                SetContents(() => new ManiaPlayfield(stageDefinitions));
+                SetContents(_ => new ManiaPlayfield(stageDefinitions));
             });
         }
 
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                     new StageDefinition { Columns = 2 }
                 };
 
-                SetContents(() => new ManiaPlayfield(stageDefinitions));
+                SetContents(_ => new ManiaPlayfield(stageDefinitions));
             });
         }
 

@@ -13,19 +13,24 @@ namespace osu.Game.Overlays.News
 
         public Action ShowFrontPage;
 
-        private readonly Bindable<string> article = new Bindable<string>(null);
+        private readonly Bindable<string> article = new Bindable<string>();
 
         public NewsHeader()
         {
             TabControl.AddItem(front_page_string);
+
+            article.BindValueChanged(onArticleChanged, true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             Current.BindValueChanged(e =>
             {
                 if (e.NewValue == front_page_string)
                     ShowFrontPage?.Invoke();
             });
-
-            article.BindValueChanged(onArticleChanged, true);
         }
 
         public void SetFrontPage() => article.Value = null;

@@ -1,54 +1,35 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Testing;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.Osu;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSkinnableScoreCounter : SkinnableTestScene
+    public class TestSceneSkinnableScoreCounter : SkinnableHUDComponentTestScene
     {
-        private IEnumerable<SkinnableScoreCounter> scoreCounters => CreatedDrawables.OfType<SkinnableScoreCounter>();
+        [Cached]
+        private ScoreProcessor scoreProcessor = new ScoreProcessor();
 
-        protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
-
-        [SetUpSteps]
-        public void SetUpSteps()
-        {
-            AddStep("Create combo counters", () => SetContents(() =>
-            {
-                var comboCounter = new SkinnableScoreCounter();
-                comboCounter.Current.Value = 1;
-                return comboCounter;
-            }));
-        }
+        protected override Drawable CreateDefaultImplementation() => new DefaultScoreCounter();
+        protected override Drawable CreateLegacyImplementation() => new LegacyScoreCounter();
 
         [Test]
         public void TestScoreCounterIncrementing()
         {
-            AddStep(@"Reset all", delegate
-            {
-                foreach (var s in scoreCounters)
-                    s.Current.Value = 0;
-            });
+            AddStep(@"Reset all", () => scoreProcessor.TotalScore.Value = 0);
 
-            AddStep(@"Hit! :D", delegate
-            {
-                foreach (var s in scoreCounters)
-                    s.Current.Value += 300;
-            });
+            AddStep(@"Hit! :D", () => scoreProcessor.TotalScore.Value += 300);
         }
 
         [Test]
         public void TestVeryLargeScore()
         {
-            AddStep("set large score", () => scoreCounters.ForEach(counter => counter.Current.Value = 1_000_000_000));
+            AddStep("set large score", () => scoreProcessor.TotalScore.Value = 1_000_000_000);
         }
     }
 }
