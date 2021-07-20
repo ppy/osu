@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using JetBrains.Annotations;
@@ -226,11 +227,13 @@ namespace osu.Game.Tests.Visual.Playlists
 
         private MultiplayerScore createUserResponse([NotNull] ScoreInfo userScore)
         {
+            Debug.Assert(userScore.Date != null);
+
             var multiplayerUserScore = new MultiplayerScore
             {
                 ID = (int)(userScore.OnlineScoreID ?? currentScoreId++),
                 Accuracy = userScore.Accuracy,
-                EndedAt = userScore.Date,
+                EndedAt = userScore.Date.Value,
                 Passed = userScore.Passed,
                 Rank = userScore.Rank,
                 Position = 200,
@@ -251,7 +254,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 {
                     ID = currentScoreId++,
                     Accuracy = userScore.Accuracy,
-                    EndedAt = userScore.Date,
+                    EndedAt = userScore.Date.Value,
                     Passed = true,
                     Rank = userScore.Rank,
                     MaxCombo = userScore.MaxCombo,
@@ -269,7 +272,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 {
                     ID = currentScoreId++,
                     Accuracy = userScore.Accuracy,
-                    EndedAt = userScore.Date,
+                    EndedAt = userScore.Date.Value,
                     Passed = true,
                     Rank = userScore.Rank,
                     MaxCombo = userScore.MaxCombo,

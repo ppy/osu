@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -136,9 +137,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             set
             {
+                Debug.Assert(value.Date != null);
+
                 avatar.User = value.User;
                 flag.Country = value.User.Country;
-                achievedOn.Date = value.Date;
+                achievedOn.Date = value.Date.Value;
 
                 usernameText.Clear();
                 usernameText.AddUserLink(value.User);
