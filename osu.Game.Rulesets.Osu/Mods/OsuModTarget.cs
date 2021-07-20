@@ -353,6 +353,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             public TargetBeatContainer(double firstHitTime)
             {
                 this.firstHitTime = firstHitTime;
+                AllowMistimedEventFiring = false;
                 Divisor = 1;
             }
 
