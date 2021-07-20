@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Skinning.Editor
@@ -91,7 +92,7 @@ namespace osu.Game.Skinning.Editor
                                         new TriangleButton
                                         {
                                             Margin = new MarginPadding(10),
-                                            Text = "Close",
+                                            Text = CommonStrings.ButtonsClose,
                                             Width = 100,
                                             Action = Hide,
                                         },
