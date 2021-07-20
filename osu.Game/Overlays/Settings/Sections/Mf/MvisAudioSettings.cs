@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public class MvisAudioSettings : SettingsSubsection
     {
-        protected override string Header => "音频";
+        protected override LocalisableString Header => "音频";
 
         [BackgroundDependencyLoader]
         private void load(MConfigManager config, MvisPluginManager pluginManager)

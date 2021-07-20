@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public class ExperimentalSettings : SettingsSubsection
     {
-        protected override string Header => "实验性功能";
+        protected override LocalisableString Header => "实验性功能";
 
         private readonly Bindable<string> customWindowIconPath = new Bindable<string>();
         private readonly Bindable<Font> currentFont = new Bindable<Font> { Default = fake_font };

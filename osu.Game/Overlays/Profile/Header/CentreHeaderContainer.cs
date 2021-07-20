@@ -120,13 +120,11 @@ namespace osu.Game.Overlays.Profile.Header
                             {
                                 hiddenDetailGlobal = new OverlinedInfoContainer
                                 {
-                                    Title = UsersStrings.ShowRankGlobalSimple,
-                                    LineColour = colourProvider.Highlight1
+                                    Title = UsersStrings.ShowRankGlobalSimple
                                 },
                                 hiddenDetailCountry = new OverlinedInfoContainer
                                 {
-                                    Title = UsersStrings.ShowRankCountrySimple,
-                                    LineColour = colourProvider.Highlight1
+                                    Title = UsersStrings.ShowRankCountrySimple
                                 },
                             }
                         }

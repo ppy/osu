@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Screens.Mvis.SideBar.Tabs;
 
@@ -11,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public class MvisUISettings : SettingsSubsection
     {
-        protected override string Header => "界面";
+        protected override LocalisableString Header => "界面";
         private readonly BindableFloat iR = new BindableFloat();
         private readonly BindableFloat iG = new BindableFloat();
         private readonly BindableFloat iB = new BindableFloat();

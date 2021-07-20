@@ -27,9 +27,10 @@ namespace osu.Game.Overlays.KeyBinding
             Add(new InGameKeyBindingsSubsection(manager));
             Add(new EditorKeyBindingsSubsection(manager));
         }
+
         private class MvisBindingsSection : KeyBindingsSubsection
         {
-            protected override string Header => "Mvis播放器";
+            protected override LocalisableString Header => "Mvis播放器";
 
             public MvisBindingsSection(GlobalActionContainer manager)
                 : base(null)
@@ -37,6 +38,7 @@ namespace osu.Game.Overlays.KeyBinding
                 Defaults = manager.MvisControlKeyBindings;
             }
         }
+
         private class DefaultBindingsSubsection : KeyBindingsSubsection
         {
             protected override LocalisableString Header => string.Empty;
