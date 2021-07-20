@@ -390,6 +390,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 base.LoadComplete();
 
                 Schedule(() => GetContainingInputManager().ChangeFocus(passwordTextbox));
+                passwordTextbox.OnCommit += (_, __) => JoinRequested?.Invoke(room, passwordTextbox.Text);
             }
         }
     }
