@@ -86,9 +86,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(false, false)]
         public void TestLegacyOffsetWithBeatmapColours(bool userHasCustomColours, bool useBeatmapSkin)
         {
-            TestBeatmap = new OsuCustomSkinWorkingBeatmap(audio, true, getHitCirclesWithLegacyOffsets());
-            base.TestBeatmapComboColours(userHasCustomColours, useBeatmapSkin);
-
+            PrepareBeatmap(() => new OsuCustomSkinWorkingBeatmap(audio, true, getHitCirclesWithLegacyOffsets()));
+            ConfigureTest(useBeatmapSkin, true, userHasCustomColours);
             assertCorrectObjectComboColours("is beatmap skin colours with legacy offsets applied",
                 TestBeatmapSkin.Colours,
                 (i, obj) => i + 1 + obj.LegacyBeatmapComboOffset);
@@ -98,9 +97,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(false)]
         public void TestLegacyOffsetWithIgnoredBeatmapColours(bool useBeatmapSkin)
         {
-            TestBeatmap = new OsuCustomSkinWorkingBeatmap(audio, true, getHitCirclesWithLegacyOffsets());
-            base.TestBeatmapComboColoursOverride(useBeatmapSkin);
-
+            PrepareBeatmap(() => new OsuCustomSkinWorkingBeatmap(audio, true, getHitCirclesWithLegacyOffsets()));
+            ConfigureTest(useBeatmapSkin, false, true);
             assertCorrectObjectComboColours("is user skin colours without legacy offsets applied",
                 TestSkin.Colours,
                 (i, _) => i + 1);
