@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using osu.Game.Beatmaps;
@@ -155,7 +156,8 @@ namespace osu.Game.Scoring
         public long? OnlineScoreID { get; set; }
 
         [JsonIgnore]
-        public DateTimeOffset Date { get; set; }
+        [CanBeNull] // may be null in cases of autoplay.
+        public DateTimeOffset? Date { get; set; }
 
         [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics = new Dictionary<HitResult, int>();
