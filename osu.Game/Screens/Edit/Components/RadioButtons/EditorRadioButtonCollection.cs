@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Components.RadioButtons
 {
-    public class RadioButtonCollection : CompositeDrawable
+    public class EditorRadioButtonCollection : CompositeDrawable
     {
         private IReadOnlyList<RadioButton> items;
 
@@ -28,13 +28,13 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             }
         }
 
-        private readonly FlowContainer<DrawableRadioButton> buttonContainer;
+        private readonly FlowContainer<EditorRadioButton> buttonContainer;
 
-        public RadioButtonCollection()
+        public EditorRadioButtonCollection()
         {
             AutoSizeAxes = Axes.Y;
 
-            InternalChild = buttonContainer = new FillFlowContainer<DrawableRadioButton>
+            InternalChild = buttonContainer = new FillFlowContainer<EditorRadioButton>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
                     currentlySelected = null;
             };
 
-            buttonContainer.Add(new DrawableRadioButton(button));
+            buttonContainer.Add(new EditorRadioButton(button));
         }
     }
 }

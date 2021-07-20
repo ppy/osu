@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("create mods", () =>
             {
                 original = new OsuModDoubleTime();
-                copy = (OsuModDoubleTime)original.CreateCopy();
+                copy = (OsuModDoubleTime)original.DeepClone();
             });
 
             AddStep("change property", () => original.SpeedChange.Value = 2);
@@ -106,7 +106,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("create mods", () =>
             {
                 original = new MultiMod(new OsuModDoubleTime());
-                copy = (MultiMod)original.CreateCopy();
+                copy = (MultiMod)original.DeepClone();
             });
 
             AddStep("change property", () => ((OsuModDoubleTime)original.Mods[0]).SpeedChange.Value = 2);

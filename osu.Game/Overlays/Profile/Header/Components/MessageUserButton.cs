@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 using osuTK;
 
@@ -17,7 +18,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         public readonly Bindable<User> User = new Bindable<User>();
 
-        public override LocalisableString TooltipText => "send message";
+        public override LocalisableString TooltipText => UsersStrings.CardSendMessage;
 
         [Resolved(CanBeNull = true)]
         private ChannelManager channelManager { get; set; }

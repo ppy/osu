@@ -152,7 +152,7 @@ namespace osu.Game.Tests.Visual.Playlists
                     onSuccess?.Invoke(room);
             }
 
-            public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => throw new NotImplementedException();
+            public void JoinRoom(Room room, string password, Action<Room> onSuccess = null, Action<string> onError = null) => throw new NotImplementedException();
 
             public void PartRoom() => throw new NotImplementedException();
         }

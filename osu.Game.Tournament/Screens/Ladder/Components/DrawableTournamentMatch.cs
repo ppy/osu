@@ -303,6 +303,15 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             Match.LosersProgression.Value = null;
 
             ladderInfo.Matches.Remove(Match);
+
+            foreach (var m in ladderInfo.Matches)
+            {
+                if (m.Progression.Value == Match)
+                    m.Progression.Value = null;
+
+                if (m.LosersProgression.Value == Match)
+                    m.LosersProgression.Value = null;
+            }
         }
     }
 }

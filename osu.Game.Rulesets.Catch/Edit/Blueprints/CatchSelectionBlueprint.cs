@@ -19,9 +19,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
         {
             get
             {
-                float x = HitObject.OriginalX;
-                float y = HitObjectContainer.PositionAtTime(HitObject.StartTime);
-                return HitObjectContainer.ToScreenSpace(new Vector2(x, y + HitObjectContainer.DrawHeight));
+                Vector2 position = CatchHitObjectUtils.GetStartPosition(HitObjectContainer, HitObject);
+                return HitObjectContainer.ToScreenSpace(position + new Vector2(0, HitObjectContainer.DrawHeight));
             }
         }
 
