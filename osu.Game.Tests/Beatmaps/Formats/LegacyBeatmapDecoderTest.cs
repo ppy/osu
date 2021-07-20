@@ -14,6 +14,8 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.IO;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
@@ -308,7 +310,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
-        public void TestDecodeLegacyBeatmapComboOffsets()
+        public void TestDecodeBeatmapComboOffsetsOsu()
         {
             var decoder = new LegacyBeatmapDecoder();
 
@@ -321,12 +323,35 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 new OsuBeatmapProcessor(converted).PreProcess();
                 new OsuBeatmapProcessor(converted).PostProcess();
 
-                Assert.AreEqual(4, ((IHasLegacyBeatmapComboOffset)converted.HitObjects.ElementAt(0)).LegacyBeatmapComboIndex);
-                Assert.AreEqual(5, ((IHasLegacyBeatmapComboOffset)converted.HitObjects.ElementAt(2)).LegacyBeatmapComboIndex);
-                Assert.AreEqual(5, ((IHasLegacyBeatmapComboOffset)converted.HitObjects.ElementAt(4)).LegacyBeatmapComboIndex);
-                Assert.AreEqual(6, ((IHasLegacyBeatmapComboOffset)converted.HitObjects.ElementAt(6)).LegacyBeatmapComboIndex);
-                Assert.AreEqual(11, ((IHasLegacyBeatmapComboOffset)converted.HitObjects.ElementAt(8)).LegacyBeatmapComboIndex);
-                Assert.AreEqual(14, ((IHasLegacyBeatmapComboOffset)converted.HitObjects.ElementAt(11)).LegacyBeatmapComboIndex);
+                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).BeatmapSkinComboIndex);
+                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).BeatmapSkinComboIndex);
+                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).BeatmapSkinComboIndex);
+                Assert.AreEqual(6, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).BeatmapSkinComboIndex);
+                Assert.AreEqual(11, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).BeatmapSkinComboIndex);
+                Assert.AreEqual(14, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).BeatmapSkinComboIndex);
+            }
+        }
+
+        [Test]
+        public void TestDecodeBeatmapComboOffsetsCatch()
+        {
+            var decoder = new LegacyBeatmapDecoder();
+
+            using (var resStream = TestResources.OpenResource("hitobject-combo-offset.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var beatmap = decoder.Decode(stream);
+
+                var converted = new CatchBeatmapConverter(beatmap, new CatchRuleset()).Convert();
+                new CatchBeatmapProcessor(converted).PreProcess();
+                new CatchBeatmapProcessor(converted).PostProcess();
+
+                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).BeatmapSkinComboIndex);
+                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).BeatmapSkinComboIndex);
+                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).BeatmapSkinComboIndex);
+                Assert.AreEqual(6, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).BeatmapSkinComboIndex);
+                Assert.AreEqual(11, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).BeatmapSkinComboIndex);
+                Assert.AreEqual(14, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).BeatmapSkinComboIndex);
             }
         }
 

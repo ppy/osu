@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             ConfigureTest(useBeatmapSkin, true, userHasCustomColours);
             assertCorrectObjectComboColours("is beatmap skin colours with legacy offsets applied",
                 TestBeatmapSkin.Colours,
-                (i, obj) => i + 1 + obj.LegacyBeatmapComboOffset);
+                (i, obj) => i + 1 + obj.ComboOffset);
         }
 
         [TestCase(true)]
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     StartTime = i,
                     Position = new Vector2(256, 192),
                     NewCombo = true,
-                    LegacyBeatmapComboOffset = i,
+                    ComboOffset = i,
                 });
             }
 

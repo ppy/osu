@@ -82,6 +82,7 @@ namespace osu.Game.Tests.Gameplay
         private class TestHitObjectWithCombo : ConvertHitObject, IHasComboInformation
         {
             public bool NewCombo { get; set; }
+            public int ComboOffset => 0;
 
             public Bindable<int> IndexInCurrentComboBindable { get; } = new Bindable<int>();
 
@@ -98,6 +99,8 @@ namespace osu.Game.Tests.Gameplay
                 get => ComboIndexBindable.Value;
                 set => ComboIndexBindable.Value = value;
             }
+
+            public int BeatmapSkinComboIndex { get; set; }
 
             public Bindable<bool> LastInComboBindable { get; } = new Bindable<bool>();
 

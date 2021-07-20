@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition, IHasLegacyBeatmapComboOffset
+    public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition
     {
         /// <summary>
         /// The radius of hit objects (ie. the radius of a <see cref="HitCircle"/>).
@@ -73,6 +73,14 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public virtual bool NewCombo { get; set; }
 
+        public readonly Bindable<int> ComboOffsetBindable = new Bindable<int>();
+
+        public int ComboOffset
+        {
+            get => ComboOffsetBindable.Value;
+            set => ComboOffsetBindable.Value = value;
+        }
+
         public Bindable<int> IndexInCurrentComboBindable { get; } = new Bindable<int>();
 
         public virtual int IndexInCurrentCombo
@@ -89,6 +97,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => ComboIndexBindable.Value = value;
         }
 
+        public int BeatmapSkinComboIndex { get; set; }
+
         public Bindable<bool> LastInComboBindable { get; } = new Bindable<bool>();
 
         public bool LastInCombo
@@ -96,10 +106,6 @@ namespace osu.Game.Rulesets.Osu.Objects
             get => LastInComboBindable.Value;
             set => LastInComboBindable.Value = value;
         }
-
-        public int LegacyBeatmapComboOffset { get; set; }
-
-        public int LegacyBeatmapComboIndex { get; set; }
 
         protected OsuHitObject()
         {
