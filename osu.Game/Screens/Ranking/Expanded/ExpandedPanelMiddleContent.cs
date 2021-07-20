@@ -227,8 +227,8 @@ namespace osu.Game.Screens.Ranking.Expanded
                 }
             });
 
-            if (score.Date != null)
-                AddInternal(new PlayedOnText(score.Date.Value));
+            if (score.Date != default)
+                AddInternal(new PlayedOnText(score.Date));
 
             if (score.Mods.Any())
             {
