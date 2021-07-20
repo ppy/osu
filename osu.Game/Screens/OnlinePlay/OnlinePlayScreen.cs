@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -222,7 +223,9 @@ namespace osu.Game.Screens.OnlinePlay
             this.FadeIn(250);
             this.ScaleTo(1, 250, Easing.OutSine);
 
-            screenStack.CurrentScreen?.OnResuming(last);
+            Debug.Assert(screenStack.CurrentScreen != null);
+            screenStack.CurrentScreen.OnResuming(last);
+
             base.OnResuming(last);
 
             UpdatePollingRate(isIdle.Value);
@@ -233,14 +236,16 @@ namespace osu.Game.Screens.OnlinePlay
             this.ScaleTo(1.1f, 250, Easing.InSine);
             this.FadeOut(250);
 
-            screenStack.CurrentScreen?.OnSuspending(next);
+            Debug.Assert(screenStack.CurrentScreen != null);
+            screenStack.CurrentScreen.OnSuspending(next);
 
             UpdatePollingRate(isIdle.Value);
         }
 
         public override bool OnExiting(IScreen next)
         {
-            if (screenStack.CurrentScreen?.OnExiting(next) == true)
+            var subScreen = screenStack.CurrentScreen as Drawable;
+            if (subScreen?.IsLoaded == true && screenStack.CurrentScreen.OnExiting(next))
                 return true;
 
             RoomManager.PartRoom();
