@@ -38,6 +38,7 @@ namespace osu.Game.Beatmaps
                 {
                     obj.IndexInCurrentCombo = 0;
                     obj.ComboIndex = (lastObj?.ComboIndex ?? 0) + 1;
+                    obj.BeatmapSkinComboIndex = (lastObj?.BeatmapSkinComboIndex ?? 0) + obj.ComboOffset + 1;
 
                     if (lastObj != null)
                         lastObj.LastInCombo = true;
@@ -46,6 +47,7 @@ namespace osu.Game.Beatmaps
                 {
                     obj.IndexInCurrentCombo = lastObj.IndexInCurrentCombo + 1;
                     obj.ComboIndex = lastObj.ComboIndex;
+                    obj.BeatmapSkinComboIndex = lastObj.BeatmapSkinComboIndex;
                 }
 
                 lastObj = obj;

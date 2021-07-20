@@ -63,12 +63,7 @@ namespace osu.Game.Skinning
         }
 
         protected override IBindable<Color4> GetComboColour(IHasComboColours source, int comboIndex, IHasComboInformation combo)
-        {
-            if (combo is IHasLegacyBeatmapComboOffset legacyBeatmapCombo)
-                return base.GetComboColour(source, legacyBeatmapCombo.LegacyBeatmapComboIndex, combo);
-
-            return base.GetComboColour(source, comboIndex, combo);
-        }
+            => base.GetComboColour(source, combo.BeatmapSkinComboIndex, combo);
 
         public override ISample GetSample(ISampleInfo sampleInfo)
         {

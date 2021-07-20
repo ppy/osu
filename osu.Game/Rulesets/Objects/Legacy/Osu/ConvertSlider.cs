@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
     /// <summary>
     /// Legacy osu! Slider-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class ConvertSlider : Legacy.ConvertSlider, IHasPosition, IHasCombo, IHasLegacyBeatmapComboOffset
+    internal sealed class ConvertSlider : Legacy.ConvertSlider, IHasPosition, IHasCombo
     {
         public Vector2 Position { get; set; }
 
@@ -19,8 +19,6 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
 
         public bool NewCombo { get; set; }
 
-        public int LegacyBeatmapComboOffset { get; set; }
-
-        int IHasLegacyBeatmapComboOffset.LegacyBeatmapComboIndex { get; set; }
+        public int ComboOffset { get; set; }
     }
 }

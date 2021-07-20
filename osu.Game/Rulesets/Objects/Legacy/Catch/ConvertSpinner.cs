@@ -17,5 +17,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
         public float X => 256; // Required for CatchBeatmapConverter
 
         public bool NewCombo { get; set; }
+
+        public int ComboOffset { get; set; }
     }
 }

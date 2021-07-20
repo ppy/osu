@@ -27,6 +27,12 @@ namespace osu.Game.Rulesets.Objects.Types
         int ComboIndex { get; set; }
 
         /// <summary>
+        /// A <see cref="ComboIndex"/> with the <see cref="IHasCombo.ComboOffset"/> of this and all previous hitobjects applied to it.
+        /// This is used primarily for beatmap skins during combo colour retrieval, rather than the regular <see cref="ComboIndex"/>.
+        /// </summary>
+        int BeatmapSkinComboIndex { get; set; }
+
+        /// <summary>
         /// Whether the HitObject starts a new combo.
         /// </summary>
         new bool NewCombo { get; set; }

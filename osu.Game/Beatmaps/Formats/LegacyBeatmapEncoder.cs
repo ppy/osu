@@ -289,11 +289,10 @@ namespace osu.Game.Beatmaps.Formats
 
             if (hitObject is IHasCombo combo)
             {
+                type = (LegacyHitObjectType)(combo.ComboOffset << 4);
+
                 if (combo.NewCombo)
                     type |= LegacyHitObjectType.NewCombo;
-
-                if (hitObject is IHasLegacyBeatmapComboOffset comboOffset)
-                    type |= (LegacyHitObjectType)(comboOffset.LegacyBeatmapComboOffset << 4);
             }
 
             switch (hitObject)
