@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
-        public void TestWithNullDate()
+        public void TestWithDefaultDate()
         {
             AddStep("show autoplay score", () =>
             {
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 {
                     Mods = mods,
                     Beatmap = beatmap,
-                    Date = null,
+                    Date = default,
                 });
             });
 
