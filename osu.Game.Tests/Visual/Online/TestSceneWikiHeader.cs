@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestWikiHeader()
         {
-            AddAssert("Current is index", () => checkCurrent("index"));
+            AddAssert("Current is index", () => checkCurrent(WikiHeader.IndexPageString));
 
             AddStep("Change wiki page data", () => wikiPageData.Value = new APIWikiPage
             {
@@ -54,8 +54,8 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Current is welcome", () => checkCurrent("Welcome"));
             AddAssert("Check breadcrumb", checkBreadcrumb);
 
-            AddStep("Change current to index", () => header.Current.Value = "index");
-            AddAssert("Current is index", () => checkCurrent("index"));
+            AddStep("Change current to index", () => header.Current.Value = WikiHeader.IndexPageString);
+            AddAssert("Current is index", () => checkCurrent(WikiHeader.IndexPageString));
 
             AddStep("Change wiki page data", () => wikiPageData.Value = new APIWikiPage
             {
@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Check breadcrumb", checkBreadcrumb);
         }
 
-        private bool checkCurrent(string expectedCurrent) => header.Current.Value == expectedCurrent;
+        private bool checkCurrent(LocalisableString expectedCurrent) => header.Current.Value == expectedCurrent;
 
         private bool checkBreadcrumb()
         {
