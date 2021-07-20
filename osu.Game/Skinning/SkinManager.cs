@@ -30,6 +30,13 @@ using osu.Game.IO.Archives;
 
 namespace osu.Game.Skinning
 {
+    /// <summary>
+    /// Handles the storage and retrieval of <see cref="Skin"/>s.
+    /// </summary>
+    /// <remarks>
+    /// This is also exposed and cached as <see cref="ISkinSource"/> to allow for any component to potentially have skinning support.
+    /// For gameplay components, see <see cref="RulesetSkinProvidingContainer"/> which adds extra legacy and toggle logic that may affect the lookup process.
+    /// </remarks>
     [ExcludeFromDynamicCompile]
     public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>, ISkinSource, IStorageResourceProvider
     {
@@ -39,7 +46,7 @@ namespace osu.Game.Skinning
 
         private readonly IResourceStore<byte[]> resources;
 
-        public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>(new DefaultSkin(null));
+        public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>();
         public readonly Bindable<SkinInfo> CurrentSkinInfo = new Bindable<SkinInfo>(SkinInfo.Default) { Default = SkinInfo.Default };
 
         public override IEnumerable<string> HandledExtensions => new[] { ".osk" };
@@ -48,6 +55,16 @@ namespace osu.Game.Skinning
 
         protected override string ImportFromStablePath => "Skins";
 
+        /// <summary>
+        /// The default skin.
+        /// </summary>
+        public Skin DefaultSkin { get; }
+
+        /// <summary>
+        /// The default legacy skin.
+        /// </summary>
+        public Skin DefaultLegacySkin { get; }
+
         public SkinManager(Storage storage, DatabaseContextFactory contextFactory, GameHost host, IResourceStore<byte[]> resources, AudioManager audio)
             : base(storage, contextFactory, new SkinStore(contextFactory, storage), host)
         {
@@ -55,7 +72,12 @@ namespace osu.Game.Skinning
             this.host = host;
             this.resources = resources;
 
+            DefaultLegacySkin = new DefaultLegacySkin(this);
+            DefaultSkin = new DefaultSkin(this);
+
             CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = GetSkin(skin.NewValue);
+
+            CurrentSkin.Value = DefaultSkin;
             CurrentSkin.ValueChanged += skin =>
             {
                 if (skin.NewValue.SkinInfo != CurrentSkinInfo.Value)
@@ -74,8 +96,8 @@ namespace osu.Game.Skinning
         public List<SkinInfo> GetAllUsableSkins()
         {
             var userSkins = GetAllUserSkins();
-            userSkins.Insert(0, SkinInfo.Default);
-            userSkins.Insert(1, DefaultLegacySkin.Info);
+            userSkins.Insert(0, DefaultSkin.SkinInfo);
+            userSkins.Insert(1, DefaultLegacySkin.SkinInfo);
             return userSkins;
         }
 
@@ -103,6 +125,8 @@ namespace osu.Game.Skinning
 
         private const string unknown_creator_string = "Unknown";
 
+        protected override bool HasCustomHashFunction => true;
+
         protected override string ComputeHash(SkinInfo item, ArchiveReader reader = null)
         {
             // we need to populate early to create a hash based off skin.ini contents
@@ -120,16 +144,16 @@ namespace osu.Game.Skinning
             return base.ComputeHash(item, reader);
         }
 
-        protected override async Task Populate(SkinInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
+        protected override Task Populate(SkinInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
-            await base.Populate(model, archive, cancellationToken).ConfigureAwait(false);
-
             var instance = GetSkin(model);
 
             model.InstantiationInfo ??= instance.GetType().GetInvariantInstantiationInfo();
 
             if (model.Name?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true)
                 populateMetadata(model, instance);
+
+            return Task.CompletedTask;
         }
 
         private void populateMetadata(SkinInfo item, Skin instance)
@@ -204,13 +228,50 @@ namespace osu.Game.Skinning
 
         public event Action SourceChanged;
 
-        public Drawable GetDrawableComponent(ISkinComponent component) => CurrentSkin.Value.GetDrawableComponent(component);
+        public Drawable GetDrawableComponent(ISkinComponent component) => lookupWithFallback(s => s.GetDrawableComponent(component));
 
-        public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => CurrentSkin.Value.GetTexture(componentName, wrapModeS, wrapModeT);
+        public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => lookupWithFallback(s => s.GetTexture(componentName, wrapModeS, wrapModeT));
 
-        public ISample GetSample(ISampleInfo sampleInfo) => CurrentSkin.Value.GetSample(sampleInfo);
+        public ISample GetSample(ISampleInfo sampleInfo) => lookupWithFallback(s => s.GetSample(sampleInfo));
 
-        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => CurrentSkin.Value.GetConfig<TLookup, TValue>(lookup);
+        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => lookupWithFallback(s => s.GetConfig<TLookup, TValue>(lookup));
+
+        public ISkin FindProvider(Func<ISkin, bool> lookupFunction)
+        {
+            foreach (var source in AllSources)
+            {
+                if (lookupFunction(source))
+                    return source;
+            }
+
+            return null;
+        }
+
+        public IEnumerable<ISkin> AllSources
+        {
+            get
+            {
+                yield return CurrentSkin.Value;
+
+                if (CurrentSkin.Value is LegacySkin && CurrentSkin.Value != DefaultLegacySkin)
+                    yield return DefaultLegacySkin;
+
+                if (CurrentSkin.Value != DefaultSkin)
+                    yield return DefaultSkin;
+            }
+        }
+
+        private T lookupWithFallback<T>(Func<ISkin, T> lookupFunction)
+            where T : class
+        {
+            foreach (var source in AllSources)
+            {
+                if (lookupFunction(source) is T skinSourced)
+                    return skinSourced;
+            }
+
+            return null;
+        }
 
         #region IResourceStorageProvider
 

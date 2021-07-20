@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods, double clockRate) => new Skill[]
         {
             new Colour(mods),
             new Rhythm(mods),

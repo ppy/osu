@@ -123,18 +123,14 @@ namespace osu.Game.Tests.Gameplay
 
             public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
+            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
+
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
             {
                 switch (lookup)
                 {
-                    case GlobalSkinColours global:
-                        switch (global)
-                        {
-                            case GlobalSkinColours.ComboColours:
-                                return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(ComboColours));
-                        }
-
-                        break;
+                    case SkinComboColourLookup comboColour:
+                        return SkinUtils.As<TValue>(new Bindable<Color4>(ComboColours[comboColour.ColourIndex % ComboColours.Count]));
                 }
 
                 throw new NotImplementedException();

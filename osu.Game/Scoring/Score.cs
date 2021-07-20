@@ -2,12 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Replays;
+using osu.Game.Utils;
 
 namespace osu.Game.Scoring
 {
-    public class Score
+    public class Score : IDeepCloneable<Score>
     {
         public ScoreInfo ScoreInfo = new ScoreInfo();
         public Replay Replay = new Replay();
+
+        public Score DeepClone()
+        {
+            return new Score
+            {
+                ScoreInfo = ScoreInfo.DeepClone(),
+                Replay = Replay.DeepClone(),
+            };
+        }
     }
 }

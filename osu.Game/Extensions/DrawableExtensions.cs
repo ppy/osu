@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Threading;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Extensions
@@ -56,6 +57,9 @@ namespace osu.Game.Extensions
             component.Scale = info.Scale;
             component.Anchor = info.Anchor;
             component.Origin = info.Origin;
+
+            if (component is ISkinnableDrawable skinnable)
+                skinnable.UsesFixedAnchor = info.UsesFixedAnchor;
 
             if (component is Container container)
             {

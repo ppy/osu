@@ -24,13 +24,15 @@ using osu.Game.Overlays.Chat.Tabs;
 using osuTK.Input;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Localisation;
 using osu.Game.Localisation;
 using osu.Game.Online;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
+    public class ChatOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, IKeyBindingHandler<PlatformAction>
     {
         public string IconTexture => "Icons/Hexacons/messaging";
         public LocalisableString Title => ChatStrings.HeaderTitle;
@@ -368,6 +370,30 @@ namespace osu.Game.Overlays
             }
 
             return base.OnKeyDown(e);
+        }
+
+        public bool OnPressed(PlatformAction action)
+        {
+            switch (action.ActionType)
+            {
+                case PlatformActionType.TabNew:
+                    ChannelTabControl.SelectChannelSelectorTab();
+                    return true;
+
+                case PlatformActionType.TabRestore:
+                    channelManager.JoinLastClosedChannel();
+                    return true;
+
+                case PlatformActionType.DocumentClose:
+                    channelManager.LeaveChannel(channelManager.CurrentChannel.Value);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(PlatformAction action)
+        {
         }
 
         public override bool AcceptsFocus => true;

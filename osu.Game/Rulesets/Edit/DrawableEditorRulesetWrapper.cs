@@ -1,9 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit;
@@ -52,15 +54,21 @@ namespace osu.Game.Rulesets.Edit
             if (changeHandler != null)
             {
                 // for now only regenerate replay on a finalised state change, not HitObjectUpdated.
-                changeHandler.OnStateChange += updateReplay;
+                changeHandler.OnStateChange += () => Scheduler.AddOnce(regenerateAutoplay);
             }
             else
             {
-                beatmap.HitObjectUpdated += _ => updateReplay();
+                beatmap.HitObjectUpdated += _ => Scheduler.AddOnce(regenerateAutoplay);
             }
+
+            Scheduler.AddOnce(regenerateAutoplay);
         }
 
-        private void updateReplay() => Scheduler.AddOnce(drawableRuleset.RegenerateAutoplay);
+        private void regenerateAutoplay()
+        {
+            var autoplayMod = drawableRuleset.Mods.OfType<ModAutoplay>().Single();
+            drawableRuleset.SetReplayScore(autoplayMod.CreateReplayScore(drawableRuleset.Beatmap, drawableRuleset.Mods));
+        }
 
         private void addHitObject(HitObject hitObject)
         {

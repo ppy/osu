@@ -7,13 +7,28 @@ namespace osu.Game.Localisation
 {
     public static class CommonStrings
     {
-        private const string prefix = "osu.Game.Localisation.Common";
+        private const string prefix = @"osu.Game.Resources.Localisation.Common";
 
         /// <summary>
         /// "Cancel"
         /// </summary>
-        public static LocalisableString Cancel => new TranslatableString(getKey("cancel"), "Cancel");
+        public static LocalisableString Cancel => new TranslatableString(getKey(@"cancel"), @"Cancel");
 
-        private static string getKey(string key) => $"{prefix}:{key}";
+        /// <summary>
+        /// "Enabled"
+        /// </summary>
+        public static LocalisableString Enabled => new TranslatableString(getKey(@"enabled"), @"Enabled");
+
+        /// <summary>
+        /// "Width"
+        /// </summary>
+        public static LocalisableString Width => new TranslatableString(getKey(@"width"), @"Width");
+
+        /// <summary>
+        /// "Height"
+        /// </summary>
+        public static LocalisableString Height => new TranslatableString(getKey(@"height"), @"Height");
+
+        private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

@@ -13,7 +13,14 @@ namespace osu.Game.Rulesets.Osu.Edit
     {
         private readonly List<ICheck> checks = new List<ICheck>
         {
-            new CheckOffscreenObjects()
+            // Compose
+            new CheckOffscreenObjects(),
+            new CheckTooShortSpinners(),
+
+            // Spread
+            new CheckTimeDistanceEquality(),
+            new CheckLowDiffOverlaps(),
+            new CheckTooShortSliders(),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

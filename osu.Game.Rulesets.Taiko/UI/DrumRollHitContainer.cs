@@ -1,9 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Performance;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 
@@ -11,6 +8,11 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     internal class DrumRollHitContainer : ScrollingHitObjectContainer
     {
+        // TODO: this usage is buggy.
+        // Because `LifetimeStart` is set based on scrolling, lifetime is not same as the time when the object is created.
+        // If the `Update` override is removed, it breaks in an obscure way.
+        protected override bool RemoveRewoundEntry => true;
+
         protected override void Update()
         {
             base.Update();
@@ -22,15 +24,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                 if (Time.Current <= flyingHit.HitObject.StartTime)
                     Remove(flyingHit);
             }
-        }
-
-        protected override void OnChildLifetimeBoundaryCrossed(LifetimeBoundaryCrossedEvent e)
-        {
-            base.OnChildLifetimeBoundaryCrossed(e);
-
-            // ensure all old hits are removed on becoming alive (may miss being in the AliveInternalChildren list above).
-            if (e.Kind == LifetimeBoundaryKind.Start && e.Direction == LifetimeBoundaryCrossingDirection.Backward)
-                Remove((DrawableHitObject)e.Child);
         }
     }
 }

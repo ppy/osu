@@ -6,19 +6,25 @@ using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
@@ -26,7 +32,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>, IFilterable, IHasContextMenu
+    public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>, IFilterable, IHasContextMenu, IHasPopover, IKeyBindingHandler<GlobalAction>
     {
         public const float SELECTION_BORDER_WIDTH = 4;
         private const float corner_radius = 5;
@@ -45,6 +51,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private Bindable<Room> selectedRoom { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private LoungeSubScreen lounge { get; set; }
 
         public readonly Room Room;
 
@@ -90,6 +102,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         }
 
         public bool FilteringActive { get; set; }
+
+        private PasswordProtectedIcon passwordIcon;
+
+        private readonly Bindable<bool> hasPassword = new Bindable<bool>();
 
         public DrawableRoom(Room room)
         {
@@ -200,6 +216,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     },
                                 },
                             },
+                            passwordIcon = new PasswordProtectedIcon { Alpha = 0 }
                         },
                     },
                 },
@@ -222,9 +239,68 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 this.FadeInFromZero(transition_duration);
             else
                 Alpha = 0;
+
+            hasPassword.BindTo(Room.HasPassword);
+            hasPassword.BindValueChanged(v => passwordIcon.Alpha = v.NewValue ? 1 : 0, true);
+        }
+
+        public Popover GetPopover() => new PasswordEntryPopover(Room) { JoinRequested = lounge.Join };
+
+        public MenuItem[] ContextMenuItems => new MenuItem[]
+        {
+            new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
+            {
+                parentScreen?.OpenNewRoom(Room.DeepClone());
+            })
+        };
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (selectedRoom.Value != Room)
+                return false;
+
+            switch (action)
+            {
+                case GlobalAction.Select:
+                    Click();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => state == SelectionState.Selected;
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (selectedRoom.Value != Room)
+                return true;
+
+            return base.OnMouseDown(e);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (Room != selectedRoom.Value)
+            {
+                selectedRoom.Value = Room;
+                return true;
+            }
+
+            if (Room.HasPassword.Value)
+            {
+                this.ShowPopover();
+                return true;
+            }
+
+            lounge?.Join(Room, null);
+
+            return base.OnClick(e);
+        }
 
         private class RoomName : OsuSpriteText
         {
@@ -238,12 +314,83 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        public MenuItem[] ContextMenuItems => new MenuItem[]
+        public class PasswordProtectedIcon : CompositeDrawable
         {
-            new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
             {
-                parentScreen?.OpenNewRoom(Room.CreateCopy());
-            })
-        };
+                Anchor = Anchor.TopRight;
+                Origin = Anchor.TopRight;
+
+                Size = new Vector2(32);
+
+                InternalChildren = new Drawable[]
+                {
+                    new Box
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopCentre,
+                        Colour = colours.Gray5,
+                        Rotation = 45,
+                        RelativeSizeAxes = Axes.Both,
+                        Width = 2,
+                    },
+                    new SpriteIcon
+                    {
+                        Icon = FontAwesome.Solid.Lock,
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        Margin = new MarginPadding(6),
+                        Size = new Vector2(14),
+                    }
+                };
+            }
+        }
+
+        public class PasswordEntryPopover : OsuPopover
+        {
+            private readonly Room room;
+
+            public Action<Room, string> JoinRequested;
+
+            public PasswordEntryPopover(Room room)
+            {
+                this.room = room;
+            }
+
+            private OsuPasswordTextBox passwordTextbox;
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Child = new FillFlowContainer
+                {
+                    Margin = new MarginPadding(10),
+                    Spacing = new Vector2(5),
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Children = new Drawable[]
+                    {
+                        passwordTextbox = new OsuPasswordTextBox
+                        {
+                            Width = 200,
+                        },
+                        new TriangleButton
+                        {
+                            Width = 80,
+                            Text = "Join Room",
+                            Action = () => JoinRequested?.Invoke(room, passwordTextbox.Text)
+                        }
+                    }
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Schedule(() => GetContainingInputManager().ChangeFocus(passwordTextbox));
+            }
+        }
     }
 }

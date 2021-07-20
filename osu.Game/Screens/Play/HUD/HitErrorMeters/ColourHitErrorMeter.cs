@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -24,7 +25,13 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             InternalChild = judgementsFlow = new JudgementFlow();
         }
 
-        protected override void OnNewJudgement(JudgementResult judgement) => judgementsFlow.Push(GetColourForHitResult(judgement.Type));
+        protected override void OnNewJudgement(JudgementResult judgement)
+        {
+            if (!judgement.Type.IsScorable() || judgement.Type.IsBonus())
+                return;
+
+            judgementsFlow.Push(GetColourForHitResult(judgement.Type));
+        }
 
         private class JudgementFlow : FillFlowContainer<HitErrorCircle>
         {
@@ -53,7 +60,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
-        private class HitErrorCircle : Container
+        internal class HitErrorCircle : Container
         {
             public bool IsRemoved { get; private set; }
 

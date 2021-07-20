@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -10,7 +11,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Wiki;
-using osu.Game.Overlays.Wiki.Markdown;
 
 namespace osu.Game.Overlays
 {
@@ -30,6 +30,8 @@ namespace osu.Game.Overlays
         private CancellationTokenSource cancellationToken;
 
         private bool displayUpdateRequired = true;
+
+        private WikiArticlePage articlePage;
 
         public WikiOverlay()
             : base(OverlayColourScheme.Orange, false)
@@ -82,6 +84,17 @@ namespace osu.Game.Overlays
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (articlePage != null)
+            {
+                articlePage.SidebarContainer.Height = DrawHeight;
+                articlePage.SidebarContainer.Y = Math.Clamp(ScrollFlow.Current - Header.DrawHeight, 0, Math.Max(ScrollFlow.ScrollContent.DrawHeight - DrawHeight - Header.DrawHeight, 0));
+            }
+        }
+
         private void onPathChanged(ValueChangedEvent<string> e)
         {
             cancellationToken?.Cancel();
@@ -92,7 +105,7 @@ namespace osu.Game.Overlays
             Loading.Show();
 
             request.Success += response => Schedule(() => onSuccess(response));
-            request.Failure += _ => Schedule(() => LoadDisplay(Empty()));
+            request.Failure += _ => Schedule(onFail);
 
             api.PerformAsync(request);
         }
@@ -115,21 +128,14 @@ namespace osu.Game.Overlays
             }
             else
             {
-                LoadDisplay(new WikiMarkdownContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    CurrentPath = $@"{api.WebsiteRootUrl}/wiki/{path.Value}/",
-                    Text = response.Markdown,
-                    DocumentMargin = new MarginPadding(0),
-                    DocumentPadding = new MarginPadding
-                    {
-                        Vertical = 20,
-                        Left = 30,
-                        Right = 50,
-                    },
-                });
+                LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/{path.Value}/", response.Markdown));
             }
+        }
+
+        private void onFail()
+        {
+            LoadDisplay(articlePage = new WikiArticlePage($@"{api.WebsiteRootUrl}/wiki/",
+                $"Something went wrong when trying to fetch page \"{path.Value}\".\n\n[Return to the main page](Main_Page)."));
         }
 
         private void showParentPage()

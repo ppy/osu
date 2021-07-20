@@ -5,19 +5,22 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
     public abstract class ManiaSelectionBlueprint<T> : HitObjectSelectionBlueprint<T>
         where T : ManiaHitObject
     {
-        public new DrawableManiaHitObject DrawableObject => (DrawableManiaHitObject)base.DrawableObject;
+        [Resolved]
+        private Playfield playfield { get; set; }
 
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
+
+        protected ScrollingHitObjectContainer HitObjectContainer => ((ManiaPlayfield)playfield).GetColumn(HitObject.Column).HitObjectContainer;
 
         protected ManiaSelectionBlueprint(T hitObject)
             : base(hitObject)
@@ -29,19 +32,13 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             base.Update();
 
-            Position = Parent.ToLocalSpace(DrawableObject.ToScreenSpace(Vector2.Zero));
-        }
+            var anchor = scrollingInfo.Direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+            Anchor = Origin = anchor;
+            foreach (var child in InternalChildren)
+                child.Anchor = child.Origin = anchor;
 
-        public override void Show()
-        {
-            DrawableObject.AlwaysAlive = true;
-            base.Show();
-        }
-
-        public override void Hide()
-        {
-            DrawableObject.AlwaysAlive = false;
-            base.Hide();
+            Position = Parent.ToLocalSpace(HitObjectContainer.ScreenSpacePositionAtTime(HitObject.StartTime)) - AnchorPosition;
+            Width = HitObjectContainer.DrawWidth;
         }
     }
 }

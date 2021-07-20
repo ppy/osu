@@ -8,8 +8,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Header.Components
@@ -18,13 +20,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         public readonly Bindable<User> User = new Bindable<User>();
 
-        public string TooltipText { get; }
+        public LocalisableString TooltipText { get; private set; }
 
         private OsuSpriteText levelText;
 
         public LevelBadge()
         {
-            TooltipText = "level";
+            TooltipText = UsersStrings.ShowStatsLevel("0");
         }
 
         [BackgroundDependencyLoader]
@@ -52,6 +54,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private void updateLevel(User user)
         {
             levelText.Text = user?.Statistics?.Level.Current.ToString() ?? "0";
+            TooltipText = UsersStrings.ShowStatsLevel(user?.Statistics?.Level.Current.ToString());
         }
     }
 }

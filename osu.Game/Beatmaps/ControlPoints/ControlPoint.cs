@@ -3,11 +3,12 @@
 
 using System;
 using osu.Game.Graphics;
+using osu.Game.Utils;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public abstract class ControlPoint : IComparable<ControlPoint>
+    public abstract class ControlPoint : IComparable<ControlPoint>, IDeepCloneable<ControlPoint>
     {
         /// <summary>
         /// The time at which the control point takes effect.
@@ -32,7 +33,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// Create an unbound copy of this control point.
         /// </summary>
-        public ControlPoint CreateCopy()
+        public ControlPoint DeepClone()
         {
             var copy = (ControlPoint)Activator.CreateInstance(GetType());
 

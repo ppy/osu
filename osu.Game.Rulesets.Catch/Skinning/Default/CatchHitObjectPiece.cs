@@ -15,6 +15,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
     {
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>();
         public readonly Bindable<bool> HyperDash = new Bindable<bool>();
+        public readonly Bindable<int> IndexInBeatmap = new Bindable<int>();
 
         [Resolved]
         protected IHasCatchObjectState ObjectState { get; private set; }
@@ -37,6 +38,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
 
             AccentColour.BindTo(ObjectState.AccentColour);
             HyperDash.BindTo(ObjectState.HyperDash);
+            IndexInBeatmap.BindTo(ObjectState.IndexInBeatmap);
 
             HyperDash.BindValueChanged(hyper =>
             {

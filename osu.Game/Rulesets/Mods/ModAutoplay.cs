@@ -7,22 +7,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Replays;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModAutoplay<T> : ModAutoplay, IApplicableToDrawableRuleset<T>
-        where T : HitObject
-    {
-        public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
-        {
-            drawableRuleset.SetReplayScore(CreateReplayScore(drawableRuleset.Beatmap, drawableRuleset.Mods));
-        }
-    }
-
-    public abstract class ModAutoplay : Mod, IApplicableFailOverride
+    public abstract class ModAutoplay : Mod, IApplicableFailOverride, ICreateReplay
     {
         public override string Name => "Autoplay";
         public override string Acronym => "AT";
@@ -34,6 +23,8 @@ namespace osu.Game.Rulesets.Mods
         public bool PerformFail() => false;
 
         public bool RestartOnFail => false;
+
+        public override bool UserPlayable => false;
 
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModFailCondition), typeof(ModNoFail) };
 

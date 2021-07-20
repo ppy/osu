@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
     public class LayoutSettings : SettingsSubsection
     {
-        protected override string Header => "Layout";
+        protected override LocalisableString Header => "Layout";
 
         private FillFlowContainer<SettingsSlider<float>> scalingSettings;
 
@@ -233,7 +233,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private class UIScaleSlider : OsuSliderBar<float>
         {
-            public override string TooltipText => base.TooltipText + "x";
+            public override LocalisableString TooltipText => base.TooltipText + "x";
         }
 
         private class ResolutionSettingsDropdown : SettingsDropdown<Size>

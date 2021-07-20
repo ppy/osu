@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Screens.Play;
@@ -22,6 +23,8 @@ namespace osu.Game.Skinning
 {
     public class DefaultSkin : Skin
     {
+        private readonly IStorageResourceProvider resources;
+
         public DefaultSkin(IStorageResourceProvider resources)
             : this(SkinInfo.Default, resources)
         {
@@ -31,12 +34,23 @@ namespace osu.Game.Skinning
         public DefaultSkin(SkinInfo skin, IStorageResourceProvider resources)
             : base(skin, resources)
         {
+            this.resources = resources;
             Configuration = new DefaultSkinConfiguration();
         }
 
         public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
 
-        public override ISample GetSample(ISampleInfo sampleInfo) => null;
+        public override ISample GetSample(ISampleInfo sampleInfo)
+        {
+            foreach (var lookup in sampleInfo.LookupNames)
+            {
+                var sample = resources.AudioManager.Samples.Get(lookup);
+                if (sample != null)
+                    return sample;
+            }
+
+            return null;
+        }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
@@ -123,10 +137,10 @@ namespace osu.Game.Skinning
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
+            // todo: this code is pulled from LegacySkin and should not exist.
+            // will likely change based on how databased storage of skin configuration goes.
             switch (lookup)
             {
-                // todo: this code is pulled from LegacySkin and should not exist.
-                // will likely change based on how databased storage of skin configuration goes.
                 case GlobalSkinColours global:
                     switch (global)
                     {
@@ -135,9 +149,15 @@ namespace osu.Game.Skinning
                     }
 
                     break;
+
+                case SkinComboColourLookup comboColour:
+                    return SkinUtils.As<TValue>(new Bindable<Color4>(getComboColour(Configuration, comboColour.ColourIndex)));
             }
 
             return null;
         }
+
+        private static Color4 getComboColour(IHasComboColours source, int colourIndex)
+            => source.ComboColours[colourIndex % source.ComboColours.Count];
     }
 }

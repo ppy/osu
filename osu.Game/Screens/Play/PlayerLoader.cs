@@ -184,8 +184,6 @@ namespace osu.Game.Screens.Play
             {
                 if (epilepsyWarning != null)
                     epilepsyWarning.DimmableBackground = b;
-
-                b?.FadeColour(Color4.White, 800, Easing.OutQuint);
             });
 
             Beatmap.Value.Track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
@@ -334,6 +332,8 @@ namespace osu.Game.Screens.Play
 
             content.FadeInFromZero(400);
             content.ScaleTo(1, 650, Easing.OutQuint).Then().Schedule(prepareNewPlayer);
+
+            ApplyToBackground(b => b?.FadeColour(Color4.White, 800, Easing.OutQuint));
         }
 
         private void contentOut()
