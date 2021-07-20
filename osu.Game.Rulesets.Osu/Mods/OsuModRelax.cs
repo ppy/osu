@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 changeState(true);
             else
             {
-                bool hasCompleted = time >= lastHitTime - AutoGenerator.KEY_UP_DELAY;
+                bool hasCompleted = time > lastHitTime;
                 bool shouldRelease = isDownState && (time - lastStateChangeTime > AutoGenerator.KEY_UP_DELAY || hasCompleted);
 
                 if (shouldRelease)
