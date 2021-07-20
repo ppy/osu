@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -30,17 +31,19 @@ namespace osu.Game.Screens.OnlinePlay
     [Cached]
     public abstract class OnlinePlayScreen : OsuScreen, IHasSubScreenStack
     {
-        public override bool CursorVisible => (screenStack.CurrentScreen as IOnlinePlaySubScreen)?.CursorVisible ?? true;
+        public override bool CursorVisible => (screenStack?.CurrentScreen as IOnlinePlaySubScreen)?.CursorVisible ?? true;
 
         // this is required due to PlayerLoader eventually being pushed to the main stack
         // while leases may be taken out by a subscreen.
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
-        private readonly MultiplayerWaveContainer waves;
+        private MultiplayerWaveContainer waves;
 
-        private readonly OsuButton createButton;
-        private readonly LoungeSubScreen loungeSubScreen;
-        private readonly ScreenStack screenStack;
+        private OsuButton createButton;
+
+        private ScreenStack screenStack;
+
+        private LoungeSubScreen loungeSubScreen;
 
         private readonly IBindable<bool> isIdle = new BindableBool();
 
@@ -54,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
 
         [Cached]
-        private OngoingOperationTracker ongoingOperationTracker { get; set; }
+        private readonly OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
 
         [Resolved(CanBeNull = true)]
         private MusicController music { get; set; }
@@ -66,10 +69,13 @@ namespace osu.Game.Screens.OnlinePlay
         protected IAPIProvider API { get; private set; }
 
         [Resolved(CanBeNull = true)]
+        private IdleTracker idleTracker { get; set; }
+
+        [Resolved(CanBeNull = true)]
         private OsuLogo logo { get; set; }
 
-        private readonly Drawable header;
-        private readonly Drawable headerBackground;
+        private Drawable header;
+        private Drawable headerBackground;
 
         protected OnlinePlayScreen()
         {
@@ -78,6 +84,14 @@ namespace osu.Game.Screens.OnlinePlay
             RelativeSizeAxes = Axes.Both;
             Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
 
+            RoomManager = CreateRoomManager();
+        }
+
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             var backgroundColour = Color4Extensions.FromHex(@"3e3a44");
 
             InternalChild = waves = new MultiplayerWaveContainer
@@ -144,27 +158,14 @@ namespace osu.Game.Screens.OnlinePlay
                         };
                         button.Action = () => OpenNewRoom();
                     }),
-                    RoomManager = CreateRoomManager(),
-                    ongoingOperationTracker = new OngoingOperationTracker()
+                    RoomManager,
+                    ongoingOperationTracker,
                 }
             };
 
-            screenStack.ScreenPushed += screenPushed;
-            screenStack.ScreenExited += screenExited;
-
-            screenStack.Push(loungeSubScreen = CreateLounge());
-        }
-
-        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
-
-        [BackgroundDependencyLoader(true)]
-        private void load(IdleTracker idleTracker)
-        {
-            apiState.BindTo(API.State);
-            apiState.BindValueChanged(onlineStateChanged, true);
-
-            if (idleTracker != null)
-                isIdle.BindTo(idleTracker.IsIdle);
+            // a lot of the functionality in this class depends on loungeSubScreen being in a ready to go state.
+            // as such, we intentionally load this inline so it is ready alongside this screen.
+            LoadComponent(loungeSubScreen = CreateLounge());
         }
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
@@ -179,7 +180,20 @@ namespace osu.Game.Screens.OnlinePlay
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            isIdle.BindValueChanged(idle => UpdatePollingRate(idle.NewValue), true);
+
+            screenStack.ScreenPushed += screenPushed;
+            screenStack.ScreenExited += screenExited;
+
+            screenStack.Push(loungeSubScreen);
+
+            apiState.BindTo(API.State);
+            apiState.BindValueChanged(onlineStateChanged, true);
+
+            if (idleTracker != null)
+            {
+                isIdle.BindTo(idleTracker.IsIdle);
+                isIdle.BindValueChanged(idle => UpdatePollingRate(idle.NewValue), true);
+            }
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -222,7 +236,9 @@ namespace osu.Game.Screens.OnlinePlay
             this.FadeIn(250);
             this.ScaleTo(1, 250, Easing.OutSine);
 
-            screenStack.CurrentScreen?.OnResuming(last);
+            Debug.Assert(screenStack.CurrentScreen != null);
+            screenStack.CurrentScreen.OnResuming(last);
+
             base.OnResuming(last);
 
             UpdatePollingRate(isIdle.Value);
@@ -233,14 +249,16 @@ namespace osu.Game.Screens.OnlinePlay
             this.ScaleTo(1.1f, 250, Easing.InSine);
             this.FadeOut(250);
 
-            screenStack.CurrentScreen?.OnSuspending(next);
+            Debug.Assert(screenStack.CurrentScreen != null);
+            screenStack.CurrentScreen.OnSuspending(next);
 
             UpdatePollingRate(isIdle.Value);
         }
 
         public override bool OnExiting(IScreen next)
         {
-            if (screenStack.CurrentScreen?.OnExiting(next) == true)
+            var subScreen = screenStack.CurrentScreen as Drawable;
+            if (subScreen?.IsLoaded == true && screenStack.CurrentScreen.OnExiting(next))
                 return true;
 
             RoomManager.PartRoom();

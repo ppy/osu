@@ -3,13 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Online
 {
     public class IntegrationSettings : SettingsSubsection
     {
-        protected override string Header => "Integrations";
+        protected override LocalisableString Header => "Integrations";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
