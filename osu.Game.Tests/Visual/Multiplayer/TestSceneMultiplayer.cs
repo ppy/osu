@@ -209,6 +209,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
             AddStep("enter password in text box", () => passwordEntryPopover.ChildrenOfType<TextBox>().First().Text = "password");
             AddStep("press join room button", () => passwordEntryPopover.ChildrenOfType<OsuButton>().First().Click());
+
+            AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
+            AddUntilStep("wait for join", () => client.Room != null);
         }
 
         [Test]
