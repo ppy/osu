@@ -4,12 +4,15 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
+using osu.Framework.Screens;
+using osu.Game.Screens.Import;
 
 namespace osu.Game.Overlays.Settings.Sections.Debug
 {
     public class GeneralSettings : SettingsSubsection
     {
-        protected override string Header => "整体";
+        protected override LocalisableString Header => "整体";
 
         [BackgroundDependencyLoader(true)]
         private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig, OsuGame game)

@@ -3,21 +3,23 @@
 
 using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Online.API.Requests;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
     public class RanksSection : ProfileSection
     {
-        public override string Title => "排名";
+        public override LocalisableString Title => UsersStrings.ShowExtraTopRanksTitle;
 
-        public override string Identifier => "top_ranks";
+        public override string Identifier => @"top_ranks";
 
         public RanksSection()
         {
             Children = new[]
             {
-                new PaginatedScoreContainer(ScoreType.Best, User, "最好成绩"),
-                new PaginatedScoreContainer(ScoreType.Firsts, User, "第一名")
+                new PaginatedScoreContainer(ScoreType.Best, User, UsersStrings.ShowExtraTopRanksBestTitle),
+                new PaginatedScoreContainer(ScoreType.Firsts, User, UsersStrings.ShowExtraTopRanksFirstTitle)
             };
         }
     }

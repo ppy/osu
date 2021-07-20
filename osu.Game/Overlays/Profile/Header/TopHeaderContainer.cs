@@ -7,11 +7,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Profile.Header.Components;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
@@ -328,49 +330,49 @@ namespace osu.Game.Overlays.Profile.Header
                     {
                         new Drawable[]
                         {
-                            new UserStatsLine("Ranked谱面总分", user.Statistics.RankedScore.ToString("#,##0"))
+                            new UserStatsLine(UsersStrings.ShowStatsRankedScore, user.Statistics.RankedScore.ToString("#,##0"))
                             {
                                 Icon = FontAwesome.Regular.Map
                             }
                         },
                         new Drawable[]
                         {
-                            new UserStatsLine("准确率", user.Statistics.DisplayAccuracy)
+                            new UserStatsLine(UsersStrings.ShowStatsHitAccuracy, user.Statistics.DisplayAccuracy)
                             {
                                 Icon = FontAwesome.Regular.CheckCircle
                             }
                         },
                         new Drawable[]
                         {
-                            new UserStatsLine("游玩次数", user.Statistics.PlayCount.ToString("#,##0"))
+                            new UserStatsLine(UsersStrings.ShowStatsPlayCount, user.Statistics.PlayCount.ToString("#,##0"))
                             {
                                 Icon = FontAwesome.Solid.PlayCircle
                             }
                         },
                         new Drawable[]
                         {
-                            new UserStatsLine("回放被观看次数", user.Statistics.ReplaysWatched.ToString("#,##0"))
+                            new UserStatsLine(UsersStrings.ShowStatsReplaysWatchedByOthers, user.Statistics.ReplaysWatched.ToString("#,##0"))
                             {
                                 Icon = FontAwesome.Regular.FileVideo
                             }
                         },
                         new Drawable[]
                         {
-                            new UserStatsLine("总连击", user.Statistics.TotalHits.ToString("#,##0"))
+                            new UserStatsLine(UsersStrings.ShowStatsTotalHits, user.Statistics.TotalHits.ToString("#,##0"))
                             {
                                 Icon = FontAwesome.Regular.Compass
                             }
                         },
                         new Drawable[]
                         {
-                            new UserStatsLine("最大连击", user.Statistics.MaxCombo.ToString("#,##0"))
+                            new UserStatsLine(UsersStrings.ShowStatsMaximumCombo, user.Statistics.MaxCombo.ToString("#,##0"))
                             {
                                 Icon = FontAwesome.Regular.WindowMaximize
                             }
                         },
                         new Drawable[]
                         {
-                            new UserStatsLine("总分", user.Statistics.TotalScore.ToString("#,##0"))
+                            new UserStatsLine(UsersStrings.ShowStatsTotalScore, user.Statistics.TotalScore.ToString("#,##0"))
                             {
                                 Icon = FontAwesome.Regular.Calendar
                             }
@@ -394,7 +396,7 @@ namespace osu.Game.Overlays.Profile.Header
             private SpriteIcon icon;
             public IconUsage Icon { get; set; }
 
-            public UserStatsLine(string left, string right)
+            public UserStatsLine(LocalisableString left, string right)
             {
                 RelativeSizeAxes = Axes.Both;
                 Children = new Drawable[]

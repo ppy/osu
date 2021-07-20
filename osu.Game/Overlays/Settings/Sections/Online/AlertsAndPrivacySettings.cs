@@ -3,13 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Online
 {
     public class AlertsAndPrivacySettings : SettingsSubsection
     {
-        protected override string Header => "提示和隐私";
+        protected override LocalisableString Header => "提示和隐私";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

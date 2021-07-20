@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Users;
@@ -12,7 +13,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 {
     public class MainMenuSettings : SettingsSubsection
     {
-        protected override string Header => "主界面";
+        protected override LocalisableString Header => "主界面";
 
         private IBindable<User> user;
 

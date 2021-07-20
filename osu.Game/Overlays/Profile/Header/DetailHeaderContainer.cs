@@ -11,6 +11,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays.Profile.Header.Components;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 using osu.Game.Users;
 using osuTK;
@@ -138,11 +139,11 @@ namespace osu.Game.Overlays.Profile.Header
                                             {
                                                 detailGlobalRank = new OverlinedInfoContainer(true, 110)
                                                 {
-                                                    Title = "全球排名",
+                                                    Title = UsersStrings.ShowRankGlobalSimple,
                                                 },
                                                 detailCountryRank = new OverlinedInfoContainer(false, 110)
                                                 {
-                                                    Title = "国内/地区排名",
+                                                    Title = UsersStrings.ShowRankCountrySimple,
                                                 },
                                             }
                                         },
@@ -162,11 +163,11 @@ namespace osu.Game.Overlays.Profile.Header
                                             {
                                                 hiddenDetailGlobal = new OverlinedInfoContainer(false, 60, FillDirection.Horizontal)
                                                 {
-                                                    Title = "全球排名",
+                                                    Title = UsersStrings.ShowRankGlobalSimple,
                                                 },
                                                 hiddenDetailCountry = new OverlinedInfoContainer(false, 60, FillDirection.Horizontal)
                                                 {
-                                                    Title = "国家/地区排名",
+                                                    Title = UsersStrings.ShowRankCountrySimple,
                                                 },
                                             }
                                         },
@@ -174,7 +175,7 @@ namespace osu.Game.Overlays.Profile.Header
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Action = () => DetailsVisible.Toggle(),
-                                            TooltipText = expanded ? "折叠" : "展开"
+                                            TooltipText = expanded ? CommonStrings.ButtonsCollapse : CommonStrings.ButtonsExpand
                                         }
                                     }
                                 },

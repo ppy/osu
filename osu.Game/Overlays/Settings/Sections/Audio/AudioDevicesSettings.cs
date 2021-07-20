@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 {
     public class AudioDevicesSettings : SettingsSubsection
     {
-        protected override string Header => "输出设备";
+        protected override LocalisableString Header => "设备";
 
         [Resolved]
         private AudioManager audio { get; set; }

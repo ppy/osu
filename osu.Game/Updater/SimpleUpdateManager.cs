@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework;
@@ -47,11 +48,16 @@ namespace osu.Game.Updater
 
                 var latest = releases.ResponseObject;
 
-                if (latest.TagName != version)
+                // avoid any discrepancies due to build suffixes for now.
+                // eventually we will want to support release streams and consider these.
+                version = version.Split('-').First();
+                var latestTagName = latest.TagName.Split('-').First();
+
+                if (latestTagName != version)
                 {
                     Notifications.Post(new SimpleNotification
                     {
-                        Text = "osu!lazer已有新版本可用!\n"
+                        Text = "osu!已有新版本可用!\n"
                                + $"你的版本{version}\n"
                                + $"最新版本{latest.TagName}.\n\n"
                                + $"点击这里前往github{(useOfficalReleaseStream ? "下载" : "查看")}",

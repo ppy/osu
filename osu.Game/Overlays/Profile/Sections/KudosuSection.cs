@@ -3,14 +3,16 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Profile.Sections.Kudosu;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
     public class KudosuSection : ProfileSection
     {
-        public override string Title => "Kudosu!";
+        public override LocalisableString Title => UsersStrings.ShowExtraKudosuTitle;
 
-        public override string Identifier => "kudosu";
+        public override string Identifier => @"kudosu";
 
         public KudosuSection()
         {

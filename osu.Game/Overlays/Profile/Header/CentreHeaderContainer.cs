@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Overlays.Profile.Header.Components;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 using osuTK;
 
@@ -119,13 +120,13 @@ namespace osu.Game.Overlays.Profile.Header
                             {
                                 hiddenDetailGlobal = new OverlinedInfoContainer
                                 {
-                                    Title = "Global Ranking",
-                                    //LineColour = colourProvider.Highlight1
+                                    Title = UsersStrings.ShowRankGlobalSimple,
+                                    LineColour = colourProvider.Highlight1
                                 },
                                 hiddenDetailCountry = new OverlinedInfoContainer
                                 {
-                                    Title = "Country Ranking",
-                                    //LineColour = colourProvider.Highlight1
+                                    Title = UsersStrings.ShowRankCountrySimple,
+                                    LineColour = colourProvider.Highlight1
                                 },
                             }
                         }

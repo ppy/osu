@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         protected virtual bool AlwaysShowWhenSelected => false;
 
-        protected override bool ShouldBeAlive => (DrawableObject.IsAlive && DrawableObject.IsPresent) || (AlwaysShowWhenSelected && State == SelectionState.Selected);
+        protected override bool ShouldBeAlive => (DrawableObject?.IsAlive == true && DrawableObject.IsPresent) || (AlwaysShowWhenSelected && State == SelectionState.Selected);
 
         protected HitObjectSelectionBlueprint(HitObject hitObject)
             : base(hitObject)

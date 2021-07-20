@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 {
     public class OffsetSettings : SettingsSubsection
     {
-        protected override string Header => "偏移量调整";
+        protected override LocalisableString Header => "偏移量调整";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

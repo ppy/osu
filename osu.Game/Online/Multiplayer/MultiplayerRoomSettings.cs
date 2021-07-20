@@ -36,12 +36,16 @@ namespace osu.Game.Online.Multiplayer
         [Key(6)]
         public long PlaylistItemId { get; set; }
 
+        [Key(7)]
+        public string Password { get; set; } = string.Empty;
+
         public bool Equals(MultiplayerRoomSettings other)
             => BeatmapID == other.BeatmapID
                && BeatmapChecksum == other.BeatmapChecksum
                && RequiredMods.SequenceEqual(other.RequiredMods)
                && AllowedMods.SequenceEqual(other.AllowedMods)
                && RulesetID == other.RulesetID
+               && Password.Equals(other.Password, StringComparison.Ordinal)
                && Name.Equals(other.Name, StringComparison.Ordinal)
                && PlaylistItemId == other.PlaylistItemId;
 
@@ -49,6 +53,7 @@ namespace osu.Game.Online.Multiplayer
                                              + $" Beatmap:{BeatmapID} ({BeatmapChecksum})"
                                              + $" RequiredMods:{string.Join(',', RequiredMods)}"
                                              + $" AllowedMods:{string.Join(',', AllowedMods)}"
+                                             + $" Password:{(string.IsNullOrEmpty(Password) ? "no" : "yes")}"
                                              + $" Ruleset:{RulesetID}"
                                              + $" Item:{PlaylistItemId}";
     }

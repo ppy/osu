@@ -4,13 +4,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
     public class ModsSettings : SettingsSubsection
     {
-        protected override string Header => "Mods";
+        protected override LocalisableString Header => "Mods";
 
         public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(new[] { "mod" });
 

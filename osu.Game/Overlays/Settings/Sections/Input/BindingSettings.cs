@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public class BindingSettings : SettingsSubsection
     {
-        protected override string Header => "快捷键和键位设定";
+        protected override LocalisableString Header => BindingSettingsStrings.ShortcutAndGameplayBindings;
 
         public BindingSettings(KeyBindingPanel keyConfig)
         {
@@ -15,8 +17,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 new SettingsButton
                 {
-                    Text = "配置",
-                    TooltipText = "更改全局快捷键和键位设定",
+                    Text = BindingSettingsStrings.Configure,
+                    TooltipText = BindingSettingsStrings.ChangeBindingsButton,
                     Action = keyConfig.ToggleVisibility
                 },
             };

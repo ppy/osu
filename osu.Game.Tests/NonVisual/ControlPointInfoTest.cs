@@ -248,13 +248,13 @@ namespace osu.Game.Tests.NonVisual
         }
 
         [Test]
-        public void TestCreateCopyIsDeepClone()
+        public void TestDeepClone()
         {
             var cpi = new ControlPointInfo();
 
             cpi.Add(1000, new TimingControlPoint { BeatLength = 500 });
 
-            var cpiCopy = cpi.CreateCopy();
+            var cpiCopy = cpi.DeepClone();
 
             cpiCopy.Add(2000, new TimingControlPoint { BeatLength = 500 });
 

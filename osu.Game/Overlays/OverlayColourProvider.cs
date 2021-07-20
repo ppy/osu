@@ -14,6 +14,7 @@ namespace osu.Game.Overlays
         public static OverlayColourProvider Red { get; } = new OverlayColourProvider(OverlayColourScheme.Red);
         public static OverlayColourProvider Pink { get; } = new OverlayColourProvider(OverlayColourScheme.Pink);
         public static OverlayColourProvider Orange { get; } = new OverlayColourProvider(OverlayColourScheme.Orange);
+        public static OverlayColourProvider Lime { get; } = new OverlayColourProvider(OverlayColourScheme.Lime);
         public static OverlayColourProvider Green { get; } = new OverlayColourProvider(OverlayColourScheme.Green);
         public static OverlayColourProvider Purple { get; } = new OverlayColourProvider(OverlayColourScheme.Purple);
         public static OverlayColourProvider Blue { get; } = new OverlayColourProvider(OverlayColourScheme.Blue);
@@ -51,7 +52,7 @@ namespace osu.Game.Overlays
 
         private Color4 getColour(float saturation, float lightness) => Color4.FromHsl(new Vector4(getBaseHue(colourScheme), saturation, lightness, 1));
 
-        // See https://github.com/ppy/osu-web/blob/4218c288292d7c810b619075471eaea8bbb8f9d8/app/helpers.php#L1463
+        // See https://github.com/ppy/osu-web/blob/5a536d217a21582aad999db50a981003d3ad5659/app/helpers.php#L1620-L1628
         private static float getBaseHue(OverlayColourScheme colourScheme)
         {
             switch (colourScheme)
@@ -66,10 +67,13 @@ namespace osu.Game.Overlays
                     return 333 / 360f;
 
                 case OverlayColourScheme.Orange:
-                    return 46 / 360f;
+                    return 45 / 360f;
+
+                case OverlayColourScheme.Lime:
+                    return 90 / 360f;
 
                 case OverlayColourScheme.Green:
-                    return 115 / 360f;
+                    return 125 / 360f;
 
                 case OverlayColourScheme.Purple:
                     return 255 / 360f;
@@ -91,6 +95,7 @@ namespace osu.Game.Overlays
         Red,
         Pink,
         Orange,
+        Lime,
         Green,
         Purple,
         Blue,

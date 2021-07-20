@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
     public class MfSettings : SettingsSubsection
     {
         private SettingsCheckbox systemCursor;
-        protected override string Header => "Mf-osu";
+        protected override LocalisableString Header => "Mf-osu";
 
         [BackgroundDependencyLoader]
         private void load(MConfigManager config, OsuConfigManager osuConfig, GameHost host)
