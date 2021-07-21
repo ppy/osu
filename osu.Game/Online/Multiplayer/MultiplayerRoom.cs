@@ -47,6 +47,9 @@ namespace osu.Game.Online.Multiplayer
         [Key(4)]
         public MultiplayerRoomUser? Host { get; set; }
 
+        [Key(5)]
+        public MatchRulesetRoomState? MatchRulesetState { get; set; }
+
         [JsonConstructor]
         [SerializationConstructor]
         public MultiplayerRoom(long roomId)
