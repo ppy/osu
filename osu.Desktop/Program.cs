@@ -23,7 +23,16 @@ namespace osu.Desktop
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
 
-            using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true))
+            string gameName = @"osu";
+
+            if (DebugUtils.IsDebugBuild)
+            {
+                var customNameArg = args.SingleOrDefault(s => s.StartsWith(@"--name=", StringComparison.Ordinal));
+                if (customNameArg != null)
+                    gameName = customNameArg.Replace(@"--name=", string.Empty);
+            }
+
+            using (DesktopGameHost host = Host.GetSuitableHost(gameName, true))
             {
                 host.ExceptionThrown += handleException;
 
@@ -48,16 +57,10 @@ namespace osu.Desktop
                         return 0;
                 }
 
-                switch (args.FirstOrDefault() ?? string.Empty)
-                {
-                    default:
-                        host.Run(new OsuGameDesktop(args));
-                        break;
-
-                    case "--tournament":
-                        host.Run(new TournamentGame());
-                        break;
-                }
+                if (args.Contains("--tournament"))
+                    host.Run(new TournamentGame());
+                else
+                    host.Run(new OsuGameDesktop(args));
 
                 return 0;
             }
