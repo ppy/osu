@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
