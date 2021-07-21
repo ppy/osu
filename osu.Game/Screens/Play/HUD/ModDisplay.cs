@@ -16,7 +16,7 @@ using osuTK;
 namespace osu.Game.Screens.Play.HUD
 {
     /// <summary>
-    /// Displays a single-line horizontal auto-sized flow of mods.
+    /// Displays a single-line horizontal auto-sized flow of mods. For cases where wrapping is required, use <see cref="ModFlowDisplay"/> instead.
     /// </summary>
     public class ModDisplay : CompositeDrawable, IHasCurrentValue<IReadOnlyList<Mod>>
     {
