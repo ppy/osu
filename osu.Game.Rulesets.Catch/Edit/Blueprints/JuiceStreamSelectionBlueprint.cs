@@ -37,8 +37,16 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
         private readonly SelectionEditablePath editablePath;
 
+        /// <summary>
+        /// The <see cref="JuiceStreamPath.InvalidationID"/> of the <see cref="JuiceStreamPath"/> corresponding the current <see cref="SliderPath"/> of the hit object.
+        /// When the path is edited, the change is detected and the <see cref="SliderPath"/> of the hit object is updated.
+        /// </summary>
         private int lastEditablePathId = -1;
 
+        /// <summary>
+        /// The <see cref="SliderPath.Version"/> of the current <see cref="SliderPath"/> of the hit object.
+        /// When the <see cref="SliderPath"/> of the hit object is changed by external means, the change is detected and the <see cref="JuiceStreamPath"/> is re-initialized.
+        /// </summary>
         private int lastSliderPathVersion = -1;
 
         private Vector2 rightMouseDownPosition;
