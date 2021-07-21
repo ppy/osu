@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 {
                     area.OnNewResult(drawable, new CatchJudgementResult(fruit, new CatchJudgement())
                     {
-                        Type = area.MovableCatcher.CanCatch(fruit) ? HitResult.Great : HitResult.Miss
+                        Type = area.Catcher.CanCatch(fruit) ? HitResult.Great : HitResult.Miss
                     });
 
                     drawable.Expire();
@@ -125,13 +125,13 @@ namespace osu.Game.Rulesets.Catch.Tests
 
                 Add(droppedObjectContainer);
 
-                MovableCatcher = new Catcher(this, droppedObjectContainer, beatmapDifficulty)
+                Catcher = new Catcher(this, droppedObjectContainer, beatmapDifficulty)
                 {
                     X = CatchPlayfield.CENTER_X
                 };
             }
 
-            public void ToggleHyperDash(bool status) => MovableCatcher.SetHyperDashState(status ? 2 : 1);
+            public void ToggleHyperDash(bool status) => Catcher.SetHyperDashState(status ? 2 : 1);
         }
     }
 }

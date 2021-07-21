@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
-                    MovableCatcher = Catcher,
+                    Catcher = Catcher,
                 },
                 trailContainer,
                 HitObjectContainer,
