@@ -3,7 +3,6 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework;
@@ -17,13 +16,43 @@ namespace osu.Desktop
 {
     public static class Program
     {
+        private const string base_game_name = @"osu";
+
         [STAThread]
         public static int Main(string[] args)
         {
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
 
-            using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true))
+            string gameName = base_game_name;
+            bool tournamentClient = false;
+
+            foreach (var arg in args)
+            {
+                var split = arg.Split('=');
+
+                var key = split[0];
+                var val = split[1];
+
+                switch (key)
+                {
+                    case "--tournament":
+                        tournamentClient = true;
+                        break;
+
+                    case "--debug-client-id":
+                        if (!DebugUtils.IsDebugBuild)
+                            throw new InvalidOperationException("Cannot use this argument in a non-debug build.");
+
+                        if (!int.TryParse(val, out int clientID))
+                            throw new ArgumentException("Provided client ID must be an integer.");
+
+                        gameName = $"{base_game_name}-{clientID}";
+                        break;
+                }
+            }
+
+            using (DesktopGameHost host = Host.GetSuitableHost(gameName, true))
             {
                 host.ExceptionThrown += handleException;
 
@@ -48,16 +77,10 @@ namespace osu.Desktop
                         return 0;
                 }
 
-                switch (args.FirstOrDefault() ?? string.Empty)
-                {
-                    default:
-                        host.Run(new OsuGameDesktop(args));
-                        break;
-
-                    case "--tournament":
-                        host.Run(new TournamentGame());
-                        break;
-                }
+                if (tournamentClient)
+                    host.Run(new TournamentGame());
+                else
+                    host.Run(new OsuGameDesktop(args));
 
                 return 0;
             }
