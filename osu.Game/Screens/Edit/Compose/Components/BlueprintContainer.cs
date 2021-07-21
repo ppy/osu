@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // even if a selection didn't occur, a drag event may still move the selection.
             bool movementPossible = prepareSelectionMovement();
 
-            return selectionPerformed || movementPossible;
+            return selectionPerformed || (e.Button == MouseButton.Left && movementPossible);
         }
 
         protected SelectionBlueprint<T> ClickedBlueprint { get; private set; }
