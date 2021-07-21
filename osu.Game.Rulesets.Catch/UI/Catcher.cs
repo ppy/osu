@@ -26,6 +26,16 @@ namespace osu.Game.Rulesets.Catch.UI
     public class Catcher : SkinReloadableDrawable
     {
         /// <summary>
+        /// The size of the catcher at 1x scale.
+        /// </summary>
+        public const float BASE_SIZE = 106.75f;
+
+        /// <summary>
+        /// The width of the catcher which can receive fruit. Equivalent to "catchMargin" in osu-stable.
+        /// </summary>
+        public const float ALLOWED_CATCH_RANGE = 0.8f;
+
+        /// <summary>
         /// The default colour used to tint hyper-dash fruit, along with the moving catcher, its trail
         /// and end glow/after-image during a hyper-dash.
         /// </summary>
@@ -82,11 +92,6 @@ namespace osu.Game.Rulesets.Catch.UI
             private set => Body.AnimationState.Value = value;
         }
 
-        /// <summary>
-        /// The width of the catcher which can receive fruit. Equivalent to "catchMargin" in osu-stable.
-        /// </summary>
-        public const float ALLOWED_CATCH_RANGE = 0.8f;
-
         private bool dashing;
 
         public bool Dashing
@@ -140,7 +145,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             Origin = Anchor.TopCentre;
 
-            Size = new Vector2(CatcherArea.CATCHER_SIZE);
+            Size = new Vector2(BASE_SIZE);
             if (difficulty != null)
                 Scale = calculateScale(difficulty);
 
@@ -197,7 +202,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// Calculates the width of the area used for attempting catches in gameplay.
         /// </summary>
         /// <param name="scale">The scale of the catcher.</param>
-        public static float CalculateCatchWidth(Vector2 scale) => CatcherArea.CATCHER_SIZE * Math.Abs(scale.X) * ALLOWED_CATCH_RANGE;
+        public static float CalculateCatchWidth(Vector2 scale) => BASE_SIZE * Math.Abs(scale.X) * ALLOWED_CATCH_RANGE;
 
         /// <summary>
         /// Calculates the width of the area used for attempting catches in gameplay.
