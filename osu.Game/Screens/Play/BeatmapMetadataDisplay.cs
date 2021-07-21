@@ -172,7 +172,6 @@ namespace osu.Game.Screens.Play
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            AutoSizeAxes = Axes.Both,
                             Margin = new MarginPadding { Top = 20 },
                             Current = mods
                         },
