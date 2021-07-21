@@ -59,58 +59,18 @@ namespace osu.Game.Rulesets.Catch.Edit
         /// <returns>The positional movement with the restriction applied.</returns>
         private float limitMovement(float deltaX, IEnumerable<HitObject> movingObjects)
         {
-            float minX = float.PositiveInfinity;
-            float maxX = float.NegativeInfinity;
-
-            foreach (float x in movingObjects.SelectMany(getOriginalPositions))
-            {
-                minX = Math.Min(minX, x);
-                maxX = Math.Max(maxX, x);
-            }
-
+            var range = CatchHitObjectUtils.GetPositionRange(movingObjects);
             // To make an object with position `x` stay in bounds after `deltaX` movement, `0 <= x + deltaX <= WIDTH` should be satisfied.
             // Subtracting `x`, we get `-x <= deltaX <= WIDTH - x`.
             // We only need to apply the inequality to extreme values of `x`.
-            float lowerBound = -minX;
-            float upperBound = CatchPlayfield.WIDTH - maxX;
+            float lowerBound = -range.Min;
+            float upperBound = CatchPlayfield.WIDTH - range.Max;
             // The inequality may be unsatisfiable if the objects were already out of bounds.
             // In that case, don't move objects at all.
             if (lowerBound > upperBound)
                 return 0;
 
             return Math.Clamp(deltaX, lowerBound, upperBound);
-        }
-
-        /// <summary>
-        /// Enumerate X positions that should be contained in-bounds after move offset is applied.
-        /// </summary>
-        private IEnumerable<float> getOriginalPositions(HitObject hitObject)
-        {
-            switch (hitObject)
-            {
-                case Fruit fruit:
-                    yield return fruit.OriginalX;
-
-                    break;
-
-                case JuiceStream juiceStream:
-                    foreach (var nested in juiceStream.NestedHitObjects.OfType<CatchHitObject>())
-                    {
-                        // Even if `OriginalX` is outside the playfield, tiny droplets can be moved inside the playfield after the random offset application.
-                        if (!(nested is TinyDroplet))
-                            yield return nested.OriginalX;
-                    }
-
-                    break;
-
-                case BananaShower _:
-                    // A banana shower occupies the whole screen width.
-                    // If the selection contains a banana shower, the selection cannot be moved horizontally.
-                    yield return 0;
-                    yield return CatchPlayfield.WIDTH;
-
-                    break;
-            }
         }
     }
 }
