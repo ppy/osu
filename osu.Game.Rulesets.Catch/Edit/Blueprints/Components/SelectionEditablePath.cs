@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         protected override void OnDrag(DragEvent e)
         {
-            Vector2 mousePosition = ToLocalSpace(e.ScreenSpaceMousePosition) - new Vector2(0, DrawHeight);
+            Vector2 mousePosition = ToRelativePosition(e.ScreenSpaceMousePosition);
             double distanceDelta = PositionToDistance(mousePosition.Y) - PositionToDistance(dragStartPosition.Y);
             float xDelta = mousePosition.X - dragStartPosition.X;
             MoveSelectedVertices(distanceDelta, xDelta);
