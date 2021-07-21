@@ -3,7 +3,6 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -24,16 +23,12 @@ namespace osu.Game.Rulesets.Catch.Tests
 {
     public class TestSceneCatchSkinConfiguration : OsuTestScene
     {
-        [Cached]
-        private readonly DroppedObjectContainer droppedObjectContainer;
-
         private Catcher catcher;
 
         private readonly Container container;
 
         public TestSceneCatchSkinConfiguration()
         {
-            Add(droppedObjectContainer = new DroppedObjectContainer());
             Add(container = new Container { RelativeSizeAxes = Axes.Both });
         }
 
@@ -46,7 +41,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 var skin = new TestSkin { FlipCatcherPlate = flip };
                 container.Child = new SkinProvidingContainer(skin)
                 {
-                    Child = catcher = new Catcher(new Container())
+                    Child = catcher = new Catcher(new Container(), new DroppedObjectContainer())
                     {
                         Anchor = Anchor.Centre
                     }

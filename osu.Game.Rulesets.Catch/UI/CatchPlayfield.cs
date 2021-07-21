@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
@@ -26,38 +27,53 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         public const float CENTER_X = WIDTH / 2;
 
-        [Cached]
-        private readonly DroppedObjectContainer droppedObjectContainer;
-
-        internal readonly CatcherArea CatcherArea;
-
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             // only check the X position; handle all vertical space.
             base.ReceivePositionalInputAt(new Vector2(screenSpacePos.X, ScreenSpaceDrawQuad.Centre.Y));
 
+        internal Catcher Catcher { get; private set; }
+
+        internal CatcherArea CatcherArea { get; private set; }
+
+        private readonly BeatmapDifficulty difficulty;
+
         public CatchPlayfield(BeatmapDifficulty difficulty)
         {
-            CatcherArea = new CatcherArea(difficulty)
-            {
-                Anchor = Anchor.BottomLeft,
-                Origin = Anchor.TopLeft,
-            };
-
-            InternalChildren = new[]
-            {
-                droppedObjectContainer = new DroppedObjectContainer(),
-                CatcherArea.MovableCatcher.CreateProxiedContent(),
-                HitObjectContainer.CreateProxy(),
-                // This ordering (`CatcherArea` before `HitObjectContainer`) is important to
-                // make sure the up-to-date catcher position is used for the catcher catching logic of hit objects.
-                CatcherArea,
-                HitObjectContainer,
-            };
+            this.difficulty = difficulty;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            var trailContainer = new Container
+            {
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.TopLeft
+            };
+            var droppedObjectContainer = new DroppedObjectContainer();
+
+            Catcher = new Catcher(trailContainer, droppedObjectContainer, difficulty)
+            {
+                X = CENTER_X
+            };
+
+            AddRangeInternal(new[]
+            {
+                droppedObjectContainer,
+                Catcher.CreateProxiedContent(),
+                HitObjectContainer.CreateProxy(),
+                // This ordering (`CatcherArea` before `HitObjectContainer`) is important to
+                // make sure the up-to-date catcher position is used for the catcher catching logic of hit objects.
+                CatcherArea = new CatcherArea
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.TopLeft,
+                    Catcher = Catcher,
+                },
+                trailContainer,
+                HitObjectContainer,
+            });
+
             RegisterPool<Droplet, DrawableDroplet>(50);
             RegisterPool<TinyDroplet, DrawableTinyDroplet>(50);
             RegisterPool<Fruit, DrawableFruit>(100);
@@ -80,7 +96,7 @@ namespace osu.Game.Rulesets.Catch.UI
             ((DrawableCatchHitObject)d).CheckPosition = checkIfWeCanCatch;
         }
 
-        private bool checkIfWeCanCatch(CatchHitObject obj) => CatcherArea.MovableCatcher.CanCatch(obj);
+        private bool checkIfWeCanCatch(CatchHitObject obj) => Catcher.CanCatch(obj);
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
             => CatcherArea.OnNewResult((DrawableCatchHitObject)judgedObject, result);

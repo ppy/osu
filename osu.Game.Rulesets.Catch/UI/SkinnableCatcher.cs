@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             Anchor = Anchor.TopCentre;
             // Sets the origin roughly to the centre of the catcher's plate to allow for correct scaling.
-            OriginPosition = new Vector2(0.5f, 0.06f) * CatcherArea.CATCHER_SIZE;
+            OriginPosition = new Vector2(0.5f, 0.06f) * Catcher.BASE_SIZE;
         }
     }
 }
