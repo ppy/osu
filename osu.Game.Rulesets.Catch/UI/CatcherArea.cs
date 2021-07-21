@@ -15,6 +15,11 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
+    /// <summary>
+    /// The horizontal band at the bottom of the playfield the catcher is moving on.
+    /// It holds a <see cref="Catcher"/> as a child and translates input to the catcher movement.
+    /// It also holds a combo display that is above the catcher, and judgment results are translated to the catcher and the combo display.
+    /// </summary>
     public class CatcherArea : Container, IKeyBindingHandler<CatchAction>
     {
         public const float CATCHER_SIZE = 106.75f;
@@ -42,6 +47,9 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         private int currentDirection;
 
+        /// <remarks>
+        /// <see cref="Catcher"/> must be set before loading.
+        /// </remarks>
         public CatcherArea()
         {
             Size = new Vector2(CatchPlayfield.WIDTH, CATCHER_SIZE);
