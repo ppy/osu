@@ -189,10 +189,6 @@ namespace osu.Game.Overlays.BeatmapListing
 
         private void performRequest()
         {
-            // If the previous request returned a null cursor, the API is indicating we can't paginate further (maybe there are no more beatmaps left).
-            if (lastResponse != null && lastResponse.Cursor == null)
-                return;
-
             getSetsRequest = new SearchBeatmapSetsRequest(
                 searchControl.Query.Value,
                 searchControl.Ruleset.Value,
@@ -212,7 +208,8 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 var sets = response.BeatmapSets.Select(responseJson => responseJson.ToBeatmapSet(rulesets)).ToList();
 
-                if (sets.Count == 0)
+                // If the previous request returned a null cursor, the API is indicating we can't paginate further (maybe there are no more beatmaps left).
+                if (sets.Count == 0 || response.Cursor == null)
                     noMoreResults = true;
 
                 if (CurrentPage == 0)
