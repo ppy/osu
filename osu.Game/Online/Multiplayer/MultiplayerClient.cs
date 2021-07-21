@@ -420,6 +420,16 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
+        Task IMultiplayerClient.MatchRulesetUserStateChanged(int userId, MatchRulesetUserState state)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task IMultiplayerClient.MatchRulesetRoomStateChanged(MatchRulesetRoomState state)
+        {
+            throw new NotImplementedException();
+        }
+
         Task IMultiplayerClient.UserBeatmapAvailabilityChanged(int userId, BeatmapAvailability beatmapAvailability)
         {
             if (Room == null)

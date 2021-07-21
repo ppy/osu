@@ -36,6 +36,9 @@ namespace osu.Game.Online.Multiplayer
         [Key(3)]
         public IEnumerable<APIMod> Mods { get; set; } = Enumerable.Empty<APIMod>();
 
+        [Key(4)]
+        public MatchRulesetUserState? MatchRulesetState { get; set; }
+
         [IgnoreMember]
         public User? User { get; set; }
 
