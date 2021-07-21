@@ -36,6 +36,17 @@ namespace osu.Game.Tests.Visual.Ranking
             {
                 Beatmap = createTestBeatmap(author)
             }));
+        }
+
+        [Test]
+        public void TestExcessMods()
+        {
+            var author = new User { Username = "mapper_name" };
+
+            AddStep("show excess mods score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo, true)
+            {
+                Beatmap = createTestBeatmap(author)
+            }));
 
             AddAssert("mapper name present", () => this.ChildrenOfType<OsuSpriteText>().Any(spriteText => spriteText.Current.Value == "mapper_name"));
         }
