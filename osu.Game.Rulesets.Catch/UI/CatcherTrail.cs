@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatcherTrail()
         {
-            Size = new Vector2(CatcherArea.CATCHER_SIZE);
+            Size = new Vector2(Catcher.BASE_SIZE);
             Origin = Anchor.TopCentre;
             Blending = BlendingParameters.Additive;
             InternalChild = body = new SkinnableCatcher

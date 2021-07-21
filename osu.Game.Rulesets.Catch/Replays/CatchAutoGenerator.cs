@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 bool impossibleJump = speedRequired > movement_speed * 2;
 
                 // todo: get correct catcher size, based on difficulty CS.
-                const float catcher_width_half = CatcherArea.CATCHER_SIZE * 0.3f * 0.5f;
+                const float catcher_width_half = Catcher.BASE_SIZE * 0.3f * 0.5f;
 
                 if (lastPosition - catcher_width_half < h.EffectiveX && lastPosition + catcher_width_half > h.EffectiveX)
                 {
