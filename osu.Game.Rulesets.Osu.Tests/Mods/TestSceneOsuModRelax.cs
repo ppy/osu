@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 {
                     HitObjects = hitObjects
                 },
-                PassCondition = () => Player.ScoreProcessor.Accuracy.Value == 1
+                PassCondition = () => Player.ScoreProcessor.Combo.Value == 15
             });
             Replay replay = null;
             InputManager.UseParentInput = false;
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 list.Add(new HitCircle
                 {
-                    StartTime = start + (i - 1) * 50,
+                    StartTime = start + i * 50,
                     Position = new Vector2((i + 1) * 32, OsuPlayfield.BASE_SIZE.Y / 2)
                 });
             }
