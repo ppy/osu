@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(blinds = new DrawableOsuBlinds(drawableRuleset.Playfield.HitObjectContainer, drawableRuleset.Beatmap));
+            drawableRuleset.Overlays.Add(blinds = new DrawableOsuBlinds(drawableRuleset.Playfield, drawableRuleset.Beatmap, drawableRuleset.Mods));
         }
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
@@ -67,6 +68,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             private readonly CompositeDrawable restrictTo;
 
+            private readonly bool barrelRollActive;
+
             /// <summary>
             /// <para>
             /// Percentage of playfield to extend blinds over. Basically moves the origin points where the blinds start.
@@ -80,13 +83,24 @@ namespace osu.Game.Rulesets.Osu.Mods
             /// </summary>
             private const float leniency = 0.1f;
 
-            public DrawableOsuBlinds(CompositeDrawable restrictTo, Beatmap<OsuHitObject> beatmap)
+            public DrawableOsuBlinds(CompositeDrawable restrictTo, Beatmap<OsuHitObject> beatmap, IEnumerable<Mod> mods)
             {
                 this.restrictTo = restrictTo;
                 this.beatmap = beatmap;
 
                 targetBreakMultiplier = 0;
                 easing = 1;
+
+                barrelRollActive = false;
+
+                foreach (Mod mod in mods)
+                {
+                    if (mod is OsuModBarrelRoll)
+                    {
+                        barrelRollActive = true;
+                        break;
+                    }
+                }
             }
 
             [BackgroundDependencyLoader]
@@ -128,8 +142,21 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             protected override void Update()
             {
-                float start = Parent.ToLocalSpace(restrictTo.ScreenSpaceDrawQuad.TopLeft).X;
-                float end = Parent.ToLocalSpace(restrictTo.ScreenSpaceDrawQuad.TopRight).X;
+                float start, end;
+
+                if (barrelRollActive)
+                {
+                    float origin = restrictTo.ToSpaceOfOtherDrawable(restrictTo.OriginPosition, Parent).X;
+                    float halfDiagonal = MathF.Sqrt(MathF.Pow(restrictTo.DrawWidth / 2, 2) + MathF.Pow(restrictTo.DrawHeight / 2, 2));
+
+                    start = origin - halfDiagonal;
+                    end = origin + halfDiagonal;
+                }
+                else
+                {
+                    start = Parent.ToLocalSpace(restrictTo.ScreenSpaceDrawQuad.TopLeft).X;
+                    end = Parent.ToLocalSpace(restrictTo.ScreenSpaceDrawQuad.TopRight).X;
+                }
 
                 float rawWidth = end - start;
 
