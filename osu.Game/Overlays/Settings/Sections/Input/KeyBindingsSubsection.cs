@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
-using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osuTK;
 
