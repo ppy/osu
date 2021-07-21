@@ -7,7 +7,7 @@ using osu.Framework.Localisation;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Settings;
 
-namespace osu.Game.Overlays.KeyBinding
+namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public class GlobalKeyBindingsSection : SettingsSection
     {

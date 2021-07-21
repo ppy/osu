@@ -13,7 +13,7 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osuTK;
 
-namespace osu.Game.Overlays.KeyBinding
+namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public abstract class KeyBindingsSubsection : SettingsSubsection
     {
