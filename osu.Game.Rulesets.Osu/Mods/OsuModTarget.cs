@@ -353,6 +353,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             public TargetBeatContainer(double firstHitTime)
             {
                 this.firstHitTime = firstHitTime;
+                AllowMistimedEventFiring = false;
                 Divisor = 1;
             }
 
@@ -374,8 +375,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 int timeSignature = (int)timingPoint.TimeSignature;
 
                 // play metronome from one measure before the first object.
-                // TODO: Use BeatSyncClock from https://github.com/ppy/osu/pull/13894.
-                if (Clock.CurrentTime < firstHitTime - timingPoint.BeatLength * timeSignature)
+                if (BeatSyncClock.CurrentTime < firstHitTime - timingPoint.BeatLength * timeSignature)
                     return;
 
                 sample.Frequency.Value = beatIndex % timeSignature == 0 ? 1 : 0.5f;
