@@ -118,6 +118,14 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeUserMods), newMods);
         }
 
+        public override Task SendMatchRulesetRequest(MatchRulesetUserRequest request)
+        {
+            if (!IsConnected.Value)
+                return Task.CompletedTask;
+
+            return connection.InvokeAsync(nameof(IMultiplayerServer.SendMatchRulesetRequest), request);
+        }
+
         public override Task StartMatch()
         {
             if (!IsConnected.Value)
