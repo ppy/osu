@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             else if (!VertexStates[index].IsSelected)
                 selectOnly(index);
 
-            // Don't inhabit right click, to show the context menu
+            // Don't inhibit right click, to show the context menu
             return e.Button != MouseButton.Right;
         }
 
