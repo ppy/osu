@@ -9,6 +9,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osuTK.Graphics;
 
@@ -64,6 +65,7 @@ namespace osu.Game.Screens.Edit
             private EditorClock clock { get; set; }
 
             public RowBackground(object item)
+                : base(HoverSampleSet.Soft)
             {
                 Item = item;
 
