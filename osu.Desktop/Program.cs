@@ -17,18 +17,25 @@ namespace osu.Desktop
 {
     public static class Program
     {
+        private const string base_game_name = @"osu";
+
         [STAThread]
         public static int Main(string[] args)
         {
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
 
-            string gameName = @"osu";
+            string gameName = base_game_name;
             bool tournamentClient = false;
 
-            foreach (var arg in args.Select(s => s.Split('=')))
+            foreach (var arg in args)
             {
-                switch (arg[0])
+                var split = arg.Split('=');
+
+                var key = split[0];
+                var val = split[1];
+
+                switch (key)
                 {
                     case "--tournament":
                         tournamentClient = true;
@@ -36,9 +43,12 @@ namespace osu.Desktop
 
                     case "--debug-client-id":
                         if (!DebugUtils.IsDebugBuild)
-                            break;
+                            throw new InvalidOperationException("Cannot use this argument in a non-debug build.");
 
-                        gameName = $"{gameName}-{int.Parse(arg[1])}";
+                        if (!int.TryParse(val, out int clientID))
+                            throw new ArgumentException("Provided client ID must be an integer.");
+
+                        gameName = $"{base_game_name}-{clientID}";
                         break;
                 }
             }
