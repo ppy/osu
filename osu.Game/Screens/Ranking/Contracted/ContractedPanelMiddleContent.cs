@@ -131,13 +131,14 @@ namespace osu.Game.Screens.Ranking.Contracted
                                                 createStatistic("Accuracy", $"{score.Accuracy.FormatAccuracy()}"),
                                             }
                                         },
-                                        new ModDisplay
+                                        new ModFlowDisplay
                                         {
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
-                                            ExpansionMode = ExpansionMode.AlwaysExpanded,
+                                            AutoSizeAxes = Axes.Y,
+                                            RelativeSizeAxes = Axes.X,
                                             Current = { Value = score.Mods },
-                                            Scale = new Vector2(0.5f),
+                                            IconScale = 0.5f,
                                         }
                                     }
                                 }
