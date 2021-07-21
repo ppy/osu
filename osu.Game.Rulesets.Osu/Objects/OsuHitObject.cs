@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => ComboIndexBindable.Value = value;
         }
 
-        public int BeatmapSkinComboIndex { get; set; }
+        public int ComboIndexWithOffsets { get; set; }
 
         public Bindable<bool> LastInComboBindable { get; } = new Bindable<bool>();
 

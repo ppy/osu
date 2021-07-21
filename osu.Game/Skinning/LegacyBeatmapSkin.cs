@@ -63,7 +63,7 @@ namespace osu.Game.Skinning
         }
 
         protected override IBindable<Color4> GetComboColour(IHasComboColours source, int comboIndex, IHasComboInformation combo)
-            => base.GetComboColour(source, combo.BeatmapSkinComboIndex, combo);
+            => base.GetComboColour(source, combo.ComboIndexWithOffsets, combo);
 
         public override ISample GetSample(ISampleInfo sampleInfo)
         {

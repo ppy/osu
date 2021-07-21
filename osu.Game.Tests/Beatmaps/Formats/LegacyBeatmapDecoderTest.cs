@@ -323,12 +323,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 new OsuBeatmapProcessor(converted).PreProcess();
                 new OsuBeatmapProcessor(converted).PostProcess();
 
-                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).BeatmapSkinComboIndex);
-                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).BeatmapSkinComboIndex);
-                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).BeatmapSkinComboIndex);
-                Assert.AreEqual(6, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).BeatmapSkinComboIndex);
-                Assert.AreEqual(11, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).BeatmapSkinComboIndex);
-                Assert.AreEqual(14, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).BeatmapSkinComboIndex);
+                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndexWithOffsets);
+                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndexWithOffsets);
+                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndexWithOffsets);
+                Assert.AreEqual(6, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndexWithOffsets);
+                Assert.AreEqual(11, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndexWithOffsets);
+                Assert.AreEqual(14, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndexWithOffsets);
             }
         }
 
@@ -346,12 +346,12 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 new CatchBeatmapProcessor(converted).PreProcess();
                 new CatchBeatmapProcessor(converted).PostProcess();
 
-                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).BeatmapSkinComboIndex);
-                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).BeatmapSkinComboIndex);
-                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).BeatmapSkinComboIndex);
-                Assert.AreEqual(6, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).BeatmapSkinComboIndex);
-                Assert.AreEqual(11, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).BeatmapSkinComboIndex);
-                Assert.AreEqual(14, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).BeatmapSkinComboIndex);
+                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndexWithOffsets);
+                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndexWithOffsets);
+                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndexWithOffsets);
+                Assert.AreEqual(6, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndexWithOffsets);
+                Assert.AreEqual(11, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndexWithOffsets);
+                Assert.AreEqual(14, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndexWithOffsets);
             }
         }
 
