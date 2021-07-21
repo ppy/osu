@@ -24,12 +24,23 @@ namespace osu.Desktop
             var cwd = Environment.CurrentDirectory;
 
             string gameName = @"osu";
+            bool tournamentClient = false;
 
-            if (DebugUtils.IsDebugBuild)
+            foreach (var arg in args.Select(s => s.Split('=')))
             {
-                var customNameArg = args.SingleOrDefault(s => s.StartsWith(@"--name=", StringComparison.Ordinal));
-                if (customNameArg != null)
-                    gameName = customNameArg.Replace(@"--name=", string.Empty);
+                switch (arg[0])
+                {
+                    case "--tournament":
+                        tournamentClient = true;
+                        break;
+
+                    case "--debug-client-id":
+                        if (!DebugUtils.IsDebugBuild)
+                            break;
+
+                        gameName = $"{gameName}-{int.Parse(arg[1])}";
+                        break;
+                }
             }
 
             using (DesktopGameHost host = Host.GetSuitableHost(gameName, true))
@@ -57,7 +68,7 @@ namespace osu.Desktop
                         return 0;
                 }
 
-                if (args.Contains("--tournament"))
+                if (tournamentClient)
                     host.Run(new TournamentGame());
                 else
                     host.Run(new OsuGameDesktop(args));
