@@ -22,8 +22,6 @@ namespace osu.Game.Rulesets.Catch.UI
     /// </summary>
     public class CatcherArea : Container, IKeyBindingHandler<CatchAction>
     {
-        public const float CATCHER_SIZE = 106.75f;
-
         public Catcher Catcher
         {
             get => catcher;
@@ -52,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </remarks>
         public CatcherArea()
         {
-            Size = new Vector2(CatchPlayfield.WIDTH, CATCHER_SIZE);
+            Size = new Vector2(CatchPlayfield.WIDTH, Catcher.BASE_SIZE);
             Child = comboDisplay = new CatchComboDisplay
             {
                 RelativeSizeAxes = Axes.None,
