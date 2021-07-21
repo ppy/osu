@@ -29,6 +29,12 @@ namespace osu.Game.Tests.Visual.Ranking
             AddStep("show example score", () => showPanel(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), new TestScoreInfo(new OsuRuleset().RulesetInfo)));
         }
 
+        [Test]
+        public void TestExcessMods()
+        {
+            AddStep("show excess mods score", () => showPanel(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), new TestScoreInfo(new OsuRuleset().RulesetInfo, true)));
+        }
+
         private void showPanel(WorkingBeatmap workingBeatmap, ScoreInfo score)
         {
             Child = new ContractedPanelMiddleContentContainer(workingBeatmap, score);
