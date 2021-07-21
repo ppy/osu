@@ -12,6 +12,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
@@ -61,9 +62,33 @@ namespace osu.Game.Tests.Visual.Ranking
 
             AddAssert("mapped by text not present", () =>
                 this.ChildrenOfType<OsuSpriteText>().All(spriteText => !containsAny(spriteText.Text.ToString(), "mapped", "by")));
+
+            AddAssert("play time displayed", () => this.ChildrenOfType<ExpandedPanelMiddleContent.PlayedOnText>().Any());
         }
 
-        private void showPanel(ScoreInfo score) => Child = new ExpandedPanelMiddleContentContainer(score);
+        [Test]
+        public void TestWithDefaultDate()
+        {
+            AddStep("show autoplay score", () =>
+            {
+                var ruleset = new OsuRuleset();
+
+                var mods = new Mod[] { ruleset.GetAutoplayMod() };
+                var beatmap = createTestBeatmap(null);
+
+                showPanel(new TestScoreInfo(ruleset.RulesetInfo)
+                {
+                    Mods = mods,
+                    Beatmap = beatmap,
+                    Date = default,
+                });
+            });
+
+            AddAssert("play time not displayed", () => !this.ChildrenOfType<ExpandedPanelMiddleContent.PlayedOnText>().Any());
+        }
+
+        private void showPanel(ScoreInfo score) =>
+            Child = new ExpandedPanelMiddleContentContainer(score);
 
         private BeatmapInfo createTestBeatmap(User author)
         {
