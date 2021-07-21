@@ -70,7 +70,7 @@ namespace osu.Game.Online
                 return true;
             }
 
-            // not ennough time has passed since the last poll. we do want to schedule a poll to happen, though.
+            // not enough time has passed since the last poll. we do want to schedule a poll to happen, though.
             scheduleNextPoll();
             return false;
         }

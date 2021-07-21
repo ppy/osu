@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mods
     /// The base class for gameplay modifiers.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public abstract class Mod : IMod, IEquatable<Mod>, IJsonSerializable
+    public abstract class Mod : IMod, IEquatable<Mod>, IJsonSerializable, IDeepCloneable<Mod>
     {
         /// <summary>
         /// The name of this mod.
@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
         /// </summary>
-        public virtual Mod CreateCopy()
+        public virtual Mod DeepClone()
         {
             var result = (Mod)Activator.CreateInstance(GetType());
             result.CopyFrom(this);
