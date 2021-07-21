@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         public const float CATCHER_SIZE = 106.75f;
 
-        public Catcher MovableCatcher
+        public Catcher Catcher
         {
             get => catcher;
             set
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void OnNewResult(DrawableCatchHitObject hitObject, JudgementResult result)
         {
-            MovableCatcher.OnNewResult(hitObject, result);
+            Catcher.OnNewResult(hitObject, result);
 
             if (!result.Type.IsScorable())
                 return;
@@ -66,9 +66,9 @@ namespace osu.Game.Rulesets.Catch.UI
             if (hitObject.HitObject.LastInCombo)
             {
                 if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
-                    MovableCatcher.Explode();
+                    Catcher.Explode();
                 else
-                    MovableCatcher.Drop();
+                    Catcher.Drop();
             }
 
             comboDisplay.OnNewResult(hitObject, result);
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Catch.UI
         public void OnRevertResult(DrawableCatchHitObject hitObject, JudgementResult result)
         {
             comboDisplay.OnRevertResult(hitObject, result);
-            MovableCatcher.OnRevertResult(hitObject, result);
+            Catcher.OnRevertResult(hitObject, result);
         }
 
         protected override void Update()
@@ -88,27 +88,27 @@ namespace osu.Game.Rulesets.Catch.UI
 
             SetCatcherPosition(
                 replayState?.CatcherX ??
-                (float)(MovableCatcher.X + MovableCatcher.Speed * currentDirection * Clock.ElapsedFrameTime));
+                (float)(Catcher.X + Catcher.Speed * currentDirection * Clock.ElapsedFrameTime));
         }
 
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
 
-            comboDisplay.X = MovableCatcher.X;
+            comboDisplay.X = Catcher.X;
         }
 
         public void SetCatcherPosition(float X)
         {
-            float lastPosition = MovableCatcher.X;
+            float lastPosition = Catcher.X;
             float newPosition = Math.Clamp(X, 0, CatchPlayfield.WIDTH);
 
-            MovableCatcher.X = newPosition;
+            Catcher.X = newPosition;
 
             if (lastPosition < newPosition)
-                MovableCatcher.VisualDirection = Direction.Right;
+                Catcher.VisualDirection = Direction.Right;
             else if (lastPosition > newPosition)
-                MovableCatcher.VisualDirection = Direction.Left;
+                Catcher.VisualDirection = Direction.Left;
         }
 
         public bool OnPressed(CatchAction action)
@@ -124,7 +124,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     return true;
 
                 case CatchAction.Dash:
-                    MovableCatcher.Dashing = true;
+                    Catcher.Dashing = true;
                     return true;
             }
 
@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     break;
 
                 case CatchAction.Dash:
-                    MovableCatcher.Dashing = false;
+                    Catcher.Dashing = false;
                     break;
             }
         }
