@@ -238,6 +238,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         internal class TimelineSelectionHandler : EditorSelectionHandler, IKeyBindingHandler<GlobalAction>
         {
+            [Resolved]
+            private Timeline timeline { get; set; }
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => timeline.ScreenSpaceDrawQuad.Contains(screenSpacePos);
+
             // for now we always allow movement. snapping is provided by the Timeline's "distance" snap implementation
             public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent) => true;
 
