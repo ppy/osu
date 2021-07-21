@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         public static PositionRange Union(PositionRange a, PositionRange b) => new PositionRange(Math.Min(a.Min, b.Min), Math.Max(a.Max, b.Max));
 
+        public float GetFlippedPosition(float x) => Max - (x - Min);
+
         public static readonly PositionRange EMPTY = new PositionRange(float.PositiveInfinity, float.NegativeInfinity);
     }
 }

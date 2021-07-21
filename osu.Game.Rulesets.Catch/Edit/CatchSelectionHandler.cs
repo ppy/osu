@@ -12,6 +12,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
+using Direction = osu.Framework.Graphics.Direction;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
@@ -51,6 +52,26 @@ namespace osu.Game.Rulesets.Catch.Edit
             return true;
         }
 
+        public override bool HandleFlip(Direction direction)
+        {
+            var selectionRange = CatchHitObjectUtils.GetPositionRange(EditorBeatmap.SelectedHitObjects);
+
+            bool changed = false;
+            EditorBeatmap.PerformOnSelection(h =>
+            {
+                if (h is CatchHitObject hitObject)
+                    changed |= handleFlip(selectionRange, hitObject);
+            });
+            return changed;
+        }
+
+        protected override void OnSelectionChanged()
+        {
+            base.OnSelectionChanged();
+
+            SelectionBox.CanFlipX = true;
+        }
+
         /// <summary>
         /// Limit positional movement of the objects by the constraint that moved objects should stay in bounds.
         /// </summary>
@@ -71,6 +92,28 @@ namespace osu.Game.Rulesets.Catch.Edit
                 return 0;
 
             return Math.Clamp(deltaX, lowerBound, upperBound);
+        }
+
+        private bool handleFlip(PositionRange selectionRange, CatchHitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case BananaShower _:
+                    return false;
+
+                case JuiceStream juiceStream:
+                    juiceStream.OriginalX = selectionRange.GetFlippedPosition(juiceStream.OriginalX);
+
+                    foreach (var point in juiceStream.Path.ControlPoints)
+                        point.Position.Value *= new Vector2(-1, 1);
+
+                    EditorBeatmap.Update(juiceStream);
+                    return true;
+
+                default:
+                    hitObject.OriginalX = selectionRange.GetFlippedPosition(hitObject.OriginalX);
+                    return true;
+            }
         }
     }
 }
