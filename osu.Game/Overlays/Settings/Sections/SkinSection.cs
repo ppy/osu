@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -59,7 +60,7 @@ namespace osu.Game.Overlays.Settings.Sections
         private IBindable<WeakReference<SkinInfo>> managerRemoved;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuConfigManager config, SkinEditorOverlay skinEditor)
+        private void load(OsuConfigManager config, [CanBeNull] SkinEditorOverlay skinEditor)
         {
             FlowContent.Spacing = new Vector2(0, 5);
 
