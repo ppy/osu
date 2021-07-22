@@ -9,6 +9,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps;
@@ -113,31 +115,43 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 int index = 0;
 
-                foreach (var drawable in TestPlayer.DrawableRuleset.Playfield.AllHitObjects)
+                return TestPlayer.DrawableRuleset.Playfield.AllHitObjects.All(d =>
                 {
-                    index = nextExpectedComboIndex(index, (OsuHitObject)drawable.HitObject);
-
-                    if (drawable.AccentColour.Value != expectedColours[index % expectedColours.Length])
-                        return false;
-                }
-
-                return true;
+                    index = nextExpectedComboIndex(index, (OsuHitObject)d.HitObject);
+                    return checkComboColour(d, expectedColours[index % expectedColours.Length]);
+                });
             });
+
+            static bool checkComboColour(DrawableHitObject drawableHitObject, Color4 expectedColour)
+            {
+                return drawableHitObject.AccentColour.Value == expectedColour &&
+                       drawableHitObject.NestedHitObjects.All(n => checkComboColour(n, expectedColour));
+            }
         }
 
         private static IEnumerable<OsuHitObject> getHitCirclesWithLegacyOffsets()
         {
             var hitObjects = new List<OsuHitObject>();
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 10; i++)
             {
-                hitObjects.Add(new HitCircle
-                {
-                    StartTime = i,
-                    Position = new Vector2(256, 192),
-                    NewCombo = true,
-                    ComboOffset = i,
-                });
+                var hitObject = i % 2 == 0
+                    ? (OsuHitObject)new HitCircle()
+                    : new Slider()
+                    {
+                        Path = new SliderPath(new[]
+                        {
+                            new PathControlPoint(new Vector2(0, 0)),
+                            new PathControlPoint(new Vector2(100, 0)),
+                        })
+                    };
+
+                hitObject.StartTime = i;
+                hitObject.Position = new Vector2(256, 192);
+                hitObject.NewCombo = true;
+                hitObject.ComboOffset = i;
+
+                hitObjects.Add(hitObject);
             }
 
             return hitObjects;
