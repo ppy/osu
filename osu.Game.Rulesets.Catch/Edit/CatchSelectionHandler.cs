@@ -40,12 +40,12 @@ namespace osu.Game.Rulesets.Catch.Edit
 
             EditorBeatmap.PerformOnSelection(h =>
             {
-                if (!(h is CatchHitObject hitObject)) return;
+                if (!(h is CatchHitObject catchObject)) return;
 
-                hitObject.OriginalX += deltaX;
+                catchObject.OriginalX += deltaX;
 
                 // Move the nested hit objects to give an instant result before nested objects are recreated.
-                foreach (var nested in hitObject.NestedHitObjects.OfType<CatchHitObject>())
+                foreach (var nested in catchObject.NestedHitObjects.OfType<CatchHitObject>())
                     nested.OriginalX += deltaX;
             });
 
@@ -59,8 +59,8 @@ namespace osu.Game.Rulesets.Catch.Edit
             bool changed = false;
             EditorBeatmap.PerformOnSelection(h =>
             {
-                if (h is CatchHitObject hitObject)
-                    changed |= handleFlip(selectionRange, hitObject);
+                if (h is CatchHitObject catchObject)
+                    changed |= handleFlip(selectionRange, catchObject);
             });
             return changed;
         }
