@@ -146,11 +146,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 if (barrelRollActive)
                 {
-                    float origin = restrictTo.ToSpaceOfOtherDrawable(restrictTo.OriginPosition, Parent).X;
+                    float center = restrictTo.ToSpaceOfOtherDrawable(restrictTo.OriginPosition, Parent).X;
                     float halfDiagonal = MathF.Sqrt(MathF.Pow(restrictTo.DrawWidth / 2, 2) + MathF.Pow(restrictTo.DrawHeight / 2, 2));
 
-                    start = origin - halfDiagonal;
-                    end = origin + halfDiagonal;
+                    start = center - halfDiagonal;
+                    end = center + halfDiagonal;
                 }
                 else
                 {
