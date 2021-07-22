@@ -59,14 +59,13 @@ namespace osu.Game.Skinning.Editor
 
         public override void Hide()
         {
-            base.Hide();
+            // base call intentionally omitted.
             skinEditor.Hide();
         }
 
         public override void Show()
         {
-            base.Show();
-
+            // base call intentionally omitted.
             if (skinEditor == null)
             {
                 LoadComponentAsync(skinEditor = new SkinEditor(target), AddInternal);
