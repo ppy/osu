@@ -69,7 +69,8 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
             base.OnSelectionChanged();
 
-            SelectionBox.CanFlipX = true;
+            var selectionRange = CatchHitObjectUtils.GetPositionRange(EditorBeatmap.SelectedHitObjects);
+            SelectionBox.CanFlipX = selectionRange.Length > 0 && EditorBeatmap.SelectedHitObjects.Any(h => h is CatchHitObject && !(h is BananaShower));
         }
 
         /// <summary>
