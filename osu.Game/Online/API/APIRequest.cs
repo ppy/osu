@@ -25,6 +25,11 @@ namespace osu.Game.Online.API
         /// </summary>
         public new event APISuccessHandler<T> Success;
 
+        protected APIRequest()
+        {
+            base.Success += () => Success?.Invoke(Result);
+        }
+
         protected override void PostProcess()
         {
             base.PostProcess();
@@ -39,12 +44,6 @@ namespace osu.Game.Online.API
             Result = result;
 
             TriggerSuccess();
-        }
-
-        internal override void TriggerSuccess()
-        {
-            base.TriggerSuccess();
-            Success?.Invoke(Result);
         }
     }
 
@@ -132,7 +131,7 @@ namespace osu.Game.Online.API
         {
         }
 
-        internal virtual void TriggerSuccess()
+        internal void TriggerSuccess()
         {
             lock (completionStateLock)
             {
