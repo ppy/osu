@@ -65,12 +65,33 @@ namespace osu.Game.Rulesets.Catch.Edit
             return changed;
         }
 
+        public override bool HandleReverse()
+        {
+            double selectionStartTime = SelectedItems.Min(h => h.StartTime);
+            double selectionEndTime = SelectedItems.Max(h => h.GetEndTime());
+
+            EditorBeatmap.PerformOnSelection(hitObject =>
+            {
+                hitObject.StartTime = selectionEndTime - (hitObject.GetEndTime() - selectionStartTime);
+
+                if (hitObject is JuiceStream juiceStream)
+                {
+                    juiceStream.Path.Reverse(out Vector2 positionalOffset);
+                    juiceStream.OriginalX += positionalOffset.X;
+                    juiceStream.LegacyConvertedY += positionalOffset.Y;
+                    EditorBeatmap.Update(juiceStream);
+                }
+            });
+            return true;
+        }
+
         protected override void OnSelectionChanged()
         {
             base.OnSelectionChanged();
 
             var selectionRange = CatchHitObjectUtils.GetPositionRange(SelectedItems);
             SelectionBox.CanFlipX = selectionRange.Length > 0 && SelectedItems.Any(h => h is CatchHitObject && !(h is BananaShower));
+            SelectionBox.CanReverse = SelectedItems.Count > 1 || SelectedItems.Any(h => h is JuiceStream);
         }
 
         /// <summary>
