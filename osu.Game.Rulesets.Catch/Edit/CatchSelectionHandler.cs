@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             Vector2 targetPosition = HitObjectContainer.ToLocalSpace(blueprint.ScreenSpaceSelectionPoint + moveEvent.ScreenSpaceDelta);
 
             float deltaX = targetPosition.X - originalPosition.X;
-            deltaX = limitMovement(deltaX, EditorBeatmap.SelectedHitObjects);
+            deltaX = limitMovement(deltaX, SelectedItems);
 
             if (deltaX == 0)
             {
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         public override bool HandleFlip(Direction direction)
         {
-            var selectionRange = CatchHitObjectUtils.GetPositionRange(EditorBeatmap.SelectedHitObjects);
+            var selectionRange = CatchHitObjectUtils.GetPositionRange(SelectedItems);
 
             bool changed = false;
             EditorBeatmap.PerformOnSelection(h =>
@@ -69,8 +69,8 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
             base.OnSelectionChanged();
 
-            var selectionRange = CatchHitObjectUtils.GetPositionRange(EditorBeatmap.SelectedHitObjects);
-            SelectionBox.CanFlipX = selectionRange.Length > 0 && EditorBeatmap.SelectedHitObjects.Any(h => h is CatchHitObject && !(h is BananaShower));
+            var selectionRange = CatchHitObjectUtils.GetPositionRange(SelectedItems);
+            SelectionBox.CanFlipX = selectionRange.Length > 0 && SelectedItems.Any(h => h is CatchHitObject && !(h is BananaShower));
         }
 
         /// <summary>
