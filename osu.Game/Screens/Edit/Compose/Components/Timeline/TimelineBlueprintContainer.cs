@@ -190,6 +190,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private class SelectableAreaBackground : CompositeDrawable
         {
+            [Resolved]
+            private OsuColour colours { get; set; }
+
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             {
                 float localY = ToLocalSpace(screenSpacePos).Y;
@@ -219,9 +222,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     }
                 });
             }
-
-            [Resolved]
-            private OsuColour colours { get; set; }
 
             protected override bool OnHover(HoverEvent e)
             {
