@@ -50,8 +50,7 @@ namespace osu.Game.Rulesets.Mods
 
             var playfieldSize = drawableRuleset.Playfield.DrawSize;
             var minSide = MathF.Min(playfieldSize.X, playfieldSize.Y);
-            var diagonal = MathF.Sqrt(MathF.Pow(playfieldSize.X, 2) + MathF.Pow(playfieldSize.Y, 2));
-            drawableRuleset.Playfield.Scale = new Vector2(minSide / diagonal);
+            drawableRuleset.Playfield.Scale = new Vector2(minSide / playfieldSize.Length);
         }
     }
 }
