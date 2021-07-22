@@ -4,7 +4,7 @@
 using osu.Framework.Localisation;
 using osu.Game.Rulesets;
 
-namespace osu.Game.Overlays.KeyBinding
+namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public class VariantBindingsSubsection : KeyBindingsSubsection
     {
