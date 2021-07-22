@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             Vector2 targetPosition = HitObjectContainer.ToLocalSpace(blueprint.ScreenSpaceSelectionPoint + moveEvent.ScreenSpaceDelta);
 
             float deltaX = targetPosition.X - originalPosition.X;
-            deltaX = limitMovement(deltaX, EditorBeatmap.SelectedHitObjects);
+            deltaX = limitMovement(deltaX, SelectedItems);
 
             if (deltaX == 0)
             {
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         public override bool HandleFlip(Direction direction)
         {
-            var selectionRange = CatchHitObjectUtils.GetPositionRange(EditorBeatmap.SelectedHitObjects);
+            var selectionRange = CatchHitObjectUtils.GetPositionRange(SelectedItems);
 
             bool changed = false;
             EditorBeatmap.PerformOnSelection(h =>
@@ -65,12 +65,33 @@ namespace osu.Game.Rulesets.Catch.Edit
             return changed;
         }
 
+        public override bool HandleReverse()
+        {
+            double selectionStartTime = SelectedItems.Min(h => h.StartTime);
+            double selectionEndTime = SelectedItems.Max(h => h.GetEndTime());
+
+            EditorBeatmap.PerformOnSelection(hitObject =>
+            {
+                hitObject.StartTime = selectionEndTime - (hitObject.GetEndTime() - selectionStartTime);
+
+                if (hitObject is JuiceStream juiceStream)
+                {
+                    juiceStream.Path.Reverse(out Vector2 positionalOffset);
+                    juiceStream.OriginalX += positionalOffset.X;
+                    juiceStream.LegacyConvertedY += positionalOffset.Y;
+                    EditorBeatmap.Update(juiceStream);
+                }
+            });
+            return true;
+        }
+
         protected override void OnSelectionChanged()
         {
             base.OnSelectionChanged();
 
-            var selectionRange = CatchHitObjectUtils.GetPositionRange(EditorBeatmap.SelectedHitObjects);
-            SelectionBox.CanFlipX = selectionRange.Length > 0 && EditorBeatmap.SelectedHitObjects.Any(h => h is CatchHitObject && !(h is BananaShower));
+            var selectionRange = CatchHitObjectUtils.GetPositionRange(SelectedItems);
+            SelectionBox.CanFlipX = selectionRange.Length > 0 && SelectedItems.Any(h => h is CatchHitObject && !(h is BananaShower));
+            SelectionBox.CanReverse = SelectedItems.Count > 1 || SelectedItems.Any(h => h is JuiceStream);
         }
 
         /// <summary>
