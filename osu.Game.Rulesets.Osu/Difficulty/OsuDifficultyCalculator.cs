@@ -34,7 +34,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
             double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
-            double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
+            
+            double baseAimPerformance = Math.Pow(5 * Math.Max(1, aimRating) - 4, 3) / 100000;
+            double baseSpeedPerformance = Math.Pow(5 * Math.Max(1, speedRating) - 4, 3) / 100000;
+            double basePerformance = Math.Pow(Math.Pow(baseAimPerformance, 1.1) + Math.Pow(baseSpeedPerformance, 1.1), 1 / 1.1);
+            double starRating = basePerformance > 0.00001 ? 0.027 * (Math.Cbrt(100000 / Math.Pow(2, 1 / 1.1) * basePerformance) + 4) : 0;
 
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
