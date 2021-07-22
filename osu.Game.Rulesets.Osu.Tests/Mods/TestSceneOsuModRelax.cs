@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
-using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
@@ -20,11 +19,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
     public class TestSceneOsuModRelax : OsuModTestScene
     {
+        protected new ScoreAccessiblePlayer Player => (ScoreAccessiblePlayer)base.Player;
+
         [Test]
         public void TestKeyUp()
         {
-            var hitObjects = CreateHitObjects();
-
             CreateModTest(new ModTestData
             {
                 Autoplay = false,
@@ -36,17 +35,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     },
                 Beatmap = new Beatmap
                 {
-                    HitObjects = hitObjects
+                    HitObjects = CreateHitObjects()
                 },
                 PassCondition = () => Player.ScoreProcessor.Combo.Value == 15
             });
-            Replay replay = null;
-            InputManager.UseParentInput = false;
 
-            AddStep("show key overlay", () => Player.HUDOverlay.KeyCounter.AlwaysVisible.Value = true);
-            AddUntilStep("wait for beatmap end", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= hitObjects.Last().StartTime);
-            AddStep("get replay", () => replay = ((ScoreAccessiblePlayer)Player).Score.Replay);
-            AddAssert("no key was held", () => replay.Frames.Cast<OsuReplayFrame>().Last().Actions.Count == 0);
+            AddUntilStep("wait for beatmap end", () => Player.ScoreProcessor.HasCompleted.Value);
+            AddAssert("no key was held", () => Player.Score.Replay.Frames
+                                                     .Cast<OsuReplayFrame>().Last().Actions.Count == 0);
         }
 
         protected override TestPlayer CreateModPlayer(Ruleset ruleset) => new ScoreAccessiblePlayer(AllowFail);
