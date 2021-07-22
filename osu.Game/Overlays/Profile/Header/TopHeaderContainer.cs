@@ -181,19 +181,19 @@ namespace osu.Game.Overlays.Profile.Header
 
             if (user?.Statistics != null)
             {
-                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsRankedScore, user.Statistics.RankedScore.ToString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsRankedScore, user.Statistics.RankedScore.ToLocalisableString("#,##0")));
                 userStats.Add(new UserStatsLine(UsersStrings.ShowStatsHitAccuracy, user.Statistics.DisplayAccuracy));
-                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsPlayCount, user.Statistics.PlayCount.ToString("#,##0")));
-                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsTotalScore, user.Statistics.TotalScore.ToString("#,##0")));
-                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsTotalHits, user.Statistics.TotalHits.ToString("#,##0")));
-                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsMaximumCombo, user.Statistics.MaxCombo.ToString("#,##0")));
-                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsReplaysWatchedByOthers, user.Statistics.ReplaysWatched.ToString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsPlayCount, user.Statistics.PlayCount.ToLocalisableString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsTotalScore, user.Statistics.TotalScore.ToLocalisableString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsTotalHits, user.Statistics.TotalHits.ToLocalisableString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsMaximumCombo, user.Statistics.MaxCombo.ToLocalisableString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsReplaysWatchedByOthers, user.Statistics.ReplaysWatched.ToLocalisableString("#,##0")));
             }
         }
 
         private class UserStatsLine : Container
         {
-            public UserStatsLine(LocalisableString left, string right)
+            public UserStatsLine(LocalisableString left, LocalisableString right)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
