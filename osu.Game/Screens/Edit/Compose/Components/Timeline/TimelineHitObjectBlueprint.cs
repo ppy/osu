@@ -37,7 +37,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private readonly Bindable<double> startTime;
 
         private Bindable<int> indexInCurrentComboBindable;
+
         private Bindable<int> comboIndexBindable;
+        private Bindable<int> comboIndexWithOffsetsBindable;
+
         private Bindable<Color4> displayColourBindable;
 
         private readonly ExtendableCircle circle;
@@ -121,6 +124,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     comboIndexBindable = comboInfo.ComboIndexBindable.GetBoundCopy();
                     comboIndexBindable.BindValueChanged(_ => updateColour(), true);
+
+                    comboIndexWithOffsetsBindable = comboInfo.ComboIndexWithOffsetsBindable.GetBoundCopy();
+                    comboIndexWithOffsetsBindable.BindValueChanged(_ => updateColour(), true);
 
                     skin.SourceChanged += updateColour;
                     break;
