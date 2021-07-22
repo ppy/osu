@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             base.LoadComplete();
 
             // TODO: honor "hit animation" setting?
-            CatcherArea.MovableCatcher.CatchFruitOnPlate = false;
+            Catcher.CatchFruitOnPlate = false;
 
             // TODO: disable hit lighting as well
         }

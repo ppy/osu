@@ -9,11 +9,10 @@ using osu.Framework.Graphics;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
-using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osuTK;
 
-namespace osu.Game.Overlays.KeyBinding
+namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public abstract class KeyBindingsSubsection : SettingsSubsection
     {

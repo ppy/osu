@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -34,7 +36,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     new OsuSpriteText
                     {
                         Margin = new MarginPadding { Horizontal = 10f, Vertical = 2f },
-                        Text = "EXPLICIT",
+                        Text = BeatmapsetsStrings.NsfwBadgeLabel.ToUpper(),
                         Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold),
                         Colour = OverlayColourProvider.Orange.Colour2,
                     }

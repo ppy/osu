@@ -24,7 +24,7 @@ using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
-namespace osu.Game.Overlays.KeyBinding
+namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public class KeyBindingRow : Container, IFilterable
     {
