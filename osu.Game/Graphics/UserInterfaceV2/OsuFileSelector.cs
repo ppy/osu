@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -50,9 +51,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Flow.AutoSizeAxes = Axes.X;
                 Flow.Height = OsuDirectorySelector.ITEM_HEIGHT;
 
-                AddInternal(new OsuDirectorySelectorDirectory.Background
+                AddRangeInternal(new Drawable[]
                 {
-                    Depth = 1
+                    new OsuDirectorySelectorDirectory.Background
+                    {
+                        Depth = 1
+                    },
+                    new HoverClickSounds(HoverSampleSet.Soft)
                 });
             }
 

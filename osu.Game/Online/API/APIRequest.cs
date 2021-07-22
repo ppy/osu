@@ -25,6 +25,11 @@ namespace osu.Game.Online.API
         /// </summary>
         public new event APISuccessHandler<T> Success;
 
+        protected APIRequest()
+        {
+            base.Success += () => Success?.Invoke(Result);
+        }
+
         protected override void PostProcess()
         {
             base.PostProcess();
@@ -39,12 +44,6 @@ namespace osu.Game.Online.API
             Result = result;
 
             TriggerSuccess();
-        }
-
-        internal override void TriggerSuccess()
-        {
-            base.TriggerSuccess();
-            Success?.Invoke(Result);
         }
     }
 
@@ -79,7 +78,13 @@ namespace osu.Game.Online.API
         /// </summary>
         public event APIFailureHandler Failure;
 
-        private bool cancelled;
+        private readonly object completionStateLock = new object();
+
+        /// <summary>
+        /// The state of this request, from an outside perspective.
+        /// This is used to ensure correct notification events are fired.
+        /// </summary>
+        private APIRequestCompletionState completionState;
 
         private Action pendingFailure;
 
@@ -116,12 +121,7 @@ namespace osu.Game.Online.API
 
             PostProcess();
 
-            API.Schedule(delegate
-            {
-                if (cancelled) return;
-
-                TriggerSuccess();
-            });
+            API.Schedule(TriggerSuccess);
         }
 
         /// <summary>
@@ -131,16 +131,29 @@ namespace osu.Game.Online.API
         {
         }
 
-        private bool succeeded;
-
-        internal virtual void TriggerSuccess()
+        internal void TriggerSuccess()
         {
-            succeeded = true;
+            lock (completionStateLock)
+            {
+                if (completionState != APIRequestCompletionState.Waiting)
+                    return;
+
+                completionState = APIRequestCompletionState.Completed;
+            }
+
             Success?.Invoke();
         }
 
         internal void TriggerFailure(Exception e)
         {
+            lock (completionStateLock)
+            {
+                if (completionState != APIRequestCompletionState.Waiting)
+                    return;
+
+                completionState = APIRequestCompletionState.Failed;
+            }
+
             Failure?.Invoke(e);
         }
 
@@ -148,10 +161,14 @@ namespace osu.Game.Online.API
 
         public void Fail(Exception e)
         {
-            if (succeeded || cancelled)
-                return;
+            lock (completionStateLock)
+            {
+                // while it doesn't matter if code following this check is run more than once,
+                // this avoids unnecessarily performing work where we are already sure the user has been informed.
+                if (completionState != APIRequestCompletionState.Waiting)
+                    return;
+            }
 
-            cancelled = true;
             WebRequest?.Abort();
 
             string responseString = WebRequest?.GetResponseString();
@@ -181,7 +198,11 @@ namespace osu.Game.Online.API
         /// <returns>Whether we are in a failed or cancelled state.</returns>
         private bool checkAndScheduleFailure()
         {
-            if (pendingFailure == null) return cancelled;
+            lock (completionStateLock)
+            {
+                if (pendingFailure == null)
+                    return completionState == APIRequestCompletionState.Failed;
+            }
 
             if (API == null)
                 pendingFailure();
@@ -196,14 +217,6 @@ namespace osu.Game.Online.API
         {
             [JsonProperty("error")]
             public string ErrorMessage { get; set; }
-        }
-    }
-
-    public class APIException : InvalidOperationException
-    {
-        public APIException(string messsage, Exception innerException)
-            : base(messsage, innerException)
-        {
         }
     }
 

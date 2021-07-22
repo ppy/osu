@@ -46,11 +46,11 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                 case BeatmapSetType.Loved:
                     return user.LovedBeatmapsetCount;
 
-                case BeatmapSetType.RankedAndApproved:
-                    return user.RankedAndApprovedBeatmapsetCount;
+                case BeatmapSetType.Ranked:
+                    return user.RankedBeatmapsetCount;
 
-                case BeatmapSetType.Unranked:
-                    return user.UnrankedBeatmapsetCount;
+                case BeatmapSetType.Pending:
+                    return user.PendingBeatmapsetCount;
 
                 default:
                     return 0;
