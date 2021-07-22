@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Catch.Edit
         public readonly float Min;
         public readonly float Max;
 
+        public float Length => Max - Min;
+
         public PositionRange(float value)
             : this(value, value)
         {
