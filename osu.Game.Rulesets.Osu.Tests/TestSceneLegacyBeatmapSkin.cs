@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var hitObject = i % 2 == 0
                     ? (OsuHitObject)new HitCircle()
-                    : new Slider()
+                    : new Slider
                     {
                         Path = new SliderPath(new[]
                         {
