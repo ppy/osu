@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Objects.Types
         /// </summary>
         int ComboIndex { get; set; }
 
+        Bindable<int> ComboIndexWithOffsetsBindable { get; }
+
         /// <summary>
         /// The offset of this combo in relation to the beatmap, with all aggregate <see cref="IHasCombo.ComboOffset"/>s applied.
         /// This should be used instead of <see cref="ComboIndex"/> only when retrieving combo colours from the beatmap's skin.
