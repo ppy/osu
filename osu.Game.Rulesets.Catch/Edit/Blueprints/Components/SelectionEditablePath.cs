@@ -44,8 +44,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             int index = getMouseTargetVertex(e.ScreenSpaceMouseDownPosition);
-
-            if (index == -1)
+            if (index == -1 || VertexStates[index].IsFixed)
                 return false;
 
             if (e.Button == MouseButton.Left && e.ShiftPressed)
@@ -65,7 +64,12 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         protected override bool OnDragStart(DragStartEvent e)
         {
-            if (e.Button != MouseButton.Left || getMouseTargetVertex(e.ScreenSpaceMouseDownPosition) == -1) return false;
+            int index = getMouseTargetVertex(e.ScreenSpaceMouseDownPosition);
+            if (index == -1 || VertexStates[index].IsFixed)
+                return false;
+
+            if (e.Button != MouseButton.Left)
+                return false;
 
             dragStartPosition = ToRelativePosition(e.ScreenSpaceMouseDownPosition);
 
