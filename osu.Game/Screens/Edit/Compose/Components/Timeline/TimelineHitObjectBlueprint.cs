@@ -125,10 +125,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     comboIndexBindable = comboInfo.ComboIndexBindable.GetBoundCopy();
                     comboIndexWithOffsetsBindable = comboInfo.ComboIndexWithOffsetsBindable.GetBoundCopy();
 
-                    comboIndexBindable.ValueChanged += _ => updateColour();
-                    comboIndexWithOffsetsBindable.ValueChanged += _ => updateColour();
+                    comboIndexBindable.BindValueChanged(_ => updateColour());
+                    comboIndexWithOffsetsBindable.BindValueChanged(_ => updateColour(), true);
+
                     skin.SourceChanged += updateColour;
-                    updateColour();
                     break;
             }
         }
