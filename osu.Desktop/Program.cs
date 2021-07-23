@@ -32,7 +32,7 @@ namespace osu.Desktop
                 var split = arg.Split('=');
 
                 var key = split[0];
-                var val = split[1];
+                var val = split.Length > 1 ? split[1] : string.Empty;
 
                 switch (key)
                 {
