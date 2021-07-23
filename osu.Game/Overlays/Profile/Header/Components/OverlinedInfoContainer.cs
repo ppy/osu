@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             set => title.Text = value;
         }
 
-        public string Content
+        public LocalisableString Content
         {
             set => content.Text = value;
         }
