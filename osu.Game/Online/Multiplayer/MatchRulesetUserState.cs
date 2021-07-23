@@ -12,7 +12,7 @@ namespace osu.Game.Online.Multiplayer
     /// </summary>
     [Serializable]
     [MessagePackObject]
-    public abstract class MatchRulesetUserState
+    public class MatchRulesetUserState
     {
     }
 }
