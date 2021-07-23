@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             for (int i = 0; i < VertexCount; i++)
             {
                 VertexStates[i].IsSelected = i == index;
+                VertexStates[i].IsFixed = i != index;
                 VertexStates[i].VertexBeforeChange = Vertices[i];
             }
 
