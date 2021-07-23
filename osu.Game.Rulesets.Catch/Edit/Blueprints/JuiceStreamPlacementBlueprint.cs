@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Catch.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Catch.Objects;
@@ -21,6 +22,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
         private int lastEditablePathId = -1;
 
+        private InputManager inputManager;
+
         public JuiceStreamPlacementBlueprint()
         {
             InternalChildren = new Drawable[]
@@ -37,6 +40,13 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
 
             if (PlacementActive == PlacementState.Active)
                 editablePath.UpdateFrom(HitObjectContainer, HitObject);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -80,7 +90,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
                     break;
 
                 case PlacementState.Active:
-                    Vector2 unsnappedPosition = GetContainingInputManager().CurrentState.Mouse.Position;
+                    Vector2 unsnappedPosition = inputManager.CurrentState.Mouse.Position;
                     editablePath.MoveLastVertex(unsnappedPosition);
                     break;
 
