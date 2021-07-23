@@ -67,10 +67,19 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
         [Test]
         public void TestVelocityLimit()
         {
-            double[] times = { 100, 300, 500 };
-            float[] positions = { 200, 300, 100 };
+            double[] times = { 100, 300 };
+            float[] positions = { 200, 500 };
             addPlacementSteps(times, positions);
-            addPathCheckStep(times, new float[] { 200, 200, 100 });
+            addPathCheckStep(times, new float[] { 200, 300 });
+        }
+
+        [Test]
+        public void TestPreviousVerticesAreFixed()
+        {
+            double[] times = { 100, 300, 500, 700 };
+            float[] positions = { 200, 400, 100, 500 };
+            addPlacementSteps(times, positions);
+            addPathCheckStep(times, new float[] { 200, 300, 200, 300 });
         }
 
         [Test]
