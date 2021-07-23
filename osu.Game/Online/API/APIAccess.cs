@@ -148,6 +148,16 @@ namespace osu.Game.Online.API
 
                         var userReq = new GetUserRequest();
 
+                        userReq.Failure += ex =>
+                        {
+                            if (ex.InnerException is WebException webException && webException.Message == @"Unauthorized")
+                            {
+                                log.Add(@"Login no longer valid");
+                                Logout();
+                            }
+                            else
+                                failConnectionProcess();
+                        };
                         userReq.Success += u =>
                         {
                             localUser.Value = u;
@@ -167,6 +177,7 @@ namespace osu.Game.Online.API
                         // getting user's friends is considered part of the connection process.
                         var friendsReq = new GetFriendsRequest();
 
+                        friendsReq.Failure += _ => failConnectionProcess();
                         friendsReq.Success += res =>
                         {
                             friends.AddRange(res);
