@@ -187,7 +187,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadComplete();
 
-            comboIndexBindable.BindValueChanged(_ => UpdateComboColour(), true);
+            comboIndexBindable.BindValueChanged(_ => UpdateComboColour());
             comboIndexWithOffsetsBindable.BindValueChanged(_ => UpdateComboColour(), true);
 
             updateState(ArmedState.Idle, true);
