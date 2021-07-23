@@ -9,7 +9,11 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 {
     public class PlacementEditablePath : EditablePath
     {
-        private JuiceStreamPathVertex originalNewVertex;
+        /// <summary>
+        /// The original position of the last added vertex.
+        /// This is not same as the last vertex of the current path because the vertex ordering can change.
+        /// </summary>
+        private JuiceStreamPathVertex lastVertex;
 
         public PlacementEditablePath(Func<float, double> positionToDistance)
             : base(positionToDistance)
@@ -27,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
                 VertexStates[i].VertexBeforeChange = Vertices[i];
             }
 
-            originalNewVertex = Vertices[index];
+            lastVertex = Vertices[index];
         }
 
         /// <summary>
@@ -36,8 +40,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         public void MoveLastVertex(Vector2 screenSpacePosition)
         {
             Vector2 position = ToRelativePosition(screenSpacePosition);
-            double distanceDelta = PositionToDistance(position.Y) - originalNewVertex.Distance;
-            float xDelta = position.X - originalNewVertex.X;
+            double distanceDelta = PositionToDistance(position.Y) - lastVertex.Distance;
+            float xDelta = position.X - lastVertex.X;
             MoveSelectedVertices(distanceDelta, xDelta);
         }
     }
