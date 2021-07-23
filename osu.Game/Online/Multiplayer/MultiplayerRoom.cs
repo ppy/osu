@@ -39,7 +39,7 @@ namespace osu.Game.Online.Multiplayer
         /// All users currently in this room.
         /// </summary>
         [Key(3)]
-        public List<MultiplayerRoomUser> Users { get; set; } = new List<MultiplayerRoomUser>();
+        public IList<MultiplayerRoomUser> Users { get; set; } = new List<MultiplayerRoomUser>();
 
         /// <summary>
         /// The host of this room, in control of changing room settings.
