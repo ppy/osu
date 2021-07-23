@@ -118,6 +118,7 @@ namespace osu.Game.Rulesets.Objects
                 foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
                 {
                     n.ComboIndexBindable.BindTo(hasCombo.ComboIndexBindable);
+                    n.ComboIndexWithOffsetsBindable.BindTo(hasCombo.ComboIndexWithOffsetsBindable);
                     n.IndexInCurrentComboBindable.BindTo(hasCombo.IndexInCurrentComboBindable);
                 }
             }
