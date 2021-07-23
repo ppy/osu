@@ -123,12 +123,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     indexInCurrentComboBindable.BindValueChanged(_ => updateComboIndex(), true);
 
                     comboIndexBindable = comboInfo.ComboIndexBindable.GetBoundCopy();
-                    comboIndexBindable.BindValueChanged(_ => updateColour(), true);
-
                     comboIndexWithOffsetsBindable = comboInfo.ComboIndexWithOffsetsBindable.GetBoundCopy();
-                    comboIndexWithOffsetsBindable.BindValueChanged(_ => updateColour(), true);
 
+                    comboIndexBindable.ValueChanged += _ => updateColour();
+                    comboIndexWithOffsetsBindable.ValueChanged += _ => updateColour();
                     skin.SourceChanged += updateColour;
+                    updateColour();
                     break;
             }
         }
