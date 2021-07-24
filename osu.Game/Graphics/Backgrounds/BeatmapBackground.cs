@@ -4,7 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
-
+using osu.Framework.Graphics;
 namespace osu.Game.Graphics.Backgrounds
 {
     public class BeatmapBackground : Background
@@ -17,6 +17,8 @@ namespace osu.Game.Graphics.Backgrounds
         {
             Beatmap = beatmap;
             this.fallbackTextureName = fallbackTextureName;
+            if (!beatmap.Storyboard.ReplacesBackground && beatmap.Storyboard.LatestEventTime != null)
+                Sprite.FillMode = FillMode.Fit;
         }
 
         [BackgroundDependencyLoader]

@@ -13,7 +13,6 @@ namespace osu.Game.Screens
         public BackgroundScreenStack()
             : base(false)
         {
-            Scale = new Vector2(1.06f);
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
