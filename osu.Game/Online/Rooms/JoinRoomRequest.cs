@@ -22,7 +22,8 @@ namespace osu.Game.Online.Rooms
         {
             var req = base.CreateWebRequest();
             req.Method = HttpMethod.Put;
-            req.AddParameter(@"password", Password, RequestParameterType.Query);
+            if (!string.IsNullOrEmpty(Password))
+                req.AddParameter(@"password", Password, RequestParameterType.Query);
             return req;
         }
 
