@@ -173,13 +173,13 @@ namespace osu.Game.Overlays.Profile.Header
         private void updateDisplay(User user)
         {
             medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
-            ppInfo.Content = user?.Statistics?.PP != null ? (LocalisableString)user?.Statistics?.PP?.ToLocalisableString("#,##0") : "0";
+            ppInfo.Content = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
 
             foreach (var scoreRankInfo in scoreRankInfos)
                 scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
-            detailGlobalRank.Content = user?.Statistics?.GlobalRank != null ? (LocalisableString)user.Statistics.GlobalRank.ToLocalisableString("\\##,##0") : "-";
-            detailCountryRank.Content = user?.Statistics?.CountryRank != null ? (LocalisableString)user.Statistics.CountryRank.ToLocalisableString("\\##,##0") : "-";
+            detailGlobalRank.Content = user?.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+            detailCountryRank.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
 
             rankGraph.Statistics.Value = user?.Statistics;
         }
