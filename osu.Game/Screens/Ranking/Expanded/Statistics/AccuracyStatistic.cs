@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -44,7 +45,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
             protected override Easing RollingEasing => AccuracyCircle.ACCURACY_TRANSFORM_EASING;
 
-            protected override string FormatCount(double count) => count.FormatAccuracy();
+            protected override LocalisableString FormatCount(double count) => count.FormatAccuracy();
 
             protected override OsuSpriteText CreateSpriteText() => base.CreateSpriteText().With(s =>
             {
