@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Localisation;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
@@ -145,8 +146,8 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void updateDisplay(User user)
         {
-            hiddenDetailGlobal.Content = user?.Statistics?.GlobalRank?.ToString("\\##,##0") ?? "-";
-            hiddenDetailCountry.Content = user?.Statistics?.CountryRank?.ToString("\\##,##0") ?? "-";
+            hiddenDetailGlobal.Content = user?.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+            hiddenDetailCountry.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
         }
     }
 }
