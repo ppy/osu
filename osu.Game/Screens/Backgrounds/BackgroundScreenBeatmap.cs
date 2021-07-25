@@ -96,13 +96,7 @@ namespace osu.Game.Screens.Backgrounds
                 Schedule(() =>
                 {
                     if ((Background as BeatmapBackground)?.Beatmap.BeatmapInfo.BackgroundEquals(beatmap?.BeatmapInfo) ?? false)
-                    {
-                        //if (!beatmap.Storyboard.ReplacesBackground && beatmap.Storyboard.HasDrawable)
-                        //{
-                        //    beatmap.Sprite.FillMode = FillMode.Fit;
-                        //}
                         return;
-                    }
 
                     cancellationSource?.Cancel();
                     LoadComponentAsync(new BeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
