@@ -27,6 +27,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             InternalChild = new SkinnableDrawable(new CatchSkinComponent(CatchSkinComponents.HitExplosion), _ => new DefaultHitExplosion())
             {
+                CentreComponent = false,
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre
             };
