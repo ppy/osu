@@ -23,6 +23,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
+    [Cached]
     public class Catcher : SkinReloadableDrawable
     {
         /// <summary>
@@ -106,7 +107,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Width of the area that can be used to attempt catches during gameplay.
         /// </summary>
-        private readonly float catchWidth;
+        public readonly float CatchWidth;
 
         private readonly SkinnableCatcher body;
 
@@ -133,7 +134,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (difficulty != null)
                 Scale = calculateScale(difficulty);
 
-            catchWidth = CalculateCatchWidth(Scale);
+            CatchWidth = CalculateCatchWidth(Scale);
 
             InternalChildren = new Drawable[]
             {
@@ -193,7 +194,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (!(hitObject is PalpableCatchHitObject fruit))
                 return false;
 
-            float halfCatchWidth = catchWidth * 0.5f;
+            float halfCatchWidth = CatchWidth * 0.5f;
             return fruit.EffectiveX >= X - halfCatchWidth &&
                    fruit.EffectiveX <= X + halfCatchWidth;
         }
