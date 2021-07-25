@@ -60,6 +60,19 @@ namespace osu.Game.Screens.Backgrounds
             StoryboardReplacesBackground.BindTo(dimmable.StoryboardReplacesBackground);
         }
 
+        public void TurnFitMode(bool On)
+        {
+            cancellationSource?.Cancel();
+            if (On)
+            {
+                LoadComponentAsync(BeatmapBackground.FittedBeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
+            }
+            else
+            {
+                LoadComponentAsync(new BeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
+            }
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -83,7 +96,13 @@ namespace osu.Game.Screens.Backgrounds
                 Schedule(() =>
                 {
                     if ((Background as BeatmapBackground)?.Beatmap.BeatmapInfo.BackgroundEquals(beatmap?.BeatmapInfo) ?? false)
+                    {
+                        //if (!beatmap.Storyboard.ReplacesBackground && beatmap.Storyboard.HasDrawable)
+                        //{
+                        //    beatmap.Sprite.FillMode = FillMode.Fit;
+                        //}
                         return;
+                    }
 
                     cancellationSource?.Cancel();
                     LoadComponentAsync(new BeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
