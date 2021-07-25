@@ -216,7 +216,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     placeCaughtObject(palpableObject, positionInStack);
 
                 if (hitLighting.Value)
-                    addLighting(hitObject, positionInStack.X, drawableObject.AccentColour.Value);
+                    addLighting(result, drawableObject.AccentColour.Value, positionInStack.X);
             }
 
             // droplet doesn't affect the catcher state
@@ -365,8 +365,8 @@ namespace osu.Game.Rulesets.Catch.UI
             return position;
         }
 
-        private void addLighting(CatchHitObject hitObject, float x, Color4 colour) =>
-            hitExplosionContainer.Add(new HitExplosionEntry(Time.Current, x, hitObject.Scale, colour, hitObject.RandomSeed));
+        private void addLighting(JudgementResult judgementResult, Color4 colour, float x) =>
+            hitExplosionContainer.Add(new HitExplosionEntry(judgementResult, colour, x, Time.Current));
 
         private CaughtObject getCaughtObject(PalpableCatchHitObject source)
         {

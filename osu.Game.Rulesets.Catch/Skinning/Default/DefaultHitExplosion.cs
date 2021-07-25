@@ -87,11 +87,11 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
                 return;
 
             X = entry.Position;
-            Scale = new Vector2(entry.Scale);
+            Scale = new Vector2(entry.HitObject.Scale);
             setColour(entry.ObjectColour);
 
             using (BeginAbsoluteSequence(entry.LifetimeStart))
-                applyTransforms(entry.RNGSeed);
+                applyTransforms(entry.HitObject.RandomSeed);
         }
 
         private void applyTransforms(int randomSeed)
