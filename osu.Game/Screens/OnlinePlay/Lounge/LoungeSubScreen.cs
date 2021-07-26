@@ -177,7 +177,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             this.HidePopover();
         }
 
-        public void Join(Room room, string password)
+        public void Join(Room room, string password) => Schedule(() =>
         {
             if (joiningRoomOperation != null)
                 return;
@@ -194,25 +194,22 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 joiningRoomOperation?.Dispose();
                 joiningRoomOperation = null;
             });
-        }
-
-        private void updateLoadingLayer()
-        {
-            if (operationInProgress.Value || !initialRoomsReceived.Value)
-                loadingLayer.Show();
-            else
-                loadingLayer.Hide();
-        }
+        });
 
         /// <summary>
         /// Push a room as a new subscreen.
         /// </summary>
-        public virtual void Open(Room room)
+        public void Open(Room room) => Schedule(() =>
         {
             // Handles the case where a room is clicked 3 times in quick succession
             if (!this.IsCurrentScreen())
                 return;
 
+            OpenNewRoom(room);
+        });
+
+        protected virtual void OpenNewRoom(Room room)
+        {
             selectedRoom.Value = room;
 
             this.Push(CreateRoomSubScreen(room));
@@ -221,5 +218,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         protected abstract FilterControl CreateFilterControl();
 
         protected abstract RoomSubScreen CreateRoomSubScreen(Room room);
+
+        private void updateLoadingLayer()
+        {
+            if (operationInProgress.Value || !initialRoomsReceived.Value)
+                loadingLayer.Show();
+            else
+                loadingLayer.Hide();
+        }
     }
 }
