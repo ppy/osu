@@ -113,10 +113,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             highPrecisionMouse.Current.BindValueChanged(highPrecision =>
             {
-                if (RuntimeInfo.OS == RuntimeInfo.Platform.macOS)
+                if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
                 {
                     if (highPrecision.NewValue)
-                        highPrecisionMouse.WarningText = MouseSettingsStrings.HighPrecisionMacOSWarning;
+                        highPrecisionMouse.WarningText = MouseSettingsStrings.HighPrecisionPlatformWarning;
                     else
                         highPrecisionMouse.WarningText = null;
                 }
