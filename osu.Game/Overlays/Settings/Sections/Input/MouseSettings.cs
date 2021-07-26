@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
@@ -28,6 +29,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private SettingsEnumDropdown<OsuConfineMouseMode> confineMouseModeSetting;
         private Bindable<bool> relativeMode;
 
+        private SettingsCheckbox highPrecisionMouse;
+
         public MouseSettings(MouseHandler mouseHandler)
         {
             this.mouseHandler = mouseHandler;
@@ -45,7 +48,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             Children = new Drawable[]
             {
-                new SettingsCheckbox
+                highPrecisionMouse = new SettingsCheckbox
                 {
                     LabelText = MouseSettingsStrings.HighPrecisionMouse,
                     TooltipText = MouseSettingsStrings.HighPrecisionMouseTooltip,
@@ -105,6 +108,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     confineMouseModeSetting.Current.Disabled = false;
                     confineMouseModeSetting.TooltipText = string.Empty;
+                }
+            }, true);
+
+            highPrecisionMouse.Current.BindValueChanged(highPrecision =>
+            {
+                if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
+                {
+                    if (highPrecision.NewValue)
+                        highPrecisionMouse.WarningText = MouseSettingsStrings.HighPrecisionPlatformWarning;
+                    else
+                        highPrecisionMouse.WarningText = null;
                 }
             }, true);
         }
