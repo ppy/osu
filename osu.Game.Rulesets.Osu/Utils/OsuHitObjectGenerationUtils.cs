@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         }
 
         /// <summary>
-        /// Reflects an OsuHitObject's position horizontally (over the 'y axis').
+        /// Reflects an OsuHitObject's position horizontally.
         /// </summary>
         /// <param name="osuObject">The OsuHitObject to be reflected.</param>
         /// <returns>The reflected OsuHitObject.</returns>
@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         }
 
         /// <summary>
-        /// Reflects an OsuHitObject's position vertically (over the 'x axis').
+        /// Reflects an OsuHitObject's position vertically.
         /// </summary>
         /// <param name="osuObject">The OsuHitObject to be reflected.</param>
         /// <returns>The reflected OsuHitObject.</returns>
