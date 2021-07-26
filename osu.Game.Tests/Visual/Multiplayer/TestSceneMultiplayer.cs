@@ -79,6 +79,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("load multiplayer", () => LoadScreen(multiplayerScreen));
             AddUntilStep("wait for multiplayer to load", () => multiplayerScreen.IsLoaded);
+            AddUntilStep("wait for lounge to load", () => this.ChildrenOfType<MultiplayerLoungeSubScreen>().FirstOrDefault()?.IsLoaded == true);
         }
 
         [Test]
