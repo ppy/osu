@@ -218,14 +218,9 @@ namespace osu.Game.Rulesets.Catch.UI
             if (!(hitObject is PalpableCatchHitObject fruit))
                 return false;
 
-            var halfCatchWidth = catchWidth * 0.5f;
-
-            // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
-            var catchObjectPosition = fruit.EffectiveX;
-            var catcherPosition = Position.X;
-
-            return catchObjectPosition >= catcherPosition - halfCatchWidth &&
-                   catchObjectPosition <= catcherPosition + halfCatchWidth;
+            float halfCatchWidth = catchWidth * 0.5f;
+            return fruit.EffectiveX >= X - halfCatchWidth &&
+                   fruit.EffectiveX <= X + halfCatchWidth;
         }
 
         public void OnNewResult(DrawableCatchHitObject drawableObject, JudgementResult result)
