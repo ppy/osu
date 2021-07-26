@@ -432,6 +432,11 @@ namespace osu.Game.Online.Multiplayer
             throw new NotImplementedException();
         }
 
+        public Task MatchRulesetEvent(MatchRulesetServerEvent e)
+        {
+            throw new NotImplementedException();
+        }
+
         Task IMultiplayerClient.UserBeatmapAvailabilityChanged(int userId, BeatmapAvailability beatmapAvailability)
         {
             if (Room == null)
