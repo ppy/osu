@@ -113,30 +113,28 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private void checkHyperDashCatcherColour(ISkin skin, Color4 expectedCatcherColour, Color4? expectedEndGlowColour = null)
         {
-            Container trailsContainer = null;
-            Catcher catcher = null;
             CatcherTrailDisplay trails = null;
+            Catcher catcher = null;
 
             AddStep("create hyper-dashing catcher", () =>
             {
-                trailsContainer = new Container();
+                trails = new CatcherTrailDisplay();
                 Child = setupSkinHierarchy(new Container
                 {
                     Anchor = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        catcher = new Catcher(trailsContainer, new DroppedObjectContainer())
+                        catcher = new Catcher(trails, new DroppedObjectContainer())
                         {
                             Scale = new Vector2(4)
                         },
-                        trailsContainer
+                        trails
                     }
                 }, skin);
             });
 
-            AddStep("get trails container", () =>
+            AddStep("start hyper-dash", () =>
             {
-                trails = trailsContainer.OfType<CatcherTrailDisplay>().Single();
                 catcher.SetHyperDashState(2);
             });
 
