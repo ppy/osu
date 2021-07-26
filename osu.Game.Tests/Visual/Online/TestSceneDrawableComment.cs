@@ -59,6 +59,7 @@ namespace osu.Game.Tests.Visual.Online
         private static object[] comments =
         {
             new[] { "Plain", "This is plain comment" },
+            new[] { "Link", "Please visit https://osu.ppy.sh" },
 
             new[]
             {
