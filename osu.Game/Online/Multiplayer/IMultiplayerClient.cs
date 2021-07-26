@@ -64,6 +64,12 @@ namespace osu.Game.Online.Multiplayer
         Task MatchRulesetRoomStateChanged(MatchRulesetRoomState state);
 
         /// <summary>
+        /// Send a match ruleset specific request.
+        /// </summary>
+        /// <param name="e">The event to handle.</param>
+        Task MatchRulesetEvent(MatchRulesetServerEvent e);
+
+        /// <summary>
         /// Signals that a user in this room changed their beatmap availability state.
         /// </summary>
         /// <param name="userId">The ID of the user whose beatmap availability state has changed.</param>
