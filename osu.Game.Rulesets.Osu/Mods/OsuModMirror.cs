@@ -2,34 +2,36 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Framework.Bindables;
+using osu.Game.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Osu.Utils;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModMirror : ModMirror, IApplicableToHitObject
     {
+        public override string Description => "Reflect the playfield.";
+
+        [SettingSource("Reflect Horizontally", "Reflect the playfield horizontally.")]
+        public Bindable<bool> ReflectY { get; } = new BindableBool(true);
+        [SettingSource("Reflect Vertically", "Reflect the playfield vertically.")]
+        public Bindable<bool> ReflectX { get; } = new BindableBool(false);
+
         public void ApplyToHitObject(HitObject hitObject)
         {
+            if (!(ReflectY.Value || ReflectX.Value))
+                return; // TODO deselect the mod if possible so replays and submissions don't have purposeless mods attached.
             var osuObject = (OsuHitObject)hitObject;
-
-            osuObject.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - osuObject.X, osuObject.Position.Y);
-
-            if (!(hitObject is Slider slider))
-                return;
-
-            slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
-            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
-
-            var controlPoints = slider.Path.ControlPoints.Select(p => new PathControlPoint(p.Position.Value, p.Type.Value)).ToArray();
-            foreach (var point in controlPoints)
-                point.Position.Value = new Vector2(-point.Position.Value.X, point.Position.Value.Y);
-
-            slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
+            if (ReflectY.Value)
+                OsuHitObjectGenerationUtils.ReflectOsuHitObjectHorizontally(osuObject);
+            if (ReflectX.Value)
+                OsuHitObjectGenerationUtils.ReflectOsuHitObjectVertically(osuObject);
         }
     }
 }

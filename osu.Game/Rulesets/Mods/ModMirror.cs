@@ -8,7 +8,6 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Mirror";
         public override string Acronym => "MR";
         public override ModType Type => ModType.Conversion;
-        public override string Description => "Flips the beatmap horizontally.";
         public override double ScoreMultiplier => 1;
     }
 }
