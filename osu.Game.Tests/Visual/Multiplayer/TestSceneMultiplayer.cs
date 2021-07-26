@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create room", () =>
             {
-                API.Queue(new CreateRoomRequest(new Room
+                multiplayerScreen.RoomManager.AddRoom(new Room
                 {
                     Name = { Value = "Test Room" },
                     Playlist =
@@ -151,7 +151,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Ruleset = { Value = new OsuRuleset().RulesetInfo },
                         }
                     }
-                }));
+                });
             });
 
             AddStep("refresh rooms", () => multiplayerScreen.RoomManager.Filter.Value = new FilterCriteria());
@@ -187,7 +187,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("create room", () =>
             {
-                API.Queue(new CreateRoomRequest(new Room
+                multiplayerScreen.RoomManager.AddRoom(new Room
                 {
                     Name = { Value = "Test Room" },
                     Password = { Value = "password" },
@@ -199,7 +199,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Ruleset = { Value = new OsuRuleset().RulesetInfo },
                         }
                     }
-                }));
+                });
             });
 
             AddStep("refresh rooms", () => multiplayerScreen.RoomManager.Filter.Value = new FilterCriteria());
@@ -433,9 +433,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
         {
-            public new TestMultiplayerRoomManager RoomManager { get; private set; }
+            public new TestRequestHandlingMultiplayerRoomManager RoomManager { get; private set; }
 
-            protected override RoomManager CreateRoomManager() => RoomManager = new TestMultiplayerRoomManager();
+            protected override RoomManager CreateRoomManager() => RoomManager = new TestRequestHandlingMultiplayerRoomManager();
         }
     }
 }
