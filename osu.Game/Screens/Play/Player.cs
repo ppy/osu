@@ -758,6 +758,9 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
 
+        [Resolved(CanBeNull = true)]
+        private OsuGame game { get; set; }
+
         #region Fail Logic
 
         protected FailOverlay FailOverlay { get; private set; }
@@ -793,6 +796,7 @@ namespace osu.Game.Screens.Play
 
             FailOverlay.Retries = RestartCount;
             FailOverlay.Show();
+            game?.Toolbar.Show();
         }
 
         #endregion
@@ -850,6 +854,7 @@ namespace osu.Game.Screens.Play
             GameplayClockContainer.Stop();
             PauseOverlay.Show();
             lastPauseActionTime = GameplayClockContainer.GameplayClock.CurrentTime;
+            game?.Toolbar.Show();
             return true;
         }
 
@@ -859,6 +864,7 @@ namespace osu.Game.Screens.Play
 
             IsResuming = true;
             PauseOverlay.Hide();
+            game?.Toolbar.Hide();
 
             // breaks and time-based conditions may allow instant resume.
             if (breakTracker.IsBreakTime.Value)
