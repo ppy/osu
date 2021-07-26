@@ -55,7 +55,7 @@ namespace osu.Game.Localisation
         public static LocalisableString CursorSensitivity => new TranslatableString(getKey(@"cursor_sensitivity"), @"Cursor sensitivity");
 
         /// <summary>
-        /// "This setting currently has issues on your platform. It is recommended to adjust sensitivity externally and keep this disabled for now."
+        /// "This setting has known issues on your platform. If you encounter problems, it is recommended to adjust sensitivity externally and keep this disabled for now."
         /// </summary>
         public static LocalisableString HighPrecisionPlatformWarning => new TranslatableString(getKey(@"high_precision_platform_warning"), @"This setting has known issues on your platform. If you encounter problems, it is recommended to adjust sensitivity externally and keep this disabled for now.");
 
