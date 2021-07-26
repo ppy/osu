@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
@@ -45,14 +44,14 @@ namespace osu.Game.Rulesets.Catch.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            var trailContainer = new Container
+            var trailDisplay = new CatcherTrailDisplay
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.TopLeft
             };
             var droppedObjectContainer = new DroppedObjectContainer();
 
-            Catcher = new Catcher(trailContainer, droppedObjectContainer, difficulty)
+            Catcher = new Catcher(trailDisplay, droppedObjectContainer, difficulty)
             {
                 X = CENTER_X
             };
@@ -70,7 +69,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     Origin = Anchor.TopLeft,
                     Catcher = Catcher,
                 },
-                trailContainer,
+                trailDisplay,
                 HitObjectContainer,
             });
 

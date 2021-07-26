@@ -71,10 +71,10 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         private const float caught_fruit_scale_adjust = 0.5f;
 
-        [NotNull]
-        private readonly Container trailsTarget;
-
-        private CatcherTrailDisplay trails;
+        /// <summary>
+        /// Contains trails and afterimages (also called "end glow" in code) of the catcher.
+        /// </summary>
+        private readonly CatcherTrailDisplay trails;
 
         /// <summary>
         /// Contains caught objects on the plate.
@@ -92,20 +92,7 @@ namespace osu.Game.Rulesets.Catch.UI
             private set => Body.AnimationState.Value = value;
         }
 
-        private bool dashing;
-
-        public bool Dashing
-        {
-            get => dashing;
-            set
-            {
-                if (value == dashing) return;
-
-                dashing = value;
-
-                updateTrailVisibility();
-            }
-        }
+        public bool Dashing { get; set; }
 
         /// <summary>
         /// The currently facing direction.
@@ -138,9 +125,9 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly DrawablePool<CaughtBanana> caughtBananaPool;
         private readonly DrawablePool<CaughtDroplet> caughtDropletPool;
 
-        public Catcher([NotNull] Container trailsTarget, [NotNull] DroppedObjectContainer droppedObjectTarget, BeatmapDifficulty difficulty = null)
+        public Catcher([NotNull] CatcherTrailDisplay trails, [NotNull] DroppedObjectContainer droppedObjectTarget, BeatmapDifficulty difficulty = null)
         {
-            this.trailsTarget = trailsTarget;
+            this.trails = trails;
             this.droppedObjectTarget = droppedObjectTarget;
 
             Origin = Anchor.TopCentre;
@@ -177,15 +164,6 @@ namespace osu.Game.Rulesets.Catch.UI
         private void load(OsuConfigManager config)
         {
             hitLighting = config.GetBindable<bool>(OsuSetting.HitLighting);
-            trails = new CatcherTrailDisplay(this);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // don't add in above load as we may potentially modify a parent in an unsafe manner.
-            trailsTarget.Add(trails);
         }
 
         /// <summary>
@@ -313,7 +291,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (!wasHyperDashing)
                 {
-                    trails.DisplayEndGlow();
+                    trails.DisplayEndGlow(CurrentState, X, Scale * Body.Scale);
                     runHyperDashStateTransition(true);
                 }
             }
@@ -331,12 +309,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void runHyperDashStateTransition(bool hyperDashing)
         {
-            updateTrailVisibility();
-
             this.FadeColour(hyperDashing ? hyperDashColour : Color4.White, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
         }
-
-        private void updateTrailVisibility() => trails.DisplayTrail = Dashing || HyperDashing;
 
         protected override void SkinChanged(ISkinSource skin)
         {
@@ -372,6 +346,15 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 X = hyperDashTargetPosition;
                 SetHyperDashState();
+            }
+
+            if (Dashing || HyperDashing)
+            {
+                double lastTrailTime = trails.LastDashTrail?.LifetimeStart ?? double.NegativeInfinity;
+                double generationInterval = HyperDashing ? 25 : 50;
+
+                if (Time.Current - lastTrailTime >= generationInterval)
+                    trails.DisplayDashTrail(CurrentState, X, Scale * Body.Scale, HyperDashing);
             }
         }
 

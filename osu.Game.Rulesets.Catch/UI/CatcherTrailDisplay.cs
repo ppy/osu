@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,7 +17,10 @@ namespace osu.Game.Rulesets.Catch.UI
     /// </summary>
     public class CatcherTrailDisplay : CompositeDrawable
     {
-        private readonly Catcher catcher;
+        [CanBeNull]
+        public CatcherTrail LastDashTrail => dashTrails.Concat(hyperDashTrails)
+                                                       .OrderByDescending(trail => trail.LifetimeStart)
+                                                       .FirstOrDefault();
 
         private readonly DrawablePool<CatcherTrail> trailPool;
 
@@ -55,30 +58,8 @@ namespace osu.Game.Rulesets.Catch.UI
             }
         }
 
-        private bool trail;
-
-        /// <summary>
-        /// Whether to start displaying trails following the catcher.
-        /// </summary>
-        public bool DisplayTrail
+        public CatcherTrailDisplay()
         {
-            get => trail;
-            set
-            {
-                if (trail == value)
-                    return;
-
-                trail = value;
-
-                if (trail)
-                    displayTrail();
-            }
-        }
-
-        public CatcherTrailDisplay([NotNull] Catcher catcher)
-        {
-            this.catcher = catcher ?? throw new ArgumentNullException(nameof(catcher));
-
             RelativeSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
@@ -93,9 +74,11 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Displays a single end-glow catcher sprite.
         /// </summary>
-        public void DisplayEndGlow()
+        public void DisplayEndGlow(CatcherAnimationState animationState, float x, Vector2 scale)
         {
-            var endGlow = createTrailSprite(endGlowSprites);
+            var endGlow = createTrail(animationState, x, scale);
+
+            endGlowSprites.Add(endGlow);
 
             endGlow.MoveToOffset(new Vector2(0, -10), 1200, Easing.In);
             endGlow.ScaleTo(endGlow.Scale * 0.95f).ScaleTo(endGlow.Scale * 1.2f, 1200, Easing.In);
@@ -103,28 +86,26 @@ namespace osu.Game.Rulesets.Catch.UI
             endGlow.Expire(true);
         }
 
-        private void displayTrail()
+        public void DisplayDashTrail(CatcherAnimationState animationState, float x, Vector2 scale, bool hyperDashing)
         {
-            if (!DisplayTrail)
-                return;
+            var sprite = createTrail(animationState, x, scale);
 
-            var sprite = createTrailSprite(catcher.HyperDashing ? hyperDashTrails : dashTrails);
+            if (hyperDashing)
+                hyperDashTrails.Add(sprite);
+            else
+                dashTrails.Add(sprite);
 
             sprite.FadeTo(0.4f).FadeOut(800, Easing.OutQuint);
             sprite.Expire(true);
-
-            Scheduler.AddDelayed(displayTrail, catcher.HyperDashing ? 25 : 50);
         }
 
-        private CatcherTrail createTrailSprite(Container<CatcherTrail> target)
+        private CatcherTrail createTrail(CatcherAnimationState animationState, float x, Vector2 scale)
         {
             CatcherTrail sprite = trailPool.Get();
 
-            sprite.AnimationState = catcher.CurrentState;
-            sprite.Scale = catcher.Scale * catcher.Body.Scale;
-            sprite.Position = catcher.Position;
-
-            target.Add(sprite);
+            sprite.AnimationState = animationState;
+            sprite.Scale = scale;
+            sprite.Position = new Vector2(x, 0);
 
             return sprite;
         }
