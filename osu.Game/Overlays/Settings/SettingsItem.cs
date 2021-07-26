@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Settings
                 }
 
                 warningText.Alpha = hasValue ? 0 : 1;
-                warningText.Text = value.ToString(); // TODO: Add localisation support after https://github.com/ppy/osu-framework/pull/4603 is merged.
+                warningText.Text = value.ToString(); // TODO: Remove ToString() call after TextFlowContainer supports localisation (see https://github.com/ppy/osu-framework/issues/4636).
             }
         }
 
