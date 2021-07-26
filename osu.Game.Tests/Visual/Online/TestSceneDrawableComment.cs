@@ -59,6 +59,17 @@ namespace osu.Game.Tests.Visual.Online
         private static object[] comments =
         {
             new[] { "Plain", "This is plain comment" },
+
+            new[]
+            {
+                "Heading", @"# Heading 1
+## Heading 2
+### Heading 3
+#### Heading 4
+##### Heading 5
+###### Heading 6"
+            },
+
             // Taken from https://github.com/ppy/osu/issues/13993#issuecomment-885994077
             new[]
             {
