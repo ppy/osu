@@ -275,14 +275,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => state == SelectionState.Selected;
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            if (selectedRoom.Value != Room)
-                return true;
-
-            return base.OnMouseDown(e);
-        }
-
         protected override bool OnClick(ClickEvent e)
         {
             if (Room != selectedRoom.Value)
