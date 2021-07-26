@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -32,6 +33,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
+    [HeadlessTest]
     public class TestSceneOsuGame : OsuTestScene
     {
         private IReadOnlyList<Type> requiredGameDependencies => new[]
@@ -83,10 +85,15 @@ namespace osu.Game.Tests.Visual
             typeof(PreviewTrackManager),
         };
 
+        private OsuGame game;
+
+        [Resolved]
+        private OsuGameBase gameBase { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(GameHost host, OsuGameBase gameBase)
+        private void load(GameHost host)
         {
-            OsuGame game = new OsuGame();
+            game = new OsuGame();
             game.SetHost(host);
 
             Children = new Drawable[]
@@ -100,7 +107,39 @@ namespace osu.Game.Tests.Visual
             };
 
             AddUntilStep("wait for load", () => game.IsLoaded);
+        }
 
+        [Test]
+        public void TestNullRulesetHandled()
+        {
+            RulesetInfo ruleset = null;
+
+            AddStep("store current ruleset", () => ruleset = Ruleset.Value);
+            AddStep("set global ruleset to null value", () => Ruleset.Value = null);
+
+            AddAssert("ruleset still valid", () => Ruleset.Value.Available);
+            AddAssert("ruleset unchanged", () => ReferenceEquals(Ruleset.Value, ruleset));
+        }
+
+        [Test]
+        public void TestUnavailableRulesetHandled()
+        {
+            RulesetInfo ruleset = null;
+
+            AddStep("store current ruleset", () => ruleset = Ruleset.Value);
+            AddStep("set global ruleset to invalid value", () => Ruleset.Value = new RulesetInfo
+            {
+                Name = "unavailable",
+                Available = false,
+            });
+
+            AddAssert("ruleset still valid", () => Ruleset.Value.Available);
+            AddAssert("ruleset unchanged", () => ReferenceEquals(Ruleset.Value, ruleset));
+        }
+
+        [Test]
+        public void TestAvailableDependencies()
+        {
             AddAssert("check OsuGame DI members", () =>
             {
                 foreach (var type in requiredGameDependencies)
@@ -111,6 +150,7 @@ namespace osu.Game.Tests.Visual
 
                 return true;
             });
+
             AddAssert("check OsuGameBase DI members", () =>
             {
                 foreach (var type in requiredGameBaseDependencies)
