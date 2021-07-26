@@ -54,6 +54,11 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString CursorSensitivity => new TranslatableString(getKey(@"cursor_sensitivity"), @"Cursor sensitivity");
 
+        /// <summary>
+        /// "This setting currently has issues on macOS. It is recommended to adjust sensitivity externally and keep this disabled for now."
+        /// </summary>
+        public static LocalisableString HighPrecisionMacOSWarning => new TranslatableString(getKey(@"high_precision_macos_warning"), @"This setting currently has issues on macOS. It is recommended to adjust sensitivity externally and keep this disabled for now.");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }
