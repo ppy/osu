@@ -17,6 +17,10 @@ namespace osu.Game.Rulesets.Catch.UI
     /// </summary>
     public class CatcherTrailDisplay : CompositeDrawable
     {
+        /// <summary>
+        /// The most recent dash trail added in this container.
+        /// Only alive (not faded out) trails are considered.
+        /// </summary>
         [CanBeNull]
         public CatcherTrail LastDashTrail => dashTrails.Concat(hyperDashTrails)
                                                        .OrderByDescending(trail => trail.LifetimeStart)

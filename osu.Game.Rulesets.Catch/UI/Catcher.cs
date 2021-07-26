@@ -92,6 +92,9 @@ namespace osu.Game.Rulesets.Catch.UI
             private set => Body.AnimationState.Value = value;
         }
 
+        /// <summary>
+        /// Whether the catcher is currently dashing.
+        /// </summary>
         public bool Dashing { get; set; }
 
         /// <summary>
