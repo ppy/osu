@@ -61,12 +61,17 @@ namespace osu.Game.Overlays.Settings
         /// Text to be displayed at the bottom of this <see cref="SettingsItem{T}"/>.
         /// Generally used to recommend the user change their setting as the current one is considered sub-optimal.
         /// </summary>
-        public string WarningText
+        public LocalisableString? WarningText
         {
             set
             {
+                bool hasValue = string.IsNullOrWhiteSpace(value.ToString());
+
                 if (warningText == null)
                 {
+                    if (!hasValue)
+                        return;
+
                     // construct lazily for cases where the label is not needed (may be provided by the Control).
                     FlowContent.Add(warningText = new OsuTextFlowContainer
                     {
@@ -77,8 +82,8 @@ namespace osu.Game.Overlays.Settings
                     });
                 }
 
-                warningText.Alpha = string.IsNullOrWhiteSpace(value) ? 0 : 1;
-                warningText.Text = value;
+                warningText.Alpha = hasValue ? 0 : 1;
+                warningText.Text = value.ToString(); // TODO: Remove ToString() call after TextFlowContainer supports localisation (see https://github.com/ppy/osu-framework/issues/4636).
             }
         }
 
