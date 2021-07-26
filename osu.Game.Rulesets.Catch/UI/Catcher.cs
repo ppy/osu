@@ -88,8 +88,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatcherAnimationState CurrentState
         {
-            get => Body.AnimationState.Value;
-            private set => Body.AnimationState.Value = value;
+            get => body.AnimationState.Value;
+            private set => body.AnimationState.Value = value;
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         private readonly float catchWidth;
 
-        internal readonly SkinnableCatcher Body;
+        private readonly SkinnableCatcher body;
 
         private Color4 hyperDashColour = DEFAULT_HYPER_DASH_COLOUR;
         private Color4 hyperDashEndGlowColour = DEFAULT_HYPER_DASH_COLOUR;
@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     // offset fruit vertically to better place "above" the plate.
                     Y = -5
                 },
-                Body = new SkinnableCatcher(),
+                body = new SkinnableCatcher(),
                 hitExplosionContainer = new HitExplosionContainer
                 {
                     Anchor = Anchor.TopCentre,
@@ -294,7 +294,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (!wasHyperDashing)
                 {
-                    trails.DisplayEndGlow(CurrentState, X, Scale * Body.Scale);
+                    trails.DisplayEndGlow(CurrentState, X, Scale * body.Scale);
                     runHyperDashStateTransition(true);
                 }
             }
@@ -340,7 +340,7 @@ namespace osu.Game.Rulesets.Catch.UI
             base.Update();
 
             var scaleFromDirection = new Vector2((int)VisualDirection, 1);
-            Body.Scale = scaleFromDirection;
+            body.Scale = scaleFromDirection;
             caughtObjectContainer.Scale = hitExplosionContainer.Scale = flipCatcherPlate ? scaleFromDirection : Vector2.One;
 
             // Correct overshooting.
@@ -357,7 +357,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 double generationInterval = HyperDashing ? 25 : 50;
 
                 if (Time.Current - lastTrailTime >= generationInterval)
-                    trails.DisplayDashTrail(CurrentState, X, Scale * Body.Scale, HyperDashing);
+                    trails.DisplayDashTrail(CurrentState, X, Scale * body.Scale, HyperDashing);
             }
         }
 
