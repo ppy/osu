@@ -18,11 +18,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// </summary>
     public class BasicTestRoomManager : IRoomManager
     {
-        public event Action RoomsUpdated
-        {
-            add { }
-            remove { }
-        }
+        public event Action RoomsUpdated;
 
         public readonly BindableList<Room> Rooms = new BindableList<Room>();
 
@@ -35,8 +31,21 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
             room.RoomID.Value ??= Rooms.Select(r => r.RoomID.Value).Where(id => id != null).Select(id => id.Value).DefaultIfEmpty().Max() + 1;
-            Rooms.Add(room);
             onSuccess?.Invoke(room);
+
+            AddRoom(room);
+        }
+
+        public void AddRoom(Room room)
+        {
+            Rooms.Add(room);
+            RoomsUpdated?.Invoke();
+        }
+
+        public void RemoveRoom(Room room)
+        {
+            Rooms.Remove(room);
+            RoomsUpdated?.Invoke();
         }
 
         public void JoinRoom(Room room, string password, Action<Room> onSuccess = null, Action<string> onError = null)
@@ -56,6 +65,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 var room = new Room
                 {
                     RoomID = { Value = i },
+                    Position = { Value = i },
                     Name = { Value = $"Room {i}" },
                     Host = { Value = new User { Username = "Host" } },
                     EndDate = { Value = DateTimeOffset.Now + TimeSpan.FromSeconds(10) },
