@@ -162,10 +162,6 @@ namespace osu.Game.Screens.OnlinePlay
                     ongoingOperationTracker,
                 }
             };
-
-            // a lot of the functionality in this class depends on loungeSubScreen being in a ready to go state.
-            // as such, we intentionally load this inline so it is ready alongside this screen.
-            LoadComponent(loungeSubScreen = CreateLounge());
         }
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
@@ -184,7 +180,7 @@ namespace osu.Game.Screens.OnlinePlay
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
 
-            screenStack.Push(loungeSubScreen);
+            screenStack.Push(loungeSubScreen = CreateLounge());
 
             apiState.BindTo(API.State);
             apiState.BindValueChanged(onlineStateChanged, true);
