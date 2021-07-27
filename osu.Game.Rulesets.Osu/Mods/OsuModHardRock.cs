@@ -3,13 +3,10 @@
 
 using System;
 using System.Linq;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Osu.Utils;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {

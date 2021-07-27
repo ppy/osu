@@ -2,16 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Osu.Utils;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -26,6 +22,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToHitObject(HitObject hitObject)
         {
             var osuObject = (OsuHitObject)hitObject;
+
             switch (Reflection.Value)
             {
                 case MirrorType.Horizontal:
