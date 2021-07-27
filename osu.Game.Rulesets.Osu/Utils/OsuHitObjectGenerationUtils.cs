@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         }
 
         /// <summary>
-        /// Reflects the position of the <see cref="OsuHitObject"/> in the playfield vertically.
+        /// Reflects the position of the <see cref="OsuHitObject"/> in the playfield horizontally.
         /// </summary>
         /// <param name="osuObject">The object to reflect.</param>
         public static void ReflectHorizontally(OsuHitObject osuObject)
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         }
 
         /// <summary>
-        /// Reflects the position of the <see cref="OsuHitObject"/> in the playfield horizontally.
+        /// Reflects the position of the <see cref="OsuHitObject"/> in the playfield vertically.
         /// </summary>
         /// <param name="osuObject">The object to reflect.</param>
         public static void ReflectVertically(OsuHitObject osuObject)
