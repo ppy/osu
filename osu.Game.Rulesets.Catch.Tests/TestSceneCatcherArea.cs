@@ -121,13 +121,10 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             public TestCatcherArea(BeatmapDifficulty beatmapDifficulty)
             {
-                var trailDisplay = new CatcherTrailDisplay { Depth = -1 };
-                Add(trailDisplay);
-
                 var droppedObjectContainer = new DroppedObjectContainer();
                 Add(droppedObjectContainer);
 
-                Catcher = new Catcher(trailDisplay, droppedObjectContainer, beatmapDifficulty)
+                Catcher = new Catcher(droppedObjectContainer, beatmapDifficulty)
                 {
                     X = CatchPlayfield.CENTER_X
                 };

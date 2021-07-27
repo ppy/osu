@@ -118,19 +118,19 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             AddStep("create hyper-dashing catcher", () =>
             {
-                trails = new CatcherTrailDisplay();
+                CatcherArea catcherArea;
                 Child = setupSkinHierarchy(new Container
                 {
                     Anchor = Anchor.Centre,
-                    Children = new Drawable[]
+                    Child = catcherArea = new CatcherArea
                     {
-                        catcher = new Catcher(trails, new DroppedObjectContainer())
+                        Catcher = catcher = new Catcher(new DroppedObjectContainer())
                         {
                             Scale = new Vector2(4)
-                        },
-                        trails
+                        }
                     }
                 }, skin);
+                trails = catcherArea.CatcherTrails;
             });
 
             AddStep("start hyper-dash", () =>

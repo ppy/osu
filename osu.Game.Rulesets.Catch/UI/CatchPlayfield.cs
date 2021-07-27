@@ -44,14 +44,9 @@ namespace osu.Game.Rulesets.Catch.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            var trailDisplay = new CatcherTrailDisplay
-            {
-                Anchor = Anchor.BottomLeft,
-                Origin = Anchor.TopLeft
-            };
             var droppedObjectContainer = new DroppedObjectContainer();
 
-            Catcher = new Catcher(trailDisplay, droppedObjectContainer, difficulty)
+            Catcher = new Catcher(droppedObjectContainer, difficulty)
             {
                 X = CENTER_X
             };
@@ -69,7 +64,6 @@ namespace osu.Game.Rulesets.Catch.UI
                     Origin = Anchor.TopLeft,
                     Catcher = Catcher,
                 },
-                trailDisplay,
                 HitObjectContainer,
             });
 

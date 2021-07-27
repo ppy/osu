@@ -25,14 +25,12 @@ namespace osu.Game.Rulesets.Catch.UI
         public Catcher Catcher
         {
             get => catcher;
-            set
-            {
-                if (catcher != null)
-                    Remove(catcher);
-
-                Add(catcher = value);
-            }
+            set => catcherContainer.Child = catcher = value;
         }
+
+        internal CatcherTrailDisplay CatcherTrails { get; }
+
+        private readonly Container<Catcher> catcherContainer;
 
         private readonly CatchComboDisplay comboDisplay;
 
@@ -45,20 +43,28 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         private int currentDirection;
 
+        // TODO: support replay rewind
+        private bool lastHyperDashState;
+
         /// <remarks>
         /// <see cref="Catcher"/> must be set before loading.
         /// </remarks>
         public CatcherArea()
         {
             Size = new Vector2(CatchPlayfield.WIDTH, Catcher.BASE_SIZE);
-            Child = comboDisplay = new CatchComboDisplay
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.None,
-                AutoSizeAxes = Axes.Both,
-                Anchor = Anchor.TopLeft,
-                Origin = Anchor.Centre,
-                Margin = new MarginPadding { Bottom = 350f },
-                X = CatchPlayfield.CENTER_X
+                catcherContainer = new Container<Catcher> { RelativeSizeAxes = Axes.Both },
+                CatcherTrails = new CatcherTrailDisplay(),
+                comboDisplay = new CatchComboDisplay
+                {
+                    RelativeSizeAxes = Axes.None,
+                    AutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.Centre,
+                    Margin = new MarginPadding { Bottom = 350f },
+                    X = CatchPlayfield.CENTER_X
+                }
             };
         }
 
@@ -102,6 +108,20 @@ namespace osu.Game.Rulesets.Catch.UI
             base.UpdateAfterChildren();
 
             comboDisplay.X = Catcher.X;
+
+            if (!lastHyperDashState && Catcher.HyperDashing && Time.Elapsed > 0)
+                CatcherTrails.DisplayEndGlow(Catcher.CurrentState, Catcher.X, Catcher.BodyScale);
+
+            if (Catcher.Dashing || Catcher.HyperDashing)
+            {
+                double lastTrailTime = CatcherTrails.LastDashTrail?.LifetimeStart ?? double.NegativeInfinity;
+                double generationInterval = Catcher.HyperDashing ? 25 : 50;
+
+                if (Time.Current - lastTrailTime >= generationInterval)
+                    CatcherTrails.DisplayDashTrail(Catcher.CurrentState, Catcher.X, Catcher.BodyScale, Catcher.HyperDashing);
+            }
+
+            lastHyperDashState = Catcher.HyperDashing;
         }
 
         public void SetCatcherPosition(float X)
