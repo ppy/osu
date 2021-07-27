@@ -1,8 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
-using JetBrains.Annotations;
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
@@ -20,13 +19,11 @@ namespace osu.Game.Rulesets.Catch.UI
     public class CatcherTrailDisplay : SkinReloadableDrawable
     {
         /// <summary>
-        /// The most recent dash trail added in this container.
+        /// The most recent time a dash trail was added to this container.
         /// Only alive (not faded out) trails are considered.
+        /// Returns <see cref="double.NegativeInfinity"/> if no dash trail is alive.
         /// </summary>
-        [CanBeNull]
-        public CatcherTrail LastDashTrail => dashTrails.Concat(hyperDashTrails)
-                                                       .OrderByDescending(trail => trail.LifetimeStart)
-                                                       .FirstOrDefault();
+        public double LastDashTrailTime => getLastDashTrailTime();
 
         public Color4 HyperDashTrailsColour => hyperDashTrails.Colour;
 
@@ -96,6 +93,19 @@ namespace osu.Game.Rulesets.Catch.UI
             sprite.Position = new Vector2(x, 0);
 
             return sprite;
+        }
+
+        private double getLastDashTrailTime()
+        {
+            double maxTime = double.NegativeInfinity;
+
+            foreach (var trail in dashTrails)
+                maxTime = Math.Max(maxTime, trail.LifetimeStart);
+
+            foreach (var trail in hyperDashTrails)
+                maxTime = Math.Max(maxTime, trail.LifetimeStart);
+
+            return maxTime;
         }
     }
 }
