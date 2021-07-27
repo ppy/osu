@@ -3,6 +3,8 @@
 
 using MessagePack;
 
+#nullable enable
+
 namespace osu.Game.Online.Multiplayer.MatchRulesets.TeamVs
 {
     public class ChangeTeamRequest : MatchRulesetUserRequest

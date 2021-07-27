@@ -4,6 +4,8 @@
 using System;
 using MessagePack;
 
+#nullable enable
+
 namespace osu.Game.Online.Multiplayer.MatchRulesets.TeamVs
 {
     [Serializable]
@@ -14,6 +16,6 @@ namespace osu.Game.Online.Multiplayer.MatchRulesets.TeamVs
         public int ID { get; set; }
 
         [Key(1)]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }
