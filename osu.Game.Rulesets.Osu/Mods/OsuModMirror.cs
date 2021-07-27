@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Reflect the playfield.";
         public override Type[] IncompatibleMods => new[] { typeof(ModHardRock) };
 
-        [SettingSource("Reflection", "Change the type of reflection.")]
+        [SettingSource("Mirrored axes", "Choose which of the playfield's axes are mirrored.")]
         public Bindable<MirrorType> Reflection { get; } = new Bindable<MirrorType>();
 
         public void ApplyToHitObject(HitObject hitObject)
