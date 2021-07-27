@@ -22,19 +22,13 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected virtual IEnumerable<string> GradeColumns => new List<string> { "SS", "S", "A" };
 
-        protected override TableColumn[] CreateAdditionalHeaders() => new[]
+        protected override RankingsTableColumn[] CreateAdditionalHeaders() => new[]
             {
-                new TableColumn("Accuracy", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+                new RankingsTableColumn("Accuracy", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+                new RankingsTableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
             }.Concat(CreateUniqueHeaders())
-             .Concat(GradeColumns.Select(grade => new TableColumn(grade, Anchor.Centre, new Dimension(GridSizeMode.AutoSize))))
+             .Concat(GradeColumns.Select(grade => new GradeTableColumn(grade, Anchor.Centre, new Dimension(GridSizeMode.AutoSize))))
              .ToArray();
-
-        protected override Drawable CreateHeader(int index, TableColumn column)
-        {
-            var title = column?.Header ?? default;
-            return new UserTableHeaderText(title, HighlightedColumn == title, GradeColumns.Contains(title.ToString()));
-        }
 
         protected sealed override Country GetCountry(UserStatistics item) => item.User.Country;
 
@@ -61,19 +55,29 @@ namespace osu.Game.Overlays.Rankings.Tables
             new ColoredRowText { Text = $@"{item.GradesCount[ScoreRank.A]:N0}", }
         }).ToArray();
 
-        protected abstract TableColumn[] CreateUniqueHeaders();
+        protected abstract RankingsTableColumn[] CreateUniqueHeaders();
 
         protected abstract Drawable[] CreateUniqueContent(UserStatistics item);
 
-        private class UserTableHeaderText : HeaderText
+        private class GradeTableColumn : RankingsTableColumn
         {
-            public UserTableHeaderText(LocalisableString text, bool isHighlighted, bool isGrade)
+            public GradeTableColumn(LocalisableString? header = null, Anchor anchor = Anchor.TopLeft, Dimension dimension = null, bool highlighted = false)
+                : base(header, anchor, dimension, highlighted)
+            {
+            }
+
+            public override HeaderText CreateHeaderText() => new GradeHeaderText(Header, Highlighted);
+        }
+
+        private class GradeHeaderText : HeaderText
+        {
+            public GradeHeaderText(LocalisableString text, bool isHighlighted)
                 : base(text, isHighlighted)
             {
                 Margin = new MarginPadding
                 {
                     // Grade columns have extra horizontal padding for readibility
-                    Horizontal = isGrade ? 20 : 10,
+                    Horizontal = 20,
                     Vertical = 5
                 };
             }
