@@ -72,11 +72,6 @@ namespace osu.Game.Rulesets.Catch.UI
         private const float caught_fruit_scale_adjust = 0.5f;
 
         /// <summary>
-        /// Contains trails and afterimages (also called "end glow" in code) of the catcher.
-        /// </summary>
-        private readonly CatcherTrailDisplay trails;
-
-        /// <summary>
         /// Contains caught objects on the plate.
         /// </summary>
         private readonly Container<CaughtObject> caughtObjectContainer;
@@ -101,6 +96,8 @@ namespace osu.Game.Rulesets.Catch.UI
         /// The currently facing direction.
         /// </summary>
         public Direction VisualDirection { get; set; } = Direction.Right;
+
+        public Vector2 BodyScale => Scale * body.Scale;
 
         /// <summary>
         /// Whether the contents of the catcher plate should be visually flipped when the catcher direction is changed.
@@ -127,9 +124,8 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly DrawablePool<CaughtBanana> caughtBananaPool;
         private readonly DrawablePool<CaughtDroplet> caughtDropletPool;
 
-        public Catcher([NotNull] CatcherTrailDisplay trails, [NotNull] DroppedObjectContainer droppedObjectTarget, BeatmapDifficulty difficulty = null)
+        public Catcher([NotNull] DroppedObjectContainer droppedObjectTarget, BeatmapDifficulty difficulty = null)
         {
-            this.trails = trails;
             this.droppedObjectTarget = droppedObjectTarget;
 
             Origin = Anchor.TopCentre;
@@ -292,10 +288,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 hyperDashTargetPosition = targetPosition;
 
                 if (!wasHyperDashing)
-                {
-                    trails.DisplayEndGlow(CurrentState, X, Scale * body.Scale);
                     runHyperDashStateTransition(true);
-                }
             }
         }
 
@@ -341,15 +334,6 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 X = hyperDashTargetPosition;
                 SetHyperDashState();
-            }
-
-            if (Dashing || HyperDashing)
-            {
-                double lastTrailTime = trails.LastDashTrail?.LifetimeStart ?? double.NegativeInfinity;
-                double generationInterval = HyperDashing ? 25 : 50;
-
-                if (Time.Current - lastTrailTime >= generationInterval)
-                    trails.DisplayDashTrail(CurrentState, X, Scale * body.Scale, HyperDashing);
             }
         }
 
