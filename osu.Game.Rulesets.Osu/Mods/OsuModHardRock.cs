@@ -17,13 +17,13 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override double ScoreMultiplier => 1.06;
 
-        public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModDifficultyAdjust), typeof(ModMirror) };
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModMirror)).ToArray();
 
         public void ApplyToHitObject(HitObject hitObject)
         {
             var osuObject = (OsuHitObject)hitObject;
 
-            OsuHitObjectGenerationUtils.ReflectOsuHitObjectVertically(osuObject);
+            OsuHitObjectGenerationUtils.ReflectVertically(osuObject);
         }
     }
 }

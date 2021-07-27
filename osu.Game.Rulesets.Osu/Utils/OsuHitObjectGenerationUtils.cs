@@ -106,16 +106,15 @@ namespace osu.Game.Rulesets.Osu.Utils
         }
 
         /// <summary>
-        /// Reflects an OsuHitObject's position horizontally.
+        /// Reflects the position of the <see cref="OsuHitObject"/> in the playfield vertically.
         /// </summary>
-        /// <param name="osuObject">The OsuHitObject to be reflected.</param>
-        /// <returns>The reflected OsuHitObject.</returns>
-        public static OsuHitObject ReflectOsuHitObjectHorizontally(OsuHitObject osuObject)
+        /// <param name="osuObject">The object to reflect.</param>
+        public static void ReflectHorizontally(OsuHitObject osuObject)
         {
             osuObject.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - osuObject.X, osuObject.Position.Y);
 
             if (!(osuObject is Slider slider))
-                return osuObject;
+                return;
 
             slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
             slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
@@ -125,21 +124,18 @@ namespace osu.Game.Rulesets.Osu.Utils
                 point.Position.Value = new Vector2(-point.Position.Value.X, point.Position.Value.Y);
 
             slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
-
-            return osuObject;
         }
 
         /// <summary>
-        /// Reflects an OsuHitObject's position vertically.
+        /// Reflects the position of the <see cref="OsuHitObject"/> in the playfield horizontally.
         /// </summary>
-        /// <param name="osuObject">The OsuHitObject to be reflected.</param>
-        /// <returns>The reflected OsuHitObject.</returns>
-        public static OsuHitObject ReflectOsuHitObjectVertically(OsuHitObject osuObject)
+        /// <param name="osuObject">The object to reflect.</param>
+        public static void ReflectVertically(OsuHitObject osuObject)
         {
             osuObject.Position = new Vector2(osuObject.Position.X, OsuPlayfield.BASE_SIZE.Y - osuObject.Y);
 
             if (!(osuObject is Slider slider))
-                return osuObject;
+                return;
 
             slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
             slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
@@ -149,8 +145,6 @@ namespace osu.Game.Rulesets.Osu.Utils
                 point.Position.Value = new Vector2(point.Position.Value.X, -point.Position.Value.Y);
 
             slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
-
-            return osuObject;
         }
     }
 }
