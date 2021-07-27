@@ -115,7 +115,6 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly SkinnableCatcher body;
 
         private Color4 hyperDashColour = DEFAULT_HYPER_DASH_COLOUR;
-        private Color4 hyperDashEndGlowColour = DEFAULT_HYPER_DASH_COLOUR;
 
         private double hyperDashModifier = 1;
         private int hyperDashDirection;
@@ -322,13 +321,6 @@ namespace osu.Game.Rulesets.Catch.UI
             hyperDashColour =
                 skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??
                 DEFAULT_HYPER_DASH_COLOUR;
-
-            hyperDashEndGlowColour =
-                skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value ??
-                hyperDashColour;
-
-            trails.HyperDashTrailsColour = hyperDashColour;
-            trails.EndGlowSpritesColour = hyperDashEndGlowColour;
 
             flipCatcherPlate = skin.GetConfig<CatchSkinConfiguration, bool>(CatchSkinConfiguration.FlipCatcherPlate)?.Value ?? true;
 

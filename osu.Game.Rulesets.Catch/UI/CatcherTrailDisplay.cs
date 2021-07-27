@@ -6,6 +6,8 @@ using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
+using osu.Game.Rulesets.Catch.Skinning;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -15,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.UI
     /// Represents a component responsible for displaying
     /// the appropriate catcher trails when requested to.
     /// </summary>
-    public class CatcherTrailDisplay : CompositeDrawable
+    public class CatcherTrailDisplay : SkinReloadableDrawable
     {
         /// <summary>
         /// The most recent dash trail added in this container.
@@ -26,41 +28,15 @@ namespace osu.Game.Rulesets.Catch.UI
                                                        .OrderByDescending(trail => trail.LifetimeStart)
                                                        .FirstOrDefault();
 
+        public Color4 HyperDashTrailsColour => hyperDashTrails.Colour;
+
+        public Color4 EndGlowSpritesColour => endGlowSprites.Colour;
+
         private readonly DrawablePool<CatcherTrail> trailPool;
 
         private readonly Container<CatcherTrail> dashTrails;
         private readonly Container<CatcherTrail> hyperDashTrails;
         private readonly Container<CatcherTrail> endGlowSprites;
-
-        private Color4 hyperDashTrailsColour = Catcher.DEFAULT_HYPER_DASH_COLOUR;
-
-        public Color4 HyperDashTrailsColour
-        {
-            get => hyperDashTrailsColour;
-            set
-            {
-                if (hyperDashTrailsColour == value)
-                    return;
-
-                hyperDashTrailsColour = value;
-                hyperDashTrails.Colour = hyperDashTrailsColour;
-            }
-        }
-
-        private Color4 endGlowSpritesColour = Catcher.DEFAULT_HYPER_DASH_COLOUR;
-
-        public Color4 EndGlowSpritesColour
-        {
-            get => endGlowSpritesColour;
-            set
-            {
-                if (endGlowSpritesColour == value)
-                    return;
-
-                endGlowSpritesColour = value;
-                endGlowSprites.Colour = endGlowSpritesColour;
-            }
-        }
 
         public CatcherTrailDisplay()
         {
@@ -73,6 +49,14 @@ namespace osu.Game.Rulesets.Catch.UI
                 hyperDashTrails = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
                 endGlowSprites = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
             };
+        }
+
+        protected override void SkinChanged(ISkinSource skin)
+        {
+            base.SkinChanged(skin);
+
+            hyperDashTrails.Colour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ?? Catcher.DEFAULT_HYPER_DASH_COLOUR;
+            endGlowSprites.Colour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value ?? hyperDashTrails.Colour;
         }
 
         /// <summary>
