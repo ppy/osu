@@ -114,10 +114,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (Catcher.Dashing || Catcher.HyperDashing)
             {
-                double lastTrailTime = CatcherTrails.LastDashTrail?.LifetimeStart ?? double.NegativeInfinity;
                 double generationInterval = Catcher.HyperDashing ? 25 : 50;
 
-                if (Time.Current - lastTrailTime >= generationInterval)
+                if (Time.Current - CatcherTrails.LastDashTrailTime >= generationInterval)
                     CatcherTrails.DisplayDashTrail(Catcher.CurrentState, Catcher.X, Catcher.BodyScale, Catcher.HyperDashing);
             }
 
