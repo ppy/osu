@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected override Drawable CreateHeader(int index, TableColumn column)
         {
-            var title = column?.Header ?? string.Empty;
+            var title = column?.Header ?? default;
             return new HeaderText(title, title == HighlightedColumn);
         }
 
