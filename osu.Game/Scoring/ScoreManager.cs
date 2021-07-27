@@ -19,6 +19,7 @@ using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -37,17 +38,22 @@ namespace osu.Game.Scoring
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
 
+        private readonly IAPIProvider api;
+
         [CanBeNull]
         private readonly Func<BeatmapDifficultyCache> difficulties;
 
         [CanBeNull]
         private readonly OsuConfigManager configManager;
 
+        public Action<int> RequestShowBeatmap;
+
         public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, IIpcHost importHost = null,
                             Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
             : base(storage, contextFactory, api, new ScoreStore(contextFactory, storage), importHost)
         {
             this.rulesets = rulesets;
+            this.api = api;
             this.beatmaps = beatmaps;
             this.difficulties = difficulties;
             this.configManager = configManager;
@@ -67,9 +73,32 @@ namespace osu.Game.Scoring
                 catch (LegacyScoreDecoder.BeatmapNotFoundException e)
                 {
                     Logger.Log(e.Message, LoggingTarget.Information, LogLevel.Error);
+                    getBeatmapIDFromHash(e.BeatmapHash);
                     return null;
                 }
             }
+        }
+
+        private void getBeatmapIDFromHash(string beatmapHash)
+        {
+            var req = new GetBeatmapRequest(beatmapHash);
+
+            req.Success += result =>
+            {
+                var notification = new SimpleNotification
+                {
+                    Text = "You just tried to import a score with missing beatmap, would you like to download it?",
+                    Activated = () =>
+                    {
+                        RequestShowBeatmap?.Invoke(result.OnlineBeatmapID);
+                        return true;
+                    }
+                };
+
+                PostNotification?.Invoke(notification);
+            };
+
+            api.Queue(req);
         }
 
         protected override Task Populate(ScoreInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)

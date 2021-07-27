@@ -269,6 +269,7 @@ namespace osu.Game
             Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
 
             SelectedMods.BindValueChanged(modsChanged);
+            ScoreManager.RequestShowBeatmap += ShowBeatmap;
             Beatmap.BindValueChanged(beatmapChanged, true);
         }
 

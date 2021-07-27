@@ -41,9 +41,10 @@ namespace osu.Game.Scoring.Legacy
 
                 var version = sr.ReadInt32();
 
-                workingBeatmap = GetBeatmap(sr.ReadString());
+                string beatmapHash;
+                workingBeatmap = GetBeatmap(beatmapHash = sr.ReadString());
                 if (workingBeatmap is DummyWorkingBeatmap)
-                    throw new BeatmapNotFoundException();
+                    throw new BeatmapNotFoundException(beatmapHash);
 
                 scoreInfo.User = new User { Username = sr.ReadString() };
 
@@ -299,9 +300,12 @@ namespace osu.Game.Scoring.Legacy
 
         public class BeatmapNotFoundException : Exception
         {
-            public BeatmapNotFoundException()
+            public string BeatmapHash;
+
+            public BeatmapNotFoundException(string beatmapHash)
                 : base("No corresponding beatmap for the score could be found.")
             {
+                BeatmapHash = beatmapHash;
             }
         }
     }
