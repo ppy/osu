@@ -61,7 +61,7 @@ namespace osu.Game.Online.Rooms
         public readonly Bindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
 
         [Cached]
-        [JsonIgnore]
+        [JsonProperty("type")]
         public readonly Bindable<MatchType> Type = new Bindable<MatchType>();
 
         // Todo: osu-framework bug (https://github.com/ppy/osu-framework/issues/4106)
