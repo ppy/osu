@@ -73,26 +73,26 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void DisplayDashTrail(CatcherAnimationState animationState, float x, Vector2 scale, bool hyperDashing)
         {
-            var sprite = createTrail(animationState, x, scale);
+            var trail = createTrail(animationState, x, scale);
 
             if (hyperDashing)
-                hyperDashTrails.Add(sprite);
+                hyperDashTrails.Add(trail);
             else
-                dashTrails.Add(sprite);
+                dashTrails.Add(trail);
 
-            sprite.FadeTo(0.4f).FadeOut(800, Easing.OutQuint);
-            sprite.Expire(true);
+            trail.FadeTo(0.4f).FadeOut(800, Easing.OutQuint);
+            trail.Expire(true);
         }
 
         private CatcherTrail createTrail(CatcherAnimationState animationState, float x, Vector2 scale)
         {
-            CatcherTrail sprite = trailPool.Get();
+            CatcherTrail trail = trailPool.Get();
 
-            sprite.AnimationState = animationState;
-            sprite.Scale = scale;
-            sprite.Position = new Vector2(x, 0);
+            trail.AnimationState = animationState;
+            trail.Scale = scale;
+            trail.Position = new Vector2(x, 0);
 
-            return sprite;
+            return trail;
         }
 
         private double getLastDashTrailTime()
