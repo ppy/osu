@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                         }
                     }
                 }, skin);
-                trails = catcherArea.CatcherTrails;
+                trails = catcherArea.ChildrenOfType<CatcherTrailDisplay>().Single();
             });
 
             AddStep("start hyper-dash", () =>
