@@ -27,13 +27,13 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public Color4 HyperDashTrailsColour => hyperDashTrails.Colour;
 
-        public Color4 EndGlowSpritesColour => endGlowSprites.Colour;
+        public Color4 HyperDashAfterImageColour => hyperDashAfterImages.Colour;
 
         private readonly DrawablePool<CatcherTrail> trailPool;
 
         private readonly Container<CatcherTrail> dashTrails;
         private readonly Container<CatcherTrail> hyperDashTrails;
-        private readonly Container<CatcherTrail> endGlowSprites;
+        private readonly Container<CatcherTrail> hyperDashAfterImages;
 
         public CatcherTrailDisplay()
         {
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 trailPool = new DrawablePool<CatcherTrail>(30),
                 dashTrails = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both },
                 hyperDashTrails = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
-                endGlowSprites = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
+                hyperDashAfterImages = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
             };
         }
 
@@ -53,46 +53,46 @@ namespace osu.Game.Rulesets.Catch.UI
             base.SkinChanged(skin);
 
             hyperDashTrails.Colour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ?? Catcher.DEFAULT_HYPER_DASH_COLOUR;
-            endGlowSprites.Colour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value ?? hyperDashTrails.Colour;
+            hyperDashAfterImages.Colour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value ?? hyperDashTrails.Colour;
         }
 
         /// <summary>
-        /// Displays a single end-glow catcher sprite.
+        /// Displays a hyper-dash after-image of the catcher.
         /// </summary>
-        public void DisplayEndGlow(CatcherAnimationState animationState, float x, Vector2 scale)
+        public void DisplayHyperDashAfterImage(CatcherAnimationState animationState, float x, Vector2 scale)
         {
-            var endGlow = createTrail(animationState, x, scale);
+            var trail = createTrail(animationState, x, scale);
 
-            endGlowSprites.Add(endGlow);
+            hyperDashAfterImages.Add(trail);
 
-            endGlow.MoveToOffset(new Vector2(0, -10), 1200, Easing.In);
-            endGlow.ScaleTo(endGlow.Scale * 0.95f).ScaleTo(endGlow.Scale * 1.2f, 1200, Easing.In);
-            endGlow.FadeOut(1200);
-            endGlow.Expire(true);
+            trail.MoveToOffset(new Vector2(0, -10), 1200, Easing.In);
+            trail.ScaleTo(trail.Scale * 0.95f).ScaleTo(trail.Scale * 1.2f, 1200, Easing.In);
+            trail.FadeOut(1200);
+            trail.Expire(true);
         }
 
         public void DisplayDashTrail(CatcherAnimationState animationState, float x, Vector2 scale, bool hyperDashing)
         {
-            var sprite = createTrail(animationState, x, scale);
+            var trail = createTrail(animationState, x, scale);
 
             if (hyperDashing)
-                hyperDashTrails.Add(sprite);
+                hyperDashTrails.Add(trail);
             else
-                dashTrails.Add(sprite);
+                dashTrails.Add(trail);
 
-            sprite.FadeTo(0.4f).FadeOut(800, Easing.OutQuint);
-            sprite.Expire(true);
+            trail.FadeTo(0.4f).FadeOut(800, Easing.OutQuint);
+            trail.Expire(true);
         }
 
         private CatcherTrail createTrail(CatcherAnimationState animationState, float x, Vector2 scale)
         {
-            CatcherTrail sprite = trailPool.Get();
+            CatcherTrail trail = trailPool.Get();
 
-            sprite.AnimationState = animationState;
-            sprite.Scale = scale;
-            sprite.Position = new Vector2(x, 0);
+            trail.AnimationState = animationState;
+            trail.Scale = scale;
+            trail.Position = new Vector2(x, 0);
 
-            return sprite;
+            return trail;
         }
 
         private double getLastDashTrailTime()
