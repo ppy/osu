@@ -31,6 +31,7 @@ namespace osu.Game.Scoring.Legacy
             };
 
             WorkingBeatmap workingBeatmap;
+            string beatmapHash;
 
             using (SerializationReader sr = new SerializationReader(stream))
             {
@@ -41,10 +42,7 @@ namespace osu.Game.Scoring.Legacy
 
                 var version = sr.ReadInt32();
 
-                string beatmapHash;
                 workingBeatmap = GetBeatmap(beatmapHash = sr.ReadString());
-                if (workingBeatmap is DummyWorkingBeatmap)
-                    throw new BeatmapNotFoundException(beatmapHash);
 
                 scoreInfo.User = new User { Username = sr.ReadString() };
 
@@ -121,6 +119,9 @@ namespace osu.Game.Scoring.Legacy
             // before returning for database import, we must restore the database-sourced BeatmapInfo.
             // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.
             score.ScoreInfo.Beatmap = workingBeatmap.BeatmapInfo;
+
+            if (workingBeatmap is DummyWorkingBeatmap)
+                throw new BeatmapNotFoundException(beatmapHash, score);
 
             return score;
         }
@@ -301,11 +302,13 @@ namespace osu.Game.Scoring.Legacy
         public class BeatmapNotFoundException : Exception
         {
             public string BeatmapHash;
+            public Score Score;
 
-            public BeatmapNotFoundException(string beatmapHash)
+            public BeatmapNotFoundException(string beatmapHash, Score score)
                 : base("No corresponding beatmap for the score could be found.")
             {
                 BeatmapHash = beatmapHash;
+                Score = score;
             }
         }
     }

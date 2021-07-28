@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
@@ -24,6 +25,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring.Legacy;
+using osu.Game.Screens.Import;
 
 namespace osu.Game.Scoring
 {
@@ -46,7 +48,7 @@ namespace osu.Game.Scoring
         [CanBeNull]
         private readonly OsuConfigManager configManager;
 
-        public Action<int> RequestShowBeatmap;
+        public Action<Action<IScreen>> PerformFromScreen;
 
         public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, IIpcHost importHost = null,
                             Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
@@ -72,29 +74,35 @@ namespace osu.Game.Scoring
                 }
                 catch (LegacyScoreDecoder.BeatmapNotFoundException e)
                 {
-                    Logger.Log(e.Message, LoggingTarget.Information, LogLevel.Error);
-                    getBeatmapIDFromHash(e.BeatmapHash);
+                    Logger.Log(e.Message, LoggingTarget.Information, LogLevel.Error, false);
+                    sendNotification(e, archive);
                     return null;
                 }
             }
         }
 
-        private void getBeatmapIDFromHash(string beatmapHash)
+        private void sendNotification(LegacyScoreDecoder.BeatmapNotFoundException e, ArchiveReader archive)
         {
-            var req = new GetBeatmapRequest(beatmapHash);
+            var req = new GetBeatmapRequest(e.BeatmapHash);
 
-            req.Success += result =>
+            var notification = new SimpleErrorNotification
             {
-                var notification = new SimpleNotification
-                {
-                    Text = "You just tried to import a score with missing beatmap, would you like to download it?",
-                    Activated = () =>
-                    {
-                        RequestShowBeatmap?.Invoke(result.OnlineBeatmapID);
-                        return true;
-                    }
-                };
+                Text = e.Message
+            };
 
+            req.Success += res =>
+            {
+                notification.Text += " Click here to download it.";
+                notification.Activated = () =>
+                {
+                    PerformFromScreen?.Invoke(screen => screen.Push(new ReplayImportScreen(e.Score, res, archive)));
+                    return true;
+                };
+                PostNotification?.Invoke(notification);
+            };
+
+            req.Failure += _ =>
+            {
                 PostNotification?.Invoke(notification);
             };
 
