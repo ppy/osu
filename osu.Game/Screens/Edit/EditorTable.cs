@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -46,9 +47,9 @@ namespace osu.Game.Screens.Edit
 
         private class HeaderText : OsuSpriteText
         {
-            public HeaderText(string text)
+            public HeaderText(LocalisableString text)
             {
-                Text = text.ToUpper();
+                Text = text;
                 Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold);
             }
         }

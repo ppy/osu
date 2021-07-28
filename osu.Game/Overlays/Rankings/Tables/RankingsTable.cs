@@ -10,6 +10,7 @@ using osu.Framework.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Localisation;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -70,7 +71,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected abstract Drawable[] CreateAdditionalContent(TModel item);
 
-        protected virtual string HighlightedColumn => @"Performance";
+        protected virtual string HighlightedColumn => @"表现";
 
         protected override Drawable CreateHeader(int index, TableColumn column)
         {
@@ -109,7 +110,7 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
             private readonly bool isHighlighted;
 
-            public HeaderText(string text, bool isHighlighted)
+            public HeaderText(LocalisableString text, bool isHighlighted)
             {
                 this.isHighlighted = isHighlighted;
 

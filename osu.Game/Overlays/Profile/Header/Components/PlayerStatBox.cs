@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private readonly OsuSpriteText content;
         private readonly SpriteIcon icon;
         private readonly OsuSpriteText iconDescription;
-        public string ContentText { set => content.Text = value; }
+        public LocalisableString ContentText { set => content.Text = value; }
         public LocalisableString Title { set => title.Text = value; }
         public IconUsage Icon { set => icon.Icon = value; }
         public string IconDescription { set => iconDescription.Text = value; }

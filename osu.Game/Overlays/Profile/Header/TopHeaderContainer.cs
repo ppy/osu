@@ -380,13 +380,13 @@ namespace osu.Game.Overlays.Profile.Header
                     }
                 });
 
-                medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
-                ppInfo.Content = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
+                medalInfo.ContentText = user?.Achievements?.Length.ToString() ?? "0";
+                ppInfo.ContentText = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
 
                 foreach (var scoreRankInfo in scoreRankInfos)
                     scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
-                var levelProgress = user?.Statistics?.Level.Progress.ToString("0'%'");
+                var levelProgress = user?.Statistics?.Level.Progress.ToLocalisableString("0'%'");
                 levelInfo.ContentText = $"等级{user?.Statistics?.Level.Current.ToString() ?? "0"}, 进度{levelProgress}";
             }
         }
