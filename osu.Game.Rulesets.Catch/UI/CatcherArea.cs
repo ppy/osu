@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Catch.UI
             comboDisplay.X = Catcher.X;
 
             if (!lastHyperDashState && Catcher.HyperDashing && Time.Elapsed > 0)
-                catcherTrails.DisplayEndGlow(Catcher.CurrentState, Catcher.X, Catcher.BodyScale);
+                catcherTrails.DisplayHyperDashAfterImage(Catcher.CurrentState, Catcher.X, Catcher.BodyScale);
 
             if (Catcher.Dashing || Catcher.HyperDashing)
             {
