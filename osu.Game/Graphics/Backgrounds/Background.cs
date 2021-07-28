@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.Backgrounds
     {
         private const float blur_scale = 0.5f;
 
-        public Sprite Sprite { get; protected set; }
+        public readonly Sprite Sprite;
 
         private readonly string textureName;
 

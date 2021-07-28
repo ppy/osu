@@ -45,6 +45,7 @@ namespace osu.Game.Screens
         protected override void Update()
         {
             base.Update();
+            Scale = new Vector2(1 + x_movement_amount / DrawSize.X * 2);
         }
 
         public override void OnEntering(IScreen last)

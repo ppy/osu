@@ -4,7 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
-using osu.Framework.Graphics;
+
 namespace osu.Game.Graphics.Backgrounds
 {
     public class BeatmapBackground : Background
