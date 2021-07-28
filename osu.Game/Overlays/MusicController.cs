@@ -12,8 +12,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Threading;
 using osu.Framework.Utils;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 

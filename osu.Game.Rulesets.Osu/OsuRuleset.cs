@@ -1,39 +1,39 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
-using System.Linq;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
-using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Osu.Edit;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Osu.Replays;
+using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
-using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Difficulty;
-using osu.Game.Rulesets.Osu.Edit;
-using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
+using osu.Game.Skinning;
+using System;
+using System.Linq;
+using osu.Framework.Extensions.EnumExtensions;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.Statistics;
-using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Rulesets.Replays.Types;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
-using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
-using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu
 {
