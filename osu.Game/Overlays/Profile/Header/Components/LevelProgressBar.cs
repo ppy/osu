@@ -46,6 +46,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private void updateProgress(User user)
         {
             levelProgressBar.Length = user?.Statistics?.Level.Progress / 100f ?? 0;
+            levelProgressText.Text = user?.Statistics?.Level.Progress.ToLocalisableString("0'%'");
         }
     }
 }

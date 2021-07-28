@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -137,8 +138,8 @@ namespace osu.Game.Graphics.UserInterface
         /// Used to format counts.
         /// </summary>
         /// <param name="count">Count to format.</param>
-        /// <returns>Count formatted as a string.</returns>
-        protected virtual string FormatCount(T count)
+        /// <returns>Count formatted as a localisable string.</returns>
+        protected virtual LocalisableString FormatCount(T count)
         {
             return count.ToString();
         }

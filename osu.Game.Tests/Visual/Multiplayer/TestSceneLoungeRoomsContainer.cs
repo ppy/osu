@@ -4,6 +4,8 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
@@ -60,6 +62,31 @@ namespace osu.Game.Tests.Visual.Multiplayer
             press(Key.Down);
             press(Key.Down);
             AddAssert("last room selected", () => checkRoomSelected(RoomManager.Rooms.Last()));
+        }
+
+        [Test]
+        public void TestKeyboardNavigationAfterOrderChange()
+        {
+            AddStep("add rooms", () => RoomManager.AddRooms(3));
+
+            AddStep("reorder rooms", () =>
+            {
+                var room = RoomManager.Rooms[1];
+
+                RoomManager.RemoveRoom(room);
+                RoomManager.AddRoom(room);
+            });
+
+            AddAssert("no selection", () => checkRoomSelected(null));
+
+            press(Key.Down);
+            AddAssert("first room selected", () => checkRoomSelected(getRoomInFlow(0)));
+
+            press(Key.Down);
+            AddAssert("second room selected", () => checkRoomSelected(getRoomInFlow(1)));
+
+            press(Key.Down);
+            AddAssert("third room selected", () => checkRoomSelected(getRoomInFlow(2)));
         }
 
         [Test]
@@ -121,5 +148,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         private bool checkRoomSelected(Room room) => SelectedRoom.Value == room;
+
+        private Room getRoomInFlow(int index) =>
+            (container.ChildrenOfType<FillFlowContainer<DrawableRoom>>().First().FlowingChildren.ElementAt(index) as DrawableRoom)?.Room;
     }
 }

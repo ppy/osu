@@ -38,9 +38,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
-        private readonly TestMultiplayerRoomManager roomManager;
+        private readonly TestRequestHandlingMultiplayerRoomManager roomManager;
 
-        public TestMultiplayerClient(TestMultiplayerRoomManager roomManager)
+        public TestMultiplayerClient(TestRequestHandlingMultiplayerRoomManager roomManager)
         {
             this.roomManager = roomManager;
         }

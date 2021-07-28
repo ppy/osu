@@ -490,13 +490,17 @@ namespace osu.Game
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {
+            if (r.NewValue?.Available != true)
+            {
+                // reject the change if the ruleset is not available.
+                Ruleset.Value = r.OldValue;
+                return;
+            }
+
             var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
 
-            if (r.NewValue?.Available == true)
-            {
-                foreach (ModType type in Enum.GetValues(typeof(ModType)))
-                    dict[type] = r.NewValue.CreateInstance().GetModsFor(type).ToList();
-            }
+            foreach (ModType type in Enum.GetValues(typeof(ModType)))
+                dict[type] = r.NewValue.CreateInstance().GetModsFor(type).ToList();
 
             if (!SelectedMods.Disabled)
                 SelectedMods.Value = Array.Empty<Mod>();

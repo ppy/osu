@@ -80,6 +80,22 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("room join password correct", () => lastJoinedPassword == "password");
         }
 
+        [Test]
+        public void TestJoinRoomWithPasswordViaKeyboardOnly()
+        {
+            DrawableRoom.PasswordEntryPopover passwordEntryPopover = null;
+
+            AddStep("add room", () => RoomManager.AddRooms(1, withPassword: true));
+            AddStep("select room", () => InputManager.Key(Key.Down));
+            AddStep("attempt join room", () => InputManager.Key(Key.Enter));
+            AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
+            AddStep("enter password in text box", () => passwordEntryPopover.ChildrenOfType<TextBox>().First().Text = "password");
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            AddAssert("room join requested", () => lastJoinedRoom == RoomManager.Rooms.First());
+            AddAssert("room join password correct", () => lastJoinedPassword == "password");
+        }
+
         private void onRoomJoined(Room room, string password)
         {
             lastJoinedRoom = room;

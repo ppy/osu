@@ -844,7 +844,7 @@ namespace osu.Game
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(screenContainer), overlayContent.Add);
+            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(screenContainer), overlayContent.Add, true);
 
             loadComponentSingleFile(new LoginOverlay
             {
@@ -1019,7 +1019,7 @@ namespace osu.Game
 
                     try
                     {
-                        Logger.Log($"Loading {component}...", level: LogLevel.Debug);
+                        Logger.Log($"Loading {component}...");
 
                         // Since this is running in a separate thread, it is possible for OsuGame to be disposed after LoadComponentAsync has been called
                         // throwing an exception. To avoid this, the call is scheduled on the update thread, which does not run if IsDisposed = true
@@ -1039,7 +1039,7 @@ namespace osu.Game
 
                         await task.ConfigureAwait(false);
 
-                        Logger.Log($"Loaded {component}!", level: LogLevel.Debug);
+                        Logger.Log($"Loaded {component}!");
                     }
                     catch (OperationCanceledException)
                     {

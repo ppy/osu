@@ -330,29 +330,29 @@ namespace osu.Game.Screens.Edit
 
         public bool OnPressed(PlatformAction action)
         {
-            switch (action.ActionType)
+            switch (action)
             {
-                case PlatformActionType.Cut:
+                case PlatformAction.Cut:
                     Cut();
                     return true;
 
-                case PlatformActionType.Copy:
+                case PlatformAction.Copy:
                     Copy();
                     return true;
 
-                case PlatformActionType.Paste:
+                case PlatformAction.Paste:
                     Paste();
                     return true;
 
-                case PlatformActionType.Undo:
+                case PlatformAction.Undo:
                     Undo();
                     return true;
 
-                case PlatformActionType.Redo:
+                case PlatformAction.Redo:
                     Redo();
                     return true;
 
-                case PlatformActionType.Save:
+                case PlatformAction.Save:
                     Save();
                     return true;
             }

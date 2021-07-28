@@ -330,7 +330,7 @@ namespace osu.Game.Overlays.Profile.Header
                     {
                         new Drawable[]
                         {
-                            new UserStatsLine(UsersStrings.ShowStatsRankedScore, user.Statistics.RankedScore.ToString("#,##0"))
+                            new UserStatsLine(UsersStrings.ShowStatsRankedScore, user.Statistics.RankedScore.ToLocalisableString("#,##0"))
                             {
                                 Icon = FontAwesome.Regular.Map
                             }
@@ -344,35 +344,35 @@ namespace osu.Game.Overlays.Profile.Header
                         },
                         new Drawable[]
                         {
-                            new UserStatsLine(UsersStrings.ShowStatsPlayCount, user.Statistics.PlayCount.ToString("#,##0"))
+                            new UserStatsLine(UsersStrings.ShowStatsPlayCount, user.Statistics.PlayCount.ToLocalisableString("#,##0"))
                             {
                                 Icon = FontAwesome.Solid.PlayCircle
                             }
                         },
                         new Drawable[]
                         {
-                            new UserStatsLine(UsersStrings.ShowStatsReplaysWatchedByOthers, user.Statistics.ReplaysWatched.ToString("#,##0"))
+                            new UserStatsLine(UsersStrings.ShowStatsReplaysWatchedByOthers, user.Statistics.ReplaysWatched.ToLocalisableString("#,##0"))
                             {
                                 Icon = FontAwesome.Regular.FileVideo
                             }
                         },
                         new Drawable[]
                         {
-                            new UserStatsLine(UsersStrings.ShowStatsTotalHits, user.Statistics.TotalHits.ToString("#,##0"))
+                            new UserStatsLine(UsersStrings.ShowStatsTotalHits, user.Statistics.TotalHits.ToLocalisableString("#,##0"))
                             {
                                 Icon = FontAwesome.Regular.Compass
                             }
                         },
                         new Drawable[]
                         {
-                            new UserStatsLine(UsersStrings.ShowStatsMaximumCombo, user.Statistics.MaxCombo.ToString("#,##0"))
+                            new UserStatsLine(UsersStrings.ShowStatsMaximumCombo, user.Statistics.MaxCombo.ToLocalisableString("#,##0"))
                             {
                                 Icon = FontAwesome.Regular.WindowMaximize
                             }
                         },
                         new Drawable[]
                         {
-                            new UserStatsLine(UsersStrings.ShowStatsTotalScore, user.Statistics.TotalScore.ToString("#,##0"))
+                            new UserStatsLine(UsersStrings.ShowStatsTotalScore, user.Statistics.TotalScore.ToLocalisableString("#,##0"))
                             {
                                 Icon = FontAwesome.Regular.Calendar
                             }
@@ -380,11 +380,11 @@ namespace osu.Game.Overlays.Profile.Header
                     }
                 });
 
+                medalInfo.Content = user?.Achievements?.Length.ToString() ?? "0";
+                ppInfo.Content = user?.Statistics?.PP?.ToLocalisableString("#,##0") ?? (LocalisableString)"0";
+
                 foreach (var scoreRankInfo in scoreRankInfos)
                     scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
-
-                medalInfo.ContentText = user?.Achievements?.Length.ToString() ?? "0";
-                ppInfo.ContentText = user?.Statistics?.PP?.ToString("#,##0") ?? "0";
 
                 var levelProgress = user?.Statistics?.Level.Progress.ToString("0'%'");
                 levelInfo.ContentText = $"等级{user?.Statistics?.Level.Current.ToString() ?? "0"}, 进度{levelProgress}";
@@ -396,7 +396,7 @@ namespace osu.Game.Overlays.Profile.Header
             private SpriteIcon icon;
             public IconUsage Icon { get; set; }
 
-            public UserStatsLine(LocalisableString left, string right)
+            public UserStatsLine(LocalisableString left, LocalisableString right)
             {
                 RelativeSizeAxes = Axes.Both;
                 Children = new Drawable[]
