@@ -13,10 +13,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModMirror : ModMirror, IApplicableToHitObject
     {
-        public override string Description => "Reflect the playfield.";
+        public override string Description => "Flip objects on the chosen axes.";
         public override Type[] IncompatibleMods => new[] { typeof(ModHardRock) };
 
-        [SettingSource("Mirrored axes", "Choose which of the playfield's axes are mirrored.")]
+        [SettingSource("Mirrored axes", "Choose which axes objects are mirrored over.")]
         public Bindable<MirrorType> Reflection { get; } = new Bindable<MirrorType>();
 
         public void ApplyToHitObject(HitObject hitObject)
