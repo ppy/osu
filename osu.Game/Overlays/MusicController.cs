@@ -12,8 +12,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Utils;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 
@@ -419,14 +419,19 @@ namespace osu.Game.Overlays
         }
 
         /// <summary>
-        /// Resets the speed adjustments currently applied on <see cref="CurrentTrack"/> and applies the mod adjustments if <see cref="AllowRateAdjustments"/> is <c>true</c>.
+        /// Resets the track adjustments currently applied on <see cref="CurrentTrack"/> and applies the mod adjustments if <see cref="AllowRateAdjustments"/> is <c>true</c>.
         /// </summary>
         /// <remarks>
-        /// Does not reset speed adjustments applied directly to the beatmap track.
+        /// Does not reset any adjustments applied directly to the beatmap track.
         /// </remarks>
         public void ResetTrackAdjustments()
         {
             CurrentTrack.ResetSpeedAdjustments();
+
+            // Adjustments other than speed should also be reset
+            // e.g. ModMuted may apply volume adjustments
+            CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Balance);
+            CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Volume);
 
             if (allowRateAdjustments)
             {
