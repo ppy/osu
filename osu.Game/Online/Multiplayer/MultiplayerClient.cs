@@ -192,8 +192,9 @@ namespace osu.Game.Online.Multiplayer
         /// </remarks>
         /// <param name="name">The new room name, if any.</param>
         /// <param name="password">The new password, if any.</param>
+        /// <param name="matchType">The type of the match, if any.</param>
         /// <param name="item">The new room playlist item, if any.</param>
-        public Task ChangeSettings(Optional<string> name = default, Optional<string> password = default, Optional<PlaylistItem> item = default)
+        public Task ChangeSettings(Optional<string> name = default, Optional<string> password = default, Optional<MatchType> matchType = default, Optional<PlaylistItem> item = default)
         {
             if (Room == null)
                 throw new InvalidOperationException("Must be joined to a match to change settings.");
@@ -219,6 +220,7 @@ namespace osu.Game.Online.Multiplayer
                 BeatmapID = item.GetOr(existingPlaylistItem).BeatmapID,
                 BeatmapChecksum = item.GetOr(existingPlaylistItem).Beatmap.Value.MD5Hash,
                 RulesetID = item.GetOr(existingPlaylistItem).RulesetID,
+                MatchType = matchType.GetOr(Room.Settings.MatchType),
                 RequiredMods = item.HasValue ? item.Value.AsNonNull().RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.RequiredMods,
                 AllowedMods = item.HasValue ? item.Value.AsNonNull().AllowedMods.Select(m => new APIMod(m)).ToList() : Room.Settings.AllowedMods,
             });
