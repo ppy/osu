@@ -116,10 +116,7 @@ namespace osu.Game.Online
                     }
                     catch (Exception e)
                     {
-                        Logger.Log($"{clientName} connection error: {e}", LoggingTarget.Network);
-
-                        // retry on any failure.
-                        await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
+                        await handleErrorAndDelay(e, cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -127,6 +124,15 @@ namespace osu.Game.Online
             {
                 connectionLock.Release();
             }
+        }
+
+        /// <summary>
+        /// Handles an exception and delays an async flow.
+        /// </summary>
+        private async Task handleErrorAndDelay(Exception exception, CancellationToken cancellationToken)
+        {
+            Logger.Log($"{clientName} connection error: {exception}", LoggingTarget.Network);
+            await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
         }
 
         private HubConnection buildConnection(CancellationToken cancellationToken)
@@ -155,17 +161,18 @@ namespace osu.Game.Online
             return newConnection;
         }
 
-        private Task onConnectionClosed(Exception? ex, CancellationToken cancellationToken)
+        private async Task onConnectionClosed(Exception? ex, CancellationToken cancellationToken)
         {
             isConnected.Value = false;
 
-            Logger.Log(ex != null ? $"{clientName} lost connection: {ex}" : $"{clientName} disconnected", LoggingTarget.Network);
+            if (ex != null)
+                await handleErrorAndDelay(ex, cancellationToken).ConfigureAwait(false);
+            else
+                Logger.Log($"{clientName} disconnected", LoggingTarget.Network);
 
             // make sure a disconnect wasn't triggered (and this is still the active connection).
             if (!cancellationToken.IsCancellationRequested)
-                Task.Run(connect, default);
-
-            return Task.CompletedTask;
+                await Task.Run(connect, default).ConfigureAwait(false);
         }
 
         private async Task disconnect(bool takeLock)
