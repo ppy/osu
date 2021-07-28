@@ -10,7 +10,6 @@ using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Mixing;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -291,7 +290,6 @@ namespace osu.Game.Tests.Visual
                 private bool running;
 
                 public TrackVirtualManual(IFrameBasedClock referenceClock)
-                    : base(new NullAudioMixer())
                 {
                     this.referenceClock = referenceClock;
                     Length = double.PositiveInfinity;

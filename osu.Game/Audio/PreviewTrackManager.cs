@@ -148,8 +148,12 @@ namespace osu.Game.Audio
                 if (dataStream == null)
                     return null;
 
-                Track track = new TrackBass(dataStream, (IBassAudioMixer)defaultMixer);
+                // Todo: This is quite unsafe. TrackBass shouldn't be exposed as public.
+                Track track = new TrackBass(dataStream);
+
+                defaultMixer.Add(track);
                 AddItem(track);
+
                 return track;
             }
 
