@@ -189,6 +189,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModTraceable(),
                         new OsuModBarrelRoll(),
                         new OsuModApproachDifferent(),
+                        new OsuModMuted(),
                     };
 
                 case ModType.System:
