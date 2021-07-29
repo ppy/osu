@@ -5,6 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -23,7 +25,8 @@ using osuTK;
 
 namespace osu.Game.Screens.Import
 {
-    public class ReplayImportScreen : OsuScreen
+    [Cached(typeof(IPreviewTrackOwner))]
+    public class ReplayImportScreen : OsuScreen, IPreviewTrackOwner
     {
         [Resolved]
         private RulesetStore rulesets { get; set; }
@@ -33,6 +36,9 @@ namespace osu.Game.Screens.Import
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
+
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; }
 
         private BeatmapSetInfo onlineBeatmap;
         private Container container;
@@ -143,15 +149,16 @@ namespace osu.Game.Screens.Import
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            scorePanel.StateChanged += state => container.MoveToX(scorePanel.Size.X / 2, 500, Easing.OutQuint);
+
+            scorePanel.StateChanged += _ => container.MoveToX(scorePanel.Size.X / 2, 500, Easing.OutQuint);
+            automaticDownload.Current.BindValueChanged(_ => checkForAutomaticDownload());
+            score.ScoreInfo.Beatmap = beatmap.ToBeatmap(rulesets);
 
             var onlineBeatmapRequest = new GetBeatmapSetRequest(beatmap.OnlineBeatmapSetID);
 
             onlineBeatmapRequest.Success += res => Schedule(() =>
             {
                 onlineBeatmap = res.ToBeatmapSet(rulesets);
-                score.ScoreInfo.Beatmap = beatmap.ToBeatmap(rulesets);
-                score.ScoreInfo.BeatmapInfoID = beatmap.ToBeatmap(rulesets).OnlineBeatmapID ?? 0;
                 beatmapPanelContainer.Child = new GridBeatmapPanel(onlineBeatmap);
             });
 
@@ -179,6 +186,12 @@ namespace osu.Game.Screens.Import
                 return;
 
             beatmaps.Download(onlineBeatmap);
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            previewTrackManager.StopAnyPlaying(this);
+            return base.OnExiting(next);
         }
     }
 }

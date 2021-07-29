@@ -269,7 +269,6 @@ namespace osu.Game
             Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
 
             SelectedMods.BindValueChanged(modsChanged);
-
             Beatmap.BindValueChanged(beatmapChanged, true);
 
             ScoreManager.PerformFromScreen += action => PerformFromScreen(action);
