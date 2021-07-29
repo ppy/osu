@@ -109,7 +109,15 @@ namespace osu.Game.Rulesets.Catch.UI
 
             comboDisplay.X = Catcher.X;
 
-            if (!lastHyperDashState && Catcher.HyperDashing && Time.Elapsed > 0)
+            if (Time.Elapsed <= 0)
+            {
+                // This is probably a wrong value, but currently the true value is not recorded.
+                // Setting `true` will prevent generation of false-positive after-images (with more false-positives).
+                lastHyperDashState = true;
+                return;
+            }
+
+            if (!lastHyperDashState && Catcher.HyperDashing)
                 displayCatcherTrail(CatcherTrailAnimation.HyperDashAfterimage);
 
             if (Catcher.Dashing || Catcher.HyperDashing)
