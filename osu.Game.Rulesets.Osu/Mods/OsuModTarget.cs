@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
@@ -16,7 +14,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -29,7 +26,6 @@ using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Osu.Utils;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -341,46 +337,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(new TargetBeatContainer(drawableRuleset.Beatmap.HitObjects.First().StartTime));
-        }
-
-        public class TargetBeatContainer : BeatSyncedContainer
-        {
-            private readonly double firstHitTime;
-
-            private PausableSkinnableSound sample;
-
-            public TargetBeatContainer(double firstHitTime)
-            {
-                this.firstHitTime = firstHitTime;
-                AllowMistimedEventFiring = false;
-                Divisor = 1;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                InternalChildren = new Drawable[]
-                {
-                    sample = new PausableSkinnableSound(new SampleInfo("Gameplay/catch-banana"))
-                };
-            }
-
-            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
-            {
-                base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
-
-                if (!IsBeatSyncedWithTrack) return;
-
-                int timeSignature = (int)timingPoint.TimeSignature;
-
-                // play metronome from one measure before the first object.
-                if (BeatSyncClock.CurrentTime < firstHitTime - timingPoint.BeatLength * timeSignature)
-                    return;
-
-                sample.Frequency.Value = beatIndex % timeSignature == 0 ? 1 : 0.5f;
-                sample.Play();
-            }
+            drawableRuleset.Overlays.Add(new MetronomeBeatContainer(drawableRuleset.Beatmap.HitObjects.First().StartTime));
         }
 
         #endregion
