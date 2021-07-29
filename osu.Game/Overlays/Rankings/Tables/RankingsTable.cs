@@ -13,6 +13,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
@@ -74,7 +75,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected override Drawable CreateHeader(int index, TableColumn column)
         {
-            var title = column?.Header ?? string.Empty;
+            var title = column?.Header ?? default;
             return new HeaderText(title, title == HighlightedColumn);
         }
 
@@ -109,7 +110,7 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
             private readonly bool isHighlighted;
 
-            public HeaderText(string text, bool isHighlighted)
+            public HeaderText(LocalisableString text, bool isHighlighted)
             {
                 this.isHighlighted = isHighlighted;
 

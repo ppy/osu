@@ -9,6 +9,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Users;
 using osu.Game.Scoring;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
@@ -31,8 +32,8 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected override Drawable CreateHeader(int index, TableColumn column)
         {
-            var title = column?.Header ?? string.Empty;
-            return new UserTableHeaderText(title, HighlightedColumn == title, GradeColumns.Contains(title));
+            var title = column?.Header ?? default;
+            return new UserTableHeaderText(title, HighlightedColumn == title, GradeColumns.Contains(title.ToString()));
         }
 
         protected sealed override Country GetCountry(UserStatistics item) => item.User.Country;
@@ -66,7 +67,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         private class UserTableHeaderText : HeaderText
         {
-            public UserTableHeaderText(string text, bool isHighlighted, bool isGrade)
+            public UserTableHeaderText(LocalisableString text, bool isHighlighted, bool isGrade)
                 : base(text, isHighlighted)
             {
                 Margin = new MarginPadding
