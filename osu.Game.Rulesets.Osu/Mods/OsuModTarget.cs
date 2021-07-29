@@ -63,11 +63,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// </summary>
         private const float distance_cap = 380f;
 
-        // The distances from the hit objects to the borders of the playfield they start to "turn around" and curve towards the middle.
-        // The closer the hit objects draw to the border, the sharper the turn
-        private const byte border_distance_x = 192;
-        private const byte border_distance_y = 144;
-
         /// <summary>
         /// The extent of rotation towards playfield centre when a circle is near the edge
         /// </summary>
