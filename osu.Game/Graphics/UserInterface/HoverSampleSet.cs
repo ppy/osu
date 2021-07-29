@@ -10,8 +10,6 @@ namespace osu.Game.Graphics.UserInterface
         [Description("default")]
         Default,
 
-        [Description("soft")]
-        Soft,
 
         [Description("button")]
         Button,

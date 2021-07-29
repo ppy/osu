@@ -67,7 +67,6 @@ namespace osu.Game.Screens.Edit
             private EditorClock clock { get; set; }
 
             public RowBackground(object item)
-                : base(HoverSampleSet.Soft)
             {
                 Item = item;
 
