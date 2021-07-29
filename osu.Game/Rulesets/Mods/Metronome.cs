@@ -11,14 +11,14 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class MetronomeBeatContainer : BeatSyncedContainer
+    public class Metronome : BeatSyncedContainer
     {
         private readonly double firstHitTime;
 
         private PausableSkinnableSound sample;
 
         /// <param name="firstHitTime">Start time of the first hit object, used for providing a count down.</param>
-        public MetronomeBeatContainer(double firstHitTime)
+        public Metronome(double firstHitTime)
         {
             this.firstHitTime = firstHitTime;
             AllowMistimedEventFiring = false;
