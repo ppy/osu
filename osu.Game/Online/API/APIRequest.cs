@@ -171,19 +171,24 @@ namespace osu.Game.Online.API
 
             WebRequest?.Abort();
 
-            string responseString = WebRequest?.GetResponseString();
-
-            if (!string.IsNullOrEmpty(responseString))
+            // in the case of a cancellation we don't care about whether there's an error in the response.
+            if (!(e is OperationCanceledException))
             {
-                try
+                string responseString = WebRequest?.GetResponseString();
+
+                // naive check whether there's an error in the response to avoid unnecessary JSON deserialisation.
+                if (!string.IsNullOrEmpty(responseString) && responseString.Contains(@"""error"""))
                 {
-                    // attempt to decode a displayable error string.
-                    var error = JsonConvert.DeserializeObject<DisplayableError>(responseString);
-                    if (error != null)
-                        e = new APIException(error.ErrorMessage, e);
-                }
-                catch
-                {
+                    try
+                    {
+                        // attempt to decode a displayable error string.
+                        var error = JsonConvert.DeserializeObject<DisplayableError>(responseString);
+                        if (error != null)
+                            e = new APIException(error.ErrorMessage, e);
+                    }
+                    catch
+                    {
+                    }
                 }
             }
 
