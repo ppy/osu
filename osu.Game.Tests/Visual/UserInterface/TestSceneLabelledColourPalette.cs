@@ -53,15 +53,15 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 component.Colours.AddRange(new[]
                 {
-                    Color4.DarkRed,
-                    Color4.Aquamarine,
-                    Color4.Goldenrod,
-                    Color4.Gainsboro
+                    Colour4.DarkRed,
+                    Colour4.Aquamarine,
+                    Colour4.Goldenrod,
+                    Colour4.Gainsboro
                 });
             });
         }
 
-        private Color4 randomColour() => new Color4(
+        private Colour4 randomColour() => new Color4(
             RNG.NextSingle(),
             RNG.NextSingle(),
             RNG.NextSingle(),
