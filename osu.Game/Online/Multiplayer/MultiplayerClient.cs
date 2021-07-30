@@ -424,17 +424,42 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.MatchRulesetUserStateChanged(int userId, MatchRulesetUserState state)
         {
-            throw new NotImplementedException();
+            if (Room == null)
+                return Task.CompletedTask;
+
+            Scheduler.Add(() =>
+            {
+                if (Room == null)
+                    return;
+
+                Room.Users.Single(u => u.UserID == userId).MatchRulesetState = state;
+                RoomUpdated?.Invoke();
+            }, false);
+
+            return Task.CompletedTask;
         }
 
         Task IMultiplayerClient.MatchRulesetRoomStateChanged(MatchRulesetRoomState state)
         {
-            throw new NotImplementedException();
+            if (Room == null)
+                return Task.CompletedTask;
+
+            Scheduler.Add(() =>
+            {
+                if (Room == null)
+                    return;
+
+                Room.MatchRulesetState = state;
+                RoomUpdated?.Invoke();
+            });
+
+            return Task.CompletedTask;
         }
 
         public Task MatchRulesetEvent(MatchRulesetServerEvent e)
         {
-            throw new NotImplementedException();
+            // not used by any match rulesets just yet.
+            return Task.CompletedTask;
         }
 
         Task IMultiplayerClient.UserBeatmapAvailabilityChanged(int userId, BeatmapAvailability beatmapAvailability)
