@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
@@ -11,7 +12,7 @@ namespace osu.Game.Overlays.Rankings
     {
         public RankingsSortTabControl()
         {
-            Title = RankingsStrings.FilterTitle;
+            Title = RankingsStrings.FilterTitle.ToUpper();
         }
     }
 
