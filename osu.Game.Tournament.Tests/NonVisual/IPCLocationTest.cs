@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -15,7 +12,7 @@ using osu.Game.Tournament.IPC;
 namespace osu.Game.Tournament.Tests.NonVisual
 {
     [TestFixture]
-    public class IPCLocationTest
+    public class IPCLocationTest : TournamentHostTest
     {
         [Test]
         public void CheckIPCLocation()
@@ -34,11 +31,11 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadTournament(host);
                     TournamentStorage storage = (TournamentStorage)osu.Dependencies.Get<Storage>();
                     FileBasedIPC ipc = null;
 
-                    waitForOrAssert(() => (ipc = osu.Dependencies.Get<MatchIPCInfo>() as FileBasedIPC) != null, @"ipc could not be populated in a reasonable amount of time");
+                    WaitForOrAssert(() => (ipc = osu.Dependencies.Get<MatchIPCInfo>() as FileBasedIPC) != null, @"ipc could not be populated in a reasonable amount of time");
 
                     Assert.True(ipc.SetIPCLocation(testStableInstallDirectory));
                     Assert.True(storage.AllTournaments.Exists("stable.json"));
@@ -50,25 +47,6 @@ namespace osu.Game.Tournament.Tests.NonVisual
                     host.Exit();
                 }
             }
-        }
-
-        private TournamentGameBase loadOsu(GameHost host)
-        {
-            var osu = new TournamentGameBase();
-            Task.Run(() => host.Run(osu))
-                .ContinueWith(t => Assert.Fail($"Host threw exception {t.Exception}"), TaskContinuationOptions.OnlyOnFaulted);
-            waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
-            return osu;
-        }
-
-        private static void waitForOrAssert(Func<bool> result, string failureMessage, int timeout = 90000)
-        {
-            Task task = Task.Run(() =>
-            {
-                while (!result()) Thread.Sleep(200);
-            });
-
-            Assert.IsTrue(task.Wait(timeout), failureMessage);
         }
     }
 }
