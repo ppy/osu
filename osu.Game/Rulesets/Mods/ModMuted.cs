@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
@@ -43,7 +44,7 @@ namespace osu.Game.Rulesets.Mods
             Value = true
         };
 
-        [SettingSource("Muted at combo", "The combo count at which point the music is completely muted.")]
+        [SettingSource("Final volume at combo", "The combo count at which point the music reaches its final volume.")]
         public BindableInt MuteComboCount { get; } = new BindableInt
         {
             Default = 100,
@@ -83,10 +84,19 @@ namespace osu.Game.Rulesets.Mods
             {
                 double dimFactor = Math.Min(1, (double)combo.NewValue / MuteComboCount.Value);
 
-                metronomeVolumeAdjust.Value = dimFactor;
-                trackVolumeAdjust.Value = 1 - dimFactor;
                 if (InverseMuting.Value)
                     dimFactor = 1 - dimFactor;
+
+                if (combo.NewValue < combo.OldValue)
+                {
+                    scoreProcessor.TransformBindableTo(metronomeVolumeAdjust, dimFactor, 200, Easing.OutQuint);
+                    scoreProcessor.TransformBindableTo(trackVolumeAdjust, 1 - dimFactor, 200, Easing.OutQuint);
+                }
+                else
+                {
+                    metronomeVolumeAdjust.Value = dimFactor;
+                    trackVolumeAdjust.Value = 1 - dimFactor;
+                }
             }, true);
         }
 
