@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Rankings
             {
                 case RankingsScope.Performance:
                     return RankingsStrings.TypePerformance;
-                    
+
                 case RankingsScope.Spotlights:
                     return RankingsStrings.TypeCharts;
 
