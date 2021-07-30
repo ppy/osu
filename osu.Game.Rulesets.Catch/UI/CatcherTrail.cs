@@ -31,9 +31,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override void OnApply(CatcherTrailEntry entry)
         {
-            Scale = entry.Scale;
             Position = new Vector2(entry.Position, 0);
-            Alpha = 1;
+            Scale = entry.Scale;
 
             body.AnimationState.Value = entry.CatcherState;
 
@@ -43,6 +42,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override void OnFree(CatcherTrailEntry entry)
         {
+            ApplyTransformsAt(double.MinValue);
             ClearTransforms();
         }
 
