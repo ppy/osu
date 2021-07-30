@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModMuted<TObject> : ModMuted, IApplicableToDrawableRuleset<TObject>, IApplicableToTrack, IApplicableToScoreProcessor
         where TObject : HitObject
     {
-        private readonly BindableNumber<double> trackVolumeAdjust = new BindableDouble(0.5);
+        private readonly BindableNumber<double> mainVolumeAdjust = new BindableDouble(0.5);
         private readonly BindableNumber<double> metronomeVolumeAdjust = new BindableDouble(0.5);
 
         private BindableNumber<int> currentCombo;
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mods
             Value = true
         };
 
-        [SettingSource("Final volume at combo", "The combo count at which point the music reaches its final volume.")]
+        [SettingSource("Final volume at combo", "The combo count at which point the track reaches its final volume.")]
         public BindableInt MuteComboCount { get; } = new BindableInt
         {
             Default = 100,
@@ -60,9 +60,16 @@ namespace osu.Game.Rulesets.Mods
             Value = false
         };
 
+        [SettingSource("Mute hit sounds", "Hit sounds are also muted alongside the track.")]
+        public BindableBool AffectsHitSounds { get; } = new BindableBool
+        {
+            Default = false,
+            Value = false
+        };
+
         public void ApplyToTrack(ITrack track)
         {
-            track.AddAdjustment(AdjustableProperty.Volume, trackVolumeAdjust);
+            track.AddAdjustment(AdjustableProperty.Volume, mainVolumeAdjust);
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
@@ -75,6 +82,9 @@ namespace osu.Game.Rulesets.Mods
             });
 
             metronomeContainer.AddAdjustment(AdjustableProperty.Volume, metronomeVolumeAdjust);
+
+            if (AffectsHitSounds.Value)
+                drawableRuleset.AudioContainer.AddAdjustment(AdjustableProperty.Volume, mainVolumeAdjust);
         }
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
@@ -90,12 +100,12 @@ namespace osu.Game.Rulesets.Mods
                 if (combo.NewValue < combo.OldValue)
                 {
                     scoreProcessor.TransformBindableTo(metronomeVolumeAdjust, dimFactor, 200, Easing.OutQuint);
-                    scoreProcessor.TransformBindableTo(trackVolumeAdjust, 1 - dimFactor, 200, Easing.OutQuint);
+                    scoreProcessor.TransformBindableTo(mainVolumeAdjust, 1 - dimFactor, 200, Easing.OutQuint);
                 }
                 else
                 {
                     metronomeVolumeAdjust.Value = dimFactor;
-                    trackVolumeAdjust.Value = 1 - dimFactor;
+                    mainVolumeAdjust.Value = 1 - dimFactor;
                 }
             }, true);
         }
