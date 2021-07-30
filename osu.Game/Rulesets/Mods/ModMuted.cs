@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mods
 
         private AudioContainer metronomeContainer;
 
-        [SettingSource("Enable metronome", "Add a metronome to help you keep track of the rhythm.")]
+        [SettingSource("Enable metronome", "Add a metronome beat to help you keep track of the rhythm.")]
         public BindableBool EnableMetronome { get; } = new BindableBool
         {
             Default = true,
@@ -63,8 +63,8 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Mute hit sounds", "Hit sounds are also muted alongside the track.")]
         public BindableBool AffectsHitSounds { get; } = new BindableBool
         {
-            Default = false,
-            Value = false
+            Default = true,
+            Value = true
         };
 
         public void ApplyToTrack(ITrack track)
@@ -97,16 +97,8 @@ namespace osu.Game.Rulesets.Mods
                 if (InverseMuting.Value)
                     dimFactor = 1 - dimFactor;
 
-                if (combo.NewValue < combo.OldValue)
-                {
-                    scoreProcessor.TransformBindableTo(metronomeVolumeAdjust, dimFactor, 200, Easing.OutQuint);
-                    scoreProcessor.TransformBindableTo(mainVolumeAdjust, 1 - dimFactor, 200, Easing.OutQuint);
-                }
-                else
-                {
-                    metronomeVolumeAdjust.Value = dimFactor;
-                    mainVolumeAdjust.Value = 1 - dimFactor;
-                }
+                scoreProcessor.TransformBindableTo(metronomeVolumeAdjust, dimFactor, 500, Easing.OutQuint);
+                scoreProcessor.TransformBindableTo(mainVolumeAdjust, 1 - dimFactor, 500, Easing.OutQuint);
             }, true);
         }
 
