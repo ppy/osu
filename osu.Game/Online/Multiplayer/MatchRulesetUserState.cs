@@ -3,6 +3,7 @@
 
 using System;
 using MessagePack;
+using osu.Game.Online.Multiplayer.MatchRulesets.TeamVs;
 
 #nullable enable
 
@@ -14,7 +15,8 @@ namespace osu.Game.Online.Multiplayer
     /// </summary>
     [Serializable]
     [MessagePackObject]
-    public class MatchRulesetUserState
+    [Union(0, typeof(TeamVsMatchUserState))]
+    public abstract class MatchRulesetUserState
     {
     }
 }
