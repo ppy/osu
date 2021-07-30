@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (Time.Elapsed <= 0)
             {
                 // This is probably a wrong value, but currently the true value is not recorded.
-                // Setting `true` will prevent generation of false-positive after-images (with more false-positives).
+                // Setting `true` will prevent generation of false-positive after-images (with more false-negatives).
                 lastHyperDashState = true;
                 return;
             }
