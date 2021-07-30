@@ -17,6 +17,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.MatchRulesets.TeamVs;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
@@ -37,6 +38,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         private RulesetStore rulesets { get; set; }
 
         private SpriteIcon crown;
+        private Box teamDisplay;
+
         private OsuSpriteText userRankText;
         private ModDisplay userModsDisplay;
         private StateDisplay userStateDisplay;
@@ -66,6 +69,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     Size = new Vector2(14),
                     Colour = Color4Extensions.FromHex("#F7E65D"),
                     Alpha = 0
+                },
+                teamDisplay = new Box
+                {
+                    Colour = Color4.Black,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 15,
+                    Alpha = 0,
                 },
                 new Container
                 {
@@ -174,9 +184,34 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             else
                 crown.FadeOut(fade_time);
 
+            if (User.MatchRulesetState is TeamVsMatchUserState teamState)
+            {
+                teamDisplay.Show();
+                teamDisplay.FadeColour(getColourForTeam(teamState.TeamID), 100, Easing.OutQuint);
+            }
+            else
+            {
+                teamDisplay.Hide();
+            }
+
             // If the mods are updated at the end of the frame, the flow container will skip a reflow cycle: https://github.com/ppy/osu-framework/issues/4187
             // This looks particularly jarring here, so re-schedule the update to that start of our frame as a fix.
             Schedule(() => userModsDisplay.Current.Value = User.Mods.Select(m => m.ToMod(ruleset)).ToList());
+        }
+
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        private ColourInfo getColourForTeam(int id)
+        {
+            switch (id)
+            {
+                default:
+                    return colours.Red;
+
+                case 1:
+                    return colours.Blue;
+            }
         }
 
         public MenuItem[] ContextMenuItems
