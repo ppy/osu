@@ -10,6 +10,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Users;
 using osu.Game.Scoring;
 using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
@@ -20,12 +21,12 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
         }
 
-        protected virtual IEnumerable<string> GradeColumns => new List<string> { "SS", "S", "A" };
+        protected virtual IEnumerable<LocalisableString> GradeColumns => new List<LocalisableString> { RankingsStrings.Statss, RankingsStrings.Stats, RankingsStrings.Stata };
 
         protected override RankingsTableColumn[] CreateAdditionalHeaders() => new[]
             {
-                new RankingsTableColumn("Accuracy", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-                new RankingsTableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+                new RankingsTableColumn(RankingsStrings.StatAccuracy, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+                new RankingsTableColumn(RankingsStrings.StatPlayCount, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
             }.Concat(CreateUniqueHeaders())
              .Concat(GradeColumns.Select(grade => new GradeTableColumn(grade, Anchor.Centre, new Dimension(GridSizeMode.AutoSize))))
              .ToArray();
@@ -47,12 +48,12 @@ namespace osu.Game.Overlays.Rankings.Tables
         protected sealed override Drawable[] CreateAdditionalContent(UserStatistics item) => new[]
         {
             new ColoredRowText { Text = item.DisplayAccuracy, },
-            new ColoredRowText { Text = $@"{item.PlayCount:N0}", },
+            new ColoredRowText { Text = item.PlayCount.ToLocalisableString("N0") },
         }.Concat(CreateUniqueContent(item)).Concat(new[]
         {
-            new ColoredRowText { Text = $@"{item.GradesCount[ScoreRank.XH] + item.GradesCount[ScoreRank.X]:N0}", },
-            new ColoredRowText { Text = $@"{item.GradesCount[ScoreRank.SH] + item.GradesCount[ScoreRank.S]:N0}", },
-            new ColoredRowText { Text = $@"{item.GradesCount[ScoreRank.A]:N0}", }
+            new ColoredRowText { Text = (item.GradesCount[ScoreRank.XH] + item.GradesCount[ScoreRank.X]).ToLocalisableString("N0"), },
+            new ColoredRowText { Text = (item.GradesCount[ScoreRank.SH] + item.GradesCount[ScoreRank.S]).ToLocalisableString("N0"), },
+            new ColoredRowText { Text = item.GradesCount[ScoreRank.A].ToLocalisableString("N0"), }
         }).ToArray();
 
         protected abstract RankingsTableColumn[] CreateUniqueHeaders();
@@ -78,7 +79,7 @@ namespace osu.Game.Overlays.Rankings.Tables
                 {
                     // Grade columns have extra horizontal padding for readibility
                     Horizontal = 20,
-                    Vertical = 5
+                    Vertical = 150
                 };
             }
         }
