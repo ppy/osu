@@ -74,14 +74,15 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
-            if (!EnableMetronome.Value) return;
-
-            drawableRuleset.Overlays.Add(metronomeContainer = new AudioContainer
+            if (EnableMetronome.Value)
             {
-                Child = new Metronome(drawableRuleset.Beatmap.HitObjects.First().StartTime)
-            });
+                drawableRuleset.Overlays.Add(metronomeContainer = new AudioContainer
+                {
+                    Child = new Metronome(drawableRuleset.Beatmap.HitObjects.First().StartTime)
+                });
 
-            metronomeContainer.AddAdjustment(AdjustableProperty.Volume, metronomeVolumeAdjust);
+                metronomeContainer.AddAdjustment(AdjustableProperty.Volume, metronomeVolumeAdjust);
+            }
 
             if (AffectsHitSounds.Value)
                 drawableRuleset.AudioContainer.AddAdjustment(AdjustableProperty.Volume, mainVolumeAdjust);
