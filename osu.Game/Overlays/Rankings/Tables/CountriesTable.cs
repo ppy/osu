@@ -19,14 +19,14 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
         }
 
-        protected override TableColumn[] CreateAdditionalHeaders() => new[]
+        protected override RankingsTableColumn[] CreateAdditionalHeaders() => new[]
         {
-            new TableColumn("Active Users", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Ranked Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Avg. Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Performance", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Avg. Perf.", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new RankingsTableColumn("Active Users", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new RankingsTableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new RankingsTableColumn("Ranked Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new RankingsTableColumn("Avg. Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new RankingsTableColumn("Performance", Anchor.Centre, new Dimension(GridSizeMode.AutoSize), true),
+            new RankingsTableColumn("Avg. Perf.", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
         };
 
         protected override Country GetCountry(CountryStatistics item) => item.Country;
