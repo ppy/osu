@@ -13,19 +13,16 @@ using Microsoft.EntityFrameworkCore;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring.Legacy;
-using osu.Game.Screens.Import;
 
 namespace osu.Game.Scoring
 {
@@ -40,22 +37,19 @@ namespace osu.Game.Scoring
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
 
-        private readonly IAPIProvider api;
-
         [CanBeNull]
         private readonly Func<BeatmapDifficultyCache> difficulties;
 
         [CanBeNull]
         private readonly OsuConfigManager configManager;
 
-        public Action<Action<IScreen>> PerformFromScreen;
+        public Action<LegacyScoreDecoder.BeatmapNotFoundException, ArchiveReader> OnMissingBeatmap;
 
         public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, IIpcHost importHost = null,
                             Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
             : base(storage, contextFactory, api, new ScoreStore(contextFactory, storage), importHost)
         {
             this.rulesets = rulesets;
-            this.api = api;
             this.beatmaps = beatmaps;
             this.difficulties = difficulties;
             this.configManager = configManager;
@@ -75,38 +69,10 @@ namespace osu.Game.Scoring
                 catch (LegacyScoreDecoder.BeatmapNotFoundException e)
                 {
                     Logger.Log(e.Message, LoggingTarget.Information, LogLevel.Error, false);
-                    sendNotification(e, archive);
+                    OnMissingBeatmap?.Invoke(e, archive);
                     return null;
                 }
             }
-        }
-
-        private void sendNotification(LegacyScoreDecoder.BeatmapNotFoundException e, ArchiveReader archive)
-        {
-            var req = new GetBeatmapRequest(e.BeatmapHash);
-
-            var notification = new SimpleErrorNotification
-            {
-                Text = e.Message
-            };
-
-            req.Success += res =>
-            {
-                notification.Text += " Click here to download it.";
-                notification.Activated = () =>
-                {
-                    PerformFromScreen?.Invoke(screen => screen.Push(new ReplayImportScreen(e.Score, res, archive)));
-                    return true;
-                };
-                PostNotification?.Invoke(notification);
-            };
-
-            req.Failure += _ =>
-            {
-                PostNotification?.Invoke(notification);
-            };
-
-            api.Queue(req);
         }
 
         protected override Task Populate(ScoreInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)

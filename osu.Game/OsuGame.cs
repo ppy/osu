@@ -52,8 +52,12 @@ using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
+using osu.Game.IO.Archives;
 using osu.Game.Localisation;
+using osu.Game.Online.API.Requests;
 using osu.Game.Performance;
+using osu.Game.Scoring.Legacy;
+using osu.Game.Screens.Import;
 using osu.Game.Skinning.Editor;
 
 namespace osu.Game
@@ -271,10 +275,38 @@ namespace osu.Game
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
 
-            ScoreManager.PerformFromScreen += action => PerformFromScreen(action);
+            ScoreManager.OnMissingBeatmap += (e, archive) => onMissingBeatmap(e, archive);
         }
 
         private ExternalLinkOpener externalLinkOpener;
+
+        private void onMissingBeatmap(LegacyScoreDecoder.BeatmapNotFoundException e, ArchiveReader archive)
+        {
+            var req = new GetBeatmapRequest(e.BeatmapHash);
+
+            var notification = new SimpleErrorNotification
+            {
+                Text = e.Message
+            };
+
+            req.Success += res =>
+            {
+                notification.Text += " Click here to download it.";
+                notification.Activated = () =>
+                {
+                    PerformFromScreen(screen => screen.Push(new ReplayImportScreen(e.Score, res, archive)));
+                    return true;
+                };
+                notifications.Post(notification);
+            };
+
+            req.Failure += _ =>
+            {
+                notifications.Post(notification);
+            };
+
+            API.Queue(req);
+        }
 
         /// <summary>
         /// Handle an arbitrary URL. Displays via in-game overlays where possible.
