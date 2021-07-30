@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Rankings.Tables
                 {
                     // Grade columns have extra horizontal padding for readibility
                     Horizontal = 20,
-                    Vertical = 150
+                    Vertical = 5
                 };
             }
         }
