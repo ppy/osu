@@ -8,6 +8,7 @@ using MessagePack;
 
 namespace osu.Game.Online.Multiplayer.MatchRulesets.TeamVs
 {
+    [MessagePackObject]
     public class TeamVsMatchRoomState : MatchRulesetRoomState
     {
         [Key(0)]
