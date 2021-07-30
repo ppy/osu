@@ -56,6 +56,8 @@ namespace osu.Game.Online.Multiplayer
                     connection.On(nameof(IMultiplayerClient.ResultsReady), ((IMultiplayerClient)this).ResultsReady);
                     connection.On<int, IEnumerable<APIMod>>(nameof(IMultiplayerClient.UserModsChanged), ((IMultiplayerClient)this).UserModsChanged);
                     connection.On<int, BeatmapAvailability>(nameof(IMultiplayerClient.UserBeatmapAvailabilityChanged), ((IMultiplayerClient)this).UserBeatmapAvailabilityChanged);
+                    connection.On<MatchRulesetRoomState>(nameof(IMultiplayerClient.MatchRulesetRoomStateChanged), ((IMultiplayerClient)this).MatchRulesetRoomStateChanged);
+                    connection.On<int, MatchRulesetUserState>(nameof(IMultiplayerClient.MatchRulesetUserStateChanged), ((IMultiplayerClient)this).MatchRulesetUserStateChanged);
                 };
 
                 IsConnected.BindTo(connector.IsConnected);
