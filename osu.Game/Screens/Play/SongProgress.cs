@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Play
             float barHeight = bottom_bar_height + handle_size.Y;
 
             bar.ResizeHeightTo(ShowGraph.Value ? barHeight + graph_height : barHeight, transition_duration, Easing.In);
-            graph.MoveToY(ShowGraph.Value ? 0 : bottom_bar_height + graph_height, transition_duration, Easing.In);
+            graph.FadeTo(ShowGraph.Value ? 1 : 0, transition_duration, Easing.In);
 
             updateInfoMargin();
         }
