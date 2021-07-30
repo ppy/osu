@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         private OsuSpriteText createIndexDrawable(int index) => new RowText
         {
-            Text = $"#{index + 1}",
+            Text = (index + 1).ToLocalisableString("\\##"),
             Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.SemiBold)
         };
 
