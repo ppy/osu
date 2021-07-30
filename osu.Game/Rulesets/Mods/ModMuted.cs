@@ -52,6 +52,13 @@ namespace osu.Game.Rulesets.Mods
             MaxValue = 500,
         };
 
+        [SettingSource("Start muted", "Increase volume as combo builds.")]
+        public BindableBool InverseMuting { get; } = new BindableBool
+        {
+            Default = false,
+            Value = false
+        };
+
         public void ApplyToTrack(ITrack track)
         {
             track.AddAdjustment(AdjustableProperty.Volume, trackVolumeAdjust);
@@ -78,6 +85,8 @@ namespace osu.Game.Rulesets.Mods
 
                 metronomeVolumeAdjust.Value = dimFactor;
                 trackVolumeAdjust.Value = 1 - dimFactor;
+                if (InverseMuting.Value)
+                    dimFactor = 1 - dimFactor;
             }, true);
         }
 
