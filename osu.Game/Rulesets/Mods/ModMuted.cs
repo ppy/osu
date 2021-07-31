@@ -35,8 +35,6 @@ namespace osu.Game.Rulesets.Mods
 
         private BindableNumber<int> currentCombo;
 
-        private AudioContainer metronomeContainer;
-
         [SettingSource("Enable metronome", "Add a metronome beat to help you keep track of the rhythm.")]
         public BindableBool EnableMetronome { get; } = new BindableBool
         {
@@ -76,12 +74,11 @@ namespace osu.Game.Rulesets.Mods
         {
             if (EnableMetronome.Value)
             {
-                drawableRuleset.Overlays.Add(metronomeContainer = new AudioContainer
-                {
-                    Child = new Metronome(drawableRuleset.Beatmap.HitObjects.First().StartTime)
-                });
+                Metronome metronome;
 
-                metronomeContainer.AddAdjustment(AdjustableProperty.Volume, metronomeVolumeAdjust);
+                drawableRuleset.Overlays.Add(metronome = new Metronome(drawableRuleset.Beatmap.HitObjects.First().StartTime));
+
+                metronome.AddAdjustment(AdjustableProperty.Volume, metronomeVolumeAdjust);
             }
 
             if (AffectsHitSounds.Value)
