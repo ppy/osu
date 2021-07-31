@@ -5,6 +5,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets;
 using osu.Game.Users;
+using osu.Game.Resources.Localisation.Web;
+using osu.Framework.Localisation;
+using System;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -29,18 +32,43 @@ namespace osu.Game.Overlays.Rankings
         {
             public RankingsTitle()
             {
-                Title = "ranking";
+                Title = PageTitleStrings.MainRankingControllerDefault;
                 Description = "find out who's the best right now";
                 IconTexture = "Icons/Hexacons/rankings";
             }
         }
     }
 
+    [LocalisableEnum(typeof(RankingsScopeEnumLocalisationMapper))]
     public enum RankingsScope
     {
         Performance,
         Spotlights,
         Score,
         Country
+    }
+
+    public class RankingsScopeEnumLocalisationMapper : EnumLocalisationMapper<RankingsScope>
+    {
+        public override LocalisableString Map(RankingsScope value)
+        {
+            switch (value)
+            {
+                case RankingsScope.Performance:
+                    return RankingsStrings.TypePerformance;
+
+                case RankingsScope.Spotlights:
+                    return RankingsStrings.TypeCharts;
+
+                case RankingsScope.Score:
+                    return RankingsStrings.TypeScore;
+
+                case RankingsScope.Country:
+                    return RankingsStrings.TypeCountry;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
+            }
+        }
     }
 }
