@@ -31,7 +31,6 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private readonly BindableWithCurrent<Colour4> current = new BindableWithCurrent<Colour4>();
 
-        private OsuClickableContainer colourCircle;
         private OsuSpriteText colourName;
 
         public Bindable<Colour4> Current
@@ -70,7 +69,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Spacing = new Vector2(0, 10),
                 Children = new Drawable[]
                 {
-                    colourCircle = new ColourCircle
+                    new ColourCircle
                     {
                         Current = { BindTarget = Current },
                         DeleteRequested = () => DeleteRequested?.Invoke(this)
