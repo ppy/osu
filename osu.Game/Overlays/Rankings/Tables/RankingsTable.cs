@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         private OsuSpriteText createIndexDrawable(int index) => new RowText
         {
-            Text = (index + 1).ToLocalisableString("\\##"),
+            Text = (index + 1).ToLocalisableString(@"\##"),
             Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.SemiBold)
         };
 
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         }
 
-        protected class ColoredRowText : RowText
+        protected class ColouredRowText : RowText
         {
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)

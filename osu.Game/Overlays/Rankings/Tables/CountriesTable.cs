@@ -37,29 +37,29 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected override Drawable[] CreateAdditionalContent(CountryStatistics item) => new Drawable[]
         {
-            new ColoredRowText
+            new ColouredRowText
             {
-                Text = item.ActiveUsers.ToLocalisableString("N0")
+                Text = item.ActiveUsers.ToLocalisableString(@"N0")
             },
-            new ColoredRowText
+            new ColouredRowText
             {
-                Text = item.PlayCount.ToLocalisableString("N0")
+                Text = item.PlayCount.ToLocalisableString(@"N0")
             },
-            new ColoredRowText
+            new ColouredRowText
             {
-                Text = item.RankedScore.ToLocalisableString("N0")
+                Text = item.RankedScore.ToLocalisableString(@"N0")
             },
-            new ColoredRowText
+            new ColouredRowText
             {
-                Text = (item.RankedScore / Math.Max(item.ActiveUsers, 1)).ToLocalisableString("N0")
+                Text = (item.RankedScore / Math.Max(item.ActiveUsers, 1)).ToLocalisableString(@"N0")
             },
             new RowText
             {
-                Text = item.Performance.ToLocalisableString("N0")
+                Text = item.Performance.ToLocalisableString(@"N0")
             },
-            new ColoredRowText
+            new ColouredRowText
             {
-                Text = (item.Performance / Math.Max(item.ActiveUsers, 1)).ToLocalisableString("N0")
+                Text = (item.Performance / Math.Max(item.ActiveUsers, 1)).ToLocalisableString(@"N0")
             }
         };
 

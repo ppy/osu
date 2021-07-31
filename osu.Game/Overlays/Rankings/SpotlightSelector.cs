@@ -124,11 +124,11 @@ namespace osu.Game.Overlays.Rankings
         {
             startDateColumn.Value = dateToString(response.Spotlight.StartDate);
             endDateColumn.Value = dateToString(response.Spotlight.EndDate);
-            mapCountColumn.Value = response.BeatmapSets.Count.ToLocalisableString("N0");
-            participantsColumn.Value = response.Spotlight.Participants?.ToLocalisableString("N0");
+            mapCountColumn.Value = response.BeatmapSets.Count.ToLocalisableString(@"N0");
+            participantsColumn.Value = response.Spotlight.Participants?.ToLocalisableString(@"N0");
         }
 
-        private LocalisableString dateToString(DateTimeOffset date) => date.ToLocalisableString("yyyy-MM-dd");
+        private LocalisableString dateToString(DateTimeOffset date) => date.ToLocalisableString(@"yyyy-MM-dd");
 
         private class InfoColumn : FillFlowContainer
         {
