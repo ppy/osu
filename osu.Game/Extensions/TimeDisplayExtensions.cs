@@ -22,5 +22,11 @@ namespace osu.Game.Extensions
         /// <returns>An editor formatted display string.</returns>
         public static string ToEditorFormattedString(this TimeSpan timeSpan) =>
             $"{(timeSpan < TimeSpan.Zero ? "-" : string.Empty)}{timeSpan:mm\\:ss\\:fff}";
+
+        public static string ToFormattedDuration(this double milliseconds) =>
+            ToFormattedDuration(TimeSpan.FromMilliseconds(milliseconds));
+
+        public static string ToFormattedDuration(this TimeSpan timeSpan) =>
+            timeSpan.Hours == 0 ? $"{timeSpan:mm\\:ss}" : $"{timeSpan:HH\\:mm\\:ss}";
     }
 }

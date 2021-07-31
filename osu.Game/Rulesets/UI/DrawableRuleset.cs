@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -99,12 +100,12 @@ namespace osu.Game.Rulesets.UI
         private DrawableRulesetDependencies dependencies;
 
         /// <summary>
-        /// An audio container which can be used to apply adjustments to playfield content.
+        /// Audio adjustments which are applied to the playfield.
         /// </summary>
         /// <remarks>
         /// Does not affect <see cref="Overlays"/>.
         /// </remarks>
-        public AudioContainer AudioContainer { get; private set; }
+        public IAdjustableAudioComponent Audio { get; private set; }
 
         /// <summary>
         /// Creates a ruleset visualisation for the provided ruleset and beatmap.
@@ -163,13 +164,15 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load(CancellationToken? cancellationToken)
         {
+            AudioContainer audioContainer;
+
             InternalChild = frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
             {
                 FrameStablePlayback = FrameStablePlayback,
                 Children = new Drawable[]
                 {
                     FrameStableComponents,
-                    AudioContainer = new AudioContainer
+                    audioContainer = new AudioContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = KeyBindingInputManager
@@ -180,6 +183,8 @@ namespace osu.Game.Rulesets.UI
                     Overlays,
                 }
             };
+
+            Audio = audioContainer;
 
             if ((ResumeOverlay = CreateResumeOverlay()) != null)
             {
