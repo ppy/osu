@@ -7,7 +7,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
@@ -82,7 +81,7 @@ namespace osu.Game.Rulesets.Mods
             }
 
             if (AffectsHitSounds.Value)
-                drawableRuleset.AudioContainer.AddAdjustment(AdjustableProperty.Volume, mainVolumeAdjust);
+                drawableRuleset.Audio.AddAdjustment(AdjustableProperty.Volume, mainVolumeAdjust);
         }
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
