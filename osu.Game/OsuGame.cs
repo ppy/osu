@@ -833,9 +833,9 @@ namespace osu.Game
             {
                 float offset = 0;
 
-                if (Settings.State.Value == Visibility.Visible)
+                if (Settings.IsLoaded && Settings.State.Value == Visibility.Visible)
                     offset += Toolbar.HEIGHT / 2;
-                if (notifications.State.Value == Visibility.Visible)
+                if (notifications.IsLoaded && notifications.State.Value == Visibility.Visible)
                     offset -= Toolbar.HEIGHT / 2;
 
                 screenOffsetContainer.MoveToX(offset, SettingsPanel.TRANSITION_LENGTH, Easing.OutQuint);
