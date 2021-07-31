@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
@@ -52,7 +53,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 12),
-                    Text = UsersStrings.ShowExtraTopRanksPpWeight(weight.ToString("0%"))
+                    Text = UsersStrings.ShowExtraTopRanksPpWeight(weight.ToLocalisableString("0%"))
                 }
             }
         };
