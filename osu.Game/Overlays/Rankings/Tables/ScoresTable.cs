@@ -27,11 +27,11 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
             new ColouredRowText
             {
-                Text = item.TotalScore.ToLocalisableString("N0"),
+                Text = item.TotalScore.ToLocalisableString(@"N0"),
             },
             new RowText
             {
-                Text = item.RankedScore.ToLocalisableString("N0")
+                Text = item.RankedScore.ToLocalisableString(@"N0")
             }
         };
     }

@@ -48,12 +48,12 @@ namespace osu.Game.Overlays.Rankings.Tables
         protected sealed override Drawable[] CreateAdditionalContent(UserStatistics item) => new[]
         {
             new ColouredRowText { Text = item.DisplayAccuracy, },
-            new ColouredRowText { Text = item.PlayCount.ToLocalisableString("N0") },
+            new ColouredRowText { Text = item.PlayCount.ToLocalisableString(@"N0") },
         }.Concat(CreateUniqueContent(item)).Concat(new[]
         {
-            new ColouredRowText { Text = (item.GradesCount[ScoreRank.XH] + item.GradesCount[ScoreRank.X]).ToLocalisableString("N0"), },
-            new ColouredRowText { Text = (item.GradesCount[ScoreRank.SH] + item.GradesCount[ScoreRank.S]).ToLocalisableString("N0"), },
-            new ColouredRowText { Text = item.GradesCount[ScoreRank.A].ToLocalisableString("N0"), }
+            new ColouredRowText { Text = (item.GradesCount[ScoreRank.XH] + item.GradesCount[ScoreRank.X]).ToLocalisableString(@"N0"), },
+            new ColouredRowText { Text = (item.GradesCount[ScoreRank.SH] + item.GradesCount[ScoreRank.S]).ToLocalisableString(@"N0"), },
+            new ColouredRowText { Text = item.GradesCount[ScoreRank.A].ToLocalisableString(@"N0"), }
         }).ToArray();
 
         protected abstract RankingsTableColumn[] CreateUniqueHeaders();
