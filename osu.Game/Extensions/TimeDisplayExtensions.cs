@@ -25,7 +25,7 @@ namespace osu.Game.Extensions
             $"{(timeSpan < TimeSpan.Zero ? "-" : string.Empty)}{(int)timeSpan.TotalMinutes:00}:{timeSpan:ss\\:fff}";
 
         /// <summary>
-        /// Get a formatted duration (mm:ss or HH:mm:ss if more than an hour).
+        /// Get a formatted duration (dd:hh:mm:ss with days/hours omitted if zero).
         /// </summary>
         /// <param name="milliseconds">A duration in milliseconds.</param>
         /// <returns>A formatted duration string.</returns>
