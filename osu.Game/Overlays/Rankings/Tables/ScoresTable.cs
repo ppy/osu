@@ -15,10 +15,10 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
         }
 
-        protected override TableColumn[] CreateUniqueHeaders() => new[]
+        protected override RankingsTableColumn[] CreateUniqueHeaders() => new[]
         {
-            new TableColumn("Total Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new TableColumn("Ranked Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize))
+            new RankingsTableColumn("Total Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new RankingsTableColumn("Ranked Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize), true)
         };
 
         protected override Drawable[] CreateUniqueContent(UserStatistics item) => new Drawable[]
@@ -32,7 +32,5 @@ namespace osu.Game.Overlays.Rankings.Tables
                 Text = $@"{item.RankedScore:N0}",
             }
         };
-
-        protected override string HighlightedColumn => @"Ranked Score";
     }
 }
