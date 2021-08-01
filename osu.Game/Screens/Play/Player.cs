@@ -297,11 +297,17 @@ namespace osu.Game.Screens.Play
             ScoreProcessor.HasCompleted.BindValueChanged(scoreCompletionChanged);
             HealthProcessor.Failed += onFail;
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
-                mod.ApplyToScoreProcessor(ScoreProcessor);
+            ScoreProcessor.OnLoadComplete += _ =>
+            {
+                foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
+                    mod.ApplyToScoreProcessor(ScoreProcessor);
+            };
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToHealthProcessor>())
-                mod.ApplyToHealthProcessor(HealthProcessor);
+            HealthProcessor.OnLoadComplete += _ =>
+            {
+                foreach (var mod in Mods.Value.OfType<IApplicableToHealthProcessor>())
+                    mod.ApplyToHealthProcessor(HealthProcessor);
+            };
 
             IsBreakTime.BindTo(breakTracker.IsBreakTime);
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
