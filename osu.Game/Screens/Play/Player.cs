@@ -297,6 +297,8 @@ namespace osu.Game.Screens.Play
             ScoreProcessor.HasCompleted.BindValueChanged(scoreCompletionChanged);
             HealthProcessor.Failed += onFail;
 
+            // Provide judgement processors to mods after they're loaded so that they're on the gameplay clock,
+            // this is required for mods that apply transforms to these processors.
             ScoreProcessor.OnLoadComplete += _ =>
             {
                 foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
