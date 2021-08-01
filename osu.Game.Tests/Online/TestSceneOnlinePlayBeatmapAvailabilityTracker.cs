@@ -168,8 +168,8 @@ namespace osu.Game.Tests.Online
 
             public override async Task<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
             {
-                await AllowImport.Task;
-                return await (CurrentImportTask = base.Import(item, archive, lowPriority, cancellationToken));
+                await AllowImport.Task.ConfigureAwait(false);
+                return await (CurrentImportTask = base.Import(item, archive, lowPriority, cancellationToken)).ConfigureAwait(false);
             }
         }
 

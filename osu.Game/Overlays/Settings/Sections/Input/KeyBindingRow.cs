@@ -138,7 +138,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             },
                         }
                     }
-                }
+                },
+                new HoverClickSounds()
             };
 
             foreach (var b in bindings)
@@ -458,6 +459,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         Origin = Anchor.Centre,
                         Text = keyBinding.KeyCombination.ReadableString(),
                     },
+                    new HoverSounds()
                 };
             }
 

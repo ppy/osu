@@ -31,6 +31,7 @@ namespace osu.Game.Users
         protected Drawable Background { get; private set; }
 
         protected UserPanel(User user)
+            : base(HoverSampleSet.Submit)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
