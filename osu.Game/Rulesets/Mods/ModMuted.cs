@@ -66,6 +66,11 @@ namespace osu.Game.Rulesets.Mods
             Value = true
         };
 
+        protected ModMuted()
+        {
+            InverseMuting.BindValueChanged(i => MuteComboCount.MinValue = i.NewValue ? 1 : 0, true);
+        }
+
         public void ApplyToTrack(ITrack track)
         {
             track.AddAdjustment(AdjustableProperty.Volume, mainVolumeAdjust);
