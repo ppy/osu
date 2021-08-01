@@ -3,6 +3,7 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
@@ -37,7 +38,7 @@ namespace osu.Game.Graphics.UserInterface
             return currentValue > newValue ? currentValue - newValue : newValue - currentValue;
         }
 
-        protected override string FormatCount(double count)
+        protected override LocalisableString FormatCount(double count)
         {
             string format = new string('0', RequiredDisplayDigits.Value);
 
