@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -89,7 +88,7 @@ namespace osu.Game.Rulesets.Mods
             currentCombo = scoreProcessor.Combo.GetBoundCopy();
             currentCombo.BindValueChanged(combo =>
             {
-                double dimFactor = Math.Min(1, (double)combo.NewValue / MuteComboCount.Value);
+                double dimFactor = MuteComboCount.Value == 0 ? 1 : (double)combo.NewValue / MuteComboCount.Value;
 
                 if (InverseMuting.Value)
                     dimFactor = 1 - dimFactor;
