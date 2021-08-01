@@ -18,6 +18,7 @@ namespace osu.Game.Graphics.Backgrounds
             Beatmap = beatmap;
             this.fallbackTextureName = fallbackTextureName;
         }
+
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore textures)
         {
