@@ -7,7 +7,10 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -40,7 +43,7 @@ namespace osu.Game.Rulesets.Mods
             Value = true
         };
 
-        [SettingSource("Final volume at combo", "The combo count at which point the track reaches its final volume.")]
+        [SettingSource("Final volume at combo", "The combo count at which point the track reaches its final volume.", SettingControlType = typeof(SettingsSlider<int, MuteComboSlider>))]
         public BindableInt MuteComboCount { get; } = new BindableInt
         {
             Default = 100,
@@ -99,5 +102,10 @@ namespace osu.Game.Rulesets.Mods
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+    }
+
+    public class MuteComboSlider : OsuSliderBar<int>
+    {
+        public override LocalisableString TooltipText => Current.Value == 0 ? "(always muted)" : base.TooltipText;
     }
 }
