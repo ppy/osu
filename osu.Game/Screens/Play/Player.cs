@@ -73,8 +73,6 @@ namespace osu.Game.Screens.Play
 
         private Bindable<bool> mouseWheelDisabled;
 
-        private bool hasBackgroundToFit=false;
-
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
         protected readonly Bindable<bool> LocalUserPlaying = new Bindable<bool>();
@@ -886,16 +884,6 @@ namespace osu.Game.Screens.Play
             if (!LoadedBeatmapSuccessfully)
                 return;
 
-            hasBackgroundToFit = !Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
-
-            if (hasBackgroundToFit)
-            {
-                ApplyToBackground(b =>
-                {
-                    b.TurnFitMode(true);
-                });
-            }
-
             Alpha = 0;
             this
                 .ScaleTo(0.7f)
@@ -963,15 +951,6 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(IScreen next)
         {
-            if (hasBackgroundToFit)
-            {
-                ApplyToBackground(b =>
-                {
-                    b.TurnFitMode(false);
-                });
-                hasBackgroundToFit = false;
-            }
-
             screenSuspension?.Expire();
 
             // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.

@@ -60,19 +60,6 @@ namespace osu.Game.Screens.Backgrounds
             StoryboardReplacesBackground.BindTo(dimmable.StoryboardReplacesBackground);
         }
 
-        public void TurnFitMode(bool On)
-        {
-            cancellationSource?.Cancel();
-            if (On)
-            {
-                LoadComponentAsync(BeatmapBackground.FittedBeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
-            }
-            else
-            {
-                LoadComponentAsync(new BeatmapBackground(beatmap), switchBackground, (cancellationSource = new CancellationTokenSource()).Token);
-            }
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {

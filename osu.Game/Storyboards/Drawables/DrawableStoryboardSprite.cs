@@ -121,7 +121,8 @@ namespace osu.Game.Storyboards.Drawables
 
             if (drawable != null)
                 InternalChild = drawable;
-
+            if (Sprite.Path==storyboard.BeatmapInfo.Metadata.BackgroundFile)
+                drawable.ScaleTo<Drawable>(480f/ drawable.Height);
             Sprite.ApplyTransforms(this);
         }
     }

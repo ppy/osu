@@ -18,12 +18,6 @@ namespace osu.Game.Graphics.Backgrounds
             Beatmap = beatmap;
             this.fallbackTextureName = fallbackTextureName;
         }
-        public static BeatmapBackground FittedBeatmapBackground(WorkingBeatmap beatmap, string fallbackTextureName = @"Backgrounds/bg1")
-        {
-            BeatmapBackground newBackground = new BeatmapBackground(beatmap, fallbackTextureName);
-            newBackground.Sprite.FillMode = FillMode.Fit;
-            return newBackground;
-        }
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore textures)
         {
