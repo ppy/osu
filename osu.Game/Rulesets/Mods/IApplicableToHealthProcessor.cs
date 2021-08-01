@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Mods
     public interface IApplicableToHealthProcessor : IApplicableMod
     {
         /// <summary>
-        /// Provides a ready <see cref="HealthProcessor"/> to a mod. Called once on initialisation of a play instance.
+        /// Provides a loaded <see cref="HealthProcessor"/> to a mod. Called once on initialisation of a play instance.
         /// </summary>
         void ApplyToHealthProcessor(HealthProcessor healthProcessor);
     }
