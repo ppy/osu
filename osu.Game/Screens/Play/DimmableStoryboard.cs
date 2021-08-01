@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Play
 
             double storyboardLastestEventTime = storyboard.LatestEventTime ?? 0;
 
-            if (!storyboard.ReplacesBackground && storyboardLastestEventTime != 0)
+            if (storyboard.BeatmapInfo.Metadata?.BackgroundFile!=null && !storyboard.ReplacesBackground && storyboardLastestEventTime != 0)
             {
                 var sprite = new StoryboardSprite(storyboard.BeatmapInfo.Metadata.BackgroundFile, Anchor.Centre, new Vector2(320, 240));
                 sprite.TimelineGroup.Alpha.Add(Easing.None, 0, storyboardLastestEventTime, 1, 1);
