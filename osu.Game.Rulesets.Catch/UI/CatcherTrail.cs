@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     this.FadeTo(0.4f).FadeOut(800, Easing.OutQuint);
                     break;
 
-                case CatcherTrailAnimation.HyperDashAfterimage:
+                case CatcherTrailAnimation.HyperDashAfterImage:
                     this.MoveToOffset(new Vector2(0, -10), 1200, Easing.In);
                     this.ScaleTo(Scale * 0.95f).ScaleTo(Scale * 1.2f, 1200, Easing.In);
                     this.FadeOut(1200);

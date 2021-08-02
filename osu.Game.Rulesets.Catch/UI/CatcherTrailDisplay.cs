@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     hyperDashTrails.Add(drawable);
                     break;
 
-                case CatcherTrailAnimation.HyperDashAfterimage:
+                case CatcherTrailAnimation.HyperDashAfterImage:
                     hyperDashAfterImages.Add(drawable);
                     break;
             }
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     hyperDashTrails.Remove(drawable);
                     break;
 
-                case CatcherTrailAnimation.HyperDashAfterimage:
+                case CatcherTrailAnimation.HyperDashAfterImage:
                     hyperDashAfterImages.Remove(drawable);
                     break;
             }

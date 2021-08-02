@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Catch.UI
             }
 
             if (!lastHyperDashState && Catcher.HyperDashing)
-                displayCatcherTrail(CatcherTrailAnimation.HyperDashAfterimage);
+                displayCatcherTrail(CatcherTrailAnimation.HyperDashAfterImage);
 
             if (Catcher.Dashing || Catcher.HyperDashing)
             {
