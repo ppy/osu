@@ -37,7 +37,9 @@ namespace osu.Game.Online.Multiplayer
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api)
         {
-            connector = api.GetHubConnector(nameof(OnlineMultiplayerClient), endpoint);
+            // Importantly, we are intentionally not using MessagePack here to correctly support derived class serialization.
+            // More information on the limitations / reasoning can be found in osu-server-spectator's initialisation code.
+            connector = api.GetHubConnector(nameof(OnlineMultiplayerClient), endpoint, false);
 
             if (connector != null)
             {
