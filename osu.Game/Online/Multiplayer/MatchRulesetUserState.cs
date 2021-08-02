@@ -16,7 +16,7 @@ namespace osu.Game.Online.Multiplayer
     [Serializable]
     [MessagePackObject]
     [Union(0, typeof(TeamVsMatchUserState))]
-    public abstract class MatchRulesetUserState
+    public class MatchRulesetUserState // TODO: this will need to be abstract or interface when/if we get messagepack working. for now it isn't as it breaks json serialisation.
     {
     }
 }
