@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osuTK.Graphics;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
@@ -13,7 +13,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
         }
 
-        public BindableList<Color4> Colours => Component.Colours;
+        public BindableList<Colour4> Colours => Component.Colours;
 
         public string ColourNamePrefix
         {
