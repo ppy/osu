@@ -26,6 +26,7 @@ namespace osu.Game.Online
         private readonly string clientName;
         private readonly string endpoint;
         private readonly string versionHash;
+        private readonly bool preferMessagePack;
         private readonly IAPIProvider api;
 
         /// <summary>
@@ -51,12 +52,14 @@ namespace osu.Game.Online
         /// <param name="endpoint">The endpoint to the hub.</param>
         /// <param name="api"> An API provider used to react to connection state changes.</param>
         /// <param name="versionHash">The hash representing the current game version, used for verification purposes.</param>
-        public HubClientConnector(string clientName, string endpoint, IAPIProvider api, string versionHash)
+        /// <param name="preferMessagePack">Whether to use MessagePack for serialisation if available on this platform.</param>
+        public HubClientConnector(string clientName, string endpoint, IAPIProvider api, string versionHash, bool preferMessagePack = true)
         {
             this.clientName = clientName;
             this.endpoint = endpoint;
             this.api = api;
             this.versionHash = versionHash;
+            this.preferMessagePack = preferMessagePack;
 
             apiState.BindTo(api.State);
             apiState.BindValueChanged(state =>
@@ -144,7 +147,7 @@ namespace osu.Game.Online
                     options.Headers.Add("OsuVersionHash", versionHash);
                 });
 
-            if (RuntimeInfo.SupportsJIT)
+            if (RuntimeInfo.SupportsJIT && preferMessagePack)
                 builder.AddMessagePackProtocol();
             else
             {
