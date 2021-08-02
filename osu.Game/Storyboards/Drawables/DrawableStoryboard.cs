@@ -85,15 +85,11 @@ namespace osu.Game.Storyboards.Drawables
 
             dependencies.Cache(textureStore);
 
-            double storyboardLatestEventTime = Storyboard.LatestEventTime ?? 0;
+            double? storyboardLatestEventTime = Storyboard.LatestEventTime;
 
-            var drawableBackground = Storyboard.CreateSpriteFromResourcePath(Storyboard.BeatmapInfo.Metadata?.BackgroundFile, textureStore);
-
-            if (drawableBackground != null && !Storyboard.ReplacesBackground && storyboardLatestEventTime != 0)
+            if (!Storyboard.ReplacesBackground && storyboardLatestEventTime != null)
             {
-                var sprite = new StoryboardSprite(Storyboard.BeatmapInfo.Metadata?.BackgroundFile, Anchor.Centre, new Vector2(320, 240));
-                sprite.TimelineGroup.Scale.Add(Easing.None, 0, 0, 1, 480f / drawableBackground.Height);
-                sprite.TimelineGroup.Alpha.Add(Easing.None, 0, storyboardLatestEventTime, 1, 1);
+                var sprite = new StoryboardBackgroundSprite(Storyboard.BeatmapInfo.Metadata?.BackgroundFile, storyboardLatestEventTime ?? 0);
                 Storyboard.GetLayer("Background").Elements.Insert(0, sprite);
             }
 
