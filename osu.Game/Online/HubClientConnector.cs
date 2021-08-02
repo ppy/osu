@@ -150,7 +150,16 @@ namespace osu.Game.Online
             {
                 // eventually we will precompile resolvers for messagepack, but this isn't working currently
                 // see https://github.com/neuecc/MessagePack-CSharp/issues/780#issuecomment-768794308.
-                builder.AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; });
+                builder.AddNewtonsoftJsonProtocol(options =>
+                {
+                    options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    options.PayloadSerializerSettings = new JsonSerializerSettings
+                    {
+                        // TODO: This should only be required to be `TypeNameHandling.Auto`.
+                        // See usage in osu-server-spectator for further documentation as to why this is required.
+                        TypeNameHandling = TypeNameHandling.All
+                    };
+                });
             }
 
             var newConnection = builder.Build();
