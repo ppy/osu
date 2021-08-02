@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         Dashing,
         HyperDashing,
-        HyperDashAfterimage
+        HyperDashAfterImage
     }
 }
