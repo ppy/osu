@@ -13,5 +13,15 @@ namespace osu.Game.Online.Multiplayer.MatchRulesets.TeamVs
     {
         [Key(0)]
         public List<MultiplayerTeam> Teams { get; set; } = new List<MultiplayerTeam>();
+
+        public static TeamVsMatchRoomState CreateDefault() =>
+            new TeamVsMatchRoomState
+            {
+                Teams =
+                {
+                    new MultiplayerTeam { ID = 0, Name = "Team Red" },
+                    new MultiplayerTeam { ID = 1, Name = "Team Blue" },
+                }
+            };
     }
 }
