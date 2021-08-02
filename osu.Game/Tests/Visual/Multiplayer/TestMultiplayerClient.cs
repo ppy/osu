@@ -14,6 +14,7 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
@@ -132,6 +133,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Settings =
                 {
                     Name = apiRoom.Name.Value,
+                    MatchType = apiRoom.Type.Value,
                     BeatmapID = apiRoom.Playlist.Last().BeatmapID,
                     RulesetID = apiRoom.Playlist.Last().RulesetID,
                     BeatmapChecksum = apiRoom.Playlist.Last().Beatmap.Value.MD5Hash,
@@ -163,6 +165,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             foreach (var user in Room.Users.Where(u => u.State == MultiplayerUserState.Ready))
                 ChangeUserState(user.UserID, MultiplayerUserState.Idle);
+
+            switch (settings.MatchType)
+            {
+                case MatchType.HeadToHead:
+                    await ((IMultiplayerClient)this).MatchRoomStateChanged(null).ConfigureAwait(false);
+
+                    foreach (var user in Room.Users)
+                        await ((IMultiplayerClient)this).MatchUserStateChanged(user.UserID, null).ConfigureAwait(false);
+                    break;
+
+                case MatchType.TeamVersus:
+                    await ((IMultiplayerClient)this).MatchRoomStateChanged(TeamVersusRoomState.CreateDefault()).ConfigureAwait(false);
+
+                    foreach (var user in Room.Users)
+                        await ((IMultiplayerClient)this).MatchUserStateChanged(user.UserID, new TeamVersusUserState()).ConfigureAwait(false);
+                    break;
+            }
         }
 
         public override Task ChangeState(MultiplayerUserState newState)
@@ -192,7 +211,30 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
-        public override Task SendMatchRequest(MatchUserRequest request) => Task.CompletedTask;
+        public override async Task SendMatchRequest(MatchUserRequest request)
+        {
+            Debug.Assert(Room != null);
+            Debug.Assert(LocalUser != null);
+
+            switch (request)
+            {
+                case ChangeTeamRequest changeTeam:
+
+                    TeamVersusRoomState roomState = (TeamVersusRoomState)Room.MatchState!;
+                    TeamVersusUserState userState = (TeamVersusUserState)LocalUser.MatchState!;
+
+                    var targetTeam = roomState.Teams.FirstOrDefault(t => t.ID == changeTeam.TeamID);
+
+                    if (targetTeam != null)
+                    {
+                        userState.TeamID = targetTeam.ID;
+
+                        await ((IMultiplayerClient)this).MatchUserStateChanged(LocalUser.UserID, userState).ConfigureAwait(false);
+                    }
+
+                    break;
+            }
+        }
 
         public override Task StartMatch()
         {
