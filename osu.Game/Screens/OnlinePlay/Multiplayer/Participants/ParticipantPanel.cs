@@ -17,7 +17,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Multiplayer.MatchRulesets.TeamVs;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
@@ -38,7 +37,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         private RulesetStore rulesets { get; set; }
 
         private SpriteIcon crown;
-        private Box teamDisplay;
 
         private OsuSpriteText userRankText;
         private ModDisplay userModsDisplay;
@@ -59,106 +57,108 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             var backgroundColour = Color4Extensions.FromHex("#33413C");
 
-            InternalChildren = new Drawable[]
+            InternalChild = new GridContainer
             {
-                crown = new SpriteIcon
+                RelativeSizeAxes = Axes.Both,
+                ColumnDimensions = new[]
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Icon = FontAwesome.Solid.Crown,
-                    Size = new Vector2(14),
-                    Colour = Color4Extensions.FromHex("#F7E65D"),
-                    Alpha = 0
+                    new Dimension(GridSizeMode.Absolute, 14),
+                    new Dimension(GridSizeMode.AutoSize),
+                    new Dimension()
                 },
-                teamDisplay = new Box
+                Content = new[]
                 {
-                    Colour = Color4.Black,
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 15,
-                    Alpha = 0,
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = 24 },
-                    Child = new Container
+                    new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        CornerRadius = 5,
-                        Children = new Drawable[]
+                        crown = new SpriteIcon
                         {
-                            new Box
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Icon = FontAwesome.Solid.Crown,
+                            Size = new Vector2(14),
+                            Colour = Color4Extensions.FromHex("#F7E65D"),
+                            Alpha = 0
+                        },
+                        new TeamDisplay(user),
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Masking = true,
+                            CornerRadius = 5,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = backgroundColour
-                            },
-                            new UserCoverBackground
-                            {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                RelativeSizeAxes = Axes.Both,
-                                Width = 0.75f,
-                                User = user,
-                                Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0), Color4.White.Opacity(0.25f))
-                            },
-                            new FillFlowContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Spacing = new Vector2(10),
-                                Direction = FillDirection.Horizontal,
-                                Children = new Drawable[]
+                                new Box
                                 {
-                                    new UpdateableAvatar
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = backgroundColour
+                                },
+                                new UserCoverBackground
+                                {
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Width = 0.75f,
+                                    User = user,
+                                    Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0), Color4.White.Opacity(0.25f))
+                                },
+                                new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Spacing = new Vector2(10),
+                                    Direction = FillDirection.Horizontal,
+                                    Children = new Drawable[]
                                     {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        RelativeSizeAxes = Axes.Both,
-                                        FillMode = FillMode.Fit,
-                                        User = user
-                                    },
-                                    new UpdateableFlag
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Size = new Vector2(30, 20),
-                                        Country = user?.Country
-                                    },
-                                    new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
-                                        Text = user?.Username
-                                    },
-                                    userRankText = new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(size: 14),
+                                        new UpdateableAvatar
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            RelativeSizeAxes = Axes.Both,
+                                            FillMode = FillMode.Fit,
+                                            User = user
+                                        },
+                                        new UpdateableFlag
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            Size = new Vector2(30, 20),
+                                            Country = user?.Country
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
+                                            Text = user?.Username
+                                        },
+                                        userRankText = new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            Font = OsuFont.GetFont(size: 14),
+                                        }
                                     }
-                                }
-                            },
-                            new Container
-                            {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                AutoSizeAxes = Axes.Both,
-                                Margin = new MarginPadding { Right = 70 },
-                                Child = userModsDisplay = new ModDisplay
+                                },
+                                new Container
                                 {
-                                    Scale = new Vector2(0.5f),
-                                    ExpansionMode = ExpansionMode.AlwaysContracted,
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    AutoSizeAxes = Axes.Both,
+                                    Margin = new MarginPadding { Right = 70 },
+                                    Child = userModsDisplay = new ModDisplay
+                                    {
+                                        Scale = new Vector2(0.5f),
+                                        ExpansionMode = ExpansionMode.AlwaysContracted,
+                                    }
+                                },
+                                userStateDisplay = new StateDisplay
+                                {
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    Margin = new MarginPadding { Right = 10 },
                                 }
-                            },
-                            userStateDisplay = new StateDisplay
-                            {
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                Margin = new MarginPadding { Right = 10 },
                             }
                         }
-                    }
+                    },
                 }
             };
         }
@@ -184,34 +184,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             else
                 crown.FadeOut(fade_time);
 
-            if (User.MatchRulesetState is TeamVsMatchUserState teamState)
-            {
-                teamDisplay.Show();
-                teamDisplay.FadeColour(getColourForTeam(teamState.TeamID), 100, Easing.OutQuint);
-            }
-            else
-            {
-                teamDisplay.Hide();
-            }
-
             // If the mods are updated at the end of the frame, the flow container will skip a reflow cycle: https://github.com/ppy/osu-framework/issues/4187
             // This looks particularly jarring here, so re-schedule the update to that start of our frame as a fix.
             Schedule(() => userModsDisplay.Current.Value = User.Mods.Select(m => m.ToMod(ruleset)).ToList());
-        }
-
-        [Resolved]
-        private OsuColour colours { get; set; }
-
-        private ColourInfo getColourForTeam(int id)
-        {
-            switch (id)
-            {
-                default:
-                    return colours.Red;
-
-                case 1:
-                    return colours.Blue;
-            }
         }
 
         public MenuItem[] ContextMenuItems
