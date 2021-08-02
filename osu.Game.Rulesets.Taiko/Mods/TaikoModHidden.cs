@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModHidden : ModHidden, IApplicableToDifficulty
+    public class TaikoModHidden : ModHidden
     {
         public override string Description => @"Beats fade out before you hit them!";
         public override double ScoreMultiplier => 1.06;
