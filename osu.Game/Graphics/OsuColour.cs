@@ -34,7 +34,7 @@ namespace osu.Game.Graphics
                     return Color4Extensions.FromHex("66ff91");
 
                 case DifficultyRating.Hard:
-                    return Color4Extensions.FromHex("f7e75d");
+                    return Color4Extensions.FromHex("f7e85d");
 
                 case DifficultyRating.Insane:
                     return Color4Extensions.FromHex("ff7e68");
