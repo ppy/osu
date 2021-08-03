@@ -36,6 +36,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             Width = 15;
 
             Margin = new MarginPadding { Horizontal = 3 };
+
+            Alpha = 0;
+            Scale = new Vector2(0, 1);
         }
 
         [BackgroundDependencyLoader]
@@ -46,7 +49,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 RelativeSizeAxes = Axes.Both,
                 CornerRadius = 5,
                 Masking = true,
-                Alpha = 0,
                 Scale = new Vector2(0, 1),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -104,14 +106,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             if (displayedTeam != null)
             {
-                box.FadeIn(duration);
                 box.FadeColour(getColourForTeam(displayedTeam.Value), duration, Easing.OutQuint);
                 box.ScaleTo(new Vector2(box.Scale.X < 0 ? 1 : -1, 1), duration, Easing.OutQuint);
+
+                this.ScaleTo(Vector2.One, duration, Easing.OutQuint);
+                this.FadeIn(duration);
             }
             else
             {
-                box.ScaleTo(new Vector2(0, 1), duration, Easing.OutQuint);
-                box.FadeOut(duration);
+                this.ScaleTo(new Vector2(0, 1), duration, Easing.OutQuint);
+                this.FadeOut(duration);
             }
         }
 

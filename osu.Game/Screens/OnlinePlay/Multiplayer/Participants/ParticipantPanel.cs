@@ -62,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 RelativeSizeAxes = Axes.Both,
                 ColumnDimensions = new[]
                 {
-                    new Dimension(GridSizeMode.Absolute, 14),
+                    new Dimension(GridSizeMode.Absolute, 18),
                     new Dimension(GridSizeMode.AutoSize),
                     new Dimension()
                 },
