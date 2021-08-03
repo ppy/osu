@@ -5,13 +5,15 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
+using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class BeatmapSelectionControl : RoomSubScreenComposite
+    public class BeatmapSelectionControl : RoomSubScreenComposite, IKeyBindingHandler<GlobalAction>
     {
         [Resolved]
         private MultiplayerMatchSubScreen matchSubScreen { get; set; }
@@ -74,6 +76,26 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 beatmapPanelContainer.Clear();
             else
                 beatmapPanelContainer.Child = new DrawableRoomPlaylistItem(SelectedItem.Value, false, false);
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            // only handle keyboard input if there is no current selection.
+            if (SelectedItem.Value != null)
+                return false;
+
+            switch (action)
+            {
+                case GlobalAction.Select:
+                    selectButton.Click();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
     }
 }
