@@ -44,7 +44,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             public OsuTextBox NameField, MaxParticipantsField;
             public RoomAvailabilityPicker AvailabilityPicker;
-            public GameTypePicker TypePicker;
+            public MatchTypePicker TypePicker;
             public OsuTextBox PasswordTextBox;
             public TriangleButton ApplyButton;
 
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         Spacing = new Vector2(7),
                                                                         Children = new Drawable[]
                                                                         {
-                                                                            TypePicker = new GameTypePicker
+                                                                            TypePicker = new MatchTypePicker
                                                                             {
                                                                                 RelativeSizeAxes = Axes.X,
                                                                                 Enabled = { Value = false }

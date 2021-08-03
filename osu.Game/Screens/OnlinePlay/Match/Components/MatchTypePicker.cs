@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public class GameTypePicker : DisableableTabControl<MatchType>
+    public class MatchTypePicker : DisableableTabControl<MatchType>
     {
         private const float height = 40;
         private const float selection_width = 3;
@@ -23,13 +23,15 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected override Dropdown<MatchType> CreateDropdown() => null;
 
-        public GameTypePicker()
+        public MatchTypePicker()
         {
             Height = height + selection_width * 2;
             TabContainer.Spacing = new Vector2(10 - selection_width * 2);
 
             AddItem(MatchType.HeadToHead);
             AddItem(MatchType.TeamVersus);
+            // TODO: remove after osu-web is updated to set the correct default type.
+            AddItem(MatchType.Playlists);
         }
 
         private class GameTypePickerItem : DisableableTabItem
