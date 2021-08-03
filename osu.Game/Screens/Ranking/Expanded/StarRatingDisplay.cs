@@ -107,9 +107,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             string fractionPart = starRatingParts[1];
             string separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
-            var rating = Current.Value.DifficultyRating;
-
-            background.Colour = colours.ForDifficultyRating(rating, true);
+            background.Colour = colours.ForStarDifficulty(Current.Value.Stars);
 
             textFlow.Clear();
             textFlow.AddText($"{wholePart}", s =>
