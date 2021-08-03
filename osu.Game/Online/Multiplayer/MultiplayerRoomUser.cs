@@ -25,7 +25,7 @@ namespace osu.Game.Online.Multiplayer
         public MultiplayerUserState State { get; set; } = MultiplayerUserState.Idle;
 
         [Key(4)]
-        public MatchRulesetUserState? MatchRulesetState { get; set; }
+        public MatchUserState? MatchState { get; set; }
 
         /// <summary>
         /// The availability state of the current beatmap.

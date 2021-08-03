@@ -293,7 +293,7 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task ChangeUserMods(IEnumerable<APIMod> newMods);
 
-        public abstract Task SendMatchRulesetRequest(MatchRulesetUserRequest request);
+        public abstract Task SendMatchRequest(MatchUserRequest request);
 
         public abstract Task StartMatch();
 
@@ -422,7 +422,7 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        Task IMultiplayerClient.MatchRulesetUserStateChanged(int userId, MatchRulesetUserState state)
+        Task IMultiplayerClient.MatchUserStateChanged(int userId, MatchUserState state)
         {
             if (Room == null)
                 return Task.CompletedTask;
@@ -432,14 +432,14 @@ namespace osu.Game.Online.Multiplayer
                 if (Room == null)
                     return;
 
-                Room.Users.Single(u => u.UserID == userId).MatchRulesetState = state;
+                Room.Users.Single(u => u.UserID == userId).MatchState = state;
                 RoomUpdated?.Invoke();
             }, false);
 
             return Task.CompletedTask;
         }
 
-        Task IMultiplayerClient.MatchRulesetRoomStateChanged(MatchRulesetRoomState state)
+        Task IMultiplayerClient.MatchRoomStateChanged(MatchRoomState state)
         {
             if (Room == null)
                 return Task.CompletedTask;
@@ -449,16 +449,16 @@ namespace osu.Game.Online.Multiplayer
                 if (Room == null)
                     return;
 
-                Room.MatchRulesetState = state;
+                Room.MatchState = state;
                 RoomUpdated?.Invoke();
             }, false);
 
             return Task.CompletedTask;
         }
 
-        public Task MatchRulesetEvent(MatchRulesetServerEvent e)
+        public Task MatchEvent(MatchServerEvent e)
         {
-            // not used by any match rulesets just yet.
+            // not used by any match types just yet.
             return Task.CompletedTask;
         }
 

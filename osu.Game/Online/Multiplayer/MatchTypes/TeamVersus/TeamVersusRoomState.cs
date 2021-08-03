@@ -6,16 +6,16 @@ using MessagePack;
 
 #nullable enable
 
-namespace osu.Game.Online.Multiplayer.MatchRulesets.TeamVs
+namespace osu.Game.Online.Multiplayer.MatchTypes.TeamVersus
 {
     [MessagePackObject]
-    public class TeamVsMatchRoomState : MatchRulesetRoomState
+    public class TeamVersusRoomState : MatchRoomState
     {
         [Key(0)]
         public List<MultiplayerTeam> Teams { get; set; } = new List<MultiplayerTeam>();
 
-        public static TeamVsMatchRoomState CreateDefault() =>
-            new TeamVsMatchRoomState
+        public static TeamVersusRoomState CreateDefault() =>
+            new TeamVersusRoomState
             {
                 Teams =
                 {

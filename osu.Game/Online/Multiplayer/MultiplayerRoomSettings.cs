@@ -41,7 +41,7 @@ namespace osu.Game.Online.Multiplayer
         public string Password { get; set; } = string.Empty;
 
         [Key(8)]
-        public MatchType MatchRulesetType { get; set; }
+        public MatchType MatchType { get; set; }
 
         public bool Equals(MultiplayerRoomSettings other)
             => BeatmapID == other.BeatmapID
@@ -52,7 +52,7 @@ namespace osu.Game.Online.Multiplayer
                && Password.Equals(other.Password, StringComparison.Ordinal)
                && Name.Equals(other.Name, StringComparison.Ordinal)
                && PlaylistItemId == other.PlaylistItemId
-               && MatchRulesetType == other.MatchRulesetType;
+               && MatchType == other.MatchType;
 
         public override string ToString() => $"Name:{Name}"
                                              + $" Beatmap:{BeatmapID} ({BeatmapChecksum})"
@@ -60,7 +60,7 @@ namespace osu.Game.Online.Multiplayer
                                              + $" AllowedMods:{string.Join(',', AllowedMods)}"
                                              + $" Password:{(string.IsNullOrEmpty(Password) ? "no" : "yes")}"
                                              + $" Ruleset:{RulesetID}"
-                                             + $" MatchRuleset:{MatchRulesetType}"
+                                             + $" Type:{MatchType}"
                                              + $" Item:{PlaylistItemId}";
     }
 }

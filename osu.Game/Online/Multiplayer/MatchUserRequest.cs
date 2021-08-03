@@ -7,11 +7,11 @@ using MessagePack;
 namespace osu.Game.Online.Multiplayer
 {
     /// <summary>
-    /// A request from a user to perform an action specific to the current match ruleset.
+    /// A request from a user to perform an action specific to the current match type.
     /// </summary>
     [Serializable]
     [MessagePackObject]
-    public abstract class MatchRulesetUserRequest
+    public abstract class MatchUserRequest
     {
     }
 }

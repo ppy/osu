@@ -11,7 +11,7 @@ namespace osu.Game.Online.Multiplayer
     /// </summary>
     [Serializable]
     [MessagePackObject]
-    public abstract class MatchRulesetServerEvent
+    public abstract class MatchServerEvent
     {
     }
 }
