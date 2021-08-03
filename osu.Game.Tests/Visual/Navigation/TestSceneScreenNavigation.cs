@@ -318,7 +318,7 @@ namespace osu.Game.Tests.Visual.Navigation
             PushAndConfirm(() => multiplayer = new TestMultiplayer());
 
             AddUntilStep("wait for lounge", () => multiplayer.ChildrenOfType<LoungeSubScreen>().SingleOrDefault()?.IsLoaded == true);
-            AddStep("open room", () => multiplayer.ChildrenOfType<LoungeSubScreen>().Single().OpenNewRoom());
+            AddStep("open room", () => multiplayer.ChildrenOfType<LoungeSubScreen>().Single().Open());
             AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
             AddWaitStep("wait two frames", 2);
         }
