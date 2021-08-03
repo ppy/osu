@@ -3,6 +3,7 @@
 
 using System.ComponentModel;
 using osu.Framework.Localisation;
+using osu.Game.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Dashboard
@@ -15,8 +16,8 @@ namespace osu.Game.Overlays.Dashboard
         {
             public DashboardTitle()
             {
-                Title = HomeStrings.UserTitle;
-                Description = "view your friends and other information";
+                Title = PageTitleStrings.MainHomeControllerIndex;
+                Description = NamedOverlayComponentStrings.DashboardDescription;
                 IconTexture = "Icons/Hexacons/social";
             }
         }
