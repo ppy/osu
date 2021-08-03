@@ -26,16 +26,13 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
     {
         public Action EditPlaylist;
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Child = Settings = new MatchSettings
+        protected override OnlinePlayComposite CreateSettings()
+            => new MatchSettings
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Y,
                 EditPlaylist = () => EditPlaylist?.Invoke()
             };
-        }
 
         protected class MatchSettings : OnlinePlayComposite
         {

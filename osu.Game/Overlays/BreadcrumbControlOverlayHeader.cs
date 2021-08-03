@@ -4,15 +4,16 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
 {
-    public abstract class BreadcrumbControlOverlayHeader : TabControlOverlayHeader<string>
+    public abstract class BreadcrumbControlOverlayHeader : TabControlOverlayHeader<LocalisableString?>
     {
-        protected override OsuTabControl<string> CreateTabControl() => new OverlayHeaderBreadcrumbControl();
+        protected override OsuTabControl<LocalisableString?> CreateTabControl() => new OverlayHeaderBreadcrumbControl();
 
-        public class OverlayHeaderBreadcrumbControl : BreadcrumbControl<string>
+        public class OverlayHeaderBreadcrumbControl : BreadcrumbControl<LocalisableString?>
         {
             public OverlayHeaderBreadcrumbControl()
             {
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays
                 AccentColour = colourProvider.Light2;
             }
 
-            protected override TabItem<string> CreateTabItem(string value) => new ControlTabItem(value)
+            protected override TabItem<LocalisableString?> CreateTabItem(LocalisableString? value) => new ControlTabItem(value)
             {
                 AccentColour = AccentColour,
             };
@@ -35,7 +36,7 @@ namespace osu.Game.Overlays
             {
                 protected override float ChevronSize => 8;
 
-                public ControlTabItem(string value)
+                public ControlTabItem(LocalisableString? value)
                     : base(value)
                 {
                     RelativeSizeAxes = Axes.Y;

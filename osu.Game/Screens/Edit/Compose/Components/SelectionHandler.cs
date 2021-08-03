@@ -139,9 +139,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public bool OnPressed(PlatformAction action)
         {
-            switch (action.ActionMethod)
+            switch (action)
             {
-                case PlatformActionMethod.Delete:
+                case PlatformAction.Delete:
                     DeleteSelected();
                     return true;
             }

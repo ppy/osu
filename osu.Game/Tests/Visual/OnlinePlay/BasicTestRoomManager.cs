@@ -18,13 +18,11 @@ namespace osu.Game.Tests.Visual.OnlinePlay
     /// </summary>
     public class BasicTestRoomManager : IRoomManager
     {
-        public event Action RoomsUpdated
-        {
-            add { }
-            remove { }
-        }
+        public event Action RoomsUpdated;
 
         public readonly BindableList<Room> Rooms = new BindableList<Room>();
+
+        public Action<Room, string> JoinRoomRequested;
 
         public IBindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>(true);
 
@@ -33,27 +31,46 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
             room.RoomID.Value ??= Rooms.Select(r => r.RoomID.Value).Where(id => id != null).Select(id => id.Value).DefaultIfEmpty().Max() + 1;
-            Rooms.Add(room);
             onSuccess?.Invoke(room);
+
+            AddRoom(room);
         }
 
-        public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => onSuccess?.Invoke(room);
+        public void AddRoom(Room room)
+        {
+            Rooms.Add(room);
+            RoomsUpdated?.Invoke();
+        }
+
+        public void RemoveRoom(Room room)
+        {
+            Rooms.Remove(room);
+            RoomsUpdated?.Invoke();
+        }
+
+        public void JoinRoom(Room room, string password, Action<Room> onSuccess = null, Action<string> onError = null)
+        {
+            JoinRoomRequested?.Invoke(room, password);
+            onSuccess?.Invoke(room);
+        }
 
         public void PartRoom()
         {
         }
 
-        public void AddRooms(int count, RulesetInfo ruleset = null)
+        public void AddRooms(int count, RulesetInfo ruleset = null, bool withPassword = false)
         {
             for (int i = 0; i < count; i++)
             {
                 var room = new Room
                 {
                     RoomID = { Value = i },
+                    Position = { Value = i },
                     Name = { Value = $"Room {i}" },
                     Host = { Value = new User { Username = "Host" } },
                     EndDate = { Value = DateTimeOffset.Now + TimeSpan.FromSeconds(10) },
-                    Category = { Value = i % 2 == 0 ? RoomCategory.Spotlight : RoomCategory.Normal }
+                    Category = { Value = i % 2 == 0 ? RoomCategory.Spotlight : RoomCategory.Normal },
+                    Password = { Value = withPassword ? "password" : string.Empty }
                 };
 
                 if (ruleset != null)

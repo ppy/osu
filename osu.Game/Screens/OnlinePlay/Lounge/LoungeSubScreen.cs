@@ -6,6 +6,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -55,10 +56,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         [CanBeNull]
         private IDisposable joiningRoomOperation { get; set; }
 
+        private RoomsContainer roomsContainer;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            RoomsContainer roomsContainer;
             OsuScrollContainer scrollContainer;
 
             InternalChildren = new Drawable[]
@@ -102,7 +104,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                         Buttons.WithChild(CreateNewRoomButton().With(d =>
                                         {
                                             d.Size = new Vector2(150, 25);
-                                            d.Action = () => OpenNewRoom();
+                                            d.Action = () => Open();
                                         }))
                                     }
                                 }
@@ -119,7 +121,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             ScrollbarOverlapsContent = false,
-                                            Child = roomsContainer = new RoomsContainer { JoinRequested = joinRequested }
+                                            Child = roomsContainer = new RoomsContainer()
                                         },
                                         loadingLayer = new LoadingLayer(true),
                                     }
@@ -177,31 +179,39 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             onReturning();
         }
 
-        private void onReturning()
-        {
-            filter.HoldFocus = true;
-        }
-
         public override bool OnExiting(IScreen next)
         {
-            filter.HoldFocus = false;
+            onLeaving();
             return base.OnExiting(next);
         }
 
         public override void OnSuspending(IScreen next)
         {
+            onLeaving();
             base.OnSuspending(next);
-            filter.HoldFocus = false;
         }
 
-        private void joinRequested(Room room)
+        private void onReturning()
+        {
+            filter.HoldFocus = true;
+        }
+
+        private void onLeaving()
+        {
+            filter.HoldFocus = false;
+
+            // ensure any password prompt is dismissed.
+            this.HidePopover();
+        }
+
+        public void Join(Room room, string password) => Schedule(() =>
         {
             if (joiningRoomOperation != null)
                 return;
 
             joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
-            RoomManager?.JoinRoom(room, r =>
+            RoomManager?.JoinRoom(room, password, r =>
             {
                 Open(room);
                 joiningRoomOperation?.Dispose();
@@ -211,37 +221,29 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 joiningRoomOperation?.Dispose();
                 joiningRoomOperation = null;
             });
-        }
-
-        private void updateLoadingLayer()
-        {
-            if (operationInProgress.Value || !initialRoomsReceived.Value)
-                loadingLayer.Show();
-            else
-                loadingLayer.Hide();
-        }
+        });
 
         /// <summary>
         /// Push a room as a new subscreen.
         /// </summary>
-        public virtual void Open(Room room)
+        /// <param name="room">An optional template to use when creating the room.</param>
+        public void Open(Room room = null) => Schedule(() =>
         {
             // Handles the case where a room is clicked 3 times in quick succession
             if (!this.IsCurrentScreen())
                 return;
 
+            OpenNewRoom(room ?? CreateNewRoom());
+        });
+
+        protected virtual void OpenNewRoom(Room room)
+        {
             selectedRoom.Value = room;
 
             this.Push(CreateRoomSubScreen(room));
         }
 
         protected abstract FilterControl CreateFilterControl();
-
-        /// <summary>
-        /// Creates and opens the newly-created room.
-        /// </summary>
-        /// <param name="room">An optional template to use when creating the room.</param>
-        public void OpenNewRoom(Room room = null) => Open(room ?? CreateNewRoom());
 
         protected abstract OsuButton CreateNewRoomButton();
 
@@ -252,5 +254,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         protected abstract Room CreateNewRoom();
 
         protected abstract RoomSubScreen CreateRoomSubScreen(Room room);
+
+        private void updateLoadingLayer()
+        {
+            if (operationInProgress.Value || !initialRoomsReceived.Value)
+                loadingLayer.Show();
+            else
+                loadingLayer.Hide();
+        }
     }
 }

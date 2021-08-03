@@ -8,7 +8,7 @@ using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
-using osu.Game.Overlays.KeyBinding;
+using osu.Game.Overlays.Settings.Sections.Input;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Settings

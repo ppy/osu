@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,6 +14,7 @@ using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Skinning;
+using osu.Game.Skinning.Editor;
 using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections
@@ -57,14 +59,19 @@ namespace osu.Game.Overlays.Settings.Sections
         private IBindable<WeakReference<SkinInfo>> managerUpdated;
         private IBindable<WeakReference<SkinInfo>> managerRemoved;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(OsuConfigManager config, [CanBeNull] SkinEditorOverlay skinEditor)
         {
             FlowContent.Spacing = new Vector2(0, 5);
 
             Children = new Drawable[]
             {
                 skinDropdown = new SkinSettingsDropdown(),
+                new SettingsButton
+                {
+                    Text = "Skin layout editor",
+                    Action = () => skinEditor?.Toggle(),
+                },
                 new ExportSkinButton(),
                 new SettingsSlider<float, SizeSlider>
                 {
