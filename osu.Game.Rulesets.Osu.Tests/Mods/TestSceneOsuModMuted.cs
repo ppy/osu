@@ -24,5 +24,29 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             PassCondition = () => Beatmap.Value.Track.AggregateVolume.Value == 0.0 &&
                                   Player.ChildrenOfType<Metronome>().SingleOrDefault()?.AggregateVolume.Value == 1.0,
         });
+
+        /// <summary>
+        /// Ensures that copying from a normal mod with 0 final combo while originally inversed does not yield incorrect results.
+        /// </summary>
+        [Test]
+        public void TestModCopy()
+        {
+            OsuModMuted muted = null;
+
+            AddStep("create inversed mod", () => muted = new OsuModMuted
+            {
+                MuteComboCount = { Value = 100 },
+                InverseMuting = { Value = true },
+            });
+
+            AddStep("copy from normal", () => muted.CopyFrom(new OsuModMuted
+            {
+                MuteComboCount = { Value = 0 },
+                InverseMuting = { Value = false },
+            }));
+
+            AddAssert("mute combo count = 0", () => muted.MuteComboCount.Value == 0);
+            AddAssert("inverse muting = false", () => muted.InverseMuting.Value == false);
+        }
     }
 }
