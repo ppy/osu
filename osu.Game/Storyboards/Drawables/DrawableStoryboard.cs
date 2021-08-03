@@ -81,17 +81,7 @@ namespace osu.Game.Storyboards.Drawables
             if (clock != null)
                 Clock = clock;
 
-            TextureStore textureStore = new TextureStore(host.CreateTextureLoaderStore(fileStore.Store), false, scaleAdjust: 1);
-
-            dependencies.Cache(textureStore);
-
-            double? storyboardLatestEventTime = Storyboard.LatestEventTime;
-
-            if (!Storyboard.ReplacesBackground && storyboardLatestEventTime != null)
-            {
-                var sprite = new StoryboardBackgroundSprite(Storyboard.BeatmapInfo.Metadata?.BackgroundFile, storyboardLatestEventTime ?? 0);
-                Storyboard.GetLayer("Background").Elements.Insert(0, sprite);
-            }
+            dependencies.Cache(new TextureStore(host.CreateTextureLoaderStore(fileStore.Store), false, scaleAdjust: 1));
 
             foreach (var layer in Storyboard.Layers)
             {

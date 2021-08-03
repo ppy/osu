@@ -57,6 +57,14 @@ namespace osu.Game.Screens.Play
             if (!ShowStoryboard.Value && !IgnoreUserSettings.Value)
                 return;
 
+            double? storyboardLatestEventTime = storyboard.LatestEventTime;
+
+            if (!storyboard.ReplacesBackground && storyboardLatestEventTime != null)
+            {
+                var sprite = new StoryboardBackgroundSprite(storyboard.BeatmapInfo.Metadata?.BackgroundFile, storyboardLatestEventTime ?? 0);
+                storyboard.GetLayer("Background").Elements.Insert(0, sprite);
+            }
+
             drawableStoryboard = storyboard.CreateDrawable();
             HasStoryboardEnded.BindTo(drawableStoryboard.HasStoryboardEnded);
 
