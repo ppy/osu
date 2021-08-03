@@ -153,6 +153,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.FromResult(room);
         }
 
+        protected override void OnRoomJoined()
+        {
+            Debug.Assert(Room != null);
+
+            // emulate the server sending this after the join room. scheduler required to make sure the join room event is fired first (in Join).
+            changeMatchType(Room.Settings.MatchType).Wait();
+        }
+
         protected override Task LeaveRoomInternal() => Task.CompletedTask;
 
         public override Task TransferHost(int userId) => ((IMultiplayerClient)this).HostChanged(userId);
@@ -166,22 +174,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             foreach (var user in Room.Users.Where(u => u.State == MultiplayerUserState.Ready))
                 ChangeUserState(user.UserID, MultiplayerUserState.Idle);
 
-            switch (settings.MatchType)
-            {
-                case MatchType.HeadToHead:
-                    await ((IMultiplayerClient)this).MatchRoomStateChanged(null).ConfigureAwait(false);
-
-                    foreach (var user in Room.Users)
-                        await ((IMultiplayerClient)this).MatchUserStateChanged(user.UserID, null).ConfigureAwait(false);
-                    break;
-
-                case MatchType.TeamVersus:
-                    await ((IMultiplayerClient)this).MatchRoomStateChanged(TeamVersusRoomState.CreateDefault()).ConfigureAwait(false);
-
-                    foreach (var user in Room.Users)
-                        await ((IMultiplayerClient)this).MatchUserStateChanged(user.UserID, new TeamVersusUserState()).ConfigureAwait(false);
-                    break;
-            }
+            await changeMatchType(settings.MatchType).ConfigureAwait(false);
         }
 
         public override Task ChangeState(MultiplayerUserState newState)
@@ -259,6 +252,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 throw new InvalidOperationException("Beatmap not found.");
 
             return Task.FromResult(set);
+        }
+
+        private async Task changeMatchType(MatchType type)
+        {
+            Debug.Assert(Room != null);
+
+            switch (type)
+            {
+                case MatchType.HeadToHead:
+                    await ((IMultiplayerClient)this).MatchRoomStateChanged(null).ConfigureAwait(false);
+
+                    foreach (var user in Room.Users)
+                        await ((IMultiplayerClient)this).MatchUserStateChanged(user.UserID, null).ConfigureAwait(false);
+                    break;
+
+                case MatchType.TeamVersus:
+                    await ((IMultiplayerClient)this).MatchRoomStateChanged(TeamVersusRoomState.CreateDefault()).ConfigureAwait(false);
+
+                    foreach (var user in Room.Users)
+                        await ((IMultiplayerClient)this).MatchUserStateChanged(user.UserID, new TeamVersusUserState()).ConfigureAwait(false);
+                    break;
+            }
         }
     }
 }
