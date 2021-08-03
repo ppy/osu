@@ -24,6 +24,9 @@ namespace osu.Game.Online.Multiplayer
         [Key(1)]
         public MultiplayerUserState State { get; set; } = MultiplayerUserState.Idle;
 
+        [Key(4)]
+        public MatchRulesetUserState? MatchRulesetState { get; set; }
+
         /// <summary>
         /// The availability state of the current beatmap.
         /// </summary>
@@ -35,9 +38,6 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         [Key(3)]
         public IEnumerable<APIMod> Mods { get; set; } = Enumerable.Empty<APIMod>();
-
-        [Key(4)]
-        public MatchRulesetUserState? MatchRulesetState { get; set; }
 
         [IgnoreMember]
         public User? User { get; set; }
