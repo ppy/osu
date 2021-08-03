@@ -192,7 +192,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
-        public override Task SendMatchRulesetRequest(MatchRulesetUserRequest request) => Task.CompletedTask;
+        public override Task SendMatchRequest(MatchUserRequest request) => Task.CompletedTask;
 
         public override Task StartMatch()
         {

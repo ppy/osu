@@ -5,9 +5,9 @@ using MessagePack;
 
 #nullable enable
 
-namespace osu.Game.Online.Multiplayer.MatchRulesets.TeamVs
+namespace osu.Game.Online.Multiplayer.MatchTypes.TeamVersus
 {
-    public class TeamVsMatchUserState : MatchRulesetUserState
+    public class TeamVersusUserState : MatchUserState
     {
         [Key(0)]
         public int TeamID { get; set; }

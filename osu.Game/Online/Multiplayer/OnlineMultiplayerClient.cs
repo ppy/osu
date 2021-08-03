@@ -58,8 +58,8 @@ namespace osu.Game.Online.Multiplayer
                     connection.On(nameof(IMultiplayerClient.ResultsReady), ((IMultiplayerClient)this).ResultsReady);
                     connection.On<int, IEnumerable<APIMod>>(nameof(IMultiplayerClient.UserModsChanged), ((IMultiplayerClient)this).UserModsChanged);
                     connection.On<int, BeatmapAvailability>(nameof(IMultiplayerClient.UserBeatmapAvailabilityChanged), ((IMultiplayerClient)this).UserBeatmapAvailabilityChanged);
-                    connection.On<MatchRulesetRoomState>(nameof(IMultiplayerClient.MatchRulesetRoomStateChanged), ((IMultiplayerClient)this).MatchRulesetRoomStateChanged);
-                    connection.On<int, MatchRulesetUserState>(nameof(IMultiplayerClient.MatchRulesetUserStateChanged), ((IMultiplayerClient)this).MatchRulesetUserStateChanged);
+                    connection.On<MatchRoomState>(nameof(IMultiplayerClient.MatchRoomStateChanged), ((IMultiplayerClient)this).MatchRoomStateChanged);
+                    connection.On<int, MatchUserState>(nameof(IMultiplayerClient.MatchUserStateChanged), ((IMultiplayerClient)this).MatchUserStateChanged);
                 };
 
                 IsConnected.BindTo(connector.IsConnected);
@@ -122,12 +122,12 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeUserMods), newMods);
         }
 
-        public override Task SendMatchRulesetRequest(MatchRulesetUserRequest request)
+        public override Task SendMatchRequest(MatchUserRequest request)
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            return connection.InvokeAsync(nameof(IMultiplayerServer.SendMatchRulesetRequest), request);
+            return connection.InvokeAsync(nameof(IMultiplayerServer.SendMatchRequest), request);
         }
 
         public override Task StartMatch()
