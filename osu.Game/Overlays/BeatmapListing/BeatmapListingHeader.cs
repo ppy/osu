@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -13,7 +14,7 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             public BeatmapListingTitle()
             {
-                Title = NamedOverlayComponentStrings.BeatmapListingTitle;
+                Title = PageTitleStrings.MainBeatmapsetsControllerIndex;
                 Description = NamedOverlayComponentStrings.BeatmapListingDescription;
                 IconTexture = "Icons/Hexacons/beatmap";
             }

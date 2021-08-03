@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Wiki
         {
             public WikiHeaderTitle()
             {
-                Title = NamedOverlayComponentStrings.WikiTitle;
+                Title = PageTitleStrings.MainWikiControllerDefault;
                 Description = NamedOverlayComponentStrings.WikiDescription;
                 IconTexture = "Icons/Hexacons/wiki";
             }
