@@ -140,7 +140,7 @@ namespace osu.Game.Screens.OnlinePlay
                         }
                     },
                     new Header(ScreenTitle, screenStack),
-                    RoomManager = CreateRoomManager(),
+                    RoomManager,
                     ongoingOperationTracker
                 }
             };
