@@ -61,7 +61,7 @@ namespace osu.Game.Graphics
             (7.0f, Color4Extensions.FromHex("6563de")),
             (8.0f, Color4Extensions.FromHex("18158e")),
             (8.0f, Color4.Black),
-        }, (float)starDifficulty);
+        }, (float)Math.Round(starDifficulty, 2, MidpointRounding.AwayFromZero));
 
         /// <summary>
         /// Retrieves the colour for a <see cref="ScoreRank"/>.
