@@ -451,7 +451,7 @@ namespace osu.Game.Online.Multiplayer
 
                 Room.MatchRulesetState = state;
                 RoomUpdated?.Invoke();
-            });
+            }, false);
 
             return Task.CompletedTask;
         }
