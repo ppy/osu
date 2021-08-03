@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Edit.Compose
 
         public bool OnPressed(PlatformAction action)
         {
-            if (action.ActionType == PlatformActionType.Copy)
+            if (action == PlatformAction.Copy)
                 host.GetClipboard().SetText(formatSelectionAsString());
 
             return false;

@@ -26,9 +26,9 @@ namespace osu.Game.Online.API.Requests
     public enum BeatmapSetType
     {
         Favourite,
-        RankedAndApproved,
+        Ranked,
         Loved,
-        Unranked,
+        Pending,
         Graveyard
     }
 }

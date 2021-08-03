@@ -416,7 +416,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    AutoSizeAxes = Axes.Both,
                     Position = new Vector2(-5, 25),
                     Current = { BindTarget = modSelect.SelectedMods }
                 }

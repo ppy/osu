@@ -4,13 +4,13 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Tests.Visual.OnlinePlay;
-using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -29,7 +29,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Width = 0.5f,
-                JoinRequested = joinRequested
             };
         });
 
@@ -43,11 +42,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("has 2 rooms", () => container.Rooms.Count == 2);
             AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID.Value != 0));
 
-            AddStep("select first room", () => container.Rooms.First().Action?.Invoke());
+            AddStep("select first room", () => container.Rooms.First().Click());
             AddAssert("first room selected", () => checkRoomSelected(RoomManager.Rooms.First()));
-
-            AddStep("join first room", () => container.Rooms.First().Action?.Invoke());
-            AddAssert("first room joined", () => RoomManager.Rooms.First().Status.Value is JoinedRoomStatus);
         }
 
         [Test]
@@ -66,9 +62,31 @@ namespace osu.Game.Tests.Visual.Multiplayer
             press(Key.Down);
             press(Key.Down);
             AddAssert("last room selected", () => checkRoomSelected(RoomManager.Rooms.Last()));
+        }
 
-            press(Key.Enter);
-            AddAssert("last room joined", () => RoomManager.Rooms.Last().Status.Value is JoinedRoomStatus);
+        [Test]
+        public void TestKeyboardNavigationAfterOrderChange()
+        {
+            AddStep("add rooms", () => RoomManager.AddRooms(3));
+
+            AddStep("reorder rooms", () =>
+            {
+                var room = RoomManager.Rooms[1];
+
+                RoomManager.RemoveRoom(room);
+                RoomManager.AddRoom(room);
+            });
+
+            AddAssert("no selection", () => checkRoomSelected(null));
+
+            press(Key.Down);
+            AddAssert("first room selected", () => checkRoomSelected(getRoomInFlow(0)));
+
+            press(Key.Down);
+            AddAssert("second room selected", () => checkRoomSelected(getRoomInFlow(1)));
+
+            press(Key.Down);
+            AddAssert("third room selected", () => checkRoomSelected(getRoomInFlow(2)));
         }
 
         [Test]
@@ -123,15 +141,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("3 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 3);
         }
 
+        [Test]
+        public void TestPasswordProtectedRooms()
+        {
+            AddStep("add rooms", () => RoomManager.AddRooms(3, withPassword: true));
+        }
+
         private bool checkRoomSelected(Room room) => SelectedRoom.Value == room;
 
-        private void joinRequested(Room room) => room.Status.Value = new JoinedRoomStatus();
-
-        private class JoinedRoomStatus : RoomStatus
-        {
-            public override string Message => "Joined";
-
-            public override Color4 GetAppropriateColour(OsuColour colours) => colours.Yellow;
-        }
+        private Room getRoomInFlow(int index) =>
+            (container.ChildrenOfType<FillFlowContainer<DrawableRoom>>().First().FlowingChildren.ElementAt(index) as DrawableRoom)?.Room;
     }
 }

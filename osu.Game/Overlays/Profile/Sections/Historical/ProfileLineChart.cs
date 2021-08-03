@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osuTK;
+using osu.Framework.Localisation;
 using static osu.Game.Users.User;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
@@ -42,7 +43,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         private readonly Container<TickLine> rowLinesContainer;
         private readonly Container<TickLine> columnLinesContainer;
 
-        public ProfileLineChart(string graphCounterName)
+        public ProfileLineChart(LocalisableString graphCounterName)
         {
             RelativeSizeAxes = Axes.X;
             Height = 250;
@@ -169,7 +170,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 Origin = Anchor.CentreRight,
                 RelativePositionAxes = Axes.Y,
                 Margin = new MarginPadding { Right = 3 },
-                Text = value.ToString("N0"),
+                Text = value.ToLocalisableString("N0"),
                 Font = OsuFont.GetFont(size: 12),
                 Y = y
             });
@@ -192,7 +193,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             {
                 Origin = Anchor.CentreLeft,
                 RelativePositionAxes = Axes.X,
-                Text = value.ToString("MMM yyyy"),
+                Text = value.ToLocalisableString("MMM yyyy"),
                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                 Rotation = 45,
                 X = x

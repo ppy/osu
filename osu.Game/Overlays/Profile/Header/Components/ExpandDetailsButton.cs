@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components
@@ -18,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         public readonly BindableBool DetailsVisible = new BindableBool();
 
-        public override LocalisableString TooltipText => DetailsVisible.Value ? "collapse" : "expand";
+        public override LocalisableString TooltipText => DetailsVisible.Value ? CommonStrings.ButtonsCollapse : CommonStrings.ButtonsExpand;
 
         private SpriteIcon icon;
         private Sample sampleOpen;

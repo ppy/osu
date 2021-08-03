@@ -7,8 +7,10 @@ using System.Linq;
 using Humanizer;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Header.Components
@@ -27,7 +29,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Text = "No recent plays",
+                Text = UsersStrings.ShowExtraUnranked,
                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular)
             });
         }
@@ -64,7 +66,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             return new TooltipDisplayContent
             {
-                Rank = $"#{rank:N0}",
+                Rank = rank.ToLocalisableString("\\##,##0"),
                 Time = days == 0 ? "now" : $"{"day".ToQuantity(days)} ago"
             };
         }
@@ -74,7 +76,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private class RankGraphTooltip : UserGraphTooltip
         {
             public RankGraphTooltip()
-                : base("Global Ranking")
+                : base(UsersStrings.ShowRankGlobalSimple)
             {
             }
 
@@ -91,7 +93,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         private class TooltipDisplayContent
         {
-            public string Rank;
+            public LocalisableString Rank;
             public string Time;
         }
     }

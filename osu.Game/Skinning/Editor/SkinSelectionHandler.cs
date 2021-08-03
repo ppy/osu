@@ -170,6 +170,8 @@ namespace osu.Game.Skinning.Editor
             SelectionBox.CanRotate = true;
             SelectionBox.CanScaleX = true;
             SelectionBox.CanScaleY = true;
+            SelectionBox.CanFlipX = true;
+            SelectionBox.CanFlipY = true;
             SelectionBox.CanReverse = false;
         }
 

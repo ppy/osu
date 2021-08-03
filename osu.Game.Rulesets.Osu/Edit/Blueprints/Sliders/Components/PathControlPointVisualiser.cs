@@ -129,9 +129,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         public bool OnPressed(PlatformAction action)
         {
-            switch (action.ActionMethod)
+            switch (action)
             {
-                case PlatformActionMethod.Delete:
+                case PlatformAction.Delete:
                     return DeleteSelected();
             }
 

@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
-        public override bool AllowRateAdjustments => false;
+        public override bool AllowTrackAdjustments => false;
 
         protected bool HasUnsavedChanges => lastSavedHash != changeHandler.CurrentStateHash;
 
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Edit
 
                 // clone these locally for now to avoid incurring overhead on GetPlayableBeatmap usages.
                 // eventually we will want to improve how/where this is done as there are issues with *not* cloning it in all cases.
-                playableBeatmap.ControlPointInfo = playableBeatmap.ControlPointInfo.CreateCopy();
+                playableBeatmap.ControlPointInfo = playableBeatmap.ControlPointInfo.DeepClone();
             }
             catch (Exception e)
             {
@@ -330,29 +330,29 @@ namespace osu.Game.Screens.Edit
 
         public bool OnPressed(PlatformAction action)
         {
-            switch (action.ActionType)
+            switch (action)
             {
-                case PlatformActionType.Cut:
+                case PlatformAction.Cut:
                     Cut();
                     return true;
 
-                case PlatformActionType.Copy:
+                case PlatformAction.Copy:
                     Copy();
                     return true;
 
-                case PlatformActionType.Paste:
+                case PlatformAction.Paste:
                     Paste();
                     return true;
 
-                case PlatformActionType.Undo:
+                case PlatformAction.Undo:
                     Undo();
                     return true;
 
-                case PlatformActionType.Redo:
+                case PlatformAction.Redo:
                     Redo();
                     return true;
 
-                case PlatformActionType.Save:
+                case PlatformAction.Save:
                     Save();
                     return true;
             }

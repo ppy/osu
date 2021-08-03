@@ -108,7 +108,11 @@ namespace osu.Game.Screens.OnlinePlay
             difficultyIconContainer.Child = new DifficultyIcon(beatmap.Value, ruleset.Value, requiredMods) { Size = new Vector2(32) };
 
             beatmapText.Clear();
-            beatmapText.AddLink(Item.Beatmap.Value.ToRomanisableString(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString());
+            beatmapText.AddLink(Item.Beatmap.Value.ToRomanisableString(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString(), null, text =>
+            {
+                text.Truncate = true;
+                text.RelativeSizeAxes = Axes.X;
+            });
 
             authorText.Clear();
 
@@ -147,84 +151,96 @@ namespace osu.Game.Screens.OnlinePlay
                         RelativeSizeAxes = Axes.Both,
                         Beatmap = { BindTarget = beatmap }
                     },
-                    new FillFlowContainer
+                    new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Left = 8 },
-                        Spacing = new Vector2(8, 0),
-                        Direction = FillDirection.Horizontal,
-                        Children = new Drawable[]
+                        ColumnDimensions = new[]
                         {
-                            difficultyIconContainer = new Container
+                            new Dimension(GridSizeMode.AutoSize),
+                            new Dimension(),
+                            new Dimension(GridSizeMode.AutoSize),
+                        },
+                        Content = new[]
+                        {
+                            new Drawable[]
                             {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                AutoSizeAxes = Axes.Both,
-                            },
-                            new FillFlowContainer
-                            {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Vertical,
-                                Children = new Drawable[]
+                                difficultyIconContainer = new Container
                                 {
-                                    beatmapText = new LinkFlowContainer(fontParameters) { AutoSizeAxes = Axes.Both },
-                                    new FillFlowContainer
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    AutoSizeAxes = Axes.Both,
+                                    Margin = new MarginPadding { Left = 8, Right = 8, },
+                                },
+                                new FillFlowContainer
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    AutoSizeAxes = Axes.Y,
+                                    RelativeSizeAxes = Axes.X,
+                                    Direction = FillDirection.Vertical,
+                                    Children = new Drawable[]
                                     {
-                                        AutoSizeAxes = Axes.Both,
-                                        Direction = FillDirection.Horizontal,
-                                        Spacing = new Vector2(10f, 0),
-                                        Children = new Drawable[]
+                                        beatmapText = new LinkFlowContainer(fontParameters)
                                         {
-                                            new FillFlowContainer
+                                            AutoSizeAxes = Axes.Y,
+                                            RelativeSizeAxes = Axes.X,
+                                        },
+                                        new FillFlowContainer
+                                        {
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(10f, 0),
+                                            Children = new Drawable[]
                                             {
-                                                AutoSizeAxes = Axes.Both,
-                                                Direction = FillDirection.Horizontal,
-                                                Spacing = new Vector2(10f, 0),
-                                                Children = new Drawable[]
+                                                new FillFlowContainer
                                                 {
-                                                    authorText = new LinkFlowContainer(fontParameters) { AutoSizeAxes = Axes.Both },
-                                                    explicitContentPill = new ExplicitContentBeatmapPill
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Direction = FillDirection.Horizontal,
+                                                    Spacing = new Vector2(10f, 0),
+                                                    Children = new Drawable[]
                                                     {
-                                                        Alpha = 0f,
-                                                        Anchor = Anchor.CentreLeft,
-                                                        Origin = Anchor.CentreLeft,
-                                                        Margin = new MarginPadding { Top = 3f },
-                                                    }
+                                                        authorText = new LinkFlowContainer(fontParameters) { AutoSizeAxes = Axes.Both },
+                                                        explicitContentPill = new ExplicitContentBeatmapPill
+                                                        {
+                                                            Alpha = 0f,
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                            Margin = new MarginPadding { Top = 3f },
+                                                        }
+                                                    },
                                                 },
-                                            },
-                                            new Container
-                                            {
-                                                Anchor = Anchor.CentreLeft,
-                                                Origin = Anchor.CentreLeft,
-                                                AutoSizeAxes = Axes.Both,
-                                                Child = modDisplay = new ModDisplay
+                                                new Container
                                                 {
-                                                    Scale = new Vector2(0.4f),
-                                                    ExpansionMode = ExpansionMode.AlwaysExpanded
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Child = modDisplay = new ModDisplay
+                                                    {
+                                                        Scale = new Vector2(0.4f),
+                                                        ExpansionMode = ExpansionMode.AlwaysExpanded
+                                                    }
                                                 }
                                             }
                                         }
                                     }
+                                },
+                                new FillFlowContainer
+                                {
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    Direction = FillDirection.Horizontal,
+                                    Margin = new MarginPadding { Left = 8, Right = 10, },
+                                    AutoSizeAxes = Axes.Both,
+                                    Spacing = new Vector2(5),
+                                    ChildrenEnumerable = CreateButtons().Select(button => button.With(b =>
+                                    {
+                                        b.Anchor = Anchor.Centre;
+                                        b.Origin = Anchor.Centre;
+                                    }))
                                 }
                             }
                         }
                     },
-                    new FillFlowContainer
-                    {
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Direction = FillDirection.Horizontal,
-                        AutoSizeAxes = Axes.Both,
-                        Spacing = new Vector2(5),
-                        X = -10,
-                        ChildrenEnumerable = CreateButtons().Select(button => button.With(b =>
-                        {
-                            b.Anchor = Anchor.Centre;
-                            b.Origin = Anchor.Centre;
-                        }))
-                    }
                 }
             };
         }
