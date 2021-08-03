@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void onJudgementLoaded(DrawableOsuJudgement judgement)
         {
-            judgementAboveHitObjectLayer.Add(judgement.GetProxyAboveHitObjectsContent());
+            judgementAboveHitObjectLayer.Add(judgement.ProxiedAboveHitObjectsContent);
         }
 
         [BackgroundDependencyLoader(true)]
@@ -150,6 +150,10 @@ namespace osu.Game.Rulesets.Osu.UI
             DrawableOsuJudgement explosion = poolDictionary[result.Type].Get(doj => doj.Apply(result, judgedObject));
 
             judgementLayer.Add(explosion);
+
+            // the proxied content is added to judgementAboveHitObjectLayer once, on first load, and never removed from it.
+            // ensure that ordering is consistent with expectations (latest judgement should be front-most).
+            judgementAboveHitObjectLayer.ChangeChildDepth(explosion.ProxiedAboveHitObjectsContent, (float)-result.TimeAbsolute);
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObjectContainer.ReceivePositionalInputAt(screenSpacePos);

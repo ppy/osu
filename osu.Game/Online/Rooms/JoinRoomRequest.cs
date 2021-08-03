@@ -9,20 +9,24 @@ namespace osu.Game.Online.Rooms
 {
     public class JoinRoomRequest : APIRequest
     {
-        private readonly Room room;
+        public readonly Room Room;
+        public readonly string Password;
 
-        public JoinRoomRequest(Room room)
+        public JoinRoomRequest(Room room, string password)
         {
-            this.room = room;
+            Room = room;
+            Password = password;
         }
 
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
             req.Method = HttpMethod.Put;
+            if (!string.IsNullOrEmpty(Password))
+                req.AddParameter(@"password", Password, RequestParameterType.Query);
             return req;
         }
 
-        protected override string Target => $"rooms/{room.RoomID.Value}/users/{User.Id}";
+        protected override string Target => $@"rooms/{Room.RoomID.Value}/users/{User.Id}";
     }
 }
