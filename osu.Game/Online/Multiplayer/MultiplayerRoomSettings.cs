@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MessagePack;
 using osu.Game.Online.API;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -40,7 +41,7 @@ namespace osu.Game.Online.Multiplayer
         public string Password { get; set; } = string.Empty;
 
         [Key(8)]
-        public MatchRulesetType MatchRulesetType { get; set; }
+        public MatchType MatchRulesetType { get; set; }
 
         public bool Equals(MultiplayerRoomSettings other)
             => BeatmapID == other.BeatmapID
