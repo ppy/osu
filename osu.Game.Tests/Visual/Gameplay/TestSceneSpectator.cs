@@ -13,6 +13,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Tests.Visual.Multiplayer;
@@ -25,41 +26,43 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private readonly User streamingUser = new User { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Test user" };
 
-        [Cached(typeof(SpectatorClient))]
-        private TestSpectatorClient testSpectatorClient = new TestSpectatorClient();
-
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestUserLookupCache();
 
         // used just to show beatmap card for the time being.
         protected override bool UseOnlineAPI => true;
 
-        private SoloSpectator spectatorScreen;
-
         [Resolved]
         private OsuGameBase game { get; set; }
 
-        private BeatmapSetInfo importedBeatmap;
+        private TestSpectatorClient spectatorClient;
+        private SoloSpectator spectatorScreen;
 
+        private BeatmapSetInfo importedBeatmap;
         private int importedBeatmapId;
 
-        public override void SetUpSteps()
+        [SetUpSteps]
+        public void SetupSteps()
         {
-            base.SetUpSteps();
+            DependenciesScreen dependenciesScreen = null;
+
+            AddStep("load dependencies", () =>
+            {
+                spectatorClient = new TestSpectatorClient();
+
+                // The screen gets suspended so it stops receiving updates.
+                Child = spectatorClient;
+
+                LoadScreen(dependenciesScreen = new DependenciesScreen(spectatorClient));
+            });
+
+            AddUntilStep("wait for dependencies to load", () => dependenciesScreen.IsLoaded);
 
             AddStep("import beatmap", () =>
             {
                 importedBeatmap = ImportBeatmapTest.LoadOszIntoOsu(game, virtualTrack: true).Result;
                 importedBeatmapId = importedBeatmap.Beatmaps.First(b => b.RulesetID == 0).OnlineBeatmapID ?? -1;
             });
-
-            AddStep("add streaming client", () =>
-            {
-                Remove(testSpectatorClient);
-                Add(testSpectatorClient);
-            });
-
-            finish();
         }
 
         [Test]
@@ -206,22 +209,36 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void waitForPlayer() => AddUntilStep("wait for player", () => (Stack.CurrentScreen as Player)?.IsLoaded == true);
 
-        private void start(int? beatmapId = null) => AddStep("start play", () => testSpectatorClient.StartPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
+        private void start(int? beatmapId = null) => AddStep("start play", () => spectatorClient.StartPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
 
-        private void finish() => AddStep("end play", () => testSpectatorClient.EndPlay(streamingUser.Id));
+        private void finish() => AddStep("end play", () => spectatorClient.EndPlay(streamingUser.Id));
 
         private void checkPaused(bool state) =>
             AddUntilStep($"game is {(state ? "paused" : "playing")}", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value == state);
 
         private void sendFrames(int count = 10)
         {
-            AddStep("send frames", () => testSpectatorClient.SendFrames(streamingUser.Id, count));
+            AddStep("send frames", () => spectatorClient.SendFrames(streamingUser.Id, count));
         }
 
         private void loadSpectatingScreen()
         {
-            AddStep("load screen", () => LoadScreen(spectatorScreen = new SoloSpectator(streamingUser)));
+            AddStep("load spectator", () => LoadScreen(spectatorScreen = new SoloSpectator(streamingUser)));
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded);
+        }
+
+        /// <summary>
+        /// Used for the sole purpose of adding <see cref="TestSpectatorClient"/> as a resolvable dependency.
+        /// </summary>
+        private class DependenciesScreen : OsuScreen
+        {
+            [Cached(typeof(SpectatorClient))]
+            public readonly TestSpectatorClient Client;
+
+            public DependenciesScreen(TestSpectatorClient client)
+            {
+                Client = client;
+            }
         }
     }
 }

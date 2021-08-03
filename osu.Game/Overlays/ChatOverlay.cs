@@ -374,17 +374,17 @@ namespace osu.Game.Overlays
 
         public bool OnPressed(PlatformAction action)
         {
-            switch (action.ActionType)
+            switch (action)
             {
-                case PlatformActionType.TabNew:
+                case PlatformAction.TabNew:
                     ChannelTabControl.SelectChannelSelectorTab();
                     return true;
 
-                case PlatformActionType.TabRestore:
+                case PlatformAction.TabRestore:
                     channelManager.JoinLastClosedChannel();
                     return true;
 
-                case PlatformActionType.DocumentClose:
+                case PlatformAction.DocumentClose:
                     channelManager.LeaveChannel(channelManager.CurrentChannel.Value);
                     return true;
             }

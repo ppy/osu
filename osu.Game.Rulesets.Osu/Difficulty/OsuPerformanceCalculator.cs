@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
@@ -36,10 +35,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             mods = Score.Mods;
             accuracy = Score.Accuracy;
             scoreMaxCombo = Score.MaxCombo;
-            countGreat = Score.Statistics.GetOrDefault(HitResult.Great);
-            countOk = Score.Statistics.GetOrDefault(HitResult.Ok);
-            countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
-            countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
+            countGreat = Score.Statistics.GetValueOrDefault(HitResult.Great);
+            countOk = Score.Statistics.GetValueOrDefault(HitResult.Ok);
+            countMeh = Score.Statistics.GetValueOrDefault(HitResult.Meh);
+            countMiss = Score.Statistics.GetValueOrDefault(HitResult.Miss);
 
             // Custom multipliers for NoFail and SpunOut.
             double multiplier = 1.12; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
@@ -98,25 +97,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor += 0.4 * (Attributes.ApproachRate - 10.33);
+                approachRateFactor = Attributes.ApproachRate - 10.33;
             else if (Attributes.ApproachRate < 8.0)
-                approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
+                approachRateFactor = 0.025 * (8.0 - Attributes.ApproachRate);
 
-            aimValue *= 1.0 + Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
+            double approachRateTotalHitsFactor = 1.0 / (1.0 + Math.Exp(-(0.007 * (totalHits - 400))));
+
+            double approachRateBonus = 1.0 + (0.03 + 0.37 * approachRateTotalHitsFactor) * approachRateFactor;
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(h => h is OsuModHidden))
                 aimValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
 
+            double flashlightBonus = 1.0;
+
             if (mods.Any(h => h is OsuModFlashlight))
             {
                 // Apply object-based bonus for flashlight.
-                aimValue *= 1.0 + 0.35 * Math.Min(1.0, totalHits / 200.0) +
-                            (totalHits > 200
-                                ? 0.3 * Math.Min(1.0, (totalHits - 200) / 300.0) +
-                                  (totalHits > 500 ? (totalHits - 500) / 1200.0 : 0.0)
-                                : 0.0);
+                flashlightBonus = 1.0 + 0.35 * Math.Min(1.0, totalHits / 200.0) +
+                                  (totalHits > 200
+                                      ? 0.3 * Math.Min(1.0, (totalHits - 200) / 300.0) +
+                                        (totalHits > 500 ? (totalHits - 500) / 1200.0 : 0.0)
+                                      : 0.0);
             }
+
+            aimValue *= Math.Max(flashlightBonus, approachRateBonus);
 
             // Scale the aim value with accuracy _slightly_
             aimValue *= 0.5 + accuracy / 2.0;
@@ -145,9 +150,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor += 0.4 * (Attributes.ApproachRate - 10.33);
+                approachRateFactor = Attributes.ApproachRate - 10.33;
 
-            speedValue *= 1.0 + Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
+            double approachRateTotalHitsFactor = 1.0 / (1.0 + Math.Exp(-(0.007 * (totalHits - 400))));
+
+            speedValue *= 1.0 + (0.03 + 0.37 * approachRateTotalHitsFactor) * approachRateFactor;
 
             if (mods.Any(m => m is OsuModHidden))
                 speedValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);

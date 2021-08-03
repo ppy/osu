@@ -35,8 +35,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             Quad quad = selectedMovableObjects.Length > 0 ? getSurroundingQuad(selectedMovableObjects) : new Quad();
 
             SelectionBox.CanRotate = quad.Width > 0 || quad.Height > 0;
-            SelectionBox.CanScaleX = quad.Width > 0;
-            SelectionBox.CanScaleY = quad.Height > 0;
+            SelectionBox.CanFlipX = SelectionBox.CanScaleX = quad.Width > 0;
+            SelectionBox.CanFlipY = SelectionBox.CanScaleY = quad.Height > 0;
             SelectionBox.CanReverse = EditorBeatmap.SelectedHitObjects.Count > 1 || EditorBeatmap.SelectedHitObjects.Any(s => s is Slider);
         }
 
@@ -76,32 +76,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 if (h is Slider slider)
                 {
-                    var points = slider.Path.ControlPoints.ToArray();
-                    Vector2 endPos = points.Last().Position.Value;
-
-                    slider.Path.ControlPoints.Clear();
-
-                    slider.Position += endPos;
-
-                    PathType? lastType = null;
-
-                    for (var i = 0; i < points.Length; i++)
-                    {
-                        var p = points[i];
-                        p.Position.Value -= endPos;
-
-                        // propagate types forwards to last null type
-                        if (i == points.Length - 1)
-                            p.Type.Value = lastType;
-                        else if (p.Type.Value != null)
-                        {
-                            var newType = p.Type.Value;
-                            p.Type.Value = lastType;
-                            lastType = newType;
-                        }
-
-                        slider.Path.ControlPoints.Insert(0, p);
-                    }
+                    slider.Path.Reverse(out Vector2 offset);
+                    slider.Position += offset;
                 }
             }
 

@@ -2,7 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Utils
@@ -99,6 +103,48 @@ namespace osu.Game.Rulesets.Osu.Utils
                 initial.Length * MathF.Cos(finalAngleRad),
                 initial.Length * MathF.Sin(finalAngleRad)
             );
+        }
+
+        /// <summary>
+        /// Reflects the position of the <see cref="OsuHitObject"/> in the playfield horizontally.
+        /// </summary>
+        /// <param name="osuObject">The object to reflect.</param>
+        public static void ReflectHorizontally(OsuHitObject osuObject)
+        {
+            osuObject.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - osuObject.X, osuObject.Position.Y);
+
+            if (!(osuObject is Slider slider))
+                return;
+
+            slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
+            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
+
+            var controlPoints = slider.Path.ControlPoints.Select(p => new PathControlPoint(p.Position.Value, p.Type.Value)).ToArray();
+            foreach (var point in controlPoints)
+                point.Position.Value = new Vector2(-point.Position.Value.X, point.Position.Value.Y);
+
+            slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
+        }
+
+        /// <summary>
+        /// Reflects the position of the <see cref="OsuHitObject"/> in the playfield vertically.
+        /// </summary>
+        /// <param name="osuObject">The object to reflect.</param>
+        public static void ReflectVertically(OsuHitObject osuObject)
+        {
+            osuObject.Position = new Vector2(osuObject.Position.X, OsuPlayfield.BASE_SIZE.Y - osuObject.Y);
+
+            if (!(osuObject is Slider slider))
+                return;
+
+            slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
+            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
+
+            var controlPoints = slider.Path.ControlPoints.Select(p => new PathControlPoint(p.Position.Value, p.Type.Value)).ToArray();
+            foreach (var point in controlPoints)
+                point.Position.Value = new Vector2(point.Position.Value.X, -point.Position.Value.Y);
+
+            slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
         }
     }
 }

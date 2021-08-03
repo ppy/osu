@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Users;
 using static osu.Game.Users.User;
 
@@ -18,9 +19,9 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         /// <summary>
         /// Text describing the value being plotted on the graph, which will be displayed as a prefix to the value in the history graph tooltip.
         /// </summary>
-        protected abstract string GraphCounterName { get; }
+        protected abstract LocalisableString GraphCounterName { get; }
 
-        protected ChartProfileSubsection(Bindable<User> user, string headerText)
+        protected ChartProfileSubsection(Bindable<User> user, LocalisableString headerText)
             : base(user, headerText)
         {
         }

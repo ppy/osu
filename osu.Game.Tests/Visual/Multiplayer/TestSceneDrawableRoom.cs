@@ -3,8 +3,11 @@
 
 using System;
 using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
@@ -78,6 +81,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
             drawableRoom.Action = () => drawableRoom.State = drawableRoom.State == SelectionState.Selected ? SelectionState.NotSelected : SelectionState.Selected;
 
             return drawableRoom;
+        }
+
+        [Test]
+        public void TestEnableAndDisablePassword()
+        {
+            DrawableRoom drawableRoom = null;
+            Room room = null;
+
+            AddStep("create room", () => Child = drawableRoom = new DrawableRoom(room = new Room
+            {
+                Name = { Value = "Room with password" },
+                Status = { Value = new RoomStatusOpen() },
+                Category = { Value = RoomCategory.Realtime },
+            }) { MatchingFilter = true });
+
+            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
+
+            AddStep("set password", () => room.Password.Value = "password");
+            AddAssert("password icon visible", () => Precision.AlmostEquals(1, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
+
+            AddStep("unset password", () => room.Password.Value = string.Empty);
+            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
         }
     }
 }

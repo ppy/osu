@@ -10,6 +10,9 @@ namespace osu.Game.Graphics.UserInterface
         [Description("default")]
         Default,
 
+        [Description("submit")]
+        Submit,
+
         [Description("button")]
         Button,
 

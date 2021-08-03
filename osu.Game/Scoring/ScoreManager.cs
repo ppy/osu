@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -210,7 +209,7 @@ namespace osu.Game.Scoring
                 {
                     // This is guaranteed to be a non-legacy score.
                     // The combo must be determined through the score's statistics, as both the beatmap's max combo and the difficulty calculator will provide osu!stable combo values.
-                    beatmapMaxCombo = Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r.AffectsCombo()).Select(r => score.Statistics.GetOrDefault(r)).Sum();
+                    beatmapMaxCombo = Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r.AffectsCombo()).Select(r => score.Statistics.GetValueOrDefault(r)).Sum();
                 }
 
                 updateScore(beatmapMaxCombo, accuracy);

@@ -2,15 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects.Types;
+using osuTK;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Catch
 {
     /// <summary>
     /// Legacy osu!catch Slider-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class ConvertSlider : Legacy.ConvertSlider, IHasXPosition, IHasCombo
+    internal sealed class ConvertSlider : Legacy.ConvertSlider, IHasPosition, IHasCombo
     {
-        public float X { get; set; }
+        public float X => Position.X;
+
+        public float Y => Position.Y;
+
+        public Vector2 Position { get; set; }
 
         public bool NewCombo { get; set; }
 
