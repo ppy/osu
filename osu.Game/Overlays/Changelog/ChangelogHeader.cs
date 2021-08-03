@@ -117,7 +117,7 @@ namespace osu.Game.Overlays.Changelog
         {
             public ChangelogHeaderTitle()
             {
-                Title = NamedOverlayComponentStrings.ChangelogTitle;
+                Title = PageTitleStrings.MainChangelogControllerDefault;
                 Description = NamedOverlayComponentStrings.ChangelogDescription;
                 IconTexture = "Icons/Hexacons/devtools";
             }

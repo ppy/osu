@@ -7,7 +7,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Beatmaps;
-using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             public BeatmapHeaderTitle()
             {
-                Title = NamedOverlayComponentStrings.BeatmapSetTitle;
+                Title = PageTitleStrings.MainBeatmapsetsControllerShow;
                 IconTexture = "Icons/Hexacons/beatmap";
             }
         }
