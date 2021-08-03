@@ -17,6 +17,12 @@ namespace osu.Game.Graphics
         public static Color4 Gray(float amt) => new Color4(amt, amt, amt, 1f);
         public static Color4 Gray(byte amt) => new Color4(amt, amt, amt, 255);
 
+        /// <summary>
+        /// Retrieves the colour for a <see cref="DifficultyRating"/>.
+        /// </summary>
+        /// <remarks>
+        /// Sourced from the @diff-{rating} variables in https://github.com/ppy/osu-web/blob/71fbab8936d79a7929d13854f5e854b4f383b236/resources/assets/less/variables.less.
+        /// </remarks>
         public Color4 ForDifficultyRating(DifficultyRating difficulty, bool useLighterColour = false)
         {
             switch (difficulty)
