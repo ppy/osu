@@ -4,6 +4,8 @@
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Rankings.Tables
@@ -17,12 +19,12 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected override RankingsTableColumn[] CreateUniqueHeaders() => new[]
         {
-            new RankingsTableColumn("Performance", Anchor.Centre, new Dimension(GridSizeMode.AutoSize), true),
+            new RankingsTableColumn(RankingsStrings.StatPerformance, Anchor.Centre, new Dimension(GridSizeMode.AutoSize), true),
         };
 
         protected override Drawable[] CreateUniqueContent(UserStatistics item) => new Drawable[]
         {
-            new RowText { Text = $@"{item.PP:N0}", }
+            new RowText { Text = item.PP.ToLocalisableString(@"N0"), }
         };
     }
 }

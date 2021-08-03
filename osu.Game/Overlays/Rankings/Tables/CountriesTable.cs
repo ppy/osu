@@ -9,6 +9,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Game.Resources.Localisation.Web;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
@@ -21,12 +23,12 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected override RankingsTableColumn[] CreateAdditionalHeaders() => new[]
         {
-            new RankingsTableColumn("Active Users", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new RankingsTableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new RankingsTableColumn("Ranked Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new RankingsTableColumn("Avg. Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new RankingsTableColumn("Performance", Anchor.Centre, new Dimension(GridSizeMode.AutoSize), true),
-            new RankingsTableColumn("Avg. Perf.", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new RankingsTableColumn(RankingsStrings.StatActiveUsers, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new RankingsTableColumn(RankingsStrings.StatPlayCount, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new RankingsTableColumn(RankingsStrings.StatRankedScore, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new RankingsTableColumn(RankingsStrings.StatAverageScore, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new RankingsTableColumn(RankingsStrings.StatPerformance, Anchor.Centre, new Dimension(GridSizeMode.AutoSize), true),
+            new RankingsTableColumn(RankingsStrings.StatAveragePerformance, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
         };
 
         protected override Country GetCountry(CountryStatistics item) => item.Country;
@@ -35,29 +37,29 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected override Drawable[] CreateAdditionalContent(CountryStatistics item) => new Drawable[]
         {
-            new ColoredRowText
+            new ColouredRowText
             {
-                Text = $@"{item.ActiveUsers:N0}",
+                Text = item.ActiveUsers.ToLocalisableString(@"N0")
             },
-            new ColoredRowText
+            new ColouredRowText
             {
-                Text = $@"{item.PlayCount:N0}",
+                Text = item.PlayCount.ToLocalisableString(@"N0")
             },
-            new ColoredRowText
+            new ColouredRowText
             {
-                Text = $@"{item.RankedScore:N0}",
+                Text = item.RankedScore.ToLocalisableString(@"N0")
             },
-            new ColoredRowText
+            new ColouredRowText
             {
-                Text = $@"{item.RankedScore / Math.Max(item.ActiveUsers, 1):N0}",
+                Text = (item.RankedScore / Math.Max(item.ActiveUsers, 1)).ToLocalisableString(@"N0")
             },
             new RowText
             {
-                Text = $@"{item.Performance:N0}",
+                Text = item.Performance.ToLocalisableString(@"N0")
             },
-            new ColoredRowText
+            new ColouredRowText
             {
-                Text = $@"{item.Performance / Math.Max(item.ActiveUsers, 1):N0}",
+                Text = (item.Performance / Math.Max(item.ActiveUsers, 1)).ToLocalisableString(@"N0")
             }
         };
 

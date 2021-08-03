@@ -1,16 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneLabelledColourPalette : OsuTestScene
+    public class TestSceneLabelledColourPalette : OsuManualInputManagerTestScene
     {
         private LabelledColourPalette component;
 
@@ -30,21 +35,41 @@ namespace osu.Game.Tests.Visual.UserInterface
             }, 8);
         }
 
+        [Test]
+        public void TestUserInteractions()
+        {
+            createColourPalette();
+            assertColourCount(4);
+
+            clickAddColour();
+            assertColourCount(5);
+
+            deleteFirstColour();
+            assertColourCount(4);
+
+            clickFirstColour();
+            AddAssert("colour picker spawned", () => this.ChildrenOfType<OsuColourPicker>().Any());
+        }
+
         private void createColourPalette(bool hasDescription = false)
         {
             AddStep("create component", () =>
             {
-                Child = new Container
+                Child = new OsuContextMenuContainer
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Width = 500,
-                    AutoSizeAxes = Axes.Y,
-                    Child = component = new LabelledColourPalette
+                    RelativeSizeAxes = Axes.Both,
+                    Child = new Container
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        ColourNamePrefix = "My colour #"
+                        Width = 500,
+                        AutoSizeAxes = Axes.Y,
+                        Child = component = new LabelledColourPalette
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            ColourNamePrefix = "My colour #"
+                        }
                     }
                 };
 
@@ -66,5 +91,36 @@ namespace osu.Game.Tests.Visual.UserInterface
             RNG.NextSingle(),
             RNG.NextSingle(),
             1);
+
+        private void assertColourCount(int count) => AddAssert($"colour count is {count}", () => component.Colours.Count == count);
+
+        private void clickAddColour() => AddStep("click new colour button", () =>
+        {
+            InputManager.MoveMouseTo(this.ChildrenOfType<ColourPalette.AddColourButton>().Single());
+            InputManager.Click(MouseButton.Left);
+        });
+
+        private void clickFirstColour() => AddStep("click first colour", () =>
+        {
+            InputManager.MoveMouseTo(this.ChildrenOfType<ColourDisplay>().First());
+            InputManager.Click(MouseButton.Left);
+        });
+
+        private void deleteFirstColour()
+        {
+            AddStep("right-click first colour", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<ColourDisplay>().First());
+                InputManager.Click(MouseButton.Right);
+            });
+
+            AddUntilStep("wait for menu", () => this.ChildrenOfType<OsuContextMenu>().Any());
+
+            AddStep("click delete", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<DrawableOsuMenuItem>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+        }
     }
 }
