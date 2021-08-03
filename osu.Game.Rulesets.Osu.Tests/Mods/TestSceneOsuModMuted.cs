@@ -14,15 +14,15 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         /// <summary>
         /// Ensures that a final volume combo of 0 (i.e. "always muted" mode) constantly plays metronome and completely mutes track.
         /// </summary>
-        [TestCase(0.0, 1.0)]
-        public void TestZeroFinalCombo(double expectedTrackVolume, double expectedMetronomeVolume) => CreateModTest(new ModTestData
+        [Test]
+        public void TestZeroFinalCombo() => CreateModTest(new ModTestData
         {
             Mod = new OsuModMuted
             {
                 MuteComboCount = { Value = 0 },
             },
-            PassCondition = () => Beatmap.Value.Track.AggregateVolume.Value == expectedTrackVolume &&
-                                  Player.ChildrenOfType<Metronome>().SingleOrDefault()?.AggregateVolume.Value == expectedMetronomeVolume,
+            PassCondition = () => Beatmap.Value.Track.AggregateVolume.Value == 0.0 &&
+                                  Player.ChildrenOfType<Metronome>().SingleOrDefault()?.AggregateVolume.Value == 1.0,
         });
     }
 }
