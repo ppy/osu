@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -86,6 +87,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestEmpty()
         {
             // used to test the flow of multiplayer from visual tests.
+        }
+
+        [Test]
+        public void TestCreateRoomViaKeyboard()
+        {
+            // create room dialog
+            AddStep("Press new document", () => InputManager.Keys(PlatformAction.DocumentNew));
+            AddUntilStep("wait for settings", () => InputManager.ChildrenOfType<MultiplayerMatchSettingsOverlay>().FirstOrDefault() != null);
+
+            // edit playlist item
+            AddStep("Press select", () => InputManager.Key(Key.Enter));
+            AddUntilStep("wait for song select", () => InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault() != null);
+
+            // select beatmap
+            AddStep("Press select", () => InputManager.Key(Key.Enter));
+            AddUntilStep("wait for return to screen", () => InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault() == null);
+
+            // create room
+            AddStep("Press select", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
+            AddUntilStep("wait for join", () => client.Room != null);
         }
 
         [Test]
