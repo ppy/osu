@@ -12,7 +12,6 @@ using osu.Framework.Allocation;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
-using System;
 using osu.Game.Resources.Localisation.Web;
 using osu.Framework.Extensions;
 
@@ -101,32 +100,15 @@ namespace osu.Game.Overlays
         }
     }
 
-    [LocalisableEnum(typeof(OverlayPanelDisplayStyleEnumLocalisationMapper))]
     public enum OverlayPanelDisplayStyle
     {
+        [LocalisableDescription(typeof(UsersStrings), nameof(UsersStrings.ViewModeCard))]
         Card,
+
+        [LocalisableDescription(typeof(UsersStrings), nameof(UsersStrings.ViewModeList))]
         List,
+
+        [LocalisableDescription(typeof(UsersStrings), nameof(UsersStrings.ViewModeBrick))]
         Brick
-    }
-
-    public class OverlayPanelDisplayStyleEnumLocalisationMapper : EnumLocalisationMapper<OverlayPanelDisplayStyle>
-    {
-        public override LocalisableString Map(OverlayPanelDisplayStyle value)
-        {
-            switch (value)
-            {
-                case OverlayPanelDisplayStyle.Card:
-                    return UsersStrings.ViewModeCard;
-
-                case OverlayPanelDisplayStyle.List:
-                    return UsersStrings.ViewModeList;
-
-                case OverlayPanelDisplayStyle.Brick:
-                    return UsersStrings.ViewModeBrick;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
-            }
-        }
     }
 }
