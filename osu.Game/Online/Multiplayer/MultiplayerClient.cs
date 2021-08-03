@@ -142,11 +142,20 @@ namespace osu.Game.Online.Multiplayer
                     APIRoom = room;
                     foreach (var user in joinedRoom.Users)
                         updateUserPlayingState(user.UserID, user.State);
+
+                    OnRoomJoined();
                 }, cancellationSource.Token).ConfigureAwait(false);
 
                 // Update room settings.
                 await updateLocalRoomSettings(joinedRoom.Settings, cancellationSource.Token).ConfigureAwait(false);
             }, cancellationSource.Token).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Fired when the room join sequence is complete
+        /// </summary>
+        protected virtual void OnRoomJoined()
+        {
         }
 
         /// <summary>

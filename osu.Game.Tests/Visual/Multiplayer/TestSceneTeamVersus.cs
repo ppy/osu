@@ -11,6 +11,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -70,6 +71,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("load multiplayer", () => LoadScreen(multiplayerScreen));
             AddUntilStep("wait for multiplayer to load", () => multiplayerScreen.IsLoaded);
             AddUntilStep("wait for lounge to load", () => this.ChildrenOfType<MultiplayerLoungeSubScreen>().FirstOrDefault()?.IsLoaded == true);
+        }
+
+        [Test]
+        public void TestCreateWithType()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Type = { Value = MatchType.TeamVersus },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            AddAssert("room type is team vs", () => client.Room?.Settings.MatchType == MatchType.TeamVersus);
+            AddAssert("user state arrived", () => client.Room?.Users.FirstOrDefault()?.MatchState is TeamVersusUserState);
         }
 
         [Test]
