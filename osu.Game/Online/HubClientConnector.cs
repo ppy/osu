@@ -156,12 +156,9 @@ namespace osu.Game.Online
                 builder.AddNewtonsoftJsonProtocol(options =>
                 {
                     options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                    options.PayloadSerializerSettings = new JsonSerializerSettings
-                    {
-                        // TODO: This should only be required to be `TypeNameHandling.Auto`.
-                        // See usage in osu-server-spectator for further documentation as to why this is required.
-                        TypeNameHandling = TypeNameHandling.All
-                    };
+                    // TODO: This should only be required to be `TypeNameHandling.Auto`.
+                    // See usage in osu-server-spectator for further documentation as to why this is required.
+                    options.PayloadSerializerSettings.TypeNameHandling = TypeNameHandling.All;
                 });
             }
 
