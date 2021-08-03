@@ -30,6 +30,8 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
             AddItem(MatchType.HeadToHead);
             AddItem(MatchType.TeamVersus);
+            // TODO: remove after osu-web is updated to set the correct default type.
+            AddItem(MatchType.Playlists);
         }
 
         private class GameTypePickerItem : DisableableTabItem
