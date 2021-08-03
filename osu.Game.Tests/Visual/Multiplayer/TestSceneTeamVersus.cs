@@ -19,6 +19,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
 
@@ -92,6 +93,36 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddAssert("room type is team vs", () => client.Room?.Settings.MatchType == MatchType.TeamVersus);
             AddAssert("user state arrived", () => client.Room?.Users.FirstOrDefault()?.MatchState is TeamVersusUserState);
+        }
+
+        [Test]
+        public void TestChangeTeamsViaButton()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Type = { Value = MatchType.TeamVersus },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            AddAssert("user on team 0", () => (client.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
+
+            AddStep("press button", () =>
+            {
+                InputManager.MoveMouseTo(multiplayerScreen.ChildrenOfType<TeamDisplay>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("user on team 1", () => (client.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 1);
+
+            AddStep("press button", () => InputManager.Click(MouseButton.Left));
+            AddAssert("user on team 0", () => (client.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
         }
 
         [Test]
