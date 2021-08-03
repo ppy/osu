@@ -6,6 +6,7 @@ using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Graphics;
@@ -265,7 +266,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     loadingLayer = new LoadingLayer(true)
                 };
 
-                TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue?.Name ?? string.Empty, true);
+                TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue.GetLocalisableDescription(), true);
                 RoomName.BindValueChanged(name => NameField.Text = name.NewValue, true);
                 Availability.BindValueChanged(availability => AvailabilityPicker.Current.Value = availability.NewValue, true);
                 Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
