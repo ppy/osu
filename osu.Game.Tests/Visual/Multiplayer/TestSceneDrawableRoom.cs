@@ -4,6 +4,8 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
@@ -19,49 +21,78 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneDrawableRoom : OsuTestScene
     {
-        public TestSceneDrawableRoom()
+        [Cached]
+        private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
+
+        [Test]
+        public void TestMultipleStatuses()
         {
-            Child = new FillFlowContainer
+            AddStep("create rooms", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                Size = new Vector2(0.9f),
-                Spacing = new Vector2(10),
-                Children = new Drawable[]
+                Child = new FillFlowContainer
                 {
-                    createDrawableRoom(new Room
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(0.9f),
+                    Spacing = new Vector2(10),
+                    Children = new Drawable[]
                     {
-                        Name = { Value = "Room 1" },
-                        Status = { Value = new RoomStatusOpen() },
-                        EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
-                    }),
-                    createDrawableRoom(new Room
-                    {
-                        Name = { Value = "Room 2" },
-                        Status = { Value = new RoomStatusPlaying() },
-                        EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
-                    }),
-                    createDrawableRoom(new Room
-                    {
-                        Name = { Value = "Room 3" },
-                        Status = { Value = new RoomStatusEnded() },
-                        EndDate = { Value = DateTimeOffset.Now },
-                    }),
-                    createDrawableRoom(new Room
-                    {
-                        Name = { Value = "Room 4 (realtime)" },
-                        Status = { Value = new RoomStatusOpen() },
-                        Category = { Value = RoomCategory.Realtime },
-                    }),
-                    createDrawableRoom(new Room
-                    {
-                        Name = { Value = "Room 4 (spotlight)" },
-                        Status = { Value = new RoomStatusOpen() },
-                        Category = { Value = RoomCategory.Spotlight },
-                    }),
-                }
-            };
+                        createDrawableRoom(new Room
+                        {
+                            Name = { Value = "Room 1" },
+                            Status = { Value = new RoomStatusOpen() },
+                            EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
+                        }),
+                        createDrawableRoom(new Room
+                        {
+                            Name = { Value = "Room 2" },
+                            Status = { Value = new RoomStatusPlaying() },
+                            EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
+                        }),
+                        createDrawableRoom(new Room
+                        {
+                            Name = { Value = "Room 3" },
+                            Status = { Value = new RoomStatusEnded() },
+                            EndDate = { Value = DateTimeOffset.Now },
+                        }),
+                        createDrawableRoom(new Room
+                        {
+                            Name = { Value = "Room 4 (realtime)" },
+                            Status = { Value = new RoomStatusOpen() },
+                            Category = { Value = RoomCategory.Realtime },
+                        }),
+                        createDrawableRoom(new Room
+                        {
+                            Name = { Value = "Room 4 (spotlight)" },
+                            Status = { Value = new RoomStatusOpen() },
+                            Category = { Value = RoomCategory.Spotlight },
+                        }),
+                    }
+                };
+            });
+        }
+
+        [Test]
+        public void TestEnableAndDisablePassword()
+        {
+            DrawableRoom drawableRoom = null;
+            Room room = null;
+
+            AddStep("create room", () => Child = drawableRoom = createDrawableRoom(room = new Room
+            {
+                Name = { Value = "Room with password" },
+                Status = { Value = new RoomStatusOpen() },
+                Category = { Value = RoomCategory.Realtime },
+            }));
+
+            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
+
+            AddStep("set password", () => room.Password.Value = "password");
+            AddAssert("password icon visible", () => Precision.AlmostEquals(1, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
+
+            AddStep("unset password", () => room.Password.Value = string.Empty);
+            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
         }
 
         private DrawableRoom createDrawableRoom(Room room)
@@ -81,28 +112,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             drawableRoom.Action = () => drawableRoom.State = drawableRoom.State == SelectionState.Selected ? SelectionState.NotSelected : SelectionState.Selected;
 
             return drawableRoom;
-        }
-
-        [Test]
-        public void TestEnableAndDisablePassword()
-        {
-            DrawableRoom drawableRoom = null;
-            Room room = null;
-
-            AddStep("create room", () => Child = drawableRoom = new DrawableRoom(room = new Room
-            {
-                Name = { Value = "Room with password" },
-                Status = { Value = new RoomStatusOpen() },
-                Category = { Value = RoomCategory.Realtime },
-            }) { MatchingFilter = true });
-
-            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
-
-            AddStep("set password", () => room.Password.Value = "password");
-            AddAssert("password icon visible", () => Precision.AlmostEquals(1, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
-
-            AddStep("unset password", () => room.Password.Value = string.Empty);
-            AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
         }
     }
 }
