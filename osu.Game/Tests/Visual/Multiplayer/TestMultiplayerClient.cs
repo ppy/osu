@@ -38,9 +38,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
 
-        private readonly TestMultiplayerRoomManager roomManager;
+        private readonly TestRequestHandlingMultiplayerRoomManager roomManager;
 
-        public TestMultiplayerClient(TestMultiplayerRoomManager roomManager)
+        public TestMultiplayerClient(TestRequestHandlingMultiplayerRoomManager roomManager)
         {
             this.roomManager = roomManager;
         }
@@ -191,6 +191,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ChangeUserMods(api.LocalUser.Value.Id, newMods);
             return Task.CompletedTask;
         }
+
+        public override Task SendMatchRequest(MatchUserRequest request) => Task.CompletedTask;
 
         public override Task StartMatch()
         {

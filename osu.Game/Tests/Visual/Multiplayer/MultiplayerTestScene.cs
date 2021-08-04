@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public const int PLAYER_2_ID = 56;
 
         public TestMultiplayerClient Client => OnlinePlayDependencies.Client;
-        public new TestMultiplayerRoomManager RoomManager => OnlinePlayDependencies.RoomManager;
+        public new TestRequestHandlingMultiplayerRoomManager RoomManager => OnlinePlayDependencies.RoomManager;
         public TestUserLookupCache LookupCache => OnlinePlayDependencies?.LookupCache;
         public TestSpectatorClient SpectatorClient => OnlinePlayDependencies?.SpectatorClient;
 

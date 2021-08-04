@@ -7,7 +7,6 @@ using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.IO.Serialization.Converters;
-using osu.Game.Online.Rooms.GameTypes;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Users;
 using osu.Game.Utils;
@@ -63,7 +62,16 @@ namespace osu.Game.Online.Rooms
 
         [Cached]
         [JsonIgnore]
-        public readonly Bindable<GameType> Type = new Bindable<GameType>(new GameTypePlaylists());
+        public readonly Bindable<MatchType> Type = new Bindable<MatchType>();
+
+        // Todo: osu-framework bug (https://github.com/ppy/osu-framework/issues/4106)
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        [JsonProperty("type")]
+        private MatchType type
+        {
+            get => Type.Value;
+            set => Type.Value = value;
+        }
 
         [Cached]
         [JsonIgnore]

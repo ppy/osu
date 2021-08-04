@@ -14,4 +14,7 @@
     <EmbeddedResource Include="Textures\**\*" />
     <EmbeddedResource Include="Tracks\**\*" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\osu-framework\osu.Framework\osu.Framework.csproj" />
+  </ItemGroup>
 </Project>

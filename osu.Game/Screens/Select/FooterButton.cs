@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Select
         {
             if (action == Hotkey)
             {
-                Click();
+                TriggerClick();
                 return true;
             }
 

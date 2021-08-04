@@ -1,3 +1,5 @@
+using M.Resources.Localisation.Mvis;
+using M.Resources.Localisation.Mvis.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -19,52 +21,49 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
             {
                 new SettingsTogglePiece
                 {
-                    Description = "启用本插件",
+                    Description = MvisGenericStrings.EnablePlugin,
                     Bindable = config.GetBindable<bool>(LyricSettings.EnablePlugin)
                 },
                 new SettingsTogglePiece
                 {
                     Icon = FontAwesome.Solid.SwimmingPool,
-                    Description = "使用DrawablePool",
-                    TooltipText = "试验性功能！",
+                    Description = CloudMusicStrings.UseDrawablePool,
+                    TooltipText = CloudMusicStrings.ExperimentalWarning,
                     Bindable = config.GetBindable<bool>(LyricSettings.UseDrawablePool)
                 },
                 new SettingsTogglePiece
                 {
                     Icon = FontAwesome.Solid.Save,
-                    Description = "自动保存歌词到本地",
+                    Description = CloudMusicStrings.SaveLyricOnDownloadedMain,
                     Bindable = config.GetBindable<bool>(LyricSettings.SaveLrcWhenFetchFinish),
-                    TooltipText = "歌词将保存在\"custom/lyrics/beatmap-{ID}.json\"中"
+                    TooltipText = CloudMusicStrings.SaveLyricOnDownloadedSub
                 },
                 new SettingsTogglePiece
                 {
                     Icon = FontAwesome.Solid.FillDrip,
-                    Description = "禁用额外阴影",
-                    Bindable = config.GetBindable<bool>(LyricSettings.NoExtraShadow),
-                    TooltipText = "不要给歌词文本添加额外的阴影效果"
+                    Description = CloudMusicStrings.DisableShader,
+                    Bindable = config.GetBindable<bool>(LyricSettings.NoExtraShadow)
                 },
                 new SettingsSliderPiece<double>
                 {
-                    Description = "全局歌词偏移(毫秒)",
+                    Description = CloudMusicStrings.GlobalOffsetMain,
                     Bindable = config.GetBindable<double>(LyricSettings.LyricOffset),
-                    TooltipText = "如果当前歌曲歌词太早或太晚，拖动这里的滑条试试"
+                    TooltipText = CloudMusicStrings.GlobalOffsetSub,
                 },
                 new SettingsSliderPiece<float>
                 {
-                    Description = "歌词淡入时间",
-                    TooltipText = "调整歌词淡入动画要花多长时间",
+                    Description = CloudMusicStrings.LyricFadeInDuration,
                     Bindable = config.GetBindable<float>(LyricSettings.LyricFadeInDuration)
                 },
                 new SettingsSliderPiece<float>
                 {
-                    Description = "歌词淡出时间",
-                    TooltipText = "调整歌词淡出动画要花多长时间",
+                    Description = CloudMusicStrings.LyricFadeOutDuration,
                     Bindable = config.GetBindable<float>(LyricSettings.LyricFadeOutDuration)
                 },
                 new SettingsTogglePiece
                 {
-                    Description = "自动滚动歌词",
-                    TooltipText = "与DrawablePool不兼容",
+                    Description = CloudMusicStrings.LyricAutoScrollMain,
+                    TooltipText = CloudMusicStrings.LyricAutoScrollSub,
                     Bindable = config.GetBindable<bool>(LyricSettings.AutoScrollToCurrent)
                 }
             });

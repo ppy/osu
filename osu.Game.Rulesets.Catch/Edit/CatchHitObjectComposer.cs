@@ -38,6 +38,7 @@ namespace osu.Game.Rulesets.Catch.Edit
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
             new FruitCompositionTool(),
+            new JuiceStreamCompositionTool(),
             new BananaShowerCompositionTool()
         };
 

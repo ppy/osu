@@ -282,7 +282,6 @@ namespace osu.Game.Screens.Play
         {
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
-            AutoSizeAxes = Axes.Both,
         };
 
         protected PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();

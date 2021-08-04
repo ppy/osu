@@ -1,27 +1,34 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Beatmaps
 {
     public enum BeatmapSetOnlineStatus
     {
-        [Description("未知")]
         None = -3,
-        [Description("坟图")]
+
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowStatusGraveyard))]
         Graveyard = -2,
-        [Description("制作中")]
+
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowStatusWip))]
         WIP = -1,
-        [Description("审核中")]
+
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowStatusPending))]
         Pending = 0,
-        [Description("计入排名")]
+
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowStatusRanked))]
         Ranked = 1,
-        [Description("已改进")]
+
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowStatusApproved))]
         Approved = 2,
-        [Description("质量合格")]
+
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowStatusQualified))]
         Qualified = 3,
-        [Description("Loved")]
+
+        [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowStatusLoved))]
         Loved = 4,
     }
 

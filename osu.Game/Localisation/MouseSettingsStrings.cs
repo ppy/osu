@@ -7,8 +7,7 @@ namespace osu.Game.Localisation
 {
     public static class MouseSettingsStrings
     {
-        //private const string prefix = @"osu.Game.Resources.Localisation.MouseSettings";
-        private const string prefix = @"M.Resources.Localisation.MouseSettings";
+        private const string prefix = @"osu.Game.Resources.Localisation.MouseSettings";
 
         /// <summary>
         /// "Mouse"
@@ -54,6 +53,11 @@ namespace osu.Game.Localisation
         /// "Cursor sensitivity"
         /// </summary>
         public static LocalisableString CursorSensitivity => new TranslatableString(getKey(@"cursor_sensitivity"), @"Cursor sensitivity");
+
+        /// <summary>
+        /// "This setting has known issues on your platform. If you encounter problems, it is recommended to adjust sensitivity externally and keep this disabled for now."
+        /// </summary>
+        public static LocalisableString HighPrecisionPlatformWarning => new TranslatableString(getKey(@"high_precision_platform_warning"), @"This setting has known issues on your platform. If you encounter problems, it is recommended to adjust sensitivity externally and keep this disabled for now.");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

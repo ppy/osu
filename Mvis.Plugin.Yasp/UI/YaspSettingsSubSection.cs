@@ -1,3 +1,5 @@
+using M.Resources.Localisation.Mvis;
+using M.Resources.Localisation.Mvis.Plugins;
 using Mvis.Plugin.Yasp.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -23,13 +25,13 @@ namespace Mvis.Plugin.Yasp.UI
             {
                 new SettingsSlider<float>
                 {
-                    LabelText = "缩放",
+                    LabelText = YaspStrings.Scale,
                     Current = config.GetBindable<float>(YaspSettings.Scale),
                     DisplayAsPercentage = true
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "启用本插件",
+                    LabelText = MvisGenericStrings.EnablePlugin,
                     Current = config.GetBindable<bool>(YaspSettings.EnablePlugin)
                 }
             };

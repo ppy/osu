@@ -1,32 +1,39 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
     /// <summary>
     /// A component which displays a colour along with related description text.
     /// </summary>
-    public class ColourDisplay : CompositeDrawable, IHasCurrentValue<Color4>
+    public class ColourDisplay : CompositeDrawable, IHasCurrentValue<Colour4>
     {
-        private readonly BindableWithCurrent<Color4> current = new BindableWithCurrent<Color4>();
+        /// <summary>
+        /// Invoked when the user has requested the colour corresponding to this <see cref="ColourDisplay"/>
+        /// to be removed from its palette.
+        /// </summary>
+        public event Action<ColourDisplay> DeleteRequested;
 
-        private Box fill;
-        private OsuSpriteText colourHexCode;
+        private readonly BindableWithCurrent<Colour4> current = new BindableWithCurrent<Colour4>();
+
         private OsuSpriteText colourName;
 
-        public Bindable<Color4> Current
+        public Bindable<Colour4> Current
         {
             get => current.Current;
             set => current.Current = value;
@@ -62,24 +69,10 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Spacing = new Vector2(0, 10),
                 Children = new Drawable[]
                 {
-                    new CircularContainer
+                    new ColourCircle
                     {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 100,
-                        Masking = true,
-                        Children = new Drawable[]
-                        {
-                            fill = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both
-                            },
-                            colourHexCode = new OsuSpriteText
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Font = OsuFont.Default.With(size: 12)
-                            }
-                        }
+                        Current = { BindTarget = Current },
+                        DeleteRequested = () => DeleteRequested?.Invoke(this)
                     },
                     colourName = new OsuSpriteText
                     {
@@ -90,18 +83,64 @@ namespace osu.Game.Graphics.UserInterfaceV2
             };
         }
 
-        protected override void LoadComplete()
+        private class ColourCircle : OsuClickableContainer, IHasPopover, IHasContextMenu
         {
-            base.LoadComplete();
+            public Bindable<Colour4> Current { get; } = new Bindable<Colour4>();
 
-            current.BindValueChanged(_ => updateColour(), true);
-        }
+            public Action DeleteRequested { get; set; }
 
-        private void updateColour()
-        {
-            fill.Colour = current.Value;
-            colourHexCode.Text = current.Value.ToHex();
-            colourHexCode.Colour = OsuColour.ForegroundTextColourFor(current.Value);
+            private readonly Box fill;
+            private readonly OsuSpriteText colourHexCode;
+
+            public ColourCircle()
+            {
+                RelativeSizeAxes = Axes.X;
+                Height = 100;
+                CornerRadius = 50;
+                Masking = true;
+                Action = this.ShowPopover;
+
+                Children = new Drawable[]
+                {
+                    fill = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    },
+                    colourHexCode = new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Font = OsuFont.Default.With(size: 12)
+                    }
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Current.BindValueChanged(_ => updateColour(), true);
+            }
+
+            private void updateColour()
+            {
+                fill.Colour = Current.Value;
+                colourHexCode.Text = Current.Value.ToHex();
+                colourHexCode.Colour = OsuColour.ForegroundTextColourFor(Current.Value);
+            }
+
+            public Popover GetPopover() => new OsuPopover(false)
+            {
+                Child = new OsuColourPicker
+                {
+                    Current = { BindTarget = Current }
+                }
+            };
+
+            public MenuItem[] ContextMenuItems => new MenuItem[]
+            {
+                new OsuMenuItem("Delete", MenuItemType.Destructive, () => DeleteRequested?.Invoke())
+            };
         }
     }
 }

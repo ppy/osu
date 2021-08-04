@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Resources.Localisation.Web;
@@ -64,7 +65,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             return new TooltipDisplayContent
             {
-                Rank = $"#{rank:N0}",
+                Rank = rank.ToLocalisableString("\\##,##0"),
                 Time = days == 0 ? "现在" : $"{days}天之前"
             };
         }
@@ -91,7 +92,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         private class TooltipDisplayContent
         {
-            public string Rank;
+            public LocalisableString Rank;
             public string Time;
         }
     }

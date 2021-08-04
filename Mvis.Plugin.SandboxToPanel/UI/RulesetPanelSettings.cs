@@ -1,3 +1,5 @@
+using M.Resources.Localisation.Mvis;
+using M.Resources.Localisation.Mvis.Plugins;
 using Mvis.Plugin.Sandbox.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -33,36 +35,36 @@ namespace Mvis.Plugin.Sandbox.UI
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "启用Mvis面板",
+                    LabelText = MvisGenericStrings.EnablePlugin,
                     Current = config.GetBindable<bool>(SandboxSetting.EnableRulesetPanel)
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = "空闲时面板的不透明度",
+                    LabelText = StpStrings.AlphaOnIdle,
                     Current = config.GetBindable<float>(SandboxSetting.IdleAlpha),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "显示粒子",
+                    LabelText = StpStrings.ShowParticles,
                     Current = config.GetBindable<bool>(SandboxSetting.ShowParticles)
                 },
                 new SettingsSlider<int>
                 {
-                    LabelText = "粒子数",
+                    LabelText = StpStrings.ParticleCount,
                     TransferValueOnCommit = true,
                     Current = config.GetBindable<int>(SandboxSetting.ParticleCount),
                     KeyboardStep = 1,
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "显示谱面信息",
+                    LabelText = StpStrings.ShowBeatmapInfo,
                     Current = config.GetBindable<bool>(SandboxSetting.ShowBeatmapInfo)
                 },
                 new SettingsEnumDropdown<VisualizerLayout>
                 {
-                    LabelText = "界面类型",
+                    LabelText = StpStrings.VisualizerLayoutType,
                     Current = layoutType
                 },
                 typeASettings = new FillFlowContainer
@@ -75,60 +77,60 @@ namespace Mvis.Plugin.Sandbox.UI
                     {
                         new SettingsSlider<int>
                         {
-                            LabelText = "半径",
+                            LabelText = StpStrings.Radius,
                             KeyboardStep = 1,
                             Current = config.GetBindable<int>(SandboxSetting.Radius)
                         },
                         new SettingsEnumDropdown<CircularBarType>
                         {
-                            LabelText = "频谱类型",
+                            LabelText = StpStrings.BarType,
                             Current = config.GetBindable<CircularBarType>(SandboxSetting.CircularBarType)
                         },
                         new SettingsSlider<int>
                         {
-                            LabelText = "旋转角度",
+                            LabelText = StpStrings.Rotation,
                             KeyboardStep = 1,
                             Current = config.GetBindable<int>(SandboxSetting.Rotation)
                         },
                         new SettingsSlider<int>
                         {
-                            LabelText = "复原时间",
+                            LabelText = StpStrings.DecayTime,
                             Current = config.GetBindable<int>(SandboxSetting.DecayA),
                             KeyboardStep = 1
                         },
                         new SettingsSlider<int>
                         {
-                            LabelText = "高度倍率",
+                            LabelText = StpStrings.HeightMultiplier,
                             Current = config.GetBindable<int>(SandboxSetting.MultiplierA),
                             KeyboardStep = 1
                         },
                         new SettingsCheckbox
                         {
-                            LabelText = "对称",
+                            LabelText = StpStrings.Symmetry,
                             Current = config.GetBindable<bool>(SandboxSetting.Symmetry)
                         },
                         new SettingsSlider<int>
                         {
-                            LabelText = "平滑度",
+                            LabelText = StpStrings.Smoothness,
                             Current = config.GetBindable<int>(SandboxSetting.SmoothnessA),
                             KeyboardStep = 1
                         },
                         new SettingsSlider<double>
                         {
-                            LabelText = "频谱宽度",
+                            LabelText = StpStrings.BarWidth,
                             Current = config.GetBindable<double>(SandboxSetting.BarWidthA),
                             KeyboardStep = 0.1f
                         },
                         new SettingsSlider<int>
                         {
-                            LabelText = "分段数",
+                            LabelText = StpStrings.VisualizerAmount,
                             Current = config.GetBindable<int>(SandboxSetting.VisualizerAmount),
                             KeyboardStep = 1,
                             TransferValueOnCommit = true
                         },
                         new SettingsSlider<int>
                         {
-                            LabelText = "频谱密度",
+                            LabelText = StpStrings.BarsPerVisual,
                             Current = config.GetBindable<int>(SandboxSetting.BarsPerVisual),
                             KeyboardStep = 1,
                             TransferValueOnCommit = true
@@ -145,37 +147,37 @@ namespace Mvis.Plugin.Sandbox.UI
                     {
                         new SettingsSlider<int>
                         {
-                            LabelText = "复原时间",
+                            LabelText = StpStrings.DecayTime,
                             Current = config.GetBindable<int>(SandboxSetting.DecayB),
                             KeyboardStep = 1
                         },
                         new SettingsSlider<int>
                         {
-                            LabelText = "高度倍率",
+                            LabelText = StpStrings.HeightMultiplier,
                             Current = config.GetBindable<int>(SandboxSetting.MultiplierB),
                             KeyboardStep = 1
                         },
                         new SettingsSlider<int>
                         {
-                            LabelText = "平滑度",
+                            LabelText = StpStrings.Smoothness,
                             Current = config.GetBindable<int>(SandboxSetting.SmoothnessB),
                             KeyboardStep = 1
                         },
                         new SettingsSlider<double>
                         {
-                            LabelText = "频谱宽度",
+                            LabelText = StpStrings.BarWidth,
                             Current = config.GetBindable<double>(SandboxSetting.BarWidthB),
                             KeyboardStep = 0.1f
                         },
                         new SettingsSlider<int>
                         {
-                            LabelText = "频谱数量",
+                            LabelText = StpStrings.BarCount,
                             Current = config.GetBindable<int>(SandboxSetting.BarCountB),
                             KeyboardStep = 0.1f
                         },
                         new SettingsEnumDropdown<LinearBarType>
                         {
-                            LabelText = "频谱类型",
+                            LabelText = StpStrings.BarType,
                             Current = config.GetBindable<LinearBarType>(SandboxSetting.LinearBarType)
                         },
                     }
