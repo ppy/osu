@@ -14,34 +14,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneStarRatingDisplay : OsuTestScene
     {
-        [Test]
-        public void TestOldColoursDisplay()
-        {
-            AddStep("load displays", () => Child = new FillFlowContainer
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                ChildrenEnumerable = new[]
-                {
-                    1.23,
-                    2.34,
-                    3.45,
-                    4.56,
-                    5.67,
-                    6.78,
-                    10.11,
-                }.Select(starRating => new StarRatingDisplay(new StarDifficulty(starRating, 0))
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                })
-            });
-        }
-
         [TestCase(52f, 20f)]
         [TestCase(52f, 16f)]
         [TestCase(50f, 14f)]
-        public void TestNewColoursDisplay(float width, float height)
+        public void TestDisplay(float width, float height)
         {
             AddStep("load displays", () =>
             {
@@ -59,7 +35,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         AutoSizeAxes = Axes.Both,
                         Spacing = new Vector2(2f),
                         Direction = FillDirection.Vertical,
-                        ChildrenEnumerable = Enumerable.Range(0, 10).Select(j => new StarRatingDisplay(new StarDifficulty(i + j * 0.1f, 0), true)
+                        ChildrenEnumerable = Enumerable.Range(0, 10).Select(j => new StarRatingDisplay(new StarDifficulty(i + j * 0.1f, 0))
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -71,11 +47,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestChangingStarRatingDisplay([Values(false, true)] bool useNewColours)
+        public void TestChangingStarRatingDisplay()
         {
             StarRatingDisplay starRating = null;
 
-            AddStep("load display", () => Child = starRating = new StarRatingDisplay(new StarDifficulty(5.55, 1), useNewColours)
+            AddStep("load display", () => Child = starRating = new StarRatingDisplay(new StarDifficulty(5.55, 1))
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
