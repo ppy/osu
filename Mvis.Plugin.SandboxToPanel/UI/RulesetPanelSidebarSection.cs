@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using M.Resources.Localisation.Mvis;
+using M.Resources.Localisation.Mvis.Plugins;
 using Mvis.Plugin.Sandbox.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -35,34 +37,34 @@ namespace Mvis.Plugin.Sandbox.UI
             {
                 new SettingsTogglePiece
                 {
-                    Description = "启用Mvis面板",
+                    Description = MvisGenericStrings.EnablePlugin,
                     Bindable = config.GetBindable<bool>(SandboxSetting.EnableRulesetPanel)
                 },
                 new SettingsSliderPiece<float>
                 {
-                    Description = "空闲时面板的不透明度",
+                    Description = StpStrings.AlphaOnIdle,
                     Bindable = config.GetBindable<float>(SandboxSetting.IdleAlpha),
                     DisplayAsPercentage = true
                 },
                 new SettingsTogglePiece
                 {
-                    Description = "显示粒子",
+                    Description = StpStrings.ShowParticles,
                     Bindable = config.GetBindable<bool>(SandboxSetting.ShowParticles)
                 },
                 new SettingsSliderPiece<int>
                 {
-                    Description = "粒子数",
+                    Description = StpStrings.ParticleCount,
                     TransferValueOnCommit = true,
                     Bindable = config.GetBindable<int>(SandboxSetting.ParticleCount)
                 },
                 new SettingsEnumPiece<VisualizerLayout>
                 {
-                    Description = "界面类型",
+                    Description = StpStrings.VisualizerLayoutType,
                     Bindable = layoutType
                 },
                 new SettingsTogglePiece
                 {
-                    Description = "显示谱面信息",
+                    Description = StpStrings.ShowBeatmapInfo,
                     Bindable = config.GetBindable<bool>(SandboxSetting.ShowBeatmapInfo)
                 },
             });
@@ -73,53 +75,53 @@ namespace Mvis.Plugin.Sandbox.UI
             {
                 new SettingsSliderPiece<int>
                 {
-                    Description = "半径",
+                    Description = StpStrings.Radius,
                     Bindable = config.GetBindable<int>(SandboxSetting.Radius)
                 },
                 new SettingsEnumPiece<CircularBarType>
                 {
-                    Description = "频谱类型",
+                    Description = StpStrings.BarType,
                     Bindable = config.GetBindable<CircularBarType>(SandboxSetting.CircularBarType)
                 },
                 new SettingsSliderPiece<int>
                 {
-                    Description = "旋转角度",
+                    Description = StpStrings.Rotation,
                     Bindable = config.GetBindable<int>(SandboxSetting.Rotation)
                 },
                 new SettingsSliderPiece<int>
                 {
-                    Description = "复原时间",
+                    Description = StpStrings.DecayTime,
                     Bindable = config.GetBindable<int>(SandboxSetting.DecayA)
                 },
                 new SettingsSliderPiece<int>
                 {
-                    Description = "高度倍率",
+                    Description = StpStrings.HeightMultiplier,
                     Bindable = config.GetBindable<int>(SandboxSetting.MultiplierA)
                 },
                 new SettingsTogglePiece
                 {
-                    Description = "对称",
+                    Description = StpStrings.Symmetry,
                     Bindable = config.GetBindable<bool>(SandboxSetting.Symmetry)
                 },
                 new SettingsSliderPiece<int>
                 {
-                    Description = "平滑度",
+                    Description = StpStrings.Smoothness,
                     Bindable = config.GetBindable<int>(SandboxSetting.SmoothnessA)
                 },
                 new SettingsSliderPiece<double>
                 {
-                    Description = "频谱宽度",
+                    Description = StpStrings.BarWidth,
                     Bindable = config.GetBindable<double>(SandboxSetting.BarWidthA)
                 },
                 new SettingsSliderPiece<int>
                 {
-                    Description = "分段数",
+                    Description = StpStrings.VisualizerAmount,
                     Bindable = config.GetBindable<int>(SandboxSetting.VisualizerAmount),
                     TransferValueOnCommit = true
                 },
                 new SettingsSliderPiece<int>
                 {
-                    Description = "频谱密度",
+                    Description = StpStrings.BarsPerVisual,
                     Bindable = config.GetBindable<int>(SandboxSetting.BarsPerVisual),
                     TransferValueOnCommit = true
                 }
@@ -129,32 +131,32 @@ namespace Mvis.Plugin.Sandbox.UI
             {
                 new SettingsSliderPiece<int>
                 {
-                    Description = "复原时间",
+                    Description = StpStrings.DecayTime,
                     Bindable = config.GetBindable<int>(SandboxSetting.DecayB),
                 },
                 new SettingsSliderPiece<int>
                 {
-                    Description = "高度倍率",
+                    Description = StpStrings.HeightMultiplier,
                     Bindable = config.GetBindable<int>(SandboxSetting.MultiplierB),
                 },
                 new SettingsSliderPiece<int>
                 {
-                    Description = "平滑度",
+                    Description = StpStrings.Smoothness,
                     Bindable = config.GetBindable<int>(SandboxSetting.SmoothnessB),
                 },
                 new SettingsSliderPiece<double>
                 {
-                    Description = "频谱宽度",
+                    Description = StpStrings.BarWidth,
                     Bindable = config.GetBindable<double>(SandboxSetting.BarWidthB),
                 },
                 new SettingsSliderPiece<int>
                 {
-                    Description = "频谱数量",
+                    Description = StpStrings.BarCount,
                     Bindable = config.GetBindable<int>(SandboxSetting.BarCountB),
                 },
                 new SettingsEnumPiece<LinearBarType>
                 {
-                    Description = "频谱类型",
+                    Description = StpStrings.BarType,
                     Bindable = config.GetBindable<LinearBarType>(SandboxSetting.LinearBarType)
                 },
             });

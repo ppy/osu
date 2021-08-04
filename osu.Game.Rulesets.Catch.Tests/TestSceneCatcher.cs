@@ -31,9 +31,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        private TestCatcher catcher;
-
         private DroppedObjectContainer droppedObjectContainer;
+
+        private TestCatcher catcher;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -43,24 +43,16 @@ namespace osu.Game.Rulesets.Catch.Tests
                 CircleSize = 0,
             };
 
-            var trailContainer = new Container
+            droppedObjectContainer = new DroppedObjectContainer();
+
+            Child = new Container
             {
                 Anchor = Anchor.Centre,
-            };
-            droppedObjectContainer = new DroppedObjectContainer();
-            Child = new DependencyProvidingContainer
-            {
-                CachedDependencies = new (Type, object)[]
-                {
-                    (typeof(DroppedObjectContainer), droppedObjectContainer),
-                },
                 Children = new Drawable[]
                 {
                     droppedObjectContainer,
-                    catcher = new TestCatcher(trailContainer, difficulty),
-                    trailContainer
-                },
-                Anchor = Anchor.Centre
+                    catcher = new TestCatcher(droppedObjectContainer, difficulty),
+                }
             };
         });
 
@@ -298,8 +290,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             public IEnumerable<CaughtObject> CaughtObjects => this.ChildrenOfType<CaughtObject>();
 
-            public TestCatcher(Container trailsTarget, BeatmapDifficulty difficulty)
-                : base(trailsTarget, difficulty)
+            public TestCatcher(DroppedObjectContainer droppedObjectTarget, BeatmapDifficulty difficulty)
+                : base(droppedObjectTarget, difficulty)
             {
             }
         }

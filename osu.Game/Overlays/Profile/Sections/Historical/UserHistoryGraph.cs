@@ -34,8 +34,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             return new TooltipDisplayContent
             {
                 Name = tooltipCounterName,
-                Count = playCount.ToString("N0"),
-                Date = date.ToString("yyyy MMMM")
+                Count = playCount.ToLocalisableString("N0"),
+                Date = date.ToLocalisableString("yyyy MMMM")
             };
         }
 
@@ -63,8 +63,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         private class TooltipDisplayContent
         {
             public LocalisableString Name;
-            public string Count;
-            public string Date;
+            public LocalisableString Count;
+            public LocalisableString Date;
         }
     }
 }

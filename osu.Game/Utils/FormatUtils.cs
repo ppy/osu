@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Globalization;
 using Humanizer;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Utils
 {
@@ -13,9 +13,8 @@ namespace osu.Game.Utils
         /// Turns the provided accuracy into a percentage with 2 decimal places.
         /// </summary>
         /// <param name="accuracy">The accuracy to be formatted.</param>
-        /// <param name="formatProvider">An optional format provider.</param>
         /// <returns>formatted accuracy in percentage</returns>
-        public static string FormatAccuracy(this double accuracy, IFormatProvider formatProvider = null)
+        public static LocalisableString FormatAccuracy(this double accuracy)
         {
             // for the sake of display purposes, we don't want to show a user a "rounded up" percentage to the next whole number.
             // ie. a score which gets 89.99999% shouldn't ever show as 90%.
@@ -23,7 +22,7 @@ namespace osu.Game.Utils
             // percentile with a non-matching grade is confusing.
             accuracy = Math.Floor(accuracy * 10000) / 10000;
 
-            return accuracy.ToString("0.00%", formatProvider ?? CultureInfo.CurrentCulture);
+            return accuracy.ToLocalisableString("0.00%");
         }
 
         /// <summary>

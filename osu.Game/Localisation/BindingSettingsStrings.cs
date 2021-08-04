@@ -7,8 +7,7 @@ namespace osu.Game.Localisation
 {
     public static class BindingSettingsStrings
     {
-        //private const string prefix = @"osu.Game.Resources.Localisation.BindingSettings";
-        private const string prefix = @"M.Resources.Localisation.BindingSettings";
+        private const string prefix = @"osu.Game.Resources.Localisation.BindingSettings";
 
         /// <summary>
         /// "Shortcut and gameplay bindings"

@@ -262,7 +262,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             switch (action)
             {
                 case GlobalAction.Select:
-                    Click();
+                    TriggerClick();
                     return true;
             }
 
@@ -274,14 +274,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         }
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => state == SelectionState.Selected;
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            if (selectedRoom.Value != Room)
-                return true;
-
-            return base.OnMouseDown(e);
-        }
 
         protected override bool OnClick(ClickEvent e)
         {
@@ -390,6 +382,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 base.LoadComplete();
 
                 Schedule(() => GetContainingInputManager().ChangeFocus(passwordTextbox));
+                passwordTextbox.OnCommit += (_, __) => JoinRequested?.Invoke(room, passwordTextbox.Text);
             }
         }
     }

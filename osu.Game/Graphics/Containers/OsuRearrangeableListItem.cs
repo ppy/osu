@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
@@ -59,33 +60,37 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = new GridContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Content = new[]
+                new GridContainer
                 {
-                    new[]
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Content = new[]
                     {
-                        handleContainer = new Container
+                        new[]
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            AutoSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Horizontal = 5 },
-                            Child = handle = new PlaylistItemHandle
+                            handleContainer = new Container
                             {
-                                Size = new Vector2(12),
-                                Colour = HandleColour,
-                                AlwaysPresent = true,
-                                Alpha = 0
-                            }
-                        },
-                        CreateContent()
-                    }
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                AutoSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Horizontal = 5 },
+                                Child = handle = new PlaylistItemHandle
+                                {
+                                    Size = new Vector2(12),
+                                    Colour = HandleColour,
+                                    AlwaysPresent = true,
+                                    Alpha = 0
+                                }
+                            },
+                            CreateContent()
+                        }
+                    },
+                    ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                 },
-                ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
+                new HoverClickSounds()
             };
         }
 

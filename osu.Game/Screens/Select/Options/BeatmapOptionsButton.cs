@@ -14,6 +14,7 @@ using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select.Options
 {
@@ -76,6 +77,7 @@ namespace osu.Game.Screens.Select.Options
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
         public BeatmapOptionsButton()
+            : base(HoverSampleSet.Submit)
         {
             Width = width;
             RelativeSizeAxes = Axes.Y;

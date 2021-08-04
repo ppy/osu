@@ -1,3 +1,4 @@
+using M.Resources.Localisation.Mvis.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic;
@@ -46,17 +47,17 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             {
                 Icon = FontAwesome.Solid.Undo,
                 Size = new Vector2(45),
-                TooltipText = "刷新",
+                TooltipText = CloudMusicStrings.Refresh,
                 Action = () => plugin.RefreshLyric()
             },
             new IconButton
             {
                 Icon = FontAwesome.Solid.CloudDownloadAlt,
                 Size = new Vector2(45),
-                TooltipText = "重新获取歌词",
+                TooltipText = CloudMusicStrings.RefetchLyric,
                 Action = () => dialog.Push
                 (
-                    new ConfirmDialog("重新获取歌词",
+                    new ConfirmDialog(CloudMusicStrings.RefetchLyric.ToString(),
                         () => plugin.RefreshLyric(true))
                 )
             },
@@ -64,14 +65,14 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             {
                 Icon = FontAwesome.Solid.Edit,
                 Size = new Vector2(45),
-                TooltipText = "编辑",
+                TooltipText = CloudMusicStrings.Edit,
                 Action = pushEditScreen
             },
             new IconButton
             {
                 Icon = FontAwesome.Solid.AngleDown,
                 Size = new Vector2(45),
-                TooltipText = "滚动到当前歌词",
+                TooltipText = CloudMusicStrings.ScrollToCurrent,
                 Action = ScrollToCurrent
             }
         };
@@ -85,7 +86,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         {
             Icon = FontAwesome.Solid.Save,
             Size = new Vector2(45),
-            TooltipText = "保存为lrc"
+            TooltipText = CloudMusicStrings.Save
         };
 
         [Resolved]

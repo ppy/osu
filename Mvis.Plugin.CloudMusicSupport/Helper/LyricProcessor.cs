@@ -138,7 +138,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
 
         private UrlEncoder encoder;
 
-        public void StartFetchLrcFor(
+        public void StartFetchByBeatmap(
             WorkingBeatmap beatmap,
             bool noLocalFile,
             Action<List<Lyric>> onFinish,
@@ -188,6 +188,30 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             currentSearchRequest = req;
         }
 
+        public void StartFetchById(int id, Action<List<Lyric>> onFinish, Action<string> onFail)
+        {
+            //处理之前的请求
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource = new CancellationTokenSource();
+
+            var fakeResponse = new ResponseRoot
+            {
+                Result = new ResultInfo
+                {
+                    SongCount = 1,
+                    Songs = new List<SongInfo>
+                    {
+                        new SongInfo
+                        {
+                            ID = id
+                        }
+                    }
+                }
+            };
+
+            onRequestFinish(fakeResponse, onFinish, onFail);
+        }
+
         private void onRequestFinish(ResponseRoot responseRoot, Action<List<Lyric>> onFinish, Action<string> onFail)
         {
             if (responseRoot.Result.SongCount <= 0)
@@ -235,7 +259,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
 
                 return parse(obj);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.Error(e, "从本地获取歌词时发生了错误");
                 throw;

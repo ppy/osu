@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.EnumExtensions;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -211,13 +212,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             return content.ToArray();
         }
 
-        protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? string.Empty);
+        protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? default);
 
         private class HeaderText : OsuSpriteText
         {
-            public HeaderText(string text)
+            public HeaderText(LocalisableString text)
             {
-                Text = text.ToUpper();
+                Text = text;
                 Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold);
             }
 

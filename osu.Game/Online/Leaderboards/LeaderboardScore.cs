@@ -396,10 +396,10 @@ namespace osu.Game.Online.Leaderboards
         public class LeaderboardScoreStatistic
         {
             public IconUsage Icon;
-            public string Value;
+            public LocalisableString Value;
             public string Name;
 
-            public LeaderboardScoreStatistic(IconUsage icon, string name, string value)
+            public LeaderboardScoreStatistic(IconUsage icon, string name, LocalisableString value)
             {
                 Icon = icon;
                 Name = name;

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using M.Resources.Localisation.Mvis;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -57,7 +59,7 @@ namespace osu.Game.Screens.Mvis
                                               || tabHeader.IsVisible.Value //TabHeader可见
                                               || IsHovered == false; //隐藏界面或侧边栏可见，显示光标
 
-        public override bool AllowRateAdjustments => true;
+        public override bool AllowTrackAdjustments => true;
 
         private bool okForHide => IsHovered
                                   && isIdle.Value
@@ -413,13 +415,13 @@ namespace osu.Game.Screens.Mvis
                                 {
                                     ButtonIcon = FontAwesome.Solid.ArrowLeft,
                                     Action = this.Exit,
-                                    TooltipText = "退出",
+                                    TooltipText = MvisBaseStrings.Exit
                                 },
                                 new BottomBarButton
                                 {
                                     ButtonIcon = FontAwesome.Regular.QuestionCircle,
                                     Action = () => game?.OpenUrlExternally("https://matrix-feather.github.io/mfosu/mfosu_mp_manual/"),
-                                    TooltipText = "食用手册"
+                                    TooltipText = MvisBaseStrings.Manual
                                 }
                             },
                             CentreContent = new Drawable[]
@@ -431,11 +433,11 @@ namespace osu.Game.Screens.Mvis
                                     Origin = Anchor.Centre,
                                     ButtonIcon = FontAwesome.Solid.StepBackward,
                                     Action = prevTrack,
-                                    TooltipText = "上一首 / 重新开始",
+                                    TooltipText = MvisBaseStrings.PrevOrRestart
                                 },
                                 songProgressButton = new SongProgressButton
                                 {
-                                    TooltipText = "暂停 / 播放",
+                                    TooltipText = MvisBaseStrings.TogglePause,
                                     Action = togglePause,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre
@@ -447,7 +449,7 @@ namespace osu.Game.Screens.Mvis
                                     Origin = Anchor.Centre,
                                     ButtonIcon = FontAwesome.Solid.StepForward,
                                     Action = nextTrack,
-                                    TooltipText = "下一首",
+                                    TooltipText = MvisBaseStrings.Next
                                 },
                             },
                             RightContent = new Drawable[]
@@ -455,7 +457,7 @@ namespace osu.Game.Screens.Mvis
                                 pluginButton = new BottomBarButton
                                 {
                                     ButtonIcon = FontAwesome.Solid.Plug,
-                                    TooltipText = "查看插件",
+                                    TooltipText = MvisBaseStrings.ViewPlugins,
                                     Action = () => updateSidebarState(pluginsPage)
                                 },
                                 new BottomBarButton
@@ -473,25 +475,25 @@ namespace osu.Game.Screens.Mvis
                                         lockChanges.Value = RuntimeInfo.IsDesktop;
                                         lockButton.Value.Value = !RuntimeInfo.IsDesktop;
                                     },
-                                    TooltipText = "锁定变更并隐藏界面"
+                                    TooltipText = MvisBaseStrings.HideAndLockInterface
                                 },
                                 loopToggleButton = new ToggleLoopButton
                                 {
                                     ButtonIcon = FontAwesome.Solid.Undo,
                                     Action = () => CurrentTrack.Looping = loopToggleButton.Value.Value,
-                                    TooltipText = "单曲循环",
+                                    TooltipText = MvisBaseStrings.ToggleLoop
                                 },
                                 soloButton = new BottomBarButton
                                 {
                                     ButtonIcon = FontAwesome.Solid.User,
                                     Action = presentBeatmap,
-                                    TooltipText = "在单人游戏选歌界面中查看",
+                                    TooltipText = MvisBaseStrings.ViewInSongSelect,
                                 },
                                 sidebarToggleButton = new BottomBarSwitchButton
                                 {
                                     ButtonIcon = FontAwesome.Solid.List,
                                     Action = () => updateSidebarState(settingsScroll),
-                                    TooltipText = "侧边栏(播放器设置)",
+                                    TooltipText = MvisBaseStrings.OpenSidebar,
                                     Value = { BindTarget = sidebar.IsVisible },
                                     IsCoupled = false
                                 }
@@ -508,7 +510,7 @@ namespace osu.Game.Screens.Mvis
             //后期设置
             bottomBar.PluginEntriesFillFlow.Add(lockButton = new BottomBarOverlayLockSwitchButton
             {
-                TooltipText = "锁定变更",
+                TooltipText = MvisBaseStrings.LockInterface,
                 Action = showPluginEntriesTemporary
             });
 
@@ -624,7 +626,7 @@ namespace osu.Game.Screens.Mvis
                         {
                             RegisterKeybind(pl, new PluginKeybind(pluginSidebarPage.ShortcutKey, () =>
                             {
-                                if (!pl.Disabled.Value) btn?.Click();
+                                if (!pl.Disabled.Value) btn?.TriggerClick();
                             }));
                         }
                     }
@@ -675,14 +677,14 @@ namespace osu.Game.Screens.Mvis
 
         private void setupKeyBindings()
         {
-            keyBindings[GlobalAction.MvisMusicPrev] = () => prevButton.Click();
-            keyBindings[GlobalAction.MvisMusicNext] = () => nextButton.Click();
-            keyBindings[GlobalAction.MvisOpenInSongSelect] = () => soloButton.Click();
-            keyBindings[GlobalAction.MvisToggleOverlayLock] = () => lockButton.Click();
-            keyBindings[GlobalAction.MvisTogglePluginPage] = () => pluginButton.Click();
-            keyBindings[GlobalAction.MvisTogglePause] = () => songProgressButton.Click();
-            keyBindings[GlobalAction.MvisToggleTrackLoop] = () => loopToggleButton.Click();
-            keyBindings[GlobalAction.MvisTogglePlayList] = () => sidebarToggleButton.Click();
+            keyBindings[GlobalAction.MvisMusicPrev] = () => prevButton.TriggerClick();
+            keyBindings[GlobalAction.MvisMusicNext] = () => nextButton.TriggerClick();
+            keyBindings[GlobalAction.MvisOpenInSongSelect] = () => soloButton.TriggerClick();
+            keyBindings[GlobalAction.MvisToggleOverlayLock] = () => lockButton.TriggerClick();
+            keyBindings[GlobalAction.MvisTogglePluginPage] = () => pluginButton.TriggerClick();
+            keyBindings[GlobalAction.MvisTogglePause] = () => songProgressButton.TriggerClick();
+            keyBindings[GlobalAction.MvisToggleTrackLoop] = () => loopToggleButton.TriggerClick();
+            keyBindings[GlobalAction.MvisTogglePlayList] = () => sidebarToggleButton.TriggerClick();
             keyBindings[GlobalAction.MvisForceLockOverlayChanges] = () => lockChanges.Toggle();
             keyBindings[GlobalAction.Back] = () =>
             {
@@ -751,11 +753,15 @@ namespace osu.Game.Screens.Mvis
         [Resolved]
         private DialogOverlay dialog { get; set; }
 
-        public void RequestAudioControl(IProvideAudioControlPlugin pacp, string message, Action onDeny, Action onAllow)
+        public void RequestAudioControl(IProvideAudioControlPlugin pacp, LocalisableString message, Action onDeny, Action onAllow)
         {
             if (!(pacp is MvisPlugin mpl)) return;
 
-            dialog.Push(new ConfirmDialog($"插件\"{mpl}\"\n请求接手音频控制。\n原因是: {message}",
+            dialog.Push(new ConfirmDialog(
+                mpl.ToString()
+                + MvisBaseStrings.AudioControlRequestedMain
+                + "\n"
+                + MvisBaseStrings.AudioControlRequestedSub(message.ToString()),
                 () =>
                 {
                     changeAudioControlProvider(pacp);

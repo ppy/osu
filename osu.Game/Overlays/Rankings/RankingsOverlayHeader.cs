@@ -1,8 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
 using osu.Framework.Bindables;
+using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 using System.ComponentModel;
@@ -32,22 +34,10 @@ namespace osu.Game.Overlays.Rankings
 
             public RankingsTitle()
             {
-                Title = "排名";
-                Description = "看看谁是最强osu!玩家";
+                Title = PageTitleStrings.MainRankingControllerDefault;
+                Description = NamedOverlayComponentStrings.RankingsDescription;
                 IconTexture = "Icons/Hexacons/rankings";
             }
         }
-    }
-
-    public enum RankingsScope
-    {
-        [Description("表现")]
-        Performance,
-        [Description("月赛")]
-        Spotlights,
-        [Description("总分")]
-        Score,
-        [Description("国家和地区")]
-        Country
     }
 }

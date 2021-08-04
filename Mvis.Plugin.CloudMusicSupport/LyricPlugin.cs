@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using M.Resources.Localisation.Mvis.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.Helper;
 using Mvis.Plugin.CloudMusicSupport.Misc;
@@ -76,9 +77,15 @@ namespace Mvis.Plugin.CloudMusicSupport
         public void RequestControl(Action onAllow)
         {
             MvisScreen.RequestAudioControl(this,
-                "编辑歌词需要禁用切歌功能",
+                CloudMusicStrings.AudioControlRequest,
                 () => IsEditing = false,
                 onAllow);
+        }
+
+        public void GetLyricFor(int id)
+        {
+            CurrentStatus.Value = Status.Working;
+            processor.StartFetchById(id, onLyricRequestFinished, onLyricRequestFail);
         }
 
         public bool IsEditing
@@ -149,7 +156,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             Lyrics.Clear();
             CurrentLine = null;
 
-            processor.StartFetchLrcFor(currentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail);
+            processor.StartFetchByBeatmap(currentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail);
         }
 
         private double targetTime => track.CurrentTime + offset.Value;
@@ -169,7 +176,11 @@ namespace Mvis.Plugin.CloudMusicSupport
         private void onLyricRequestFail(string msg)
         {
             //onLyricRequestFail会在非Update上执行，因此添加Schedule确保不会发生InvalidThreadForMutationException
-            Schedule(() => CurrentStatus.Value = Status.Failed);
+            Schedule(() =>
+            {
+                Lyrics.Clear();
+                CurrentStatus.Value = Status.Failed;
+            });
         }
 
         private void onLyricRequestFinished(List<Lyric> lyrics)

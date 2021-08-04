@@ -20,15 +20,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private MultiplayerClient client { get; set; }
 
-        public override void Open(Room room)
+        protected override void OpenNewRoom(Room room)
         {
-            if (!client.IsConnected.Value)
+            if (client?.IsConnected.Value != true)
             {
                 Logger.Log("Not currently connected to the multiplayer server.", LoggingTarget.Runtime, LogLevel.Important);
                 return;
             }
 
-            base.Open(room);
+            base.OpenNewRoom(room);
         }
     }
 }

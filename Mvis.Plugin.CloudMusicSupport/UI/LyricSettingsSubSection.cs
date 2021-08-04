@@ -1,3 +1,5 @@
+using M.Resources.Localisation.Mvis;
+using M.Resources.Localisation.Mvis.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -25,53 +27,50 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "启用本插件",
+                    LabelText = MvisGenericStrings.EnablePlugin,
                     Current = config.GetBindable<bool>(LyricSettings.EnablePlugin)
                 },
                 useDrawablePoolCheckBox = new SettingsCheckbox
                 {
-                    LabelText = "使用DrawablePool",
+                    LabelText = CloudMusicStrings.UseDrawablePool,
                     Current = config.GetBindable<bool>(LyricSettings.UseDrawablePool)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "自动保存歌词到本地",
+                    LabelText = CloudMusicStrings.SaveLyricOnDownloadedMain,
                     Current = config.GetBindable<bool>(LyricSettings.SaveLrcWhenFetchFinish),
-                    TooltipText = "歌词将保存在\"custom/lyrics/beatmap-{ID}.json\"中"
+                    TooltipText = CloudMusicStrings.SaveLyricOnDownloadedSub
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "禁用额外阴影",
-                    Current = config.GetBindable<bool>(LyricSettings.NoExtraShadow),
-                    TooltipText = "不要给歌词文本添加额外的阴影效果"
+                    LabelText = CloudMusicStrings.DisableShader,
+                    Current = config.GetBindable<bool>(LyricSettings.NoExtraShadow)
                 },
                 new SettingsSlider<double>
                 {
-                    LabelText = "全局歌词偏移(毫秒)",
+                    LabelText = CloudMusicStrings.GlobalOffsetMain,
                     Current = config.GetBindable<double>(LyricSettings.LyricOffset),
-                    TooltipText = "如果当前歌曲歌词太早或太晚，拖动这里的滑条试试"
+                    TooltipText = CloudMusicStrings.GlobalOffsetSub
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = "歌词淡入时间",
-                    TooltipText = "调整歌词淡入动画要花多长时间",
+                    LabelText = CloudMusicStrings.LyricFadeInDuration,
                     Current = config.GetBindable<float>(LyricSettings.LyricFadeInDuration)
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = "歌词淡出时间",
-                    TooltipText = "调整歌词淡出动画要花多长时间",
+                    LabelText = CloudMusicStrings.LyricFadeOutDuration,
                     Current = config.GetBindable<float>(LyricSettings.LyricFadeOutDuration)
                 },
                 autoScrollChechBox = new SettingsCheckbox
                 {
-                    LabelText = "自动滚动歌词",
+                    LabelText = CloudMusicStrings.LyricAutoScrollMain,
                     Current = config.GetBindable<bool>(LyricSettings.AutoScrollToCurrent)
                 },
             };
 
-            useDrawablePoolCheckBox.WarningText = "试验性功能！";
-            autoScrollChechBox.WarningText = "与DrawablePool不兼容";
+            useDrawablePoolCheckBox.WarningText = CloudMusicStrings.ExperimentalWarning;
+            autoScrollChechBox.WarningText = CloudMusicStrings.LyricAutoScrollSub;
         }
     }
 }

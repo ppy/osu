@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using M.Resources.Localisation.Mvis.Plugins;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -79,14 +80,14 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                                             {
                                                 Font = OsuFont.GetFont(size: 50),
                                                 //RelativeSizeAxes = Axes.X,
-                                                Text = "未选择收藏夹",
+                                                Text = CollectionStrings.NoCollectionSelected,
                                                 //Truncate = true
                                             },
                                             collectionBeatmapCount = new OsuSpriteText
                                             {
                                                 Font = OsuFont.GetFont(size: 38),
                                                 //RelativeSizeAxes = Axes.X,
-                                                Text = "请先选择一个!"
+                                                Text = CollectionStrings.SelectOneFirst,
                                             }
                                         }
                                     }
@@ -147,7 +148,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             }
 
             collectionName.Text = c.Name.Value;
-            collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
+            collectionBeatmapCount.Text = CollectionStrings.SongCount(beatmapSets.Count);
 
             refreshBeatmapSetList();
         }
@@ -203,8 +204,8 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         {
             beatmapSets.Clear();
             beatmapList.ClearList();
-            collectionName.Text = "未选择收藏夹";
-            collectionBeatmapCount.Text = "请先选择一个!";
+            collectionName.Text = CollectionStrings.NoCollectionSelected;
+            collectionBeatmapCount.Text = CollectionStrings.SelectOneFirst;
         }
     }
 }

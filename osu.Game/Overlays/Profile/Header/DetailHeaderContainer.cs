@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -188,8 +189,8 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void updateDisplay(User user)
         {
-            detailGlobalRank.Content = user?.Statistics?.GlobalRank?.ToString("\\##,##0") ?? "-";
-            detailCountryRank.Content = user?.Statistics?.CountryRank?.ToString("\\##,##0") ?? "-";
+            detailGlobalRank.Content = user?.Statistics?.GlobalRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
+            detailCountryRank.Content = user?.Statistics?.CountryRank?.ToLocalisableString("\\##,##0") ?? (LocalisableString)"-";
 
             hiddenDetailGlobal.Content = user?.Statistics?.GlobalRank?.ToString("\\##,##0") ?? "-";
             hiddenDetailCountry.Content = user?.Statistics?.CountryRank?.ToString("\\##,##0") ?? "-";
@@ -210,7 +211,7 @@ namespace osu.Game.Overlays.Profile.Header
 
             public int RankCount
             {
-                set => rankCount.Text = value.ToString("#,##0");
+                set => rankCount.Text = value.ToLocalisableString("#,##0");
             }
 
             public ScoreRankInfo(ScoreRank rank)

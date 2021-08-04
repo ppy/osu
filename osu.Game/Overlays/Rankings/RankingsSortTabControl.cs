@@ -1,7 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
+using osu.Framework.Extensions.LocalisationExtensions;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -9,16 +11,16 @@ namespace osu.Game.Overlays.Rankings
     {
         public RankingsSortTabControl()
         {
-            Title = "显示";
+            Title = RankingsStrings.FilterTitle.ToUpper();
         }
     }
 
     public enum RankingsSortCriteria
     {
-        [Description("所有")]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.All))]
         All,
 
-        [Description("仅好友")]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Friends))]
         Friends
     }
 }

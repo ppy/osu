@@ -1,133 +1,73 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
-using System;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    [LocalisableEnum(typeof(SearchLanguageEnumLocalisationMapper))]
     [HasOrderedElements]
     public enum SearchLanguage
     {
-        [Description("任意")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.LanguageAny))]
         [Order(0)]
         Any,
 
-        [Description("未指定")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.LanguageUnspecified))]
         [Order(14)]
         Unspecified,
 
-        [Description("英语")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.LanguageEnglish))]
         [Order(1)]
         English,
 
-        [Description("日语")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.LanguageJapanese))]
         [Order(6)]
         Japanese,
 
-        [Description("汉语")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.LanguageChinese))]
         [Order(2)]
         Chinese,
 
-        [Description("乐器")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.LanguageInstrumental))]
         [Order(12)]
         Instrumental,
 
-        [Description("韩语")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.LanguageKorean))]
         [Order(7)]
         Korean,
 
-        [Description("法语")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.LanguageFrench))]
         [Order(3)]
         French,
 
-        [Description("德语")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.LanguageGerman))]
         [Order(4)]
         German,
 
-        [Description("瑞典语")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.LanguageSwedish))]
         [Order(9)]
         Swedish,
 
-        [Description("西班牙语")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.LanguageSpanish))]
         [Order(8)]
         Spanish,
 
-        [Description("意大利语")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.LanguageItalian))]
         [Order(5)]
         Italian,
 
-        [Description("俄语")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.LanguageRussian))]
         [Order(10)]
         Russian,
 
-        [Description("波兰语")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.LanguagePolish))]
         [Order(11)]
         Polish,
 
-        [Description("其他")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.LanguageOther))]
         [Order(13)]
         Other
-    }
-
-    public class SearchLanguageEnumLocalisationMapper : EnumLocalisationMapper<SearchLanguage>
-    {
-        public override LocalisableString Map(SearchLanguage value)
-        {
-            switch (value)
-            {
-                case SearchLanguage.Any:
-                    return BeatmapsStrings.LanguageAny;
-
-                case SearchLanguage.Unspecified:
-                    return BeatmapsStrings.LanguageUnspecified;
-
-                case SearchLanguage.English:
-                    return BeatmapsStrings.LanguageEnglish;
-
-                case SearchLanguage.Japanese:
-                    return BeatmapsStrings.LanguageJapanese;
-
-                case SearchLanguage.Chinese:
-                    return BeatmapsStrings.LanguageChinese;
-
-                case SearchLanguage.Instrumental:
-                    return BeatmapsStrings.LanguageInstrumental;
-
-                case SearchLanguage.Korean:
-                    return BeatmapsStrings.LanguageKorean;
-
-                case SearchLanguage.French:
-                    return BeatmapsStrings.LanguageFrench;
-
-                case SearchLanguage.German:
-                    return BeatmapsStrings.LanguageGerman;
-
-                case SearchLanguage.Swedish:
-                    return BeatmapsStrings.LanguageSwedish;
-
-                case SearchLanguage.Spanish:
-                    return BeatmapsStrings.LanguageSpanish;
-
-                case SearchLanguage.Italian:
-                    return BeatmapsStrings.LanguageItalian;
-
-                case SearchLanguage.Russian:
-                    return BeatmapsStrings.LanguageRussian;
-
-                case SearchLanguage.Polish:
-                    return BeatmapsStrings.LanguagePolish;
-
-                case SearchLanguage.Other:
-                    return BeatmapsStrings.LanguageOther;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
-            }
-        }
     }
 }

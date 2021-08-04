@@ -1,99 +1,56 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.ComponentModel;
 using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
-    [LocalisableEnum(typeof(SearchGenreEnumLocalisationMapper))]
     public enum SearchGenre
     {
-        [Description("任意")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GenreAny))]
         Any = 0,
-        [Description("未指定")]
+
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GenreUnspecified))]
         Unspecified = 1,
 
-        [Description("游戏")]
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GenreVideoGame))]
+        [Description("电子游戏")]
         VideoGame = 2,
-        [Description("动漫")]
+
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GenreAnime))]
         Anime = 3,
-        [Description("摇滚")]
+
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GenreRock))]
         Rock = 4,
-        [Description("流行")]
+
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GenrePop))]
         Pop = 5,
-        [Description("其他")]
+
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GenreOther))]
         Other = 6,
-        [Description("新奇")]
+
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GenreNovelty))]
         Novelty = 7,
 
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GenreHipHop))]
         [Description("嘻哈")]
         HipHop = 9,
-        [Description("电子")]
+
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GenreElectronic))]
         Electronic = 10,
-        [Description("金属")]
+
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GenreMetal))]
         Metal = 11,
-        [Description("古典")]
+
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GenreClassical))]
         Classical = 12,
-        [Description("民歌")]
+
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GenreFolk))]
         Folk = 13,
-        [Description("爵士")]
+
+        [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GenreJazz))]
         Jazz = 14
-    }
-
-    public class SearchGenreEnumLocalisationMapper : EnumLocalisationMapper<SearchGenre>
-    {
-        public override LocalisableString Map(SearchGenre value)
-        {
-            switch (value)
-            {
-                case SearchGenre.Any:
-                    return BeatmapsStrings.GenreAny;
-
-                case SearchGenre.Unspecified:
-                    return BeatmapsStrings.GenreUnspecified;
-
-                case SearchGenre.VideoGame:
-                    return BeatmapsStrings.GenreVideoGame;
-
-                case SearchGenre.Anime:
-                    return BeatmapsStrings.GenreAnime;
-
-                case SearchGenre.Rock:
-                    return BeatmapsStrings.GenreRock;
-
-                case SearchGenre.Pop:
-                    return BeatmapsStrings.GenrePop;
-
-                case SearchGenre.Other:
-                    return BeatmapsStrings.GenreOther;
-
-                case SearchGenre.Novelty:
-                    return BeatmapsStrings.GenreNovelty;
-
-                case SearchGenre.HipHop:
-                    return BeatmapsStrings.GenreHipHop;
-
-                case SearchGenre.Electronic:
-                    return BeatmapsStrings.GenreElectronic;
-
-                case SearchGenre.Metal:
-                    return BeatmapsStrings.GenreMetal;
-
-                case SearchGenre.Classical:
-                    return BeatmapsStrings.GenreClassical;
-
-                case SearchGenre.Folk:
-                    return BeatmapsStrings.GenreFolk;
-
-                case SearchGenre.Jazz:
-                    return BeatmapsStrings.GenreJazz;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
-            }
-        }
     }
 }
