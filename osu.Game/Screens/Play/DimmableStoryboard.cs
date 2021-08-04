@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Play
 
             if (!storyboard.ReplacesBackground && storyboardLatestEventTime != null)
             {
-                var sprite = new StoryboardBackgroundSprite(storyboard.BeatmapInfo.Metadata?.BackgroundFile, storyboardLatestEventTime ?? 0);
+                var sprite = new StoryboardBackgroundSprite(storyboard.BeatmapInfo.Metadata?.BackgroundFile, (double)storyboardLatestEventTime);
                 storyboard.GetLayer("Background").Elements.Insert(0, sprite);
             }
 
