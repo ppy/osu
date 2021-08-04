@@ -190,7 +190,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = Color4Extensions.FromHex(@"#27302E"),
                                     },
-                                    new OnlinePlayBackgroundSprite(BeatmapSetCoverType.List)
+                                    new OnlinePlayBackgroundSprite(BeatmapSetCoverType.Cover)
                                     {
                                         RelativeSizeAxes = Axes.Both
                                     },
