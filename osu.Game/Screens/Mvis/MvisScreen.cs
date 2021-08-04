@@ -683,7 +683,7 @@ namespace osu.Game.Screens.Mvis
             keyBindings[GlobalAction.MvisTogglePause] = () => songProgressButton.TriggerClick();
             keyBindings[GlobalAction.MvisToggleTrackLoop] = () => loopToggleButton.TriggerClick();
             keyBindings[GlobalAction.MvisTogglePlayList] = () => sidebarToggleButton.TriggerClick();
-            keyBindings[GlobalAction.MvisForceLockOverlayChanges] = () => lockChanges.TTriggeroggle();
+            keyBindings[GlobalAction.MvisForceLockOverlayChanges] = () => lockChanges.Toggle();
             keyBindings[GlobalAction.Back] = () =>
             {
                 if (sidebar.IsPresent && sidebar.IsVisible.Value)

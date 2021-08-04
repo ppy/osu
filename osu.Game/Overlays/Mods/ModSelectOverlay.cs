@@ -404,11 +404,11 @@ namespace osu.Game.Overlays.Mods
             switch (e.Key)
             {
                 case Key.Number1:
-                    DeselectAllButton.Click();
+                    DeselectAllButton.TriggerClick();
                     return true;
 
                 case Key.Number2:
-                    CloseButton.Click();
+                    CloseButton.TriggerClick();
                     return true;
             }
 

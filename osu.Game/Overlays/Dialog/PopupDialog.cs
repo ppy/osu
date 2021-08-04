@@ -218,7 +218,7 @@ namespace osu.Game.Overlays.Dialog
         /// <summary>
         /// Programmatically clicks the first <see cref="PopupDialogOkButton"/>.
         /// </summary>
-        public void PerformOkAction() => Buttons.OfType<PopupDialogOkButton>().First().Click();
+        public void PerformOkAction() => Buttons.OfType<PopupDialogOkButton>().First().TriggerClick();
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -265,7 +265,7 @@ namespace osu.Game.Overlays.Dialog
             if (!actionInvoked && content.IsPresent)
                 // In the case a user did not choose an action before a hide was triggered, press the last button.
                 // This is presumed to always be a sane default "cancel" action.
-                buttonsContainer.Last().Click();
+                buttonsContainer.Last().TriggerClick();
 
             content.FadeOut(EXIT_DURATION, Easing.InSine);
         }
@@ -273,7 +273,7 @@ namespace osu.Game.Overlays.Dialog
         private void pressButtonAtIndex(int index)
         {
             if (index < Buttons.Count())
-                Buttons.Skip(index).First().Click();
+                Buttons.Skip(index).First().TriggerClick();
         }
     }
 }
