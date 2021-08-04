@@ -22,7 +22,6 @@ namespace osu.Game.Beatmaps.Drawables
     /// </summary>
     public class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty>
     {
-        private readonly bool useNewDifficultyColours;
         private readonly Box background;
         private readonly SpriteIcon starIcon;
         private readonly OsuSpriteText starsText;
@@ -45,11 +44,8 @@ namespace osu.Game.Beatmaps.Drawables
         /// Creates a new <see cref="StarRatingDisplay"/> using an already computed <see cref="StarDifficulty"/>.
         /// </summary>
         /// <param name="starDifficulty">The already computed <see cref="StarDifficulty"/> to display.</param>
-        /// <param name="useNewDifficultyColours">Use the new spectrum-based difficulty colours for the display, rather than the old.</param>
-        public StarRatingDisplay(StarDifficulty starDifficulty, bool useNewDifficultyColours = false)
+        public StarRatingDisplay(StarDifficulty starDifficulty)
         {
-            this.useNewDifficultyColours = useNewDifficultyColours;
-
             Current.Value = starDifficulty;
 
             Size = new Vector2(52f, 20f);
@@ -92,9 +88,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 starsText.Text = c.NewValue.Stars.ToString("0.00");
 
-                background.Colour = useNewDifficultyColours
-                    ? colours.ForStarDifficulty(c.NewValue.Stars)
-                    : colours.ForDifficultyRating(c.NewValue.DifficultyRating);
+                background.Colour = colours.ForStarDifficulty(c.NewValue.Stars);
 
                 starIcon.Colour = c.NewValue.Stars >= 6.5 ? colours.Orange1 : colourProvider?.Background5 ?? Color4Extensions.FromHex("303d47");
                 starsText.Colour = c.NewValue.Stars >= 6.5 ? colours.Orange1 : colourProvider?.Background5 ?? Color4.Black.Opacity(0.75f);

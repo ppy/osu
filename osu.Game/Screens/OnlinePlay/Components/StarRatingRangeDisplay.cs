@@ -16,8 +16,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
 {
     public class StarRatingRangeDisplay : OnlinePlayComposite
     {
-        private readonly bool useNewDifficultyColours;
-
         [Resolved]
         private OsuColour colours { get; set; }
 
@@ -26,10 +24,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
         private StarRatingDisplay maxDisplay;
         private Drawable maxBackground;
 
-        public StarRatingRangeDisplay(bool useNewDifficultyColours = false)
+        public StarRatingRangeDisplay()
         {
-            this.useNewDifficultyColours = useNewDifficultyColours;
-
             AutoSizeAxes = Axes.Both;
         }
 
