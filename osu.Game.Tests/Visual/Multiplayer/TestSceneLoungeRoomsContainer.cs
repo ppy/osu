@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("has 2 rooms", () => container.Rooms.Count == 2);
             AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID.Value != 0));
 
-            AddStep("select first room", () => container.Rooms.First().Click());
+            AddStep("select first room", () => container.Rooms.First().TriggerClick());
             AddAssert("first room selected", () => checkRoomSelected(RoomManager.Rooms.First()));
         }
 
