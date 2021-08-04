@@ -64,6 +64,15 @@ namespace osu.Game.Online.Rooms
         [JsonIgnore]
         public readonly Bindable<MatchType> Type = new Bindable<MatchType>();
 
+        // Todo: osu-framework bug (https://github.com/ppy/osu-framework/issues/4106)
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        [JsonProperty("type")]
+        private MatchType type
+        {
+            get => Type.Value;
+            set => Type.Value = value;
+        }
+
         [Cached]
         [JsonIgnore]
         public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();

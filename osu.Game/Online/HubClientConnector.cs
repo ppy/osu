@@ -26,6 +26,7 @@ namespace osu.Game.Online
         private readonly string clientName;
         private readonly string endpoint;
         private readonly string versionHash;
+        private readonly bool preferMessagePack;
         private readonly IAPIProvider api;
 
         /// <summary>
@@ -51,12 +52,14 @@ namespace osu.Game.Online
         /// <param name="endpoint">The endpoint to the hub.</param>
         /// <param name="api"> An API provider used to react to connection state changes.</param>
         /// <param name="versionHash">The hash representing the current game version, used for verification purposes.</param>
-        public HubClientConnector(string clientName, string endpoint, IAPIProvider api, string versionHash)
+        /// <param name="preferMessagePack">Whether to use MessagePack for serialisation if available on this platform.</param>
+        public HubClientConnector(string clientName, string endpoint, IAPIProvider api, string versionHash, bool preferMessagePack = true)
         {
             this.clientName = clientName;
             this.endpoint = endpoint;
             this.api = api;
             this.versionHash = versionHash;
+            this.preferMessagePack = preferMessagePack;
 
             apiState.BindTo(api.State);
             apiState.BindValueChanged(state =>
@@ -144,13 +147,19 @@ namespace osu.Game.Online
                     options.Headers.Add("OsuVersionHash", versionHash);
                 });
 
-            if (RuntimeInfo.SupportsJIT)
+            if (RuntimeInfo.SupportsJIT && preferMessagePack)
                 builder.AddMessagePackProtocol();
             else
             {
                 // eventually we will precompile resolvers for messagepack, but this isn't working currently
                 // see https://github.com/neuecc/MessagePack-CSharp/issues/780#issuecomment-768794308.
-                builder.AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; });
+                builder.AddNewtonsoftJsonProtocol(options =>
+                {
+                    options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    // TODO: This should only be required to be `TypeNameHandling.Auto`.
+                    // See usage in osu-server-spectator for further documentation as to why this is required.
+                    options.PayloadSerializerSettings.TypeNameHandling = TypeNameHandling.All;
+                });
             }
 
             var newConnection = builder.Build();
