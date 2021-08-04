@@ -51,6 +51,25 @@ namespace osu.Game.Online.Multiplayer
         Task UserStateChanged(int userId, MultiplayerUserState state);
 
         /// <summary>
+        /// Signals that the match type state has changed for a user in this room.
+        /// </summary>
+        /// <param name="userId">The ID of the user performing a state change.</param>
+        /// <param name="state">The new state of the user.</param>
+        Task MatchUserStateChanged(int userId, MatchUserState state);
+
+        /// <summary>
+        /// Signals that the match type state has changed for this room.
+        /// </summary>
+        /// <param name="state">The new state of the room.</param>
+        Task MatchRoomStateChanged(MatchRoomState state);
+
+        /// <summary>
+        /// Send a match type specific request.
+        /// </summary>
+        /// <param name="e">The event to handle.</param>
+        Task MatchEvent(MatchServerEvent e);
+
+        /// <summary>
         /// Signals that a user in this room changed their beatmap availability state.
         /// </summary>
         /// <param name="userId">The ID of the user whose beatmap availability state has changed.</param>
