@@ -1,4 +1,5 @@
 using System;
+using M.Resources.Localisation.Mvis.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -122,7 +123,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Current = config.GetBindable<double>(LyricSettings.LyricOffset),
-                    LabelText = "全局歌词偏移",
+                    LabelText = CloudMusicStrings.GlobalOffsetMain,
                     RelativeSizeAxes = Axes.None,
                     Width = 200 + 25,
                     Padding = new MarginPadding { Right = 10 },

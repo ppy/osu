@@ -1,3 +1,4 @@
+using M.Resources.Localisation.Mvis;
 using Mvis.Plugin.FakeEditor.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -25,7 +26,7 @@ namespace Mvis.Plugin.FakeEditor.UI
             {
                 new SettingsTogglePiece
                 {
-                    Description = "启用Note打击音效",
+                    Description = MvisGenericStrings.EnablePlugin,
                     Bindable = config.GetBindable<bool>(FakeEditorSetting.EnableFakeEditor)
                 }
             });

@@ -1,4 +1,5 @@
 using System;
+using M.Resources.Localisation.Mvis.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using osu.Framework.Allocation;
@@ -25,7 +26,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         [Resolved]
         private LyricConfigManager config { get; set; }
 
-        public MenuItem[] ContextMenuItems => new MenuItem[] { new OsuMenuItem("对其偏移至该歌词", MenuItemType.Standard, () => config.SetValue(LyricSettings.LyricOffset, Value.Time - mvisScreen.CurrentTrack.CurrentTime)) };
+        public MenuItem[] ContextMenuItems => new MenuItem[]
+        {
+            new OsuMenuItem(
+                CloudMusicStrings.AdjustOffsetToLyric.ToString(),
+                MenuItemType.Standard,
+                () => config.SetValue(LyricSettings.LyricOffset, Value.Time - mvisScreen.CurrentTrack.CurrentTime))
+        };
 
         private Box hoverBox;
         private OsuSpriteText contentText;

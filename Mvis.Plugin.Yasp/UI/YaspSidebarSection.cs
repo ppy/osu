@@ -1,3 +1,5 @@
+using M.Resources.Localisation.Mvis;
+using M.Resources.Localisation.Mvis.Plugins;
 using Mvis.Plugin.Yasp.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -26,13 +28,13 @@ namespace Mvis.Plugin.Yasp.UI
             {
                 new SettingsTogglePiece
                 {
-                    Description = "启用本插件",
+                    Description = MvisGenericStrings.EnablePlugin,
                     Bindable = config.GetBindable<bool>(YaspSettings.EnablePlugin)
                 },
                 new SettingsSliderPiece<float>
                 {
                     Icon = FontAwesome.Solid.ExpandArrowsAlt,
-                    Description = "缩放",
+                    Description = YaspStrings.Scale,
                     Bindable = config.GetBindable<float>(YaspSettings.Scale),
                     DisplayAsPercentage = true
                 }

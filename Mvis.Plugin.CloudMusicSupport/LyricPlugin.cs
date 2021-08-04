@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using M.Resources.Localisation.Mvis.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.Helper;
 using Mvis.Plugin.CloudMusicSupport.Misc;
@@ -76,7 +77,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         public void RequestControl(Action onAllow)
         {
             MvisScreen.RequestAudioControl(this,
-                "编辑歌词需要禁用切歌功能",
+                CloudMusicStrings.AudioControlRequest,
                 () => IsEditing = false,
                 onAllow);
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using M.Resources.Localisation.Mvis.Plugins;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -164,7 +165,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                 : ActiveState.Disabled;
 
             collectionName.Text = Collection.Name.Value;
-            collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
+            collectionBeatmapCount.Text = CollectionStrings.SongCount(beatmapSets.Count);
 
             State.BindValueChanged(onStateChanged, true);
 

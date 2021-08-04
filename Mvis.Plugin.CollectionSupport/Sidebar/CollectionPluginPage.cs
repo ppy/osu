@@ -1,5 +1,6 @@
 using System.Collections.Specialized;
 using System.Linq;
+using M.Resources.Localisation.Mvis.Plugins;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -214,7 +215,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             if (!requestedOnce)
             {
                 requestedOnce = true;
-                mvisScreen?.RequestAudioControl((CollectionHelper)Plugin, "激活以确保插件可以发挥功能\n本提示在本次会话中不会出现第二次。", null, null);
+                mvisScreen?.RequestAudioControl((CollectionHelper)Plugin, CollectionStrings.AudioControlRequest, null, null);
             }
         }
 

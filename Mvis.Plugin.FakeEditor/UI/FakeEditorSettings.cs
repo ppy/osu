@@ -1,3 +1,4 @@
+using M.Resources.Localisation.Mvis;
 using Mvis.Plugin.FakeEditor.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -23,7 +24,7 @@ namespace Mvis.Plugin.FakeEditor.UI
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "启用Note打击音效",
+                    LabelText = MvisGenericStrings.EnablePlugin,
                     Current = config.GetBindable<bool>(FakeEditorSetting.EnableFakeEditor)
                 },
             };

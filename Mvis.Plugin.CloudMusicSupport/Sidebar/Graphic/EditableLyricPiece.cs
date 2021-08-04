@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using M.Resources.Localisation.Mvis.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -69,21 +70,21 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
                             Width = 0.5f,
-                            PlaceholderText = "歌词时间(毫秒)",
+                            PlaceholderText = CloudMusicStrings.LyricTime,
                             CommitOnFocusLost = true
                         },
                         contentTextBox = new OsuTextBox
                         {
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
-                            PlaceholderText = "歌词原文",
+                            PlaceholderText = CloudMusicStrings.LyricRaw,
                             CommitOnFocusLost = true
                         },
                         translationTextBox = new OsuTextBox
                         {
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
-                            PlaceholderText = "歌词翻译",
+                            PlaceholderText = CloudMusicStrings.LyricTranslated,
                             CommitOnFocusLost = true,
                         },
                         new FillFlowContainer
@@ -95,7 +96,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                             {
                                 new OsuButton
                                 {
-                                    Text = "删除这条歌词",
+                                    Text = CloudMusicStrings.Delete,
                                     Size = new Vector2(90, 40),
                                     Action = () =>
                                     {
@@ -106,7 +107,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                                 },
                                 new OsuButton
                                 {
-                                    Text = "调整歌词到歌曲时间",
+                                    Text = CloudMusicStrings.TrackTimeToLyric,
                                     Size = new Vector2(120, 40),
                                     Action = () =>
                                     {
@@ -118,7 +119,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                                 },
                                 new OsuButton
                                 {
-                                    Text = "调整歌曲到歌词时间",
+                                    Text = CloudMusicStrings.LyricTimeToTrack,
                                     Size = new Vector2(120, 40),
                                     Action = () => mvisScreen.SeekTo(Value.Time)
                                 }
