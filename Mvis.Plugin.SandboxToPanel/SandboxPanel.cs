@@ -62,6 +62,8 @@ namespace Mvis.Plugin.Sandbox
                     MvisScreen?.OnBeatmapChanged(onBeatmapChanged, this, true);
                 };
             }
+
+            AddInternal(new Particles());
         }
 
         private void onIdleAlphaChanged(ValueChangedEvent<float> v)
