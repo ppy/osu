@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Wiki
                 Child = new OsuSpriteText
                 {
                     Text = blurbNode.InnerText,
-                    Font = OsuFont.GetFont(size: 12),
+                    Font = OsuFont.GetFont(Typeface.Inter, size: 12, weight: FontWeight.Light),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                 }
