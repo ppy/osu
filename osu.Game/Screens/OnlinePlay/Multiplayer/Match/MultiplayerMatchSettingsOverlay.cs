@@ -6,6 +6,7 @@ using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Graphics;
@@ -45,7 +46,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             public OsuTextBox NameField, MaxParticipantsField;
             public RoomAvailabilityPicker AvailabilityPicker;
-            public GameTypePicker TypePicker;
+            public MatchTypePicker TypePicker;
             public OsuTextBox PasswordTextBox;
             public TriangleButton ApplyButton;
 
@@ -159,7 +160,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         Spacing = new Vector2(7),
                                                                         Children = new Drawable[]
                                                                         {
-                                                                            TypePicker = new GameTypePicker
+                                                                            TypePicker = new MatchTypePicker
                                                                             {
                                                                                 RelativeSizeAxes = Axes.X,
                                                                                 Enabled = { Value = false }
@@ -267,7 +268,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     loadingLayer = new LoadingLayer(true)
                 };
 
-                TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue?.Name ?? string.Empty, true);
+                TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue.GetLocalisableDescription(), true);
                 RoomName.BindValueChanged(name => NameField.Text = name.NewValue, true);
                 Availability.BindValueChanged(availability => AvailabilityPicker.Current.Value = availability.NewValue, true);
                 Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);

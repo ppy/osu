@@ -257,8 +257,8 @@ namespace osu.Game.Online.API
             this.password = password;
         }
 
-        public IHubClientConnector GetHubConnector(string clientName, string endpoint) =>
-            new HubClientConnector(clientName, endpoint, this, versionHash);
+        public IHubClientConnector GetHubConnector(string clientName, string endpoint, bool preferMessagePack) =>
+            new HubClientConnector(clientName, endpoint, this, versionHash, preferMessagePack);
 
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
