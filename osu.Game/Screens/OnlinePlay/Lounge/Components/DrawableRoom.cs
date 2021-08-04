@@ -359,7 +359,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             roomCategory.BindTo(Room.Category);
             roomCategory.BindValueChanged(c =>
             {
-                // Todo: Tournament category...
                 if (c.NewValue == RoomCategory.Spotlight)
                     specialCategoryPill.Show();
                 else
