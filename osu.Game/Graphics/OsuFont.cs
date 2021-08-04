@@ -23,6 +23,8 @@ namespace osu.Game.Graphics
 
         public static FontUsage Torus => GetFont(Typeface.Torus, weight: FontWeight.Regular);
 
+        public static FontUsage Inter => GetFont(Typeface.Inter, weight: FontWeight.Regular);
+
         /// <summary>
         /// Retrieves a <see cref="FontUsage"/>.
         /// </summary>
@@ -58,8 +60,11 @@ namespace osu.Game.Graphics
                 case Typeface.Custom:
                     if (CustomStore.CustomFontLoaded)
                         return GetCustomTypeface();
-                    else
-                        return "Torus";
+
+                    return "Torus";
+
+                case Typeface.Inter:
+                    return "Inter";
             }
 
             return null;
@@ -116,7 +121,8 @@ namespace osu.Game.Graphics
     {
         Venera,
         Torus,
-        Custom
+        Custom,
+        Inter
     }
 
     public enum FontWeight

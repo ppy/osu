@@ -493,7 +493,7 @@ namespace osu.Game
             if (r.NewValue?.Available != true)
             {
                 // reject the change if the ruleset is not available.
-                Ruleset.Value = r.OldValue;
+                Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
                 return;
             }
 

@@ -12,10 +12,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModMirror : ModMirror, IApplicableToBeatmap
     {
-        public override string Name => "镜像";
-        public override string Acronym => "MR";
-        public override ModType Type => ModType.Conversion;
-        public override double ScoreMultiplier => 1;
+        public override string Description => "物件水平翻转。";
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {

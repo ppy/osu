@@ -212,7 +212,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             return content.ToArray();
         }
 
-        protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? string.Empty);
+        protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? default);
 
         private class HeaderText : OsuSpriteText
         {

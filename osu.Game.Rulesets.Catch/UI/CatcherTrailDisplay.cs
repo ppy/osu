@@ -2,12 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Catch.Skinning;
+using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Skinning;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
@@ -16,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.UI
     /// Represents a component responsible for displaying
     /// the appropriate catcher trails when requested to.
     /// </summary>
-    public class CatcherTrailDisplay : SkinReloadableDrawable
+    public class CatcherTrailDisplay : PooledDrawableWithLifetimeContainer<CatcherTrailEntry, CatcherTrail>
     {
         /// <summary>
         /// The most recent time a dash trail was added to this container.
@@ -27,13 +28,18 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public Color4 HyperDashTrailsColour => hyperDashTrails.Colour;
 
-        public Color4 EndGlowSpritesColour => endGlowSprites.Colour;
+        public Color4 HyperDashAfterImageColour => hyperDashAfterImages.Colour;
+
+        protected override bool RemoveRewoundEntry => true;
 
         private readonly DrawablePool<CatcherTrail> trailPool;
 
         private readonly Container<CatcherTrail> dashTrails;
         private readonly Container<CatcherTrail> hyperDashTrails;
-        private readonly Container<CatcherTrail> endGlowSprites;
+        private readonly Container<CatcherTrail> hyperDashAfterImages;
+
+        [Resolved]
+        private ISkinSource skin { get; set; }
 
         public CatcherTrailDisplay()
         {
@@ -44,55 +50,65 @@ namespace osu.Game.Rulesets.Catch.UI
                 trailPool = new DrawablePool<CatcherTrail>(30),
                 dashTrails = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both },
                 hyperDashTrails = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
-                endGlowSprites = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
+                hyperDashAfterImages = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
             };
         }
 
-        protected override void SkinChanged(ISkinSource skin)
+        protected override void LoadComplete()
         {
-            base.SkinChanged(skin);
+            base.LoadComplete();
 
+            skin.SourceChanged += skinSourceChanged;
+            skinSourceChanged();
+        }
+
+        private void skinSourceChanged()
+        {
             hyperDashTrails.Colour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ?? Catcher.DEFAULT_HYPER_DASH_COLOUR;
-            endGlowSprites.Colour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value ?? hyperDashTrails.Colour;
+            hyperDashAfterImages.Colour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value ?? hyperDashTrails.Colour;
         }
 
-        /// <summary>
-        /// Displays a single end-glow catcher sprite.
-        /// </summary>
-        public void DisplayEndGlow(CatcherAnimationState animationState, float x, Vector2 scale)
+        protected override void AddDrawable(CatcherTrailEntry entry, CatcherTrail drawable)
         {
-            var endGlow = createTrail(animationState, x, scale);
+            switch (entry.Animation)
+            {
+                case CatcherTrailAnimation.Dashing:
+                    dashTrails.Add(drawable);
+                    break;
 
-            endGlowSprites.Add(endGlow);
+                case CatcherTrailAnimation.HyperDashing:
+                    hyperDashTrails.Add(drawable);
+                    break;
 
-            endGlow.MoveToOffset(new Vector2(0, -10), 1200, Easing.In);
-            endGlow.ScaleTo(endGlow.Scale * 0.95f).ScaleTo(endGlow.Scale * 1.2f, 1200, Easing.In);
-            endGlow.FadeOut(1200);
-            endGlow.Expire(true);
+                case CatcherTrailAnimation.HyperDashAfterImage:
+                    hyperDashAfterImages.Add(drawable);
+                    break;
+            }
         }
 
-        public void DisplayDashTrail(CatcherAnimationState animationState, float x, Vector2 scale, bool hyperDashing)
+        protected override void RemoveDrawable(CatcherTrailEntry entry, CatcherTrail drawable)
         {
-            var sprite = createTrail(animationState, x, scale);
+            switch (entry.Animation)
+            {
+                case CatcherTrailAnimation.Dashing:
+                    dashTrails.Remove(drawable);
+                    break;
 
-            if (hyperDashing)
-                hyperDashTrails.Add(sprite);
-            else
-                dashTrails.Add(sprite);
+                case CatcherTrailAnimation.HyperDashing:
+                    hyperDashTrails.Remove(drawable);
+                    break;
 
-            sprite.FadeTo(0.4f).FadeOut(800, Easing.OutQuint);
-            sprite.Expire(true);
+                case CatcherTrailAnimation.HyperDashAfterImage:
+                    hyperDashAfterImages.Remove(drawable);
+                    break;
+            }
         }
 
-        private CatcherTrail createTrail(CatcherAnimationState animationState, float x, Vector2 scale)
+        protected override CatcherTrail GetDrawable(CatcherTrailEntry entry)
         {
-            CatcherTrail sprite = trailPool.Get();
-
-            sprite.AnimationState = animationState;
-            sprite.Scale = scale;
-            sprite.Position = new Vector2(x, 0);
-
-            return sprite;
+            CatcherTrail trail = trailPool.Get();
+            trail.Apply(entry);
+            return trail;
         }
 
         private double getLastDashTrailTime()
@@ -106,6 +122,14 @@ namespace osu.Game.Rulesets.Catch.UI
                 maxTime = Math.Max(maxTime, trail.LifetimeStart);
 
             return maxTime;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (skin != null)
+                skin.SourceChanged -= skinSourceChanged;
         }
     }
 }

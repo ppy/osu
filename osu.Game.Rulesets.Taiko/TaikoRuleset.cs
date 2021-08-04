@@ -150,7 +150,8 @@ namespace osu.Game.Rulesets.Taiko
                     return new Mod[]
                     {
                         new MultiMod(new ModWindUp(), new ModWindDown()),
-                        new TaikoModBeatCore()
+                        new TaikoModBeatCore(),
+                        new TaikoModMuted(),
                     };
 
                 default:

@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         }
 
         [Test]
-        public void TestCustomEndGlowColour()
+        public void TestCustomAfterImageColour()
         {
             var skin = new TestSkin
             {
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         }
 
         [Test]
-        public void TestCustomEndGlowColourPriority()
+        public void TestCustomAfterImageColourPriority()
         {
             var skin = new TestSkin
             {
@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             checkHyperDashFruitColour(skin, skin.HyperDashColour);
         }
 
-        private void checkHyperDashCatcherColour(ISkin skin, Color4 expectedCatcherColour, Color4? expectedEndGlowColour = null)
+        private void checkHyperDashCatcherColour(ISkin skin, Color4 expectedCatcherColour, Color4? expectedAfterImageColour = null)
         {
             CatcherTrailDisplay trails = null;
             Catcher catcher = null;
@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddUntilStep("catcher colour is correct", () => catcher.Colour == expectedCatcherColour);
 
             AddAssert("catcher trails colours are correct", () => trails.HyperDashTrailsColour == expectedCatcherColour);
-            AddAssert("catcher end-glow colours are correct", () => trails.EndGlowSpritesColour == (expectedEndGlowColour ?? expectedCatcherColour));
+            AddAssert("catcher after-image colours are correct", () => trails.HyperDashAfterImageColour == (expectedAfterImageColour ?? expectedCatcherColour));
 
             AddStep("finish hyper-dashing", () =>
             {

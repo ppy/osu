@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             Size = TwoLayerButton.SIZE_EXTENDED;
 
-            Child = button = new TwoLayerButton
+            Child = button = new TwoLayerButton(HoverSampleSet.Submit)
             {
                 Anchor = Anchor.TopLeft,
                 Origin = Anchor.TopLeft,

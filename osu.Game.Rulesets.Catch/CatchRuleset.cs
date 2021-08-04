@@ -131,7 +131,8 @@ namespace osu.Game.Rulesets.Catch
                     {
                         new MultiMod(new ModWindUp(), new ModWindDown()),
                         new CatchModBeatCore(),
-                        new CatchModFloatingFruits()
+                        new CatchModFloatingFruits(),
+                        new CatchModMuted(),
                     };
 
                 default:
