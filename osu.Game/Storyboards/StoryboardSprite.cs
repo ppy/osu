@@ -202,20 +202,4 @@ namespace osu.Game.Storyboards
             }
         }
     }
-
-    public class StoryboardBackgroundSprite : IStoryboardElementWithDuration
-    {
-        public string Path { get; }
-        public bool IsDrawable => true;
-        public double StartTime => 0;
-        public double EndTime { get; }
-
-        public StoryboardBackgroundSprite(string path, double endTime)
-        {
-            Path = path;
-            EndTime = endTime;
-        }
-
-        public Drawable CreateDrawable() => new DrawableStoryboardBackgroundSprite(this);
-    }
 }

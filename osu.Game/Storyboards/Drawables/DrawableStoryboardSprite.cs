@@ -125,34 +125,4 @@ namespace osu.Game.Storyboards.Drawables
             Sprite.ApplyTransforms(this);
         }
     }
-
-    public class DrawableStoryboardBackgroundSprite : CompositeDrawable
-    {
-        public StoryboardBackgroundSprite Sprite;
-
-        public override bool RemoveWhenNotAlive => false;
-
-        public DrawableStoryboardBackgroundSprite(StoryboardBackgroundSprite sprite)
-        {
-            Sprite = sprite;
-            LifetimeStart = sprite.StartTime;
-            LifetimeEnd = sprite.EndTime;
-
-            AutoSizeAxes = Axes.Both;
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textureStore, Storyboard storyboard)
-        {
-            var drawable = storyboard.CreateSpriteFromResourcePath(Sprite.Path, textureStore);
-
-            if (drawable != null)
-            {
-                InternalChild = drawable;
-                drawable.ScaleTo(480f / drawable.Height);
-            }
-        }
-    }
 }
