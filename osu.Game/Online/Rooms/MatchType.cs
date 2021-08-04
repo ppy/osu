@@ -7,6 +7,8 @@ namespace osu.Game.Online.Rooms
 {
     public enum MatchType
     {
+        // used for osu-web deserialization so names shouldn't be changed.
+
         Playlists,
 
         [Description("Head to head")]
