@@ -20,10 +20,10 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModMuted : Mod
     {
-        public override string Name => "Muted";
+        public override string Name => "静音";
         public override string Acronym => "MU";
         public override IconUsage? Icon => FontAwesome.Solid.VolumeMute;
-        public override string Description => "Can you still feel the rhythm without music?";
+        public override string Description => "你还能感受到歌曲的节奏吗？";
         public override ModType Type => ModType.Fun;
         public override double ScoreMultiplier => 1;
     }
@@ -36,14 +36,14 @@ namespace osu.Game.Rulesets.Mods
 
         private BindableNumber<int> currentCombo;
 
-        [SettingSource("Enable metronome", "Add a metronome beat to help you keep track of the rhythm.")]
+        [SettingSource("启用节拍器", "添加节拍器来帮助你跟住歌曲的节奏。")]
         public BindableBool EnableMetronome { get; } = new BindableBool
         {
             Default = true,
             Value = true
         };
 
-        [SettingSource("Final volume at combo", "The combo count at which point the track reaches its final volume.", SettingControlType = typeof(SettingsSlider<int, MuteComboSlider>))]
+        [SettingSource("抵达最大音量的连击", "抵达最大音量时的连击数", SettingControlType = typeof(SettingsSlider<int, MuteComboSlider>))]
         public BindableInt MuteComboCount { get; } = new BindableInt
         {
             Default = 100,
@@ -52,14 +52,14 @@ namespace osu.Game.Rulesets.Mods
             MaxValue = 500,
         };
 
-        [SettingSource("Start muted", "Increase volume as combo builds.")]
+        [SettingSource("以静音开始", "随连击增加音量")]
         public BindableBool InverseMuting { get; } = new BindableBool
         {
             Default = false,
             Value = false
         };
 
-        [SettingSource("Mute hit sounds", "Hit sounds are also muted alongside the track.")]
+        [SettingSource("静音音效", "音效也会跟着音频静音。")]
         public BindableBool AffectsHitSounds { get; } = new BindableBool
         {
             Default = true,
@@ -111,6 +111,6 @@ namespace osu.Game.Rulesets.Mods
 
     public class MuteComboSlider : OsuSliderBar<int>
     {
-        public override LocalisableString TooltipText => Current.Value == 0 ? "always muted" : base.TooltipText;
+        public override LocalisableString TooltipText => Current.Value == 0 ? "总是静音" : base.TooltipText;
     }
 }
