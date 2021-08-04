@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.ComponentModel;
 using osu.Framework.Localisation;
 using osu.Game.Resources.Localisation.Web;
@@ -12,33 +11,16 @@ namespace osu.Game.Overlays.Dashboard.Friends
     {
     }
 
-    [LocalisableEnum(typeof(UserSortCriteriaEnumLocalisationMappper))]
     public enum UserSortCriteria
     {
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.LastVisit))]
         [Description(@"Recently Active")]
         LastVisit,
+
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Rank))]
         Rank,
+
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Username))]
         Username
-    }
-
-    public class UserSortCriteriaEnumLocalisationMappper : EnumLocalisationMapper<UserSortCriteria>
-    {
-        public override LocalisableString Map(UserSortCriteria value)
-        {
-            switch (value)
-            {
-                case UserSortCriteria.LastVisit:
-                    return SortStrings.LastVisit;
-
-                case UserSortCriteria.Rank:
-                    return SortStrings.Rank;
-
-                case UserSortCriteria.Username:
-                    return SortStrings.Username;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
-            }
-        }
     }
 }
