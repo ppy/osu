@@ -388,7 +388,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             switch (action)
             {
                 case GlobalAction.Select:
-                    Click();
+                    TriggerClick();
                     return true;
             }
 

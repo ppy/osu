@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.UserInterface
                 Add(receptor = new Receptor());
             }
 
-            receptor.OnBackPressed = () => button.Click();
+            receptor.OnBackPressed = () => button.TriggerClick();
         }
 
         [BackgroundDependencyLoader]
