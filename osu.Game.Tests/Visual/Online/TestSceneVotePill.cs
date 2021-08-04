@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Log in", logIn);
             AddStep("User comment", () => addVotePill(getUserComment()));
             AddAssert("Background is transparent", () => votePill.Background.Alpha == 0);
-            AddStep("Click", () => votePill.Click());
+            AddStep("Click", () => votePill.TriggerClick());
             AddAssert("Not loading", () => !votePill.IsLoading);
         }
 
@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Log in", logIn);
             AddStep("Random comment", () => addVotePill(getRandomComment()));
             AddAssert("Background is visible", () => votePill.Background.Alpha == 1);
-            AddStep("Click", () => votePill.Click());
+            AddStep("Click", () => votePill.TriggerClick());
             AddAssert("Loading", () => votePill.IsLoading);
         }
 
@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Hide login overlay", () => login.Hide());
             AddStep("Log out", API.Logout);
             AddStep("Random comment", () => addVotePill(getRandomComment()));
-            AddStep("Click", () => votePill.Click());
+            AddStep("Click", () => votePill.TriggerClick());
             AddAssert("Login overlay is visible", () => login.State.Value == Visibility.Visible);
         }
 

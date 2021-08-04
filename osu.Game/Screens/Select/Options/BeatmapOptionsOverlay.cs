@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Select.Options
 
                 if (found != null)
                 {
-                    found.Click();
+                    found.TriggerClick();
                     return true;
                 }
             }

@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddUntilStep("first room is not masked", () => checkRoomVisible(roomsContainer.Rooms[0]));
 
-            AddStep("select last room", () => roomsContainer.Rooms[^1].Click());
+            AddStep("select last room", () => roomsContainer.Rooms[^1].TriggerClick());
 
             AddUntilStep("first room is masked", () => !checkRoomVisible(roomsContainer.Rooms[0]));
             AddUntilStep("last room is not masked", () => checkRoomVisible(roomsContainer.Rooms[^1]));
