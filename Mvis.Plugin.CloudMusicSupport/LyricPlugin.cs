@@ -82,6 +82,12 @@ namespace Mvis.Plugin.CloudMusicSupport
                 onAllow);
         }
 
+        public void GetLyricFor(int id)
+        {
+            CurrentStatus.Value = Status.Working;
+            processor.StartFetchById(id, onLyricRequestFinished, onLyricRequestFail);
+        }
+
         public bool IsEditing
         {
             set
@@ -150,7 +156,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             Lyrics.Clear();
             CurrentLine = null;
 
-            processor.StartFetchLrcFor(currentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail);
+            processor.StartFetchByBeatmap(currentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail);
         }
 
         private double targetTime => track.CurrentTime + offset.Value;
@@ -170,7 +176,11 @@ namespace Mvis.Plugin.CloudMusicSupport
         private void onLyricRequestFail(string msg)
         {
             //onLyricRequestFail会在非Update上执行，因此添加Schedule确保不会发生InvalidThreadForMutationException
-            Schedule(() => CurrentStatus.Value = Status.Failed);
+            Schedule(() =>
+            {
+                Lyrics.Clear();
+                CurrentStatus.Value = Status.Failed;
+            });
         }
 
         private void onLyricRequestFinished(List<Lyric> lyrics)
