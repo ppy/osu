@@ -57,6 +57,8 @@ namespace osu.Game.Screens.Play
             if (!ShowStoryboard.Value && !IgnoreUserSettings.Value)
                 return;
 
+            // If beatmap's background is used with storyboard, add it as an element to the storyboard.
+            // This code updates the storyboard before creating its DrawableStoryboard and starting elements' loading.
             double? storyboardLatestEventTime = storyboard.LatestEventTime;
 
             if (!storyboard.ReplacesBackground && storyboardLatestEventTime != null)
