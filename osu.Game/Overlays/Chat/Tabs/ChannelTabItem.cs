@@ -153,7 +153,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             switch (e.Button)
             {
                 case MouseButton.Middle:
-                    CloseButton.Click();
+                    CloseButton.TriggerClick();
                     break;
             }
         }
