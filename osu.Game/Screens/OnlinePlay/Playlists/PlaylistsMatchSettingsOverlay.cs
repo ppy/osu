@@ -26,8 +26,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
     {
         public Action EditPlaylist;
 
+        private MatchSettings settings;
+
+        protected override OsuButton SubmitButton => settings.ApplyButton;
+
+        protected override void SelectBeatmap() => EditPlaylist();
+
         protected override OnlinePlayComposite CreateSettings()
-            => new MatchSettings
+            => settings = new MatchSettings
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Y,
