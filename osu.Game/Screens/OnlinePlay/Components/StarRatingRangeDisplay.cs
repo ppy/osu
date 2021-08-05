@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Screens.Ranking.Expanded;
@@ -85,6 +86,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             minDisplay.Current.Value = minDifficulty;
             maxDisplay.Current.Value = maxDifficulty;
+            maxDisplay.Alpha = Precision.AlmostEquals(minDifficulty.Stars, maxDifficulty.Stars) ? 0 : 1;
 
             minBackground.Colour = colours.ForDifficultyRating(minDifficulty.DifficultyRating, true);
             maxBackground.Colour = colours.ForDifficultyRating(maxDifficulty.DifficultyRating, true);
