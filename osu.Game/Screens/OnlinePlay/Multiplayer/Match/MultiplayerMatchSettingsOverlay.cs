@@ -12,13 +12,11 @@ using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Input.Bindings;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -30,8 +28,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerMatchSettingsOverlay : MatchSettingsOverlay
     {
+        private MatchSettings settings;
+
+        protected override OsuButton SubmitButton => settings.ApplyButton;
+
+        protected override void SelectBeatmap() => settings.SelectBeatmap();
+
         protected override OnlinePlayComposite CreateSettings()
-            => new MatchSettings
+            => settings = new MatchSettings
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Y,
@@ -55,6 +59,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private OsuSpriteText typeLabel;
             private LoadingLayer loadingLayer;
             private BeatmapSelectionControl initialBeatmapControl;
+
+            public void SelectBeatmap() => initialBeatmapControl.BeginSelection();
 
             [Resolved]
             private IRoomManager manager { get; set; }
@@ -355,7 +361,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             }
         }
 
-        public class CreateOrUpdateButton : TriangleButton, IKeyBindingHandler<GlobalAction>
+        public class CreateOrUpdateButton : TriangleButton
         {
             [Resolved(typeof(Room), nameof(Room.RoomID))]
             private Bindable<long?> roomId { get; set; }
@@ -372,25 +378,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 BackgroundColour = colours.Yellow;
                 Triangles.ColourLight = colours.YellowLight;
                 Triangles.ColourDark = colours.YellowDark;
-            }
-
-            public bool OnPressed(GlobalAction action)
-            {
-                if (!Enabled.Value)
-                    return false;
-
-                switch (action)
-                {
-                    case GlobalAction.Select:
-                        TriggerClick();
-                        return true;
-                }
-
-                return false;
-            }
-
-            public void OnReleased(GlobalAction action)
-            {
             }
         }
     }
