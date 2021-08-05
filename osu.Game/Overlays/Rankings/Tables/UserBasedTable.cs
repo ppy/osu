@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Users;
@@ -20,7 +19,7 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
         }
 
-        protected virtual IEnumerable<LocalisableString> GradeColumns => new List<LocalisableString> { "SS", "S", "A" };
+        protected virtual IEnumerable<string> GradeColumns => new List<string> { "SS", "S", "A" };
 
         protected override TableColumn[] CreateAdditionalHeaders() => new[]
             {
@@ -67,7 +66,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         private class UserTableHeaderText : HeaderText
         {
-            public UserTableHeaderText(LocalisableString text, bool isHighlighted, bool isGrade)
+            public UserTableHeaderText(string text, bool isHighlighted, bool isGrade)
                 : base(text, isHighlighted)
             {
                 Margin = new MarginPadding
