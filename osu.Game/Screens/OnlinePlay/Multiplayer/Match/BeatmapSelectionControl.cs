@@ -87,7 +87,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             switch (action)
             {
                 case GlobalAction.Select:
-                    selectButton.Click();
+                    selectButton.TriggerClick();
                     return true;
             }
 
