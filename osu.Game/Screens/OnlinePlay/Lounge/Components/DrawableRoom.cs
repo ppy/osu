@@ -171,6 +171,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 {
                     Name = @"Room content",
                     RelativeSizeAxes = Axes.Both,
+                    // This negative padding resolves 1px gaps between this background and the background above.
                     Padding = new MarginPadding { Left = 20, Vertical = -0.5f },
                     Child = new Container
                     {
