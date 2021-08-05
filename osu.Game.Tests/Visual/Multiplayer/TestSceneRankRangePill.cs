@@ -63,5 +63,33 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Client.RemoveUser(API.LocalUser.Value);
             });
         }
+
+        [TestCase(1, 10)]
+        [TestCase(10, 100)]
+        [TestCase(100, 1000)]
+        [TestCase(1000, 10000)]
+        [TestCase(10000, 100000)]
+        [TestCase(100000, 1000000)]
+        [TestCase(1000000, 10000000)]
+        public void TestRange(int min, int max)
+        {
+            AddStep("add users", () =>
+            {
+                Client.AddUser(new User
+                {
+                    Id = 2,
+                    Statistics = { GlobalRank = min }
+                });
+
+                Client.AddUser(new User
+                {
+                    Id = 3,
+                    Statistics = { GlobalRank = max }
+                });
+
+                // Remove the local user so only the ones above are displayed.
+                Client.RemoveUser(API.LocalUser.Value);
+            });
+        }
     }
 }

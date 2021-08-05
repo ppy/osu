@@ -65,13 +65,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 return;
             }
 
+            int minRank = Room.Users.Select(u => u.User?.Statistics.GlobalRank ?? 0).DefaultIfEmpty(0).Min();
+            int maxRank = Room.Users.Select(u => u.User?.Statistics.GlobalRank ?? 0).DefaultIfEmpty(0).Max();
+
             rankFlow.AddText("#");
-            rankFlow.AddText(Room.Users.Select(u => u.User?.Statistics.GlobalRank ?? 0).DefaultIfEmpty(0).Min().ToString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
+            rankFlow.AddText(minRank.ToString("#,0"), s => s.Font = s.Font.With(weight: FontWeight.Bold));
 
             rankFlow.AddText(" - ");
 
             rankFlow.AddText("#");
-            rankFlow.AddText(Room.Users.Select(u => u.User?.Statistics.GlobalRank ?? 0).DefaultIfEmpty(0).Max().ToString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
+            rankFlow.AddText(maxRank.ToString("#,0"), s => s.Font = s.Font.With(weight: FontWeight.Bold));
         }
     }
 }
