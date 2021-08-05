@@ -4,15 +4,17 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public abstract class MatchSettingsOverlay : FocusedOverlayContainer
+    public abstract class MatchSettingsOverlay : FocusedOverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         protected const float TRANSITION_DURATION = 350;
         protected const float FIELD_PADDING = 45;
@@ -21,6 +23,10 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected override bool BlockScrollInput => false;
 
+        protected abstract OsuButton SubmitButton { get; }
+
+        protected abstract bool IsLoading { get; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -28,6 +34,8 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
             Add(Settings = CreateSettings());
         }
+
+        protected abstract void SelectBeatmap();
 
         protected abstract OnlinePlayComposite CreateSettings();
 
@@ -39,6 +47,33 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         protected override void PopOut()
         {
             Settings.MoveToY(-1, TRANSITION_DURATION, Easing.InSine);
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Select:
+                    if (IsLoading)
+                        return true;
+
+                    if (SubmitButton.Enabled.Value)
+                    {
+                        SubmitButton.TriggerClick();
+                        return true;
+                    }
+                    else
+                    {
+                        SelectBeatmap();
+                        return true;
+                    }
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
 
         protected class SettingsTextBox : OsuTextBox
