@@ -103,7 +103,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        private int numberOfAvatars = 3;
+        private int numberOfAvatars = 7;
 
         public int NumberOfAvatars
         {
