@@ -40,6 +40,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private const float transition_duration = 60;
         private const float height = 100;
 
+        private static readonly Color4 background_colour = Color4Extensions.FromHex(@"#27302E");
+
         public event Action<SelectionState> StateChanged;
 
         private Drawable selectionBox;
@@ -159,7 +161,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex(@"#27302E"),
+                            Colour = background_colour,
                         },
                         new OnlinePlayBackgroundSprite(BeatmapSetCoverType.Cover)
                         {
@@ -189,7 +191,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4Extensions.FromHex(@"#27302E"),
+                                        Colour = background_colour,
                                     },
                                     new OnlinePlayBackgroundSprite(BeatmapSetCoverType.Cover)
                                     {
@@ -209,12 +211,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                 new Box
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
-                                                    Colour = Color4Extensions.FromHex(@"#27302E"),
+                                                    Colour = background_colour,
                                                 },
                                                 new Box
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
-                                                    Colour = ColourInfo.GradientHorizontal(Color4Extensions.FromHex(@"#27302E"), Color4Extensions.FromHex(@"#27302E").Opacity(0.3f))
+                                                    Colour = ColourInfo.GradientHorizontal(background_colour, background_colour.Opacity(0.3f))
                                                 },
                                             }
                                         }
