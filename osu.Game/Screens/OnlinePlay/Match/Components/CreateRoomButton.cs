@@ -25,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
                 case PlatformAction.DocumentNew:
                 // might as well also handle new tab. it's a bit of an undefined flow on this screen.
                 case PlatformAction.TabNew:
-                    Click();
+                    TriggerClick();
                     return true;
             }
 
