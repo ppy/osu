@@ -25,6 +25,8 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected abstract OsuButton SubmitButton { get; }
 
+        protected abstract bool IsLoading { get; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -52,6 +54,9 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
             switch (action)
             {
                 case GlobalAction.Select:
+                    if (IsLoading)
+                        return true;
+
                     if (SubmitButton.Enabled.Value)
                     {
                         SubmitButton.TriggerClick();

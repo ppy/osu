@@ -30,6 +30,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override OsuButton SubmitButton => settings.ApplyButton;
 
+        protected override bool IsLoading => settings.IsLoading; // should probably be replaced with an OngoingOperationTracker.
+
         protected override void SelectBeatmap() => EditPlaylist();
 
         protected override OnlinePlayComposite CreateSettings()
@@ -50,6 +52,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             public OsuDropdown<TimeSpan> DurationField;
             public RoomAvailabilityPicker AvailabilityPicker;
             public TriangleButton ApplyButton;
+
+            public bool IsLoading => loadingLayer.State.Value == Visibility.Visible;
 
             public OsuSpriteText ErrorText;
 
