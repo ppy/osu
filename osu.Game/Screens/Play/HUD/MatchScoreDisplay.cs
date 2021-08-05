@@ -10,26 +10,25 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Tournament.IPC;
-using osu.Game.Tournament.Models;
 using osuTK;
 
-namespace osu.Game.Tournament.Screens.Gameplay.Components
+namespace osu.Game.Screens.Play.HUD
 {
     public class MatchScoreDisplay : CompositeDrawable
     {
         private const float bar_height = 18;
 
-        private readonly BindableInt score1 = new BindableInt();
-        private readonly BindableInt score2 = new BindableInt();
+        public BindableInt Team1Score = new BindableInt();
+        public BindableInt Team2Score = new BindableInt();
 
-        private readonly MatchScoreCounter score1Text;
-        private readonly MatchScoreCounter score2Text;
+        private MatchScoreCounter score1Text;
+        private MatchScoreCounter score2Text;
 
-        private readonly Drawable score1Bar;
-        private readonly Drawable score2Bar;
+        private Drawable score1Bar;
+        private Drawable score2Bar;
 
-        public MatchScoreDisplay()
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -42,7 +41,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                     RelativeSizeAxes = Axes.X,
                     Height = bar_height / 4,
                     Width = 0.5f,
-                    Colour = TournamentGame.COLOUR_RED,
+                    Colour = colours.TeamColourRed,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopRight
                 },
@@ -52,7 +51,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                     RelativeSizeAxes = Axes.X,
                     Height = bar_height / 4,
                     Width = 0.5f,
-                    Colour = TournamentGame.COLOUR_BLUE,
+                    Colour = colours.TeamColourBlue,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopLeft
                 },
@@ -62,7 +61,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                     RelativeSizeAxes = Axes.X,
                     Height = bar_height,
                     Width = 0,
-                    Colour = TournamentGame.COLOUR_RED,
+                    Colour = colours.TeamColourRed,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopRight
                 },
@@ -77,7 +76,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                     RelativeSizeAxes = Axes.X,
                     Height = bar_height,
                     Width = 0,
-                    Colour = TournamentGame.COLOUR_BLUE,
+                    Colour = colours.TeamColourBlue,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopLeft
                 },
@@ -89,31 +88,29 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, MatchIPCInfo ipc)
+        protected override void LoadComplete()
         {
-            score1.BindValueChanged(_ => updateScores());
-            score1.BindTo(ipc.Score1);
+            base.LoadComplete();
 
-            score2.BindValueChanged(_ => updateScores());
-            score2.BindTo(ipc.Score2);
+            Team1Score.BindValueChanged(_ => updateScores());
+            Team2Score.BindValueChanged(_ => updateScores());
         }
 
         private void updateScores()
         {
-            score1Text.Current.Value = score1.Value;
-            score2Text.Current.Value = score2.Value;
+            score1Text.Current.Value = Team1Score.Value;
+            score2Text.Current.Value = Team2Score.Value;
 
-            var winningText = score1.Value > score2.Value ? score1Text : score2Text;
-            var losingText = score1.Value <= score2.Value ? score1Text : score2Text;
+            var winningText = Team1Score.Value > Team2Score.Value ? score1Text : score2Text;
+            var losingText = Team1Score.Value <= Team2Score.Value ? score1Text : score2Text;
 
             winningText.Winning = true;
             losingText.Winning = false;
 
-            var winningBar = score1.Value > score2.Value ? score1Bar : score2Bar;
-            var losingBar = score1.Value <= score2.Value ? score1Bar : score2Bar;
+            var winningBar = Team1Score.Value > Team2Score.Value ? score1Bar : score2Bar;
+            var losingBar = Team1Score.Value <= Team2Score.Value ? score1Bar : score2Bar;
 
-            var diff = Math.Max(score1.Value, score2.Value) - Math.Min(score1.Value, score2.Value);
+            var diff = Math.Max(Team1Score.Value, Team2Score.Value) - Math.Min(Team1Score.Value, Team2Score.Value);
 
             losingBar.ResizeWidthTo(0, 400, Easing.OutQuint);
             winningBar.ResizeWidthTo(Math.Min(0.4f, MathF.Pow(diff / 1500000f, 0.5f) / 2), 400, Easing.OutQuint);
