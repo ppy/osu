@@ -6,6 +6,7 @@ using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Graphics;
@@ -27,8 +28,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerMatchSettingsOverlay : MatchSettingsOverlay
     {
+        private MatchSettings settings;
+
+        protected override OsuButton SubmitButton => settings.ApplyButton;
+
+        [Resolved]
+        private OngoingOperationTracker ongoingOperationTracker { get; set; }
+
+        protected override bool IsLoading => ongoingOperationTracker.InProgress.Value;
+
+        protected override void SelectBeatmap() => settings.SelectBeatmap();
+
         protected override OnlinePlayComposite CreateSettings()
-            => new MatchSettings
+            => settings = new MatchSettings
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Y,
@@ -43,7 +55,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             public OsuTextBox NameField, MaxParticipantsField;
             public RoomAvailabilityPicker AvailabilityPicker;
-            public GameTypePicker TypePicker;
+            public MatchTypePicker TypePicker;
             public OsuTextBox PasswordTextBox;
             public TriangleButton ApplyButton;
 
@@ -52,6 +64,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private OsuSpriteText typeLabel;
             private LoadingLayer loadingLayer;
             private BeatmapSelectionControl initialBeatmapControl;
+
+            public void SelectBeatmap() => initialBeatmapControl.BeginSelection();
 
             [Resolved]
             private IRoomManager manager { get; set; }
@@ -148,7 +162,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                 },
                                                                 new Section("Game type")
                                                                 {
-                                                                    Alpha = disabled_alpha,
                                                                     Child = new FillFlowContainer
                                                                     {
                                                                         AutoSizeAxes = Axes.Y,
@@ -157,10 +170,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         Spacing = new Vector2(7),
                                                                         Children = new Drawable[]
                                                                         {
-                                                                            TypePicker = new GameTypePicker
+                                                                            TypePicker = new MatchTypePicker
                                                                             {
                                                                                 RelativeSizeAxes = Axes.X,
-                                                                                Enabled = { Value = false }
                                                                             },
                                                                             typeLabel = new OsuSpriteText
                                                                             {
@@ -265,7 +277,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     loadingLayer = new LoadingLayer(true)
                 };
 
-                TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue?.Name ?? string.Empty, true);
+                TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue.GetLocalisableDescription(), true);
                 RoomName.BindValueChanged(name => NameField.Text = name.NewValue, true);
                 Availability.BindValueChanged(availability => AvailabilityPicker.Current.Value = availability.NewValue, true);
                 Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
@@ -304,7 +316,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 // Otherwise, update the room directly in preparation for it to be submitted to the API on match creation.
                 if (client.Room != null)
                 {
-                    client.ChangeSettings(name: NameField.Text, password: PasswordTextBox.Text).ContinueWith(t => Schedule(() =>
+                    client.ChangeSettings(name: NameField.Text, password: PasswordTextBox.Text, matchType: TypePicker.Current.Value).ContinueWith(t => Schedule(() =>
                     {
                         if (t.IsCompletedSuccessfully)
                             onSuccess(currentRoom.Value);

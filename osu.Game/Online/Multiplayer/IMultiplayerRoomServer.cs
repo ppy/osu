@@ -56,6 +56,12 @@ namespace osu.Game.Online.Multiplayer
         Task ChangeUserMods(IEnumerable<APIMod> newMods);
 
         /// <summary>
+        /// Send a match type specific request.
+        /// </summary>
+        /// <param name="request">The request to send.</param>
+        Task SendMatchRequest(MatchUserRequest request);
+
+        /// <summary>
         /// As the host of a room, start the match.
         /// </summary>
         /// <exception cref="NotHostException">A user other than the current host is attempting to start the game.</exception>

@@ -24,6 +24,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -333,7 +334,7 @@ namespace osu.Game.Screens.Select
                     {
                         Name = "Length",
                         CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Length),
-                        Content = TimeSpan.FromMilliseconds(beatmap.BeatmapInfo.Length).ToString(@"m\:ss"),
+                        Content = beatmap.BeatmapInfo.Length.ToFormattedDuration().ToString(),
                     }),
                     bpmLabelContainer = new Container
                     {
