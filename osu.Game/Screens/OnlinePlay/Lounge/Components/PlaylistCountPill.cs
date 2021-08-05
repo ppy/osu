@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Specialized;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
@@ -46,7 +47,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             count.Clear();
             count.AddText(Playlist.Count.ToString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
-            count.AddText(" Maps");
+            count.AddText(" ");
+            count.AddText("Beatmap".ToQuantity(Playlist.Count, ShowQuantityAs.None));
         }
     }
 }
