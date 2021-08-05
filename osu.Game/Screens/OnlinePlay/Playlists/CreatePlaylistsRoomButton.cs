@@ -6,14 +6,12 @@ using osu.Game.Screens.OnlinePlay.Match.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class CreatePlaylistsRoomButton : PurpleTriangleButton
+    public class CreatePlaylistsRoomButton : CreateRoomButton
     {
         [BackgroundDependencyLoader]
         private void load()
         {
-            Triangles.TriangleScale = 1.5f;
             SpriteText.Font = SpriteText.Font.With(size: 14);
-
             Text = "Create playlist";
         }
     }
