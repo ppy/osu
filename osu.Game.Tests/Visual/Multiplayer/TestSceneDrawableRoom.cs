@@ -13,7 +13,9 @@ using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
+using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
 using osuTK;
 
@@ -43,12 +45,57 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Name = { Value = "Room 1" },
                             Status = { Value = new RoomStatusOpen() },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
+                            Playlist =
+                            {
+                                new PlaylistItem
+                                {
+                                    Beatmap =
+                                    {
+                                        Value = new TestBeatmap(new OsuRuleset().RulesetInfo)
+                                        {
+                                            BeatmapInfo =
+                                            {
+                                                StarDifficulty = 2.5
+                                            }
+                                        }.BeatmapInfo,
+                                    }
+                                }
+                            }
                         }),
                         createDrawableRoom(new Room
                         {
                             Name = { Value = "Room 2" },
                             Status = { Value = new RoomStatusPlaying() },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
+                            Playlist =
+                            {
+                                new PlaylistItem
+                                {
+                                    Beatmap =
+                                    {
+                                        Value = new TestBeatmap(new OsuRuleset().RulesetInfo)
+                                        {
+                                            BeatmapInfo =
+                                            {
+                                                StarDifficulty = 2.5
+                                            }
+                                        }.BeatmapInfo,
+                                    }
+                                },
+                                new PlaylistItem
+                                {
+                                    Beatmap =
+                                    {
+                                        Value = new TestBeatmap(new OsuRuleset().RulesetInfo)
+                                        {
+                                            BeatmapInfo =
+                                            {
+                                                StarDifficulty = 4.5
+                                            }
+                                        }.BeatmapInfo,
+                                    }
+                                }
+                            }
                         }),
                         createDrawableRoom(new Room
                         {
