@@ -235,7 +235,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     {
                                         AutoSizeAxes = Axes.Both,
                                         Direction = FillDirection.Horizontal,
-                                        Spacing = new Vector2(4),
+                                        Spacing = new Vector2(5),
                                         Children = new Drawable[]
                                         {
                                             new RoomStatusPill
