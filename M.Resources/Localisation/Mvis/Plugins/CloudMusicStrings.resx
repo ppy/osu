@@ -117,40 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="tablet" xml:space="preserve">
-    <value>数位板</value>
-    <comment/>
-  </data>
-  <data name="no_tablet_detected" xml:space="preserve">
-    <value>未检测到数位板！</value>
-    <comment/>
-  </data>
-  <data name="reset_to_full_area" xml:space="preserve">
-    <value>重置为全板映射</value>
-    <comment/>
-  </data>
-  <data name="conform_to_current_game_aspect_ratio" xml:space="preserve">
-    <value>调整至当前游戏长宽比</value>
-    <comment/>
-  </data>
-  <data name="x_offset" xml:space="preserve">
-    <value>水平位移</value>
-    <comment/>
-  </data>
-  <data name="y_offset" xml:space="preserve">
-    <value>垂直位移</value>
-    <comment/>
-  </data>
-  <data name="rotation" xml:space="preserve">
-    <value>旋转</value>
-    <comment/>
-  </data>
-  <data name="aspect_ratio" xml:space="preserve">
-    <value>长宽比</value>
-    <comment/>
-  </data>
-  <data name="lock_aspect_ratio" xml:space="preserve">
-    <value>锁定长宽比</value>
-    <comment/>
-  </data>
 </root>

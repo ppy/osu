@@ -13,7 +13,7 @@ namespace M.Resources.Localisation.Mvis.Plugins
 
         public static LocalisableString SaveLyricOnDownloadedMain => new TranslatableString(getKey(@"save_lrc_on_downloaded_main"), @"自动保存歌词到本地");
 
-        public static LocalisableString SaveLyricOnDownloadedSub => new TranslatableString(getKey(@"save_lrc_on_downloaded_sub"), @"歌词将保存在 custom/lyrics/beatmap-{ID}.json 中");
+        public static LocalisableString SaveLyricOnDownloadedSub => new TranslatableString(getKey(@"save_lrc_on_downloaded_sub"), "歌词将保存在 custom/lyrics/beatmap-<ID>.json 中");
 
         public static LocalisableString DisableShader => new TranslatableString(getKey(@"disable_shader"), @"禁用额外阴影");
 
