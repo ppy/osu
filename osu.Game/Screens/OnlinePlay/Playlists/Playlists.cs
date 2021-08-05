@@ -48,7 +48,11 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override Room CreateNewRoom()
         {
-            return new Room { Name = { Value = $"{API.LocalUser}'s awesome playlist" } };
+            return new Room
+            {
+                Name = { Value = $"{API.LocalUser}'s awesome playlist" },
+                Type = { Value = MatchType.Playlists }
+            };
         }
 
         protected override string ScreenTitle => "Playlists";
