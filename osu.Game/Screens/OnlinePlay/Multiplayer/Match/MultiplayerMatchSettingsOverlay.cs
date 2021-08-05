@@ -32,6 +32,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         protected override OsuButton SubmitButton => settings.ApplyButton;
 
+        [Resolved]
+        private OngoingOperationTracker ongoingOperationTracker { get; set; }
+
+        protected override bool IsLoading => ongoingOperationTracker.InProgress.Value;
+
         protected override void SelectBeatmap() => settings.SelectBeatmap();
 
         protected override OnlinePlayComposite CreateSettings()
