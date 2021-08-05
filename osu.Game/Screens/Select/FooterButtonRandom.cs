@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Select
                 return false;
             }
 
-            Click();
+            TriggerClick();
             return true;
         }
 

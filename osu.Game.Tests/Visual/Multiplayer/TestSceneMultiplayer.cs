@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -86,6 +87,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestEmpty()
         {
             // used to test the flow of multiplayer from visual tests.
+        }
+
+        [Test]
+        public void TestCreateRoomViaKeyboard()
+        {
+            // create room dialog
+            AddStep("Press new document", () => InputManager.Keys(PlatformAction.DocumentNew));
+            AddUntilStep("wait for settings", () => InputManager.ChildrenOfType<MultiplayerMatchSettingsOverlay>().FirstOrDefault() != null);
+
+            // edit playlist item
+            AddStep("Press select", () => InputManager.Key(Key.Enter));
+            AddUntilStep("wait for song select", () => InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault() != null);
+
+            // select beatmap
+            AddStep("Press select", () => InputManager.Key(Key.Enter));
+            AddUntilStep("wait for return to screen", () => InputManager.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault() == null);
+
+            // create room
+            AddStep("Press select", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
+            AddUntilStep("wait for join", () => client.Room != null);
         }
 
         [Test]
@@ -209,7 +232,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             DrawableRoom.PasswordEntryPopover passwordEntryPopover = null;
             AddUntilStep("password prompt appeared", () => (passwordEntryPopover = InputManager.ChildrenOfType<DrawableRoom.PasswordEntryPopover>().FirstOrDefault()) != null);
             AddStep("enter password in text box", () => passwordEntryPopover.ChildrenOfType<TextBox>().First().Text = "password");
-            AddStep("press join room button", () => passwordEntryPopover.ChildrenOfType<OsuButton>().First().Click());
+            AddStep("press join room button", () => passwordEntryPopover.ChildrenOfType<OsuButton>().First().TriggerClick());
 
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
             AddUntilStep("wait for join", () => client.Room != null);
@@ -373,7 +396,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddStep("open mod overlay", () => this.ChildrenOfType<PurpleTriangleButton>().ElementAt(2).Click());
+            AddStep("open mod overlay", () => this.ChildrenOfType<PurpleTriangleButton>().ElementAt(2).TriggerClick());
 
             AddStep("invoke on back button", () => multiplayerScreen.OnBackButton());
 
@@ -381,7 +404,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddAssert("dialog overlay is hidden", () => DialogOverlay.State.Value == Visibility.Hidden);
 
-            testLeave("lounge tab item", () => this.ChildrenOfType<BreadcrumbControl<IScreen>.BreadcrumbTabItem>().First().Click());
+            testLeave("lounge tab item", () => this.ChildrenOfType<BreadcrumbControl<IScreen>.BreadcrumbTabItem>().First().TriggerClick());
 
             testLeave("back button", () => multiplayerScreen.OnBackButton());
 

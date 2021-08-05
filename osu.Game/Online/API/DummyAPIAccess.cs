@@ -89,7 +89,7 @@ namespace osu.Game.Online.API
             state.Value = APIState.Offline;
         }
 
-        public IHubClientConnector GetHubConnector(string clientName, string endpoint) => null;
+        public IHubClientConnector GetHubConnector(string clientName, string endpoint, bool preferMessagePack) => null;
 
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {

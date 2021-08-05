@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("show manually", () => accountCreation.Show());
             AddUntilStep("overlay is visible", () => accountCreation.State.Value == Visibility.Visible);
 
-            AddStep("click button", () => accountCreation.ChildrenOfType<SettingsButton>().Single().Click());
+            AddStep("click button", () => accountCreation.ChildrenOfType<SettingsButton>().Single().TriggerClick());
             AddUntilStep("warning screen is present", () => accountCreation.ChildrenOfType<ScreenWarning>().SingleOrDefault()?.IsPresent == true);
 
             AddStep("log back in", () => API.Login("dummy", "password"));

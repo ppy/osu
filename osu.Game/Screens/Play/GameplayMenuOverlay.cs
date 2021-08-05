@@ -42,12 +42,12 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Back"/> is triggered.
         /// </summary>
-        protected virtual Action BackAction => () => InternalButtons.Children.LastOrDefault()?.Click();
+        protected virtual Action BackAction => () => InternalButtons.Children.LastOrDefault()?.TriggerClick();
 
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Select"/> is triggered.
         /// </summary>
-        protected virtual Action SelectAction => () => InternalButtons.Selected?.Click();
+        protected virtual Action SelectAction => () => InternalButtons.Selected?.TriggerClick();
 
         public abstract string Header { get; }
 
@@ -61,8 +61,6 @@ namespace osu.Game.Screens.Play
         protected GameplayMenuOverlay()
         {
             RelativeSizeAxes = Axes.Both;
-
-            State.ValueChanged += s => InternalButtons.Deselect();
         }
 
         [BackgroundDependencyLoader]
@@ -141,6 +139,8 @@ namespace osu.Game.Screens.Play
                     }
                 },
             };
+
+            State.ValueChanged += s => InternalButtons.Deselect();
 
             updateRetryCount();
         }
