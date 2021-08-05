@@ -57,6 +57,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
+            if (!LoadedBeatmapSuccessfully)
+                return;
+
             // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
             LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(ScoreProcessor, userIds), HUDOverlay.Add);
 
@@ -66,6 +69,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override void LoadAsyncComplete()
         {
             base.LoadAsyncComplete();
+
+            if (!LoadedBeatmapSuccessfully)
+                return;
 
             if (!ValidForResume)
                 return; // token retrieval may have failed.
@@ -96,6 +102,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
+            if (!LoadedBeatmapSuccessfully)
+                return;
+
             ((IBindable<bool>)leaderboard.Expanded).BindTo(HUDOverlay.ShowHud);
         }
 
@@ -118,6 +127,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override void Update()
         {
             base.Update();
+
+            if (!LoadedBeatmapSuccessfully)
+                return;
+
             adjustLeaderboardPosition();
         }
 
