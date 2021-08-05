@@ -28,8 +28,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerMatchSettingsOverlay : MatchSettingsOverlay
     {
+        private MatchSettings settings;
+
+        protected override OsuButton SubmitButton => settings.ApplyButton;
+
+        [Resolved]
+        private OngoingOperationTracker ongoingOperationTracker { get; set; }
+
+        protected override bool IsLoading => ongoingOperationTracker.InProgress.Value;
+
+        protected override void SelectBeatmap() => settings.SelectBeatmap();
+
         protected override OnlinePlayComposite CreateSettings()
-            => new MatchSettings
+            => settings = new MatchSettings
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Y,
@@ -53,6 +64,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             private OsuSpriteText typeLabel;
             private LoadingLayer loadingLayer;
             private BeatmapSelectionControl initialBeatmapControl;
+
+            public void SelectBeatmap() => initialBeatmapControl.BeginSelection();
 
             [Resolved]
             private IRoomManager manager { get; set; }
