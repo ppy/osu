@@ -61,8 +61,6 @@ namespace osu.Game.Screens.Play
         protected GameplayMenuOverlay()
         {
             RelativeSizeAxes = Axes.Both;
-
-            State.ValueChanged += s => InternalButtons.Deselect();
         }
 
         [BackgroundDependencyLoader]
@@ -141,6 +139,8 @@ namespace osu.Game.Screens.Play
                     }
                 },
             };
+
+            State.ValueChanged += s => InternalButtons.Deselect();
 
             updateRetryCount();
         }
