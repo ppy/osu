@@ -32,7 +32,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override bool IsLoading => settings.IsLoading; // should probably be replaced with an OngoingOperationTracker.
 
-        protected override void SelectBeatmap() => EditPlaylist();
+        protected override void SelectBeatmap() => settings.SelectBeatmap();
 
         protected override OnlinePlayComposite CreateSettings()
             => settings = new MatchSettings
@@ -60,6 +60,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             private LoadingLayer loadingLayer;
             private DrawableRoomPlaylist playlist;
             private OsuSpriteText playlistLength;
+
+            private PurpleTriangleButton editPlaylistButton;
 
             [Resolved(CanBeNull = true)]
             private IRoomManager manager { get; set; }
@@ -209,7 +211,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                     },
                                                                     new Drawable[]
                                                                     {
-                                                                        new PurpleTriangleButton
+                                                                        editPlaylistButton = new PurpleTriangleButton
                                                                         {
                                                                             RelativeSizeAxes = Axes.X,
                                                                             Height = 40,
@@ -301,6 +303,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 ApplyButton.Enabled.Value = hasValidSettings;
             }
+
+            public void SelectBeatmap() => editPlaylistButton.TriggerClick();
 
             private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) =>
                 playlistLength.Text = $"Length: {Playlist.GetTotalDuration()}";
