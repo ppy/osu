@@ -36,13 +36,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("add 50 users", () =>
             {
                 for (int i = 0; i < 50; i++)
-                {
-                    SelectedRoom.Value.RecentParticipants.Add(new User
-                    {
-                        Id = i,
-                        Username = $"User {i}"
-                    });
-                }
+                    addUser(i);
             });
 
             AddStep("set 3 avatars", () => list.NumberOfAvatars = 3);
@@ -60,34 +54,44 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("add 50 users", () =>
             {
                 for (int i = 0; i < 50; i++)
-                {
-                    SelectedRoom.Value.RecentParticipants.Add(new User
-                    {
-                        Id = i,
-                        Username = $"User {i}"
-                    });
-                }
+                    addUser(i);
             });
 
-            AddStep("remove from start", () => SelectedRoom.Value.RecentParticipants.RemoveAt(0));
+            AddStep("remove from start", () => removeUserAt(0));
             AddAssert("3 avatars displayed", () => list.ChildrenOfType<UpdateableAvatar>().Count() == 3);
             AddAssert("46 hidden users", () => list.ChildrenOfType<RecentParticipantsList.HiddenUserCount>().Single().Count == 46);
 
-            AddStep("remove from end", () => SelectedRoom.Value.RecentParticipants.RemoveAt(SelectedRoom.Value.RecentParticipants.Count - 1));
+            AddStep("remove from end", () => removeUserAt(SelectedRoom.Value.RecentParticipants.Count - 1));
             AddAssert("3 avatars displayed", () => list.ChildrenOfType<UpdateableAvatar>().Count() == 3);
             AddAssert("45 hidden users", () => list.ChildrenOfType<RecentParticipantsList.HiddenUserCount>().Single().Count == 45);
 
-            AddRepeatStep("remove 45 users", () => SelectedRoom.Value.RecentParticipants.RemoveAt(0), 45);
+            AddRepeatStep("remove 45 users", () => removeUserAt(0), 45);
             AddAssert("3 avatars displayed", () => list.ChildrenOfType<UpdateableAvatar>().Count() == 3);
             AddAssert("0 hidden users", () => list.ChildrenOfType<RecentParticipantsList.HiddenUserCount>().Single().Count == 0);
             AddAssert("hidden users bubble hidden", () => list.ChildrenOfType<RecentParticipantsList.HiddenUserCount>().Single().Alpha < 0.5f);
 
-            AddStep("remove another user", () => SelectedRoom.Value.RecentParticipants.RemoveAt(0));
+            AddStep("remove another user", () => removeUserAt(0));
             AddAssert("2 avatars displayed", () => list.ChildrenOfType<UpdateableAvatar>().Count() == 2);
             AddAssert("0 hidden users", () => list.ChildrenOfType<RecentParticipantsList.HiddenUserCount>().Single().Count == 0);
 
-            AddRepeatStep("remove the remaining two users", () => SelectedRoom.Value.RecentParticipants.RemoveAt(0), 2);
+            AddRepeatStep("remove the remaining two users", () => removeUserAt(0), 2);
             AddAssert("0 avatars displayed", () => !list.ChildrenOfType<UpdateableAvatar>().Any());
+        }
+
+        private void addUser(int id)
+        {
+            SelectedRoom.Value.ParticipantCount.Value++;
+            SelectedRoom.Value.RecentParticipants.Add(new User
+            {
+                Id = id,
+                Username = $"User {id}"
+            });
+        }
+
+        private void removeUserAt(int index)
+        {
+            SelectedRoom.Value.ParticipantCount.Value--;
+            SelectedRoom.Value.RecentParticipants.RemoveAt(index);
         }
     }
 }
