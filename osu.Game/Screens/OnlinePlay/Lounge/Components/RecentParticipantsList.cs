@@ -88,6 +88,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             base.LoadComplete();
 
             RecentParticipants.BindCollectionChanged(onParticipantsChanged, true);
+            ParticipantCount.BindValueChanged(_ => updateHiddenUserCount(), true);
         }
 
         private int numberOfAvatars = 3;
@@ -141,8 +142,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             if (avatarFlow.Count < NumberOfAvatars)
                 avatarFlow.Add(new CircularAvatar { User = user });
-            else
-                hiddenUsers.Count++;
+
+            updateHiddenUserCount();
         }
 
         private void removeUser(User user)
@@ -150,20 +151,19 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             if (avatarFlow.RemoveAll(a => a.User == user) > 0)
             {
                 if (RecentParticipants.Count >= NumberOfAvatars)
-                {
                     avatarFlow.Add(new CircularAvatar { User = RecentParticipants.First(u => avatarFlow.All(a => a.User != u)) });
-                    hiddenUsers.Count--;
-                }
             }
-            else
-                hiddenUsers.Count--;
+
+            updateHiddenUserCount();
         }
 
         private void clearUsers()
         {
             avatarFlow.Clear();
-            hiddenUsers.Count = 0;
+            updateHiddenUserCount();
         }
+
+        private void updateHiddenUserCount() => hiddenUsers.Count = ParticipantCount.Value - avatarFlow.Count;
 
         private class CircularAvatar : CompositeDrawable
         {
