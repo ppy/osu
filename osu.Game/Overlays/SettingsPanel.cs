@@ -35,6 +35,12 @@ namespace osu.Game.Overlays
         protected override Container<Drawable> Content => ContentContainer;
 
         /// <summary>
+        /// The <see cref="SettingsPanel"/> always needs to be present for <see cref="ContentContainer"/> to process transforms while overlay is masked away.
+        /// todo: there may be a better solution for this and the existing <see cref="NonMaskedContent"/>, likely requires a refactor.
+        /// </summary>
+        public override bool IsPresent => true;
+
+        /// <summary>
         /// A horizontal offset to apply to the game-wide screen.
         /// </summary>
         public virtual float HorizontalScreenOffset => (WIDTH + Content?.X) ?? 0f;
