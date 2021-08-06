@@ -24,7 +24,7 @@ namespace osu.Game.Overlays
         public LocalisableString Title => NotificationsStrings.HeaderTitle;
         public LocalisableString Description => NotificationsStrings.HeaderDescription;
 
-        private const float width = 320;
+        public const float WIDTH = 320;
 
         public const float TRANSITION_LENGTH = 600;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// A horizontal offset to apply to the game-wide screen.
         /// </summary>
-        public float HorizontalScreenOffset => -width + X;
+        public float HorizontalScreenOffset => -WIDTH + X;
 
         /// <summary>
         /// Provide a source for the toolbar height.
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            Width = width;
+            Width = WIDTH;
             RelativeSizeAxes = Axes.Y;
 
             Children = new Drawable[]
@@ -157,7 +157,7 @@ namespace osu.Game.Overlays
 
             markAllRead();
 
-            this.MoveToX(width, TRANSITION_LENGTH, Easing.OutQuint);
+            this.MoveToX(WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
         }
 
