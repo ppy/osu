@@ -17,12 +17,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         public readonly Drawable Background;
 
-        protected override Container<Drawable> Content { get; } = new Container
-        {
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-            AutoSizeAxes = Axes.Both,
-        };
+        protected override Container<Drawable> Content => content;
+        private readonly Container content;
 
         public PillContainer()
         {
@@ -59,7 +55,22 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             },
                             Content = new[]
                             {
-                                new[] { Content }
+                                new[]
+                                {
+                                    new Container
+                                    {
+                                        AutoSizeAxes = Axes.Both,
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Padding = new MarginPadding { Bottom = 2 },
+                                        Child = content = new Container
+                                        {
+                                            AutoSizeAxes = Axes.Both,
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

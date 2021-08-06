@@ -288,7 +288,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                             {
                                                 Anchor = Anchor.CentreLeft,
                                                 Origin = Anchor.CentreLeft,
-                                                Scale = new Vector2(0.85f)
+                                                Scale = new Vector2(0.8f)
                                             }
                                         }
                                     }
