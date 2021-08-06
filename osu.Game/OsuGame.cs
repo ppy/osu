@@ -828,21 +828,6 @@ namespace osu.Game
             {
                 if (mode.NewValue != OverlayActivation.All) CloseAllOverlays();
             };
-
-            void updateScreenOffset()
-            {
-                float offset = 0;
-
-                if (Settings.State.Value == Visibility.Visible)
-                    offset += Toolbar.HEIGHT / 2;
-                if (notifications.State.Value == Visibility.Visible)
-                    offset -= Toolbar.HEIGHT / 2;
-
-                screenOffsetContainer.MoveToX(offset, SettingsPanel.TRANSITION_LENGTH, Easing.OutQuint);
-            }
-
-            Settings.State.ValueChanged += _ => updateScreenOffset();
-            notifications.State.ValueChanged += _ => updateScreenOffset();
         }
 
         private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays)
@@ -1025,6 +1010,9 @@ namespace osu.Game
 
             screenOffsetContainer.Padding = new MarginPadding { Top = ToolbarOffset };
             overlayContent.Padding = new MarginPadding { Top = ToolbarOffset };
+
+            screenOffsetContainer.X = Settings.HorizontalScreenOffset * 0.125f +
+                                      notifications.HorizontalScreenOffset * 0.125f;
 
             MenuCursorContainer.CanShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
         }
