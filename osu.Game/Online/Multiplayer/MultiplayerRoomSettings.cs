@@ -41,7 +41,7 @@ namespace osu.Game.Online.Multiplayer
         public string Password { get; set; } = string.Empty;
 
         [Key(8)]
-        public MatchType MatchType { get; set; }
+        public MatchType MatchType { get; set; } = MatchType.HeadToHead;
 
         public bool Equals(MultiplayerRoomSettings other)
             => BeatmapID == other.BeatmapID
