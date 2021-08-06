@@ -19,6 +19,7 @@ namespace osu.Game.Tests.Visual.Menus
             base.SetUpSteps();
 
             AddAssert("no screen offset applied", () => Game.ScreenOffsetContainer.X == 0f);
+            AddUntilStep("wait for overlays", () => Game.Settings.IsLoaded && Game.Notifications.IsLoaded);
         }
 
         [Test]
