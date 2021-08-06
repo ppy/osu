@@ -163,7 +163,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             RelativeSizeAxes = Axes.Both,
                             Colour = background_colour,
                         },
-                        new OnlinePlayBackgroundSprite(BeatmapSetCoverType.Cover)
+                        new OnlinePlayBackgroundSprite
                         {
                             RelativeSizeAxes = Axes.Both
                         },
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = background_colour,
                                     },
-                                    new OnlinePlayBackgroundSprite(BeatmapSetCoverType.Cover)
+                                    new OnlinePlayBackgroundSprite
                                     {
                                         RelativeSizeAxes = Axes.Both
                                     },
