@@ -11,6 +11,7 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 
@@ -55,7 +56,9 @@ namespace osu.Game.Screens.Play.HUD
 
             foreach (var userId in playingUsers)
             {
-                var trackedUser = CreateUserData(userId, scoreProcessor);
+                var user = multiplayerClient.Room?.Users.FirstOrDefault(u => u.UserID == userId);
+
+                var trackedUser = CreateUserData(user, scoreProcessor);
                 trackedUser.ScoringMode.BindTo(scoringMode);
                 UserScores[userId] = trackedUser;
             }
@@ -145,7 +148,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected class TrackedUserData
         {
-            public readonly int UserId;
+            public readonly MultiplayerRoomUser User;
             public readonly ScoreProcessor ScoreProcessor;
 
             public readonly BindableDouble Score = new BindableDouble();
@@ -157,9 +160,9 @@ namespace osu.Game.Screens.Play.HUD
 
             public readonly List<TimedFrame> Frames = new List<TimedFrame>();
 
-            public TrackedUserData(int userId, ScoreProcessor scoreProcessor)
+            public TrackedUserData(MultiplayerRoomUser user, ScoreProcessor scoreProcessor)
             {
-                UserId = userId;
+                User = user;
                 ScoreProcessor = scoreProcessor;
 
                 ScoringMode.BindValueChanged(_ => UpdateScore());
