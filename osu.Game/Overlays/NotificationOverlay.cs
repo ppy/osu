@@ -31,6 +31,11 @@ namespace osu.Game.Overlays
         private FlowContainer<NotificationSection> sections;
 
         /// <summary>
+        /// A horizontal offset to apply to the game-wide screen.
+        /// </summary>
+        public float HorizontalScreenOffset => -width + X;
+
+        /// <summary>
         /// Provide a source for the toolbar height.
         /// </summary>
         public Func<float> GetToolbarHeight;

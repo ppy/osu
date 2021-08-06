@@ -34,6 +34,11 @@ namespace osu.Game.Overlays
 
         protected override Container<Drawable> Content => ContentContainer;
 
+        /// <summary>
+        /// A horizontal offset to apply to the game-wide screen.
+        /// </summary>
+        public virtual float HorizontalScreenOffset => (WIDTH + Content?.X) ?? 0f;
+
         protected Sidebar Sidebar;
         private SidebarButton selectedSidebarButton;
 
@@ -64,6 +69,7 @@ namespace osu.Game.Overlays
         {
             InternalChild = ContentContainer = new NonMaskedContent
             {
+                X = -WIDTH + ExpandedPosition,
                 Width = WIDTH,
                 RelativeSizeAxes = Axes.Y,
                 Children = new Drawable[]
