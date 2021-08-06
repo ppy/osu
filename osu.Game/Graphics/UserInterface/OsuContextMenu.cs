@@ -3,6 +3,9 @@
 
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
@@ -13,8 +16,16 @@ namespace osu.Game.Graphics.UserInterface
     public class OsuContextMenu : OsuMenu
     {
         private const int fade_duration = 250;
+        private Sample sampleOpen;
+        private Sample sampleClose;
+        private Sample sampleClick;
 
-        public OsuContextMenu()
+        // todo: this shouldn't be required after https://github.com/ppy/osu-framework/issues/4519 is fixed.
+        private bool wasOpened;
+        private readonly bool playClickSample;
+        private readonly Menu parentMenu;
+
+        public OsuContextMenu(bool playClickSample = false, Menu parentMenu = null)
             : base(Direction.Vertical)
         {
             MaskingContainer.CornerRadius = 5;
@@ -28,17 +39,49 @@ namespace osu.Game.Graphics.UserInterface
             ItemsContainer.Padding = new MarginPadding { Vertical = DrawableOsuMenuItem.MARGIN_VERTICAL };
 
             MaxHeight = 250;
+
+            this.playClickSample = playClickSample;
+            this.parentMenu = parentMenu;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
             BackgroundColour = colours.ContextMenuGray;
+            sampleClick = audio.Samples.Get($"UI/{HoverSampleSet.Default.GetDescription()}-select");
+            sampleOpen = audio.Samples.Get(@"UI/dropdown-open");
+            sampleClose = audio.Samples.Get(@"UI/dropdown-close");
         }
 
-        protected override void AnimateOpen() => this.FadeIn(fade_duration, Easing.OutQuint);
-        protected override void AnimateClose() => this.FadeOut(fade_duration, Easing.OutQuint);
+        protected override void AnimateOpen()
+        {
+            this.FadeIn(fade_duration, Easing.OutQuint);
 
-        protected override Menu CreateSubMenu() => new OsuContextMenu();
+            if (playClickSample)
+                sampleClick?.Play();
+
+            if (!wasOpened)
+                sampleOpen?.Play();
+
+            wasOpened = true;
+        }
+
+        protected override void AnimateClose()
+        {
+            this.FadeOut(fade_duration, Easing.OutQuint);
+
+            if (parentMenu?.State == MenuState.Closed)
+            {
+                wasOpened = false;
+                return;
+            }
+
+            if (wasOpened)
+                sampleClose?.Play();
+
+            wasOpened = false;
+        }
+
+        protected override Menu CreateSubMenu() => new OsuContextMenu(false, this);
     }
 }
