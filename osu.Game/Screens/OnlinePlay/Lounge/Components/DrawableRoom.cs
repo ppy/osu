@@ -237,38 +237,45 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     new FillFlowContainer
                                     {
                                         AutoSizeAxes = Axes.Both,
-                                        Direction = FillDirection.Horizontal,
-                                        Spacing = new Vector2(5),
-                                        Children = new Drawable[]
-                                        {
-                                            new RoomStatusPill
-                                            {
-                                                Anchor = Anchor.CentreLeft,
-                                                Origin = Anchor.CentreLeft
-                                            },
-                                            specialCategoryPill = new RoomSpecialCategoryPill
-                                            {
-                                                Anchor = Anchor.CentreLeft,
-                                                Origin = Anchor.CentreLeft
-                                            },
-                                            new EndDateInfo
-                                            {
-                                                Anchor = Anchor.CentreLeft,
-                                                Origin = Anchor.CentreLeft
-                                            },
-                                        }
-                                    },
-                                    new FillFlowContainer
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        AutoSizeAxes = Axes.Both,
                                         Direction = FillDirection.Vertical,
                                         Children = new Drawable[]
                                         {
-                                            new RoomNameText(),
-                                            new RoomHostText()
-                                        }
+                                            new FillFlowContainer
+                                            {
+                                                AutoSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Horizontal,
+                                                Spacing = new Vector2(5),
+                                                Children = new Drawable[]
+                                                {
+                                                    new RoomStatusPill
+                                                    {
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Origin = Anchor.CentreLeft
+                                                    },
+                                                    specialCategoryPill = new RoomSpecialCategoryPill
+                                                    {
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Origin = Anchor.CentreLeft
+                                                    },
+                                                    new EndDateInfo
+                                                    {
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Origin = Anchor.CentreLeft
+                                                    },
+                                                }
+                                            },
+                                            new FillFlowContainer
+                                            {
+                                                AutoSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding { Top = 3 },
+                                                Direction = FillDirection.Vertical,
+                                                Children = new Drawable[]
+                                                {
+                                                    new RoomNameText(),
+                                                    new RoomHostText(),
+                                                }
+                                            }
+                                        },
                                     },
                                     new FillFlowContainer
                                     {
@@ -276,7 +283,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                         Origin = Anchor.BottomLeft,
                                         AutoSizeAxes = Axes.Both,
                                         Direction = FillDirection.Horizontal,
-                                        Spacing = new Vector2(4),
+                                        Spacing = new Vector2(5),
                                         Children = new Drawable[]
                                         {
                                             new PlaylistCountPill
@@ -429,7 +436,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
             public RoomNameText()
             {
-                Font = OsuFont.GetFont(size: 24);
+                Font = OsuFont.GetFont(size: 28);
             }
 
             [BackgroundDependencyLoader]
@@ -451,7 +458,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             [BackgroundDependencyLoader]
             private void load()
             {
-                InternalChild = hostText = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
+                InternalChild = hostText = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 16))
                 {
                     AutoSizeAxes = Axes.Both
                 };

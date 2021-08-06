@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         createDrawableRoom(new Room
                         {
-                            Name = { Value = "Room 1" },
+                            Name = { Value = "Flyte's Trash Playlist" },
                             Status = { Value = new RoomStatusOpen() },
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
                             Playlist =
