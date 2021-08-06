@@ -93,15 +93,15 @@ namespace osu.Game.Beatmaps.Drawables
                 new CircularContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Scale = new Vector2(0.84f),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Masking = true,
                     EdgeEffect = new EdgeEffectParameters
                     {
-                        Colour = Color4.Black.Opacity(0.08f),
+                        Colour = Color4.Black.Opacity(0.06f),
+
                         Type = EdgeEffectType.Shadow,
-                        Radius = 5,
+                        Radius = 3,
                     },
                     Child = background = new Box
                     {
