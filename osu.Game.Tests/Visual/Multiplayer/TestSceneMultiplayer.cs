@@ -87,6 +87,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestEmpty()
         {
             // used to test the flow of multiplayer from visual tests.
+            AddStep("empty step", () => { });
         }
 
         [Test]
