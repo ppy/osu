@@ -43,6 +43,7 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
+            X = WIDTH;
             Width = WIDTH;
             RelativeSizeAxes = Axes.Y;
 
