@@ -187,15 +187,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                 RelativeSizeAxes = Axes.Both,
                                 Children = new Drawable[]
                                 {
-                                    new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = background_colour,
-                                    },
-                                    new OnlinePlayBackgroundSprite
-                                    {
-                                        RelativeSizeAxes = Axes.Both
-                                    },
                                     new GridContainer
                                     {
                                         RelativeSizeAxes = Axes.Both,
