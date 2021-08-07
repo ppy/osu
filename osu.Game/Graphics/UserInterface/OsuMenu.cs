@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void AnimateOpen()
         {
-            if (!wasOpened)
+            if (!TopLevelMenu && !wasOpened)
                 sampleOpen?.Play();
 
             this.FadeIn(300, Easing.OutQuint);
@@ -49,7 +49,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void AnimateClose()
         {
-            if (wasOpened)
+            if (!TopLevelMenu && wasOpened)
                 sampleClose?.Play();
 
             this.FadeOut(300, Easing.OutQuint);
