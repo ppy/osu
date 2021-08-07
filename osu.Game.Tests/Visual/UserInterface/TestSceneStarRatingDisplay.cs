@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics.Containers;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -28,19 +29,19 @@ namespace osu.Game.Tests.Visual.UserInterface
                     AutoSizeAxes = Axes.Both,
                     Spacing = new Vector2(2f),
                     Direction = FillDirection.Horizontal,
-                    ChildrenEnumerable = Enumerable.Range(0, 10).Select(i => new FillFlowContainer
+                    ChildrenEnumerable = Enumerable.Range(0, 15).Select(i => new FillFlowContainer
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
                         Spacing = new Vector2(2f),
                         Direction = FillDirection.Vertical,
-                        ChildrenEnumerable = Enumerable.Range(0, 10).Select(j => new StarRatingDisplay(new StarDifficulty(i + j * 0.1f, 0))
+                        ChildrenEnumerable = Enumerable.Range(0, 10).Select(j => new StarRatingDisplay(new StarDifficulty(i * (i >= 11 ? 25f : 1f) + j * 0.1f, 0))
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(width, height),
-                        })
+                        }),
                     })
                 };
             });
