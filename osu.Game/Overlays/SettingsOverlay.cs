@@ -21,8 +21,6 @@ namespace osu.Game.Overlays
         public LocalisableString Title => SettingsStrings.HeaderTitle;
         public LocalisableString Description => SettingsStrings.HeaderDescription;
 
-        public override float HorizontalScreenOffset => base.HorizontalScreenOffset + (lastOpenedSubPanel?.HorizontalScreenOffset ?? 0f);
-
         protected override IEnumerable<SettingsSection> CreateSections() => new SettingsSection[]
         {
             new GeneralSection(),
