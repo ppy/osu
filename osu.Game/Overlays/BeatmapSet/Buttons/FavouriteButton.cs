@@ -13,6 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 using osuTK;
 
@@ -35,7 +36,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             {
                 if (!Enabled.Value) return string.Empty;
 
-                return (favourited.Value ? "Unfavourite" : "Favourite") + " this beatmapset";
+                return favourited.Value ? BeatmapsetsStrings.ShowDetailsUnfavourite : BeatmapsetsStrings.ShowDetailsFavourite;
             }
         }
 
