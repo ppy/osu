@@ -59,19 +59,20 @@ namespace osu.Game.Graphics.Containers
         }
 
         public void AddLink(string text, string url, Action<SpriteText> creationParameters = null) =>
-            createLink(AddText(text, creationParameters), new LinkDetails(LinkAction.External, url), url);
+            createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.External, url), url);
 
         public void AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(text, creationParameters), new LinkDetails(LinkAction.Custom, string.Empty), tooltipText, action);
+            => createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.Custom, string.Empty), tooltipText, action);
 
         public void AddLink(string text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(text, creationParameters), new LinkDetails(action, argument), tooltipText);
+            => createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(action, argument), tooltipText);
 
         public void AddLink(LocalisableString text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
         {
             var spriteText = new OsuSpriteText { Text = text };
 
             AddText(spriteText, creationParameters);
+            RemoveInternal(spriteText); // TODO: temporary, will go away when TextParts support localisation properly.
             createLink(new TextPartManual(spriteText.Yield()), new LinkDetails(action, argument), tooltipText);
         }
 
@@ -81,7 +82,7 @@ namespace osu.Game.Graphics.Containers
         }
 
         public void AddUserLink(User user, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(user.Username, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user.Id.ToString()), "view profile");
+            => createLink(CreateChunkFor(user.Username, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user.Id.ToString()), "view profile");
 
         private void createLink(ITextPart textPart, LinkDetails link, LocalisableString tooltipText, Action action = null)
         {
