@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -14,13 +13,10 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public class LegacyHitExplosion : CompositeDrawable
+    public class LegacyHitExplosion : CompositeDrawable, IHitExplosion
     {
         [Resolved]
         private Catcher catcher { get; set; }
-
-        [Resolved]
-        private Bindable<HitExplosionEntry> entryBindable { get; set; }
 
         private const float catch_margin = (1 - Catcher.ALLOWED_CATCH_RANGE) / 2;
 
@@ -62,14 +58,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             explosion2.Texture = defaultLegacySkin.GetTexture("scoreboard-explosion-1");
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            entryBindable.BindValueChanged(entry => apply(entry.NewValue), true);
-        }
-
-        private void apply(HitExplosionEntry entry)
+        public void Animate(HitExplosionEntry entry)
         {
             if (entry == null)
                 return;
@@ -88,15 +77,17 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     explosion1.Scale = new Vector2(1, 0.9f);
                     explosion1.Position = new Vector2(explosionOffset, 0);
 
-                    explosion1.FadeOut(300);
+                    explosion1.FadeOutFromOne(300);
                     explosion1.ScaleTo(new Vector2(20 * scale, 1.1f), 160, Easing.Out);
                 }
 
                 explosion2.Scale = new Vector2(0.9f, 1);
                 explosion2.Position = new Vector2(explosionOffset, 0);
 
-                explosion2.FadeOut(700);
+                explosion2.FadeOutFromOne(700);
                 explosion2.ScaleTo(new Vector2(0.9f, 1.3f), 500, Easing.Out);
+
+                this.Delay(700).FadeOutFromOne();
             }
         }
     }
