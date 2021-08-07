@@ -28,7 +28,15 @@ namespace osu.Game.Overlays
 
         private const float sidebar_width = Sidebar.DEFAULT_WIDTH;
 
-        public const float WIDTH = 400;
+        /// <summary>
+        /// The width of the settings panel content, excluding the sidebar.
+        /// </summary>
+        public const float PANEL_WIDTH = 400;
+
+        /// <summary>
+        /// The full width of the settings panel, including the sidebar.
+        /// </summary>
+        public const float WIDTH = sidebar_width + PANEL_WIDTH;
 
         protected Container<Drawable> ContentContainer;
 
@@ -71,7 +79,7 @@ namespace osu.Game.Overlays
             InternalChild = ContentContainer = new NonMaskedContent
             {
                 X = -WIDTH + ExpandedPosition,
-                Width = WIDTH,
+                Width = PANEL_WIDTH,
                 RelativeSizeAxes = Axes.Y,
                 Children = new Drawable[]
                 {

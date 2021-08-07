@@ -69,7 +69,7 @@ namespace osu.Game.Overlays
                     Sidebar?.FadeColour(Color4.DarkGray, 300, Easing.OutQuint);
 
                     SectionsContainer.FadeOut(300, Easing.OutQuint);
-                    ContentContainer.MoveToX(-WIDTH, 500, Easing.OutQuint);
+                    ContentContainer.MoveToX(-PANEL_WIDTH, 500, Easing.OutQuint);
 
                     lastOpenedSubPanel = panel;
                     break;
@@ -83,7 +83,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        protected override float ExpandedPosition => lastOpenedSubPanel?.State.Value == Visibility.Visible ? -WIDTH : base.ExpandedPosition;
+        protected override float ExpandedPosition => lastOpenedSubPanel?.State.Value == Visibility.Visible ? -PANEL_WIDTH : base.ExpandedPosition;
 
         [BackgroundDependencyLoader]
         private void load()
