@@ -40,11 +40,6 @@ namespace osu.Game.Overlays
         /// </summary>
         public override bool IsPresent => true;
 
-        /// <summary>
-        /// A horizontal offset to apply to the game-wide screen.
-        /// </summary>
-        public virtual float HorizontalScreenOffset => (WIDTH + Content?.X) ?? 0f;
-
         protected Sidebar Sidebar;
         private SidebarButton selectedSidebarButton;
 
