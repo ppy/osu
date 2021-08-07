@@ -99,7 +99,7 @@ namespace osu.Game
 
         private ScalingContainer screenContainer;
 
-        protected Container ScreenOffsetContainer;
+        protected Container ScreenOffsetContainer { get; private set; }
 
         [Resolved]
         private FrameworkConfigManager frameworkConfig { get; set; }
