@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Skinning.Default;
 using osu.Game.Rulesets.Objects.Pooling;
@@ -12,8 +11,7 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class HitExplosion : PoolableDrawableWithLifetime<HitExplosionEntry>
     {
-        [Cached]
-        private Bindable<HitExplosionEntry> bindableEntry { get; set; } = new Bindable<HitExplosionEntry>();
+        private SkinnableDrawable skinnableExplosion;
 
         public HitExplosion()
         {
@@ -25,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = new SkinnableDrawable(new CatchSkinComponent(CatchSkinComponents.HitExplosion), _ => new DefaultHitExplosion())
+            InternalChild = skinnableExplosion = new SkinnableDrawable(new CatchSkinComponent(CatchSkinComponents.HitExplosion), _ => new DefaultHitExplosion())
             {
                 CentreComponent = false,
                 Anchor = Anchor.BottomCentre,
@@ -37,7 +35,11 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             base.OnApply(entry);
 
-            bindableEntry.Value = entry;
+            ApplyTransformsAt(double.MinValue, true);
+            ClearTransforms(true);
+
+            (skinnableExplosion.Drawable as IHitExplosion)?.Animate(entry);
+            LifetimeEnd = skinnableExplosion.Drawable.LatestTransformEndTime;
         }
     }
 }

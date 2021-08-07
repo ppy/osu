@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,11 +14,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Default
 {
-    public class DefaultHitExplosion : CompositeDrawable
+    public class DefaultHitExplosion : CompositeDrawable, IHitExplosion
     {
-        [Resolved]
-        private Bindable<HitExplosionEntry> entryBindable { get; set; }
-
         private CircularContainer largeFaint;
         private CircularContainer smallFaint;
         private CircularContainer directionalGlow1;
@@ -74,14 +70,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
             };
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            entryBindable.BindValueChanged(entry => apply(entry.NewValue), true);
-        }
-
-        private void apply(HitExplosionEntry entry)
+        public void Animate(HitExplosionEntry entry)
         {
             if (entry == null)
                 return;
@@ -110,7 +99,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
             directionalGlow1.Rotation = StatelessRNG.NextSingle(-angle_variangle, angle_variangle, randomSeed, 4);
             directionalGlow2.Rotation = StatelessRNG.NextSingle(-angle_variangle, angle_variangle, randomSeed, 5);
 
-            this.FadeInFromZero(50).Then().FadeOut(duration, Easing.Out).Expire();
+            this.FadeInFromZero(50).Then().FadeOut(duration, Easing.Out);
         }
 
         private void setColour(Color4 objectColour)
