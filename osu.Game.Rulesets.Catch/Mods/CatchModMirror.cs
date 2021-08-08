@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Catch.Mods
     public class CatchModMirror : ModMirror, IApplicableToHitObject
     {
         public override string Description => "Fruits are flipped horizontally.";
-        
+
         public void ApplyToHitObject(HitObject hitObject)
         {
             var catchObject = (CatchHitObject)hitObject;
