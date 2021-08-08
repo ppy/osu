@@ -31,6 +31,7 @@ namespace osu.Game.Overlays
             new UserInterfaceSection(),
             new GameplaySection(),
             new SkinSection(),
+            new BeatmapDownloaderSection(),
             new OnlineSection(),
             new MaintenanceSection(),
             new DebugSection(),

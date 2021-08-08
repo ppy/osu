@@ -11,6 +11,7 @@ using osu.Framework.Testing;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -146,6 +147,11 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
             SetDefault(OsuSetting.EditorHitAnimations, false);
+
+            SetDefault(OsuSetting.BeatmapDownloadMinimumStarRating, 0.0, 0, 10, 0.1);
+            SetDefault(OsuSetting.BeatmapDownloadLastTime, DateTime.Now);
+            SetDefault(OsuSetting.BeatmapDownloadSearchCategory, Overlays.BeatmapListing.SearchCategory.Leaderboard);
+            SetDefault(OsuSetting.BeatmapDownloadRuleset, 0, 0, int.MaxValue);
         }
 
         public OsuConfigManager(Storage storage)
@@ -274,5 +280,9 @@ namespace osu.Game.Configuration
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
         ShowOnlineExplicitContent,
+        BeatmapDownloadMinimumStarRating,
+        BeatmapDownloadLastTime,
+        BeatmapDownloadSearchCategory,
+        BeatmapDownloadRuleset,
     }
 }
