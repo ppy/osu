@@ -2,12 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -45,18 +43,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 for (int i = 0; i < Previous.Count; i++) {
                     var osuPrevious = (OsuDifficultyHitObject)Previous[i];
                     var osuPreviousHitObject = (OsuHitObject)(osuPrevious.BaseObject);
-                    
+
                     if (!(osuPrevious.BaseObject is Spinner)) {
-                        double JumpDistance = (osuHitObject.StackedPosition - osuPreviousHitObject.EndPosition).Length;
+                        double jumpDistance = (osuHitObject.StackedPosition - osuPreviousHitObject.EndPosition).Length;
 
                         cumulativeStrainTime += osuPrevious.StrainTime;
 
                         // We want to nerf objects that can be easily seen within the Flashlight circle radius.
-                        if (i == 0 && JumpDistance < 50.0) {
-                            smallDistNerf = JumpDistance / 50.0;
+                        if (i == 0 && jumpDistance < 50.0) {
+                            smallDistNerf = jumpDistance / 50.0;
                         }
 
-                        result += Math.Pow(0.8, i) * scalingFactor * JumpDistance / cumulativeStrainTime;
+                        result += Math.Pow(0.8, i) * scalingFactor * jumpDistance / cumulativeStrainTime;
                     }
                 }
             }

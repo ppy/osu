@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Math.Pow(
                     Math.Pow(aimValue, 1.1) +
                     Math.Pow(speedValue, 1.1) +
-                    Math.Pow(accuracyValue, 1.1) + 
+                    Math.Pow(accuracyValue, 1.1) +
                     Math.Pow(flashlightValue, 1.1), 1.0 / 1.1
                 ) * multiplier;
 
@@ -194,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(h => h is OsuModFlashlight)) {
                 flashlightValue = Math.Pow(Attributes.FlashlightStrain, 2.0) * 25.0;
-                
+
                 // Add an additional bonus for HDFL.
                 if (mods.Any(h => h is OsuModHidden))
                     flashlightValue *= 1.2;
@@ -205,7 +205,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 // Combo scaling
                 if (Attributes.MaxCombo > 0)
-                    flashlightValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0); 
+                    flashlightValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
 
                 // Account for shorter maps having a higher ratio of 0 combo/100 combo flashlight radius.
                 flashlightValue *= 0.5 + 0.15 * Math.Min(1.0, totalHits / 200.0) +
