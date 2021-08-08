@@ -83,6 +83,7 @@ namespace osu.Game.Tests.Visual
             typeof(Bindable<WorkingBeatmap>),
             typeof(GlobalActionContainer),
             typeof(PreviewTrackManager),
+            typeof(BeatmapDownloader),
         };
 
         private OsuGame game;

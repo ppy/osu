@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Settings.Sections.BeatmapDownloader
 {
@@ -25,10 +22,8 @@ namespace osu.Game.Overlays.Settings.Sections.BeatmapDownloader
         private NotificationOverlay notifications { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, BeatmapManager beatmapManager, IAPIProvider api, RulesetStore rulesets)
+        private void load(OsuConfigManager config, Beatmaps.BeatmapDownloader beatmapDownloader)
         {
-            Beatmaps.BeatmapDownloader beatmapDownloader = new Beatmaps.BeatmapDownloader(config, beatmapManager, api, rulesets);
-
             Add(downloadBeatmapsButton = new SettingsButton
             {
                 Text = "Download Beatmaps now",

@@ -22,22 +22,26 @@ namespace osu.Game.Overlays.Settings.Sections.BeatmapDownloader
         private void load(OsuConfigManager config, RulesetStore rulesets)
         {
             ruleset = config.GetBindable<int>(OsuSetting.BeatmapDownloadRuleset);
+
             Add(new SettingsSlider<double, StarsSlider>
             {
-                LabelText = "Minimum Star Rating",
+                LabelText = "Download Sets that have atleast",
                 Current = config.GetBindable<double>(OsuSetting.BeatmapDownloadMinimumStarRating),
                 KeyboardStep = 0.1f,
             });
+
             Add(new SettingsEnumDropdown<BeatmapListing.SearchCategory>
             {
                 LabelText = "Category",
                 Current = config.GetBindable<BeatmapListing.SearchCategory>(OsuSetting.BeatmapDownloadSearchCategory),
             });
+
             Add(rulesetInfoDropdown = new SettingsDropdown<RulesetInfo>
             {
                 LabelText = "Ruleset",
                 Items = rulesets.AvailableRulesets,
             });
+
             rulesetInfoDropdown.SettingChanged += () =>
             {
                 ruleset.Value = rulesetInfoDropdown.Current.Value.ID ?? 0;

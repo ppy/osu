@@ -103,6 +103,8 @@ namespace osu.Game
 
         protected MusicController MusicController { get; private set; }
 
+        protected BeatmapDownloader BeatmapDownloader { get; private set; }
+
         protected IAPIProvider API { get; set; }
 
         protected Storage Storage { get; set; }
@@ -364,6 +366,8 @@ namespace osu.Game
 
             AddInternal(MusicController = new MusicController());
             dependencies.CacheAs(MusicController);
+
+            dependencies.CacheAs(BeatmapDownloader = new BeatmapDownloader(LocalConfig, BeatmapManager, API, RulesetStore));
 
             Ruleset.BindValueChanged(onRulesetChanged);
         }
