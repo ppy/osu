@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osuTK.Graphics;
@@ -40,7 +39,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 Color4 outerColour = AccentColour.Darken(0.1f);
                 Color4 innerColour = lighten(AccentColour, 0.5f);
 
-                return Interpolation.ValueAt(position / realGradientPortion, outerColour, innerColour, 0, 1);
+                // Stable doesn't use linear space / gamma-correct colour interpolation
+                // for slider bodies, so we can't use Interpolation.ValueAt().
+                // Instead, we use a local method that interpolates between the colours directly in sRGB space.
+                return valueAt(position / realGradientPortion, outerColour, innerColour, 0, 1);
             }
 
             /// <summary>
@@ -54,6 +56,26 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     Math.Min(1, color.G * (1 + 0.5f * amount) + 1 * amount),
                     Math.Min(1, color.B * (1 + 0.5f * amount) + 1 * amount),
                     color.A);
+            }
+
+            private static Color4 valueAt(double time, Color4 startColour, Color4 endColour, double startTime, double endTime)
+            {
+                if (startColour == endColour)
+                    return startColour;
+
+                double current = time - startTime;
+                double duration = endTime - startTime;
+
+                if (duration == 0 || current == 0)
+                    return startColour;
+
+                float t = (float)Math.Max(0, Math.Min(1, current / duration));
+
+                return new Color4(
+                    startColour.R + t * (endColour.R - startColour.R),
+                    startColour.G + t * (endColour.G - startColour.G),
+                    startColour.B + t * (endColour.B - startColour.B),
+                    startColour.A + t * (endColour.A - startColour.A));
             }
         }
     }
