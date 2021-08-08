@@ -43,6 +43,9 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep(description, () =>
             {
+                if (description == "Pinned")
+                    comment.Pinned = true;
+
                 comment.Message = text;
                 container.Add(new DrawableComment(comment));
             });
@@ -59,6 +62,7 @@ namespace osu.Game.Tests.Visual.Online
         private static object[] comments =
         {
             new[] { "Plain", "This is plain comment" },
+            new[] { "Pinned", "This is pinned comment" },
             new[] { "Link", "Please visit https://osu.ppy.sh" },
 
             new[]
