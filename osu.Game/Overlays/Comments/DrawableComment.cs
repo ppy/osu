@@ -21,6 +21,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
 using osu.Framework.Localisation;
 using osu.Game.Overlays.Comments.Buttons;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -142,6 +143,26 @@ namespace osu.Game.Overlays.Comments
                                                         username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold))
                                                         {
                                                             AutoSizeAxes = Axes.Both
+                                                        },
+                                                        new FillFlowContainer
+                                                        {
+                                                            AutoSizeAxes = Axes.Both,
+                                                            Direction = FillDirection.Horizontal,
+                                                            Spacing = new Vector2(3, 0),
+                                                            Alpha = Comment.Pinned ? 1 : 0,
+                                                            Children = new Drawable[]
+                                                            {
+                                                                new SpriteIcon
+                                                                {
+                                                                    Icon = FontAwesome.Solid.Thumbtack,
+                                                                    Size = new Vector2(14),
+                                                                },
+                                                                new OsuSpriteText
+                                                                {
+                                                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
+                                                                    Text = CommentsStrings.Pinned,
+                                                                }
+                                                            },
                                                         },
                                                         new ParentUsername(Comment),
                                                         new OsuSpriteText
