@@ -39,7 +39,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
-                    MaskingSmoothness = 2,
                     CornerRadius = 10,
                     Shear = new Vector2(0.2f, 0),
                     Child = new Box
