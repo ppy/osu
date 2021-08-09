@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         protected readonly Dictionary<int, TrackedUserData> UserScores = new Dictionary<int, TrackedUserData>();
 
-        public readonly Dictionary<int, BindableInt> TeamScores = new Dictionary<int, BindableInt>();
+        public readonly SortedDictionary<int, BindableInt> TeamScores = new SortedDictionary<int, BindableInt>();
 
         [Resolved]
         private OsuColour colours { get; set; }
