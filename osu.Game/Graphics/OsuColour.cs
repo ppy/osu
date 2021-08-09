@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Utils;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics
@@ -15,30 +17,51 @@ namespace osu.Game.Graphics
         public static Color4 Gray(float amt) => new Color4(amt, amt, amt, 1f);
         public static Color4 Gray(byte amt) => new Color4(amt, amt, amt, 255);
 
+        /// <summary>
+        /// Retrieves the colour for a <see cref="DifficultyRating"/>.
+        /// </summary>
+        /// <remarks>
+        /// Sourced from the @diff-{rating} variables in https://github.com/ppy/osu-web/blob/71fbab8936d79a7929d13854f5e854b4f383b236/resources/assets/less/variables.less.
+        /// </remarks>
         public Color4 ForDifficultyRating(DifficultyRating difficulty, bool useLighterColour = false)
         {
             switch (difficulty)
             {
                 case DifficultyRating.Easy:
-                    return Green;
+                    return Color4Extensions.FromHex("4ebfff");
 
-                default:
                 case DifficultyRating.Normal:
-                    return Blue;
+                    return Color4Extensions.FromHex("66ff91");
 
                 case DifficultyRating.Hard:
-                    return Yellow;
+                    return Color4Extensions.FromHex("f7e85d");
 
                 case DifficultyRating.Insane:
-                    return Pink;
+                    return Color4Extensions.FromHex("ff7e68");
 
                 case DifficultyRating.Expert:
-                    return PurpleLight;
+                    return Color4Extensions.FromHex("fe3c71");
 
                 case DifficultyRating.ExpertPlus:
-                    return useLighterColour ? Gray9 : Color4Extensions.FromHex("#121415");
+                    return Color4Extensions.FromHex("6662dd");
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(difficulty));
             }
         }
+
+        public Color4 ForStarDifficulty(double starDifficulty) => ColourUtils.SampleFromLinearGradient(new[]
+        {
+            (1.5f, Color4Extensions.FromHex("4fc0ff")),
+            (2.0f, Color4Extensions.FromHex("4fffd5")),
+            (2.5f, Color4Extensions.FromHex("7cff4f")),
+            (3.25f, Color4Extensions.FromHex("f6f05c")),
+            (4.5f, Color4Extensions.FromHex("ff8068")),
+            (6.0f, Color4Extensions.FromHex("ff3c71")),
+            (7.0f, Color4Extensions.FromHex("6563de")),
+            (8.0f, Color4Extensions.FromHex("18158e")),
+            (8.0f, Color4.Black),
+        }, (float)Math.Round(starDifficulty, 2, MidpointRounding.AwayFromZero));
 
         /// <summary>
         /// Retrieves the colour for a <see cref="ScoreRank"/>.

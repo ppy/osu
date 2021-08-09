@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("wait for button load", () => modSelect.ButtonsLoaded);
             AddStep("select mod", () => modSelect.SelectMod(testCustomisableMod));
             AddAssert("button enabled", () => modSelect.CustomiseButton.Enabled.Value);
-            AddStep("open Customisation", () => modSelect.CustomiseButton.Click());
+            AddStep("open Customisation", () => modSelect.CustomiseButton.TriggerClick());
             AddStep("deselect mod", () => modSelect.SelectMod(testCustomisableMod));
             AddAssert("controls hidden", () => modSelect.ModSettingsContainer.State.Value == Visibility.Hidden);
         }
