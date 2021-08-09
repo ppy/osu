@@ -91,8 +91,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
             maxDisplay.Current.Value = maxDifficulty;
             maxDisplay.Alpha = Precision.AlmostEquals(minDifficulty.Stars, maxDifficulty.Stars) ? 0 : 1;
 
-            minBackground.Colour = colours.ForDifficultyRating(minDifficulty.DifficultyRating, true);
-            maxBackground.Colour = colours.ForDifficultyRating(maxDifficulty.DifficultyRating, true);
+            minBackground.Colour = colours.ForStarDifficulty(minDifficulty.Stars);
+            maxBackground.Colour = colours.ForStarDifficulty(maxDifficulty.Stars);
         }
     }
 }

@@ -503,7 +503,7 @@ namespace osu.Game.Screens.Select
                 {
                     const float full_opacity_ratio = 0.7f;
 
-                    var difficultyColour = colours.ForDifficultyRating(difficulty.DifficultyRating);
+                    var difficultyColour = colours.ForStarDifficulty(difficulty.Stars);
 
                     Children = new Drawable[]
                     {
