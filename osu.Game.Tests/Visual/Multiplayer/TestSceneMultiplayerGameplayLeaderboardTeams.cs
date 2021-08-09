@@ -60,16 +60,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 foreach (var user in users)
                 {
                     SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
-                    var roomUser = OnlinePlayDependencies.Client.AddUser(new User { Id = user });
+                    var roomUser = OnlinePlayDependencies.Client.AddUser(new User { Id = user }, true);
 
                     roomUser.MatchState = new TeamVersusUserState
                     {
                         TeamID = RNG.Next(0, 2)
                     };
                 }
-
-                // Todo: This is REALLY bad.
-                Client.CurrentMatchPlayingUserIds.AddRange(users);
 
                 Children = new Drawable[]
                 {

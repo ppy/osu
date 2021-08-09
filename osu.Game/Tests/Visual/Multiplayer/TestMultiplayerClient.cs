@@ -50,10 +50,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public void Disconnect() => isConnected.Value = false;
 
-        public MultiplayerRoomUser AddUser(User user)
+        public MultiplayerRoomUser AddUser(User user, bool markAsPlaying = false)
         {
             var roomUser = new MultiplayerRoomUser(user.Id) { User = user };
             ((IMultiplayerClient)this).UserJoined(roomUser);
+
+            if (markAsPlaying)
+                PlayingUserIds.Add(user.Id);
+
             return roomUser;
         }
 

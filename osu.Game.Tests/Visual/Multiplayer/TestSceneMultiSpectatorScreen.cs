@@ -49,11 +49,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("start players silently", () =>
             {
-                Client.CurrentMatchPlayingUserIds.Add(PLAYER_1_ID);
-                Client.CurrentMatchPlayingUserIds.Add(PLAYER_2_ID);
-
-                OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_1_ID });
-                OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_2_ID });
+                OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_1_ID }, true);
+                OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_2_ID }, true);
 
                 playingUserIds.Add(PLAYER_1_ID);
                 playingUserIds.Add(PLAYER_2_ID);
@@ -87,16 +84,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("start players", () =>
             {
-                Client.CurrentMatchPlayingUserIds.Add(PLAYER_1_ID);
-                Client.CurrentMatchPlayingUserIds.Add(PLAYER_2_ID);
-
-                var player1 = OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_1_ID });
+                var player1 = OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_1_ID }, true);
                 player1.MatchState = new TeamVersusUserState
                 {
                     TeamID = 0,
                 };
 
-                var player2 = OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_2_ID });
+                var player2 = OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_2_ID }, true);
                 player2.MatchState = new TeamVersusUserState
                 {
                     TeamID = 1,
@@ -305,8 +299,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 foreach (int id in userIds)
                 {
-                    Client.CurrentMatchPlayingUserIds.Add(id);
-                    OnlinePlayDependencies.Client.AddUser(new User { Id = id });
+                    OnlinePlayDependencies.Client.AddUser(new User { Id = id }, true);
 
                     SpectatorClient.StartPlay(id, beatmapId ?? importedBeatmapId);
                     playingUserIds.Add(id);
