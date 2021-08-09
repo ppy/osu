@@ -16,24 +16,24 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         public void ApplyToHitObject(HitObject hitObject)
         {
-            var catchObject = (CatchHitObject)hitObject;
-
-            if (catchObject is BananaShower)
+            if (hitObject is BananaShower)
                 return;
+
+            var catchObject = (CatchHitObject)hitObject;
 
             catchObject.OriginalX = CatchPlayfield.WIDTH - catchObject.OriginalX;
 
             foreach (var nested in catchObject.NestedHitObjects.Cast<CatchHitObject>())
                 nested.OriginalX = CatchPlayfield.WIDTH - nested.OriginalX;
 
-            if (!(catchObject is JuiceStream juiceStream))
-                return;
+            if (catchObject is JuiceStream juiceStream)
+            {
+                var controlPoints = juiceStream.Path.ControlPoints.Select(p => new PathControlPoint(p.Position.Value, p.Type.Value)).ToArray();
+                foreach (var point in controlPoints)
+                    point.Position.Value = new Vector2(-point.Position.Value.X, point.Position.Value.Y);
 
-            var controlPoints = juiceStream.Path.ControlPoints.Select(p => new PathControlPoint(p.Position.Value, p.Type.Value)).ToArray();
-            foreach (var point in controlPoints)
-                point.Position.Value = new Vector2(-point.Position.Value.X, point.Position.Value.Y);
-
-            juiceStream.Path = new SliderPath(controlPoints, juiceStream.Path.ExpectedDistance.Value);
+                juiceStream.Path = new SliderPath(controlPoints, juiceStream.Path.ExpectedDistance.Value);
+            }
         }
     }
 }
