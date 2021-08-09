@@ -83,6 +83,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 }, Add);
+
+                LoadComponentAsync(new MatchScoreDisplay
+                {
+                    Team1Score = { BindTarget = leaderboard.Team1Score },
+                    Team2Score = { BindTarget = leaderboard.Team2Score }
+                }, Add);
             });
 
             AddUntilStep("wait for load", () => leaderboard.IsLoaded);
