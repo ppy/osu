@@ -55,13 +55,21 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void updateDisplay()
         {
-            RoomStatus status = EndDate.Value < DateTimeOffset.Now ? new RoomStatusEnded() : Status.Value ?? new RoomStatusOpen();
+            RoomStatus status = getDisplayStatus();
 
             pill.Background.Alpha = 1;
             pill.Background.FadeColour(status.GetAppropriateColour(colours), firstDisplay ? 0 : 100);
             statusText.Text = status.Message;
 
             firstDisplay = false;
+        }
+
+        private RoomStatus getDisplayStatus()
+        {
+            if (EndDate.Value < DateTimeOffset.Now)
+                return new RoomStatusEnded();
+
+            return Status.Value ?? new RoomStatusOpen();
         }
     }
 }
