@@ -9,6 +9,7 @@ using osu.Framework.Timing;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -31,7 +32,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 };
 
                 foreach (var (userId, _) in clocks)
+                {
                     SpectatorClient.StartPlay(userId, 0);
+                    OnlinePlayDependencies.Client.AddUser(new User { Id = userId });
+                }
             });
 
             AddStep("create leaderboard", () =>

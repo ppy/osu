@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Spectate;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
@@ -59,6 +60,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private void load()
         {
             Container leaderboardContainer;
+            Container scoreDisplayContainer;
+
             masterClockContainer = new MasterGameplayClockContainer(Beatmap.Value, 0);
 
             InternalChildren = new[]
@@ -67,20 +70,36 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 masterClockContainer.WithChild(new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ColumnDimensions = new[]
-                    {
-                        new Dimension(GridSizeMode.AutoSize)
-                    },
+                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                     Content = new[]
                     {
                         new Drawable[]
                         {
-                            leaderboardContainer = new Container
+                            scoreDisplayContainer = new Container
                             {
-                                RelativeSizeAxes = Axes.Y,
-                                AutoSizeAxes = Axes.X
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y
                             },
-                            grid = new PlayerGrid { RelativeSizeAxes = Axes.Both }
+                        },
+                        new Drawable[]
+                        {
+                            new GridContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
+                                Content = new[]
+                                {
+                                    new Drawable[]
+                                    {
+                                        leaderboardContainer = new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Y,
+                                            AutoSizeAxes = Axes.X
+                                        },
+                                        grid = new PlayerGrid { RelativeSizeAxes = Axes.Both }
+                                    }
+                                }
+                            }
                         }
                     }
                 })
@@ -108,6 +127,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                     leaderboard.AddClock(instance.UserId, instance.GameplayClock);
 
                 leaderboardContainer.Add(leaderboard);
+
+                if (leaderboard.TeamScores.Count >= 2)
+                {
+                    LoadComponentAsync(new MatchScoreDisplay
+                    {
+                        Team1Score = { BindTarget = leaderboard.TeamScores.First().Value },
+                        Team2Score = { BindTarget = leaderboard.TeamScores.Last().Value },
+                    }, scoreDisplayContainer.Add);
+                }
             });
         }
 
