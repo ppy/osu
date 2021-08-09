@@ -4,11 +4,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
-using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
@@ -82,13 +80,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                }, Add);
-
-                LoadComponentAsync(new MatchScoreDisplay
+                }, gameplayLeaderboard =>
                 {
-                    Team1Score = { BindTarget = leaderboard.Team1Score },
-                    Team2Score = { BindTarget = leaderboard.Team2Score }
-                }, Add);
+                    LoadComponentAsync(new MatchScoreDisplay
+                    {
+                        Team1Score = { BindTarget = leaderboard.TeamScores[0] },
+                        Team2Score = { BindTarget = leaderboard.TeamScores[1] }
+                    }, Add);
+
+                    Add(gameplayLeaderboard);
+                });
             });
 
             AddUntilStep("wait for load", () => leaderboard.IsLoaded);

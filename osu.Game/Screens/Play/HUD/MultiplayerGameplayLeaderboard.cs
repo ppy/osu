@@ -26,8 +26,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         protected readonly Dictionary<int, TrackedUserData> UserScores = new Dictionary<int, TrackedUserData>();
 
-        public readonly BindableInt Team1Score = new BindableInt();
-        public readonly BindableInt Team2Score = new BindableInt();
+        public readonly Dictionary<int, BindableInt> TeamScores = new Dictionary<int, BindableInt>();
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -45,7 +44,7 @@ namespace osu.Game.Screens.Play.HUD
         private readonly BindableList<int> playingUsers;
         private Bindable<ScoringMode> scoringMode;
 
-        private bool hasTeams;
+        private bool hasTeams => TeamScores.Count > 0;
 
         /// <summary>
         /// Construct a new leaderboard.
@@ -74,7 +73,8 @@ namespace osu.Game.Screens.Play.HUD
                 trackedUser.ScoringMode.BindTo(scoringMode);
                 UserScores[userId] = trackedUser;
 
-                hasTeams |= trackedUser.Team != null;
+                if (trackedUser.Team is int team && !TeamScores.ContainsKey(team))
+                    TeamScores.Add(team, new BindableInt());
             }
 
             userLookupCache.GetUsersAsync(playingUsers.ToArray()).ContinueWith(users => Schedule(() =>
@@ -177,15 +177,15 @@ namespace osu.Game.Screens.Play.HUD
             if (!hasTeams)
                 return;
 
-            Team1Score.Value = 0;
-            Team2Score.Value = 0;
+            foreach (var scores in TeamScores.Values) scores.Value = 0;
 
             foreach (var u in UserScores.Values)
             {
-                if (u.Team == 0)
-                    Team1Score.Value += (int)u.Score.Value;
-                else
-                    Team2Score.Value += (int)u.Score.Value;
+                if (u.Team == null)
+                    continue;
+
+                if (TeamScores.TryGetValue(u.Team.Value, out var team))
+                    team.Value += (int)u.Score.Value;
             }
         }
 
