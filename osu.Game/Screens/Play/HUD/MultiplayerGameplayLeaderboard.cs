@@ -7,13 +7,17 @@ using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Rooms;
+using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Users;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -103,6 +107,34 @@ namespace osu.Game.Screens.Play.HUD
             spectatorClient.OnNewFrames += handleIncomingFrames;
         }
 
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        protected override GameplayLeaderboardScore CreateLeaderboardScoreDrawable(User user, bool isTracked)
+        {
+            var leaderboardScore = base.CreateLeaderboardScoreDrawable(user, isTracked);
+
+            if (UserScores[user.Id].Team is int team)
+            {
+                leaderboardScore.BackgroundColour = getTeamColour(team).Lighten(1.2f);
+                leaderboardScore.TextColour = Color4.White;
+            }
+
+            return leaderboardScore;
+        }
+
+        private Color4 getTeamColour(int team)
+        {
+            switch (team)
+            {
+                case 0:
+                    return colours.TeamColourRed;
+
+                default:
+                    return colours.TeamColourBlue;
+            }
+        }
+
         private void usersChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
@@ -129,7 +161,7 @@ namespace osu.Game.Screens.Play.HUD
             trackedData.UpdateScore();
         });
 
-        protected virtual TrackedUserData CreateUserData(int userId, ScoreProcessor scoreProcessor) => new TrackedUserData(userId, scoreProcessor);
+        protected virtual TrackedUserData CreateUserData(MultiplayerRoomUser user, ScoreProcessor scoreProcessor) => new TrackedUserData(user, scoreProcessor);
 
         protected override void Dispose(bool isDisposing)
         {
@@ -159,6 +191,8 @@ namespace osu.Game.Screens.Play.HUD
             public readonly IBindable<ScoringMode> ScoringMode = new Bindable<ScoringMode>();
 
             public readonly List<TimedFrame> Frames = new List<TimedFrame>();
+
+            public int? Team => (User.MatchState as TeamVersusUserState)?.TeamID;
 
             public TrackedUserData(MultiplayerRoomUser user, ScoreProcessor scoreProcessor)
             {
