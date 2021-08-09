@@ -4,14 +4,11 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Overlays;
-using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Rulesets;
 using static osu.Game.Overlays.BeatmapListing.BeatmapListingFilterControl;
 
@@ -25,10 +22,12 @@ namespace osu.Game.Beatmaps
         private Bindable<DateTime> lastBeatmapDownloadTime { get; set; }
         private Bindable<double> minimumStarRating { get; set; }
         private Bindable<bool> noVideoSetting { get; set; }
-        private Bindable<Overlays.BeatmapListing.SearchCategory> category { get; set; }
+        private Bindable<SearchCategory> category { get; set; }
         private Bindable<int> ruelsetId { get; set; }
 
-        private const int max_requests = 100;
+        private const int max_requests = 10;
+        private bool finished = false;
+        private readonly object downloadLock = new object();
 
         /// <summary> 
         /// Downloads <see cref="BeatmapSetInfo"/> that have a higher <see cref="BeatmapSetInfo.MaxStarDifficulty"/>  than specified in <see cref="OsuSetting.BeatmapDownloadMinimumStarRating"/>.
@@ -43,7 +42,7 @@ namespace osu.Game.Beatmaps
             noVideoSetting = config.GetBindable<bool>(OsuSetting.PreferNoVideo);
             lastBeatmapDownloadTime = config.GetBindable<DateTime>(OsuSetting.BeatmapDownloadLastTime);
             minimumStarRating = config.GetBindable<double>(OsuSetting.BeatmapDownloadMinimumStarRating);
-            category = config.GetBindable<Overlays.BeatmapListing.SearchCategory>(OsuSetting.BeatmapDownloadSearchCategory);
+            category = config.GetBindable<SearchCategory>(OsuSetting.BeatmapDownloadSearchCategory);
             ruelsetId = config.GetBindable<int>(OsuSetting.BeatmapDownloadRuleset);
         }
 
@@ -51,61 +50,69 @@ namespace osu.Game.Beatmaps
         /// Sends the <see cref="SearchBeatmapSetsRequest"/> to the API and processes the Result.
         /// </summary>
         /// <returns>If it was successful or not.</returns>
-        public Task<bool> DownloadBeatmapsAsync()
+        public Task<string> DownloadBeatmapsAsync()
         {
             return Task.Run(() =>
             {
-                //needed if multiple api reqeusts are required
-                bool upToDate = false;
-                int nReqeusts = 0;
-                SearchBeatmapSetsRequest getSetsRequest;
-                SearchBeatmapSetsResponse lastResponse = null;
-
-                RulesetInfo ruleset = rulesets.GetRuleset(ruelsetId.Value);
-                Overlays.BeatmapListing.SearchCategory searchCategory = category.Value;
-
-                if (ruleset == null || lastBeatmapDownloadTime.Value >= DateTime.Now)
+                lock (downloadLock)
                 {
-                    return false;
+                    RulesetInfo ruleset = rulesets.GetRuleset(ruelsetId.Value);
+                    SearchCategory searchCategory = category.Value;
+
+                    if (ruleset == null)
+                    {
+                        return @"No Ruleset found with this ID";
+                    }
+
+                    if (lastBeatmapDownloadTime.Value >= DateTime.Now)
+                    {
+                        lastBeatmapDownloadTime.Value = DateTime.Now;
+                        return @"lastBeatmapDownloadTime was higher than DateTime.Now";
+                    }
+
+                    if (lastBeatmapDownloadTime.Value < DateTime.Now.AddMinutes(1))
+                    {
+                        return @"Please wait a Minute before requesting new Beatmaps";
+                    }
+
+                    finished = false;
+
+                    downloadIteration(0, ruleset, searchCategory, null);
+
+                    while (!finished) { Task.Delay(100); }
+
+                    return string.Empty;
                 }
-
-                while (!upToDate)
-                {
-                    bool currRunFinished = false;
-
-                    getSetsRequest = new SearchBeatmapSetsRequest($"star>={minimumStarRating.Value}", ruleset, lastResponse?.Cursor, null, searchCategory);
-
-                    getSetsRequest.Success += response =>
-                                {
-                                    var sets = response.BeatmapSets.Select(responseJson => responseJson.ToBeatmapSet(rulesets)).ToList();
-
-                                    lastResponse = response;
-                                    getSetsRequest = null;
-
-                                    if (sets.Count == 0)
-                                    {
-                                        upToDate = true;
-                                        return;
-                                    }
-
-                                    if (handleSearchResults(SearchResult.ResultsReturned(sets)) || nReqeusts >= max_requests)
-                                    {
-                                        upToDate = true;
-                                    }
-
-                                    currRunFinished = true;
-                                };
-
-                    api.Queue(getSetsRequest);
-                    nReqeusts++;
-
-                    while (!currRunFinished) { Task.Delay(100); }
-                }
-
-                lastBeatmapDownloadTime.Value = DateTime.Now;
-
-                return true;
             });
+        }
+
+        /// <summary>
+        /// A recursive Function that downloads <see cref="BeatmapSetInfo"/> until certain Criterias are met.
+        /// </summary>
+        /// <param name="iteration">Number of Iterations beforehand.</param>
+        /// <param name="ruleset">A <see cref="RulesetInfo"/> that filters the APIRequest.</param>
+        /// <param name="searchCategory">A <see cref="SearchCategory"/> that filters the APIRequest.</param>
+        /// <param name="cursor">A <see cref="Cursor"/> from the last <see cref="SearchBeatmapSetsResponse"/>, default is null.</param>
+        private void downloadIteration(int iteration, RulesetInfo ruleset, SearchCategory searchCategory, Cursor cursor = null)
+        {
+            SearchBeatmapSetsRequest getSetsRequest = new SearchBeatmapSetsRequest($"star>={minimumStarRating.Value}", ruleset, cursor, null, searchCategory);
+
+            getSetsRequest.Success += (response) =>
+            {
+                var sets = response.BeatmapSets.Select(responseJson => responseJson.ToBeatmapSet(rulesets)).ToList();
+
+                if (!handleSearchResults(SearchResult.ResultsReturned(sets)) && sets.Count > 0 && iteration < max_requests)
+                {
+                    downloadIteration(++iteration, ruleset, searchCategory, response.Cursor);
+                }
+                else
+                {
+                    lastBeatmapDownloadTime.Value = DateTime.Now;
+                    finished = true;
+                }
+            };
+
+            api.Queue(getSetsRequest);
         }
 
         /// <summary>

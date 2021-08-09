@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Settings.Sections.BeatmapDownloader
                     downloadBeatmapsButton.Enabled.Value = false;
                     Task.Run(beatmapDownloader.DownloadBeatmapsAsync).ContinueWith(t => Schedule(() =>
                     {
-                        if (t.Result)
+                        if (t.Result.Length == 0)
                         {
                             notifications?.Post(new SimpleNotification
                             {
@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Settings.Sections.BeatmapDownloader
                         {
                             notifications?.Post(new SimpleNotification
                             {
-                                Text = "An Error has occured while downloading the Beatmaps",
+                                Text = $"An Error has occured while downloading the Beatmaps: {t.Result}",
                                 Icon = FontAwesome.Solid.Cross,
                             });
                         }
