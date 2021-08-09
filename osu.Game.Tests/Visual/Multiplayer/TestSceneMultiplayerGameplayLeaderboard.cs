@@ -20,6 +20,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Tests.Visual.Spectator;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -53,10 +54,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var playable = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
 
                 foreach (var user in users)
+                {
                     SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
-
-                // Todo: This is REALLY bad.
-                Client.CurrentMatchPlayingUserIds.AddRange(users);
+                    OnlinePlayDependencies.Client.AddUser(new User { Id = user }, true);
+                }
 
                 Children = new Drawable[]
                 {
