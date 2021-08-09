@@ -56,11 +56,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 foreach (var user in users)
                 {
                     SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
-                    OnlinePlayDependencies.Client.AddUser(new User { Id = user });
+                    OnlinePlayDependencies.Client.AddUser(new User { Id = user }, true);
                 }
-
-                // Todo: This is REALLY bad.
-                Client.CurrentMatchPlayingUserIds.AddRange(users);
 
                 Children = new Drawable[]
                 {
