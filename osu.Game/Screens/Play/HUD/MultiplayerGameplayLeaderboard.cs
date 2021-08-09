@@ -26,6 +26,12 @@ namespace osu.Game.Screens.Play.HUD
     {
         protected readonly Dictionary<int, TrackedUserData> UserScores = new Dictionary<int, TrackedUserData>();
 
+        public readonly BindableInt Team1Score = new BindableInt();
+        public readonly BindableInt Team2Score = new BindableInt();
+
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
 
@@ -38,6 +44,8 @@ namespace osu.Game.Screens.Play.HUD
         private readonly ScoreProcessor scoreProcessor;
         private readonly BindableList<int> playingUsers;
         private Bindable<ScoringMode> scoringMode;
+
+        private bool hasTeams;
 
         /// <summary>
         /// Construct a new leaderboard.
@@ -65,6 +73,8 @@ namespace osu.Game.Screens.Play.HUD
                 var trackedUser = CreateUserData(user, scoreProcessor);
                 trackedUser.ScoringMode.BindTo(scoringMode);
                 UserScores[userId] = trackedUser;
+
+                hasTeams |= trackedUser.Team != null;
             }
 
             userLookupCache.GetUsersAsync(playingUsers.ToArray()).ContinueWith(users => Schedule(() =>
@@ -107,8 +117,7 @@ namespace osu.Game.Screens.Play.HUD
             spectatorClient.OnNewFrames += handleIncomingFrames;
         }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
+        protected virtual TrackedUserData CreateUserData(MultiplayerRoomUser user, ScoreProcessor scoreProcessor) => new TrackedUserData(user, scoreProcessor);
 
         protected override GameplayLeaderboardScore CreateLeaderboardScoreDrawable(User user, bool isTracked)
         {
@@ -159,9 +168,26 @@ namespace osu.Game.Screens.Play.HUD
 
             trackedData.Frames.Add(new TimedFrame(bundle.Frames.First().Time, bundle.Header));
             trackedData.UpdateScore();
+
+            updateTotals();
         });
 
-        protected virtual TrackedUserData CreateUserData(MultiplayerRoomUser user, ScoreProcessor scoreProcessor) => new TrackedUserData(user, scoreProcessor);
+        private void updateTotals()
+        {
+            if (!hasTeams)
+                return;
+
+            Team1Score.Value = 0;
+            Team2Score.Value = 0;
+
+            foreach (var u in UserScores.Values)
+            {
+                if (u.Team == 0)
+                    Team1Score.Value += (int)u.Score.Value;
+                else
+                    Team2Score.Value += (int)u.Score.Value;
+            }
+        }
 
         protected override void Dispose(bool isDisposing)
         {
