@@ -8,10 +8,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -49,6 +51,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Client.CurrentMatchPlayingUserIds.Add(PLAYER_1_ID);
                 Client.CurrentMatchPlayingUserIds.Add(PLAYER_2_ID);
+
+                OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_1_ID });
+                OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_2_ID });
+
                 playingUserIds.Add(PLAYER_1_ID);
                 playingUserIds.Add(PLAYER_2_ID);
             });
@@ -73,6 +79,41 @@ namespace osu.Game.Tests.Visual.Multiplayer
             loadSpectateScreen();
 
             sendFrames(userIds, 1000);
+            AddWaitStep("wait a bit", 20);
+        }
+
+        [Test]
+        public void TestTeamDisplay()
+        {
+            AddStep("start players", () =>
+            {
+                Client.CurrentMatchPlayingUserIds.Add(PLAYER_1_ID);
+                Client.CurrentMatchPlayingUserIds.Add(PLAYER_2_ID);
+
+                var player1 = OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_1_ID });
+                player1.MatchState = new TeamVersusUserState
+                {
+                    TeamID = 0,
+                };
+
+                var player2 = OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_2_ID });
+                player2.MatchState = new TeamVersusUserState
+                {
+                    TeamID = 1,
+                };
+
+                SpectatorClient.StartPlay(PLAYER_1_ID, importedBeatmapId);
+                SpectatorClient.StartPlay(PLAYER_2_ID, importedBeatmapId);
+
+                playingUserIds.Add(PLAYER_1_ID);
+                playingUserIds.Add(PLAYER_2_ID);
+            });
+
+            loadSpectateScreen();
+
+            sendFrames(PLAYER_1_ID, 1000);
+            sendFrames(PLAYER_2_ID, 1000);
+
             AddWaitStep("wait a bit", 20);
         }
 
@@ -265,6 +306,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 foreach (int id in userIds)
                 {
                     Client.CurrentMatchPlayingUserIds.Add(id);
+                    OnlinePlayDependencies.Client.AddUser(new User { Id = id });
+
                     SpectatorClient.StartPlay(id, beatmapId ?? importedBeatmapId);
                     playingUserIds.Add(id);
                 }
