@@ -11,7 +11,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [BackgroundDependencyLoader]
         private void load()
         {
-            SpriteText.Font = SpriteText.Font.With(size: 14);
             Text = "Create playlist";
         }
     }
