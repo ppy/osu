@@ -22,7 +22,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
-            SpriteText.Font = SpriteText.Font.With(size: 14);
             Text = "Create room";
 
             isConnected = multiplayerClient.IsConnected.GetBoundCopy();
