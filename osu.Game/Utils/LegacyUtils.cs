@@ -42,7 +42,7 @@ namespace osu.Game.Utils
         /// <summary>
         /// Interpolates between two sRGB <see cref="Colour4"/>s directly in sRGB space.
         /// </summary>
-        public static Colour4 InterpolateNonLinear<TEasing>(double time, Colour4 startColour, Colour4 endColour, double startTime, double endTime, in TEasing easing) where TEasing : IEasingFunction
+        public static Colour4 InterpolateNonLinear<TEasing>(double time, Colour4 startColour, Colour4 endColour, double startTime, double endTime, TEasing easing) where TEasing : IEasingFunction
         {
             if (startColour == endColour)
                 return startColour;
