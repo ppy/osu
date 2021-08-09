@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Play.HUD
     public class MatchScoreDisplay : CompositeDrawable
     {
         private const float bar_height = 18;
+        private const float font_size = 50;
 
         public BindableInt Team1Score = new BindableInt();
         public BindableInt Team2Score = new BindableInt();
@@ -78,7 +79,7 @@ namespace osu.Game.Screens.Play.HUD
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 50,
+                    Height = font_size + bar_height,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Children = new Drawable[]
@@ -156,8 +157,8 @@ namespace osu.Game.Screens.Play.HUD
 
             private void updateFont(bool winning)
                 => displayedSpriteText.Font = winning
-                    ? OsuFont.Torus.With(weight: FontWeight.Bold, size: 50, fixedWidth: true)
-                    : OsuFont.Torus.With(weight: FontWeight.Regular, size: 40, fixedWidth: true);
+                    ? OsuFont.Torus.With(weight: FontWeight.Bold, size: font_size, fixedWidth: true)
+                    : OsuFont.Torus.With(weight: FontWeight.Regular, size: font_size * 0.8f, fixedWidth: true);
         }
     }
 }
