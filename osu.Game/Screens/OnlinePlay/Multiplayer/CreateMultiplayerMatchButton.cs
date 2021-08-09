@@ -8,7 +8,7 @@ using osu.Game.Screens.OnlinePlay.Match.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class CreateMultiplayerMatchButton : PurpleTriangleButton
+    public class CreateMultiplayerMatchButton : CreateRoomButton
     {
         private IBindable<bool> isConnected;
         private IBindable<bool> operationInProgress;
@@ -22,9 +22,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
-            Triangles.TriangleScale = 1.5f;
-
-            Text = "screen.multi.multiplayer.createMultiplayerMatchButton.text";
+            Text = "创建房间";
 
             isConnected = multiplayerClient.IsConnected.GetBoundCopy();
             operationInProgress = ongoingOperationTracker.InProgress.GetBoundCopy();
