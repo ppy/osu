@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
@@ -43,6 +45,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         public event Action<SelectionState> StateChanged;
 
+        protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds();
+
         private Drawable selectionBox;
 
         [Resolved(canBeNull: true)]
@@ -60,6 +64,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         public readonly Room Room;
 
         private SelectionState state;
+
+        private Sample sampleSelect;
+        private Sample sampleJoin;
 
         public SelectionState State
         {
@@ -147,7 +154,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
             Children = new Drawable[]
             {
@@ -337,6 +344,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     }
                 },
             };
+
+            sampleSelect = audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
+            sampleJoin = audio.Samples.Get($@"UI/{HoverSampleSet.Submit.GetDescription()}-select");
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -398,22 +408,25 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
         }
 
-        protected override bool ShouldBeConsideredForInput(Drawable child) => state == SelectionState.Selected;
+        protected override bool ShouldBeConsideredForInput(Drawable child) => state == SelectionState.Selected || child is HoverSounds;
 
         protected override bool OnClick(ClickEvent e)
         {
             if (Room != selectedRoom.Value)
             {
+                sampleSelect?.Play();
                 selectedRoom.Value = Room;
                 return true;
             }
 
             if (Room.HasPassword.Value)
             {
+                sampleJoin?.Play();
                 this.ShowPopover();
                 return true;
             }
 
+            sampleJoin?.Play();
             lounge?.Join(Room, null);
 
             return base.OnClick(e);
