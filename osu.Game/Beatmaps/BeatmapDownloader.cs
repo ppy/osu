@@ -2,13 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays;
@@ -23,9 +24,9 @@ namespace osu.Game.Beatmaps
     {
         [Resolved(CanBeNull = true)]
         private NotificationOverlay notifications { get; set; }
-        private BeatmapManager beatmapManager { get; set; }
-        private IAPIProvider api { get; set; }
-        private RulesetStore rulesets { get; set; }
+        protected BeatmapManager beatmapManager { get; set; }
+        protected IAPIProvider api { get; set; }
+        protected RulesetStore rulesets { get; set; }
         private Bindable<DateTime> lastBeatmapDownloadTime { get; set; }
         private Bindable<double> minimumStarRating { get; set; }
         private Bindable<bool> noVideoSetting { get; set; }
@@ -33,7 +34,7 @@ namespace osu.Game.Beatmaps
         private Bindable<int> ruelsetId { get; set; }
 
         private const int max_requests = 10;
-        private bool finished = false;
+        protected bool finished = false;
         private bool forceStop = false;
         private readonly object downloadLock = new object();
 
@@ -62,8 +63,8 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Sends the <see cref="SearchBeatmapSetsRequest"/> to the API and processes the Result.
         /// </summary>
-        /// <returns>Whether it was successful or not.</returns>
-        public Task<bool> DownloadBeatmaps()
+        /// <returns>The Error Message if there is any, otherwise <see cref="string.Empty"/></returns>
+        public Task<string> DownloadBeatmaps()
         {
             return Task.Run(() =>
             {
@@ -76,56 +77,56 @@ namespace osu.Game.Beatmaps
 
                         if (!api.IsLoggedIn)
                         {
-                            throw new DownloaderException(@"You need to be logged in to download Beatmaps");
+                            throw new DownloaderException(BeatmapDownloaderStrings.YouNeedToBeLoggedInToDownloadBeatmaps.ToString());
                         }
 
                         if (ruleset == null)
                         {
-                            throw new DownloaderException(@"No Ruleset found with this ID");
+                            throw new DownloaderException(BeatmapDownloaderStrings.NoRulesetFoundWithThisID.ToString());
                         }
 
                         if (lastBeatmapDownloadTime.Value >= DateTime.Now)
                         {
                             lastBeatmapDownloadTime.Value = DateTime.Now;
-                            throw new DownloaderException(@"lastBeatmapDownloadTime was higher than DateTime.Now");
+                            throw new DownloaderException(BeatmapDownloaderStrings.TheLastDownloadedBeatmapTimeIsInTheFuture.ToString());
                         }
 
                         if (lastBeatmapDownloadTime.Value > DateTime.Now.AddMinutes(-1))
                         {
-                            throw new DownloaderException(@"Please wait a Minute before requesting new Beatmaps");
+                            throw new DownloaderException(BeatmapDownloaderStrings.PleaseWaitAMinuteBeforeRequestingNewBeatmaps.ToString());
                         }
 
                         finished = false;
 
-                        downloadIteration(0, ruleset, searchCategory, null);
+                        sendAPIReqeust(0, ruleset, searchCategory, null);
 
                         while (!finished) { Task.Delay(100); }
 
                         notifications?.Post(new SimpleNotification
                         {
-                            Text = $"Finished downloading new Beatmaps",
-                            Icon = FontAwesome.Solid.Cross,
+                            Text = BeatmapDownloaderStrings.FinishedDownloadingNewBeatmaps.ToString(),
+                            Icon = FontAwesome.Solid.Check,
                         });
 
-                        return true;
+                        return string.Empty;
                     }
                     catch (DownloaderException ex)
                     {
                         notifications?.Post(new SimpleNotification
                         {
-                            Text = $"An Error has occured while downloading the Beatmaps: {ex.Message}",
+                            Text = BeatmapDownloaderStrings.AnErrorHasOccuredWhileDownloadingTheBeatmaps(ex.Message).ToString(),
                             Icon = FontAwesome.Solid.Cross,
                         });
-                        return false;
+                        return ex.Message;
                     }
                     catch (Exception ex)
                     {
                         notifications?.Post(new SimpleNotification
                         {
-                            Text = $"An internal Error has occured while downloading the Beatmaps: {ex.Message}",
+                            Text = BeatmapDownloaderStrings.AnInternalErrorHasOccuredWhileDownloadingTheBeatmaps(ex.Message).ToString(),
                             Icon = FontAwesome.Solid.Cross,
                         });
-                        return false;
+                        return ex.Message;
                     }
 
                 }
@@ -144,32 +145,42 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// A recursive Function that downloads <see cref="BeatmapSetInfo"/> until certain Criterias are met.
+        /// Sends an APIReqeust that recursively downloads <see cref="BeatmapSetInfo"/> until certain Criterias are met.
         /// </summary>
         /// <param name="iteration">Number of Iterations beforehand.</param>
         /// <param name="ruleset">A <see cref="RulesetInfo"/> that filters the APIRequest.</param>
         /// <param name="searchCategory">A <see cref="SearchCategory"/> that filters the APIRequest.</param>
         /// <param name="cursor">A <see cref="Cursor"/> from the last <see cref="SearchBeatmapSetsResponse"/>, default is null.</param>
-        private void downloadIteration(int iteration, RulesetInfo ruleset, SearchCategory searchCategory, Cursor cursor = null)
+        protected virtual void sendAPIReqeust(int iteration, RulesetInfo ruleset, SearchCategory searchCategory, Cursor cursor = null)
         {
             SearchBeatmapSetsRequest getSetsRequest = new SearchBeatmapSetsRequest($"star>={minimumStarRating.Value}", ruleset, cursor, null, searchCategory);
 
             getSetsRequest.Success += (response) =>
-            {
-                var sets = response.BeatmapSets.Select(responseJson => responseJson.ToBeatmapSet(rulesets)).ToList();
-
-                if (!handleSearchResults(SearchResult.ResultsReturned(sets)) && sets.Count > 0 && iteration < max_requests && !forceStop)
-                {
-                    downloadIteration(++iteration, ruleset, searchCategory, response.Cursor);
-                }
-                else
-                {
-                    lastBeatmapDownloadTime.Value = DateTime.Now;
-                    finished = true;
-                }
-            };
+            handleAPIReqeust(SearchResult.ResultsReturned(response.BeatmapSets.Select(responseJson => responseJson.ToBeatmapSet(rulesets)).ToList()),
+                                cursor, iteration, ruleset, searchCategory);
 
             api.Queue(getSetsRequest);
+        }
+
+        /// <summary>
+        /// Handles the APIRequest from <see cref="sendAPIReqeust(int, RulesetInfo, SearchCategory, Cursor)"/>.
+        /// </summary>
+        /// <param name="result">A <see cref="SearchResult"/> from the last <see cref="SearchBeatmapSetsResponse"/>.</param>
+        /// <param name="cursor">A <see cref="Cursor"/> from the last <see cref="SearchBeatmapSetsResponse"/>.</param>
+        /// <param name="iteration">Number of Iterations beforehand.</param>
+        /// <param name="ruleset">A <see cref="RulesetInfo"/> that filters the APIRequest.</param>
+        /// <param name="searchCategory">A <see cref="SearchCategory"/> that filters the APIRequest.</param>
+        protected void handleAPIReqeust(SearchResult result, Cursor cursor, int iteration, RulesetInfo ruleset, SearchCategory searchCategory)
+        {
+            if (!handleSearchResults(result) && result.Results.Count > 0 && iteration < max_requests && !forceStop)
+            {
+                sendAPIReqeust(++iteration, ruleset, searchCategory, cursor);
+            }
+            else
+            {
+                lastBeatmapDownloadTime.Value = DateTime.Now;
+                finished = true;
+            }
         }
 
         /// <summary>
@@ -183,11 +194,20 @@ namespace osu.Game.Beatmaps
             {
                 if (MatchesDownloadCriteria(beatmapSetInfo))
                 {
-                    beatmapManager.Download(beatmapSetInfo, noVideoSetting.Value);
+                    downloadBeatmap(beatmapSetInfo);
                 }
             }
 
             return result.Results.Where(b => !isAfterLastBeatmapDownloadTime(b)).Any();
+        }
+
+        /// <summary>
+        /// Downloads and imports the BeatmapSet
+        /// </summary>
+        /// <param name="beatmapSetInfo">The <see cref="BeatmapSetInfo"/> to download</param>
+        protected virtual void downloadBeatmap(BeatmapSetInfo beatmapSetInfo)
+        {
+            beatmapManager.Download(beatmapSetInfo, noVideoSetting.Value);
         }
 
         /// <summary>
