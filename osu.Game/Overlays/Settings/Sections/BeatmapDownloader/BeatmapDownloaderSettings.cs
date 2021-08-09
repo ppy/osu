@@ -46,6 +46,12 @@ namespace osu.Game.Overlays.Settings.Sections.BeatmapDownloader
             {
                 ruleset.Value = rulesetInfoDropdown.Current.Value.ID ?? 0;
             };
+
+            Add(new SettingsCheckbox
+            {
+                LabelText = "Download at launch",
+                Current = config.GetBindable<bool>(OsuSetting.BeatmapDownloadStartUp),
+            });
         }
     }
 

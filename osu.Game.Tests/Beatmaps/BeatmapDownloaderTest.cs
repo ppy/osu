@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
@@ -104,6 +105,28 @@ namespace osu.Game.Tests.Beatmaps
             {
                 Assert.False(downloader.MatchesDownloadCriteria(beatmapsetinfo));
             }
+        }
+
+        [Test]
+        public void TestDownloadFunctionSuccess()
+        {
+            config.GetBindable<DateTime>(OsuSetting.BeatmapDownloadLastTime).Value = new DateTime(DateTime.Now.Ticks - TimeSpan.TicksPerDay * 7);
+            config.GetBindable<double>(OsuSetting.BeatmapDownloadMinimumStarRating).Value = 7.0;
+            config.GetBindable<int>(OsuSetting.BeatmapDownloadRuleset).Value = 0;
+            config.GetBindable<Overlays.BeatmapListing.SearchCategory>(OsuSetting.BeatmapDownloadSearchCategory).Value = Overlays.BeatmapListing.SearchCategory.Leaderboard;
+
+            //Will fail because no API Access, waiting for response from a knowlegeable Person to fix this
+            Assert.True(downloader.DownloadBeatmaps().Result);
+        }
+
+        [Test]
+        public void TestDownloadFunctionFail()
+        {
+            config.GetBindable<DateTime>(OsuSetting.BeatmapDownloadLastTime).Value = new DateTime(DateTime.Now.Ticks + TimeSpan.TicksPerDay * 7);
+            Assert.False(downloader.DownloadBeatmaps().Result);
+
+            config.GetBindable<DateTime>(OsuSetting.BeatmapDownloadLastTime).Value = DateTime.Now.AddSeconds(-30);
+            Assert.False(downloader.DownloadBeatmaps().Result);
         }
     }
 }

@@ -3,12 +3,17 @@
 
 using System;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using static osu.Game.Overlays.BeatmapListing.BeatmapListingFilterControl;
 
@@ -16,6 +21,8 @@ namespace osu.Game.Beatmaps
 {
     public class BeatmapDownloader
     {
+        [Resolved(CanBeNull = true)]
+        private NotificationOverlay notifications { get; set; }
         private BeatmapManager beatmapManager { get; set; }
         private IAPIProvider api { get; set; }
         private RulesetStore rulesets { get; set; }
@@ -27,6 +34,7 @@ namespace osu.Game.Beatmaps
 
         private const int max_requests = 10;
         private bool finished = false;
+        private bool forceStop = false;
         private readonly object downloadLock = new object();
 
         /// <summary> 
@@ -44,46 +52,89 @@ namespace osu.Game.Beatmaps
             minimumStarRating = config.GetBindable<double>(OsuSetting.BeatmapDownloadMinimumStarRating);
             category = config.GetBindable<SearchCategory>(OsuSetting.BeatmapDownloadSearchCategory);
             ruelsetId = config.GetBindable<int>(OsuSetting.BeatmapDownloadRuleset);
+
+            if (config.GetBindable<bool>(OsuSetting.BeatmapDownloadStartUp).Value)
+            {
+                Task.Run(DownloadBeatmaps);
+            }
         }
 
         /// <summary>
         /// Sends the <see cref="SearchBeatmapSetsRequest"/> to the API and processes the Result.
         /// </summary>
-        /// <returns>If it was successful or not.</returns>
-        public Task<string> DownloadBeatmapsAsync()
+        /// <returns>Whether it was successful or not.</returns>
+        public Task<bool> DownloadBeatmaps()
         {
             return Task.Run(() =>
             {
                 lock (downloadLock)
                 {
-                    RulesetInfo ruleset = rulesets.GetRuleset(ruelsetId.Value);
-                    SearchCategory searchCategory = category.Value;
-
-                    if (ruleset == null)
+                    try
                     {
-                        return @"No Ruleset found with this ID";
+                        RulesetInfo ruleset = rulesets.GetRuleset(ruelsetId.Value);
+                        SearchCategory searchCategory = category.Value;
+
+                        if (!api.IsLoggedIn)
+                        {
+                            throw new DownloaderException(@"You need to be logged in to download Beatmaps");
+                        }
+
+                        if (ruleset == null)
+                        {
+                            throw new DownloaderException(@"No Ruleset found with this ID");
+                        }
+
+                        if (lastBeatmapDownloadTime.Value >= DateTime.Now)
+                        {
+                            lastBeatmapDownloadTime.Value = DateTime.Now;
+                            throw new DownloaderException(@"lastBeatmapDownloadTime was higher than DateTime.Now");
+                        }
+
+                        if (lastBeatmapDownloadTime.Value > DateTime.Now.AddMinutes(-1))
+                        {
+                            throw new DownloaderException(@"Please wait a Minute before requesting new Beatmaps");
+                        }
+
+                        finished = false;
+
+                        downloadIteration(0, ruleset, searchCategory, null);
+
+                        while (!finished) { Task.Delay(100); }
+
+                        return true;
+                    }
+                    catch (DownloaderException ex)
+                    {
+                        notifications?.Post(new SimpleNotification
+                        {
+                            Text = $"An Error has occured while downloading the Beatmaps: {ex.Message}",
+                            Icon = FontAwesome.Solid.Cross,
+                        });
+                        return false;
+                    }
+                    catch (Exception ex)
+                    {
+                        notifications?.Post(new SimpleNotification
+                        {
+                            Text = $"An internal Error has occured while downloading the Beatmaps: {ex.Message}",
+                            Icon = FontAwesome.Solid.Cross,
+                        });
+                        return false;
                     }
 
-                    if (lastBeatmapDownloadTime.Value >= DateTime.Now)
-                    {
-                        lastBeatmapDownloadTime.Value = DateTime.Now;
-                        return @"lastBeatmapDownloadTime was higher than DateTime.Now";
-                    }
-
-                    if (lastBeatmapDownloadTime.Value < DateTime.Now.AddMinutes(1))
-                    {
-                        return @"Please wait a Minute before requesting new Beatmaps";
-                    }
-
-                    finished = false;
-
-                    downloadIteration(0, ruleset, searchCategory, null);
-
-                    while (!finished) { Task.Delay(100); }
-
-                    return string.Empty;
                 }
             });
+        }
+
+        /// <summary>
+        /// Stops the Downloader in the next Iteration if it's running.
+        /// </summary>
+        public void ForceStop()
+        {
+            if (!finished)
+            {
+                forceStop = true;
+            }
         }
 
         /// <summary>
@@ -101,7 +152,7 @@ namespace osu.Game.Beatmaps
             {
                 var sets = response.BeatmapSets.Select(responseJson => responseJson.ToBeatmapSet(rulesets)).ToList();
 
-                if (!handleSearchResults(SearchResult.ResultsReturned(sets)) && sets.Count > 0 && iteration < max_requests)
+                if (!handleSearchResults(SearchResult.ResultsReturned(sets)) && sets.Count > 0 && iteration < max_requests && !forceStop)
                 {
                     downloadIteration(++iteration, ruleset, searchCategory, response.Cursor);
                 }
@@ -153,6 +204,15 @@ namespace osu.Game.Beatmaps
         private bool isAfterLastBeatmapDownloadTime(BeatmapSetInfo beatmapSetInfo)
         {
             return (beatmapSetInfo.OnlineInfo.Ranked == null && beatmapSetInfo.OnlineInfo.LastUpdated?.DateTime > lastBeatmapDownloadTime.Value) || beatmapSetInfo.OnlineInfo.Ranked?.DateTime > lastBeatmapDownloadTime.Value;
+        }
+    }
+
+    [Serializable]
+    internal class DownloaderException : Exception
+    {
+
+        public DownloaderException(string message) : base(message)
+        {
         }
     }
 }

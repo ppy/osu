@@ -152,6 +152,7 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.BeatmapDownloadLastTime, DateTime.Now);
             SetDefault(OsuSetting.BeatmapDownloadSearchCategory, Overlays.BeatmapListing.SearchCategory.Leaderboard);
             SetDefault(OsuSetting.BeatmapDownloadRuleset, 0, 0, int.MaxValue);
+            SetDefault(OsuSetting.BeatmapDownloadStartUp, false);
         }
 
         public OsuConfigManager(Storage storage)
@@ -284,5 +285,6 @@ namespace osu.Game.Configuration
         BeatmapDownloadLastTime,
         BeatmapDownloadSearchCategory,
         BeatmapDownloadRuleset,
+        BeatmapDownloadStartUp,
     }
 }

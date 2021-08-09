@@ -30,27 +30,19 @@ namespace osu.Game.Overlays.Settings.Sections.BeatmapDownloader
                 Action = () =>
                 {
                     downloadBeatmapsButton.Enabled.Value = false;
-                    Task.Run(beatmapDownloader.DownloadBeatmapsAsync).ContinueWith(t => Schedule(() =>
+                    Task.Run(beatmapDownloader.DownloadBeatmaps).ContinueWith(t => Schedule(() =>
                     {
-                        if (t.Result.Length == 0)
-                        {
-                            notifications?.Post(new SimpleNotification
-                            {
-                                Text = "Finished downloading the newest filtered Beatmaps",
-                                Icon = FontAwesome.Solid.Check,
-                            });
-                        }
-                        else
-                        {
-                            notifications?.Post(new SimpleNotification
-                            {
-                                Text = $"An Error has occured while downloading the Beatmaps: {t.Result}",
-                                Icon = FontAwesome.Solid.Cross,
-                            });
-                        }
-
                         downloadBeatmapsButton.Enabled.Value = true;
                     }));
+                }
+            });
+
+            Add(new SettingsButton
+            {
+                Text = "Stop the Downloader",
+                Action = () =>
+                {
+                    beatmapDownloader.ForceStop();
                 }
             });
 
