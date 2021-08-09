@@ -101,6 +101,12 @@ namespace osu.Game.Beatmaps
 
                         while (!finished) { Task.Delay(100); }
 
+                        notifications?.Post(new SimpleNotification
+                        {
+                            Text = $"Finished downloading new Beatmaps",
+                            Icon = FontAwesome.Solid.Cross,
+                        });
+
                         return true;
                     }
                     catch (DownloaderException ex)
