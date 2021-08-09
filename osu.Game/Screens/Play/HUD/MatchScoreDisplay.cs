@@ -21,8 +21,8 @@ namespace osu.Game.Screens.Play.HUD
         public BindableInt Team1Score = new BindableInt();
         public BindableInt Team2Score = new BindableInt();
 
-        private MatchScoreCounter score1Text;
-        private MatchScoreCounter score2Text;
+        protected MatchScoreCounter Score1Text;
+        protected MatchScoreCounter Score2Text;
 
         private Drawable score1Bar;
         private Drawable score2Bar;
@@ -65,11 +65,6 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopRight
                 },
-                score1Text = new MatchScoreCounter
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
-                },
                 score2Bar = new Box
                 {
                     Name = "top bar blue",
@@ -80,10 +75,25 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopLeft
                 },
-                score2Text = new MatchScoreCounter
+                new Container
                 {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 50,
                     Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
+                    Origin = Anchor.TopCentre,
+                    Children = new Drawable[]
+                    {
+                        Score1Text = new MatchScoreCounter
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre
+                        },
+                        Score2Text = new MatchScoreCounter
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre
+                        },
+                    }
                 },
             };
         }
@@ -98,11 +108,11 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateScores()
         {
-            score1Text.Current.Value = Team1Score.Value;
-            score2Text.Current.Value = Team2Score.Value;
+            Score1Text.Current.Value = Team1Score.Value;
+            Score2Text.Current.Value = Team2Score.Value;
 
-            var winningText = Team1Score.Value > Team2Score.Value ? score1Text : score2Text;
-            var losingText = Team1Score.Value <= Team2Score.Value ? score1Text : score2Text;
+            var winningText = Team1Score.Value > Team2Score.Value ? Score1Text : Score2Text;
+            var losingText = Team1Score.Value <= Team2Score.Value ? Score1Text : Score2Text;
 
             winningText.Winning = true;
             losingText.Winning = false;
@@ -119,11 +129,11 @@ namespace osu.Game.Screens.Play.HUD
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            score1Text.X = -Math.Max(5 + score1Text.DrawWidth / 2, score1Bar.DrawWidth);
-            score2Text.X = Math.Max(5 + score2Text.DrawWidth / 2, score2Bar.DrawWidth);
+            Score1Text.X = -Math.Max(5 + Score1Text.DrawWidth / 2, score1Bar.DrawWidth);
+            Score2Text.X = Math.Max(5 + Score2Text.DrawWidth / 2, score2Bar.DrawWidth);
         }
 
-        private class MatchScoreCounter : ScoreCounter
+        protected class MatchScoreCounter : ScoreCounter
         {
             private OsuSpriteText displayedSpriteText;
 

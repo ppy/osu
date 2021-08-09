@@ -11,6 +11,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Tests.Visual.Spectator;
@@ -33,6 +34,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         private MultiplayerGameplayLeaderboard leaderboard;
+        private GameplayMatchScoreDisplay gameplayScoreDisplay;
 
         protected override Room CreateRoom()
         {
@@ -88,6 +90,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         Team2Score = { BindTarget = leaderboard.TeamScores[1] }
                     }, Add);
 
+                    LoadComponentAsync(gameplayScoreDisplay = new GameplayMatchScoreDisplay
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Team1Score = { BindTarget = leaderboard.TeamScores[0] },
+                        Team2Score = { BindTarget = leaderboard.TeamScores[1] }
+                    }, Add);
+
                     Add(gameplayLeaderboard);
                 });
             });
@@ -100,7 +110,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestScoreUpdates()
         {
             AddRepeatStep("update state", () => SpectatorClient.RandomlyUpdateState(), 100);
-            AddToggleStep("switch compact mode", expanded => leaderboard.Expanded.Value = expanded);
+            AddToggleStep("switch compact mode", expanded =>
+            {
+                leaderboard.Expanded.Value = expanded;
+                gameplayScoreDisplay.Expanded.Value = expanded;
+            });
         }
     }
 }
