@@ -3,9 +3,9 @@
 
 using System;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Default;
+using osu.Game.Utils;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
@@ -37,14 +37,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
                 position -= realBorderPortion;
 
-                // Stable interpolates slider body colour directly in sRGB space, and because
-                // Interpolation.ValueAt() uses linear space, we have to counteract applying it
-                // by calling ToSRGB() on the input colours, and ToLinear() on the resulting colour.
+                Color4 outerColour = AccentColour.Darken(0.1f);
+                Color4 innerColour = lighten(AccentColour, 0.5f);
 
-                Color4 outerColour = AccentColour.Darken(0.1f).ToSRGB();
-                Color4 innerColour = lighten(AccentColour, 0.5f).ToSRGB();
-
-                return Interpolation.ValueAt(position / realGradientPortion, outerColour, innerColour, 0, 1).ToLinear();
+                return LegacyUtils.InterpolateNonLinear(position / realGradientPortion, outerColour, innerColour, 0, 1);
             }
 
             /// <summary>
