@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Beatmaps
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        private static List<BeatmapSetInfo> rulesetList = new List<BeatmapSetInfo>() {
+        private static List<BeatmapSetInfo> beatmapSetInfos = new List<BeatmapSetInfo>() {
             new BeatmapSetInfo()
             {
                 OnlineBeatmapSetID = 3756,
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Beatmaps
             config.GetBindable<int>(OsuSetting.BeatmapDownloadRuleset).Value = 0;
             config.GetBindable<SearchCategory>(OsuSetting.BeatmapDownloadSearchCategory).Value = SearchCategory.Leaderboard;
 
-            foreach (var beatmapsetinfo in rulesetList)
+            foreach (var beatmapsetinfo in beatmapSetInfos)
             {
                 Assert.True(downloader.MatchesDownloadCriteria(beatmapsetinfo));
             }
@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Beatmaps
             config.GetBindable<int>(OsuSetting.BeatmapDownloadRuleset).Value = 0;
             config.GetBindable<SearchCategory>(OsuSetting.BeatmapDownloadSearchCategory).Value = SearchCategory.Leaderboard;
 
-            foreach (var beatmapsetinfo in rulesetList)
+            foreach (var beatmapsetinfo in beatmapSetInfos)
             {
                 Assert.False(downloader.MatchesDownloadCriteria(beatmapsetinfo));
             }
@@ -155,7 +155,7 @@ namespace osu.Game.Tests.Beatmaps
 
             protected override void sendAPIReqeust(int iteration, RulesetInfo ruleset, SearchCategory searchCategory, Cursor cursor = null)
             {
-                handleAPIReqeust(SearchResult.ResultsReturned(rulesetList), null, iteration, ruleset, searchCategory);
+                handleAPIReqeust(SearchResult.ResultsReturned(beatmapSetInfos), null, iteration, ruleset, searchCategory);
             }
         }
     }

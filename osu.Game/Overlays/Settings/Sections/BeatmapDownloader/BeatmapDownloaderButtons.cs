@@ -4,10 +4,8 @@
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
-using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Overlays.Settings.Sections.BeatmapDownloader
 {
@@ -17,9 +15,6 @@ namespace osu.Game.Overlays.Settings.Sections.BeatmapDownloader
         protected override LocalisableString Header => "Downloader Buttons";
 
         private SettingsButton downloadBeatmapsButton;
-
-        [Resolved(CanBeNull = true)]
-        private NotificationOverlay notifications { get; set; }
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuConfigManager config, Beatmaps.BeatmapDownloader beatmapDownloader)
