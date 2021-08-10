@@ -30,10 +30,10 @@ namespace osu.Game.Overlays.Settings.Sections.BeatmapDownloader
                 KeyboardStep = 0.1f,
             });
 
-            Add(new SettingsEnumDropdown<BeatmapListing.SearchCategory>
+            Add(new SettingsEnumDropdown<Beatmaps.BeatmapDownloader.SearchCategory>
             {
                 LabelText = "Category",
-                Current = config.GetBindable<BeatmapListing.SearchCategory>(OsuSetting.BeatmapDownloadSearchCategory),
+                Current = config.GetBindable<Beatmaps.BeatmapDownloader.SearchCategory>(OsuSetting.BeatmapDownloadSearchCategory),
             });
 
             Add(rulesetInfoDropdown = new SettingsDropdown<RulesetInfo>

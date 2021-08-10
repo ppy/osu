@@ -4,13 +4,19 @@
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
+using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Overlays.Settings.Sections.BeatmapDownloader
 {
     public class BeatmapDownloaderButtons : SettingsSubsection
     {
+
+        [Resolved(CanBeNull = true)]
+        private NotificationOverlay notifications { get; set; }
 
         protected override LocalisableString Header => "Downloader Buttons";
 
@@ -27,6 +33,22 @@ namespace osu.Game.Overlays.Settings.Sections.BeatmapDownloader
                     downloadBeatmapsButton.Enabled.Value = false;
                     Task.Run(beatmapDownloader.DownloadBeatmaps).ContinueWith(t => Schedule(() =>
                     {
+                        if (t.Result.Length == 0)
+                        {
+                            notifications?.Post(new SimpleNotification
+                            {
+                                Text = BeatmapDownloaderStrings.FinishedDownloadingNewBeatmaps.ToString(),
+                                Icon = FontAwesome.Solid.Check,
+                            });
+                        }
+                        else
+                        {
+                            notifications?.Post(new SimpleNotification
+                            {
+                                Text = BeatmapDownloaderStrings.AnErrorHasOccuredWhileDownloadingTheBeatmaps(t.Result).ToString(),
+                                Icon = FontAwesome.Solid.Cross,
+                            });
+                        }
                         downloadBeatmapsButton.Enabled.Value = true;
                     }));
                 }

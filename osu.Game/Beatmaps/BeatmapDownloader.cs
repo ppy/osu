@@ -4,16 +4,11 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Overlays;
-using osu.Game.Overlays.BeatmapListing;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using static osu.Game.Overlays.BeatmapListing.BeatmapListingFilterControl;
 
@@ -21,8 +16,6 @@ namespace osu.Game.Beatmaps
 {
     public class BeatmapDownloader
     {
-        [Resolved(CanBeNull = true)]
-        private NotificationOverlay notifications { get; set; }
         protected BeatmapManager beatmapManager { get; set; }
         protected IAPIProvider api { get; set; }
         protected RulesetStore rulesets { get; set; }
@@ -36,6 +29,14 @@ namespace osu.Game.Beatmaps
         protected bool finished = false;
         private bool forceStop = false;
         private readonly object downloadLock = new object();
+
+        //Ints match Overlays.BeatmapListing.SearchCategory
+        public enum SearchCategory
+        {
+            Both = 1,
+            Ranked = 2,
+            Loved = 4,
+        }
 
         /// <summary> 
         /// Downloads <see cref="BeatmapSetInfo"/> that have a higher <see cref="BeatmapSetInfo.MaxStarDifficulty"/>  than specified in <see cref="OsuSetting.BeatmapDownloadMinimumStarRating"/>.
@@ -101,33 +102,12 @@ namespace osu.Game.Beatmaps
 
                         while (!finished) { Task.Delay(100); }
 
-                        notifications?.Post(new SimpleNotification
-                        {
-                            Text = BeatmapDownloaderStrings.FinishedDownloadingNewBeatmaps.ToString(),
-                            Icon = FontAwesome.Solid.Check,
-                        });
-
                         return string.Empty;
-                    }
-                    catch (DownloaderException ex)
-                    {
-                        notifications?.Post(new SimpleNotification
-                        {
-                            Text = BeatmapDownloaderStrings.AnErrorHasOccuredWhileDownloadingTheBeatmaps(ex.Message).ToString(),
-                            Icon = FontAwesome.Solid.Cross,
-                        });
-                        return ex.Message;
                     }
                     catch (Exception ex)
                     {
-                        notifications?.Post(new SimpleNotification
-                        {
-                            Text = BeatmapDownloaderStrings.AnInternalErrorHasOccuredWhileDownloadingTheBeatmaps(ex.Message).ToString(),
-                            Icon = FontAwesome.Solid.Cross,
-                        });
                         return ex.Message;
                     }
-
                 }
             });
         }
@@ -152,7 +132,7 @@ namespace osu.Game.Beatmaps
         /// <param name="cursor">A <see cref="Cursor"/> from the last <see cref="SearchBeatmapSetsResponse"/>, default is null.</param>
         protected virtual void sendAPIReqeust(int iteration, RulesetInfo ruleset, SearchCategory searchCategory, Cursor cursor = null)
         {
-            SearchBeatmapSetsRequest getSetsRequest = new SearchBeatmapSetsRequest($"star>={minimumStarRating.Value}", ruleset, cursor, null, searchCategory);
+            SearchBeatmapSetsRequest getSetsRequest = new SearchBeatmapSetsRequest($"star>={minimumStarRating.Value}", ruleset, cursor, null, (Overlays.BeatmapListing.SearchCategory)searchCategory);
 
             getSetsRequest.Success += (response) =>
             handleAPIReqeust(SearchResult.ResultsReturned(response.BeatmapSets.Select(responseJson => responseJson.ToBeatmapSet(rulesets)).ToList()),

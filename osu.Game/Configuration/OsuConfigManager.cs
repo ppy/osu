@@ -150,7 +150,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.BeatmapDownloadMinimumStarRating, 0.0, 0, 10, 0.1);
             SetDefault(OsuSetting.BeatmapDownloadLastTime, DateTime.Now);
-            SetDefault(OsuSetting.BeatmapDownloadSearchCategory, Overlays.BeatmapListing.SearchCategory.Leaderboard);
+            SetDefault(OsuSetting.BeatmapDownloadSearchCategory, Beatmaps.BeatmapDownloader.SearchCategory.Both);
             SetDefault(OsuSetting.BeatmapDownloadRuleset, 0, 0, int.MaxValue);
             SetDefault(OsuSetting.BeatmapDownloadStartUp, false);
         }
