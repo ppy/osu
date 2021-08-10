@@ -71,12 +71,16 @@ namespace osu.Game.Overlays.Changelog
                         Colour = colourProvider.Background6,
                         Margin = new MarginPadding { Top = 30 },
                     },
-                    new ChangelogSupporterPromo(),
+                    new ChangelogSupporterPromo
+                    {
+                        Alpha = api.LocalUser.Value.IsSupporter ? 0 : 1,
+                    },
                     new Box
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 2,
                         Colour = colourProvider.Background6,
+                        Alpha = api.LocalUser.Value.IsSupporter ? 0 : 1,
                     },
                     comments = new CommentsContainer()
                 };
