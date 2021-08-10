@@ -78,12 +78,12 @@ namespace osu.Game.Overlays.Changelog
                                         new OsuSpriteText
                                         {
                                             Text = ChangelogStrings.SupportHeading,
-                                            Font = OsuFont.GetFont(size: 22, weight: FontWeight.Light),
+                                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Light),
                                             Margin = new MarginPadding { Bottom = 20 },
                                         },
                                         supportLinkText = new LinkFlowContainer(t =>
                                         {
-                                            t.Font = t.Font.With(size: 17.5f);
+                                            t.Font = t.Font.With(size: 14);
                                         })
                                         {
                                             RelativeSizeAxes = Axes.X,
@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Changelog
                                         },
                                         supportNoteText = new TextFlowContainer(t =>
                                         {
-                                            t.Font = t.Font.With(size: 15);
+                                            t.Font = t.Font.With(size: 12);
                                         })
                                         {
                                             Margin = new MarginPadding { Top = 10 },
