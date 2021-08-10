@@ -194,7 +194,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(h => h is OsuModFlashlight))
             {
-                flashlightValue = Math.Pow(Attributes.FlashlightStrain, 2.0) * 25.0;
+                double rawFlashlight = Attributes.FlashlightStrain;
+
+                if (mods.Any(m => m is OsuModTouchDevice))
+                    rawFlashlight = Math.Pow(rawFlashlight, 0.8);
+
+                flashlightValue = Math.Pow(rawFlashlight, 2.0) * 25.0;
 
                 // Add an additional bonus for HDFL.
                 if (mods.Any(h => h is OsuModHidden))
