@@ -71,6 +71,7 @@ namespace osu.Game.Overlays.Changelog
                         Colour = colourProvider.Background6,
                         Margin = new MarginPadding { Top = 30 },
                     },
+                    new ChangelogSupporterPromo(),
                     comments = new CommentsContainer()
                 };
 
