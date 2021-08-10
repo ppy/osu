@@ -15,11 +15,6 @@ namespace osu.Game.Localisation
         public static LocalisableString YouNeedToBeLoggedInToDownloadBeatmaps => new TranslatableString(getKey(@"you_need_to_be_logged_in_to_download_beatmaps"), @"You need to be logged in to download Beatmaps");
 
         /// <summary>
-        /// "No Ruleset found with this ID"
-        /// </summary>
-        public static LocalisableString NoRulesetFoundWithThisID => new TranslatableString(getKey(@"no_ruleset_found_with_this_i_d"), @"No Ruleset found with this ID");
-
-        /// <summary>
         /// "The Last Downloaded Beatmap Time is in the Future"
         /// </summary>
         public static LocalisableString TheLastDownloadedBeatmapTimeIsInTheFuture => new TranslatableString(getKey(@"the_last_downloaded_beatmap_time_is_in_the_future"), @"The Last Downloaded Beatmap Time is in the Future");

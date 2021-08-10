@@ -80,9 +80,10 @@ namespace osu.Game.Beatmaps
                             throw new DownloaderException(BeatmapDownloaderStrings.YouNeedToBeLoggedInToDownloadBeatmaps.ToString());
                         }
 
+                        //Should never be hit since GetRuleset returns FirstOrDefault
                         if (ruleset == null)
                         {
-                            throw new DownloaderException(BeatmapDownloaderStrings.NoRulesetFoundWithThisID.ToString());
+                            throw new DownloaderException("No Ruleset available");
                         }
 
                         if (lastBeatmapDownloadTime.Value >= DateTime.Now)

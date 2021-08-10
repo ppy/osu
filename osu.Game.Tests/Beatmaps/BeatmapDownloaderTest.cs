@@ -11,7 +11,6 @@ using osu.Game.Configuration;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Rulesets;
 using osu.Game.Tests.Visual;
 using static osu.Game.Overlays.BeatmapListing.BeatmapListingFilterControl;
@@ -30,6 +29,7 @@ namespace osu.Game.Tests.Beatmaps
         private static List<BeatmapSetInfo> beatmapSetInfos = new List<BeatmapSetInfo>() {
             new BeatmapSetInfo()
             {
+                ID = 1,
                 OnlineBeatmapSetID = 3756,
                 Beatmaps = new List<BeatmapInfo>
                 {
@@ -46,6 +46,7 @@ namespace osu.Game.Tests.Beatmaps
             },
             new BeatmapSetInfo()
             {
+                ID = 1,
                 OnlineBeatmapSetID = 1,
                 Beatmaps = new List<BeatmapInfo>
                 {
@@ -62,7 +63,8 @@ namespace osu.Game.Tests.Beatmaps
             },
             new BeatmapSetInfo()
             {
-                OnlineBeatmapSetID = 1,
+                ID = 1,
+                OnlineBeatmapSetID = 2459,
                 Beatmaps = new List<BeatmapInfo>
                 {
                     new BeatmapInfo()
@@ -84,18 +86,31 @@ namespace osu.Game.Tests.Beatmaps
             Dependencies.CacheAs<BeatmapDownloader>(downloader = new TestBeatmapDownloader(config, beatmapManager, API, rulesets));
         }
 
-        public BeatmapDownloaderTest()
+        [SetUp]
+        public void SetUp()
         {
+            //TestConstructor Test will fail otherwise
+            if (config == null)
+                return;
+
+            config.GetBindable<DateTime>(OsuSetting.BeatmapDownloadLastTime).Value = new DateTime(2007, 1, 1);
+            config.GetBindable<double>(OsuSetting.BeatmapDownloadMinimumStarRating).Value = 0.0;
+            config.GetBindable<int>(OsuSetting.BeatmapDownloadRuleset).Value = 0;
+            config.GetBindable<BeatmapDownloader.SearchCategory>(OsuSetting.BeatmapDownloadSearchCategory).Value = BeatmapDownloader.SearchCategory.Both;
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            foreach (var beatmapsetinfo in beatmapSetInfos)
+            {
+                beatmapsetinfo.ID = 0;
+            }
         }
 
         [Test]
         public void TestMatchingCriteriaSuccess()
         {
-            config.GetBindable<DateTime>(OsuSetting.BeatmapDownloadLastTime).Value = new DateTime(2007, 10, 1);
-            config.GetBindable<double>(OsuSetting.BeatmapDownloadMinimumStarRating).Value = 0.0;
-            config.GetBindable<int>(OsuSetting.BeatmapDownloadRuleset).Value = 0;
-            config.GetBindable<SearchCategory>(OsuSetting.BeatmapDownloadSearchCategory).Value = SearchCategory.Leaderboard;
-
             foreach (var beatmapsetinfo in beatmapSetInfos)
             {
                 Assert.True(downloader.MatchesDownloadCriteria(beatmapsetinfo));
@@ -103,12 +118,9 @@ namespace osu.Game.Tests.Beatmaps
         }
 
         [Test]
-        public void TestMatchingCriteriaFail()
+        public void TestMatchingCriteriaFailDate()
         {
             config.GetBindable<DateTime>(OsuSetting.BeatmapDownloadLastTime).Value = new DateTime(2020, 10, 1);
-            config.GetBindable<double>(OsuSetting.BeatmapDownloadMinimumStarRating).Value = 0.0;
-            config.GetBindable<int>(OsuSetting.BeatmapDownloadRuleset).Value = 0;
-            config.GetBindable<SearchCategory>(OsuSetting.BeatmapDownloadSearchCategory).Value = SearchCategory.Leaderboard;
 
             foreach (var beatmapsetinfo in beatmapSetInfos)
             {
@@ -119,16 +131,16 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestDownloadFunctionSuccess()
         {
-            config.GetBindable<DateTime>(OsuSetting.BeatmapDownloadLastTime).Value = new DateTime(2008, 1, 1);
-            config.GetBindable<double>(OsuSetting.BeatmapDownloadMinimumStarRating).Value = 7.0;
-            config.GetBindable<int>(OsuSetting.BeatmapDownloadRuleset).Value = 0;
-            config.GetBindable<SearchCategory>(OsuSetting.BeatmapDownloadSearchCategory).Value = SearchCategory.Leaderboard;
-
             Assert.True(downloader.DownloadBeatmaps().Result == string.Empty);
+
+            foreach (var beatmapsetinfo in beatmapSetInfos)
+            {
+                Assert.True(beatmapsetinfo.ID == 1);
+            }
         }
 
         [Test]
-        public void TestDownloadFunctionFail()
+        public void TestDownloadFunctionFailMeta()
         {
             API.Logout();
             Assert.True(downloader.DownloadBeatmaps().Result == BeatmapDownloaderStrings.YouNeedToBeLoggedInToDownloadBeatmaps.ToString());
@@ -147,14 +159,15 @@ namespace osu.Game.Tests.Beatmaps
             {
             }
 
-            //skip download part for speed
+            //skip download for consistency/speed and set ID = 1 as downloaded flag
             protected override void downloadBeatmap(BeatmapSetInfo beatmapSetInfo)
             {
                 beatmapManager.Download(beatmapSetInfo);
+                beatmapSetInfo.ID = 1;
                 beatmapManager.GetExistingDownload(beatmapSetInfo).TriggerSuccess();
             }
 
-            //skip api request for speed
+            //skip api for consistency/speed
             protected override void sendAPIReqeust(int iteration, RulesetInfo ruleset, SearchCategory searchCategory, Cursor cursor = null)
             {
                 handleAPIReqeust(SearchResult.ResultsReturned(beatmapSetInfos), null, iteration, ruleset, searchCategory);
