@@ -4,7 +4,9 @@
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Changelog
@@ -26,6 +28,15 @@ namespace osu.Game.Overlays.Changelog
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Masking = true,
+                    CornerRadius = 6,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Colour = Color4.Black.Opacity(0.25f),
+                        Offset = new Vector2(0, 1),
+                        Radius = 3,
+                    },
                     Children = new Drawable[]
                     {
                         new Box
