@@ -1,11 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -13,6 +19,9 @@ namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogSupporterPromo : CompositeDrawable
     {
+        private readonly LinkFlowContainer supportLinkText;
+        private readonly TextFlowContainer supportNoteText;
+
         public ChangelogSupporterPromo()
         {
             RelativeSizeAxes = Axes.X;
@@ -22,6 +31,7 @@ namespace osu.Game.Overlays.Changelog
                 Vertical = 20,
                 Horizontal = 50,
             };
+
             InternalChildren = new Drawable[]
             {
                 new Container
@@ -48,10 +58,67 @@ namespace osu.Game.Overlays.Changelog
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 200,
+                            Padding = new MarginPadding { Horizontal = 75 },
+                            Direction = FillDirection.Horizontal,
+                            Children = new Drawable[]
+                            {
+                                new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Children = new Drawable[]
+                                    {
+                                        new OsuSpriteText
+                                        {
+                                            Text = ChangelogStrings.SupportHeading,
+                                            Font = OsuFont.GetFont(size: 22, weight: FontWeight.Light),
+                                            Margin = new MarginPadding { Bottom = 20 },
+                                        },
+                                        supportLinkText = new LinkFlowContainer(t =>
+                                        {
+                                            t.Font = t.Font.With(size: 17.5f);
+                                        })
+                                        {
+                                            AutoSizeAxes = Axes.Both,
+                                        },
+                                        supportNoteText = new TextFlowContainer(t =>
+                                        {
+                                            t.Font = t.Font.With(size: 15);
+                                        })
+                                        {
+                                            Margin = new MarginPadding { Top = 10 },
+                                            AutoSizeAxes = Axes.Both,
+                                        }
+                                    },
+                                },
+                            }
                         },
                     }
                 },
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colour)
+        {
+            void fontPinkColour(SpriteText t) => t.Colour = colour.PinkLighter;
+
+            supportLinkText.AddText("Support further development of osu! and ", fontPinkColour);
+            supportLinkText.AddLink("become an osu!supporter", "https://osu.ppy.sh/home/support", t =>
+            {
+                t.Colour = colour.PinkDark;
+                t.Font = t.Font.With(weight: FontWeight.Bold);
+            });
+            supportLinkText.AddText(" today!", fontPinkColour);
+
+            supportNoteText.AddText(new OsuSpriteText
+            {
+                Text = ChangelogStrings.SupportText2,
+                Colour = colour.PinkLighter,
+            });
         }
     }
 }
