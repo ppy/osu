@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -19,10 +20,11 @@ namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogSupporterPromo : CompositeDrawable
     {
-        private const float image_width = 164;
+        private const float image_container_width = 164;
 
         private readonly LinkFlowContainer supportLinkText;
         private readonly TextFlowContainer supportNoteText;
+        private readonly Container imageContainer;
 
         public ChangelogSupporterPromo()
         {
@@ -70,7 +72,7 @@ namespace osu.Game.Overlays.Changelog
                                     Direction = FillDirection.Vertical,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Padding = new MarginPadding { Right = 50 + image_width },
+                                    Padding = new MarginPadding { Right = 50 + image_container_width },
                                     Children = new Drawable[]
                                     {
                                         new OsuSpriteText
@@ -98,10 +100,10 @@ namespace osu.Game.Overlays.Changelog
                                         }
                                     },
                                 },
-                                new Container
+                                imageContainer = new Container
                                 {
                                     RelativeSizeAxes = Axes.Y,
-                                    Width = image_width,
+                                    Width = image_container_width,
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                 }
@@ -113,7 +115,7 @@ namespace osu.Game.Overlays.Changelog
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
+        private void load(OsuColour colour, TextureStore textures)
         {
             void fontPinkColour(SpriteText t) => t.Colour = colour.PinkLighter;
 
@@ -126,6 +128,27 @@ namespace osu.Game.Overlays.Changelog
             supportLinkText.AddText(" today!", fontPinkColour);
 
             supportNoteText.AddText("Not only will you help speed development, but you will also get some extra features and customisations!", fontPinkColour);
+
+            imageContainer.Children = new Drawable[]
+            {
+                new Sprite
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    FillMode = FillMode.Fill,
+                    Texture = textures.Get(@"Online/supporter-pippi"),
+                },
+                new Sprite
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Width = 75,
+                    Height = 75,
+                    Margin = new MarginPadding { Top = 70 },
+                    Texture = textures.Get(@"Online/supporter-heart"),
+                },
+            };
         }
     }
 }
