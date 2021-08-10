@@ -96,7 +96,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
-            ((IBindable<bool>)leaderboard.Expanded).BindTo(IsBreakTime);
+            ((IBindable<bool>)leaderboard.Expanded).BindTo(HUDOverlay.ShowHud);
         }
 
         protected override void StartGameplay()
