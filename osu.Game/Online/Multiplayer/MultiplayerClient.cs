@@ -243,23 +243,31 @@ namespace osu.Game.Online.Multiplayer
         /// <exception cref="InvalidOperationException">If a toggle of ready state is not valid at this time.</exception>
         public async Task ToggleReady()
         {
-            var localUser = LocalUser;
-
-            if (localUser == null)
-                return;
-
-            switch (localUser.State)
+            try
             {
-                case MultiplayerUserState.Idle:
-                    await ChangeState(MultiplayerUserState.Ready).ConfigureAwait(false);
+                var localUser = LocalUser;
+
+                if (localUser == null)
                     return;
 
-                case MultiplayerUserState.Ready:
-                    await ChangeState(MultiplayerUserState.Idle).ConfigureAwait(false);
-                    return;
+                switch (localUser.State)
+                {
+                    case MultiplayerUserState.Idle:
+                        await ChangeState(MultiplayerUserState.Ready).ConfigureAwait(false);
+                        return;
 
-                default:
-                    throw new InvalidOperationException($"Cannot toggle ready when in {localUser.State}");
+                    case MultiplayerUserState.Ready:
+                        await ChangeState(MultiplayerUserState.Idle).ConfigureAwait(false);
+                        return;
+
+                    default:
+                        throw new InvalidOperationException($"Cannot toggle ready when in {localUser.State}");
+                }
+            }
+            catch (NotJoinedRoomException)
+            {
+                Logger.Log("Server reported that we are no longer in the room, exiting locally.");
+                await LeaveRoom().ConfigureAwait(false);
             }
         }
 
@@ -269,24 +277,32 @@ namespace osu.Game.Online.Multiplayer
         /// <exception cref="InvalidOperationException">If a toggle of the spectating state is not valid at this time.</exception>
         public async Task ToggleSpectate()
         {
-            var localUser = LocalUser;
-
-            if (localUser == null)
-                return;
-
-            switch (localUser.State)
+            try
             {
-                case MultiplayerUserState.Idle:
-                case MultiplayerUserState.Ready:
-                    await ChangeState(MultiplayerUserState.Spectating).ConfigureAwait(false);
+                var localUser = LocalUser;
+
+                if (localUser == null)
                     return;
 
-                case MultiplayerUserState.Spectating:
-                    await ChangeState(MultiplayerUserState.Idle).ConfigureAwait(false);
-                    return;
+                switch (localUser.State)
+                {
+                    case MultiplayerUserState.Idle:
+                    case MultiplayerUserState.Ready:
+                        await ChangeState(MultiplayerUserState.Spectating).ConfigureAwait(false);
+                        return;
 
-                default:
-                    throw new InvalidOperationException($"Cannot toggle spectate when in {localUser.State}");
+                    case MultiplayerUserState.Spectating:
+                        await ChangeState(MultiplayerUserState.Idle).ConfigureAwait(false);
+                        return;
+
+                    default:
+                        throw new InvalidOperationException($"Cannot toggle spectate when in {localUser.State}");
+                }
+            }
+            catch (NotJoinedRoomException)
+            {
+                Logger.Log("Server reported that we are no longer in the room, exiting locally.");
+                await LeaveRoom().ConfigureAwait(false);
             }
         }
 
