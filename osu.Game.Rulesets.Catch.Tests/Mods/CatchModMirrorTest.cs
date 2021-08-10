@@ -36,14 +36,12 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
             beatmapProcessor.PreProcess();
 
             foreach (var hitObject in beatmap.HitObjects)
-            {
                 hitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-                if (withMirrorMod)
-                    mirrorMod.ApplyToHitObject(hitObject);
-            }
-
             beatmapProcessor.PostProcess();
+
+            if (withMirrorMod)
+                mirrorMod.ApplyToBeatmap(beatmap);
 
             return beatmap;
         }
