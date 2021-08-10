@@ -41,8 +41,10 @@ namespace osu.Game.Screens.Play.HUD
         private UserLookupCache userLookupCache { get; set; }
 
         private readonly ScoreProcessor scoreProcessor;
-        private readonly IBindableList<int> playingUsers;
+        private readonly MultiplayerRoomUser[] playingUsers;
         private Bindable<ScoringMode> scoringMode;
+
+        private readonly IBindableList<int> playingUserIds = new BindableList<int>();
 
         private bool hasTeams => TeamScores.Count > 0;
 
@@ -50,14 +52,13 @@ namespace osu.Game.Screens.Play.HUD
         /// Construct a new leaderboard.
         /// </summary>
         /// <param name="scoreProcessor">A score processor instance to handle score calculation for scores of users in the match.</param>
-        /// <param name="userIds">IDs of all users in this match.</param>
-        public MultiplayerGameplayLeaderboard(ScoreProcessor scoreProcessor, int[] userIds)
+        /// <param name="users">IDs of all users in this match.</param>
+        public MultiplayerGameplayLeaderboard(ScoreProcessor scoreProcessor, MultiplayerRoomUser[] users)
         {
             // todo: this will eventually need to be created per user to support different mod combinations.
             this.scoreProcessor = scoreProcessor;
 
-            // todo: this will likely be passed in as User instances.
-            playingUsers = new BindableList<int>(userIds);
+            playingUsers = users;
         }
 
         [BackgroundDependencyLoader]
@@ -65,19 +66,17 @@ namespace osu.Game.Screens.Play.HUD
         {
             scoringMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
 
-            foreach (var userId in playingUsers)
+            foreach (var user in playingUsers)
             {
-                var user = multiplayerClient.Room?.Users.FirstOrDefault(u => u.UserID == userId);
-
                 var trackedUser = CreateUserData(user, scoreProcessor);
                 trackedUser.ScoringMode.BindTo(scoringMode);
-                UserScores[userId] = trackedUser;
+                UserScores[user.UserID] = trackedUser;
 
                 if (trackedUser.Team is int team && !TeamScores.ContainsKey(team))
                     TeamScores.Add(team, new BindableInt());
             }
 
-            userLookupCache.GetUsersAsync(playingUsers.ToArray()).ContinueWith(users => Schedule(() =>
+            userLookupCache.GetUsersAsync(playingUsers.Select(u => u.UserID).ToArray()).ContinueWith(users => Schedule(() =>
             {
                 foreach (var user in users.Result)
                 {
@@ -100,18 +99,18 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             // BindableList handles binding in a really bad way (Clear then AddRange) so we need to do this manually..
-            foreach (int userId in playingUsers)
+            foreach (var user in playingUsers)
             {
-                spectatorClient.WatchUser(userId);
+                spectatorClient.WatchUser(user.UserID);
 
-                if (!multiplayerClient.CurrentMatchPlayingUserIds.Contains(userId))
-                    usersChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new[] { userId }));
+                if (!multiplayerClient.CurrentMatchPlayingUserIds.Contains(user.UserID))
+                    usersChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new[] { user.UserID }));
             }
 
             // bind here is to support players leaving the match.
             // new players are not supported.
-            playingUsers.BindTo(multiplayerClient.CurrentMatchPlayingUserIds);
-            playingUsers.BindCollectionChanged(usersChanged);
+            playingUserIds.BindTo(multiplayerClient.CurrentMatchPlayingUserIds);
+            playingUserIds.BindCollectionChanged(usersChanged);
 
             // this leaderboard should be guaranteed to be completely loaded before the gameplay starts (is a prerequisite in MultiplayerPlayer).
             spectatorClient.OnNewFrames += handleIncomingFrames;
@@ -197,7 +196,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 foreach (var user in playingUsers)
                 {
-                    spectatorClient.StopWatchingUser(user);
+                    spectatorClient.StopWatchingUser(user.UserID);
                 }
 
                 spectatorClient.OnNewFrames -= handleIncomingFrames;

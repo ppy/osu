@@ -37,7 +37,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private MultiplayerGameplayLeaderboard leaderboard;
 
-        private readonly int[] userIds;
+        private readonly MultiplayerRoomUser[] users;
 
         private LoadingLayer loadingDisplay;
         private FillFlowContainer leaderboardFlow;
@@ -46,8 +46,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// Construct a multiplayer player.
         /// </summary>
         /// <param name="playlistItem">The playlist item to be played.</param>
-        /// <param name="userIds">The users which are participating in this game.</param>
-        public MultiplayerPlayer(PlaylistItem playlistItem, int[] userIds)
+        /// <param name="users">The users which are participating in this game.</param>
+        public MultiplayerPlayer(PlaylistItem playlistItem, MultiplayerRoomUser[] users)
             : base(playlistItem, new PlayerConfiguration
             {
                 AllowPause = false,
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 AllowSkipping = false,
             })
         {
-            this.userIds = userIds;
+            this.users = users;
         }
 
         [BackgroundDependencyLoader]
@@ -71,7 +71,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             });
 
             // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
-            LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(ScoreProcessor, userIds), l =>
+            LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(ScoreProcessor, users), l =>
             {
                 if (!LoadedBeatmapSuccessfully)
                     return;
