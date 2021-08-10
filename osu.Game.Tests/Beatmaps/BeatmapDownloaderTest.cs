@@ -147,12 +147,14 @@ namespace osu.Game.Tests.Beatmaps
             {
             }
 
+            //skip download part for speed
             protected override void downloadBeatmap(BeatmapSetInfo beatmapSetInfo)
             {
                 beatmapManager.Download(beatmapSetInfo);
                 beatmapManager.GetExistingDownload(beatmapSetInfo).TriggerSuccess();
             }
 
+            //skip api request for speed
             protected override void sendAPIReqeust(int iteration, RulesetInfo ruleset, SearchCategory searchCategory, Cursor cursor = null)
             {
                 handleAPIReqeust(SearchResult.ResultsReturned(beatmapSetInfos), null, iteration, ruleset, searchCategory);
