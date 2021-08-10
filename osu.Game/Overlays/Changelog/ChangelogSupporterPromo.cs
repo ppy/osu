@@ -19,6 +19,8 @@ namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogSupporterPromo : CompositeDrawable
     {
+        private const float image_width = 164;
+
         private readonly LinkFlowContainer supportLinkText;
         private readonly TextFlowContainer supportNoteText;
 
@@ -54,12 +56,11 @@ namespace osu.Game.Overlays.Changelog
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4.Black.Opacity(0.3f),
                         },
-                        new FillFlowContainer
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 200,
                             Padding = new MarginPadding { Horizontal = 75 },
-                            Direction = FillDirection.Horizontal,
                             Children = new Drawable[]
                             {
                                 new FillFlowContainer
@@ -69,6 +70,7 @@ namespace osu.Game.Overlays.Changelog
                                     Direction = FillDirection.Vertical,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
+                                    Padding = new MarginPadding { Right = 50 + image_width },
                                     Children = new Drawable[]
                                     {
                                         new OsuSpriteText
@@ -82,7 +84,8 @@ namespace osu.Game.Overlays.Changelog
                                             t.Font = t.Font.With(size: 17.5f);
                                         })
                                         {
-                                            AutoSizeAxes = Axes.Both,
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
                                         },
                                         supportNoteText = new TextFlowContainer(t =>
                                         {
@@ -90,10 +93,18 @@ namespace osu.Game.Overlays.Changelog
                                         })
                                         {
                                             Margin = new MarginPadding { Top = 10 },
-                                            AutoSizeAxes = Axes.Both,
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
                                         }
                                     },
                                 },
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Y,
+                                    Width = image_width,
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                }
                             }
                         },
                     }
@@ -114,11 +125,7 @@ namespace osu.Game.Overlays.Changelog
             });
             supportLinkText.AddText(" today!", fontPinkColour);
 
-            supportNoteText.AddText(new OsuSpriteText
-            {
-                Text = ChangelogStrings.SupportText2,
-                Colour = colour.PinkLighter,
-            });
+            supportNoteText.AddText("Not only will you help speed development, but you will also get some extra features and customisations!", fontPinkColour);
         }
     }
 }
