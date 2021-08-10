@@ -72,6 +72,12 @@ namespace osu.Game.Overlays.Changelog
                         Margin = new MarginPadding { Top = 30 },
                     },
                     new ChangelogSupporterPromo(),
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 2,
+                        Colour = colourProvider.Background6,
+                    },
                     comments = new CommentsContainer()
                 };
 
