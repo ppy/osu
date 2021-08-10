@@ -46,14 +46,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private PlayerArea currentAudioSource;
         private bool canStartMasterClock;
 
+        private readonly MultiplayerRoomUser[] users;
+
         /// <summary>
         /// Creates a new <see cref="MultiSpectatorScreen"/>.
         /// </summary>
-        /// <param name="userIds">The players to spectate.</param>
-        public MultiSpectatorScreen(int[] userIds)
-            : base(userIds.Take(PlayerGrid.MAX_PLAYERS).ToArray())
+        /// <param name="users">The players to spectate.</param>
+        public MultiSpectatorScreen(MultiplayerRoomUser[] users)
+            : base(users.Select(u => u.UserID).ToArray())
         {
-            instances = new PlayerArea[UserIds.Count];
+            // todo: this is a bit ugly, but not sure on a better way to handle.
+            this.users = users;
+
+            instances = new PlayerArea[Users.Count];
         }
 
         [BackgroundDependencyLoader]
@@ -105,9 +110,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 })
             };
 
-            for (int i = 0; i < UserIds.Count; i++)
+            for (int i = 0; i < Users.Count; i++)
             {
-                grid.Add(instances[i] = new PlayerArea(UserIds[i], masterClockContainer.GameplayClock));
+                grid.Add(instances[i] = new PlayerArea(Users[i], masterClockContainer.GameplayClock));
                 syncManager.AddPlayerClock(instances[i].GameplayClock);
             }
 
@@ -116,7 +121,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             var scoreProcessor = Ruleset.Value.CreateInstance().CreateScoreProcessor();
             scoreProcessor.ApplyBeatmap(playableBeatmap);
 
-            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(scoreProcessor, UserIds.ToArray())
+            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(scoreProcessor, users)
             {
                 Expanded = { Value = true },
                 Anchor = Anchor.CentreLeft,

@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
@@ -27,7 +28,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private MultiSpectatorScreen spectatorScreen;
 
-        private readonly List<int> playingUserIds = new List<int>();
+        private readonly List<MultiplayerRoomUser> playingUsers = new List<MultiplayerRoomUser>();
 
         private BeatmapSetInfo importedSet;
         private BeatmapInfo importedBeatmap;
@@ -42,7 +43,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [SetUp]
-        public new void Setup() => Schedule(() => playingUserIds.Clear());
+        public new void Setup() => Schedule(() => playingUsers.Clear());
 
         [Test]
         public void TestDelayedStart()
@@ -52,8 +53,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_1_ID }, true);
                 OnlinePlayDependencies.Client.AddUser(new User { Id = PLAYER_2_ID }, true);
 
-                playingUserIds.Add(PLAYER_1_ID);
-                playingUserIds.Add(PLAYER_2_ID);
+                playingUsers.Add(new MultiplayerRoomUser(PLAYER_1_ID));
+                playingUsers.Add(new MultiplayerRoomUser(PLAYER_2_ID));
             });
 
             loadSpectateScreen(false);
@@ -99,8 +100,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 SpectatorClient.StartPlay(PLAYER_1_ID, importedBeatmapId);
                 SpectatorClient.StartPlay(PLAYER_2_ID, importedBeatmapId);
 
-                playingUserIds.Add(PLAYER_1_ID);
-                playingUserIds.Add(PLAYER_2_ID);
+                playingUsers.Add(new MultiplayerRoomUser(PLAYER_1_ID));
+                playingUsers.Add(new MultiplayerRoomUser(PLAYER_2_ID));
             });
 
             loadSpectateScreen();
@@ -287,7 +288,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(importedBeatmap);
                 Ruleset.Value = importedBeatmap.Ruleset;
 
-                LoadScreen(spectatorScreen = new MultiSpectatorScreen(playingUserIds.ToArray()));
+                LoadScreen(spectatorScreen = new MultiSpectatorScreen(playingUsers.ToArray()));
             });
 
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectatorScreen.AllPlayersLoaded));
@@ -302,7 +303,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     OnlinePlayDependencies.Client.AddUser(new User { Id = id }, true);
 
                     SpectatorClient.StartPlay(id, beatmapId ?? importedBeatmapId);
-                    playingUserIds.Add(id);
+                    playingUsers.Add(new MultiplayerRoomUser(id));
                 }
             });
         }
