@@ -3,9 +3,9 @@
 
 using System;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Skinning.Default;
+using osu.Game.Utils;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 Color4 outerColour = AccentColour.Darken(0.1f);
                 Color4 innerColour = lighten(AccentColour, 0.5f);
 
-                return Interpolation.ValueAt(position / realGradientPortion, outerColour, innerColour, 0, 1);
+                return LegacyUtils.InterpolateNonLinear(position / realGradientPortion, outerColour, innerColour, 0, 1);
             }
 
             /// <summary>
