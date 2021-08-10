@@ -29,11 +29,30 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         private void applyToHitObject(HitObject hitObject)
         {
-            if (hitObject is BananaShower)
-                return;
-
             var catchObject = (CatchHitObject)hitObject;
 
+            switch (catchObject)
+            {
+                case Fruit fruit:
+                    mirrorEffectiveX(fruit);
+                    break;
+
+                case JuiceStream juiceStream:
+                    mirrorEffectiveX(juiceStream);
+                    mirrorJuiceStreamPath(juiceStream);
+                    break;
+
+                case BananaShower bananaShower:
+                    mirrorBananaShower(bananaShower);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Mirrors the effective X position of <paramref name="catchObject"/> and its nested hit objects.
+        /// </summary>
+        private static void mirrorEffectiveX(CatchHitObject catchObject)
+        {
             catchObject.OriginalX = CatchPlayfield.WIDTH - catchObject.OriginalX;
             catchObject.XOffset = -catchObject.XOffset;
 
@@ -42,15 +61,27 @@ namespace osu.Game.Rulesets.Catch.Mods
                 nested.OriginalX = CatchPlayfield.WIDTH - nested.OriginalX;
                 nested.XOffset = -nested.XOffset;
             }
+        }
 
-            if (catchObject is JuiceStream juiceStream)
-            {
-                var controlPoints = juiceStream.Path.ControlPoints.Select(p => new PathControlPoint(p.Position.Value, p.Type.Value)).ToArray();
-                foreach (var point in controlPoints)
-                    point.Position.Value = new Vector2(-point.Position.Value.X, point.Position.Value.Y);
+        /// <summary>
+        /// Mirrors the path of the <paramref name="juiceStream"/>.
+        /// </summary>
+        private static void mirrorJuiceStreamPath(JuiceStream juiceStream)
+        {
+            var controlPoints = juiceStream.Path.ControlPoints.Select(p => new PathControlPoint(p.Position.Value, p.Type.Value)).ToArray();
+            foreach (var point in controlPoints)
+                point.Position.Value = new Vector2(-point.Position.Value.X, point.Position.Value.Y);
 
-                juiceStream.Path = new SliderPath(controlPoints, juiceStream.Path.ExpectedDistance.Value);
-            }
+            juiceStream.Path = new SliderPath(controlPoints, juiceStream.Path.ExpectedDistance.Value);
+        }
+
+        /// <summary>
+        /// Mirrors X positions of all bananas in the <paramref name="bananaShower"/>.
+        /// </summary>
+        private static void mirrorBananaShower(BananaShower bananaShower)
+        {
+            foreach (var banana in bananaShower.NestedHitObjects.OfType<Banana>())
+                banana.XOffset = CatchPlayfield.WIDTH - banana.XOffset;
         }
     }
 }
