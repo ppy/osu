@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Play.HUD
         private UserLookupCache userLookupCache { get; set; }
 
         private readonly ScoreProcessor scoreProcessor;
-        private readonly BindableList<int> playingUsers;
+        private readonly IBindableList<int> playingUsers;
         private Bindable<ScoringMode> scoringMode;
 
         /// <summary>
