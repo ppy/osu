@@ -192,7 +192,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double flashlightValue = 0.0;
 
-            if (mods.Any(h => h is OsuModFlashlight)) {
+            if (mods.Any(h => h is OsuModFlashlight))
+            {
                 flashlightValue = Math.Pow(Attributes.FlashlightStrain, 2.0) * 25.0;
 
                 // Add an additional bonus for HDFL.
