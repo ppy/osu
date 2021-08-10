@@ -181,6 +181,7 @@ namespace osu.Game.Online.Multiplayer
             {
                 APIRoom = null;
                 Room = null;
+                CurrentMatchPlayingItem.Value = null;
                 PlayingUserIds.Clear();
 
                 RoomUpdated?.Invoke();
