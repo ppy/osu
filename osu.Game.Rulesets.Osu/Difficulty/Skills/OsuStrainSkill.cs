@@ -28,8 +28,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double DifficultyMultiplier => 1.06;
 
-        protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
-
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
         {
