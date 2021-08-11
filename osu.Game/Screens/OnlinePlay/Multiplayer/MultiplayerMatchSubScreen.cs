@@ -448,6 +448,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onRoomUpdated()
         {
+            // may happen if the client is kicked or otherwise removed from the room.
+            if (client.Room == null)
+            {
+                Schedule(this.Exit);
+                return;
+            }
+
             Scheduler.AddOnce(UpdateMods);
         }
 
