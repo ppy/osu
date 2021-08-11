@@ -85,8 +85,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
 
         private void applyTransforms(int randomSeed)
         {
-            ClearTransforms(true);
-
             const double duration = 400;
 
             // we want our size to be very small so the glow dominates it.
