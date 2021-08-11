@@ -45,6 +45,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public const double RESULTS_DISPLAY_DELAY = 1000.0;
 
+        /// <summary>
+        /// Raised after <see cref="StartGameplay"/> is called.
+        /// </summary>
+        public event Action OnGameplayStarted;
+
         public override bool AllowBackButton => false; // handled by HoldForMenuButton
 
         protected override UserActivity InitialActivity => new UserActivity.SoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
@@ -934,7 +939,9 @@ namespace osu.Game.Screens.Play
             updateGameplayState();
 
             GameplayClockContainer.FadeInFromZero(750, Easing.OutQuint);
+
             StartGameplay();
+            OnGameplayStarted?.Invoke();
         }
 
         /// <summary>
