@@ -184,7 +184,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         {
             base.OnRoomUpdated();
 
-            if (Room == null)
+            if (Room == null || Client.LocalUser == null)
                 return;
 
             const double fade_time = 50;
@@ -196,7 +196,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);
 
-            if (Client.LocalUser != null && Room.Host?.Equals(Client.LocalUser) == true)
+            if (Client.IsHost && !User.Equals(Client.LocalUser))
                 kickButton.FadeIn(fade_time);
             else
                 kickButton.FadeOut(fade_time);
