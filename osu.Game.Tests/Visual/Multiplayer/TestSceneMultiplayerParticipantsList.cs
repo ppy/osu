@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
             }));
 
-            AddUntilStep("kick buttons visible", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Count(d => d.IsPresent) == 2);
+            AddUntilStep("kick buttons visible", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Count(d => d.IsPresent) == 1);
 
             AddStep("make second user host", () => Client.TransferHost(3));
 
@@ -173,7 +173,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("make local user host again", () => Client.TransferHost(API.LocalUser.Value.Id));
 
-            AddUntilStep("kick buttons visible", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Count(d => d.IsPresent) == 2);
+            AddUntilStep("kick buttons visible", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Count(d => d.IsPresent) == 1);
         }
 
         [Test]
@@ -186,7 +186,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
             }));
 
-            AddStep("kick second user", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Last().TriggerClick());
+            AddStep("kick second user", () => this.ChildrenOfType<ParticipantPanel.KickButton>().Single(d => d.IsPresent).TriggerClick());
 
             AddAssert("second user kicked", () => Client.Room?.Users.Single().UserID == API.LocalUser.Value.Id);
         }
