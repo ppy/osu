@@ -36,6 +36,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.CentreLeft,
+                    Alpha = 0,
                     Blending = BlendingParameters.Additive,
                     Rotation = -90
                 },
@@ -43,6 +44,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.CentreLeft,
+                    Alpha = 0,
                     Blending = BlendingParameters.Additive,
                     Rotation = -90
                 }
