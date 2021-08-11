@@ -50,9 +50,7 @@ namespace osu.Game.Screens.Mvis.Plugins.Types
         /// </returns>
         public bool SetFunctionControls(List<IFunctionProvider> providers);
 
-
-        public void OnRemove(IFunctionBarProvider provider);
-        public void OnRemove(IPluginFunctionProvider provider);
+        public void Remove(IFunctionProvider provider);
 
         /// <summary>
         /// 临时显示功能控制按钮

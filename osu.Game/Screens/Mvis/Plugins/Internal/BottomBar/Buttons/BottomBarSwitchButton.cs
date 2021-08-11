@@ -41,10 +41,7 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.BottomBar.Buttons
 
         private void onDisabledChanged(bool disabled)
         {
-            if (disabled)
-                this.ScaleTo(0.8f, 300, Easing.OutQuint).FadeColour(Color4.Gray, 300, Easing.OutQuint);
-            else
-                this.ScaleTo(1, 300, Easing.OutQuint).FadeColour(Color4.White, 300, Easing.OutQuint);
+            this.FadeColour(disabled ? Color4.Gray : Color4.White, 300, Easing.OutQuint);
         }
 
         protected override bool OnClick(ClickEvent e)

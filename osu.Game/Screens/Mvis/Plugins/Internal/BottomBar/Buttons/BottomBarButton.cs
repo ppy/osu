@@ -72,6 +72,8 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.BottomBar.Buttons
             set => base.AutoSizeAxes = value;
         }
 
+        public readonly IFunctionProvider Provider;
+
         public BottomBarButton(IFunctionProvider provider = null)
         {
             Size = new Vector2(30);
@@ -87,6 +89,7 @@ namespace osu.Game.Screens.Mvis.Plugins.Internal.BottomBar.Buttons
                 SpriteIcon.Icon = provider.Icon;
                 TooltipText = provider.Description;
                 Size = provider.Size;
+                Provider = provider;
             }
         }
 

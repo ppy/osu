@@ -20,6 +20,8 @@ namespace osu.Game.Screens.Mvis.Plugins.Types
         public FunctionType Type { get; set; }
 
         public void Active();
+
+        public string ToString() => $"{Title} - {Description}";
     }
 
     public interface IToggleableFunctionProvider : IFunctionProvider

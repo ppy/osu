@@ -658,7 +658,7 @@ namespace osu.Game.Screens.Mvis
                 overlay.Remove(targetDrawable);
 
             currentFunctionBarProvider = target ?? legacyBottomBarContainer;
-            currentFunctionBarProvider.AddFunctionControls(functionProviders);
+            currentFunctionBarProvider.SetFunctionControls(functionProviders);
 
             overlay.Add((Drawable)currentFunctionBarProvider);
         }
@@ -670,7 +670,7 @@ namespace osu.Game.Screens.Mvis
             keyBindings[GlobalAction.MvisOpenInSongSelect] = () => soloButton.Active();
             keyBindings[GlobalAction.MvisToggleOverlayLock] = () => lockButton.Active();
             keyBindings[GlobalAction.MvisTogglePluginPage] = () => pluginButton.Active();
-            keyBindings[GlobalAction.MvisTogglePause] = () => songProgressButton.Active();
+            keyBindings[GlobalAction.MvisTogglePause] = () => songProgressButton.Active(true);
             keyBindings[GlobalAction.MvisToggleTrackLoop] = () => loopToggleButton.Active();
             keyBindings[GlobalAction.MvisTogglePlayList] = () => sidebarToggleButton.Active();
             keyBindings[GlobalAction.MvisForceLockOverlayChanges] = () => disableChangesButton.Active();
@@ -712,7 +712,8 @@ namespace osu.Game.Screens.Mvis
                         if (d is IPluginFunctionProvider btn && btn.SourcePage == plsp)
                         {
                             functionProviders.Remove(d);
-                            currentFunctionBarProvider.OnRemove(d);
+                            currentFunctionBarProvider.Remove(d);
+                            break;
                         }
                     }
                 }
