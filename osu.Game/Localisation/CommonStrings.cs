@@ -20,6 +20,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Enabled => new TranslatableString(getKey(@"enabled"), @"Enabled");
 
         /// <summary>
+        /// "Default"
+        /// </summary>
+        public static LocalisableString Default => new TranslatableString(getKey(@"default"), @"Default");
+
+        /// <summary>
         /// "Width"
         /// </summary>
         public static LocalisableString Width => new TranslatableString(getKey(@"width"), @"Width");

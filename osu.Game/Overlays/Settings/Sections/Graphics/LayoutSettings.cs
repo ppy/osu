@@ -16,13 +16,14 @@ using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
     public class LayoutSettings : SettingsSubsection
     {
-        protected override LocalisableString Header => "Layout";
+        protected override LocalisableString Header => GraphicsSettingsStrings.LayoutHeader;
 
         private FillFlowContainer<SettingsSlider<float>> scalingSettings;
 
@@ -67,20 +68,20 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 windowModeDropdown = new SettingsDropdown<WindowMode>
                 {
-                    LabelText = "Screen mode",
+                    LabelText = GraphicsSettingsStrings.ScreenMode,
                     ItemSource = windowModes,
                     Current = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
                 },
                 resolutionDropdown = new ResolutionSettingsDropdown
                 {
-                    LabelText = "Resolution",
+                    LabelText = GraphicsSettingsStrings.Resolution,
                     ShowsDefaultIndicator = false,
                     ItemSource = resolutions,
                     Current = sizeFullscreen
                 },
                 new SettingsSlider<float, UIScaleSlider>
                 {
-                    LabelText = "UI Scaling",
+                    LabelText = GraphicsSettingsStrings.UIScaling,
                     TransferValueOnCommit = true,
                     Current = osuConfig.GetBindable<float>(OsuSetting.UIScale),
                     KeyboardStep = 0.01f,
@@ -88,7 +89,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
                 new SettingsEnumDropdown<ScalingMode>
                 {
-                    LabelText = "Screen Scaling",
+                    LabelText = GraphicsSettingsStrings.ScreenScaling,
                     Current = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
                     Keywords = new[] { "scale", "letterbox" },
                 },
@@ -104,28 +105,28 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     {
                         new SettingsSlider<float>
                         {
-                            LabelText = "Horizontal position",
+                            LabelText = GraphicsSettingsStrings.HorizontalPosition,
                             Current = scalingPositionX,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
-                            LabelText = "Vertical position",
+                            LabelText = GraphicsSettingsStrings.VerticalPosition,
                             Current = scalingPositionY,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
-                            LabelText = "Horizontal scale",
+                            LabelText = GraphicsSettingsStrings.HorizontalScale,
                             Current = scalingSizeX,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
-                            LabelText = "Vertical scale",
+                            LabelText = GraphicsSettingsStrings.VerticalScale,
                             Current = scalingSizeY,
                             KeyboardStep = 0.01f,
                             DisplayAsPercentage = true
@@ -145,9 +146,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 updateResolutionDropdown();
 
-                const string not_fullscreen_note = "Running without fullscreen mode will increase your input latency!";
-
-                windowModeDropdown.WarningText = mode.NewValue != WindowMode.Fullscreen ? not_fullscreen_note : string.Empty;
+                windowModeDropdown.WarningText = mode.NewValue != WindowMode.Fullscreen ? GraphicsSettingsStrings.NotFullscreenNote : string.Empty;
             }, true);
 
             windowModes.BindCollectionChanged((sender, args) =>
@@ -245,7 +244,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 protected override LocalisableString GenerateItemText(Size item)
                 {
                     if (item == new Size(9999, 9999))
-                        return "Default";
+                        return CommonStrings.Default;
 
                     return $"{item.Width}x{item.Height}";
                 }
