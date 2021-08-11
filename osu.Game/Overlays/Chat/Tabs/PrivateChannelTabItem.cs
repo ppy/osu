@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             if (value.Type != ChannelType.PM)
                 throw new ArgumentException("Argument value needs to have the targettype user!");
 
-            ClickableAvatar avatar;
+            DrawableAvatar avatar;
 
             AddRange(new Drawable[]
             {
@@ -48,10 +48,9 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Masking = true,
-                            Child = new DelayedLoadWrapper(avatar = new ClickableAvatar(value.Users.First())
+                            Child = new DelayedLoadWrapper(avatar = new DrawableAvatar(value.Users.First())
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                OpenOnClick = { Value = false },
+                                RelativeSizeAxes = Axes.Both
                             })
                             {
                                 RelativeSizeAxes = Axes.Both,

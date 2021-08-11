@@ -2,19 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Markdig.Syntax.Inlines;
-using osu.Framework.Graphics.Containers.Markdown;
-using osu.Framework.Graphics.Cursor;
+using osu.Game.Graphics.Containers.Markdown;
 
 namespace osu.Game.Overlays.Wiki.Markdown
 {
-    public class WikiMarkdownImage : MarkdownImage, IHasTooltip
+    public class WikiMarkdownImage : OsuMarkdownImage
     {
-        public string TooltipText { get; }
-
         public WikiMarkdownImage(LinkInline linkInline)
-            : base(linkInline.Url)
+            : base(linkInline)
         {
-            TooltipText = linkInline.Title;
         }
 
         protected override ImageContainer CreateImageContainer(string url)

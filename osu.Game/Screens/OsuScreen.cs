@@ -81,7 +81,7 @@ namespace osu.Game.Screens
 
         public virtual float BackgroundParallaxAmount => 1;
 
-        public virtual bool AllowRateAdjustments => true;
+        public virtual bool AllowTrackAdjustments => true;
 
         public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
@@ -242,7 +242,6 @@ namespace osu.Game.Screens
             logo.Anchor = Anchor.TopLeft;
             logo.Origin = Anchor.Centre;
             logo.RelativePositionAxes = Axes.Both;
-            logo.BeatMatching = true;
             logo.Triangles = true;
             logo.Ripple = true;
         }

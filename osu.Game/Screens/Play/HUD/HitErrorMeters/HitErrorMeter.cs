@@ -22,6 +22,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         [Resolved]
         private OsuColour colours { get; set; }
 
+        public bool UsesFixedAnchor { get; set; }
+
         [BackgroundDependencyLoader(true)]
         private void load(DrawableRuleset drawableRuleset)
         {
@@ -41,6 +43,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             switch (result)
             {
+                case HitResult.SmallTickMiss:
+                case HitResult.LargeTickMiss:
                 case HitResult.Miss:
                     return colours.Red;
 
@@ -53,6 +57,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 case HitResult.Good:
                     return colours.GreenLight;
 
+                case HitResult.SmallTickHit:
+                case HitResult.LargeTickHit:
                 case HitResult.Great:
                     return colours.Blue;
 

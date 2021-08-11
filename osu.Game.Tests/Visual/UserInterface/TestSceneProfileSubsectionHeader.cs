@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestInitialVisibility()
         {
-            AddStep("Create header with 0 value", () => createHeader("Header with visible when zero counter", CounterVisibilityState.VisibleWhenZero, 0));
+            AddStep("Create header with 0 value", () => createHeader("Header with visible when zero counter", CounterVisibilityState.VisibleWhenZero));
             AddAssert("Value is 0", () => header.Current.Value == 0);
             AddAssert("Counter is visible", () => header.ChildrenOfType<CounterPill>().First().Alpha == 1);
 

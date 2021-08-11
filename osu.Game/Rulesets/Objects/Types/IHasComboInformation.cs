@@ -1,9 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using JetBrains.Annotations;
 using osu.Framework.Bindables;
+using osu.Game.Skinning;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Types
@@ -16,16 +15,24 @@ namespace osu.Game.Rulesets.Objects.Types
         Bindable<int> IndexInCurrentComboBindable { get; }
 
         /// <summary>
-        /// The offset of this hitobject in the current combo.
+        /// The index of this hitobject in the current combo.
         /// </summary>
         int IndexInCurrentCombo { get; set; }
 
         Bindable<int> ComboIndexBindable { get; }
 
         /// <summary>
-        /// The offset of this combo in relation to the beatmap.
+        /// The index of this combo in relation to the beatmap.
         /// </summary>
         int ComboIndex { get; set; }
+
+        Bindable<int> ComboIndexWithOffsetsBindable { get; }
+
+        /// <summary>
+        /// The index of this combo in relation to the beatmap, with all aggregate <see cref="IHasCombo.ComboOffset"/>s applied.
+        /// This should be used instead of <see cref="ComboIndex"/> only when retrieving combo colours from the beatmap's skin.
+        /// </summary>
+        int ComboIndexWithOffsets { get; set; }
 
         /// <summary>
         /// Whether the HitObject starts a new combo.
@@ -40,11 +47,21 @@ namespace osu.Game.Rulesets.Objects.Types
         bool LastInCombo { get; set; }
 
         /// <summary>
-        /// Retrieves the colour of the combo described by this <see cref="IHasComboInformation"/> object from a set of possible combo colours.
-        /// Defaults to using <see cref="ComboIndex"/> to decide the colour.
+        /// Retrieves the colour of the combo described by this <see cref="IHasComboInformation"/> object.
         /// </summary>
-        /// <param name="comboColours">A list of possible combo colours provided by the beatmap or skin.</param>
-        /// <returns>The colour of the combo described by this <see cref="IHasComboInformation"/> object.</returns>
-        Color4 GetComboColour([NotNull] IReadOnlyList<Color4> comboColours) => comboColours.Count > 0 ? comboColours[ComboIndex % comboColours.Count] : Color4.White;
+        /// <param name="skin">The skin to retrieve the combo colour from, if wanted.</param>
+        Color4 GetComboColour(ISkin skin) => GetSkinComboColour(this, skin, ComboIndex);
+
+        /// <summary>
+        /// Retrieves the colour of the combo described by a given <see cref="IHasComboInformation"/> object from a given skin.
+        /// </summary>
+        /// <param name="combo">The combo information, should be <c>this</c>.</param>
+        /// <param name="skin">The skin to retrieve the combo colour from.</param>
+        /// <param name="comboIndex">The index to retrieve the combo colour with.</param>
+        /// <returns></returns>
+        protected static Color4 GetSkinComboColour(IHasComboInformation combo, ISkin skin, int comboIndex)
+        {
+            return skin.GetConfig<SkinComboColourLookup, Color4>(new SkinComboColourLookup(comboIndex, combo))?.Value ?? Color4.White;
+        }
     }
 }

@@ -31,10 +31,11 @@ namespace osu.Game.Tests.Visual.SongSelect
         private readonly TestBeatmapDifficultyCache testDifficultyCache = new TestBeatmapDifficultyCache();
 
         [Test]
-        public void TestLocal([Values("Beatmap", "Some long title and stuff")]
-                              string title,
-                              [Values("Trial", "Some1's very hardest difficulty")]
-                              string version)
+        public void TestLocal(
+            [Values("Beatmap", "Some long title and stuff")]
+            string title,
+            [Values("Trial", "Some1's very hardest difficulty")]
+            string version)
         {
             showMetadataForBeatmap(() => CreateWorkingBeatmap(new Beatmap
             {
@@ -142,9 +143,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             public override async Task<StarDifficulty> GetDifficultyAsync(BeatmapInfo beatmapInfo, RulesetInfo rulesetInfo = null, IEnumerable<Mod> mods = null, CancellationToken cancellationToken = default)
             {
                 if (blockCalculation)
-                    await calculationBlocker.Task;
+                    await calculationBlocker.Task.ConfigureAwait(false);
 
-                return await base.GetDifficultyAsync(beatmapInfo, rulesetInfo, mods, cancellationToken);
+                return await base.GetDifficultyAsync(beatmapInfo, rulesetInfo, mods, cancellationToken).ConfigureAwait(false);
             }
         }
     }

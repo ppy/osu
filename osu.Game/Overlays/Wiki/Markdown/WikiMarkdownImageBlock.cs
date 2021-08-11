@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Framework.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Overlays.Wiki.Markdown
@@ -13,7 +14,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
     public class WikiMarkdownImageBlock : FillFlowContainer
     {
         [Resolved]
-        private IMarkdownTextComponent parentTextComponent { get; set; }
+        private IMarkdownTextFlowComponent parentFlowComponent { get; set; }
 
         private readonly LinkInline linkInline;
 
@@ -30,20 +31,65 @@ namespace osu.Game.Overlays.Wiki.Markdown
         [BackgroundDependencyLoader]
         private void load()
         {
+            MarkdownTextFlowContainer textFlow;
+
             Children = new Drawable[]
             {
-                new WikiMarkdownImage(linkInline)
+                new BlockMarkdownImage(linkInline),
+                textFlow = parentFlowComponent.CreateTextFlow().With(t =>
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                },
-                parentTextComponent.CreateSpriteText().With(t =>
-                {
-                    t.Text = linkInline.Title;
                     t.Anchor = Anchor.TopCentre;
                     t.Origin = Anchor.TopCentre;
+                    t.TextAnchor = Anchor.TopCentre;
                 }),
             };
+
+            textFlow.AddText(linkInline.Title);
+        }
+
+        private class BlockMarkdownImage : WikiMarkdownImage
+        {
+            public BlockMarkdownImage(LinkInline linkInline)
+                : base(linkInline)
+            {
+                AutoSizeAxes = Axes.Y;
+                RelativeSizeAxes = Axes.X;
+            }
+
+            protected override ImageContainer CreateImageContainer(string url) => new BlockImageContainer(url);
+
+            private class BlockImageContainer : ImageContainer
+            {
+                public BlockImageContainer(string url)
+                    : base(url)
+                {
+                    AutoSizeAxes = Axes.Y;
+                    RelativeSizeAxes = Axes.X;
+                }
+
+                protected override Sprite CreateImageSprite() => new ImageSprite();
+
+                private class ImageSprite : Sprite
+                {
+                    public ImageSprite()
+                    {
+                        Anchor = Anchor.TopCentre;
+                        Origin = Anchor.TopCentre;
+                    }
+
+                    protected override void Update()
+                    {
+                        base.Update();
+
+                        if (Width > Parent.DrawWidth)
+                        {
+                            float ratio = Height / Width;
+                            Width = Parent.DrawWidth;
+                            Height = ratio * Width;
+                        }
+                    }
+                }
+            }
         }
     }
 }

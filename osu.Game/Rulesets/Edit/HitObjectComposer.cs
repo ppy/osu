@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -43,6 +44,9 @@ namespace osu.Game.Rulesets.Edit
 
         protected readonly Ruleset Ruleset;
 
+        // Provides `Playfield`
+        private DependencyContainer dependencies;
+
         [Resolved]
         protected EditorClock EditorClock { get; private set; }
 
@@ -60,14 +64,19 @@ namespace osu.Game.Rulesets.Edit
 
         private InputManager inputManager;
 
-        private RadioButtonCollection toolboxCollection;
+        private EditorRadioButtonCollection toolboxCollection;
 
         private FillFlowContainer togglesCollection;
+
+        private IBindable<bool> hasTiming;
 
         protected HitObjectComposer(Ruleset ruleset)
         {
             Ruleset = ruleset;
         }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
         private void load()
@@ -87,6 +96,8 @@ namespace osu.Game.Rulesets.Edit
                 Logger.Error(e, "Could not load beatmap successfully!");
                 return;
             }
+
+            dependencies.CacheAs(Playfield);
 
             const float toolbar_width = 200;
 
@@ -118,7 +129,7 @@ namespace osu.Game.Rulesets.Edit
                     {
                         new ToolboxGroup("toolbox (1-9)")
                         {
-                            Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X }
+                            Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X }
                         },
                         new ToolboxGroup("toggles (Q~P)")
                         {
@@ -152,6 +163,14 @@ namespace osu.Game.Rulesets.Edit
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
+
+            hasTiming = EditorBeatmap.HasTiming.GetBoundCopy();
+            hasTiming.BindValueChanged(timing =>
+            {
+                // it's important this is performed before the similar code in EditorRadioButton disables the button.
+                if (!timing.NewValue)
+                    setSelectTool();
+            });
         }
 
         public override Playfield Playfield => drawableRulesetWrapper.Playfield;
@@ -211,7 +230,8 @@ namespace osu.Game.Rulesets.Edit
 
                 if (item != null)
                 {
-                    item.Select();
+                    if (!item.Selected.Disabled)
+                        item.Select();
                     return true;
                 }
             }

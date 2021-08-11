@@ -35,6 +35,8 @@ namespace osu.Game.Tests.Visual.Editing
                         CanRotate = true,
                         CanScaleX = true,
                         CanScaleY = true,
+                        CanFlipX = true,
+                        CanFlipY = true,
 
                         OnRotation = handleRotation,
                         OnScale = handleScale

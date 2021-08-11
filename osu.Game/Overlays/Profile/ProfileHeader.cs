@@ -7,12 +7,14 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Overlays.Profile.Header;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile
 {
-    public class ProfileHeader : TabControlOverlayHeader<string>
+    public class ProfileHeader : TabControlOverlayHeader<LocalisableString>
     {
         private UserCoverBackground coverContainer;
 
@@ -27,8 +29,8 @@ namespace osu.Game.Overlays.Profile
 
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
-            TabControl.AddItem("info");
-            TabControl.AddItem("modding");
+            TabControl.AddItem(LayoutStrings.HeaderUsersShow);
+            TabControl.AddItem(LayoutStrings.HeaderUsersModding);
 
             centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }
@@ -96,7 +98,7 @@ namespace osu.Game.Overlays.Profile
         {
             public ProfileHeaderTitle()
             {
-                Title = "player info";
+                Title = PageTitleStrings.MainUsersControllerDefault;
                 IconTexture = "Icons/Hexacons/profile";
             }
         }

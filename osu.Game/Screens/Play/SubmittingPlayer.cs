@@ -10,7 +10,7 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
-using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Play
@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        private TaskCompletionSource<bool> scoreSubmissionSource;
+
         protected SubmittingPlayer(PlayerConfiguration configuration = null)
             : base(configuration)
         {
@@ -44,9 +46,9 @@ namespace osu.Game.Screens.Play
             // Token request construction should happen post-load to allow derived classes to potentially prepare DI backings that are used to create the request.
             var tcs = new TaskCompletionSource<bool>();
 
-            if (Mods.Value.Any(m => m is ModAutoplay))
+            if (Mods.Value.Any(m => !m.UserPlayable))
             {
-                handleTokenFailure(new InvalidOperationException("Autoplay loaded."));
+                handleTokenFailure(new InvalidOperationException("Non-user playable mod selected."));
                 return false;
             }
 
@@ -107,27 +109,18 @@ namespace osu.Game.Screens.Play
         {
             await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
 
-            // token may be null if the request failed but gameplay was still allowed (see HandleTokenRetrievalFailure).
-            if (token == null)
-                return;
+            score.ScoreInfo.Date = DateTimeOffset.Now;
 
-            var tcs = new TaskCompletionSource<bool>();
-            var request = CreateSubmissionRequest(score, token.Value);
+            await submitScore(score).ConfigureAwait(false);
+        }
 
-            request.Success += s =>
-            {
-                score.ScoreInfo.OnlineScoreID = s.ID;
-                tcs.SetResult(true);
-            };
+        public override bool OnExiting(IScreen next)
+        {
+            var exiting = base.OnExiting(next);
 
-            request.Failure += e =>
-            {
-                Logger.Error(e, "Failed to submit score");
-                tcs.SetResult(false);
-            };
+            submitScore(Score.DeepClone());
 
-            api.Queue(request);
-            await tcs.Task.ConfigureAwait(false);
+            return exiting;
         }
 
         /// <summary>
@@ -144,5 +137,37 @@ namespace osu.Game.Screens.Play
         /// <param name="score">The score to be submitted.</param>
         /// <param name="token">The submission token.</param>
         protected abstract APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token);
+
+        private Task submitScore(Score score)
+        {
+            // token may be null if the request failed but gameplay was still allowed (see HandleTokenRetrievalFailure).
+            if (token == null)
+                return Task.CompletedTask;
+
+            if (scoreSubmissionSource != null)
+                return scoreSubmissionSource.Task;
+
+            // if the user never hit anything, this score should not be counted in any way.
+            if (!score.ScoreInfo.Statistics.Any(s => s.Key.IsHit() && s.Value > 0))
+                return Task.CompletedTask;
+
+            scoreSubmissionSource = new TaskCompletionSource<bool>();
+            var request = CreateSubmissionRequest(score, token.Value);
+
+            request.Success += s =>
+            {
+                score.ScoreInfo.OnlineScoreID = s.ID;
+                scoreSubmissionSource.SetResult(true);
+            };
+
+            request.Failure += e =>
+            {
+                Logger.Error(e, "Failed to submit score");
+                scoreSubmissionSource.SetResult(false);
+            };
+
+            api.Queue(request);
+            return scoreSubmissionSource.Task;
+        }
     }
 }

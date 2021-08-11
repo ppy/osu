@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -26,6 +27,8 @@ namespace osu.Game.Skinning
         private float maxFillWidth;
 
         private bool isNewStyle;
+
+        public bool UsesFixedAnchor { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource source)
@@ -81,10 +84,10 @@ namespace osu.Game.Skinning
         private static Color4 getFillColour(double hp)
         {
             if (hp < 0.2)
-                return Interpolation.ValueAt(0.2 - hp, Color4.Black, Color4.Red, 0, 0.2);
+                return LegacyUtils.InterpolateNonLinear(0.2 - hp, Color4.Black, Color4.Red, 0, 0.2);
 
             if (hp < epic_cutoff)
-                return Interpolation.ValueAt(0.5 - hp, Color4.White, Color4.Black, 0, 0.5);
+                return LegacyUtils.InterpolateNonLinear(0.5 - hp, Color4.White, Color4.Black, 0, 0.5);
 
             return Color4.White;
         }
@@ -148,9 +151,9 @@ namespace osu.Game.Skinning
             }
         }
 
-        internal class LegacyOldStyleFill : LegacyHealthPiece
+        internal abstract class LegacyFill : LegacyHealthPiece
         {
-            public LegacyOldStyleFill(ISkin skin)
+            protected LegacyFill(ISkin skin)
             {
                 // required for sizing correctly..
                 var firstFrame = getTexture(skin, "colour-0");
@@ -162,27 +165,29 @@ namespace osu.Game.Skinning
                 }
                 else
                 {
-                    InternalChild = skin.GetAnimation("scorebar-colour", true, true, startAtCurrentTime: false, applyConfigFrameRate: true) ?? Drawable.Empty();
+                    InternalChild = skin.GetAnimation("scorebar-colour", true, true, startAtCurrentTime: false, applyConfigFrameRate: true) ?? Empty();
                     Size = new Vector2(firstFrame.DisplayWidth, firstFrame.DisplayHeight);
                 }
 
-                Position = new Vector2(3, 10) * 1.6f;
                 Masking = true;
             }
         }
 
-        internal class LegacyNewStyleFill : LegacyHealthPiece
+        internal class LegacyOldStyleFill : LegacyFill
+        {
+            public LegacyOldStyleFill(ISkin skin)
+                : base(skin)
+            {
+                Position = new Vector2(3, 10) * 1.6f;
+            }
+        }
+
+        internal class LegacyNewStyleFill : LegacyFill
         {
             public LegacyNewStyleFill(ISkin skin)
+                : base(skin)
             {
-                InternalChild = new Sprite
-                {
-                    Texture = getTexture(skin, "colour"),
-                };
-
-                Size = InternalChild.Size;
                 Position = new Vector2(7.5f, 7.8f) * 1.6f;
-                Masking = true;
             }
 
             protected override void Update()

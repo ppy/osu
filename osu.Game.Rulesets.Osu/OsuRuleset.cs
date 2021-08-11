@@ -166,6 +166,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModDifficultyAdjust(),
                         new OsuModClassic(),
                         new OsuModRandom(),
+                        new OsuModMirror(),
                     };
 
                 case ModType.Automation:
@@ -187,6 +188,8 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new ModWindUp(), new ModWindDown()),
                         new OsuModTraceable(),
                         new OsuModBarrelRoll(),
+                        new OsuModApproachDifferent(),
+                        new OsuModMuted(),
                     };
 
                 case ModType.System:
@@ -218,7 +221,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 
-        public override ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => new OsuLegacySkinTransformer(source);
+        public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new OsuLegacySkinTransformer(skin);
 
         public int LegacyID => 0;
 

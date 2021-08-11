@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.Gameplay
@@ -44,11 +46,9 @@ namespace osu.Game.Tests.Gameplay
         {
             TestDrawableHitObject dho = null;
             TestLifetimeEntry entry = null;
-            AddStep("Create DHO", () =>
+            AddStep("Create DHO", () => Child = dho = new TestDrawableHitObject
             {
-                dho = new TestDrawableHitObject(null);
-                dho.Apply(entry = new TestLifetimeEntry(new HitObject()));
-                Child = dho;
+                Entry = entry = new TestLifetimeEntry(new HitObject())
             });
 
             AddStep("KeepAlive = true", () =>
@@ -81,12 +81,10 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("Lifetime is updated", () => entry.LifetimeStart == -TestLifetimeEntry.INITIAL_LIFETIME_OFFSET);
 
             TestDrawableHitObject dho = null;
-            AddStep("Create DHO", () =>
+            AddStep("Create DHO", () => Child = dho = new TestDrawableHitObject
             {
-                dho = new TestDrawableHitObject(null);
-                dho.Apply(entry);
-                Child = dho;
-                dho.SetLifetimeStartOnApply = true;
+                Entry = entry,
+                SetLifetimeStartOnApply = true
             });
             AddStep("ApplyDefaults", () => entry.HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty()));
             AddAssert("Lifetime is correct", () => dho.LifetimeStart == TestDrawableHitObject.LIFETIME_ON_APPLY && entry.LifetimeStart == TestDrawableHitObject.LIFETIME_ON_APPLY);
@@ -97,11 +95,9 @@ namespace osu.Game.Tests.Gameplay
         {
             TestDrawableHitObject dho = null;
             TestLifetimeEntry entry = null;
-            AddStep("Create DHO", () =>
+            AddStep("Create DHO", () => Child = dho = new TestDrawableHitObject
             {
-                dho = new TestDrawableHitObject(null);
-                dho.Apply(entry = new TestLifetimeEntry(new HitObject()));
-                Child = dho;
+                Entry = entry = new TestLifetimeEntry(new HitObject())
             });
 
             AddStep("Set entry lifetime", () =>
@@ -127,6 +123,18 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("Drawable lifetime is restored", () => dho.LifetimeStart == 666 && dho.LifetimeEnd == 999);
         }
 
+        [Test]
+        public void TestStateChangeBeforeLoadComplete()
+        {
+            TestDrawableHitObject dho = null;
+            AddStep("Add DHO and apply result", () =>
+            {
+                Child = dho = new TestDrawableHitObject(new HitObject { StartTime = Time.Current });
+                dho.MissForcefully();
+            });
+            AddAssert("DHO state is correct", () => dho.State.Value == ArmedState.Miss);
+        }
+
         private class TestDrawableHitObject : DrawableHitObject
         {
             public const double INITIAL_LIFETIME_OFFSET = 100;
@@ -135,7 +143,7 @@ namespace osu.Game.Tests.Gameplay
 
             public bool SetLifetimeStartOnApply;
 
-            public TestDrawableHitObject(HitObject hitObject)
+            public TestDrawableHitObject(HitObject hitObject = null)
                 : base(hitObject)
             {
             }
@@ -146,6 +154,19 @@ namespace osu.Game.Tests.Gameplay
 
                 if (SetLifetimeStartOnApply)
                     LifetimeStart = LIFETIME_ON_APPLY;
+            }
+
+            public void MissForcefully() => ApplyResult(r => r.Type = HitResult.Miss);
+
+            protected override void UpdateHitStateTransforms(ArmedState state)
+            {
+                if (state != ArmedState.Miss)
+                {
+                    base.UpdateHitStateTransforms(state);
+                    return;
+                }
+
+                this.FadeOut(1000);
             }
         }
 

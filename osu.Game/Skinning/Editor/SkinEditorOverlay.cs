@@ -37,27 +37,44 @@ namespace osu.Game.Skinning.Editor
             switch (action)
             {
                 case GlobalAction.Back:
-                    if (skinEditor?.State.Value == Visibility.Visible)
-                    {
-                        skinEditor.ToggleVisibility();
-                        return true;
-                    }
+                    if (skinEditor?.State.Value != Visibility.Visible)
+                        break;
 
-                    break;
+                    Hide();
+                    return true;
 
                 case GlobalAction.ToggleSkinEditor:
-                    if (skinEditor == null)
-                    {
-                        LoadComponentAsync(skinEditor = new SkinEditor(target), AddInternal);
-                        skinEditor.State.BindValueChanged(editorVisibilityChanged);
-                    }
-                    else
-                        skinEditor.ToggleVisibility();
-
+                    Toggle();
                     return true;
             }
 
             return false;
+        }
+
+        public void Toggle()
+        {
+            if (skinEditor == null)
+                Show();
+            else
+                skinEditor.ToggleVisibility();
+        }
+
+        public override void Hide()
+        {
+            // base call intentionally omitted.
+            skinEditor.Hide();
+        }
+
+        public override void Show()
+        {
+            // base call intentionally omitted.
+            if (skinEditor == null)
+            {
+                LoadComponentAsync(skinEditor = new SkinEditor(target), AddInternal);
+                skinEditor.State.BindValueChanged(editorVisibilityChanged);
+            }
+            else
+                skinEditor.Show();
         }
 
         private void editorVisibilityChanged(ValueChangedEvent<Visibility> visibility)

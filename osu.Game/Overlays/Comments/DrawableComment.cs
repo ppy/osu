@@ -13,13 +13,13 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Bindables;
 using System.Linq;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Chat;
 using osu.Framework.Allocation;
 using System.Collections.Generic;
 using System;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Specialized;
+using osu.Framework.Localisation;
 using osu.Game.Overlays.Comments.Buttons;
 
 namespace osu.Game.Overlays.Comments
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Comments
         {
             LinkFlowContainer username;
             FillFlowContainer info;
-            LinkFlowContainer message;
+            CommentMarkdownContainer message;
             GridContainer content;
             VotePill votePill;
 
@@ -152,10 +152,12 @@ namespace osu.Game.Overlays.Comments
                                                         }
                                                     }
                                                 },
-                                                message = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
+                                                message = new CommentMarkdownContainer
                                                 {
                                                     RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y
+                                                    AutoSizeAxes = Axes.Y,
+                                                    DocumentMargin = new MarginPadding(0),
+                                                    DocumentPadding = new MarginPadding(0),
                                                 },
                                                 info = new FillFlowContainer
                                                 {
@@ -274,10 +276,7 @@ namespace osu.Game.Overlays.Comments
             }
 
             if (Comment.HasMessage)
-            {
-                var formattedSource = MessageFormatter.FormatText(Comment.Message);
-                message.AddLinks(formattedSource.Text, formattedSource.Links);
-            }
+                message.Text = Comment.Message;
 
             if (Comment.IsDeleted)
             {
@@ -395,7 +394,7 @@ namespace osu.Game.Overlays.Comments
 
         private class ParentUsername : FillFlowContainer, IHasTooltip
         {
-            public string TooltipText => getParentMessage();
+            public LocalisableString TooltipText => getParentMessage();
 
             private readonly Comment parentComment;
 
@@ -427,7 +426,7 @@ namespace osu.Game.Overlays.Comments
                 if (parentComment == null)
                     return string.Empty;
 
-                return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? @"deleted" : string.Empty;
+                return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? "deleted" : string.Empty;
             }
         }
     }

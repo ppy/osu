@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using MessagePack;
 using Newtonsoft.Json;
 using osu.Game.Online.API;
@@ -25,6 +24,9 @@ namespace osu.Game.Online.Multiplayer
         [Key(1)]
         public MultiplayerUserState State { get; set; } = MultiplayerUserState.Idle;
 
+        [Key(4)]
+        public MatchUserState? MatchState { get; set; }
+
         /// <summary>
         /// The availability state of the current beatmap.
         /// </summary>
@@ -35,7 +37,6 @@ namespace osu.Game.Online.Multiplayer
         /// Any mods applicable only to the local user.
         /// </summary>
         [Key(3)]
-        [NotNull]
         public IEnumerable<APIMod> Mods { get; set; } = Enumerable.Empty<APIMod>();
 
         [IgnoreMember]

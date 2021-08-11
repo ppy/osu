@@ -85,8 +85,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Scale = new Vector2(0.75f)
             };
 
-            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
-                mod.ApplyToDrawableHitObjects(new[] { drawableSpinner });
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObject>())
+                mod.ApplyToDrawableHitObject(drawableSpinner);
 
             return drawableSpinner;
         }

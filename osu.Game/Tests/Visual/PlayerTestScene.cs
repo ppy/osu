@@ -57,7 +57,9 @@ namespace osu.Game.Tests.Visual
 
         protected void LoadPlayer()
         {
-            var ruleset = Ruleset.Value.CreateInstance();
+            var ruleset = CreatePlayerRuleset();
+            Ruleset.Value = ruleset.RulesetInfo;
+
             var beatmap = CreateBeatmap(ruleset.RulesetInfo);
 
             Beatmap.Value = CreateWorkingBeatmap(beatmap);

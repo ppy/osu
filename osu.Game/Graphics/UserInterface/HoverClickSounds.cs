@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.UserInterface
         /// Array of button codes which should trigger the click sound.
         /// If this optional parameter is omitted or set to <code>null</code>, the click sound will only be played on left click.
         /// </param>
-        public HoverClickSounds(HoverSampleSet sampleSet = HoverSampleSet.Normal, MouseButton[] buttons = null)
+        public HoverClickSounds(HoverSampleSet sampleSet = HoverSampleSet.Default, MouseButton[] buttons = null)
             : base(sampleSet)
         {
             this.buttons = buttons ?? new[] { MouseButton.Left };
@@ -45,7 +45,8 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleClick = audio.Samples.Get($@"UI/generic-select{SampleSet.GetDescription()}");
+            sampleClick = audio.Samples.Get($@"UI/{SampleSet.GetDescription()}-select")
+                          ?? audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
         }
     }
 }

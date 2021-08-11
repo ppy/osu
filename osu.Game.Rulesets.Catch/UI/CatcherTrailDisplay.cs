@@ -2,13 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
-using osu.Framework.Graphics.Sprites;
-using osuTK;
+using osu.Game.Rulesets.Catch.Skinning;
+using osu.Game.Rulesets.Objects.Pooling;
+using osu.Game.Skinning;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
@@ -17,123 +17,119 @@ namespace osu.Game.Rulesets.Catch.UI
     /// Represents a component responsible for displaying
     /// the appropriate catcher trails when requested to.
     /// </summary>
-    public class CatcherTrailDisplay : CompositeDrawable
+    public class CatcherTrailDisplay : PooledDrawableWithLifetimeContainer<CatcherTrailEntry, CatcherTrail>
     {
-        private readonly Catcher catcher;
-
-        private readonly DrawablePool<CatcherTrailSprite> trailPool;
-
-        private readonly Container<CatcherTrailSprite> dashTrails;
-        private readonly Container<CatcherTrailSprite> hyperDashTrails;
-        private readonly Container<CatcherTrailSprite> endGlowSprites;
-
-        private Color4 hyperDashTrailsColour = Catcher.DEFAULT_HYPER_DASH_COLOUR;
-
-        public Color4 HyperDashTrailsColour
-        {
-            get => hyperDashTrailsColour;
-            set
-            {
-                if (hyperDashTrailsColour == value)
-                    return;
-
-                hyperDashTrailsColour = value;
-                hyperDashTrails.Colour = hyperDashTrailsColour;
-            }
-        }
-
-        private Color4 endGlowSpritesColour = Catcher.DEFAULT_HYPER_DASH_COLOUR;
-
-        public Color4 EndGlowSpritesColour
-        {
-            get => endGlowSpritesColour;
-            set
-            {
-                if (endGlowSpritesColour == value)
-                    return;
-
-                endGlowSpritesColour = value;
-                endGlowSprites.Colour = endGlowSpritesColour;
-            }
-        }
-
-        private bool trail;
-
         /// <summary>
-        /// Whether to start displaying trails following the catcher.
+        /// The most recent time a dash trail was added to this container.
+        /// Only alive (not faded out) trails are considered.
+        /// Returns <see cref="double.NegativeInfinity"/> if no dash trail is alive.
         /// </summary>
-        public bool DisplayTrail
+        public double LastDashTrailTime => getLastDashTrailTime();
+
+        public Color4 HyperDashTrailsColour => hyperDashTrails.Colour;
+
+        public Color4 HyperDashAfterImageColour => hyperDashAfterImages.Colour;
+
+        protected override bool RemoveRewoundEntry => true;
+
+        private readonly DrawablePool<CatcherTrail> trailPool;
+
+        private readonly Container<CatcherTrail> dashTrails;
+        private readonly Container<CatcherTrail> hyperDashTrails;
+        private readonly Container<CatcherTrail> hyperDashAfterImages;
+
+        [Resolved]
+        private ISkinSource skin { get; set; }
+
+        public CatcherTrailDisplay()
         {
-            get => trail;
-            set
-            {
-                if (trail == value)
-                    return;
-
-                trail = value;
-
-                if (trail)
-                    displayTrail();
-            }
-        }
-
-        public CatcherTrailDisplay([NotNull] Catcher catcher)
-        {
-            this.catcher = catcher ?? throw new ArgumentNullException(nameof(catcher));
-
             RelativeSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
             {
-                trailPool = new DrawablePool<CatcherTrailSprite>(30),
-                dashTrails = new Container<CatcherTrailSprite> { RelativeSizeAxes = Axes.Both },
-                hyperDashTrails = new Container<CatcherTrailSprite> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
-                endGlowSprites = new Container<CatcherTrailSprite> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
+                trailPool = new DrawablePool<CatcherTrail>(30),
+                dashTrails = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both },
+                hyperDashTrails = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
+                hyperDashAfterImages = new Container<CatcherTrail> { RelativeSizeAxes = Axes.Both, Colour = Catcher.DEFAULT_HYPER_DASH_COLOUR },
             };
         }
 
-        /// <summary>
-        /// Displays a single end-glow catcher sprite.
-        /// </summary>
-        public void DisplayEndGlow()
+        protected override void LoadComplete()
         {
-            var endGlow = createTrailSprite(endGlowSprites);
+            base.LoadComplete();
 
-            endGlow.MoveToOffset(new Vector2(0, -10), 1200, Easing.In);
-            endGlow.ScaleTo(endGlow.Scale * 0.95f).ScaleTo(endGlow.Scale * 1.2f, 1200, Easing.In);
-            endGlow.FadeOut(1200);
-            endGlow.Expire(true);
+            skin.SourceChanged += skinSourceChanged;
+            skinSourceChanged();
         }
 
-        private void displayTrail()
+        private void skinSourceChanged()
         {
-            if (!DisplayTrail)
-                return;
-
-            var sprite = createTrailSprite(catcher.HyperDashing ? hyperDashTrails : dashTrails);
-
-            sprite.FadeTo(0.4f).FadeOut(800, Easing.OutQuint);
-            sprite.Expire(true);
-
-            Scheduler.AddDelayed(displayTrail, catcher.HyperDashing ? 25 : 50);
+            hyperDashTrails.Colour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ?? Catcher.DEFAULT_HYPER_DASH_COLOUR;
+            hyperDashAfterImages.Colour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashAfterImage)?.Value ?? hyperDashTrails.Colour;
         }
 
-        private CatcherTrailSprite createTrailSprite(Container<CatcherTrailSprite> target)
+        protected override void AddDrawable(CatcherTrailEntry entry, CatcherTrail drawable)
         {
-            var texture = (catcher.CurrentDrawableCatcher as TextureAnimation)?.CurrentFrame ?? ((Sprite)catcher.CurrentDrawableCatcher).Texture;
+            switch (entry.Animation)
+            {
+                case CatcherTrailAnimation.Dashing:
+                    dashTrails.Add(drawable);
+                    break;
 
-            CatcherTrailSprite sprite = trailPool.Get();
+                case CatcherTrailAnimation.HyperDashing:
+                    hyperDashTrails.Add(drawable);
+                    break;
 
-            sprite.Texture = texture;
-            sprite.Anchor = catcher.Anchor;
-            sprite.Scale = catcher.Scale;
-            sprite.Blending = BlendingParameters.Additive;
-            sprite.RelativePositionAxes = catcher.RelativePositionAxes;
-            sprite.Position = catcher.Position;
+                case CatcherTrailAnimation.HyperDashAfterImage:
+                    hyperDashAfterImages.Add(drawable);
+                    break;
+            }
+        }
 
-            target.Add(sprite);
+        protected override void RemoveDrawable(CatcherTrailEntry entry, CatcherTrail drawable)
+        {
+            switch (entry.Animation)
+            {
+                case CatcherTrailAnimation.Dashing:
+                    dashTrails.Remove(drawable);
+                    break;
 
-            return sprite;
+                case CatcherTrailAnimation.HyperDashing:
+                    hyperDashTrails.Remove(drawable);
+                    break;
+
+                case CatcherTrailAnimation.HyperDashAfterImage:
+                    hyperDashAfterImages.Remove(drawable);
+                    break;
+            }
+        }
+
+        protected override CatcherTrail GetDrawable(CatcherTrailEntry entry)
+        {
+            CatcherTrail trail = trailPool.Get();
+            trail.Apply(entry);
+            return trail;
+        }
+
+        private double getLastDashTrailTime()
+        {
+            double maxTime = double.NegativeInfinity;
+
+            foreach (var trail in dashTrails)
+                maxTime = Math.Max(maxTime, trail.LifetimeStart);
+
+            foreach (var trail in hyperDashTrails)
+                maxTime = Math.Max(maxTime, trail.LifetimeStart);
+
+            return maxTime;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (skin != null)
+                skin.SourceChanged -= skinSourceChanged;
         }
     }
 }

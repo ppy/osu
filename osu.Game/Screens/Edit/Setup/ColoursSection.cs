@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -25,13 +26,14 @@ namespace osu.Game.Screens.Edit.Setup
                 comboColours = new LabelledColourPalette
                 {
                     Label = "Hitcircle / Slider Combos",
+                    FixedLabelWidth = LABEL_WIDTH,
                     ColourNamePrefix = "Combo"
                 }
             };
 
             var colours = Beatmap.BeatmapSkin?.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
             if (colours != null)
-                comboColours.Colours.AddRange(colours);
+                comboColours.Colours.AddRange(colours.Select(c => (Colour4)c));
         }
     }
 }

@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
 
             return new ConvertHit
             {
-                X = position.X,
+                Position = position,
                 NewCombo = newCombo,
                 ComboOffset = comboOffset
             };
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
 
             return new ConvertSlider
             {
-                X = position.X,
+                Position = position,
                 NewCombo = FirstObject || newCombo,
                 ComboOffset = comboOffset,
                 Path = new SliderPath(controlPoints, length),

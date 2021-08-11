@@ -24,6 +24,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -333,7 +334,7 @@ namespace osu.Game.Screens.Select
                     {
                         Name = "Length",
                         CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Length),
-                        Content = TimeSpan.FromMilliseconds(beatmap.BeatmapInfo.Length).ToString(@"m\:ss"),
+                        Content = beatmap.BeatmapInfo.Length.ToFormattedDuration().ToString(),
                     }),
                     bpmLabelContainer = new Container
                     {
@@ -431,7 +432,7 @@ namespace osu.Game.Screens.Select
 
             public class InfoLabel : Container, IHasTooltip
             {
-                public string TooltipText { get; }
+                public LocalisableString TooltipText { get; }
 
                 public InfoLabel(BeatmapStatistic statistic)
                 {
@@ -502,7 +503,7 @@ namespace osu.Game.Screens.Select
                 {
                     const float full_opacity_ratio = 0.7f;
 
-                    var difficultyColour = colours.ForDifficultyRating(difficulty.DifficultyRating);
+                    var difficultyColour = colours.ForStarDifficulty(difficulty.Stars);
 
                     Children = new Drawable[]
                     {

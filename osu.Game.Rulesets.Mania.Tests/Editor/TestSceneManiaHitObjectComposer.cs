@@ -12,7 +12,7 @@ using osu.Framework.Utils;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Edit;
-using osu.Game.Rulesets.Mania.Edit.Blueprints;
+using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Skinning.Default;
@@ -184,8 +184,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             AddAssert("head note positioned correctly", () => Precision.AlmostEquals(holdNote.ScreenSpaceDrawQuad.BottomLeft, holdNote.Head.ScreenSpaceDrawQuad.BottomLeft));
             AddAssert("tail note positioned correctly", () => Precision.AlmostEquals(holdNote.ScreenSpaceDrawQuad.TopLeft, holdNote.Tail.ScreenSpaceDrawQuad.BottomLeft));
 
-            AddAssert("head blueprint positioned correctly", () => this.ChildrenOfType<HoldNoteNoteOverlay>().ElementAt(0).DrawPosition == holdNote.Head.DrawPosition);
-            AddAssert("tail blueprint positioned correctly", () => this.ChildrenOfType<HoldNoteNoteOverlay>().ElementAt(1).DrawPosition == holdNote.Tail.DrawPosition);
+            AddAssert("head blueprint positioned correctly", () => this.ChildrenOfType<EditNotePiece>().ElementAt(0).DrawPosition == holdNote.Head.DrawPosition);
+            AddAssert("tail blueprint positioned correctly", () => this.ChildrenOfType<EditNotePiece>().ElementAt(1).DrawPosition == holdNote.Tail.DrawPosition);
         }
 
         private void setScrollStep(ScrollingDirection direction)
