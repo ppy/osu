@@ -5,18 +5,16 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 using osu.Game.Online.Rooms;
 using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Localisation;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
@@ -50,35 +48,27 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
                 AddRangeInternal(new Drawable[]
                 {
-                    new FillFlowContainer
+                    new MatchScoreDisplay
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
-                        {
-                            new MatchScoreDisplay
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Team1Score = { BindTarget = redScore },
-                                Team2Score = { BindTarget = blueScore },
-                            },
-                            (winnerText = new OsuSpriteText
-                            {
-                                Alpha = 0,
-                                Font = OsuFont.Torus.With(size: 40, weight: FontWeight.Bold),
-                                Text = MultiplayerResultsScreenStrings.TeamWins(winner)
-                            }).WithEffect(new GlowEffect
-                            {
-                                Colour = winnerColour,
-                            }).With(e =>
-                            {
-                                e.Anchor = Anchor.TopCentre;
-                                e.Origin = Anchor.TopCentre;
-                            })
-                        }
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Team1Score = { BindTarget = redScore },
+                        Team2Score = { BindTarget = blueScore },
                     },
+                    (winnerText = new OsuSpriteText
+                    {
+                        Alpha = 0,
+                        Font = OsuFont.Torus.With(size: 80, weight: FontWeight.Bold),
+                        Text = MultiplayerResultsScreenStrings.TeamWins(winner),
+                        Blending = BlendingParameters.Additive
+                    }).WithEffect(new GlowEffect
+                    {
+                        Colour = winnerColour,
+                    }).With(e =>
+                    {
+                        e.Anchor = Anchor.Centre;
+                        e.Origin = Anchor.Centre;
+                    })
                 });
             }
         }
@@ -95,7 +85,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     .ScaleTo(10)
                     .ScaleTo(1, 600, Easing.InQuad)
                     .Then()
-                    .ScaleTo(1.02f, 1600, Easing.OutQuint);
+                    .ScaleTo(1.02f, 1600, Easing.OutQuint)
+                    .FadeOut(5000, Easing.InQuad);
             }
         }
     }
